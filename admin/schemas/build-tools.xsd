@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:simpleType name="requirementType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="always"/>
+         <xs:enumeration value="when-used"/>
+      </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="booleanTextType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="true"/>
+         <xs:enumeration value="false"/>
+      </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="downloadType">
+      <xs:attribute name="url" type="xs:string" use="required"/>
+      <xs:attribute name="archive" type="xs:string" use="required"/>
+      <xs:attribute name="sha256" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="managedType">
+      <xs:sequence>
+         <xs:element name="download" type="downloadType"/>
+      </xs:sequence>
+      <xs:attribute name="root" type="xs:string" use="required"/>
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="bdsType">
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="candidateType">
+      <xs:attribute name="path" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="discoverType">
+      <xs:sequence>
+         <xs:element name="candidate" type="candidateType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+      <xs:attribute name="path" type="booleanTextType" use="optional" default="false"/>
+   </xs:complexType>
+
+   <xs:complexType name="argumentType">
+      <xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="probeType">
+      <xs:sequence>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="contains" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="toolType">
+      <xs:sequence>
+         <xs:choice>
+            <xs:element name="managed" type="managedType"/>
+            <xs:element name="bds" type="bdsType"/>
+            <xs:element name="discover" type="discoverType"/>
+         </xs:choice>
+         <xs:element name="probe" type="probeType" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+      <xs:attribute name="version" type="xs:string" use="required"/>
+      <xs:attribute name="runtimeVersion" type="xs:string" use="optional"/>
+      <xs:attribute name="required" type="requirementType" use="required"/>
+   </xs:complexType>
+
+   <xs:element name="buildTools">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="tool" type="toolType" minOccurs="1" maxOccurs="unbounded"/>
+         </xs:sequence>
+         <xs:attribute name="schemaVersion" type="xs:positiveInteger" use="required"/>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>

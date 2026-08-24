@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<buildTools xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="schemas/build-tools.xsd"
+            schemaVersion="1">
+   <tool id="git" version="2.55.0.3" runtimeVersion="2.55.0.windows.3" required="always">
+      <managed root="git\2.55.0.3" executable="cmd\git.exe">
+         <download url="https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.3/MinGit-2.55.0.3-64-bit.zip"
+                   archive="MinGit-2.55.0.3-64-bit.zip"
+                   sha256="f48e2d2dc74a24454adc6d8fd0ac25bf9c2386f19cfb06202b9465aaad4f9f05"/>
+      </managed>
+      <probe contains="git version 2.55.0.windows.3">
+         <argument value="--version"/>
+      </probe>
+   </tool>
+
+   <tool id="cmake" version="4.1.1" required="always">
+      <discover executable="cmake.exe" path="false">
+         <candidate path="{USERPROFILE}\Documents\Embarcadero\Studio\37.0\CatalogRepository\CMake-cb\4.1.1\bin\cmake.exe"/>
+      </discover>
+      <probe contains="cmake version 4.1.1">
+         <argument value="--version"/>
+      </probe>
+   </tool>
+
+   <tool id="ninja" version="1.13.2" required="always">
+      <managed root="ninja\1.13.2" executable="ninja.exe">
+         <download url="https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-win.zip"
+                   archive="ninja-1.13.2.zip"
+                   sha256="07fc8261b42b20e71d1720b39068c2e14ffcee6396b76fb7a795fb460b78dc65"/>
+      </managed>
+      <probe contains="1.13.2">
+         <argument value="--version"/>
+      </probe>
+   </tool>
+
+   <tool id="perl" version="5.42.2.1" runtimeVersion="5.42.2" required="always">
+      <managed root="perl\5.42.2.1" executable="perl\bin\perl.exe">
+         <download url="https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_54221_64bit/strawberry-perl-5.42.2.1-64bit-portable.zip"
+                   archive="strawberry-perl-5.42.2.1-64bit-portable.zip"
+                   sha256="32d83be90cf04b807cfb9477482bc36302cdee6f5b04cf57e81adecbd8f07898"/>
+      </managed>
+      <probe contains="v5.42.2">
+         <argument value="-e"/>
+         <argument value="print $^V"/>
+      </probe>
+   </tool>
+
+   <tool id="python" version="3.14.7" required="always">
+      <managed root="python\3.14.7" executable="python.exe">
+         <download url="https://www.python.org/ftp/python/3.14.7/python-3.14.7-embed-amd64.zip"
+                   archive="python-3.14.7-embed-amd64.zip"
+                   sha256="d297e5ff019966817ad8502465176139f2d3d840fa4ed84b13bed399a6ab1f15"/>
+      </managed>
+      <probe contains="Python 3.14.7">
+         <argument value="--version"/>
+      </probe>
+   </tool>
+
+   <tool id="bcc64x" version="20.1.7" required="always">
+      <bds executable="bin64\bcc64x.exe"/>
+   </tool>
+
+   <tool id="embarcadero-make" version="5.43" required="always">
+      <bds executable="bin\make.exe"/>
+   </tool>
+
+   <tool id="windows-rc" version="Windows-SDK" required="when-used">
+      <discover executable="rc.exe" path="true"/>
+   </tool>
+
+   <tool id="nasm" version="3.02" required="when-used">
+      <discover executable="nasm.exe" path="true"/>
+   </tool>
+</buildTools>

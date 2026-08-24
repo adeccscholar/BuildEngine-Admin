@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:simpleType name="archiveFormatType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="zip"/>
+         <xs:enumeration value="gzip"/>
+         <xs:enumeration value="gz"/>
+      </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="booleanTextType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="true"/>
+         <xs:enumeration value="false"/>
+      </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="cmakeModeType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="configure"/>
+         <xs:enumeration value="build"/>
+         <xs:enumeration value="install"/>
+      </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="environmentType">
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="argumentType">
+      <xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="variableType">
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="downloadActionType">
+      <xs:attribute name="url" type="xs:string" use="required"/>
+      <xs:attribute name="archive" type="xs:string" use="required"/>
+      <xs:attribute name="sha256" type="xs:string" use="optional"/>
+   </xs:complexType>
+
+   <xs:complexType name="extractActionType">
+      <xs:sequence>
+         <xs:element name="require" minOccurs="1" maxOccurs="unbounded">
+            <xs:complexType>
+               <xs:attribute name="path" type="xs:string" use="required"/>
+            </xs:complexType>
+         </xs:element>
+      </xs:sequence>
+      <xs:attribute name="format" type="archiveFormatType" use="required"/>
+      <xs:attribute name="root" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="copyActionType">
+      <xs:attribute name="source" type="xs:string" use="required"/>
+      <xs:attribute name="target" type="xs:string" use="required"/>
+      <xs:attribute name="recursive" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="overwrite" type="booleanTextType" use="optional" default="false"/>
+   </xs:complexType>
+
+   <xs:complexType name="requireActionType">
+      <xs:attribute name="path" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="cmakeActionType">
+      <xs:attribute name="mode" type="cmakeModeType" use="required"/>
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+      <xs:attribute name="source" type="xs:string" use="optional"/>
+      <xs:attribute name="build" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="sourceType">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+         <xs:element name="download" type="downloadActionType"/>
+         <xs:element name="extract" type="extractActionType"/>
+         <xs:element name="copy" type="copyActionType"/>
+      </xs:choice>
+   </xs:complexType>
+
+   <xs:complexType name="buildVariantType">
+      <xs:sequence>
+         <xs:element name="variable" type="variableType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="perVariantInstallType">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+         <xs:element name="cmake" type="cmakeActionType"/>
+         <xs:element name="copy" type="copyActionType"/>
+         <xs:element name="require" type="requireActionType"/>
+      </xs:choice>
+   </xs:complexType>
+
+   <xs:complexType name="commonInstallType">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+         <xs:element name="copy" type="copyActionType"/>
+         <xs:element name="require" type="requireActionType"/>
+      </xs:choice>
+   </xs:complexType>
+
+   <xs:complexType name="installType">
+      <xs:sequence>
+         <xs:element name="perVariant" type="perVariantInstallType"/>
+         <xs:element name="common" type="commonInstallType" minOccurs="0"/>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="buildType">
+      <xs:sequence>
+         <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="cmake" type="cmakeActionType" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element name="variant" type="buildVariantType" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element name="install" type="installType"/>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:element name="buildLibraries">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="library" minOccurs="1" maxOccurs="unbounded">
+               <xs:complexType>
+                  <xs:sequence>
+                     <xs:element name="source" type="sourceType"/>
+                     <xs:element name="build" type="buildType" minOccurs="0" maxOccurs="1"/>
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required"/>
+                  <xs:attribute name="version" type="xs:string" use="required"/>
+               </xs:complexType>
+            </xs:element>
+         </xs:sequence>
+         <xs:attribute name="schemaVersion" type="xs:positiveInteger" use="required"/>
+      </xs:complexType>
+      <xs:unique name="uniqueLibraryId">
+         <xs:selector xpath="library"/>
+         <xs:field xpath="@id"/>
+      </xs:unique>
+   </xs:element>
+</xs:schema>

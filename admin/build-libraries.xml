@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:noNamespaceSchemaLocation="schemas/build-libraries.xsd"
+                schemaVersion="3">
+   <library id="pugixml" version="1.16">
+      <source>
+         <download url="https://github.com/zeux/pugixml/releases/download/v{LibraryVersion}/pugixml-{LibraryVersion}.zip"
+                   archive="pugixml-{LibraryVersion}.zip"/>
+         <extract format="zip" root="pugixml-{LibraryVersion}">
+            <!-- Upstream source and build contract required by the real pugiXML 1.16 CMake project. -->
+            <require path="CMakeLists.txt"/>
+            <require path="src\pugixml.cpp"/>
+            <require path="src\pugixml.hpp"/>
+            <require path="src\pugiconfig.hpp"/>
+            <require path="scripts\pugixml-config.cmake.in"/>
+            <require path="scripts\pugixml.pc.in"/>
+            <require path="scripts\pugixml_dll.rc"/>
+            <require path="LICENSE.md"/>
+         </extract>
+      </source>
+
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+
+         <!-- Generic CMake invocation contract. -->
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+
+         <!--
+            pugiXML 1.16 upstream CMake options.  The BuildEngine does not
+            replace the library's CMakeLists.txt or package-config template.
+         -->
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DPUGIXML_BUILD_SHARED_AND_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DPUGIXML_INSTALL:BOOL=ON"/>
+         <argument value="-DPUGIXML_INSTALL_SOURCE:BOOL=OFF"/>
+         <argument value="-DPUGIXML_BUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DPUGIXML_USE_VERSIONED_LIBDIR:BOOL=OFF"/>
+         <argument value="-DPUGIXML_USE_POSTFIX:BOOL=OFF"/>
+         <argument value="-DPUGIXML_WCHAR_MODE:BOOL=OFF"/>
+         <argument value="-DPUGIXML_COMPACT:BOOL=OFF"/>
+         <argument value="-DPUGIXML_CHARCONV_FLOAT:BOOL=ON"/>
+         <argument value="-DPUGIXML_NO_XPATH:BOOL=OFF"/>
+         <argument value="-DPUGIXML_NO_STL:BOOL=OFF"/>
+         <argument value="-DPUGIXML_NO_EXCEPTIONS:BOOL=OFF"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=17"/>
+         <argument value="-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"/>
+         <argument value="-DCMAKE_CXX_EXTENSIONS:BOOL=OFF"/>
+
+         <cmake mode="configure" executable="{Tool:cmake}"
+                source="{Workspace}\pugixml-{LibraryVersion}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="BinaryName" value="pugixml"/>
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="BinaryName" value="pugixmld"/>
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <!-- CMake initializes DEBUG_POSTFIX on library targets from this variable. -->
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+
+         <!--
+            Current build gate only: install and verify declared files.
+            These <require> actions are not compile/link/runtime smoke tests.
+         -->
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BinaryName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BinaryName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\pugixml\pugixml-config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\pugixml\pugixml-config-version.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\pugixml\pugixml-targets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\pugixml\pugixml-targets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\pugixml.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\pugixml-{LibraryVersion}\LICENSE.md"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\pugixml-LICENSE.md"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\pugixml.hpp"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\pugiconfig.hpp"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\pugixml-LICENSE.md"/>
+            </common>
+         </install>
+      </build>
+   </library>
+</buildLibraries>

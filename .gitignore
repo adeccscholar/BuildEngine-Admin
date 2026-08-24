@@ -1,0 +1,15 @@
+# Local/editor files
+.vscode/
+.idea/
+*.user
+*.local
+*.bak
+*.tmp
+
+# Machine state belongs to the working installation, not to repository history.
+/admin/tools.xml
+/admin/machine-state.xml
+
+# Generated manifests/logs
+*.log
+*.part
