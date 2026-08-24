@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:noNamespaceSchemaLocation="schemas/build-libraries.xsd"
-                schemaVersion="3">
+                schemaVersion="4">
    <library id="pugixml" version="1.16">
       <source>
          <download url="https://github.com/zeux/pugixml/releases/download/v{LibraryVersion}/pugixml-{LibraryVersion}.zip"
@@ -106,4 +106,29 @@
          </install>
       </build>
    </library>
+
+   <library id="nlohmann-json" version="3.12.0">
+      <source>
+         <download url="https://github.com/nlohmann/json/releases/download/v{LibraryVersion}/include.zip"
+                   archive="nlohmann-json-{LibraryVersion}-include.zip"
+                   sha256="b8cb0ef2dd7f57f18933997c9934bb1fa962594f701cd5a8d3c2c80541559372"/>
+         <extract format="zip" root=".">
+            <require path="include\nlohmann\json.hpp"/>
+            <require path="include\nlohmann\json_fwd.hpp"/>
+            <require path="LICENSE.MIT"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\include\nlohmann"
+               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\nlohmann"
+               recursive="true" overwrite="true"/>
+         <copy source="{Workspace}\LICENSE.MIT"
+               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.MIT"
+               overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\nlohmann\json.hpp"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\nlohmann\json_fwd.hpp"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.MIT"/>
+      </install>
+   </library>
+
 </buildLibraries>

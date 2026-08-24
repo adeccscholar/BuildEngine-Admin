@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <smokeTests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="schemas/smoke-tests.xsd"
-            schemaVersion="2">
-   <!--
-      Smoke-test sources are version-independent and live in the separately
-      synchronized BuildEngineSmokeTests repository. Version applicability
-      belongs to this administrative contract.
-   -->
+            schemaVersion="3">
    <library id="pugixml">
-      <smoke id="installed-consumer-charconv"
-             source="pugixml\installed-consumer-charconv"
-             enabled="true"
-             minVersion="1.16">
-         <description value="Consume the installed upstream CMake package and verify the floating-point charconv path."/>
-         <variant name="Release"/>
-         <variant name="Debug"/>
+      <smoke id="installed-consumer-charconv" source="pugixml\installed-consumer-charconv" enabled="true" minVersion="1.16">
+         <description value="Consume the installed CMake package with BCC64X and verify the floating-point charconv path."/>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH"
+                      value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration};{ENV:PATH}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={ProductionRoot}\admin\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-Dpugixml_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\pugixml"/>
+         <cmake mode="configure" executable="{Tool:cmake}"
+                source="{SmokeRoot}\{SmokeSource}" build="{Workspace}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{Workspace}"/>
+         <execute executable="{Workspace}\pugixml-installed-consumer-charconv.exe"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+         </variant>
          <expectation kind="compile-definition" value="PUGIXML_CHARCONV_FLOAT"/>
          <expectation kind="package-target" value="pugixml::pugixml"/>
          <expectation kind="behavior" value="double-roundtrip"/>

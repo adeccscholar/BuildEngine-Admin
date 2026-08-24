@@ -1,55 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
    <xs:simpleType name="booleanTextType">
-      <xs:restriction base="xs:string">
-         <xs:enumeration value="true"/>
-         <xs:enumeration value="false"/>
-      </xs:restriction>
+      <xs:restriction base="xs:string"><xs:enumeration value="true"/><xs:enumeration value="false"/></xs:restriction>
    </xs:simpleType>
-
-   <xs:complexType name="descriptionType">
-      <xs:attribute name="value" type="xs:string" use="required"/>
+   <xs:simpleType name="cmakeModeType">
+      <xs:restriction base="xs:string"><xs:enumeration value="configure"/><xs:enumeration value="build"/></xs:restriction>
+   </xs:simpleType>
+   <xs:complexType name="descriptionType"><xs:attribute name="value" type="xs:string" use="required"/></xs:complexType>
+   <xs:complexType name="environmentType">
+      <xs:attribute name="name" type="xs:string" use="required"/><xs:attribute name="value" type="xs:string" use="required"/>
    </xs:complexType>
-
+   <xs:complexType name="argumentType"><xs:attribute name="value" type="xs:string" use="required"/></xs:complexType>
    <xs:complexType name="variantType">
+      <xs:sequence><xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
       <xs:attribute name="name" type="xs:string" use="required"/>
    </xs:complexType>
-
-   <xs:complexType name="expectationType">
-      <xs:attribute name="kind" type="xs:string" use="required"/>
-      <xs:attribute name="value" type="xs:string" use="required"/>
+   <xs:complexType name="cmakeType">
+      <xs:attribute name="mode" type="cmakeModeType" use="required"/><xs:attribute name="executable" type="xs:string" use="required"/>
+      <xs:attribute name="source" type="xs:string" use="optional"/><xs:attribute name="build" type="xs:string" use="required"/>
    </xs:complexType>
-
+   <xs:complexType name="executeType">
+      <xs:sequence><xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="expectationType">
+      <xs:attribute name="kind" type="xs:string" use="required"/><xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
    <xs:complexType name="smokeType">
       <xs:sequence>
-         <xs:element name="description" type="descriptionType" minOccurs="0" maxOccurs="1"/>
-         <xs:element name="variant" type="variantType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="description" type="descriptionType" minOccurs="0"/>
+         <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="cmake" type="cmakeType" minOccurs="2" maxOccurs="2"/>
+         <xs:element name="execute" type="executeType"/>
+         <xs:element name="variant" type="variantType" minOccurs="1" maxOccurs="unbounded"/>
          <xs:element name="expectation" type="expectationType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
-      <xs:attribute name="id" type="xs:string" use="required"/>
-      <xs:attribute name="source" type="xs:string" use="required"/>
-      <xs:attribute name="enabled" type="booleanTextType" use="required"/>
-      <xs:attribute name="minVersion" type="xs:string" use="optional"/>
+      <xs:attribute name="id" type="xs:string" use="required"/><xs:attribute name="source" type="xs:string" use="required"/>
+      <xs:attribute name="enabled" type="booleanTextType" use="required"/><xs:attribute name="minVersion" type="xs:string" use="optional"/>
       <xs:attribute name="maxVersion" type="xs:string" use="optional"/>
    </xs:complexType>
-
    <xs:complexType name="libraryType">
-      <xs:sequence>
-         <xs:element name="smoke" type="smokeType" minOccurs="1" maxOccurs="unbounded"/>
-      </xs:sequence>
+      <xs:sequence><xs:element name="smoke" type="smokeType" minOccurs="1" maxOccurs="unbounded"/></xs:sequence>
       <xs:attribute name="id" type="xs:string" use="required"/>
    </xs:complexType>
-
    <xs:element name="smokeTests">
       <xs:complexType>
-         <xs:sequence>
-            <xs:element name="library" type="libraryType" minOccurs="0" maxOccurs="unbounded"/>
-         </xs:sequence>
-         <xs:attribute name="schemaVersion" type="xs:positiveInteger" use="required"/>
+         <xs:sequence><xs:element name="library" type="libraryType" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
+         <xs:attribute name="schemaVersion" use="required" fixed="3"/>
       </xs:complexType>
-      <xs:unique name="uniqueSmokeLibraryId">
-         <xs:selector xpath="library"/>
-         <xs:field xpath="@id"/>
-      </xs:unique>
+      <xs:unique name="uniqueSmokeLibraryId"><xs:selector xpath="library"/><xs:field xpath="@id"/></xs:unique>
    </xs:element>
 </xs:schema>
