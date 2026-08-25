@@ -136,6 +136,12 @@
          <argument value="-DCMAKE_RC_COMPILER:FILEPATH={Tool:windows-rc}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <!--
+            Artifact contract:
+            - the runtime DLL;
+            - its import .lib used to link consumers against that DLL;
+            - an independent static .lib containing the library object code.
+         -->
          <argument value="-DZLIB_BUILD_SHARED:BOOL=ON"/>
          <argument value="-DZLIB_BUILD_STATIC:BOOL=ON"/>
          <argument value="-DZLIB_BUILD_TESTING:BOOL=ON"/>
@@ -240,7 +246,11 @@
          <argument value="-DENABLE_INSTALL:BOOL=ON"/>
          <argument value="-DENABLE_TEST:BOOL=ON"/>
 
-         <!-- Complete native TAR toolset and both shared/static libarchive artifacts. -->
+         <!--
+            Complete native TAR toolset.  The package contains the runtime DLL,
+            its import .lib and an independent static .lib.  The import library
+            is not the static library, although both use the .lib extension.
+         -->
          <argument value="-DENABLE_TAR:BOOL=ON"/>
          <argument value="-DENABLE_TAR_SHARED:BOOL=ON"/>
          <argument value="-DENABLE_CPIO:BOOL=ON"/>
