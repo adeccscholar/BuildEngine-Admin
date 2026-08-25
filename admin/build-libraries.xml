@@ -182,7 +182,7 @@
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <execute name="test" executable="{Tool:cmake}"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
-                        showOutput="true">
+                        showOutput="false">
                   <argument value="--build"/>
                   <argument value="."/>
                   <argument value="--target"/>
@@ -312,7 +312,7 @@
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <execute name="test" executable="{Tool:cmake}"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
-                        showOutput="true">
+                        showOutput="false">
                   <argument value="--build"/>
                   <argument value="."/>
                   <argument value="--target"/>
