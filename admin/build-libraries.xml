@@ -249,6 +249,7 @@
             <argument value="apply"/>
             <argument value="--check"/>
             <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{BuildFileDir}\patches\libarchive\3.8.9\bcc64x-modern-mbstate.patch"/>
          </execute>
@@ -256,6 +257,7 @@
                   workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/>
             <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{BuildFileDir}\patches\libarchive\3.8.9\bcc64x-modern-mbstate.patch"/>
          </execute>
