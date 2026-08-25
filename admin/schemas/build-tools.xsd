@@ -20,9 +20,17 @@
       <xs:attribute name="sha256" type="xs:string" use="required"/>
    </xs:complexType>
 
+   <xs:complexType name="externalExtractType">
+      <xs:sequence>
+         <xs:element name="argument" type="argumentType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+   </xs:complexType>
+
    <xs:complexType name="managedType">
       <xs:sequence>
          <xs:element name="download" type="downloadType"/>
+         <xs:element name="extract" type="externalExtractType" minOccurs="0"/>
       </xs:sequence>
       <xs:attribute name="root" type="xs:string" use="required"/>
       <xs:attribute name="executable" type="xs:string" use="required"/>
