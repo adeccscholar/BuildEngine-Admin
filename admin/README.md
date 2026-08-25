@@ -22,8 +22,10 @@ Repository-maintained compatibility patches reside below `patches/<library>/<ver
 
 For libarchive 3.8.9, `bcc64x-modern-mbstate.patch` limits an upstream legacy `__BORLANDC__` workaround to non-Clang compilers. BCC64X uses the modern Clang-based runtime headers, which already provide `mbstate_t` and `wcrtomb`.
 
-## Incremental phase timestamps
+## Incremental library timestamp and machine state
 
-Library schema 6 requires independent ISO 8601 `timestamp` attributes on `source`, `build`, and `install`. A timestamp is part of the declarative contract and must be advanced whenever that phase's inputs or actions change. Changing a source timestamp invalidates downstream build and package tokens; changing a dependency installation timestamp invalidates dependent builds and packages.
+Library schema 6 requires one ISO 8601 `library/@timestamp`. It describes when that complete library contract was provided or changed and must be advanced for every change to its source, build, test, installation, patch, or artifact requirements.
 
-Successful source jobs store their token below the downloads root, variant jobs inside their build directory, and installation jobs inside the versioned package directory. Missing directories, missing markers, or differing tokens schedule the affected phase again. `BuildEngine --rebuild` bypasses all current markers.
+After each successful phase, BuildEngine writes a machine-local state beside the corresponding download, variant-build, or versioned package area. The state contains the library contract timestamp, phase identity, configuration and relevant dependency timestamps plus `completedAt`, the UTC time at which that phase completed on the machine.
+
+Missing directories, missing states, or a contract mismatch schedule only the affected phase again. A changed dependency timestamp also invalidates dependent build and package states. `BuildEngine --rebuild` bypasses all current states.
