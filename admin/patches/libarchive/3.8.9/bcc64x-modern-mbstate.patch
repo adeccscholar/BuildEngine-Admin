@@ -1,9 +1,6 @@
 --- a/libarchive/archive_windows.h
 +++ b/libarchive/archive_windows.h
-@@ -294,7 +294,7 @@ extern void __la_dosmaperr(unsigned long e);
- extern struct archive_entry *__la_win_entry_in_posix_pathseparator(
-     struct archive_entry *);
- 
+@@ -297,4 +297,4 @@
 -#if defined(HAVE_WCRTOMB) && defined(__BORLANDC__)
 +#if defined(HAVE_WCRTOMB) && defined(__BORLANDC__) && !defined(__clang__)
  typedef int mbstate_t;
