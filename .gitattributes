@@ -7,5 +7,5 @@
 CMakeLists.txt text eol=crlf
 *.md text eol=crlf
 *.txt text eol=crlf
-*.patch text eol=crlf
+*.patch text eol=lf
 LICENSE text eol=crlf
