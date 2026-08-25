@@ -224,7 +224,7 @@
       </build>
    </library>
 
-   <library id="libarchive" version="3.8.9" timestamp="2026-08-25T20:47:08Z">
+   <library id="libarchive" version="3.8.9" timestamp="2026-08-25T20:58:43Z">
       <dependency library="zlib"/>
       <source>
          <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip"
@@ -239,6 +239,9 @@
             <require path="libarchive\archive_read_support_format_tar.c"/>
             <require path="tar\bsdtar.c"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\libarchive\3.8.9\bcc64x-modern-mbstate.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-mbstate.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
          <!--
             Local compatibility backpatch for the legacy __BORLANDC__
             mbstate_t declaration in libarchive's Windows compatibility
@@ -251,7 +254,7 @@
             <argument value="--no-index"/>
             <argument value="--unidiff-zero"/>
             <argument value="--whitespace=nowarn"/>
-            <argument value="{BuildFileDir}\patches\libarchive\3.8.9\bcc64x-modern-mbstate.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-mbstate.patch"/>
          </execute>
          <execute name="patch-apply" executable="{Tool:git}"
                   workingDirectory="{CurrentArtifact}" showOutput="false">
@@ -259,7 +262,7 @@
             <argument value="--no-index"/>
             <argument value="--unidiff-zero"/>
             <argument value="--whitespace=nowarn"/>
-            <argument value="{BuildFileDir}\patches\libarchive\3.8.9\bcc64x-modern-mbstate.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-mbstate.patch"/>
          </execute>
       </source>
 
