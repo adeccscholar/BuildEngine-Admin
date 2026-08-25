@@ -21,3 +21,9 @@ This Python extractor is the bootstrap bridge until the native libarchive packag
 Repository-maintained compatibility patches reside below `patches/<library>/<version>`. A patch is never a source substitute: the XML contract first downloads and completely extracts the verified upstream source, then checks the patch against that exact tree before applying it.
 
 For libarchive 3.8.9, `bcc64x-modern-mbstate.patch` limits an upstream legacy `__BORLANDC__` workaround to non-Clang compilers. BCC64X uses the modern Clang-based runtime headers, which already provide `mbstate_t` and `wcrtomb`.
+
+## Incremental phase timestamps
+
+Library schema 6 requires independent ISO 8601 `timestamp` attributes on `source`, `build`, and `install`. A timestamp is part of the declarative contract and must be advanced whenever that phase's inputs or actions change. Changing a source timestamp invalidates downstream build and package tokens; changing a dependency installation timestamp invalidates dependent builds and packages.
+
+Successful source jobs store their token below the downloads root, variant jobs inside their build directory, and installation jobs inside the versioned package directory. Missing directories, missing markers, or differing tokens schedule the affected phase again. `BuildEngine --rebuild` bypasses all current markers.
