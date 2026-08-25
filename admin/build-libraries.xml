@@ -138,6 +138,8 @@
          <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <!-- zlib appends /zlib to CMAKE_INSTALL_DOCDIR itself. -->
+         <argument value="-DCMAKE_INSTALL_DOCDIR:STRING=share/doc"/>
          <!--
             Artifact contract:
             - libz.dll/libzd.dll and the matching import .lib;
