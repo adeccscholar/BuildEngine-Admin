@@ -134,6 +134,7 @@
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\packages\zlib-artifact-names.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DGCOV_EXECUTABLE:FILEPATH={Tool:llvm-cov}"/>
          <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
@@ -181,12 +182,10 @@
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <!--
-                  zlib 1.3.2 requires an external llvm-cov executable for its
-                  Clang coverage report.  RAD Studio 13 does not provide it in
-                  the BDS directory.  No test is excluded: an unavailable
-                  coverage tool therefore remains a visible test failure.
-                  Nested CMake integration tests reuse Ninja by resolving it
-                  through the explicitly extended process PATH.
+                  zlib 1.3.2 uses the declared portable LLVM 20.1.7 llvm-cov
+                  tool in gcov compatibility mode.  No coverage or integration
+                  test is excluded.  Nested CMake integration tests reuse Ninja
+                  by resolving it through the explicitly extended process PATH.
                -->
                <execute name="test" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
