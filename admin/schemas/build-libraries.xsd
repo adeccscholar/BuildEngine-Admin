@@ -55,7 +55,6 @@
          <xs:element name="download" type="downloadActionType"/><xs:element name="extract" type="extractActionType"/>
          <xs:element name="copy" type="copyActionType"/><xs:element name="execute" type="executeActionType"/>
       </xs:choice>
-      <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
    </xs:complexType>
    <xs:complexType name="buildVariantType">
       <xs:sequence>
@@ -78,14 +77,12 @@
    </xs:complexType>
    <xs:complexType name="installType">
       <xs:sequence><xs:element name="perVariant" type="perVariantInstallType"/><xs:element name="common" type="commonInstallType" minOccurs="0"/></xs:sequence>
-      <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
    </xs:complexType>
    <xs:complexType name="directInstallType">
       <xs:choice minOccurs="1" maxOccurs="unbounded">
          <xs:element name="execute" type="executeActionType"/><xs:element name="copy" type="copyActionType"/>
          <xs:element name="require" type="requireActionType"/>
       </xs:choice>
-      <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
    </xs:complexType>
    <xs:complexType name="buildType">
       <xs:sequence>
@@ -97,7 +94,6 @@
          <xs:element name="variant" type="buildVariantType" minOccurs="1" maxOccurs="unbounded"/>
          <xs:element name="install" type="installType"/>
       </xs:sequence>
-      <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
    </xs:complexType>
 
    <xs:element name="buildLibraries">
@@ -113,6 +109,7 @@
                      <xs:choice><xs:element name="build" type="buildType"/><xs:element name="install" type="directInstallType"/></xs:choice>
                   </xs:sequence>
                   <xs:attribute name="id" type="xs:string" use="required"/><xs:attribute name="version" type="xs:string" use="required"/>
+                  <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
                </xs:complexType>
             </xs:element>
          </xs:sequence>
