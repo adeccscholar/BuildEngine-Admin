@@ -185,12 +185,16 @@
                   zlib 1.3.2 uses the declared portable LLVM 20.1.7 llvm-cov
                   tool in gcov compatibility mode.  No coverage or integration
                   test is excluded.  Nested CMake integration tests reuse Ninja
-                  by resolving it through the explicitly extended process PATH.
+                  through PATH.  CMAKE_PREFIX_PATH points at zlib's deliberately
+                  configuration-specific test installation, so find_package()
+                  can locate the generated ZLIBConfig.cmake.
                -->
                <execute name="test" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                         showOutput="false">
                   <environment name="PATH" value="{ToolDir:ninja};{ENV:PATH}"/>
+                  <environment name="CMAKE_PREFIX_PATH"
+                               value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\test_install\lib\win64\{Configuration}\cmake\zlib"/>
                   <argument value="--output-on-failure"/>
                </execute>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
