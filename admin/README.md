@@ -22,6 +22,8 @@ Repository-maintained compatibility patches reside below `patches/<library>/<ver
 
 For libarchive 3.8.9, `bcc64x-modern-mbstate.patch` limits an upstream legacy `__BORLANDC__` workaround to non-Clang compilers. BCC64X uses the modern Clang-based runtime headers, which already provide `mbstate_t` and `wcrtomb`.
 
+The repository copy remains the authoritative input. Before validation and application, the source contract copies it to `{Workspace}\\.buildengine\\patches\\<version>`, outside the synchronized `admin` tree. The generic copy action uses `preserveCurrentArtifact="true"`, so `{CurrentArtifact}` continues to identify the completely extracted upstream source.
+
 ## Incremental library timestamp and machine state
 
 Library schema 6 requires one ISO 8601 `library/@timestamp`. It describes when that complete library contract was provided or changed and must be advanced for every change to its source, build, test, installation, patch, or artifact requirements.
