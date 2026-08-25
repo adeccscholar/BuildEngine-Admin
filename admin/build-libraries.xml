@@ -60,7 +60,7 @@
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
          <variant name="Release">
-            <variable name="BinaryName" value="pugixml"/>
+            <variable name="BinaryName" value="libpugixml"/>
             <variable name="CMakeExportConfiguration" value="release"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -69,7 +69,7 @@
          </variant>
 
          <variant name="Debug">
-            <variable name="BinaryName" value="pugixmld"/>
+            <variable name="BinaryName" value="libpugixmld"/>
             <variable name="CMakeExportConfiguration" value="debug"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
@@ -102,6 +102,240 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\pugixml.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\pugiconfig.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\pugixml-LICENSE.md"/>
+            </common>
+         </install>
+      </build>
+   </library>
+
+   <library id="zlib" version="1.3.2">
+      <source>
+         <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib132.zip"
+                   archive="zlib-{LibraryVersion}.zip"
+                   sha256="e8bf55f3017aa181690990cb58a994e77885da140609fc8f94abe9b65d2cae28"/>
+         <extract format="zip" root="zlib-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="zlib.h"/>
+            <require path="zconf.h"/>
+            <require path="LICENSE"/>
+            <require path="win32\zlib1.rc"/>
+            <require path="test\example.c"/>
+            <require path="test\minigzip.c"/>
+         </extract>
+      </source>
+
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_RC_COMPILER:FILEPATH={Tool:windows-rc}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DZLIB_BUILD_SHARED:BOOL=ON"/>
+         <argument value="-DZLIB_BUILD_STATIC:BOOL=ON"/>
+         <argument value="-DZLIB_BUILD_TESTING:BOOL=ON"/>
+         <argument value="-DZLIB_INSTALL:BOOL=ON"/>
+         <argument value="-DZLIB_PREFIX:BOOL=OFF"/>
+
+         <cmake mode="configure" executable="{Tool:cmake}"
+                source="{Workspace}\zlib-{LibraryVersion}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="SharedName" value="libz"/>
+            <variable name="StaticName" value="libzs"/>
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="SharedName" value="libzd"/>
+            <variable name="StaticName" value="libzsd"/>
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <execute name="test" executable="{Tool:cmake}"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="true">
+                  <argument value="--build"/>
+                  <argument value="."/>
+                  <argument value="--target"/>
+                  <argument value="test"/>
+               </execute>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{StaticName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIBConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIBConfigVersion.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-shared.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-shared-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-static.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-static-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\zlib.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\zlib-{LibraryVersion}\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zlib.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zconf.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\man\man3\zlib.3"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\doc\zlib\algorithm.txt"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+   </library>
+
+   <library id="libarchive" version="3.8.9">
+      <dependency library="zlib"/>
+      <source>
+         <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip"
+                   archive="libarchive-{LibraryVersion}.zip"
+                   sha256="7b20200203d08866b62373dd51417798427ec67852928d71f142bfe578e9ea75"/>
+         <extract format="zip" root="libarchive-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="build\version"/>
+            <require path="libarchive\archive.h"/>
+            <require path="libarchive\archive_entry.h"/>
+            <require path="libarchive\archive_read_support_format_tar.c"/>
+            <require path="tar\bsdtar.c"/>
+         </extract>
+      </source>
+
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_RC_COMPILER:FILEPATH={Tool:windows-rc}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DENABLE_INSTALL:BOOL=ON"/>
+         <argument value="-DENABLE_TEST:BOOL=ON"/>
+
+         <!-- Complete native TAR toolset and both shared/static libarchive artifacts. -->
+         <argument value="-DENABLE_TAR:BOOL=ON"/>
+         <argument value="-DENABLE_TAR_SHARED:BOOL=ON"/>
+         <argument value="-DENABLE_CPIO:BOOL=ON"/>
+         <argument value="-DENABLE_CPIO_SHARED:BOOL=ON"/>
+         <argument value="-DENABLE_CAT:BOOL=ON"/>
+         <argument value="-DENABLE_CAT_SHARED:BOOL=ON"/>
+         <argument value="-DENABLE_UNZIP:BOOL=ON"/>
+         <argument value="-DENABLE_UNZIP_SHARED:BOOL=ON"/>
+
+         <!-- Declared compression/Windows backends; no accidental host-library pickup. -->
+         <argument value="-DENABLE_ZLIB:BOOL=ON"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
+         <argument value="-DENABLE_CNG:BOOL=ON"/>
+         <argument value="-DENABLE_WIN32_XMLLITE:BOOL=ON"/>
+         <argument value="-DENABLE_OPENSSL:BOOL=OFF"/>
+         <argument value="-DENABLE_MBEDTLS:BOOL=OFF"/>
+         <argument value="-DENABLE_NETTLE:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBB2:BOOL=OFF"/>
+         <argument value="-DENABLE_LZ4:BOOL=OFF"/>
+         <argument value="-DENABLE_LZO:BOOL=OFF"/>
+         <argument value="-DENABLE_LZMA:BOOL=OFF"/>
+         <argument value="-DENABLE_ZSTD:BOOL=OFF"/>
+         <argument value="-DENABLE_BZip2:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBXML2:BOOL=OFF"/>
+         <argument value="-DENABLE_EXPAT:BOOL=OFF"/>
+         <argument value="-DENABLE_PCREPOSIX:BOOL=OFF"/>
+         <argument value="-DENABLE_PCRE2POSIX:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBGCC:BOOL=OFF"/>
+         <argument value="-DENABLE_ICONV:BOOL=OFF"/>
+
+         <cmake mode="configure" executable="{Tool:cmake}"
+                source="{Workspace}\libarchive-{LibraryVersion}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="ArchiveName" value="libarchive"/>
+            <variable name="ArchiveStaticName" value="libarchive_static"/>
+            <variable name="ZlibLibraryName" value="libz"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="ArchiveName" value="libarchived"/>
+            <variable name="ArchiveStaticName" value="libarchive_staticd"/>
+            <variable name="ZlibLibraryName" value="libzd"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <execute name="test" executable="{Tool:cmake}"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="true">
+                  <argument value="--build"/>
+                  <argument value="."/>
+                  <argument value="--target"/>
+                  <argument value="test"/>
+               </execute>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{ArchiveName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdtar.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdcpio.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdcat.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdunzip.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{ArchiveName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{ArchiveStaticName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libarchive.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\share"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\libarchive-{LibraryVersion}\COPYING"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive_entry.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\man\man1\bsdtar.1"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
             </common>
          </install>
       </build>

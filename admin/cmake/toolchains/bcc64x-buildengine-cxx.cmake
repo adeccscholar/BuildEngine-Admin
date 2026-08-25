@@ -3,7 +3,7 @@
 # Project: adecc Scholar
 
 # RAD Studio 13 Florence / BCC64X / Win64 Modern.
-# BuildEngine BCC64X C++ profile derived from the proven project toolchain.
+# BuildEngine BCC64X C/C++ profile derived from the proven project toolchain.
 # It contains only generic compiler/linker integration.  It does not add
 # library-specific workarounds.  If an upstream project requires additional
 # generic tooling (for example Windows RC) and stock CMake cannot resolve it,
@@ -39,6 +39,7 @@ if(DEFINED ENV{CB_BDS} AND NOT "$ENV{CB_BDS}" STREQUAL "")
    unset(_BCC64X_RAD_INCLUDE_PATHS)
 endif()
 
+set(CMAKE_C_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C compiler" FORCE)
 set(CMAKE_CXX_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C++ compiler" FORCE)
 
 set(CMAKE_USER_MAKE_RULES_OVERRIDE
