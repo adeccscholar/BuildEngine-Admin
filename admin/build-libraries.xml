@@ -137,13 +137,11 @@
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <!--
-            Artifact contract:
-            - the runtime DLL;
-            - its import .lib used to link consumers against that DLL;
-            - an independent static .lib containing the library object code.
+            Artifact contract: the runtime DLL and its import .lib used to link
+            consumers against that DLL.  A separate static zlib is not built.
          -->
          <argument value="-DZLIB_BUILD_SHARED:BOOL=ON"/>
-         <argument value="-DZLIB_BUILD_STATIC:BOOL=ON"/>
+         <argument value="-DZLIB_BUILD_STATIC:BOOL=OFF"/>
          <argument value="-DZLIB_BUILD_TESTING:BOOL=ON"/>
          <argument value="-DZLIB_INSTALL:BOOL=ON"/>
          <argument value="-DZLIB_PREFIX:BOOL=OFF"/>
@@ -156,7 +154,6 @@
 
          <variant name="Release">
             <variable name="SharedName" value="libz"/>
-            <variable name="StaticName" value="libzs"/>
             <variable name="CMakeExportConfiguration" value="release"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -166,7 +163,6 @@
 
          <variant name="Debug">
             <variable name="SharedName" value="libzd"/>
-            <variable name="StaticName" value="libzsd"/>
             <variable name="CMakeExportConfiguration" value="debug"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
@@ -189,13 +185,10 @@
                </execute>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{StaticName}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIBConfig.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIBConfigVersion.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-shared.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-shared-{CMakeExportConfiguration}.cmake"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-static.cmake"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-static-{CMakeExportConfiguration}.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\zlib.pc"/>
             </perVariant>
             <common>
