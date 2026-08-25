@@ -180,13 +180,20 @@
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <execute name="test" executable="{Tool:cmake}"
+               <!--
+                  zlib 1.3.2 registers zlib_coverage-summary for Clang even when
+                  llvm-cov was not found.  The functional infcover test remains
+                  enabled; only the unavailable coverage report is excluded.
+                  Nested CMake integration tests reuse Ninja by resolving it
+                  through the explicitly extended process PATH.
+               -->
+               <execute name="test" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                         showOutput="false">
-                  <argument value="--build"/>
-                  <argument value="."/>
-                  <argument value="--target"/>
-                  <argument value="test"/>
+                  <environment name="PATH" value="{ToolDir:ninja};{ENV:PATH}"/>
+                  <argument value="--output-on-failure"/>
+                  <argument value="--exclude-regex"/>
+                  <argument value="^zlib_coverage-summary$"/>
                </execute>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
