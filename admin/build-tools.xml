@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildTools xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="schemas/build-tools.xsd"
-            schemaVersion="1">
+            schemaVersion="2">
    <tool id="git" version="2.55.0.3" runtimeVersion="2.55.0.windows.3" required="always">
       <managed root="git\2.55.0.3" executable="cmd\git.exe">
          <download url="https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.3/MinGit-2.55.0.3-64-bit.zip"
@@ -66,6 +66,34 @@
 
    <tool id="llvm-ar" version="20.1.7" required="when-used">
       <bds executable="bin64\llvm-ar.exe"/>
+   </tool>
+
+   <tool id="llvm-cov" version="20.1.7" required="when-used">
+      <managed root="llvm\20.1.7" executable="bin\llvm-cov.exe">
+         <download url="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/clang%2Bllvm-20.1.7-x86_64-pc-windows-msvc.tar.xz"
+                   archive="clang+llvm-20.1.7-x86_64-pc-windows-msvc.tar.xz"
+                   sha256="34a66bb4891584b32d32bbe5f129e345899b255593dab2c359b730b92e304b3e"/>
+         <extract executable="{Tool:python}">
+            <argument value="{ProductionRoot}\admin\programs\extract-tar-xz.py"/>
+            <argument value="--archive"/>
+            <argument value="{Archive}"/>
+            <argument value="--target"/>
+            <argument value="{ManagedRoot}"/>
+            <argument value="--root"/>
+            <argument value="clang+llvm-20.1.7-x86_64-pc-windows-msvc"/>
+            <argument value="--include"/>
+            <argument value="bin/llvm-cov.exe"/>
+            <argument value="--include"/>
+            <argument value="bin/*.dll"/>
+            <argument value="--include"/>
+            <argument value="LICENSE.TXT"/>
+            <argument value="--require"/>
+            <argument value="bin/llvm-cov.exe"/>
+         </extract>
+      </managed>
+      <probe contains="LLVM version 20.1.7">
+         <argument value="--version"/>
+      </probe>
    </tool>
 
    <tool id="windows-rc" version="Windows-SDK" required="when-used">
