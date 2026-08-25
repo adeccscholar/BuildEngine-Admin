@@ -134,7 +134,7 @@
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\packages\zlib-artifact-names.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-         <argument value="-DCMAKE_RC_COMPILER:FILEPATH={Tool:windows-rc}"/>
+         <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <!--
@@ -240,7 +240,7 @@
          <argument value="-Wno-dev"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-         <argument value="-DCMAKE_RC_COMPILER:FILEPATH={Tool:windows-rc}"/>
+         <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
