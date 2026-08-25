@@ -134,6 +134,7 @@
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\packages\zlib-artifact-names.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DGCOV_EXECUTABLE:FILEPATH={Tool:llvm-cov}"/>
          <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
@@ -181,9 +182,9 @@
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <!--
-                  zlib 1.3.2 registers zlib_coverage-summary for Clang even when
-                  llvm-cov was not found.  The functional infcover test remains
-                  enabled; only the unavailable coverage report is excluded.
+                  zlib 1.3.2 uses llvm-cov in gcov compatibility mode for its
+                  Clang coverage report.  GCOV_EXECUTABLE is resolved as a
+                  declared BDS tool during configuration; no test is excluded.
                   Nested CMake integration tests reuse Ninja by resolving it
                   through the explicitly extended process PATH.
                -->
@@ -192,8 +193,6 @@
                         showOutput="false">
                   <environment name="PATH" value="{ToolDir:ninja};{ENV:PATH}"/>
                   <argument value="--output-on-failure"/>
-                  <argument value="--exclude-regex"/>
-                  <argument value="^zlib_coverage-summary$"/>
                </execute>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
