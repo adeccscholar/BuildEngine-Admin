@@ -68,6 +68,10 @@
       <bds executable="bin64\llvm-ar.exe"/>
    </tool>
 
+   <tool id="llvm-cov" version="20.1.7" required="when-used">
+      <bds executable="bin64\llvm-cov.exe"/>
+   </tool>
+
    <tool id="windows-rc" version="Windows-SDK" required="when-used">
       <discover executable="rc.exe" path="true"/>
    </tool>
