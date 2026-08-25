@@ -224,7 +224,7 @@
       </build>
    </library>
 
-   <library id="libarchive" version="3.8.9" timestamp="2026-08-25T20:58:43Z">
+   <library id="libarchive" version="3.8.9" timestamp="2026-08-26T0:10:43Z">
       <dependency library="zlib"/>
       <source>
          <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip"
