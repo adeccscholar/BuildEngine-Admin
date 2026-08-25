@@ -239,6 +239,26 @@
             <require path="libarchive\archive_read_support_format_tar.c"/>
             <require path="tar\bsdtar.c"/>
          </extract>
+         <!--
+            Local compatibility backpatch for the legacy __BORLANDC__
+            mbstate_t declaration in libarchive's Windows compatibility
+            header.  The complete upstream source is extracted first.
+         -->
+         <execute name="patch-check" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{BuildFileDir}\patches\libarchive\3.8.9\bcc64x-modern-mbstate.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{BuildFileDir}\patches\libarchive\3.8.9\bcc64x-modern-mbstate.patch"/>
+         </execute>
       </source>
 
       <build>
