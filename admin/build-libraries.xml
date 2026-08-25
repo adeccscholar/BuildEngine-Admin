@@ -289,6 +289,12 @@
          <argument value="-DENABLE_BZip2:BOOL=OFF"/>
          <argument value="-DENABLE_LIBXML2:BOOL=OFF"/>
          <argument value="-DENABLE_EXPAT:BOOL=OFF"/>
+         <!--
+            BCC64X on Windows provides no libc POSIX regex implementation.
+            With AUTO, libarchive otherwise enters its PCRE/libgcc fallback
+            even though both optional regex backends are disabled below.
+         -->
+         <argument value="-DPOSIX_REGEX_LIB:STRING=NONE"/>
          <argument value="-DENABLE_PCREPOSIX:BOOL=OFF"/>
          <argument value="-DENABLE_PCRE2POSIX:BOOL=OFF"/>
          <argument value="-DENABLE_LIBGCC:BOOL=OFF"/>
