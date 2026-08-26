@@ -424,7 +424,7 @@
             The perl target materializes the OpenSSL Configure target file in the variant build tree.
          -->
          <environment name="PATH"
-                      value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
+                      value="{ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
 
          <execute name="remove-build" executable="{Tool:cmake}"
                   workingDirectory="{ProductionRoot}" showOutput="false">
@@ -443,26 +443,28 @@
                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                  showOutput="true">
             <parameter name="TargetName" value="BCC64X-WIN64"/>
-            <parameter name="BaseTarget" value="BASE_unix"/>
+            <parameter name="BaseTarget" value="BASE_Windows"/>
             <parameter name="CC" value="bcc64x"/>
             <parameter name="CXX" value="bcc64x"/>
+            <parameter name="CPP" value="bcc64x -E"/>
+            <parameter name="LD" value="bcc64x"/>
             <parameter name="AR" value="llvm-ar"/>
+            <parameter name="ARFlags" value="qc"/>
             <parameter name="RANLIB" value="llvm-ranlib"/>
             <parameter name="RC" value="bcc64x-windres"/>
             <parameter name="CFlags" value="{OpenSSLCFlags}"/>
-            <parameter name="CppFlags" value="-DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -D_MT"/>
-            <parameter name="LibCppFlags" value="-DL_ENDIAN"/>
-            <parameter name="SystemLibraries" value="-lws2_32 -lgdi32 -lcrypt32"/>
+            <parameter name="CppFlags" value=""/>
+            <parameter name="SystemLibraries" value="-lws2_32 -lgdi32 -lcrypt32 -luser32 -ladvapi32"/>
             <parameter name="ThreadScheme" value="winthreads"/>
-            <parameter name="DsoScheme" value="win32"/>
-            <parameter name="SharedTarget" value="mingw-shared"/>
+            <parameter name="DsoScheme" value="win64"/>
+            <parameter name="SharedTarget" value="win-shared"/>
             <parameter name="SharedCppFlags" value="_WINDLL"/>
-            <parameter name="PerlPlatform" value="mingw"/>
-            <parameter name="SysId" value="MINGW64"/>
+            <parameter name="PerlPlatform" value="Windows::cppbuilder"/>
+            <parameter name="SysId" value="WIN64"/>
             <parameter name="BnOps" value="SIXTY_FOUR_BIT"/>
             <parameter name="AsmArch" value="x86_64"/>
             <parameter name="PerlasmScheme" value="mingw64"/>
-            <parameter name="Multilib" value="64"/>
+            <parameter name="Multilib" value="-x64"/>
 
             <temporaryFile id="OpenSSLTargetConfig"
                            path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\BCC64X-WIN64.conf">
@@ -471,23 +473,36 @@
                <line value="        inherit_from    => [ '{Target:BaseTarget}' ],"/>
                <line value="        CC              => '{Target:CC}',"/>
                <line value="        CXX             => '{Target:CXX}',"/>
+               <line value="        CPP             => '{Target:CPP}',"/>
+               <line value="        LD              => '{Target:LD}',"/>
                <line value="        AR              => '{Target:AR}',"/>
+               <line value="        ARFLAGS         => '{Target:ARFlags}',"/>
                <line value="        RANLIB          => '{Target:RANLIB}',"/>
                <line value="        RC              => '{Target:RC}',"/>
                <line value="        CFLAGS          => '{Target:CFlags}',"/>
                <line value="        cppflags        => '{Target:CppFlags}',"/>
-               <line value="        lib_cppflags    => '{Target:LibCppFlags}',"/>
+               <line value="        defines         => add('WIN32_LEAN_AND_MEAN', 'OPENSSL_SYS_WIN64', 'L_ENDIAN', 'DSO_WIN32', '_stricmp=stricmp', '_strnicmp=strnicmp', '_setmode=setmode'),"/>
                <line value="        ex_libs         => add('{Target:SystemLibraries}'),"/>
                <line value="        thread_scheme   => '{Target:ThreadScheme}',"/>
                <line value="        dso_scheme      => '{Target:DsoScheme}',"/>
                <line value="        shared_target   => '{Target:SharedTarget}',"/>
                <line value="        shared_cppflags => add('{Target:SharedCppFlags}'),"/>
-               <line value="        shared_ldflag   => '',"/>
+               <line value="        lib_cflags      => shared('-D_WINDLL -D_DLL'),"/>
+               <line value="        coutflag        => '-o',"/>
+               <line value="        ldoutflag       => '-o',"/>
+               <line value="        ldpostoutflag   => '',"/>
+               <line value="        ld_resp_delim   => &quot; \n&quot;,"/>
+               <line value="        ar_resp_delim   => &quot; \n&quot;,"/>
+               <line value="        shared_ldflag   => '-shared',"/>
+               <line value="        ld_implib_flag  => '-Wl,--out-implib,',"/>
+               <line value="        lddefflag       => '',"/>
+               <line value="        ldresflag       => '',"/>
+               <line value="        rcoutflag       => '-o',"/>
                <line value="        perl_platform   => '{Target:PerlPlatform}',"/>
                <line value="        sys_id          => '{Target:SysId}',"/>
                <line value="        bn_ops          => add('{Target:BnOps}'),"/>
                <line value="        asm_arch        => '{Target:AsmArch}',"/>
-               <line value="        uplink_arch     => undef,"/>
+               <line value="        uplink_arch     => 'common',"/>
                <line value="        perlasm_scheme  => '{Target:PerlasmScheme}',"/>
                <line value="        shared_rcflag   => '',"/>
                <line value="        multilib        => '{Target:Multilib}',"/>
@@ -499,6 +514,7 @@
             <argument value="{Target:TargetName}"/>
             <argument value="shared"/>
             <argument value="no-asm"/>
+            <argument value="no-makedepend"/>
             <argument value="{OpenSSLBuildMode}"/>
             <argument value="--config={TargetFile:OpenSSLTargetConfig}"/>
             <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -506,10 +522,10 @@
             <argument value="--libdir=lib"/>
          </target>
 
-         <target name="build" type="gmake" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe"
+         <target name="build" type="bmake" executable="{Tool:embarcadero-make}"
                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                  showOutput="false">
-            <argument value="-j{ENV:NUMBER_OF_PROCESSORS}"/>
+            <argument value="-N"/>
             <argument value="build_sw"/>
          </target>
 
@@ -533,14 +549,16 @@
                   First native proof keeps test/install in the existing perVariant sequence.
                   Scheduler-level Release/Debug test parallelism remains a separate generic change.
                -->
-               <target name="test" type="gmake" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe"
+               <target name="test" type="bmake" executable="{Tool:embarcadero-make}"
                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                        showOutput="false">
+                  <argument value="-N"/>
                   <argument value="test"/>
                </target>
-               <target name="install-upstream" type="gmake" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe"
+               <target name="install-upstream" type="bmake" executable="{Tool:embarcadero-make}"
                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                        showOutput="false">
+                  <argument value="-N"/>
                   <argument value="install_sw"/>
                </target>
 
