@@ -14,6 +14,12 @@
       </xs:restriction>
    </xs:simpleType>
 
+   <xs:simpleType name="nativeExtractFormatType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="libarchive"/>
+      </xs:restriction>
+   </xs:simpleType>
+
    <xs:complexType name="downloadType">
       <xs:attribute name="url" type="xs:string" use="required"/>
       <xs:attribute name="archive" type="xs:string" use="required"/>
@@ -27,10 +33,26 @@
       <xs:attribute name="executable" type="xs:string" use="required"/>
    </xs:complexType>
 
+   <xs:complexType name="pathPatternType">
+      <xs:attribute name="path" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="nativeExtractType">
+      <xs:sequence>
+         <xs:element name="include" type="pathPatternType" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element name="require" type="pathPatternType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="format" type="nativeExtractFormatType" use="required"/>
+      <xs:attribute name="root" type="xs:string" use="required"/>
+   </xs:complexType>
+
    <xs:complexType name="managedType">
       <xs:sequence>
          <xs:element name="download" type="downloadType"/>
-         <xs:element name="extract" type="externalExtractType" minOccurs="0"/>
+         <xs:choice minOccurs="0">
+            <xs:element name="extract" type="externalExtractType"/>
+            <xs:element name="nativeExtract" type="nativeExtractType"/>
+         </xs:choice>
       </xs:sequence>
       <xs:attribute name="root" type="xs:string" use="required"/>
       <xs:attribute name="executable" type="xs:string" use="required"/>

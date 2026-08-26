@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:noNamespaceSchemaLocation="schemas/build-libraries.xsd"
-                schemaVersion="7">
+                schemaVersion="8">
    <library id="pugixml" version="1.16" timestamp="2026-08-25T18:30:00Z">
       <source>
          <download url="https://github.com/zeux/pugixml/releases/download/v{LibraryVersion}/pugixml-{LibraryVersion}.zip"
@@ -400,6 +400,206 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive_entry.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\man\man1\bsdtar.1"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+   </library>
+
+   <library id="openssl" version="3.5.8" timestamp="2026-08-26T18:30:00Z">
+      <source>
+         <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
+                   archive="openssl-{LibraryVersion}.tar.gz"
+                   sha256="a8f84a39918ec6415ce765d9b429d313ba97b8143169c172e734b9514464f5b2"/>
+         <extract format="libarchive" root="openssl-{LibraryVersion}">
+            <require path="Configure"/>
+            <require path="LICENSE.txt"/>
+            <require path="Configurations\10-main.conf"/>
+            <require path="Configurations\shared-info.pl"/>
+         </extract>
+      </source>
+
+      <build>
+         <!--
+            Native BCC64X OpenSSL build.  All OpenSSL target knowledge remains in this XML contract.
+            The perl target materializes the OpenSSL Configure target file in the variant build tree.
+         -->
+         <environment name="PATH"
+                      value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
+
+         <execute name="remove-build" executable="{Tool:cmake}"
+                  workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="remove_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <execute name="create-build" executable="{Tool:cmake}"
+                  workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+
+         <target name="configure" type="perl" executable="{Tool:perl}"
+                 workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                 showOutput="true">
+            <parameter name="TargetName" value="BCC64X-WIN64"/>
+            <parameter name="BaseTarget" value="BASE_unix"/>
+            <parameter name="CC" value="bcc64x"/>
+            <parameter name="CXX" value="bcc64x"/>
+            <parameter name="AR" value="llvm-ar"/>
+            <parameter name="RANLIB" value="llvm-ranlib"/>
+            <parameter name="RC" value="bcc64x-windres"/>
+            <parameter name="CFlags" value="{OpenSSLCFlags}"/>
+            <parameter name="CppFlags" value="-DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -D_MT"/>
+            <parameter name="LibCppFlags" value="-DL_ENDIAN"/>
+            <parameter name="SystemLibraries" value="-lws2_32 -lgdi32 -lcrypt32"/>
+            <parameter name="ThreadScheme" value="winthreads"/>
+            <parameter name="DsoScheme" value="win32"/>
+            <parameter name="SharedTarget" value="mingw-shared"/>
+            <parameter name="SharedCppFlags" value="_WINDLL"/>
+            <parameter name="PerlPlatform" value="mingw"/>
+            <parameter name="SysId" value="MINGW64"/>
+            <parameter name="BnOps" value="SIXTY_FOUR_BIT"/>
+            <parameter name="AsmArch" value="x86_64"/>
+            <parameter name="PerlasmScheme" value="mingw64"/>
+            <parameter name="Multilib" value="64"/>
+
+            <temporaryFile id="OpenSSLTargetConfig"
+                           path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\BCC64X-WIN64.conf">
+               <line value="my %targets = ("/>
+               <line value="    '{Target:TargetName}' => {{"/>
+               <line value="        inherit_from    => [ '{Target:BaseTarget}' ],"/>
+               <line value="        CC              => '{Target:CC}',"/>
+               <line value="        CXX             => '{Target:CXX}',"/>
+               <line value="        AR              => '{Target:AR}',"/>
+               <line value="        RANLIB          => '{Target:RANLIB}',"/>
+               <line value="        RC              => '{Target:RC}',"/>
+               <line value="        CFLAGS          => '{Target:CFlags}',"/>
+               <line value="        cppflags        => '{Target:CppFlags}',"/>
+               <line value="        lib_cppflags    => '{Target:LibCppFlags}',"/>
+               <line value="        ex_libs         => add('{Target:SystemLibraries}'),"/>
+               <line value="        thread_scheme   => '{Target:ThreadScheme}',"/>
+               <line value="        dso_scheme      => '{Target:DsoScheme}',"/>
+               <line value="        shared_target   => '{Target:SharedTarget}',"/>
+               <line value="        shared_cppflags => add('{Target:SharedCppFlags}'),"/>
+               <line value="        shared_ldflag   => '',"/>
+               <line value="        perl_platform   => '{Target:PerlPlatform}',"/>
+               <line value="        sys_id          => '{Target:SysId}',"/>
+               <line value="        bn_ops          => add('{Target:BnOps}'),"/>
+               <line value="        asm_arch        => '{Target:AsmArch}',"/>
+               <line value="        uplink_arch     => undef,"/>
+               <line value="        perlasm_scheme  => '{Target:PerlasmScheme}',"/>
+               <line value="        shared_rcflag   => '',"/>
+               <line value="        multilib        => '{Target:Multilib}',"/>
+               <line value="    }},"/>
+               <line value=");"/>
+            </temporaryFile>
+
+            <argument value="{Workspace}\openssl-{LibraryVersion}\Configure"/>
+            <argument value="{Target:TargetName}"/>
+            <argument value="shared"/>
+            <argument value="no-asm"/>
+            <argument value="{OpenSSLBuildMode}"/>
+            <argument value="--config={TargetFile:OpenSSLTargetConfig}"/>
+            <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="--openssldir={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ssl"/>
+            <argument value="--libdir=lib"/>
+         </target>
+
+         <target name="build" type="gmake" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe"
+                 workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                 showOutput="false">
+            <argument value="-j{ENV:NUMBER_OF_PROCESSORS}"/>
+            <argument value="build_sw"/>
+         </target>
+
+         <variant name="Release">
+            <variable name="OpenSSLBuildMode" value="--release"/>
+            <variable name="OpenSSLCFlags" value="-O2 -DNDEBUG"/>
+            <variable name="SslDll" value="libssl-3-x64.dll"/>
+            <variable name="CryptoDll" value="libcrypto-3-x64.dll"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="OpenSSLBuildMode" value="--debug"/>
+            <variable name="OpenSSLCFlags" value="-O0 -g"/>
+            <variable name="SslDll" value="libssl-3-x64.dll"/>
+            <variable name="CryptoDll" value="libcrypto-3-x64.dll"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <!--
+                  First native proof keeps test/install in the existing perVariant sequence.
+                  Scheduler-level Release/Debug test parallelism remains a separate generic change.
+               -->
+               <target name="test" type="gmake" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe"
+                       workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                       showOutput="false">
+                  <argument value="test"/>
+               </target>
+               <target name="install-upstream" type="gmake" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe"
+                       workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                       showOutput="false">
+                  <argument value="install_sw"/>
+               </target>
+
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+
+               <!-- Generate BCC64X COFF import libraries directly from the produced native DLLs. -->
+               <execute name="ssl-def" executable="{Tool:tdump}"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="false">
+                  <argument value="-def"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SslDll}"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libssl.def"/>
+               </execute>
+               <execute name="ssl-import-lib" executable="{Tool:ld-lld}"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="false">
+                  <argument value="-m"/>
+                  <argument value="i386pep"/>
+                  <argument value="--out-implib"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libssl.lib"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libssl.def"/>
+               </execute>
+               <execute name="crypto-def" executable="{Tool:tdump}"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="false">
+                  <argument value="-def"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CryptoDll}"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libcrypto.def"/>
+               </execute>
+               <execute name="crypto-import-lib" executable="{Tool:ld-lld}"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="false">
+                  <argument value="-m"/>
+                  <argument value="i386pep"/>
+                  <argument value="--out-implib"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcrypto.lib"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libcrypto.def"/>
+               </execute>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SslDll}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CryptoDll}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libssl.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcrypto.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\openssl-{LibraryVersion}\LICENSE.txt"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\ssl.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\crypto.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt"/>
             </common>
          </install>
       </build>
