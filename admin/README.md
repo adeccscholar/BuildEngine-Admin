@@ -20,7 +20,7 @@ This Python extractor is the bootstrap bridge until the native libarchive packag
 
 Repository-maintained compatibility patches reside below `patches/<library>/<version>`. A patch is never a source substitute: the XML contract first downloads and completely extracts the verified upstream source, then checks the patch against that exact tree before applying it.
 
-For libarchive 3.8.9, `bcc64x-modern-mbstate.patch` limits an upstream legacy `__BORLANDC__` workaround to non-Clang compilers. BCC64X uses the modern Clang-based runtime headers, which already provide `mbstate_t` and `wcrtomb`.
+For libarchive 3.8.9, `bcc64x-modern-borland-compat.patch` limits legacy `__BORLANDC__` compiler workarounds to non-Clang compilers. BCC64X also defines `__clang__` and therefore uses the modern Clang-compatible paths for inline handling, integer types and literals, Windows `lseek`/`mbstate_t` handling, `open` mode arguments, and the corresponding tests.
 
 The repository copy remains the authoritative input. Before validation and application, the source contract copies it to `{Workspace}\\.buildengine\\patches\\<version>`, outside the synchronized `admin` tree. The generic copy action uses `preserveCurrentArtifact="true"`, so `{CurrentArtifact}` continues to identify the completely extracted upstream source.
 

@@ -1,8 +1,0 @@
---- a/libarchive/archive_windows.h
-+++ b/libarchive/archive_windows.h
-@@ -297,4 +297,4 @@
--#if defined(HAVE_WCRTOMB) && defined(__BORLANDC__)
-+#if defined(HAVE_WCRTOMB) && defined(__BORLANDC__) && !defined(__clang__)
- typedef int mbstate_t;
- size_t wcrtomb(char *, wchar_t, mbstate_t *);
- #endif
