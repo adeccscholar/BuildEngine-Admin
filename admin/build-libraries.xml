@@ -405,7 +405,7 @@
       </build>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-26T18:30:00Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-26T22:30:00Z">
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
                    archive="openssl-{LibraryVersion}.tar.gz"
@@ -416,6 +416,32 @@
             <require path="Configurations\10-main.conf"/>
             <require path="Configurations\shared-info.pl"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.8\bcc64x-memory-barrier.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            BCC64X defines both __BORLANDC__ and __clang__. In the current
+            Embarcadero Win64/COFF headers the WinSDK MemoryBarrier macro used
+            by OpenSSL's Windows run-once implementation is not exposed, while
+            the Interlocked API is available. For Clang-based Embarcadero
+            compilers the patch publishes ONCE_DONE through InterlockedExchange,
+            which also provides the required full memory barrier.
+         -->
+         <execute name="patch-check" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch"/>
+         </execute>
       </source>
 
       <build>

@@ -1,0 +1,22 @@
+diff --git a/crypto/threads_win.c b/crypto/threads_win.c
+--- a/crypto/threads_win.c
++++ b/crypto/threads_win.c
+@@ -548,8 +548,18 @@ int CRYPTO_THREAD_run_once(CRYPTO_ONCE *once, void (*init)(void))
+              * just insert a memory barrier here to ensure that any pending
+              * writes are flushed to memory prior to setting ONCE_DONE below
+              */
++#if defined(__BORLANDC__) && defined(__clang__)
++            /*
++             * Clang-based Embarcadero Windows headers expose the Interlocked
++             * family but do not provide the MemoryBarrier macro used here.
++             * InterlockedExchange is a full memory barrier and publishes the
++             * completed state atomically.
++             */
++            (void)InterlockedExchange(lock, ONCE_DONE);
++#else
+             MemoryBarrier();
+             *lock = ONCE_DONE;
++#endif
+             return 1;
+         }
+     } while (result == ONCE_ININIT);
