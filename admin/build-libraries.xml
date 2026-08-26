@@ -405,7 +405,7 @@
       </build>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-26T22:30:00Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-26T23:10:00Z">
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
                    archive="openssl-{LibraryVersion}.tar.gz"
@@ -421,11 +421,12 @@
                overwrite="true" preserveCurrentArtifact="true"/>
          <!--
             BCC64X defines both __BORLANDC__ and __clang__. In the current
-            Embarcadero Win64/COFF headers the WinSDK MemoryBarrier macro used
-            by OpenSSL's Windows run-once implementation is not exposed, while
-            the Interlocked API is available. For Clang-based Embarcadero
-            compilers the patch publishes ONCE_DONE through InterlockedExchange,
-            which also provides the required full memory barrier.
+            Embarcadero Win64/COFF headers the WinSDK MemoryBarrier macro is
+            not exposed. OpenSSL 3.5.8 uses it in both Windows thread
+            implementations. The patch supplies the missing full fence locally
+            for Clang-based Embarcadero compilers through __atomic_thread_fence
+            with sequentially consistent ordering; upstream call sites remain
+            unchanged.
          -->
          <execute name="patch-check" executable="{Tool:git}"
                   workingDirectory="{CurrentArtifact}" showOutput="false">
