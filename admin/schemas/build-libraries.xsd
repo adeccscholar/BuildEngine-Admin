@@ -11,6 +11,7 @@
    </xs:simpleType>
    <xs:simpleType name="targetDriverType">
       <xs:restriction base="xs:string">
+         <xs:enumeration value="generic"/>
          <xs:enumeration value="cmake"/><xs:enumeration value="perl"/><xs:enumeration value="gmake"/>
          <xs:enumeration value="python"/><xs:enumeration value="bmake"/>
       </xs:restriction>

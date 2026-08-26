@@ -467,7 +467,7 @@
 
          <target name="configure" type="perl" executable="{Tool:perl}"
                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
-                 showOutput="true">
+                 showOutput="false">
             <parameter name="TargetName" value="BCC64X-WIN64"/>
             <parameter name="BaseTarget" value="BASE_Windows"/>
             <parameter name="CC" value="bcc64x"/>
