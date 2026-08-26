@@ -107,6 +107,19 @@ index fef7cf9..9af64ae 100644
  typedef int mbstate_t;
  size_t wcrtomb(char *, wchar_t, mbstate_t *);
  #endif
+diff --git a/libarchive/filter_fork_windows.c b/libarchive/filter_fork_windows.c
+index a0fd638..9fbf1c2 100644
+--- a/libarchive/filter_fork_windows.c
++++ b/libarchive/filter_fork_windows.c
+@@ -77,7 +77,7 @@ load_WaitForInputIdle(PINIT_ONCE InitOnce, PVOID Parameter, PVOID *Context) {
+ 	(void)Parameter; /* UNUSED */
+ 
+ 	*Context = (user32 != NULL) ?
+-	    (PVOID)GetProcAddress(user32, "WaitForInputIdle") : failing_wait;
++	    (PVOID)GetProcAddress(user32, "WaitForInputIdle") : (PVOID)failing_wait;
+ 
+ 	return TRUE;
+ }
 diff --git a/libarchive/test/test_open_fd.c b/libarchive/test/test_open_fd.c
 index bd73fb3..fecbcbb 100644
 --- a/libarchive/test/test_open_fd.c
@@ -121,10 +134,20 @@ index bd73fb3..fecbcbb 100644
  #else
  	fd = open("test.tar", O_RDWR | O_CREAT | O_BINARY, 0777);
 diff --git a/libarchive/test/test_read_data_large.c b/libarchive/test/test_read_data_large.c
-index 3718234..f4dc1d3 100644
+index 3718234..bb455c8 100644
 --- a/libarchive/test/test_read_data_large.c
 +++ b/libarchive/test/test_read_data_large.c
-@@ -92,7 +92,7 @@ DEFINE_TEST(test_read_data_large)
+@@ -35,6 +35,9 @@
+ #if defined(_WIN32) && !defined(__CYGWIN__)
+ #define open _open
+ #define close _close
++#ifdef ftruncate
++#undef ftruncate
++#endif
+ #define ftruncate _chsize
+ #endif
+ 
+@@ -92,7 +95,7 @@ DEFINE_TEST(test_read_data_large)
  	assertA(0 == archive_read_support_filter_all(a));
  	assertA(0 == archive_read_open_memory(a, buff1, sizeof(buff1)));
  	assertA(0 == archive_read_next_header(a, &ae));

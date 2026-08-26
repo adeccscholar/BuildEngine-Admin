@@ -224,7 +224,7 @@
       </build>
    </library>
 
-   <library id="libarchive" version="3.8.9" timestamp="2026-08-26T13:49:00Z">
+   <library id="libarchive" version="3.8.9" timestamp="2026-08-26T17:20:00Z">
       <dependency library="zlib"/>
       <source>
          <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip"
@@ -244,10 +244,19 @@
                overwrite="true" preserveCurrentArtifact="true"/>
          <!--
             BCC64X compatibility backpatch for legacy __BORLANDC__ compiler
-            branches. BCC64X also defines __clang__ and must use the modern
-            Clang paths for inline handling, integer types and literals,
-            Windows lseek/mbstate_t handling, open mode arguments, and tests.
-            The complete upstream source is extracted first.
+            branches. BCC64X also defines __clang__ and must therefore use the
+            modern Clang-compatible paths for inline handling, integer types
+            and literals, Windows lseek/mbstate_t handling, open mode arguments,
+            and the corresponding tests.
+
+            The patch also includes the upstream Windows/Clang fix from commit
+            f75ed3a20526ef4ec2f46ee94216b6efd01eab0a for filter_fork_windows.c.
+            In test_read_data_large.c, an existing ftruncate macro is explicitly
+            undefined before libarchive maps ftruncate to _chsize, avoiding the
+            BCC64X MinGW macro redefinition while keeping Debug -Werror enabled.
+
+            The complete verified upstream source is extracted before the patch
+            is checked and applied.
          -->
          <execute name="patch-check" executable="{Tool:git}"
                   workingDirectory="{CurrentArtifact}" showOutput="false">
