@@ -405,7 +405,7 @@
       </build>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-26T23:40:00Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-27T01:10:43Z">
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
                    archive="openssl-{LibraryVersion}.tar.gz"
@@ -556,7 +556,7 @@
                <line value="        sys_id          => '{Target:SysId}',"/>
                <line value="        bn_ops          => add('{Target:BnOps}'),"/>
                <line value="        asm_arch        => '{Target:AsmArch}',"/>
-               <line value="        uplink_arch     => 'common',"/>
+               <line value="        uplink_arch     => 'x86_64',"/>
                <line value="        perlasm_scheme  => '{Target:PerlasmScheme}',"/>
                <line value="        shared_rcflag   => '',"/>
                <line value="        multilib        => '{Target:Multilib}',"/>
@@ -576,7 +576,7 @@
             <argument value="--libdir=lib"/>
          </target>
 
-         <target name="build" type="bmake" executable="{Tool:embarcadero-make}"
+         <target name="build" type="gmake" executable="{Tool:embarcadero-make}"
                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                  showOutput="false">
             <argument value="-N"/>
@@ -603,13 +603,13 @@
                   First native proof keeps test/install in the existing perVariant sequence.
                   Scheduler-level Release/Debug test parallelism remains a separate generic change.
                -->
-               <target name="test" type="bmake" executable="{Tool:embarcadero-make}"
+               <target name="test" type="gmake" executable="{Tool:embarcadero-make}"
                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                        showOutput="false">
                   <argument value="-N"/>
                   <argument value="test"/>
                </target>
-               <target name="install-upstream" type="bmake" executable="{Tool:embarcadero-make}"
+               <target name="install-upstream" type="gmake" executable="{Tool:embarcadero-make}"
                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                        showOutput="false">
                   <argument value="-N"/>
