@@ -405,7 +405,7 @@
       </build>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-27T02:27:00Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-27T03:00:00Z">
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
                    archive="openssl-{LibraryVersion}.tar.gz"
@@ -523,7 +523,7 @@
          <target name="configure" type="perl" executable="{Tool:perl}"
                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                  showOutput="false">
-            <parameter name="TargetName" value="BCC64X-WIN64"/>
+            <parameter name="TargetName" value="BC-64X"/>
             <parameter name="BaseTarget" value="BASE_Windows"/>
             <parameter name="CC" value="bcc64x"/>
             <parameter name="CXX" value="bcc64x"/>
@@ -553,7 +553,7 @@
             <parameter name="LdRespForwardSlashes" value="1"/>
 
             <temporaryFile id="OpenSSLTargetConfig"
-                           path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\BCC64X-WIN64.conf">
+                           path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\BC-64X.conf">
                <line value="my %targets = ("/>
                <line value="    '{Target:TargetName}' => {{"/>
                <line value="        inherit_from    => [ '{Target:BaseTarget}' ],"/>
