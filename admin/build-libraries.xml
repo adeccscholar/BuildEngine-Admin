@@ -334,7 +334,7 @@
       </build>
    </library>
 
-   <library id="zstd" version="1.5.7" timestamp="2026-08-27T14:06:09Z">
+   <library id="zstd" version="1.5.7" timestamp="2026-08-27T15:40:00Z">
       <source>
          <!-- Official GitHub tag archive.  It represents the unmodified v1.5.7
               source tree while using the already proven ZIP extraction path. -->
@@ -353,6 +353,32 @@
             <require path="build\cmake\lib\CMakeLists.txt"/>
             <require path="build\cmake\tests\CMakeLists.txt"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\zstd\1.5.7\bcc64x-static-import-library-name.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-static-import-library-name.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            Zstd already gives the static library a distinct zstd_static base name
+            for MSVC and Windows Clang so that it cannot collide with the shared
+            library import .lib. CMake identifies BCC64X as an Embarcadero/Borland
+            compiler family rather than plain Clang, although BCC64X uses the same
+            COFF .lib naming for static and import libraries. Extend only that
+            upstream compiler-family test; no artifact name is invented here.
+         -->
+         <execute name="static-name-patch-check" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-static-import-library-name.patch"/>
+         </execute>
+         <execute name="static-name-patch-apply" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-static-import-library-name.patch"/>
+         </execute>
       </source>
 
       <build>
@@ -361,7 +387,8 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
 
-         <!-- Stock Zstd 1.5.7 CMake build.  In particular, lib/common/mem.h is not patched. -->
+         <!-- Zstd 1.5.7 CMake build with the isolated Windows static/import-name compatibility patch above.
+              lib/common/mem.h remains completely unmodified. -->
          <argument value="-G"/>
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
