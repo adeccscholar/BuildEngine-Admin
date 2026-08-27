@@ -405,7 +405,7 @@
       </build>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-27T03:00:00Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-27T03:50:00Z">
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
                    archive="openssl-{LibraryVersion}.tar.gz"
@@ -497,6 +497,31 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-quic-winsock-inline.patch"/>
          </execute>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.8\bcc64x-pdb-platform.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-pdb-platform.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            OpenSSL's Windows::cppbuilder platform still models the legacy
+            C++Builder debug sidecar as .tds. BCC64X is the modern COFF/LLD
+            toolchain and uses PDB debug information instead. The patch adds a
+            dedicated Windows::bcc64x platform that inherits the existing
+            C++Builder behavior and overrides only the debug-file extension.
+         -->
+         <execute name="pdb-platform-patch-check" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-pdb-platform.patch"/>
+         </execute>
+         <execute name="pdb-platform-patch-apply" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-pdb-platform.patch"/>
+         </execute>
       </source>
 
       <build>
@@ -538,12 +563,13 @@
             <parameter name="AsFlags" value="-Ox -f win64 -DNEAR"/>
             <parameter name="AsOutFlag" value="-o "/>
             <parameter name="CFlags" value="{OpenSSLCFlags}"/>
+            <parameter name="LDFlags" value="-g"/>
             <parameter name="SystemLibraries" value="-lws2_32 -lgdi32 -lcrypt32 -luser32 -ladvapi32"/>
             <parameter name="ThreadScheme" value="winthreads"/>
             <parameter name="DsoScheme" value="win64"/>
             <parameter name="SharedTarget" value="win-shared"/>
             <parameter name="SharedCppFlags" value="_WINDLL"/>
-            <parameter name="PerlPlatform" value="Windows::cppbuilder"/>
+            <parameter name="PerlPlatform" value="Windows::bcc64x"/>
             <parameter name="SysId" value="WIN64"/>
             <parameter name="BnOps" value="SIXTY_FOUR_BIT"/>
             <parameter name="UplinkArch" value="x86_64"/>
@@ -570,6 +596,7 @@
                <line value="        asflags         => '{Target:AsFlags}',"/>
                <line value="        asoutflag       => '{Target:AsOutFlag}',"/>
                <line value="        CFLAGS          => '{Target:CFlags}',"/>
+               <line value="        LDFLAGS         => '{Target:LDFlags}',"/>
                <line value="        defines         => add('WIN32_LEAN_AND_MEAN', 'OPENSSL_SYS_WIN64', 'L_ENDIAN', 'DSO_WIN32', '_stricmp=stricmp', '_strnicmp=strnicmp', '_setmode=setmode'),"/>
                <line value="        ex_libs         => add('{Target:SystemLibraries}'),"/>
                <line value="        thread_scheme   => '{Target:ThreadScheme}',"/>
