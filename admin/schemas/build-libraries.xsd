@@ -45,11 +45,16 @@
       <xs:attribute name="recursive" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="overwrite" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="preserveCurrentArtifact" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
-   <xs:complexType name="requireActionType"><xs:attribute name="path" type="xs:string" use="required"/></xs:complexType>
+   <xs:complexType name="requireActionType">
+      <xs:attribute name="path" type="xs:string" use="required"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+   </xs:complexType>
    <xs:complexType name="cmakeActionType">
       <xs:attribute name="mode" type="cmakeModeType" use="required"/><xs:attribute name="executable" type="xs:string" use="required"/>
       <xs:attribute name="source" type="xs:string" use="optional"/><xs:attribute name="build" type="xs:string" use="required"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
    <xs:complexType name="executeActionType">
       <xs:sequence>
@@ -61,6 +66,7 @@
       <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
       <xs:attribute name="successExitCode" type="xs:unsignedInt" use="optional" default="0"/>
       <xs:attribute name="showOutput" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
    <xs:complexType name="targetParameterType">
       <xs:attribute name="name" type="xs:string" use="required"/>
@@ -92,6 +98,7 @@
       <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
       <xs:attribute name="successExitCode" type="xs:unsignedInt" use="optional" default="0"/>
       <xs:attribute name="showOutput" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
    <xs:complexType name="sourceType">
       <xs:choice minOccurs="1" maxOccurs="unbounded">

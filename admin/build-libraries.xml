@@ -107,7 +107,7 @@
       </build>
    </library>
 
-   <library id="zlib" version="1.3.2" timestamp="2026-08-25T18:30:00Z">
+   <library id="zlib" version="1.3.2" timestamp="2026-08-27T17:52:00Z">
       <source>
          <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib132.zip"
                    archive="zlib-{LibraryVersion}.zip"
@@ -148,7 +148,7 @@
          -->
          <argument value="-DZLIB_BUILD_SHARED:BOOL=ON"/>
          <argument value="-DZLIB_BUILD_STATIC:BOOL=ON"/>
-         <argument value="-DZLIB_BUILD_TESTING:BOOL=ON"/>
+         <argument value="-DZLIB_BUILD_TESTING:BOOL={TestsEnabled}"/>
          <argument value="-DZLIB_INSTALL:BOOL=ON"/>
          <argument value="-DZLIB_PREFIX:BOOL=OFF"/>
 
@@ -191,7 +191,7 @@
                   configuration-specific test installation, so find_package()
                   can locate the generated ZLIBConfig.cmake.
                -->
-               <execute name="test" executable="{ToolDir:cmake}\ctest.exe"
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                         showOutput="false">
                   <environment name="PATH" value="{ToolDir:ninja};{ENV:PATH}"/>
@@ -224,7 +224,7 @@
       </build>
    </library>
 
-   <library id="brotli" version="1.2.0" timestamp="2026-08-27T14:06:09Z">
+   <library id="brotli" version="1.2.0" timestamp="2026-08-27T17:52:00Z">
       <source>
          <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz"
                    archive="brotli-{LibraryVersion}.tar.gz"
@@ -260,7 +260,7 @@
          <argument value="-DBROTLI_BUILD_FOR_PACKAGE:BOOL=ON"/>
          <argument value="-DBROTLI_BUILD_TOOLS:BOOL=ON"/>
          <argument value="-DBROTLI_BUNDLED_MODE:BOOL=OFF"/>
-         <argument value="-DBROTLI_DISABLE_TESTS:BOOL=OFF"/>
+         <argument value="-DBROTLI_DISABLE_TESTS:BOOL={TestsDisabled}"/>
 
          <cmake mode="configure" executable="{Tool:cmake}"
                 source="{Workspace}\brotli-{LibraryVersion}"
@@ -302,7 +302,7 @@
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <execute name="test" executable="{ToolDir:cmake}\ctest.exe"
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                         showOutput="false">
                   <argument value="--output-on-failure"/>
@@ -334,7 +334,7 @@
       </build>
    </library>
 
-   <library id="zstd" version="1.5.7" timestamp="2026-08-27T16:30:00Z">
+   <library id="zstd" version="1.5.7" timestamp="2026-08-27T17:52:00Z">
       <source>
          <!-- Official GitHub tag archive.  It represents the unmodified v1.5.7
               source tree while using the already proven ZIP extraction path. -->
@@ -391,7 +391,7 @@
          <!-- Separate, non-installed validation world. Zstd's upstream CMake tests
               require libzstd_static, therefore the static library is generated only
               here and never becomes a production/install artifact. -->
-         <execute name="validation-configure" executable="{Tool:cmake}"
+         <execute name="validation-configure" test="true" executable="{Tool:cmake}"
                   workingDirectory="{Workspace}\zstd-{LibraryVersion}\build\cmake" showOutput="false">
             <argument value="-S"/>
             <argument value="{Workspace}\zstd-{LibraryVersion}\build\cmake"/>
@@ -415,13 +415,13 @@
             <argument value="-DZSTD_LEGACY_SUPPORT:BOOL=ON"/>
             <argument value="-DZSTD_MULTITHREAD_SUPPORT:BOOL=ON"/>
          </execute>
-         <execute name="validation-build" executable="{Tool:cmake}"
+         <execute name="validation-build" test="true" executable="{Tool:cmake}"
                   workingDirectory="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                   showOutput="false">
             <argument value="--build"/>
             <argument value="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
-         <execute name="validation-test" executable="{ToolDir:cmake}\ctest.exe"
+         <execute name="validation-test" test="true" executable="{ToolDir:cmake}\ctest.exe"
                   workingDirectory="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                   showOutput="false">
             <argument value="--output-on-failure"/>
@@ -485,7 +485,7 @@
       </build>
    </library>
 
-   <library id="libarchive" version="3.8.9" timestamp="2026-08-26T17:20:00Z">
+   <library id="libarchive" version="3.8.9" timestamp="2026-08-27T17:52:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <source>
          <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip"
@@ -553,7 +553,7 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DENABLE_INSTALL:BOOL=ON"/>
-         <argument value="-DENABLE_TEST:BOOL=ON"/>
+         <argument value="-DENABLE_TEST:BOOL={TestsEnabled}"/>
 
          <!--
             Complete native TAR toolset.  The package contains the runtime DLL,
@@ -624,7 +624,7 @@
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <execute name="test" executable="{Tool:cmake}"
+               <execute name="test" test="true" executable="{Tool:cmake}"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                         showOutput="false">
                   <argument value="--build"/>
@@ -666,7 +666,10 @@
       </build>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-27T03:50:00Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-27T20:30:00Z">
+      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="brotli" version="1.2.0"/>
+      <dependency library="zstd" version="1.5.7"/>
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
                    archive="openssl-{LibraryVersion}.tar.gz"
@@ -806,6 +809,41 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
 
+         <!--
+            OpenSSL 3.5.8 expects unprefixed Brotli import-library filenames on Windows
+            (brotlicommon.lib, brotlidec.lib, brotlienc.lib).  The upstream Brotli/BCC64X
+            producer correctly installs libbrotli*.lib.  Keep the producer artifacts
+            untouched and create private consumer-side aliases in the OpenSSL build tree.
+            The COFF import descriptors still reference the original libbrotli*.dll names.
+         -->
+         <execute name="create-compression-imports" executable="{Tool:cmake}"
+                  workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs"/>
+         </execute>
+         <execute name="brotli-common-import-alias" executable="{Tool:cmake}"
+                  workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="copy_if_different"/>
+            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlicommon.lib"/>
+         </execute>
+         <execute name="brotli-dec-import-alias" executable="{Tool:cmake}"
+                  workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="copy_if_different"/>
+            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlidec.lib"/>
+         </execute>
+         <execute name="brotli-enc-import-alias" executable="{Tool:cmake}"
+                  workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="copy_if_different"/>
+            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlienc.lib"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlienc.lib"/>
+         </execute>
+
          <target name="configure" type="perl" executable="{Tool:perl}"
                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                  showOutput="false">
@@ -893,6 +931,15 @@
             <argument value="shared"/>
             <argument value="no-asm"/>
             <argument value="no-makedepend"/>
+            <argument value="zlib"/>
+            <argument value="enable-brotli"/>
+            <argument value="enable-zstd"/>
+            <argument value="--with-zlib-include={InstallRoot}\packages\zlib\1.3.2\include"/>
+            <argument value="--with-zlib-lib={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
+            <argument value="--with-brotli-include={InstallRoot}\packages\brotli\1.2.0\include"/>
+            <argument value="--with-brotli-lib={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs"/>
+            <argument value="--with-zstd-include={InstallRoot}\packages\zstd\1.5.7\include"/>
+            <argument value="--with-zstd-lib={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
             <argument value="{OpenSSLBuildMode}"/>
             <argument value="--config={TargetFile:OpenSSLTargetConfig}"/>
             <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -910,6 +957,7 @@
          <variant name="Release">
             <variable name="OpenSSLBuildMode" value="--release"/>
             <variable name="OpenSSLCFlags" value="-O2 -DNDEBUG"/>
+            <variable name="ZlibImportLibrary" value="libz.lib"/>
             <variable name="SslDll" value="libssl-3-x64.dll"/>
             <variable name="CryptoDll" value="libcrypto-3-x64.dll"/>
          </variant>
@@ -917,6 +965,7 @@
          <variant name="Debug">
             <variable name="OpenSSLBuildMode" value="--debug"/>
             <variable name="OpenSSLCFlags" value="-O0 -g"/>
+            <variable name="ZlibImportLibrary" value="libzd.lib"/>
             <variable name="SslDll" value="libssl-3-x64.dll"/>
             <variable name="CryptoDll" value="libcrypto-3-x64.dll"/>
          </variant>
@@ -927,7 +976,7 @@
                   First native proof keeps test/install in the existing perVariant sequence.
                   Scheduler-level Release/Debug test parallelism remains a separate generic change.
                -->
-               <target name="test" type="gmake" executable="{Tool:embarcadero-make}"
+               <target name="test" test="true" type="gmake" executable="{Tool:embarcadero-make}"
                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                        showOutput="false">
                   <argument value="-N"/>
