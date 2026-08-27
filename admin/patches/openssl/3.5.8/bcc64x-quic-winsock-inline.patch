@@ -1,0 +1,30 @@
+diff --git a/ssl/quic/quic_reactor.c b/ssl/quic/quic_reactor.c
+--- a/ssl/quic/quic_reactor.c
++++ b/ssl/quic/quic_reactor.c
+@@ -13,8 +13,24 @@
+ 
+ #if defined(OPENSSL_SYS_WINDOWS)
+ #include <winsock2.h>
+-#include <mstcpip.h>
+-#include <mswsock.h>
++# if defined(__BORLANDC__) && defined(__clang__)
++/*
++ * The Microsoft SDK headers mstcpip.h and mswsockdef.h use GNU-style
++ * extern inline declarations for non-MSVC compilers. BCC64X uses Clang
++ * C inline semantics, which emits out-of-line definitions and leaves these
++ * unused helpers with unresolved SDK dependencies. This file only needs
++ * the two UDP reset IOCTL values from mstcpip.h/mswsock.h on Windows.
++ */
++#  ifndef SIO_UDP_CONNRESET
++#   define SIO_UDP_CONNRESET _WSAIOW(IOC_VENDOR, 12)
++#  endif
++#  ifndef SIO_UDP_NETRESET
++#   define SIO_UDP_NETRESET _WSAIOW(IOC_VENDOR, 15)
++#  endif
++# else
++#  include <mstcpip.h>
++#  include <mswsock.h>
++# endif
+ #endif
+ 
+ /*
