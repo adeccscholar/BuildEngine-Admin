@@ -194,6 +194,7 @@
                <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                         showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <environment name="PATH" value="{ToolDir:ninja};{ENV:PATH}"/>
                   <environment name="CMAKE_PREFIX_PATH"
                                value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\test_install\lib\win64\{Configuration}\cmake\zlib"/>
@@ -305,6 +306,7 @@
                <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                         showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <argument value="--output-on-failure"/>
                </execute>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CommonSharedName}.dll"/>
@@ -424,6 +426,7 @@
          <execute name="validation-test" test="true" executable="{ToolDir:cmake}\ctest.exe"
                   workingDirectory="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                   showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
             <argument value="--output-on-failure"/>
          </execute>
 
@@ -627,6 +630,7 @@
                <execute name="test" test="true" executable="{Tool:cmake}"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                         showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <argument value="--build"/>
                   <argument value="."/>
                   <argument value="--target"/>
@@ -979,6 +983,7 @@
                <target name="test" test="true" type="gmake" executable="{Tool:embarcadero-make}"
                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                        showOutput="false">
+                  <environment name="HARNESS_JOBS" value="{TestJobs}"/>
                   <argument value="-N"/>
                   <argument value="test"/>
                </target>
