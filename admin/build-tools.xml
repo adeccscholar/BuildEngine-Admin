@@ -109,15 +109,11 @@
    </tool>
 
    <tool id="nasm" version="3.02" required="always">
-      <managed root="nasm\3.02" executable="nasm.exe">
-         <download url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/win64/nasm-3.02-win64.zip"
-                   archive="nasm-3.02-win64.zip"
-                   sha256="161d0bfaff53c2f9e9f3e69fd0672323ebabafd1268976a5cec11be92a19aee7"/>
-         <nativeExtract format="libarchive" root="nasm-3.02">
-            <include path="nasm.exe"/>
-            <include path="ndisasm.exe"/>
-            <require path="nasm.exe"/>
-         </nativeExtract>
+      <managed root="nasm\3.02" executable="nasm-3.02\nasm.exe">
+         <download
+            url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/win64/nasm-3.02-win64.zip"
+            archive="nasm-3.02-win64.zip"
+            sha256="161d0bfaff53c2f9e9f3e69fd0672323ebabafd1268976a5cec11be92a19aee7"/>
       </managed>
       <probe contains="NASM version 3.02">
          <argument value="-v"/>
