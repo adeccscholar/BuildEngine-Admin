@@ -334,7 +334,7 @@
       </build>
    </library>
 
-   <library id="zstd" version="1.5.7" timestamp="2026-08-27T15:40:00Z">
+   <library id="zstd" version="1.5.7" timestamp="2026-08-27T16:30:00Z">
       <source>
          <!-- Official GitHub tag archive.  It represents the unmodified v1.5.7
               source tree while using the already proven ZIP extraction path. -->
@@ -353,32 +353,6 @@
             <require path="build\cmake\lib\CMakeLists.txt"/>
             <require path="build\cmake\tests\CMakeLists.txt"/>
          </extract>
-         <copy source="{BuildFileDir}\patches\zstd\1.5.7\bcc64x-static-import-library-name.patch"
-               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-static-import-library-name.patch"
-               overwrite="true" preserveCurrentArtifact="true"/>
-         <!--
-            Zstd already gives the static library a distinct zstd_static base name
-            for MSVC and Windows Clang so that it cannot collide with the shared
-            library import .lib. CMake identifies BCC64X as an Embarcadero/Borland
-            compiler family rather than plain Clang, although BCC64X uses the same
-            COFF .lib naming for static and import libraries. Extend only that
-            upstream compiler-family test; no artifact name is invented here.
-         -->
-         <execute name="static-name-patch-check" executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/>
-            <argument value="--check"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-static-import-library-name.patch"/>
-         </execute>
-         <execute name="static-name-patch-apply" executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-static-import-library-name.patch"/>
-         </execute>
       </source>
 
       <build>
@@ -387,8 +361,9 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
 
-         <!-- Zstd 1.5.7 CMake build with the isolated Windows static/import-name compatibility patch above.
-              lib/common/mem.h remains completely unmodified. -->
+         <!-- Production contract: shared Zstd only. Static linkage exists exclusively
+              in the separate validation build tree used for upstream tests.
+              The upstream source, including lib/common/mem.h, remains unmodified. -->
          <argument value="-G"/>
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
@@ -397,11 +372,12 @@
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
-         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <argument value="-DZSTD_BUILD_SHARED:BOOL=ON"/>
-         <argument value="-DZSTD_BUILD_STATIC:BOOL=ON"/>
+         <argument value="-DZSTD_BUILD_STATIC:BOOL=OFF"/>
          <argument value="-DZSTD_BUILD_PROGRAMS:BOOL=ON"/>
-         <argument value="-DZSTD_BUILD_TESTS:BOOL=ON"/>
+         <argument value="-DZSTD_PROGRAMS_LINK_SHARED:BOOL=ON"/>
+         <argument value="-DZSTD_BUILD_TESTS:BOOL=OFF"/>
          <argument value="-DZSTD_BUILD_CONTRIB:BOOL=OFF"/>
          <argument value="-DZSTD_LEGACY_SUPPORT:BOOL=ON"/>
          <argument value="-DZSTD_MULTITHREAD_SUPPORT:BOOL=ON"/>
@@ -412,9 +388,50 @@
          <cmake mode="build" executable="{Tool:cmake}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
+         <!-- Separate, non-installed validation world. Zstd's upstream CMake tests
+              require libzstd_static, therefore the static library is generated only
+              here and never becomes a production/install artifact. -->
+         <execute name="validation-configure" executable="{Tool:cmake}"
+                  workingDirectory="{Workspace}\zstd-{LibraryVersion}\build\cmake" showOutput="false">
+            <argument value="-S"/>
+            <argument value="{Workspace}\zstd-{LibraryVersion}\build\cmake"/>
+            <argument value="-B"/>
+            <argument value="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="-G"/>
+            <argument value="Ninja"/>
+            <argument value="-Wno-dev"/>
+            <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+            <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING={Configuration}"/>
+            <argument value="-DCMAKE_C_FLAGS_{CMakeConfigUpper}:STRING={ValidationCFlags}"/>
+            <argument value="-DCMAKE_CXX_FLAGS_{CMakeConfigUpper}:STRING={ValidationCxxFlags}"/>
+            <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+            <argument value="-DBUILD_TESTING:BOOL=ON"/>
+            <argument value="-DZSTD_BUILD_SHARED:BOOL=OFF"/>
+            <argument value="-DZSTD_BUILD_STATIC:BOOL=ON"/>
+            <argument value="-DZSTD_BUILD_PROGRAMS:BOOL=OFF"/>
+            <argument value="-DZSTD_BUILD_TESTS:BOOL=ON"/>
+            <argument value="-DZSTD_BUILD_CONTRIB:BOOL=OFF"/>
+            <argument value="-DZSTD_LEGACY_SUPPORT:BOOL=ON"/>
+            <argument value="-DZSTD_MULTITHREAD_SUPPORT:BOOL=ON"/>
+         </execute>
+         <execute name="validation-build" executable="{Tool:cmake}"
+                  workingDirectory="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                  showOutput="false">
+            <argument value="--build"/>
+            <argument value="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <execute name="validation-test" executable="{ToolDir:cmake}\ctest.exe"
+                  workingDirectory="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                  showOutput="false">
+            <argument value="--output-on-failure"/>
+         </execute>
+
          <variant name="Release">
             <variable name="SharedName" value="libzstd"/>
-            <variable name="StaticName" value="libzstd_static"/>
+            <variable name="CMakeConfigUpper" value="RELEASE"/>
+            <variable name="ValidationCFlags" value="-O2 -DNDEBUG"/>
+            <variable name="ValidationCxxFlags" value="-O2 -DNDEBUG"/>
             <variable name="CMakeExportConfiguration" value="release"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -425,7 +442,9 @@
 
          <variant name="Debug">
             <variable name="SharedName" value="libzstd"/>
-            <variable name="StaticName" value="libzstd_static"/>
+            <variable name="CMakeConfigUpper" value="DEBUG"/>
+            <variable name="ValidationCFlags" value="-O0"/>
+            <variable name="ValidationCxxFlags" value="-O0"/>
             <variable name="CMakeExportConfiguration" value="debug"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
@@ -440,15 +459,9 @@
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <execute name="test" executable="{ToolDir:cmake}\ctest.exe"
-                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
-                        showOutput="false">
-                  <argument value="--output-on-failure"/>
-               </execute>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zstd.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{StaticName}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zstd\zstdConfig.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zstd\zstdConfigVersion.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zstd\zstdTargets.cmake"/>
