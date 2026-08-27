@@ -405,7 +405,7 @@
       </build>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-27T01:10:43Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-27T01:35:12Z">
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
                    archive="openssl-{LibraryVersion}.tar.gz"
@@ -478,7 +478,7 @@
             The perl target materializes the OpenSSL Configure target file in the variant build tree.
          -->
          <environment name="PATH"
-                      value="{ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
+                      value="{ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:nasm};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
 
          <execute name="remove-build" executable="{Tool:cmake}"
                   workingDirectory="{ProductionRoot}" showOutput="false">
@@ -506,6 +506,10 @@
             <parameter name="ARFlags" value="qc"/>
             <parameter name="RANLIB" value="llvm-ranlib"/>
             <parameter name="RC" value="bcc64x-windres"/>
+            <parameter name="AS" value="{Tool:nasm}"/>
+            <parameter name="ASFlags" value="-g"/>
+            <parameter name="AsFlags" value="-Ox -f win64 -DNEAR"/>
+            <parameter name="AsOutFlag" value="-o "/>
             <parameter name="CFlags" value="{OpenSSLCFlags}"/>
             <parameter name="SystemLibraries" value="-lws2_32 -lgdi32 -lcrypt32 -luser32 -ladvapi32"/>
             <parameter name="ThreadScheme" value="winthreads"/>
@@ -515,8 +519,9 @@
             <parameter name="PerlPlatform" value="Windows::cppbuilder"/>
             <parameter name="SysId" value="WIN64"/>
             <parameter name="BnOps" value="SIXTY_FOUR_BIT"/>
+            <parameter name="UplinkArch" value="x86_64"/>
             <parameter name="AsmArch" value="x86_64"/>
-            <parameter name="PerlasmScheme" value="mingw64"/>
+            <parameter name="PerlasmScheme" value="nasm"/>
             <parameter name="Multilib" value="-x64"/>
             <parameter name="LdRespForwardSlashes" value="1"/>
 
@@ -533,6 +538,10 @@
                <line value="        ARFLAGS         => '{Target:ARFlags}',"/>
                <line value="        RANLIB          => '{Target:RANLIB}',"/>
                <line value="        RC              => '{Target:RC}',"/>
+               <line value="        AS              => '{Target:AS}',"/>
+               <line value="        ASFLAGS         => '{Target:ASFlags}',"/>
+               <line value="        asflags         => '{Target:AsFlags}',"/>
+               <line value="        asoutflag       => '{Target:AsOutFlag}',"/>
                <line value="        CFLAGS          => '{Target:CFlags}',"/>
                <line value="        defines         => add('WIN32_LEAN_AND_MEAN', 'OPENSSL_SYS_WIN64', 'L_ENDIAN', 'DSO_WIN32', '_stricmp=stricmp', '_strnicmp=strnicmp', '_setmode=setmode'),"/>
                <line value="        ex_libs         => add('{Target:SystemLibraries}'),"/>
@@ -556,7 +565,7 @@
                <line value="        sys_id          => '{Target:SysId}',"/>
                <line value="        bn_ops          => add('{Target:BnOps}'),"/>
                <line value="        asm_arch        => '{Target:AsmArch}',"/>
-               <line value="        uplink_arch     => 'x86_64',"/>
+               <line value="        uplink_arch     => '{Target:UplinkArch}',"/>
                <line value="        perlasm_scheme  => '{Target:PerlasmScheme}',"/>
                <line value="        shared_rcflag   => '',"/>
                <line value="        multilib        => '{Target:Multilib}',"/>
