@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:noNamespaceSchemaLocation="schemas/build-libraries.xsd"
-                schemaVersion="8">
+                schemaVersion="9">
    <library id="pugixml" version="1.16" timestamp="2026-08-25T18:30:00Z">
       <source>
          <download url="https://github.com/zeux/pugixml/releases/download/v{LibraryVersion}/pugixml-{LibraryVersion}.zip"
@@ -123,7 +123,7 @@
          </extract>
       </source>
 
-      <build>
+      <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
@@ -242,7 +242,7 @@
          </extract>
       </source>
 
-      <build>
+      <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
@@ -393,7 +393,7 @@
          <!-- Separate, non-installed validation world. Zstd's upstream CMake tests
               require libzstd_static, therefore the static library is generated only
               here and never becomes a production/install artifact. -->
-         <execute name="validation-configure" test="true" executable="{Tool:cmake}"
+         <execute name="validation-configure" test="true" phase="validation" executable="{Tool:cmake}"
                   workingDirectory="{Workspace}\zstd-{LibraryVersion}\build\cmake" showOutput="false">
             <argument value="-S"/>
             <argument value="{Workspace}\zstd-{LibraryVersion}\build\cmake"/>
@@ -417,13 +417,13 @@
             <argument value="-DZSTD_LEGACY_SUPPORT:BOOL=ON"/>
             <argument value="-DZSTD_MULTITHREAD_SUPPORT:BOOL=ON"/>
          </execute>
-         <execute name="validation-build" test="true" executable="{Tool:cmake}"
+         <execute name="validation-build" test="true" phase="validation" executable="{Tool:cmake}"
                   workingDirectory="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                   showOutput="false">
             <argument value="--build"/>
             <argument value="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
-         <execute name="validation-test" test="true" executable="{ToolDir:cmake}\ctest.exe"
+         <execute name="validation-test" test="true" phase="validation" executable="{ToolDir:cmake}\ctest.exe"
                   workingDirectory="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                   showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
@@ -541,7 +541,7 @@
          </execute>
       </source>
 
-      <build>
+      <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
@@ -977,8 +977,8 @@
          <install>
             <perVariant>
                <!--
-                  First native proof keeps test/install in the existing perVariant sequence.
-                  Scheduler-level Release/Debug test parallelism remains a separate generic change.
+                  Test and install stay declarative in the same perVariant contract, but BuildEngine
+                  schedules test and install as separate variant jobs with independent states.
                -->
                <target name="test" test="true" type="gmake" executable="{Tool:embarcadero-make}"
                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"

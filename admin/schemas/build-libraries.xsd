@@ -9,6 +9,9 @@
    <xs:simpleType name="cmakeModeType">
       <xs:restriction base="xs:string"><xs:enumeration value="configure"/><xs:enumeration value="build"/><xs:enumeration value="install"/></xs:restriction>
    </xs:simpleType>
+   <xs:simpleType name="testPhaseType">
+      <xs:restriction base="xs:string"><xs:enumeration value="test"/><xs:enumeration value="validation"/></xs:restriction>
+   </xs:simpleType>
    <xs:simpleType name="targetDriverType">
       <xs:restriction base="xs:string">
          <xs:enumeration value="generic"/>
@@ -46,15 +49,18 @@
       <xs:attribute name="overwrite" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="preserveCurrentArtifact" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
    </xs:complexType>
    <xs:complexType name="requireActionType">
       <xs:attribute name="path" type="xs:string" use="required"/>
       <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
    </xs:complexType>
    <xs:complexType name="cmakeActionType">
       <xs:attribute name="mode" type="cmakeModeType" use="required"/><xs:attribute name="executable" type="xs:string" use="required"/>
       <xs:attribute name="source" type="xs:string" use="optional"/><xs:attribute name="build" type="xs:string" use="required"/>
       <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
    </xs:complexType>
    <xs:complexType name="executeActionType">
       <xs:sequence>
@@ -67,6 +73,7 @@
       <xs:attribute name="successExitCode" type="xs:unsignedInt" use="optional" default="0"/>
       <xs:attribute name="showOutput" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
    </xs:complexType>
    <xs:complexType name="targetParameterType">
       <xs:attribute name="name" type="xs:string" use="required"/>
@@ -99,6 +106,7 @@
       <xs:attribute name="successExitCode" type="xs:unsignedInt" use="optional" default="0"/>
       <xs:attribute name="showOutput" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
    </xs:complexType>
    <xs:complexType name="sourceType">
       <xs:choice minOccurs="1" maxOccurs="unbounded">
@@ -146,6 +154,7 @@
          <xs:element name="variant" type="buildVariantType" minOccurs="1" maxOccurs="unbounded"/>
          <xs:element name="install" type="installType"/>
       </xs:sequence>
+      <xs:attribute name="testsAffectBuild" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
 
    <xs:element name="buildLibraries">
@@ -163,7 +172,7 @@
                </xs:complexType>
             </xs:element>
          </xs:sequence>
-         <xs:attribute name="schemaVersion" use="required" fixed="8"/>
+         <xs:attribute name="schemaVersion" use="required" fixed="9"/>
       </xs:complexType>
       <xs:unique name="uniqueLibraryId"><xs:selector xpath="library"/><xs:field xpath="@id"/></xs:unique>
    </xs:element>
