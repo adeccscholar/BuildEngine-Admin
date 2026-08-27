@@ -405,7 +405,7 @@
       </build>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-27T01:35:12Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-27T02:06:21Z">
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
                    archive="openssl-{LibraryVersion}.tar.gz"
@@ -594,14 +594,14 @@
 
          <variant name="Release">
             <variable name="OpenSSLBuildMode" value="--release"/>
-            <variable name="OpenSSLCFlags" value="-O2 -DNDEBUG"/>
+            <variable name="OpenSSLCFlags" value="-O2 -DNDEBUG -fgnu89-inline"/>
             <variable name="SslDll" value="libssl-3-x64.dll"/>
             <variable name="CryptoDll" value="libcrypto-3-x64.dll"/>
          </variant>
 
          <variant name="Debug">
             <variable name="OpenSSLBuildMode" value="--debug"/>
-            <variable name="OpenSSLCFlags" value="-O0 -g"/>
+            <variable name="OpenSSLCFlags" value="-O0 -g -fgnu89-inline"/>
             <variable name="SslDll" value="libssl-3-x64.dll"/>
             <variable name="CryptoDll" value="libcrypto-3-x64.dll"/>
          </variant>
