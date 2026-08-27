@@ -738,6 +738,32 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-response-paths.patch"/>
          </execute>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.8\bcc64x-linker-external-libs.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-external-libs.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            OpenSSL places Configure-supplied external compression libraries in
+            LIB_EX_LIBS / DSO_EX_LIBS / BIN_EX_LIBS. These values are written
+            into the same BCC64X/LLD response files, but they bypass the path
+            lists normalized by bcc64x-linker-response-paths.patch. Keep the
+            proven response-path patch unchanged and normalize only these
+            response-file copies of external library arguments.
+         -->
+         <execute name="external-libs-response-patch-check" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-external-libs.patch"/>
+         </execute>
+         <execute name="external-libs-response-patch-apply" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-external-libs.patch"/>
+         </execute>
          <copy source="{BuildFileDir}\patches\openssl\3.5.8\bcc64x-quic-winsock-inline.patch"
                target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-quic-winsock-inline.patch"
                overwrite="true" preserveCurrentArtifact="true"/>
