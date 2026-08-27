@@ -224,6 +224,223 @@
       </build>
    </library>
 
+   <library id="brotli" version="1.2.0" timestamp="2026-08-27T13:00:00Z">
+      <source>
+         <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz"
+                   archive="brotli-{LibraryVersion}.tar.gz"
+                   sha256="816c96e8e8f193b40151dad7e8ff37b1221d019dbcb9c35cd3fadbfe6477dfec"/>
+         <extract format="libarchive" root="brotli-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE"/>
+            <require path="c\include\brotli\decode.h"/>
+            <require path="c\include\brotli\encode.h"/>
+            <require path="c\include\brotli\types.h"/>
+            <require path="c\common\version.h"/>
+            <require path="c\tools\brotli.c"/>
+            <require path="tests\run-roundtrip-test.cmake"/>
+         </extract>
+      </source>
+
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+
+         <!-- Stock Brotli CMake build: no BCC64X source patch or replacement build file. -->
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <!-- Upstream option that builds the shared and independent static library sets together. -->
+         <argument value="-DBROTLI_BUILD_FOR_PACKAGE:BOOL=ON"/>
+         <argument value="-DBROTLI_BUILD_TOOLS:BOOL=ON"/>
+         <argument value="-DBROTLI_BUNDLED_MODE:BOOL=OFF"/>
+         <argument value="-DBROTLI_DISABLE_TESTS:BOOL=OFF"/>
+
+         <cmake mode="configure" executable="{Tool:cmake}"
+                source="{Workspace}\brotli-{LibraryVersion}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="CommonSharedName" value="brotlicommon"/>
+            <variable name="DecodeSharedName" value="brotlidec"/>
+            <variable name="EncodeSharedName" value="brotlienc"/>
+            <variable name="CommonStaticName" value="brotlicommon-static"/>
+            <variable name="DecodeStaticName" value="brotlidec-static"/>
+            <variable name="EncodeStaticName" value="brotlienc-static"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="CommonSharedName" value="brotlicommon"/>
+            <variable name="DecodeSharedName" value="brotlidec"/>
+            <variable name="EncodeSharedName" value="brotlienc"/>
+            <variable name="CommonStaticName" value="brotlicommon-static"/>
+            <variable name="DecodeStaticName" value="brotlidec-static"/>
+            <variable name="EncodeStaticName" value="brotlienc-static"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <!-- Keep upstream Brotli file names unchanged. OpenSSL's Windows
+                 with-brotli-lib contract selects a directory and expects
+                 brotlicommon/brotlidec/brotlienc without a Debug postfix. -->
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <execute name="test" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="false">
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CommonSharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{DecodeSharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{EncodeSharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\brotli.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{CommonSharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{DecodeSharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{EncodeSharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{CommonStaticName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{DecodeStaticName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{EncodeStaticName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlicommon.pc"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlidec.pc"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlienc.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\brotli-{LibraryVersion}\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\brotli\decode.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\brotli\encode.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\brotli\types.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+   </library>
+
+   <library id="zstd" version="1.5.7" timestamp="2026-08-27T13:00:00Z">
+      <source>
+         <download url="https://github.com/facebook/zstd/releases/download/v{LibraryVersion}/zstd-{LibraryVersion}.tar.gz"
+                   archive="zstd-{LibraryVersion}.tar.gz"
+                   sha256="eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3"/>
+         <extract format="libarchive" root="zstd-{LibraryVersion}">
+            <require path="LICENSE"/>
+            <require path="COPYING"/>
+            <require path="lib\zstd.h"/>
+            <require path="lib\zstd_errors.h"/>
+            <require path="lib\zdict.h"/>
+            <require path="lib\common\mem.h"/>
+            <require path="programs\zstdcli.c"/>
+            <require path="build\cmake\CMakeLists.txt"/>
+            <require path="build\cmake\lib\CMakeLists.txt"/>
+            <require path="build\cmake\tests\CMakeLists.txt"/>
+         </extract>
+      </source>
+
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+
+         <!-- Stock Zstd 1.5.7 CMake build.  In particular, lib/common/mem.h is not patched. -->
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DZSTD_BUILD_SHARED:BOOL=ON"/>
+         <argument value="-DZSTD_BUILD_STATIC:BOOL=ON"/>
+         <argument value="-DZSTD_BUILD_PROGRAMS:BOOL=ON"/>
+         <argument value="-DZSTD_BUILD_TESTS:BOOL=ON"/>
+         <argument value="-DZSTD_BUILD_CONTRIB:BOOL=OFF"/>
+         <argument value="-DZSTD_LEGACY_SUPPORT:BOOL=ON"/>
+         <argument value="-DZSTD_MULTITHREAD_SUPPORT:BOOL=ON"/>
+
+         <cmake mode="configure" executable="{Tool:cmake}"
+                source="{Workspace}\zstd-{LibraryVersion}\build\cmake"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="SharedName" value="zstd"/>
+            <variable name="StaticName" value="zstd_static"/>
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="SharedName" value="zstd"/>
+            <variable name="StaticName" value="zstd_static"/>
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <!-- Release/Debug are separated by directory; keep upstream target names. -->
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <execute name="test" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="false">
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zstd.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{StaticName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zstd\zstdConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zstd\zstdConfigVersion.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zstd\zstdTargets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zstd\zstdTargets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libzstd.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\zstd-{LibraryVersion}\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
+                     overwrite="true"/>
+               <copy source="{Workspace}\zstd-{LibraryVersion}\COPYING"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zstd.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zstd_errors.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zdict.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+   </library>
+
    <library id="libarchive" version="3.8.9" timestamp="2026-08-26T17:20:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <source>
