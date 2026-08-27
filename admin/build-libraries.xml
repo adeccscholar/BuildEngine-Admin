@@ -405,7 +405,7 @@
       </build>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-26T23:10:00Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-26T23:40:00Z">
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz"
                    archive="openssl-{LibraryVersion}.tar.gz"
@@ -415,6 +415,7 @@
             <require path="LICENSE.txt"/>
             <require path="Configurations\10-main.conf"/>
             <require path="Configurations\shared-info.pl"/>
+            <require path="Configurations\windows-makefile.tmpl"/>
          </extract>
          <copy source="{BuildFileDir}\patches\openssl\3.5.8\bcc64x-memory-barrier.patch"
                target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch"
@@ -442,6 +443,32 @@
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.8\bcc64x-linker-response-paths.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-response-paths.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            BCC64X uses GNU/Clang response-file tokenization. A backslash in
+            OpenSSL's linker inline response file escapes the following
+            character, so crypto\aes\foo.obj arrives as cryptoaesfoo.obj.
+            The patch adds an opt-in target property that converts only paths
+            written to linker response files to forward slashes. Make paths,
+            prerequisites and compiler command lines remain unchanged.
+         -->
+         <execute name="response-patch-check" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-response-paths.patch"/>
+         </execute>
+         <execute name="response-patch-apply" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-response-paths.patch"/>
          </execute>
       </source>
 
@@ -491,6 +518,7 @@
             <parameter name="AsmArch" value="x86_64"/>
             <parameter name="PerlasmScheme" value="mingw64"/>
             <parameter name="Multilib" value="-x64"/>
+            <parameter name="LdRespForwardSlashes" value="1"/>
 
             <temporaryFile id="OpenSSLTargetConfig"
                            path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\BCC64X-WIN64.conf">
@@ -517,6 +545,7 @@
                <line value="        ldoutflag       => '-o',"/>
                <line value="        ldpostoutflag   => '',"/>
                <line value="        ld_resp_delim   => &quot; \n&quot;,"/>
+               <line value="        ld_resp_forward_slashes => {Target:LdRespForwardSlashes},"/>
                <line value="        ar_resp_delim   => &quot; \n&quot;,"/>
                <line value="        shared_ldflag   => '-shared',"/>
                <line value="        ld_implib_flag  => '-Wl,--out-implib,',"/>
