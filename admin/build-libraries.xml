@@ -224,7 +224,7 @@
       </build>
    </library>
 
-   <library id="brotli" version="1.2.0" timestamp="2026-08-27T13:00:00Z">
+   <library id="brotli" version="1.2.0" timestamp="2026-08-27T14:06:09Z">
       <source>
          <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz"
                    archive="brotli-{LibraryVersion}.tar.gz"
@@ -269,12 +269,12 @@
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
          <variant name="Release">
-            <variable name="CommonSharedName" value="brotlicommon"/>
-            <variable name="DecodeSharedName" value="brotlidec"/>
-            <variable name="EncodeSharedName" value="brotlienc"/>
-            <variable name="CommonStaticName" value="brotlicommon-static"/>
-            <variable name="DecodeStaticName" value="brotlidec-static"/>
-            <variable name="EncodeStaticName" value="brotlienc-static"/>
+            <variable name="CommonSharedName" value="libbrotlicommon"/>
+            <variable name="DecodeSharedName" value="libbrotlidec"/>
+            <variable name="EncodeSharedName" value="libbrotlienc"/>
+            <variable name="CommonStaticName" value="libbrotlicommon-static"/>
+            <variable name="DecodeStaticName" value="libbrotlidec-static"/>
+            <variable name="EncodeStaticName" value="libbrotlienc-static"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
@@ -282,17 +282,18 @@
          </variant>
 
          <variant name="Debug">
-            <variable name="CommonSharedName" value="brotlicommon"/>
-            <variable name="DecodeSharedName" value="brotlidec"/>
-            <variable name="EncodeSharedName" value="brotlienc"/>
-            <variable name="CommonStaticName" value="brotlicommon-static"/>
-            <variable name="DecodeStaticName" value="brotlidec-static"/>
-            <variable name="EncodeStaticName" value="brotlienc-static"/>
+            <variable name="CommonSharedName" value="libbrotlicommon"/>
+            <variable name="DecodeSharedName" value="libbrotlidec"/>
+            <variable name="EncodeSharedName" value="libbrotlienc"/>
+            <variable name="CommonStaticName" value="libbrotlicommon-static"/>
+            <variable name="DecodeStaticName" value="libbrotlidec-static"/>
+            <variable name="EncodeStaticName" value="libbrotlienc-static"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
-            <!-- Keep upstream Brotli file names unchanged. OpenSSL's Windows
-                 with-brotli-lib contract selects a directory and expects
-                 brotlicommon/brotlidec/brotlienc without a Debug postfix. -->
+            <!-- Release and Debug are separated by directory.  Keep the
+                 artifact names emitted by the stock Brotli CMake project
+                 with the active BCC64X/CMake toolchain; do not normalize
+                 them for a downstream consumer. -->
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
          </variant>
@@ -333,12 +334,14 @@
       </build>
    </library>
 
-   <library id="zstd" version="1.5.7" timestamp="2026-08-27T13:00:00Z">
+   <library id="zstd" version="1.5.7" timestamp="2026-08-27T14:06:09Z">
       <source>
-         <download url="https://github.com/facebook/zstd/releases/download/v{LibraryVersion}/zstd-{LibraryVersion}.tar.gz"
-                   archive="zstd-{LibraryVersion}.tar.gz"
-                   sha256="eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3"/>
-         <extract format="libarchive" root="zstd-{LibraryVersion}">
+         <!-- Official GitHub tag archive.  It represents the unmodified v1.5.7
+              source tree while using the already proven ZIP extraction path. -->
+         <download url="https://github.com/facebook/zstd/archive/v{LibraryVersion}.zip"
+                   archive="zstd-{LibraryVersion}.zip"
+                   sha256="7897bc5d620580d9b7cd3539c44b59d78f3657d33663fe97a145e07b4ebd69a4"/>
+         <extract format="zip" root="zstd-{LibraryVersion}">
             <require path="LICENSE"/>
             <require path="COPYING"/>
             <require path="lib\zstd.h"/>
@@ -383,8 +386,8 @@
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
          <variant name="Release">
-            <variable name="SharedName" value="zstd"/>
-            <variable name="StaticName" value="zstd_static"/>
+            <variable name="SharedName" value="libzstd"/>
+            <variable name="StaticName" value="libzstd_static"/>
             <variable name="CMakeExportConfiguration" value="release"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -394,13 +397,14 @@
          </variant>
 
          <variant name="Debug">
-            <variable name="SharedName" value="zstd"/>
-            <variable name="StaticName" value="zstd_static"/>
+            <variable name="SharedName" value="libzstd"/>
+            <variable name="StaticName" value="libzstd_static"/>
             <variable name="CMakeExportConfiguration" value="debug"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
-            <!-- Release/Debug are separated by directory; keep upstream target names. -->
+            <!-- Release/Debug are separated by directory; keep the names emitted
+                 by upstream CMake plus the active BCC64X platform prefix. -->
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
          </variant>
