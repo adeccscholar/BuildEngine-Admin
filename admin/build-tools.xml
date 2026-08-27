@@ -108,7 +108,15 @@
       <discover executable="rc.exe" path="true"/>
    </tool>
 
-   <tool id="nasm" version="3.02" required="when-used">
-      <discover executable="nasm.exe" path="true"/>
+   <tool id="nasm" version="3.02" required="always">
+      <managed root="nasm\3.02" executable="nasm.exe">
+         <download
+            url="..."
+            archive="nasm-3.02-win64.zip"
+            sha256="..."/>
+      </managed>
+      <probe contains="NASM version 3.02">
+         <argument value="-v"/>
+      </probe>
    </tool>
 </buildTools>
