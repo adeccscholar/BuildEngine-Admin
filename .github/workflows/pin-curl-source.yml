@@ -1,0 +1,51 @@
+name: Pin curl source archive
+
+on:
+  push:
+    branches:
+      - buildengine-curl-8.21.0
+    paths:
+      - .github/workflows/pin-curl-source.yml
+
+permissions:
+  contents: write
+
+jobs:
+  pin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: buildengine-curl-8.21.0
+          fetch-depth: 0
+
+      - name: Add verified curl archive SHA256
+        shell: python
+        run: |
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          path = Path("admin/build-libraries.xml")
+          text = path.read_text(encoding="utf-8")
+          old = '''         <download url="https://curl.se/download/curl-{LibraryVersion}.tar.xz"
+                   archive="curl-{LibraryVersion}.tar.xz"/>'''
+          new = '''         <download url="https://curl.se/download/curl-{LibraryVersion}.tar.xz"
+                   archive="curl-{LibraryVersion}.tar.xz"
+                   sha256="aa1b66a70eace83dc624508745646c08ae561de512ab403adffb93ac87fc72e6"/>'''
+          if text.count(old) != 1:
+              raise SystemExit("Expected curl download node not found exactly once")
+          path.write_text(text.replace(old, new, 1), encoding="utf-8", newline="")
+          ET.parse(path)
+
+      - name: Verify and commit source pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check -- admin/build-libraries.xml
+          git diff -- admin/build-libraries.xml
+          grep -F 'sha256="aa1b66a70eace83dc624508745646c08ae561de512ab403adffb93ac87fc72e6"' admin/build-libraries.xml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin/build-libraries.xml
+          git commit -m "Pin curl 8.21.0 source archive"
+          git push origin HEAD:buildengine-curl-8.21.0
