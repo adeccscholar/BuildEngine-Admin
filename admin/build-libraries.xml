@@ -199,6 +199,12 @@
                   test installation so find_package(... COMPONENTS shared)
                   can locate the generated ZLIBConfig.cmake.
                -->
+               <execute name="remove-test-install" test="true" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\test_install"/>
+               </execute>
                <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
                         showOutput="false">
