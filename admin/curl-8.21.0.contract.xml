@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Temporary integration fragment for the curl 8.21.0 branch.
+   The <library> node is intended to be inserted into build-libraries.xml
+   after openssl and before nlohmann-json.  It is kept separate only while
+   the first native BCC64X build is being proven.
+-->
+<library id="curl" version="8.21.0" timestamp="2026-08-28T02:14:20Z">
+   <dependency library="openssl" version="3.5.8"/>
+   <dependency library="zlib" version="1.3.2"/>
+   <dependency library="brotli" version="1.2.0"/>
+   <dependency library="zstd" version="1.5.7"/>
+
+   <source>
+      <download url="https://curl.se/download/curl-{LibraryVersion}.tar.xz"
+                archive="curl-{LibraryVersion}.tar.xz"/>
+      <extract format="libarchive" root="curl-{LibraryVersion}">
+         <require path="CMakeLists.txt"/>
+         <require path="COPYING"/>
+         <require path="include\curl\curl.h"/>
+         <require path="include\curl\curlver.h"/>
+         <require path="lib\CMakeLists.txt"/>
+         <require path="CMake\curl-config.in.cmake"/>
+         <require path="CMake\FindBrotli.cmake"/>
+         <require path="CMake\FindZstd.cmake"/>
+      </extract>
+   </source>
+
+   <build>
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+      <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+      <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+
+      <argument value="-G"/>
+      <argument value="Ninja"/>
+      <argument value="-Wno-dev"/>
+      <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+      <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+      <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+      <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+
+      <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+      <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
+      <argument value="-DBUILD_CURL_EXE:BOOL=OFF"/>
+      <argument value="-DBUILD_EXAMPLES:BOOL=OFF"/>
+      <argument value="-DBUILD_TESTING:BOOL=OFF"/>
+      <argument value="-DBUILD_LIBCURL_DOCS:BOOL=OFF"/>
+      <argument value="-DBUILD_MISC_DOCS:BOOL=OFF"/>
+      <argument value="-DCURL_ENABLE_EXPORT_TARGET:BOOL=ON"/>
+
+      <argument value="-DCURL_ENABLE_SSL:BOOL=ON"/>
+      <argument value="-DCURL_USE_OPENSSL:BOOL=ON"/>
+      <argument value="-DCURL_USE_SCHANNEL:BOOL=OFF"/>
+      <argument value="-DCURL_WINDOWS_SSPI:BOOL=ON"/>
+      <argument value="-DCURL_CA_NATIVE:BOOL=ON"/>
+
+      <argument value="-DENABLE_IPV6:BOOL=ON"/>
+      <argument value="-DENABLE_ARES:BOOL=OFF"/>
+      <argument value="-DENABLE_THREADED_RESOLVER:BOOL=ON"/>
+      <argument value="-DENABLE_UNICODE:BOOL=ON"/>
+      <argument value="-DUSE_WIN32_IDN:BOOL=ON"/>
+      <argument value="-DUSE_LIBIDN2:BOOL=OFF"/>
+      <argument value="-DCURL_DISABLE_LDAP:BOOL=OFF"/>
+      <argument value="-DCURL_DISABLE_LDAPS:BOOL=OFF"/>
+      <argument value="-DUSE_WIN32_LDAP:BOOL=ON"/>
+      <argument value="-DCURL_ENABLE_NTLM:BOOL=ON"/>
+
+      <argument value="-DCURL_ZLIB:STRING=ON"/>
+      <argument value="-DCURL_BROTLI:STRING=ON"/>
+      <argument value="-DCURL_ZSTD:STRING=ON"/>
+      <argument value="-DCURL_USE_PKGCONFIG:BOOL=OFF"/>
+      <argument value="-DCURL_USE_CMAKECONFIG:BOOL=OFF"/>
+
+      <argument value="-DCURL_USE_LIBPSL:BOOL=OFF"/>
+      <argument value="-DCURL_USE_LIBSSH2:BOOL=OFF"/>
+      <argument value="-DCURL_USE_LIBSSH:BOOL=OFF"/>
+      <argument value="-DUSE_NGHTTP2:BOOL=OFF"/>
+      <argument value="-DUSE_NGTCP2:BOOL=OFF"/>
+      <argument value="-DUSE_QUICHE:BOOL=OFF"/>
+
+      <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
+      <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libssl.lib"/>
+      <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libcrypto.lib"/>
+      <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
+      <argument value="-DBROTLI_INCLUDE_DIR:PATH={InstallRoot}\packages\brotli\1.2.0\include"/>
+      <argument value="-DBROTLIDEC_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
+      <argument value="-DBROTLICOMMON_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
+      <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\include"/>
+      <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
+
+      <cmake mode="configure" executable="{Tool:cmake}"
+             source="{Workspace}\curl-{LibraryVersion}"
+             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+      <cmake mode="build" executable="{Tool:cmake}"
+             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+      <variant name="Release">
+         <variable name="CurlDll" value="libcurl.dll"/>
+         <variable name="CurlImportLibrary" value="libcurl_imp.lib"/>
+         <variable name="CMakeExportConfiguration" value="release"/>
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+         <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib"/>
+      </variant>
+
+      <variant name="Debug">
+         <variable name="CurlDll" value="libcurld.dll"/>
+         <variable name="CurlImportLibrary" value="libcurld_imp.lib"/>
+         <variable name="CMakeExportConfiguration" value="debug"/>
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+         <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib"/>
+      </variant>
+
+      <install>
+         <perVariant>
+            <cmake mode="install" executable="{Tool:cmake}"
+                   build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CurlDll}"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{CurlImportLibrary}"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLConfig.cmake"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLConfigVersion.cmake"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLTargets.cmake"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLTargets-{CMakeExportConfiguration}.cmake"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\FindBrotli.cmake"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\FindZstd.cmake"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libcurl.pc"/>
+         </perVariant>
+         <common>
+            <copy source="{Workspace}\curl-{LibraryVersion}\COPYING"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt"
+                  overwrite="true"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curl.h"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curlver.h"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt"/>
+         </common>
+      </install>
+   </build>
+</library>
