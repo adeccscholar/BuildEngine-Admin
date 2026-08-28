@@ -1,0 +1,67 @@
+name: Integrate curl contract
+
+on:
+  push:
+    branches:
+      - buildengine-curl-8.21.0
+    paths:
+      - .github/workflows/integrate-curl-contract.yml
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: buildengine-curl-8.21.0
+          fetch-depth: 0
+
+      - name: Insert curl library without rewriting existing content
+        shell: python
+        run: |
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+
+          target_path = Path("admin/build-libraries.xml")
+          fragment_path = Path("admin/curl-8.21.0.contract.xml")
+
+          target = target_path.read_text(encoding="utf-8")
+          fragment = fragment_path.read_text(encoding="utf-8")
+
+          if '<library id="curl" version="8.21.0"' in target:
+              raise SystemExit("curl 8.21.0 is already present in build-libraries.xml")
+
+          start = fragment.index('<library id="curl"')
+          end = fragment.rindex('</library>') + len('</library>')
+          library = fragment[start:end]
+          library = '\n'.join(('   ' + line) if line else line for line in library.splitlines())
+
+          marker = '   <library id="nlohmann-json"'
+          if target.count(marker) != 1:
+              raise SystemExit("nlohmann-json insertion marker is not unique")
+
+          updated = target.replace(marker, library + '\n\n' + marker, 1)
+          target_path.write_text(updated, encoding="utf-8", newline="")
+
+          ET.parse(target_path)
+
+      - name: Verify only the intended insertion
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --check -- admin/build-libraries.xml
+          git diff -- admin/build-libraries.xml
+          grep -F '<library id="curl" version="8.21.0"' admin/build-libraries.xml
+
+      - name: Commit integrated contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add admin/build-libraries.xml
+          git commit -m "Integrate curl 8.21.0 build contract"
+          git push origin HEAD:buildengine-curl-8.21.0
