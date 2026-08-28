@@ -18,6 +18,7 @@
             <require path="LICENSE.md"/>
          </extract>
       </source>
+
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
@@ -131,6 +132,8 @@
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <!-- Clear obsolete static-artifact project include cached by the previous zlib configuration. -->
+         <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH="/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
@@ -585,7 +588,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\xzdec.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\lzmadec.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\lzmainfo.exe"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\lzma.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\liblzma.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-config.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-config-version.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-targets.cmake"/>
@@ -716,7 +719,7 @@
          <argument value="-DENABLE_LZO:BOOL=OFF"/>
          <argument value="-DENABLE_LZMA:BOOL=ON"/>
          <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={InstallRoot}\packages\xz\5.8.3\include"/>
-         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={InstallRoot}\packages\xz\5.8.3\lib\win64\{Configuration}\lzma.lib"/>
+         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={InstallRoot}\packages\xz\5.8.3\lib\win64\{Configuration}\liblzma.lib"/>
          <argument value="-DENABLE_ZSTD:BOOL=ON"/>
          <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\include"/>
          <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
