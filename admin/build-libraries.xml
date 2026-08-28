@@ -18,7 +18,6 @@
             <require path="LICENSE.md"/>
          </extract>
       </source>
-
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
