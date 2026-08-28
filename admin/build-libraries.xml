@@ -107,7 +107,7 @@
       </build>
    </library>
 
-   <library id="zlib" version="1.3.2" timestamp="2026-08-27T17:52:00Z">
+   <library id="zlib" version="1.3.2" timestamp="2026-08-28T13:31:44Z">
       <source>
          <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib132.zip"
                    archive="zlib-{LibraryVersion}.zip"
@@ -132,22 +132,15 @@
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
-         <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\packages\zlib-artifact-names.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-         <argument value="-DGCOV_EXECUTABLE:FILEPATH={Tool:llvm-cov}"/>
          <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <!-- zlib appends /zlib to CMAKE_INSTALL_DOCDIR itself. -->
          <argument value="-DCMAKE_INSTALL_DOCDIR:STRING=share/doc"/>
-         <!--
-            Artifact contract:
-            - libz.dll/libzd.dll and the matching import .lib;
-            - the independent static library, explicitly named
-              libz-static.lib/libz-static-debug.lib.
-         -->
+         <!-- Product contract: shared zlib DLL plus its import library. -->
          <argument value="-DZLIB_BUILD_SHARED:BOOL=ON"/>
-         <argument value="-DZLIB_BUILD_STATIC:BOOL=ON"/>
+         <argument value="-DZLIB_BUILD_STATIC:BOOL=OFF"/>
          <argument value="-DZLIB_BUILD_TESTING:BOOL={TestsEnabled}"/>
          <argument value="-DZLIB_INSTALL:BOOL=ON"/>
          <argument value="-DZLIB_PREFIX:BOOL=OFF"/>
@@ -160,7 +153,6 @@
 
          <variant name="Release">
             <variable name="SharedName" value="libz"/>
-            <variable name="StaticName" value="libz-static"/>
             <variable name="CMakeExportConfiguration" value="release"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -170,7 +162,6 @@
 
          <variant name="Debug">
             <variable name="SharedName" value="libzd"/>
-            <variable name="StaticName" value="libz-static-debug"/>
             <variable name="CMakeExportConfiguration" value="debug"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
@@ -181,14 +172,29 @@
 
          <install>
             <perVariant>
+               <!-- Remove the configuration-specific product directories so old
+                    static artifacts cannot survive a shared-only rebuild. -->
+               <execute name="remove-installed-bin" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <!--
-                  zlib 1.3.2 uses the declared portable LLVM 20.1.7 llvm-cov
-                  tool in gcov compatibility mode.  No coverage or integration
-                  test is excluded.  Nested CMake integration tests reuse Ninja
-                  through PATH.  CMAKE_PREFIX_PATH points at zlib's deliberately
-                  configuration-specific test installation, so find_package()
+                  The production contract is shared-only. Upstream therefore
+                  runs the shared-library and matching package-integration tests;
+                  static-only coverage/tests are not part of this product shape.
+                  Nested CMake integration tests reuse Ninja through PATH.
+                  CMAKE_PREFIX_PATH points at zlib's configuration-specific
+                  test installation so find_package(... COMPONENTS shared)
                   can locate the generated ZLIBConfig.cmake.
                -->
                <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
@@ -202,13 +208,10 @@
                </execute>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{StaticName}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIBConfig.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIBConfigVersion.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-shared.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-shared-{CMakeExportConfiguration}.cmake"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-static.cmake"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-static-{CMakeExportConfiguration}.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\zlib.pc"/>
             </perVariant>
             <common>
@@ -225,7 +228,7 @@
       </build>
    </library>
 
-   <library id="brotli" version="1.2.0" timestamp="2026-08-27T17:52:00Z">
+   <library id="brotli" version="1.2.0" timestamp="2026-08-28T13:31:44Z">
       <source>
          <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz"
                    archive="brotli-{LibraryVersion}.tar.gz"
@@ -257,8 +260,8 @@
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
-         <!-- Upstream option that builds the shared and independent static library sets together. -->
-         <argument value="-DBROTLI_BUILD_FOR_PACKAGE:BOOL=ON"/>
+         <!-- Shared-only product; upstream tests and command line tool remain enabled. -->
+         <argument value="-DBROTLI_BUILD_FOR_PACKAGE:BOOL=OFF"/>
          <argument value="-DBROTLI_BUILD_TOOLS:BOOL=ON"/>
          <argument value="-DBROTLI_BUNDLED_MODE:BOOL=OFF"/>
          <argument value="-DBROTLI_DISABLE_TESTS:BOOL={TestsDisabled}"/>
@@ -273,9 +276,6 @@
             <variable name="CommonSharedName" value="libbrotlicommon"/>
             <variable name="DecodeSharedName" value="libbrotlidec"/>
             <variable name="EncodeSharedName" value="libbrotlienc"/>
-            <variable name="CommonStaticName" value="libbrotlicommon-static"/>
-            <variable name="DecodeStaticName" value="libbrotlidec-static"/>
-            <variable name="EncodeStaticName" value="libbrotlienc-static"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
@@ -286,9 +286,6 @@
             <variable name="CommonSharedName" value="libbrotlicommon"/>
             <variable name="DecodeSharedName" value="libbrotlidec"/>
             <variable name="EncodeSharedName" value="libbrotlienc"/>
-            <variable name="CommonStaticName" value="libbrotlicommon-static"/>
-            <variable name="DecodeStaticName" value="libbrotlidec-static"/>
-            <variable name="EncodeStaticName" value="libbrotlienc-static"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <!-- Release and Debug are separated by directory.  Keep the
@@ -301,6 +298,18 @@
 
          <install>
             <perVariant>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
@@ -316,9 +325,6 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{CommonSharedName}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{DecodeSharedName}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{EncodeSharedName}.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{CommonStaticName}.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{DecodeStaticName}.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{EncodeStaticName}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlicommon.pc"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlidec.pc"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlienc.pc"/>
@@ -488,8 +494,130 @@
       </build>
    </library>
 
-   <library id="libarchive" version="3.8.9" timestamp="2026-08-27T17:52:00Z">
+   <library id="xz" version="5.8.3" timestamp="2026-08-28T13:31:44Z">
+      <source>
+         <download url="https://github.com/tukaani-project/xz/releases/download/v{LibraryVersion}/xz-{LibraryVersion}.tar.gz"
+                   archive="xz-{LibraryVersion}.tar.gz"
+                   sha256="3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0"/>
+         <extract format="libarchive" root="xz-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="COPYING.0BSD"/>
+            <require path="COPYING.GPLv2"/>
+            <require path="src\liblzma\api\lzma.h"/>
+            <require path="src\liblzma\api\lzma\base.h"/>
+            <require path="src\xz\main.c"/>
+            <require path="tests\tests.cmake"/>
+         </extract>
+      </source>
+
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TESTING:BOOL={TestsEnabled}"/>
+         <!-- Matches XZ's own Windows CMake build guidance: translations are
+              disabled, while the full liblzma API, tools, docs, and tests remain. -->
+         <argument value="-DXZ_NLS:BOOL=OFF"/>
+         <argument value="-DXZ_DOC:BOOL=ON"/>
+         <argument value="-DXZ_TOOL_XZ:BOOL=ON"/>
+         <argument value="-DXZ_TOOL_XZDEC:BOOL=ON"/>
+         <argument value="-DXZ_TOOL_LZMADEC:BOOL=ON"/>
+         <argument value="-DXZ_TOOL_LZMAINFO:BOOL=ON"/>
+         <argument value="-DXZ_EXTERNAL_SHA256:BOOL=OFF"/>
+
+         <cmake mode="configure" executable="{Tool:cmake}"
+                source="{Workspace}\xz-{LibraryVersion}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration};{ENV:PATH}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\liblzma.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\xz.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\xzdec.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\lzmadec.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\lzmainfo.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\lzma.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-config-version.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-targets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-targets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\liblzma.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                     overwrite="true"/>
+               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING.0BSD"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD"
+                     overwrite="true"/>
+               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING.GPLv2"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lzma.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lzma\base.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2"/>
+            </common>
+         </install>
+      </build>
+   </library>
+
+   <library id="libarchive" version="3.8.9" timestamp="2026-08-28T13:31:44Z">
       <dependency library="zlib" version="1.3.2"/>
+      <dependency library="xz" version="5.8.3"/>
+      <dependency library="zstd" version="1.5.7"/>
+      <dependency library="openssl" version="3.5.8"/>
       <source>
          <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip"
                    archive="libarchive-{LibraryVersion}.zip"
@@ -558,11 +686,9 @@
          <argument value="-DENABLE_INSTALL:BOOL=ON"/>
          <argument value="-DENABLE_TEST:BOOL={TestsEnabled}"/>
 
-         <!--
-            Complete native TAR toolset.  The package contains the runtime DLL,
-            its import .lib and an independent static .lib.  The import library
-            is not the static library, although both use the .lib extension.
-         -->
+         <!-- Complete native command line toolset. The product package contains
+              the shared runtime and import library; libarchive's internal static
+              target remains only because upstream tests link against it. -->
          <argument value="-DENABLE_TAR:BOOL=ON"/>
          <argument value="-DENABLE_TAR_SHARED:BOOL=ON"/>
          <argument value="-DENABLE_CPIO:BOOL=ON"/>
@@ -578,14 +704,23 @@
          <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
          <argument value="-DENABLE_CNG:BOOL=ON"/>
          <argument value="-DENABLE_WIN32_XMLLITE:BOOL=ON"/>
-         <argument value="-DENABLE_OPENSSL:BOOL=OFF"/>
+         <argument value="-DENABLE_OPENSSL:BOOL=ON"/>
+         <argument value="-DOPENSSL_ROOT_DIR:PATH={InstallRoot}\packages\openssl\3.5.8"/>
+         <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
+         <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libssl.lib"/>
+         <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libcrypto.lib"/>
+         <argument value="-DOPENSSL_USE_STATIC_LIBS:BOOL=FALSE"/>
          <argument value="-DENABLE_MBEDTLS:BOOL=OFF"/>
          <argument value="-DENABLE_NETTLE:BOOL=OFF"/>
          <argument value="-DENABLE_LIBB2:BOOL=OFF"/>
          <argument value="-DENABLE_LZ4:BOOL=OFF"/>
          <argument value="-DENABLE_LZO:BOOL=OFF"/>
-         <argument value="-DENABLE_LZMA:BOOL=OFF"/>
-         <argument value="-DENABLE_ZSTD:BOOL=OFF"/>
+         <argument value="-DENABLE_LZMA:BOOL=ON"/>
+         <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={InstallRoot}\packages\xz\5.8.3\include"/>
+         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={InstallRoot}\packages\xz\5.8.3\lib\win64\{Configuration}\lzma.lib"/>
+         <argument value="-DENABLE_ZSTD:BOOL=ON"/>
+         <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\include"/>
+         <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
          <argument value="-DENABLE_BZip2:BOOL=OFF"/>
          <argument value="-DENABLE_LIBXML2:BOOL=OFF"/>
          <argument value="-DENABLE_EXPAT:BOOL=OFF"/>
@@ -608,7 +743,6 @@
 
          <variant name="Release">
             <variable name="ArchiveName" value="libarchive"/>
-            <variable name="ArchiveStaticName" value="libarchive_static"/>
             <variable name="ZlibLibraryName" value="libz"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -616,7 +750,6 @@
 
          <variant name="Debug">
             <variable name="ArchiveName" value="libarchived"/>
-            <variable name="ArchiveStaticName" value="libarchive_staticd"/>
             <variable name="ZlibLibraryName" value="libzd"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
@@ -636,11 +769,26 @@
                   <argument value="--target"/>
                   <argument value="test"/>
                </execute>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
                      recursive="true" overwrite="true"/>
-               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
-                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+               <execute name="remove-installed-lib" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\{ArchiveName}.lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{ArchiveName}.lib"
+                     overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\pkgconfig"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig"
                      recursive="true" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{ArchiveName}.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdtar.exe"/>
@@ -648,7 +796,6 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdcat.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdunzip.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{ArchiveName}.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{ArchiveStaticName}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libarchive.pc"/>
             </perVariant>
             <common>
@@ -936,9 +1083,11 @@
                <line value="        coutflag        => '-o',"/>
                <line value="        ldoutflag       => '-o',"/>
                <line value="        ldpostoutflag   => '',"/>
-               <line value="        ld_resp_delim   => &quot; \n&quot;,"/>
+               <line value="        ld_resp_delim   => &quot; \
+&quot;,"/>
                <line value="        ld_resp_forward_slashes => {Target:LdRespForwardSlashes},"/>
-               <line value="        ar_resp_delim   => &quot; \n&quot;,"/>
+               <line value="        ar_resp_delim   => &quot; \
+&quot;,"/>
                <line value="        shared_ldflag   => '-shared',"/>
                <line value="        ld_implib_flag  => '-Wl,--out-implib,',"/>
                <line value="        lddefflag       => '',"/>
@@ -1076,6 +1225,147 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\ssl.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\crypto.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt"/>
+            </common>
+         </install>
+      </build>
+   </library>
+
+   <library id="curl" version="8.21.0" timestamp="2026-08-28T02:14:20Z">
+      <dependency library="openssl" version="3.5.8"/>
+      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="brotli" version="1.2.0"/>
+      <dependency library="zstd" version="1.5.7"/>
+
+      <source>
+         <download url="https://curl.se/download/curl-{LibraryVersion}.tar.xz"
+                   archive="curl-{LibraryVersion}.tar.xz"
+                   sha256="aa1b66a70eace83dc624508745646c08ae561de512ab403adffb93ac87fc72e6"/>
+         <extract format="libarchive" root="curl-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="include\curl\curl.h"/>
+            <require path="include\curl\curlver.h"/>
+            <require path="lib\CMakeLists.txt"/>
+            <require path="CMake\curl-config.in.cmake"/>
+            <require path="CMake\FindBrotli.cmake"/>
+            <require path="CMake\FindZstd.cmake"/>
+         </extract>
+      </source>
+
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DBUILD_CURL_EXE:BOOL=OFF"/>
+         <argument value="-DBUILD_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=OFF"/>
+         <argument value="-DBUILD_LIBCURL_DOCS:BOOL=OFF"/>
+         <argument value="-DBUILD_MISC_DOCS:BOOL=OFF"/>
+         <argument value="-DENABLE_CURL_MANUAL:BOOL=OFF"/>
+         <argument value="-DCURL_ENABLE_EXPORT_TARGET:BOOL=ON"/>
+
+         <argument value="-DCURL_ENABLE_SSL:BOOL=ON"/>
+         <argument value="-DCURL_USE_OPENSSL:BOOL=ON"/>
+         <argument value="-DCURL_USE_SCHANNEL:BOOL=OFF"/>
+         <argument value="-DCURL_WINDOWS_SSPI:BOOL=ON"/>
+         <argument value="-DCURL_CA_NATIVE:BOOL=ON"/>
+
+         <argument value="-DENABLE_IPV6:BOOL=ON"/>
+         <argument value="-DENABLE_ARES:BOOL=OFF"/>
+         <argument value="-DENABLE_THREADED_RESOLVER:BOOL=ON"/>
+         <argument value="-DENABLE_UNICODE:BOOL=ON"/>
+         <argument value="-DUSE_WIN32_IDN:BOOL=ON"/>
+         <argument value="-DUSE_LIBIDN2:BOOL=OFF"/>
+         <argument value="-DCURL_DISABLE_LDAP:BOOL=OFF"/>
+         <argument value="-DCURL_DISABLE_LDAPS:BOOL=OFF"/>
+         <argument value="-DUSE_WIN32_LDAP:BOOL=ON"/>
+         <argument value="-DCURL_ENABLE_NTLM:BOOL=ON"/>
+
+         <argument value="-DCURL_ZLIB:STRING=ON"/>
+         <argument value="-DCURL_BROTLI:STRING=ON"/>
+         <argument value="-DCURL_ZSTD:STRING=ON"/>
+         <argument value="-DCURL_USE_PKGCONFIG:BOOL=OFF"/>
+         <argument value="-DCURL_USE_CMAKECONFIG:BOOL=OFF"/>
+
+         <argument value="-DCURL_USE_LIBPSL:BOOL=OFF"/>
+         <argument value="-DCURL_USE_LIBSSH2:BOOL=OFF"/>
+         <argument value="-DCURL_USE_LIBSSH:BOOL=OFF"/>
+         <argument value="-DUSE_NGHTTP2:BOOL=OFF"/>
+         <argument value="-DUSE_NGTCP2:BOOL=OFF"/>
+         <argument value="-DUSE_QUICHE:BOOL=OFF"/>
+
+         <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
+         <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libssl.lib"/>
+         <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libcrypto.lib"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
+         <argument value="-DBROTLI_INCLUDE_DIR:PATH={InstallRoot}\packages\brotli\1.2.0\include"/>
+         <argument value="-DBROTLIDEC_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
+         <argument value="-DBROTLICOMMON_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
+         <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\include"/>
+         <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
+
+         <cmake mode="configure" executable="{Tool:cmake}"
+                source="{Workspace}\curl-{LibraryVersion}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="CurlDll" value="libcurl.dll"/>
+            <variable name="CurlImportLibrary" value="libcurl_imp.lib"/>
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="CurlDll" value="libcurld.dll"/>
+            <variable name="CurlImportLibrary" value="libcurld_imp.lib"/>
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CurlDll}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{CurlImportLibrary}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLConfigVersion.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLTargets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLTargets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\FindBrotli.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\FindZstd.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libcurl.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\curl-{LibraryVersion}\COPYING"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curl.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curlver.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt"/>
             </common>
          </install>
       </build>
