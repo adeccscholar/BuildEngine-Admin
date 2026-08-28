@@ -70,6 +70,8 @@
          <expectation kind="package-target" value="CURL::libcurl"/>
          <expectation kind="protocol" value="http"/>
          <expectation kind="protocol" value="https"/>
+         <expectation kind="protocol" value="ldap"/>
+         <expectation kind="protocol" value="ldaps"/>
          <expectation kind="feature" value="OpenSSL"/>
          <expectation kind="feature" value="IPv6"/>
          <expectation kind="feature" value="AsynchDNS"/>
@@ -80,6 +82,7 @@
          <expectation kind="feature" value="brotli"/>
          <expectation kind="feature" value="zstd"/>
          <expectation kind="feature" value="Unicode"/>
+         <expectation kind="feature" value="NativeCA"/>
       </smoke>
    </library>
 </smokeTests>
