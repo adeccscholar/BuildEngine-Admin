@@ -27,13 +27,10 @@ jobs:
 
           path = Path("admin/build-libraries.xml")
           text = path.read_text(encoding="utf-8")
-          old = '''         <download url="https://curl.se/download/curl-{LibraryVersion}.tar.xz"
-                   archive="curl-{LibraryVersion}.tar.xz"/>'''
-          new = '''         <download url="https://curl.se/download/curl-{LibraryVersion}.tar.xz"
-                   archive="curl-{LibraryVersion}.tar.xz"
-                   sha256="aa1b66a70eace83dc624508745646c08ae561de512ab403adffb93ac87fc72e6"/>'''
+          old = 'archive="curl-{LibraryVersion}.tar.xz"/>'
+          new = 'archive="curl-{LibraryVersion}.tar.xz"\n                   sha256="aa1b66a70eace83dc624508745646c08ae561de512ab403adffb93ac87fc72e6"/>'
           if text.count(old) != 1:
-              raise SystemExit("Expected curl download node not found exactly once")
+              raise SystemExit("Expected curl archive attribute not found exactly once")
           path.write_text(text.replace(old, new, 1), encoding="utf-8", newline="")
           ET.parse(path)
 
