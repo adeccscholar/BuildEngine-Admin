@@ -48,7 +48,6 @@
          <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libssl.lib"/>
          <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libcrypto.lib"/>
          <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
          <argument value="-DBROTLI_INCLUDE_DIR:PATH={InstallRoot}\packages\brotli\1.2.0\include"/>
          <argument value="-DBROTLIDEC_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
          <argument value="-DBROTLICOMMON_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
@@ -61,12 +60,12 @@
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
-            <argument value="-DZlibImportLibrary:STRING=libz.lib"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib"/>
          </variant>
          <variant name="Debug">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
-            <argument value="-DZlibImportLibrary:STRING=libzd.lib"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib"/>
          </variant>
          <expectation kind="package-target" value="CURL::libcurl"/>
          <expectation kind="protocol" value="http"/>
