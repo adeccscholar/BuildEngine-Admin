@@ -48,6 +48,7 @@
       <argument value="-DBUILD_TESTING:BOOL=OFF"/>
       <argument value="-DBUILD_LIBCURL_DOCS:BOOL=OFF"/>
       <argument value="-DBUILD_MISC_DOCS:BOOL=OFF"/>
+      <argument value="-DENABLE_CURL_MANUAL:BOOL=OFF"/>
       <argument value="-DCURL_ENABLE_EXPORT_TARGET:BOOL=ON"/>
 
       <argument value="-DCURL_ENABLE_SSL:BOOL=ON"/>
