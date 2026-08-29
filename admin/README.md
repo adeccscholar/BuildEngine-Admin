@@ -26,7 +26,7 @@ The repository copy remains the authoritative input. Before validation and appli
 
 ## Publish and consumer smoke pipeline
 
-Schema 10 keeps publish and simple consumer smoke tests in the same per-library process contract. Release and Debug now progress independently through build/test/validation/install. The selected publish configuration (currently Release) continues through `publish -> smoke -> ready:Release`; Debug reaches `ready:Debug` after its own verified install. The aggregate `library:<id>:ready` remains the final library status but no longer serializes the two variants before downstream work can start.
+Schema 10 keeps publish and simple consumer smoke tests in the same per-library process contract. Release and Debug now progress independently through build/test/validation/install. The selected publish configuration (currently Release) continues through `publish -> smoke -> ready:Release`; Debug reaches `ready:Debug` after its own verified install and the shared `install:common` SDK state. `install:common` depends only on the selected publish configuration, so Release never waits for Debug. The aggregate `library:<id>:ready` remains the final library status but no longer serializes the two variants before Release downstream work can start.
 
 The versioned package tree below `install/packages/<id>/<version>` remains the authoritative producer result. The `<publish>` node maps the selected Release artifacts into the shared `install/Win64x` consumer tree. Headers, import libraries, runtime binaries, pkg-config data and CMake package entry points are published without requiring downstream consumers to know the package version directory.
 
