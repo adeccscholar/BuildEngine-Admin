@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeZlib LANGUAGES CXX)
+find_package(ZLIB CONFIG REQUIRED COMPONENTS shared)
+add_executable(zlib-consumer main.cpp)
+target_compile_features(zlib-consumer PRIVATE cxx_std_23)
+target_link_libraries(zlib-consumer PRIVATE ZLIB::ZLIB)

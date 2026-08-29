@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeXZ LANGUAGES CXX)
+find_package(liblzma CONFIG REQUIRED)
+add_executable(xz-consumer main.cpp)
+target_compile_features(xz-consumer PRIVATE cxx_std_23)
+target_link_libraries(xz-consumer PRIVATE liblzma::liblzma)

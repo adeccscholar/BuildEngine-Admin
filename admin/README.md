@@ -34,7 +34,7 @@ Installed CMake package configurations remain in their versioned package directo
 
 Simple `<smoke>` nodes are usability tests, not additional producer regression suites. Each smoke configures a fresh C++23 consumer with normal `find_package()` calls, compiles and links it against the published tree, executes it with `Win64x/bin` on the child-process `PATH`, and emits the strict `SMOKE|...` protocol. BuildEngine preserves the complete raw stdout/stderr process log and also writes a full validation log containing every observed line plus the parsed checks and final validation status.
 
-Complex multi-package integration tests and demos do not belong to these per-library smoke nodes. They are maintained in a separate integration area.
+Complex multi-package integration tests and demos do not belong to these per-library smoke nodes. They are maintained in the existing `BuildEngine-Tests` repository. That repository therefore contains only the larger integration and demo scenarios; the simple package usability smokes live exclusively in this administration repository.
 
 ## Incremental library timestamp and machine state
 

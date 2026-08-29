@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeNlohmannJson LANGUAGES CXX)
+find_package(nlohmann_json REQUIRED)
+add_executable(nlohmann-json-consumer main.cpp)
+target_compile_features(nlohmann-json-consumer PRIVATE cxx_std_23)
+target_link_libraries(nlohmann-json-consumer PRIVATE nlohmann_json::nlohmann_json)

@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokePugiXML LANGUAGES CXX)
+find_package(pugixml CONFIG REQUIRED)
+add_executable(pugixml-consumer main.cpp)
+target_compile_features(pugixml-consumer PRIVATE cxx_std_23)
+target_link_libraries(pugixml-consumer PRIVATE pugixml::pugixml)

@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeZstd LANGUAGES CXX)
+find_package(zstd CONFIG REQUIRED)
+add_executable(zstd-consumer main.cpp)
+target_compile_features(zstd-consumer PRIVATE cxx_std_23)
+target_link_libraries(zstd-consumer PRIVATE zstd::libzstd_shared)

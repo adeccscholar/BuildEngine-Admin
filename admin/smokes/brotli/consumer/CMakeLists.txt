@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeBrotli LANGUAGES CXX)
+find_package(Brotli REQUIRED)
+add_executable(brotli-consumer main.cpp)
+target_compile_features(brotli-consumer PRIVATE cxx_std_23)
+target_link_libraries(brotli-consumer PRIVATE Brotli::encoder Brotli::decoder)

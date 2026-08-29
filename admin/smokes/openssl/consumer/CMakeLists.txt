@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeOpenSSL LANGUAGES CXX)
+find_package(OpenSSL REQUIRED)
+add_executable(openssl-consumer main.cpp)
+target_compile_features(openssl-consumer PRIVATE cxx_std_23)
+target_link_libraries(openssl-consumer PRIVATE OpenSSL::SSL OpenSSL::Crypto)
