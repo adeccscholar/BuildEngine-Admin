@@ -711,8 +711,8 @@
             <variable name="CMakeExportConfiguration" value="debug"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
-            <!-- Release and Debug use separate directories.  BCC64X/CMake emits
-                 libzip.dll and libzip.lib for the upstream target named zip. -->
+            <!-- Release and Debug use separate directories.  Keep the upstream
+                 zip.dll / zip.lib names required by the existing BuildEngine project. -->
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
          </variant>
@@ -831,24 +831,11 @@
                </execute>
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <!-- Upstream installs the three tools to literal bin rather than
-                    CMAKE_INSTALL_BINDIR.  Keep that upstream location intact for
-                    libzip-bin-targets and additionally provide the configuration-
-                    specific package layout used by the BuildEngine. -->
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\zipcmp.exe"
-                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipcmp.exe"
-                     overwrite="true"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\zipmerge.exe"
-                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipmerge.exe"
-                     overwrite="true"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\ziptool.exe"
-                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ziptool.exe"
-                     overwrite="true"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libzip.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zip.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipcmp.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipmerge.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ziptool.exe"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libzip.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\zip.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-config.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-config-version.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-targets.cmake"/>
