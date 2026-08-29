@@ -621,6 +621,241 @@
       </build>
    </library>
 
+   <library id="libzip" version="1.11.4" timestamp="2026-08-28T23:46:00Z">
+      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="xz" version="5.8.3"/>
+      <dependency library="zstd" version="1.5.7"/>
+      <source>
+         <!-- Official release asset.  Use tar.gz for bootstrap so libzip does
+              not depend on the BuildEngine's not-yet-enabled XZ extraction path. -->
+         <download url="https://github.com/nih-at/libzip/releases/download/v{LibraryVersion}/libzip-{LibraryVersion}.tar.gz"
+                   archive="libzip-{LibraryVersion}.tar.gz"
+                   sha256="82e9f2f2421f9d7c2466bbc3173cd09595a88ea37db0d559a9d0a2dc60dc722e"/>
+         <extract format="libarchive" root="libzip-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE"/>
+            <require path="lib\zip.h"/>
+            <require path="lib\zipint.h"/>
+            <require path="lib\CMakeLists.txt"/>
+            <require path="src\ziptool.c"/>
+            <require path="src\CMakeLists.txt"/>
+         </extract>
+      </source>
+
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DLIBZIP_DO_INSTALL:BOOL=ON"/>
+         <argument value="-DSHARED_LIB_VERSIONNING:BOOL=ON"/>
+
+         <!-- Required deflate backend plus the two compression backends already
+              produced by this BuildEngine contract. -->
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
+         <argument value="-DENABLE_BZIP2:BOOL=OFF"/>
+         <argument value="-DENABLE_LZMA:BOOL=ON"/>
+         <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={InstallRoot}\packages\xz\5.8.3\include"/>
+         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={InstallRoot}\packages\xz\5.8.3\lib\win64\{Configuration}\liblzma.lib"/>
+         <argument value="-DENABLE_ZSTD:BOOL=ON"/>
+         <argument value="-Dzstd_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\cmake\zstd"/>
+
+         <!-- Native Windows AES implementation.  Do not introduce an OpenSSL
+              dependency when BCrypt is the upstream-preferred Windows backend. -->
+         <argument value="-DENABLE_WINDOWS_CRYPTO:BOOL=ON"/>
+         <argument value="-DENABLE_COMMONCRYPTO:BOOL=OFF"/>
+         <argument value="-DENABLE_OPENSSL:BOOL=OFF"/>
+         <argument value="-DENABLE_GNUTLS:BOOL=OFF"/>
+         <argument value="-DENABLE_MBEDTLS:BOOL=OFF"/>
+         <argument value="-DENABLE_FDOPEN:BOOL=ON"/>
+
+         <!-- Build the upstream command-line tools and documentation.  The
+              upstream regression suite additionally requires nihtest, which is
+              not part of the current BuildEngine tool contract.  The explicit
+              functional gates below exercise the produced shared library with
+              XZ, Zstd and Windows AES instead. -->
+         <argument value="-DBUILD_TOOLS:BOOL=ON"/>
+         <argument value="-DBUILD_REGRESS:BOOL=OFF"/>
+         <argument value="-DBUILD_OSSFUZZ:BOOL=OFF"/>
+         <argument value="-DBUILD_EXAMPLES:BOOL=ON"/>
+         <argument value="-DBUILD_DOC:BOOL=ON"/>
+         <argument value="-DDOCUMENTATION_FORMAT:STRING=html"/>
+
+         <cmake mode="configure" executable="{Tool:cmake}"
+                source="{Workspace}\libzip-{LibraryVersion}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="ZlibImportLibrary" value="libz.lib"/>
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="ZlibImportLibrary" value="libzd.lib"/>
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <!-- Release and Debug use separate directories.  Keep the upstream
+                 zip.dll / zip.lib names required by the existing BuildEngine project. -->
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <!-- These tests run from the build tree before installation.
+                    The working directory contains zip.dll; dependency runtime
+                    directories are supplied generically by the BuildEngine. -->
+               <execute name="remove-xz-smoke-archive" test="true" executable="{Tool:cmake}"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                        showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="rm"/>
+                  <argument value="-f"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\buildengine-libzip-xz.zip"/>
+               </execute>
+               <execute name="xz-write" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\ziptool.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                        showOutput="false">
+                  <argument value="-n"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\buildengine-libzip-xz.zip"/>
+                  <argument value="add"/>
+                  <argument value="smoke.txt"/>
+                  <argument value="BuildEngine-libzip-xz"/>
+                  <argument value="set_file_compression"/>
+                  <argument value="0"/>
+                  <argument value="xz"/>
+                  <argument value="0"/>
+               </execute>
+               <execute name="xz-read" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\ziptool.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                        showOutput="false">
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\buildengine-libzip-xz.zip"/>
+                  <argument value="cat"/>
+                  <argument value="0"/>
+               </execute>
+
+               <execute name="remove-zstd-smoke-archive" test="true" executable="{Tool:cmake}"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                        showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="rm"/>
+                  <argument value="-f"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\buildengine-libzip-zstd.zip"/>
+               </execute>
+               <execute name="zstd-write" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\ziptool.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                        showOutput="false">
+                  <argument value="-n"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\buildengine-libzip-zstd.zip"/>
+                  <argument value="add"/>
+                  <argument value="smoke.txt"/>
+                  <argument value="BuildEngine-libzip-zstd"/>
+                  <argument value="set_file_compression"/>
+                  <argument value="0"/>
+                  <argument value="zstd"/>
+                  <argument value="0"/>
+               </execute>
+               <execute name="zstd-read" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\ziptool.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                        showOutput="false">
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\buildengine-libzip-zstd.zip"/>
+                  <argument value="cat"/>
+                  <argument value="0"/>
+               </execute>
+
+               <execute name="remove-aes-smoke-archive" test="true" executable="{Tool:cmake}"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                        showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="rm"/>
+                  <argument value="-f"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\buildengine-libzip-aes.zip"/>
+               </execute>
+               <execute name="aes-write" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\ziptool.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                        showOutput="false">
+                  <argument value="-n"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\buildengine-libzip-aes.zip"/>
+                  <argument value="add"/>
+                  <argument value="smoke.txt"/>
+                  <argument value="BuildEngine-libzip-aes"/>
+                  <argument value="set_file_encryption"/>
+                  <argument value="0"/>
+                  <argument value="AES-256"/>
+                  <argument value="buildengine"/>
+               </execute>
+               <execute name="aes-read" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\ziptool.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                        showOutput="false">
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\buildengine-libzip-aes.zip"/>
+                  <argument value="set_password"/>
+                  <argument value="buildengine"/>
+                  <argument value="cat"/>
+                  <argument value="0"/>
+               </execute>
+
+               <execute name="remove-installed-bin" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}"
+                        workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zip.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipcmp.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipmerge.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ziptool.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\zip.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-config-version.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-targets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-targets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-bin-targets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-bin-targets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libzip.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\libzip-{LibraryVersion}\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zip.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zipconf.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+   </library>
+
    <library id="libarchive" version="3.8.9" timestamp="2026-08-28T13:31:44Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="xz" version="5.8.3"/>
