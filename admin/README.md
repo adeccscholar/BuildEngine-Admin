@@ -26,11 +26,13 @@ The repository copy remains the authoritative input. Before validation and appli
 
 ## Publish and consumer smoke pipeline
 
-Schema 10 keeps publish and simple consumer smoke tests in the same per-library process contract. A successful library follows the sequence `source -> build/test/validation -> install -> publish -> smoke -> ready`.
+Schema 10 keeps publish and simple consumer smoke tests in the same per-library process contract. Release and Debug now progress independently through build/test/validation/install. The selected publish configuration (currently Release) continues through `publish -> smoke -> ready:Release`; Debug reaches `ready:Debug` after its own verified install. The aggregate `library:<id>:ready` remains the final library status but no longer serializes the two variants before downstream work can start.
 
 The versioned package tree below `install/packages/<id>/<version>` remains the authoritative producer result. The `<publish>` node maps the selected Release artifacts into the shared `install/Win64x` consumer tree. Headers, import libraries, runtime binaries, pkg-config data and CMake package entry points are published without requiring downstream consumers to know the package version directory.
 
 Installed CMake package configurations remain in their versioned package directory. Publish creates relative forwarding config files below `Win64x/lib/cmake`, so their original relative target references continue to resolve correctly. `cmake/consumer/BuildEngineConsumer.cmake` adds the shared prefix, include, library, program and module search paths for normal CMake consumers.
+
+Downstream build variants depend on the matching `ready:<Configuration>` state. Existing successful schema-10 aggregate install/ready markers are migrated to the new intermediate state files so a scheduler-only DAG change does not unnecessarily rebuild already verified packages.
 
 Simple `<smoke>` nodes are usability tests, not additional producer regression suites. Each smoke configures a fresh C++23 consumer with normal `find_package()` calls, compiles and links it against the published tree, executes it with `Win64x/bin` on the child-process `PATH`, and emits the strict `SMOKE|...` protocol. BuildEngine preserves the complete raw stdout/stderr process log and also writes a full validation log containing every observed line plus the parsed checks and final validation status.
 

@@ -706,7 +706,7 @@
       </smoke>
    </library>
 
-   <library id="libzip" version="1.11.4" timestamp="2026-08-29T17:38:02Z">
+   <library id="libzip" version="1.11.4" timestamp="2026-08-29T21:40:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="xz" version="5.8.3"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -796,8 +796,8 @@
             <variable name="CMakeExportConfiguration" value="debug"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
-            <!-- Release and Debug use separate directories.  Keep the upstream
-                 zip.dll / zip.lib names required by the existing BuildEngine project. -->
+            <!-- Release and Debug use separate directories.  BCC64X/CMake emits
+                 libzip.dll and libzip.lib for the upstream target named zip. -->
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
          </variant>
@@ -916,11 +916,24 @@
                </execute>
                <cmake mode="install" executable="{Tool:cmake}"
                       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zip.dll"/>
+               <!-- Upstream installs the three tools to literal bin rather than
+                    CMAKE_INSTALL_BINDIR.  Keep that upstream location intact for
+                    libzip-bin-targets and additionally provide the configuration-
+                    specific package layout used by the BuildEngine. -->
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\zipcmp.exe"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipcmp.exe"
+                     overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\zipmerge.exe"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipmerge.exe"
+                     overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\ziptool.exe"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ziptool.exe"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libzip.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipcmp.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipmerge.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ziptool.exe"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\zip.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libzip.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-config.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-config-version.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libzip\libzip-targets.cmake"/>
@@ -1609,7 +1622,7 @@
       </smoke>
    </library>
 
-   <library id="curl" version="8.21.0" timestamp="2026-08-29T17:38:02Z">
+   <library id="curl" version="8.21.0" timestamp="2026-08-29T21:40:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -1677,7 +1690,16 @@
          <argument value="-DCURL_BROTLI:STRING=ON"/>
          <argument value="-DCURL_ZSTD:STRING=ON"/>
          <argument value="-DCURL_USE_PKGCONFIG:BOOL=OFF"/>
-         <argument value="-DCURL_USE_CMAKECONFIG:BOOL=ON"/>
+         <!-- curl 8.21.0 marks dependency discovery through CMake configs as
+              experimental and defaults it off outside MSVC.  Use the stable
+              Find-package path for BCC64X and supply the selected artifacts
+              explicitly from the BuildEngine consumer roots below. -->
+         <argument value="-DCURL_USE_CMAKECONFIG:BOOL=OFF"/>
+         <argument value="-DCMAKE_FIND_PACKAGE_PREFER_CONFIG:BOOL=OFF"/>
+         <argument value="-DOPENSSL_USE_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DZLIB_USE_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DBROTLI_USE_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DZSTD_USE_STATIC_LIBS:BOOL=OFF"/>
 
          <argument value="-DCURL_USE_LIBPSL:BOOL=OFF"/>
          <argument value="-DCURL_USE_LIBSSH2:BOOL=OFF"/>
@@ -1701,6 +1723,19 @@
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+            <!-- Release consumes only the stable published SDK view.  No
+                 dependency version or package-install path leaks into curl. -->
+            <argument value="-DOPENSSL_ROOT_DIR:PATH={InstallRoot}\Win64x"/>
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\Win64x\include"/>
+            <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={InstallRoot}\Win64x\lib\libssl.lib"/>
+            <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={InstallRoot}\Win64x\lib\libcrypto.lib"/>
+            <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\Win64x\include"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\Win64x\lib\libz.lib"/>
+            <argument value="-DBROTLI_INCLUDE_DIR:PATH={InstallRoot}\Win64x\include"/>
+            <argument value="-DBROTLIDEC_LIBRARY:FILEPATH={InstallRoot}\Win64x\lib\libbrotlidec.lib"/>
+            <argument value="-DBROTLICOMMON_LIBRARY:FILEPATH={InstallRoot}\Win64x\lib\libbrotlicommon.lib"/>
+            <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\Win64x\include"/>
+            <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\Win64x\lib\libzstd.lib"/>
          </variant>
 
          <variant name="Debug">
