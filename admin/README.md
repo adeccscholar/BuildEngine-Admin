@@ -2,7 +2,7 @@
 
 This directory contains the synchronized **administration contracts** used by BuildEngine as part of the C++Builder Third-Party Integration project.
 
-It is not an application and contains no executable BuildEngine logic. Its purpose is to describe required tools, third-party library builds, smoke-test mappings, schemas, and generic shared build configuration.
+It is not an application and contains no executable BuildEngine logic. Its purpose is to describe required tools, third-party library builds, publish mappings, library consumer smoke tests, schemas, and generic shared build configuration.
 
 The parent repository README defines the complete synchronization, ownership, version-range, and evidence contract.
 
@@ -24,10 +24,20 @@ For libarchive 3.8.9, `bcc64x-modern-borland-compat.patch` limits legacy `__BORL
 
 The repository copy remains the authoritative input. Before validation and application, the source contract copies it to `{Workspace}\\.buildengine\\patches\\<version>`, outside the synchronized `admin` tree. The generic copy action uses `preserveCurrentArtifact="true"`, so `{CurrentArtifact}` continues to identify the completely extracted upstream source.
 
+## Publish and consumer smoke pipeline
+
+Schema 10 keeps publish and simple consumer smoke tests in the same per-library process contract. A successful library follows the sequence `source -> build/test/validation -> install -> publish -> smoke -> ready`.
+
+The versioned package tree below `install/packages/<id>/<version>` remains the authoritative producer result. The `<publish>` node maps the selected Release artifacts into the shared `install/Win64x` consumer tree. Headers, import libraries, runtime binaries, pkg-config data and CMake package entry points are published without requiring downstream consumers to know the package version directory.
+
+Installed CMake package configurations remain in their versioned package directory. Publish creates relative forwarding config files below `Win64x/lib/cmake`, so their original relative target references continue to resolve correctly. `cmake/consumer/BuildEngineConsumer.cmake` adds the shared prefix, include, library, program and module search paths for normal CMake consumers.
+
+Simple `<smoke>` nodes are usability tests, not additional producer regression suites. Each smoke configures a fresh C++23 consumer with normal `find_package()` calls, compiles and links it against the published tree, executes it with `Win64x/bin` on the child-process `PATH`, and emits the strict `SMOKE|...` protocol. BuildEngine preserves the complete raw stdout/stderr process log and also writes a full validation log containing every observed line plus the parsed checks and final validation status.
+
+Complex multi-package integration tests and demos do not belong to these per-library smoke nodes. They are maintained in a separate integration area.
+
 ## Incremental library timestamp and machine state
 
-Library schema 6 requires one ISO 8601 `library/@timestamp`. It describes when that complete library contract was provided or changed and must be advanced for every change to its source, build, test, installation, patch, or artifact requirements.
+Library schema 6 and later require one ISO 8601 `library/@timestamp`. It describes when that complete library contract was provided or changed and must be advanced for every change to its source, build, test, installation, publish, smoke, patch, or artifact requirements.
 
-After each successful phase, BuildEngine writes a machine-local state beside the corresponding download, variant-build, or versioned package area. The state contains the library contract timestamp, phase identity, configuration and relevant dependency timestamps plus `completedAt`, the UTC time at which that phase completed on the machine.
-
-Missing directories, missing states, or a contract mismatch schedule only the affected phase again. A changed dependency timestamp also invalidates dependent build and package states. `BuildEngine --rebuild` bypasses all current states.
+After each successful phase, BuildEngine writes machine-local state beside the corresponding download, variant-build, package, publish, smoke, or ready area. Missing directories, missing states, contract mismatches, or missing published files schedule only the affected phase again. A changed dependency timestamp also invalidates dependent build and package states. `BuildEngine --rebuild` bypasses all current states.

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:noNamespaceSchemaLocation="schemas/build-libraries.xsd"
-                schemaVersion="9">
-   <library id="pugixml" version="1.16" timestamp="2026-08-25T18:30:00Z">
+                schemaVersion="10">
+   <library id="pugixml" version="1.16" timestamp="2026-08-29T17:38:02Z">
       <source>
          <download url="https://github.com/zeux/pugixml/releases/download/v{LibraryVersion}/pugixml-{LibraryVersion}.zip"
                    archive="pugixml-{LibraryVersion}.zip"/>
@@ -105,9 +105,26 @@
             </common>
          </install>
       </build>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\pugixml\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="pugixml-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-   <library id="zlib" version="1.3.2" timestamp="2026-08-28T13:31:44Z">
+   <library id="zlib" version="1.3.2" timestamp="2026-08-29T17:38:02Z">
       <source>
          <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib132.zip"
                    archive="zlib-{LibraryVersion}.zip"
@@ -234,9 +251,26 @@
             </common>
          </install>
       </build>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\zlib\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="zlib-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-   <library id="brotli" version="1.2.0" timestamp="2026-08-28T13:31:44Z">
+   <library id="brotli" version="1.2.0" timestamp="2026-08-29T17:38:02Z">
       <source>
          <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz"
                    archive="brotli-{LibraryVersion}.tar.gz"
@@ -348,9 +382,26 @@
             </common>
          </install>
       </build>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\brotli\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="brotli-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-   <library id="zstd" version="1.5.7" timestamp="2026-08-27T17:52:00Z">
+   <library id="zstd" version="1.5.7" timestamp="2026-08-29T17:38:02Z">
       <source>
          <!-- Official GitHub tag archive.  It represents the unmodified v1.5.7
               source tree while using the already proven ZIP extraction path. -->
@@ -500,9 +551,26 @@
             </common>
          </install>
       </build>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\zstd\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="zstd-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-   <library id="xz" version="5.8.3" timestamp="2026-08-28T13:31:44Z">
+   <library id="xz" version="5.8.3" timestamp="2026-08-29T17:38:02Z">
       <source>
          <download url="https://github.com/tukaani-project/xz/releases/download/v{LibraryVersion}/xz-{LibraryVersion}.tar.gz"
                    archive="xz-{LibraryVersion}.tar.gz"
@@ -619,9 +687,26 @@
             </common>
          </install>
       </build>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\xz\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="xz-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-   <library id="libzip" version="1.11.4" timestamp="2026-08-28T23:46:00Z">
+   <library id="libzip" version="1.11.4" timestamp="2026-08-29T17:38:02Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="xz" version="5.8.3"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -854,9 +939,26 @@
             </common>
          </install>
       </build>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\libzip\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="libzip-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-   <library id="libarchive" version="3.8.9" timestamp="2026-08-28T13:31:44Z">
+   <library id="libarchive" version="3.8.9" timestamp="2026-08-29T17:38:02Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="xz" version="5.8.3"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -1058,9 +1160,26 @@
             </common>
          </install>
       </build>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\libarchive\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="libarchive-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-   <library id="openssl" version="3.5.8" timestamp="2026-08-27T23:15:00Z">
+   <library id="openssl" version="3.5.8" timestamp="2026-08-29T17:38:02Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -1471,9 +1590,26 @@
             </common>
          </install>
       </build>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\openssl\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="openssl-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-   <library id="curl" version="8.21.0" timestamp="2026-08-28T02:14:20Z">
+   <library id="curl" version="8.21.0" timestamp="2026-08-29T17:38:02Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -1541,7 +1677,7 @@
          <argument value="-DCURL_BROTLI:STRING=ON"/>
          <argument value="-DCURL_ZSTD:STRING=ON"/>
          <argument value="-DCURL_USE_PKGCONFIG:BOOL=OFF"/>
-         <argument value="-DCURL_USE_CMAKECONFIG:BOOL=OFF"/>
+         <argument value="-DCURL_USE_CMAKECONFIG:BOOL=ON"/>
 
          <argument value="-DCURL_USE_LIBPSL:BOOL=OFF"/>
          <argument value="-DCURL_USE_LIBSSH2:BOOL=OFF"/>
@@ -1550,15 +1686,6 @@
          <argument value="-DUSE_NGTCP2:BOOL=OFF"/>
          <argument value="-DUSE_QUICHE:BOOL=OFF"/>
 
-         <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
-         <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libssl.lib"/>
-         <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\libcrypto.lib"/>
-         <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-         <argument value="-DBROTLI_INCLUDE_DIR:PATH={InstallRoot}\packages\brotli\1.2.0\include"/>
-         <argument value="-DBROTLIDEC_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
-         <argument value="-DBROTLICOMMON_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
-         <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\include"/>
-         <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
 
          <cmake mode="configure" executable="{Tool:cmake}"
                 source="{Workspace}\curl-{LibraryVersion}"
@@ -1574,7 +1701,6 @@
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
-            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib"/>
          </variant>
 
          <variant name="Debug">
@@ -1585,7 +1711,16 @@
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
+            <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\Debug\libssl.lib"/>
+            <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.8\lib\win64\Debug\libcrypto.lib"/>
+            <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
             <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib"/>
+            <argument value="-DBROTLI_INCLUDE_DIR:PATH={InstallRoot}\packages\brotli\1.2.0\include"/>
+            <argument value="-DBROTLIDEC_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\Debug\libbrotlidec.lib"/>
+            <argument value="-DBROTLICOMMON_LIBRARY:FILEPATH={InstallRoot}\packages\brotli\1.2.0\lib\win64\Debug\libbrotlicommon.lib"/>
+            <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\include"/>
+            <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\Debug\libzstd.lib"/>
          </variant>
 
          <install>
@@ -1612,9 +1747,26 @@
             </common>
          </install>
       </build>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\curl\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="curl-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-   <library id="nlohmann-json" version="3.12.0" timestamp="2026-08-25T18:30:00Z">
+   <library id="nlohmann-json" version="3.12.0" timestamp="2026-08-29T17:38:02Z">
       <source>
          <download url="https://github.com/nlohmann/json/releases/download/v{LibraryVersion}/include.zip"
                    archive="nlohmann-json-{LibraryVersion}-include.zip"
@@ -1636,6 +1788,23 @@
          <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\nlohmann\json_fwd.hpp"/>
          <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.MIT"/>
       </install>
+   
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+
+      <smoke id="consumer" source="smokes\nlohmann-json\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="nlohmann-json-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
 </buildLibraries>
