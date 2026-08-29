@@ -34,6 +34,8 @@ Installed CMake package configurations remain in their versioned package directo
 
 Downstream build variants depend on the matching `ready:<Configuration>` state. Existing successful schema-10 aggregate install/ready markers are migrated to the new intermediate state files so a scheduler-only DAG change does not unnecessarily rebuild already verified packages.
 
+Producer CMake builds receive only their declared versioned dependencies. BuildEngine supplies each package root through `CMAKE_PREFIX_PATH`, each `include` directory through `CMAKE_INCLUDE_PATH`, and each `lib/win64/<Configuration>` directory through `CMAKE_LIBRARY_PATH`. This keeps upstream `find_package()`/`find_library()` calls compatible with the versioned package layout without exposing the published consumer-only `Win64x/cmake` module overlay.
+
 Simple `<smoke>` nodes are usability tests, not additional producer regression suites. Each smoke configures a fresh C++23 consumer with normal `find_package()` calls, compiles and links it against the published tree, executes it with `Win64x/bin` on the child-process `PATH`, and emits the strict `SMOKE|...` protocol. BuildEngine preserves the complete raw stdout/stderr process log and also writes a full validation log containing every observed line plus the parsed checks and final validation status.
 
 Complex multi-package integration tests and demos do not belong to these per-library smoke nodes. They are maintained in the existing `BuildEngine-Tests` repository. That repository therefore contains only the larger integration and demo scenarios; the simple package usability smokes live exclusively in this administration repository.
