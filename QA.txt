@@ -1,0 +1,86 @@
+BuildEngine Boost 1.92.0 Component-Gates - Delivery QA
+======================================================
+Date: 2026-08-30
+
+Scope
+-----
+This QA validates the delivered complete files for the new Boost 1.92.0
+BuildEngine contract. It does not claim a new RAD Studio 13 / BCC64X target
+execution. The target-machine Boost integration remains [nicht verifiziert]
+until the next BuildEngine run.
+
+Verified baseline before this change
+------------------------------------
+The user-supplied immediately preceding BuildEngine run completed with:
+  jobs=141, success=141, failed=0, blocked=0, incomplete=0
+including curl Release/Debug build, install, publish and 6/6 Release consumer
+smoke. Boost is therefore introduced on top of a green package baseline.
+
+Static contract QA
+------------------
+PASS  build-libraries.xml validates against build-libraries.xsd schema 11.
+PASS  11 unique library contracts are present; Boost is 1.92.0.
+PASS  Boost declares exact BuildEngine dependencies OpenSSL 3.5.8 and zlib 1.3.2.
+PASS  components.json defines seven evidence/component gates.
+PASS  The seven gates contain exactly 148 unique Boost source modules.
+PASS  BOOST_INCLUDE_LIBRARIES in XML is byte-for-byte the same ordered 148-module list.
+PASS  Six external exclusions are explicit and absent from the producer module list:
+      compute, graph_parallel, mpi, parameter_python, property_map_parallel, python.
+PASS  Producer policy: C++23, shared libraries, MPI OFF, Python OFF,
+      upstream BUILD_TESTING OFF, Boost.Iostreams zlib ON.
+PASS  26 required compiled component families have both DLL and COFF import-LIB
+      probes for each selected configuration (52 generic perVariant probes).
+PASS  Boost has 14 smoke jobs: seven evidence areas x Release/Debug.
+PASS  Every Release gate uses published scope; every Debug gate uses package scope.
+PASS  Every Boost gate has a real runtime pre-run before the structured validator.
+PASS  Boost alone sets publish/@requiresAllVariants=true.
+PASS  XSD declares <run> exactly once and only inside librarySmokeType.
+PASS  BCC64X generic CMake toolchain restores CMAKE_ASM_COMPILER=CB_BCC64X.
+PASS  package-scope smoke supplies exact package/dependency prefix, include,
+      library and runtime paths.
+PASS  smoke currentness also requires every configured pre-run executable to exist.
+PASS  parser accepts schema versions through 11 and validates smoke/run/@executable.
+PASS  no BuildEngine-Integration subtree.
+PASS  no .patch or .diff delivery artifact.
+PASS  structural library DAG model is acyclic (143 model nodes, 238 dependency edges).
+
+Synthetic CMake gate QA
+-----------------------
+A generated fake Boost 1.92 CONFIG package with imported target classifications
+was used only to validate the new consumer CMake logic. This is not a compiler
+or ABI proof.
+
+PASS  closure configure
+PASS  math-numerics configure
+PASS  state-parsing-meta configure
+PASS  algorithms-containers-data configure
+PASS  concurrency-async configure
+PASS  system-io-runtime configure
+PASS  foundation-language configure
+
+The synthetic producer-hook CMake project also configures successfully with a
+known OpenSSL installation and dummy Boost.Cobalt/MySQL/Redis target names.
+This checks CMake syntax/deferred-hook structure only.
+
+Evidence-preserving architecture checks
+---------------------------------------
+PASS  Official boost-1.92.0-cmake.zip source is the only Boost source input.
+PASS  No historical stage binary is a package input.
+PASS  One coherent producer CMake graph is configured per configuration.
+PASS  Release and Debug install into one versioned package tree.
+PASS  Publication waits for the full Boost Release+Debug package, matching the
+      canonical clean-rebuild evidence and avoiding shared-header publication races.
+PASS  Logical separation is implemented by seven independently stored consumer
+      gates, not by merging independently produced DLL sets.
+PASS  native-Clang Boost.Config policy remains a project-local include overlay;
+      no upstream Boost source patch is introduced.
+
+Not target-verified by this delivery environment
+------------------------------------------------
+[nicht verifiziert] Actual Boost 1.92.0 configure/build/install with BCC64X 20.1.7.
+[nicht verifiziert] 26 compiled component families produced by the new BuildEngine run.
+[nicht verifiziert] 14 Boost Release/Debug component consumer gates on the target machine.
+
+The historical Boost evidence used to design these contracts is already target
+verified; only its integration into the current BuildEngine schema-11 pipeline
+needs the next target-machine run.
