@@ -154,13 +154,11 @@ endfunction()
 
 if(BOOST_GATE STREQUAL "system-io-runtime")
    AddEvidenceRuntime(boost-evidence-runtime-charconv 1 Boost::disable_autolinking Boost::charconv)
-   AddEvidenceRuntime(boost-evidence-runtime-serialization 2 Boost::disable_autolinking
-      Boost::iostreams Boost::locale Boost::nowide Boost::serialization Boost::url)
 
-   add_executable(boost-evidence-runtime-serialization-boundary runtime-serialization.cpp)
-   set_property(TARGET boost-evidence-runtime-serialization-boundary PROPERTY CXX_SCAN_FOR_MODULES OFF)
-   target_compile_features(boost-evidence-runtime-serialization-boundary PRIVATE cxx_std_23)
-   target_link_libraries(boost-evidence-runtime-serialization-boundary PRIVATE
+   add_executable(boost-evidence-runtime-serialization runtime-serialization.cpp)
+   set_property(TARGET boost-evidence-runtime-serialization PROPERTY CXX_SCAN_FOR_MODULES OFF)
+   target_compile_features(boost-evidence-runtime-serialization PRIVATE cxx_std_23)
+   target_link_libraries(boost-evidence-runtime-serialization PRIVATE
       Boost::disable_autolinking Boost::iostreams Boost::serialization)
 
    AddEvidenceRuntime(boost-evidence-runtime-url 3 Boost::disable_autolinking Boost::url)
