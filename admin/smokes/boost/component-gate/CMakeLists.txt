@@ -133,10 +133,6 @@ elseif(BOOST_GATE STREQUAL "system-io-runtime")
                               type_index utility winapi xpressive)
       RequireInterfaceTarget(Boost::${theTarget})
    endforeach()
-   # Runtime evidence is split so failures remain attributable.  For the
-   # serialization case we intentionally reproduce the proven R193 process
-   # composition: iostreams, locale, nowide, serialization and url were linked
-   # into the same executable.  The serialization source code remains unchanged.
 elseif(BOOST_GATE STREQUAL "foundation-language")
    set(iGateCode 7)
    find_package(Boost 1.92.0 CONFIG REQUIRED)
@@ -160,6 +156,13 @@ if(BOOST_GATE STREQUAL "system-io-runtime")
    AddEvidenceRuntime(boost-evidence-runtime-charconv 1 Boost::disable_autolinking Boost::charconv)
    AddEvidenceRuntime(boost-evidence-runtime-serialization 2 Boost::disable_autolinking
       Boost::iostreams Boost::locale Boost::nowide Boost::serialization Boost::url)
+
+   add_executable(boost-evidence-runtime-serialization-boundary runtime-serialization.cpp)
+   set_property(TARGET boost-evidence-runtime-serialization-boundary PROPERTY CXX_SCAN_FOR_MODULES OFF)
+   target_compile_features(boost-evidence-runtime-serialization-boundary PRIVATE cxx_std_23)
+   target_link_libraries(boost-evidence-runtime-serialization-boundary PRIVATE
+      Boost::disable_autolinking Boost::iostreams Boost::serialization)
+
    AddEvidenceRuntime(boost-evidence-runtime-url 3 Boost::disable_autolinking Boost::url)
 else()
    AddEvidenceRuntime(boost-evidence-runtime 0 ${theLinkTargets})
