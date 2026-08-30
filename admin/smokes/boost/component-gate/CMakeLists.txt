@@ -155,17 +155,16 @@ endfunction()
 if(BOOST_GATE STREQUAL "system-io-runtime")
    AddEvidenceRuntime(boost-evidence-runtime-charconv 1 Boost::disable_autolinking Boost::charconv)
 
-   add_library(boost-evidence-uncaught-boundary SHARED runtime-uncaught-boundary.cpp)
-   set_property(TARGET boost-evidence-uncaught-boundary PROPERTY CXX_SCAN_FOR_MODULES OFF)
-   target_compile_features(boost-evidence-uncaught-boundary PRIVATE cxx_std_23)
-   target_compile_definitions(boost-evidence-uncaught-boundary PRIVATE ADECC_UNCAUGHT_BOUNDARY_EXPORTS)
-   target_link_libraries(boost-evidence-uncaught-boundary PRIVATE Boost::headers Boost::disable_autolinking)
+   add_library(boost-evidence-stream-boundary SHARED runtime-stream-boundary.cpp)
+   set_property(TARGET boost-evidence-stream-boundary PROPERTY CXX_SCAN_FOR_MODULES OFF)
+   target_compile_features(boost-evidence-stream-boundary PRIVATE cxx_std_23)
+   target_compile_definitions(boost-evidence-stream-boundary PRIVATE ADECC_STREAM_BOUNDARY_EXPORTS)
 
-   add_executable(boost-evidence-runtime-serialization runtime-uncaught.cpp)
+   add_executable(boost-evidence-runtime-serialization runtime-serialization.cpp)
    set_property(TARGET boost-evidence-runtime-serialization PROPERTY CXX_SCAN_FOR_MODULES OFF)
    target_compile_features(boost-evidence-runtime-serialization PRIVATE cxx_std_23)
    target_link_libraries(boost-evidence-runtime-serialization PRIVATE
-      Boost::headers Boost::disable_autolinking boost-evidence-uncaught-boundary)
+      Boost::disable_autolinking Boost::iostreams Boost::serialization boost-evidence-stream-boundary)
 
    AddEvidenceRuntime(boost-evidence-runtime-url 3 Boost::disable_autolinking Boost::url)
 else()
