@@ -11,6 +11,8 @@
 #  error "Managed Boost 1.92.0 consumer expects native-Clang Boost.Config routing"
 #endif
 
+#include "runtime-stream-boundary.h"
+
 #include <boost/archive/basic_streambuf_locale_saver.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -49,6 +51,33 @@ bool RunStage(char const* const pName, function_ty theFunction) {
 
 void Checkpoint(char const* const pName) {
    std::cout << "[SERIALIZATION-BOUNDARY] CHECKPOINT " << pName << std::endl;
+}
+
+bool CheckLocalEndl() {
+   std::stringstream theStream;
+   theStream << std::endl;
+   return theStream.good() && theStream.str() == "\n";
+}
+
+bool CheckDllOstreamPut() {
+   std::stringstream theStream;
+   return AdeccBoundaryOstreamPut(theStream) == 0 && theStream.str() == "\n";
+}
+
+bool CheckDllOstreamFlush() {
+   std::stringstream theStream;
+   theStream << "x";
+   return AdeccBoundaryOstreamFlush(theStream) == 0 && theStream.str() == "x";
+}
+
+bool CheckDllOstreamInsertChar() {
+   std::stringstream theStream;
+   return AdeccBoundaryOstreamInsertChar(theStream) == 0 && theStream.str() == "\n";
+}
+
+bool CheckDllOstreamEndl() {
+   std::stringstream theStream;
+   return AdeccBoundaryOstreamEndl(theStream) == 0 && theStream.str() == "\n";
 }
 
 bool CheckLocalTextPrimitiveLifetimeStdStream() {
@@ -160,6 +189,11 @@ bool RunDiagnostics() {
              << " sizeof(wchar_t)=" << sizeof(wchar_t)
              << " sizeof(mbstate_t)=" << sizeof(std::mbstate_t) << std::endl;
 
+   if(!RunStage("local-ostream-endl", CheckLocalEndl)) return false;
+   if(!RunStage("dll-ostream-put", CheckDllOstreamPut)) return false;
+   if(!RunStage("dll-ostream-flush", CheckDllOstreamFlush)) return false;
+   if(!RunStage("dll-ostream-insert-char", CheckDllOstreamInsertChar)) return false;
+   if(!RunStage("dll-ostream-endl", CheckDllOstreamEndl)) return false;
    if(!RunStage("local-text-primitive-lifetime-std-stream", CheckLocalTextPrimitiveLifetimeStdStream)) return false;
    if(!RunStage("boost-iostreams-plain-output", CheckBoostIoStreamsPlainOutput)) return false;
    if(!RunStage("local-text-primitive-lifetime-boost-stream", CheckLocalTextPrimitiveLifetimeBoostStream)) return false;
