@@ -19,3 +19,9 @@ Lines not starting with `SMOKE|` are retained as informational stdout. Malformed
 For each smoke, BuildEngine keeps the complete CMake configure/build logs, the complete raw process log, and a
 second validation log containing every observed stdout/stderr line plus parsed CHECK/RESULT records and the final
 validation decision.
+
+Schema 11 additionally permits multiple smoke gates for one library and two consumer scopes. `published` is the
+normal Release view through `install/Win64x`; `package` addresses the exact versioned package/configuration and is
+used for Boost Debug evidence without creating a second global SDK tree. A smoke may declare one or more
+`<run executable="..."/>` pre-runs. Those programs are built by the same consumer CMake project and must all exit
+with code zero before the final protocol-emitting validator is executed.

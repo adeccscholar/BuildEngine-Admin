@@ -5,9 +5,8 @@
 # RAD Studio 13 Florence / BCC64X / Win64 Modern.
 # BuildEngine BCC64X C/C++ profile derived from the proven project toolchain.
 # It contains only generic compiler/linker integration.  It does not add
-# library-specific workarounds.  If an upstream project requires additional
-# generic tooling (for example Windows RC) and stock CMake cannot resolve it,
-# the real BCC64X target failure is used to design that support.
+# library-specific workarounds.  ASM uses the same BCC64X driver, matching the
+# proven Boost.Context/Coroutine/Fiber toolchain path.
 
 if(NOT DEFINED ENV{CB_BCC64X} OR "$ENV{CB_BCC64X}" STREQUAL "")
    message(FATAL_ERROR "CB_BCC64X is not set")
@@ -39,7 +38,8 @@ if(DEFINED ENV{CB_BDS} AND NOT "$ENV{CB_BDS}" STREQUAL "")
    unset(_BCC64X_RAD_INCLUDE_PATHS)
 endif()
 
-set(CMAKE_C_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C compiler" FORCE)
+set(CMAKE_ASM_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X assembler driver" FORCE)
+set(CMAKE_C_COMPILER   "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C compiler" FORCE)
 set(CMAKE_CXX_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C++ compiler" FORCE)
 
 set(CMAKE_USER_MAKE_RULES_OVERRIDE
@@ -53,7 +53,7 @@ set(CMAKE_TRY_COMPILE_CONFIGURATION Release CACHE STRING "" FORCE)
 
 get_property(_BCC64X_TOOLCHAIN_SUMMARY_EMITTED GLOBAL PROPERTY ADECC_BCC64X_TOOLCHAIN_SUMMARY_EMITTED)
 if(NOT _BCC64X_TOOLCHAIN_SUMMARY_EMITTED)
-   message(STATUS "BCC64X C++ toolchain: $ENV{CB_BCC64X}")
+   message(STATUS "BCC64X C/C++/ASM toolchain: $ENV{CB_BCC64X}")
    message(STATUS "BCC64X rules override: ${_BCC64X_RULE_OVERRIDE}")
    set_property(GLOBAL PROPERTY ADECC_BCC64X_TOOLCHAIN_SUMMARY_EMITTED TRUE)
 endif()

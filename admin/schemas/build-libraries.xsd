@@ -182,14 +182,26 @@
       <xs:attribute name="root" type="xs:string" use="required"/>
       <xs:attribute name="configuration" type="xs:string" use="required"/>
       <xs:attribute name="consumer" type="xs:string" use="required"/>
+      <xs:attribute name="requiresAllVariants" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
 
+   <xs:simpleType name="smokeScopeType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="published"/>
+         <xs:enumeration value="package"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:complexType name="smokeRunType">
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+   </xs:complexType>
    <xs:complexType name="librarySmokeType">
       <xs:sequence>
          <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
          <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="run" type="smokeRunType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="id" type="xs:string" use="required"/>
+      <xs:attribute name="scope" type="smokeScopeType" use="optional" default="published"/>
       <xs:attribute name="source" type="xs:string" use="required"/>
       <xs:attribute name="configuration" type="xs:string" use="required"/>
       <xs:attribute name="cmake" type="xs:string" use="required"/>
@@ -208,14 +220,14 @@
                      <xs:element name="source" type="sourceType"/>
                      <xs:choice><xs:element name="build" type="buildType"/><xs:element name="install" type="directInstallType"/></xs:choice>
                      <xs:element name="publish" type="publishType" minOccurs="0"/>
-                     <xs:element name="smoke" type="librarySmokeType" minOccurs="0"/>
+                     <xs:element name="smoke" type="librarySmokeType" minOccurs="0" maxOccurs="unbounded"/>
                   </xs:sequence>
                   <xs:attribute name="id" type="xs:string" use="required"/><xs:attribute name="version" type="xs:string" use="required"/>
                   <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
                </xs:complexType>
             </xs:element>
          </xs:sequence>
-         <xs:attribute name="schemaVersion" use="required" fixed="10"/>
+         <xs:attribute name="schemaVersion" use="required" fixed="11"/>
       </xs:complexType>
       <xs:unique name="uniqueLibraryId"><xs:selector xpath="library"/><xs:field xpath="@id"/></xs:unique>
    </xs:element>

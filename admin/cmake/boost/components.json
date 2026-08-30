@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "boostVersion": "1.92.0",
+  "model": "single-upstream-source-with-component-gates",
+  "inspiration": "vcpkg boost meta-port plus boost-* component ports",
+  "dependencyResolution": "upstream Boost CMake transitive targets; do not duplicate the full graph manually",
+  "producer": {
+    "releaseGraphs": 1,
+    "debugGraphs": 1,
+    "sourceModules": 148,
+    "sharedComponentFamilies": 26,
+    "expectedDllsPerConfiguration": 36
+  },
+  "externalExclusions": {
+    "compute": "OpenCL development SDK not discoverable in the verified BCC64X target environment",
+    "graph_parallel": "MPI C++ implementation not discoverable/usable through CMake FindMPI with BCC64X",
+    "mpi": "MPI C++ implementation not discoverable/usable through CMake FindMPI with BCC64X",
+    "parameter_python": "Python interpreter plus matching development package not discoverable through CMake FindPython with BCC64X",
+    "property_map_parallel": "MPI C++ implementation not discoverable/usable through CMake FindMPI with BCC64X",
+    "python": "Python interpreter plus matching development package not discoverable through CMake FindPython with BCC64X"
+  },
+  "gates": [
+    {"id":"closure","area":"Base / Closure","sourceModules":["filesystem","system","program_options","regex","thread","chrono","json","asio","beast"]},
+    {"id":"math-numerics","area":"Mathematics / Numerics","sourceModules":["accumulators","decimal","endian","geometry","histogram","integer","math","multi_array","multiprecision","numeric/conversion","numeric/interval","numeric/odeint","numeric/ublas","polygon","qvm","random","ratio","rational","safe_numerics","units","utility"]},
+    {"id":"state-parsing-meta","area":"State / Parsing / Meta","sourceModules":["bind","callable_traits","core","describe","function_types","fusion","hana","hof","lambda","lambda2","local_function","metaparse","mp11","mpl","msm","parser","pfr","phoenix","preprocessor","proto","spirit","statechart","static_assert","tti","type_traits","typeof","vmd","yap"]},
+    {"id":"algorithms-containers-data","area":"Algorithms / Containers / Data Structures","sourceModules":["algorithm","any","array","bimap","bloom","circular_buffer","foreach","gil","graph","heap","icl","intrusive","iterator","multi_index","optional","poly_collection","property_map","property_tree","ptr_container","range","sort","tuple","unordered","uuid","variant","variant2"]},
+    {"id":"concurrency-async","area":"Concurrency / Async","sourceModules":["cobalt","context","coroutine","coroutine2","fiber","interprocess","lockfree","mqtt5","mysql","redis"]},
+    {"id":"system-io-runtime","area":"System / I/O / Runtime","sourceModules":["assign","charconv","contract","convert","dll","exception","format","io","iostreams","leaf","lexical_cast","locale","log","nowide","process","serialization","stacktrace","static_string","test","timer","tokenizer","type_erasure","type_index","url","wave","winapi","xpressive"]},
+    {"id":"foundation-language","area":"Foundation / Language","sourceModules":["align","assert","compat","concept_check","config","container_hash","conversion","crc","detail","dynamic_bitset","flyweight","function","functional","hash2","logic","move","openmethod","outcome","parameter","pool","predef","scope","scope_exit","signals2","smart_ptr","stl_interfaces","throw_exception"]}
+  ]
+}
