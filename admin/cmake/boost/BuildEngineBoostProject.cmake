@@ -64,6 +64,14 @@ function(_adecc_boost_verify_protocol_targets)
    endforeach()
 endfunction()
 
+# R193 compatibility decision: BCC64X uses the working std::locale/codecvt
+# path, but not Boost.Locale's WinAPI backend.  The upstream CMake default
+# enables that backend solely from WIN32, which is too broad for this target.
+if(PROJECT_NAME STREQUAL "boost_locale" AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
+   set(BOOST_LOCALE_ENABLE_WINAPI OFF CACHE BOOL "Boost.Locale WinAPI backend disabled for BCC64X" FORCE)
+   message(STATUS "Boost.Locale BCC64X policy: WinAPI backend OFF; std::locale backend remains enabled")
+endif()
+
 get_property(_adecc_boost_openssl_checked GLOBAL PROPERTY ADECC_BOOST_OPENSSL_CHECKED)
 if(NOT _adecc_boost_openssl_checked)
    _adecc_boost_validate_managed_openssl()
