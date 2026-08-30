@@ -44,6 +44,7 @@
 #  if ADECC_BOOST_RUNTIME_CASE == 1
 #    include <boost/charconv.hpp>
 #  elif ADECC_BOOST_RUNTIME_CASE == 2
+#    include <boost/archive/basic_streambuf_locale_saver.hpp>
 #    include <boost/archive/binary_iarchive.hpp>
 #    include <boost/archive/binary_oarchive.hpp>
 #    include <boost/archive/codecvt_null.hpp>
@@ -93,6 +94,10 @@ bool RunSerializationDiagnosticStage(char const* const pName, function_ty theFun
       std::cout << "[SERIALIZATION-DIAG] EXCEPTION " << pName << ": unknown" << std::endl;
       return false;
    }
+}
+
+void SerializationCheckpoint(char const* const pName) {
+   std::cout << "[SERIALIZATION-DIAG] CHECKPOINT " << pName << std::endl;
 }
 
 bool CheckStdCodecvtChar() {
@@ -204,6 +209,15 @@ bool CheckBoostCodecvtNullWChar() {
    return svRoundTrip == svOriginal;
 }
 
+bool CheckBoostOstreamLocaleSaverChar() {
+   std::stringstream theStream;
+   {
+      boost::archive::basic_ostream_locale_saver<char, std::char_traits<char>> theSaver { theStream };
+      theStream << "boost-locale-saver-char";
+   }
+   return theStream.str() == "boost-locale-saver-char";
+}
+
 bool CheckBinaryArchive() {
    std::stringstream theStream;
    std::string const strOriginal { "boost-serialization-binary" };
@@ -220,19 +234,76 @@ bool CheckBinaryArchive() {
    return strRoundTrip == strOriginal;
 }
 
+bool CheckTextArchiveNoHeaderNoCodecvtConstruct() {
+   std::stringstream theStream;
+   SerializationCheckpoint("text-noheader-nocodecvt before-ctor");
+   {
+      boost::archive::text_oarchive theArchive(
+         theStream, boost::archive::no_header | boost::archive::no_codecvt);
+      SerializationCheckpoint("text-noheader-nocodecvt after-ctor");
+   }
+   SerializationCheckpoint("text-noheader-nocodecvt after-dtor");
+   return true;
+}
+
+bool CheckTextArchiveNoHeaderDefaultConstruct() {
+   std::stringstream theStream;
+   SerializationCheckpoint("text-noheader-default before-ctor");
+   {
+      boost::archive::text_oarchive theArchive(theStream, boost::archive::no_header);
+      SerializationCheckpoint("text-noheader-default after-ctor");
+   }
+   SerializationCheckpoint("text-noheader-default after-dtor");
+   return true;
+}
+
+bool CheckTextArchiveHeaderNoCodecvtConstruct() {
+   std::stringstream theStream;
+   SerializationCheckpoint("text-header-nocodecvt before-ctor");
+   {
+      boost::archive::text_oarchive theArchive(theStream, boost::archive::no_codecvt);
+      SerializationCheckpoint("text-header-nocodecvt after-ctor");
+   }
+   SerializationCheckpoint("text-header-nocodecvt after-dtor");
+   return !theStream.str().empty();
+}
+
+bool CheckTextArchiveNoHeaderNoCodecvtOutput() {
+   std::stringstream theStream;
+   std::string const strOriginal { "boost-serialization-output" };
+   SerializationCheckpoint("text-noheader-nocodecvt-output before-ctor");
+   {
+      boost::archive::text_oarchive theArchive(
+         theStream, boost::archive::no_header | boost::archive::no_codecvt);
+      SerializationCheckpoint("text-noheader-nocodecvt-output after-ctor");
+      theArchive << strOriginal;
+      SerializationCheckpoint("text-noheader-nocodecvt-output after-save");
+   }
+   SerializationCheckpoint("text-noheader-nocodecvt-output after-dtor");
+   return !theStream.str().empty();
+}
+
 bool CheckTextArchiveNoCodecvt() {
    std::stringstream theStream;
    std::string const strOriginal { "boost-serialization-no-codecvt" };
+   SerializationCheckpoint("text-roundtrip-nocodecvt before-oarchive");
    {
       boost::archive::text_oarchive theArchive(theStream, boost::archive::no_codecvt);
+      SerializationCheckpoint("text-roundtrip-nocodecvt after-oarchive-ctor");
       theArchive << strOriginal;
+      SerializationCheckpoint("text-roundtrip-nocodecvt after-save");
    }
+   SerializationCheckpoint("text-roundtrip-nocodecvt after-oarchive-dtor");
    theStream.seekg(0);
    std::string strRoundTrip;
+   SerializationCheckpoint("text-roundtrip-nocodecvt before-iarchive");
    {
       boost::archive::text_iarchive theArchive(theStream, boost::archive::no_codecvt);
+      SerializationCheckpoint("text-roundtrip-nocodecvt after-iarchive-ctor");
       theArchive >> strRoundTrip;
+      SerializationCheckpoint("text-roundtrip-nocodecvt after-load");
    }
+   SerializationCheckpoint("text-roundtrip-nocodecvt after-iarchive-dtor");
    return strRoundTrip == strOriginal;
 }
 
@@ -263,7 +334,12 @@ bool RunSerializationDiagnostics() {
    if(!RunSerializationDiagnosticStage("std-stream-imbue-wchar", CheckStdStreamImbueWChar)) return false;
    if(!RunSerializationDiagnosticStage("boost-codecvt-null-char", CheckBoostCodecvtNullChar)) return false;
    if(!RunSerializationDiagnosticStage("boost-codecvt-null-wchar", CheckBoostCodecvtNullWChar)) return false;
+   if(!RunSerializationDiagnosticStage("boost-ostream-locale-saver-char", CheckBoostOstreamLocaleSaverChar)) return false;
    if(!RunSerializationDiagnosticStage("boost-binary-archive", CheckBinaryArchive)) return false;
+   if(!RunSerializationDiagnosticStage("boost-text-noheader-nocodecvt-construct", CheckTextArchiveNoHeaderNoCodecvtConstruct)) return false;
+   if(!RunSerializationDiagnosticStage("boost-text-noheader-default-construct", CheckTextArchiveNoHeaderDefaultConstruct)) return false;
+   if(!RunSerializationDiagnosticStage("boost-text-header-nocodecvt-construct", CheckTextArchiveHeaderNoCodecvtConstruct)) return false;
+   if(!RunSerializationDiagnosticStage("boost-text-noheader-nocodecvt-output", CheckTextArchiveNoHeaderNoCodecvtOutput)) return false;
    if(!RunSerializationDiagnosticStage("boost-text-archive-no-codecvt", CheckTextArchiveNoCodecvt)) return false;
    return RunSerializationDiagnosticStage("boost-text-archive-default", CheckTextArchiveDefault);
 }
