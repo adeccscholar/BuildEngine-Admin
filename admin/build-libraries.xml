@@ -1441,7 +1441,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="boost" version="1.92.0" timestamp="2026-08-30T01:20:00Z">
+   <library id="boost" version="1.92.0" timestamp="2026-08-30T16:55:00Z">
       <!--
          Canonical Boost model from the target-machine evidence:
          - one official upstream CMake source tree;
