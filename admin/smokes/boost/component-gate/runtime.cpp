@@ -11,6 +11,10 @@
 #  error "Managed Boost 1.92.0 consumer expects native-Clang Boost.Config routing"
 #endif
 
+#ifndef ADECC_BOOST_RUNTIME_CASE
+#  define ADECC_BOOST_RUNTIME_CASE 0
+#endif
+
 #if ADECC_BOOST_GATE_CODE == 1
 #  include <boost/asio.hpp>
 #  include <boost/beast/http.hpp>
@@ -37,11 +41,17 @@
 #  include <boost/interprocess/shared_memory_object.hpp>
 #  include <boost/lockfree/queue.hpp>
 #elif ADECC_BOOST_GATE_CODE == 6
-#  include <boost/archive/text_iarchive.hpp>
-#  include <boost/archive/text_oarchive.hpp>
-#  include <boost/charconv.hpp>
-#  include <boost/serialization/string.hpp>
-#  include <boost/url.hpp>
+#  if ADECC_BOOST_RUNTIME_CASE == 1
+#    include <boost/charconv.hpp>
+#  elif ADECC_BOOST_RUNTIME_CASE == 2
+#    include <boost/archive/text_iarchive.hpp>
+#    include <boost/archive/text_oarchive.hpp>
+#    include <boost/serialization/string.hpp>
+#  elif ADECC_BOOST_RUNTIME_CASE == 3
+#    include <boost/url.hpp>
+#  else
+#    error "system-io-runtime requires an explicit runtime case"
+#  endif
 #elif ADECC_BOOST_GATE_CODE == 7
 #  include <boost/dynamic_bitset.hpp>
 #  include <boost/optional.hpp>
@@ -123,9 +133,12 @@ bool RunGate() {
    boost::interprocess::shared_memory_object::remove("BuildEngineBoostEvidenceUnused");
    return bPopped && iValue == 23;
 #elif ADECC_BOOST_GATE_CODE == 6
+#  if ADECC_BOOST_RUNTIME_CASE == 1
    int iValue = 0;
    std::string_view const svNumber { "192" };
    auto const theParse = boost::charconv::from_chars(svNumber.data(), svNumber.data() + svNumber.size(), iValue);
+   return theParse.ec == std::errc {} && iValue == 192;
+#  elif ADECC_BOOST_RUNTIME_CASE == 2
    std::stringstream theStream;
    std::string const strOriginal { "boost-serialization" };
    {
@@ -137,9 +150,13 @@ bool RunGate() {
       boost::archive::text_iarchive theArchive(theStream);
       theArchive >> strRoundTrip;
    }
+   return strRoundTrip == strOriginal;
+#  elif ADECC_BOOST_RUNTIME_CASE == 3
    auto const theUrl = boost::urls::parse_uri("https://example.invalid/boost");
-   return theParse.ec == std::errc {} && iValue == 192 && strRoundTrip == strOriginal &&
-      theUrl.has_value() && theUrl->scheme() == "https";
+   return theUrl.has_value() && theUrl->scheme() == "https";
+#  else
+   return false;
+#  endif
 #elif ADECC_BOOST_GATE_CODE == 7
    boost::dynamic_bitset<> theBits(8);
    theBits.set(3);

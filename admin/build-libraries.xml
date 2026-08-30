@@ -1441,7 +1441,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="boost" version="1.92.0" timestamp="2026-08-29T23:45:00Z">
+   <library id="boost" version="1.92.0" timestamp="2026-08-30T01:20:00Z">
       <!--
          Canonical Boost model from the target-machine evidence:
          - one official upstream CMake source tree;
@@ -1491,6 +1491,9 @@
          <argument value="-DBOOST_ENABLE_MPI:BOOL=OFF"/>
          <argument value="-DBOOST_ENABLE_PYTHON:BOOL=OFF"/>
          <argument value="-DBOOST_IOSTREAMS_ENABLE_ZLIB:BOOL=ON"/>
+         <!-- R189/R196 evidence classifies Boost.Random as header/INTERFACE.
+              Upstream CMake otherwise enables the optional random_device binary by default. -->
+         <argument value="-DBOOST_RANDOM_ENABLE_RANDOM_DEVICE:BOOL=OFF"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <!-- Exact managed dependency coordinates used by the evidence build. -->
@@ -1708,7 +1711,9 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DBOOST_GATE:STRING=system-io-runtime"/>
-         <run executable="boost-evidence-runtime.exe"/>
+         <run executable="boost-evidence-runtime-charconv.exe"/>
+         <run executable="boost-evidence-runtime-serialization.exe"/>
+         <run executable="boost-evidence-runtime-url.exe"/>
       </smoke>
       <smoke id="system-io-runtime" source="smokes\boost\component-gate" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="boost-evidence-gate.exe" scope="package">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -1717,7 +1722,9 @@
          <argument value="-DBOOST_PACKAGE_CMAKE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake"/>
          <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\bcc64x-native-clang\project-include.cmake"/>
          <argument value="-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"/>
-         <run executable="boost-evidence-runtime.exe"/>
+         <run executable="boost-evidence-runtime-charconv.exe"/>
+         <run executable="boost-evidence-runtime-serialization.exe"/>
+         <run executable="boost-evidence-runtime-url.exe"/>
       </smoke>
       <smoke id="foundation-language" source="smokes\boost\component-gate" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="boost-evidence-gate.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>

@@ -133,7 +133,9 @@ elseif(BOOST_GATE STREQUAL "system-io-runtime")
                               type_index utility winapi xpressive)
       RequireInterfaceTarget(Boost::${theTarget})
    endforeach()
-   list(APPEND theLinkTargets Boost::charconv Boost::serialization Boost::url)
+   # Runtime evidence for this domain is intentionally split below.  R193 used
+   # independent executables as well; keeping DLL-heavy subsystems in separate
+   # processes avoids hiding which runtime contract failed.
 elseif(BOOST_GATE STREQUAL "foundation-language")
    set(iGateCode 7)
    find_package(Boost 1.92.0 CONFIG REQUIRED)
@@ -142,13 +144,24 @@ else()
    message(FATAL_ERROR "Unsupported BOOST_GATE='${BOOST_GATE}'")
 endif()
 
-add_executable(boost-evidence-runtime runtime.cpp)
-set_property(TARGET boost-evidence-runtime PROPERTY CXX_SCAN_FOR_MODULES OFF)
-target_compile_features(boost-evidence-runtime PRIVATE cxx_std_23)
-target_compile_definitions(boost-evidence-runtime PRIVATE
-   ADECC_BOOST_GATE_CODE=${iGateCode}
-   ADECC_BOOST_GATE_ID="${BOOST_GATE}")
-target_link_libraries(boost-evidence-runtime PRIVATE ${theLinkTargets})
+function(AddEvidenceRuntime theTarget theRuntimeCase)
+   add_executable(${theTarget} runtime.cpp)
+   set_property(TARGET ${theTarget} PROPERTY CXX_SCAN_FOR_MODULES OFF)
+   target_compile_features(${theTarget} PRIVATE cxx_std_23)
+   target_compile_definitions(${theTarget} PRIVATE
+      ADECC_BOOST_GATE_CODE=${iGateCode}
+      ADECC_BOOST_RUNTIME_CASE=${theRuntimeCase}
+      ADECC_BOOST_GATE_ID="${BOOST_GATE}")
+   target_link_libraries(${theTarget} PRIVATE ${ARGN})
+endfunction()
+
+if(BOOST_GATE STREQUAL "system-io-runtime")
+   AddEvidenceRuntime(boost-evidence-runtime-charconv 1 Boost::disable_autolinking Boost::charconv)
+   AddEvidenceRuntime(boost-evidence-runtime-serialization 2 Boost::disable_autolinking Boost::serialization)
+   AddEvidenceRuntime(boost-evidence-runtime-url 3 Boost::disable_autolinking Boost::url)
+else()
+   AddEvidenceRuntime(boost-evidence-runtime 0 ${theLinkTargets})
+endif()
 
 add_executable(boost-evidence-gate main.cpp)
 set_property(TARGET boost-evidence-gate PROPERTY CXX_SCAN_FOR_MODULES OFF)
