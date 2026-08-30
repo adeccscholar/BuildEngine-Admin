@@ -44,6 +44,9 @@
 #  if ADECC_BOOST_RUNTIME_CASE == 1
 #    include <boost/charconv.hpp>
 #  elif ADECC_BOOST_RUNTIME_CASE == 2
+#    include <boost/archive/binary_iarchive.hpp>
+#    include <boost/archive/binary_oarchive.hpp>
+#    include <boost/archive/codecvt_null.hpp>
 #    include <boost/archive/text_iarchive.hpp>
 #    include <boost/archive/text_oarchive.hpp>
 #    include <boost/serialization/string.hpp>
@@ -59,6 +62,11 @@
 #  include <boost/variant2/variant.hpp>
 #endif
 
+#include <array>
+#include <cwchar>
+#include <exception>
+#include <iostream>
+#include <locale>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -66,6 +74,202 @@
 #include <vector>
 
 namespace {
+
+#if ADECC_BOOST_GATE_CODE == 6 && ADECC_BOOST_RUNTIME_CASE == 2
+
+template<typename function_ty>
+bool RunSerializationDiagnosticStage(char const* const pName, function_ty theFunction) {
+   std::cout << "[SERIALIZATION-DIAG] BEGIN " << pName << std::endl;
+   try {
+      bool const bSuccess = theFunction();
+      std::cout << "[SERIALIZATION-DIAG] " << (bSuccess ? "PASS " : "FAIL ") << pName << std::endl;
+      return bSuccess;
+   }
+   catch(std::exception const& theException) {
+      std::cout << "[SERIALIZATION-DIAG] EXCEPTION " << pName << ": " << theException.what() << std::endl;
+      return false;
+   }
+   catch(...) {
+      std::cout << "[SERIALIZATION-DIAG] EXCEPTION " << pName << ": unknown" << std::endl;
+      return false;
+   }
+}
+
+bool CheckStdCodecvtChar() {
+   std::locale const theLocale = std::locale::classic();
+   using facet_ty = std::codecvt<char, char, std::mbstate_t>;
+   if(!std::has_facet<facet_ty>(theLocale)) return false;
+
+   facet_ty const& theFacet = std::use_facet<facet_ty>(theLocale);
+   return theFacet.always_noconv();
+}
+
+bool CheckStdCodecvtWChar() {
+   std::locale const theLocale = std::locale::classic();
+   using facet_ty = std::codecvt<wchar_t, char, std::mbstate_t>;
+   if(!std::has_facet<facet_ty>(theLocale)) return false;
+
+   facet_ty const& theFacet = std::use_facet<facet_ty>(theLocale);
+   std::wstring_view const svOriginal { L"boost" };
+
+   std::mbstate_t theState {};
+   wchar_t const* pWideNext = svOriginal.data();
+   std::array<char, 32> arrNarrow {};
+   char* pNarrowNext = arrNarrow.data();
+   std::codecvt_base::result const theOutResult = theFacet.out(
+      theState,
+      svOriginal.data(), svOriginal.data() + svOriginal.size(), pWideNext,
+      arrNarrow.data(), arrNarrow.data() + arrNarrow.size(), pNarrowNext);
+   if(theOutResult != std::codecvt_base::ok || pWideNext != svOriginal.data() + svOriginal.size()) return false;
+
+   std::string_view const svNarrow {
+      arrNarrow.data(), static_cast<std::size_t>(pNarrowNext - arrNarrow.data()) };
+   if(svNarrow != "boost") return false;
+
+   theState = std::mbstate_t {};
+   char const* pNarrowReadNext = arrNarrow.data();
+   std::array<wchar_t, 32> arrWide {};
+   wchar_t* pWideOutputNext = arrWide.data();
+   std::codecvt_base::result const theInResult = theFacet.in(
+      theState,
+      arrNarrow.data(), pNarrowNext, pNarrowReadNext,
+      arrWide.data(), arrWide.data() + arrWide.size(), pWideOutputNext);
+   if(theInResult != std::codecvt_base::ok || pNarrowReadNext != pNarrowNext) return false;
+
+   std::wstring_view const svRoundTrip {
+      arrWide.data(), static_cast<std::size_t>(pWideOutputNext - arrWide.data()) };
+   return svRoundTrip == svOriginal;
+}
+
+bool CheckStdStreamImbueChar() {
+   std::stringstream theStream;
+   theStream.imbue(std::locale::classic());
+   theStream << "locale-char";
+   theStream.seekg(0);
+   std::string strValue;
+   theStream >> strValue;
+   return strValue == "locale-char";
+}
+
+bool CheckStdStreamImbueWChar() {
+   std::wstringstream theStream;
+   theStream.imbue(std::locale::classic());
+   theStream << L"locale-wchar";
+   theStream.seekg(0);
+   std::wstring strValue;
+   theStream >> strValue;
+   return strValue == L"locale-wchar";
+}
+
+bool CheckBoostCodecvtNullChar() {
+   boost::archive::codecvt_null<char> theFacet { 1U };
+   if(!theFacet.always_noconv()) return false;
+
+   std::stringstream theStream;
+   std::locale const theArchiveLocale { theStream.getloc(), &theFacet };
+   theStream.imbue(theArchiveLocale);
+   theStream << "boost-codecvt-char";
+   return theStream.str() == "boost-codecvt-char";
+}
+
+bool CheckBoostCodecvtNullWChar() {
+   boost::archive::codecvt_null<wchar_t> theFacet { 1U };
+   std::wstring_view const svOriginal { L"boost" };
+
+   std::mbstate_t theState {};
+   wchar_t const* pWideNext = svOriginal.data();
+   std::array<wchar_t, 32> arrEncodedStorage {};
+   char* const pEncodedBegin = reinterpret_cast<char*>(arrEncodedStorage.data());
+   char* pEncodedNext = pEncodedBegin;
+   char* const pEncodedEnd = pEncodedBegin + sizeof(arrEncodedStorage);
+   std::codecvt_base::result const theOutResult = theFacet.out(
+      theState,
+      svOriginal.data(), svOriginal.data() + svOriginal.size(), pWideNext,
+      pEncodedBegin, pEncodedEnd, pEncodedNext);
+   if(theOutResult != std::codecvt_base::ok || pWideNext != svOriginal.data() + svOriginal.size()) return false;
+   if(pEncodedNext - pEncodedBegin != static_cast<std::ptrdiff_t>(svOriginal.size() * sizeof(wchar_t))) return false;
+
+   theState = std::mbstate_t {};
+   char const* pEncodedReadNext = pEncodedBegin;
+   std::array<wchar_t, 32> arrRoundTrip {};
+   wchar_t* pWideOutputNext = arrRoundTrip.data();
+   std::codecvt_base::result const theInResult = theFacet.in(
+      theState,
+      pEncodedBegin, pEncodedNext, pEncodedReadNext,
+      arrRoundTrip.data(), arrRoundTrip.data() + arrRoundTrip.size(), pWideOutputNext);
+   if(theInResult != std::codecvt_base::ok || pEncodedReadNext != pEncodedNext) return false;
+
+   std::wstring_view const svRoundTrip {
+      arrRoundTrip.data(), static_cast<std::size_t>(pWideOutputNext - arrRoundTrip.data()) };
+   return svRoundTrip == svOriginal;
+}
+
+bool CheckBinaryArchive() {
+   std::stringstream theStream;
+   std::string const strOriginal { "boost-serialization-binary" };
+   {
+      boost::archive::binary_oarchive theArchive(theStream);
+      theArchive << strOriginal;
+   }
+   theStream.seekg(0);
+   std::string strRoundTrip;
+   {
+      boost::archive::binary_iarchive theArchive(theStream);
+      theArchive >> strRoundTrip;
+   }
+   return strRoundTrip == strOriginal;
+}
+
+bool CheckTextArchiveNoCodecvt() {
+   std::stringstream theStream;
+   std::string const strOriginal { "boost-serialization-no-codecvt" };
+   {
+      boost::archive::text_oarchive theArchive(theStream, boost::archive::no_codecvt);
+      theArchive << strOriginal;
+   }
+   theStream.seekg(0);
+   std::string strRoundTrip;
+   {
+      boost::archive::text_iarchive theArchive(theStream, boost::archive::no_codecvt);
+      theArchive >> strRoundTrip;
+   }
+   return strRoundTrip == strOriginal;
+}
+
+bool CheckTextArchiveDefault() {
+   std::stringstream theStream;
+   std::string const strOriginal { "boost-serialization" };
+   {
+      boost::archive::text_oarchive theArchive(theStream);
+      theArchive << strOriginal;
+   }
+   theStream.seekg(0);
+   std::string strRoundTrip;
+   {
+      boost::archive::text_iarchive theArchive(theStream);
+      theArchive >> strRoundTrip;
+   }
+   return strRoundTrip == strOriginal;
+}
+
+bool RunSerializationDiagnostics() {
+   std::cout << "[SERIALIZATION-DIAG] ABI sizeof(char)=" << sizeof(char)
+             << " sizeof(wchar_t)=" << sizeof(wchar_t)
+             << " sizeof(mbstate_t)=" << sizeof(std::mbstate_t) << std::endl;
+
+   if(!RunSerializationDiagnosticStage("std-codecvt-char", CheckStdCodecvtChar)) return false;
+   if(!RunSerializationDiagnosticStage("std-codecvt-wchar", CheckStdCodecvtWChar)) return false;
+   if(!RunSerializationDiagnosticStage("std-stream-imbue-char", CheckStdStreamImbueChar)) return false;
+   if(!RunSerializationDiagnosticStage("std-stream-imbue-wchar", CheckStdStreamImbueWChar)) return false;
+   if(!RunSerializationDiagnosticStage("boost-codecvt-null-char", CheckBoostCodecvtNullChar)) return false;
+   if(!RunSerializationDiagnosticStage("boost-codecvt-null-wchar", CheckBoostCodecvtNullWChar)) return false;
+   if(!RunSerializationDiagnosticStage("boost-binary-archive", CheckBinaryArchive)) return false;
+   if(!RunSerializationDiagnosticStage("boost-text-archive-no-codecvt", CheckTextArchiveNoCodecvt)) return false;
+   return RunSerializationDiagnosticStage("boost-text-archive-default", CheckTextArchiveDefault);
+}
+
+#endif
+
 bool RunGate() {
 #if ADECC_BOOST_GATE_CODE == 1
    namespace po = boost::program_options;
@@ -139,18 +343,7 @@ bool RunGate() {
    auto const theParse = boost::charconv::from_chars(svNumber.data(), svNumber.data() + svNumber.size(), iValue);
    return theParse.ec == std::errc {} && iValue == 192;
 #  elif ADECC_BOOST_RUNTIME_CASE == 2
-   std::stringstream theStream;
-   std::string const strOriginal { "boost-serialization" };
-   {
-      boost::archive::text_oarchive theArchive(theStream);
-      theArchive << strOriginal;
-   }
-   std::string strRoundTrip;
-   {
-      boost::archive::text_iarchive theArchive(theStream);
-      theArchive >> strRoundTrip;
-   }
-   return strRoundTrip == strOriginal;
+   return RunSerializationDiagnostics();
 #  elif ADECC_BOOST_RUNTIME_CASE == 3
    auto const theUrl = boost::urls::parse_uri("https://example.invalid/boost");
    return theUrl.has_value() && theUrl->scheme() == "https";
