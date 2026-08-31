@@ -3,8 +3,9 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLString.hpp>
+#include <xercesc/util/XercesVersion.hpp>
 
-#include <iostream>
+#include <print>
 #include <string_view>
 
 namespace {
@@ -23,6 +24,13 @@ public:
    XercesRuntime& operator=(XercesRuntime const&) = delete;
 };
 
+[[nodiscard]] bool Check(std::string_view const svId,
+                         bool const bPassed,
+                         std::string_view const svDetail) {
+   std::println("SMOKE|CHECK|{}|{}|{}", svId, bPassed ? "PASS" : "FAIL", svDetail);
+   return bPassed;
+}
+
 [[nodiscard]] bool XmlEquals(XMLCh const* const pValue, char const* const pExpected) {
    char* pText = xercesc::XMLString::transcode(pValue);
    if(!pText) return false;
@@ -31,7 +39,7 @@ public:
    return bResult;
 }
 
-[[nodiscard]] bool RunSmoke() {
+[[nodiscard]] bool CheckDomRuntime() {
    XercesRuntime const theRuntime;
 
    static constexpr char arrXml[] =
@@ -69,19 +77,25 @@ public:
 }
 
 int main() {
+   bool bSuccess = true;
+
+   bool const bVersion = XERCES_VERSION_MAJOR == 3 && XERCES_VERSION_MINOR == 3;
+   bSuccess = Check("package", bVersion, "Xerces-C 3.3 public headers available") && bSuccess;
+
    try {
-      bool const bSuccess = RunSmoke();
-      std::cout << "Xerces-C DOM consumer: " << (bSuccess ? "PASS" : "FAIL") << '\n';
-      return bSuccess ? 0 : 1;
+      bool const bRuntime = CheckDomRuntime();
+      bSuccess = Check("runtime", bRuntime, "initialize, in-memory parse and DOM traversal") && bSuccess;
    }
    catch(xercesc::XMLException const& theException) {
       char* pMessage = xercesc::XMLString::transcode(theException.getMessage());
-      std::cerr << "Xerces-C XMLException: " << (pMessage ? pMessage : "<unavailable>") << '\n';
+      std::string_view const svMessage = pMessage ? std::string_view { pMessage } : std::string_view { "XMLException" };
+      bSuccess = Check("runtime", false, svMessage) && bSuccess;
       xercesc::XMLString::release(&pMessage);
-      return 2;
    }
    catch(...) {
-      std::cerr << "Xerces-C consumer: unknown exception\n";
-      return 3;
+      bSuccess = Check("runtime", false, "unknown exception") && bSuccess;
    }
+
+   std::println("SMOKE|RESULT|{}|Xerces-C consumer usable", bSuccess ? "PASS" : "FAIL");
+   return bSuccess ? 0 : 1;
 }
