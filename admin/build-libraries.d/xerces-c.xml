@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="11">
+<buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="12">
    <library id="xerces-c" version="3.3.0" timestamp="2026-08-31T01:00:00Z">
       <source>
          <download url="https://downloads.apache.org/xerces/c/3/sources/xerces-c-{LibraryVersion}.zip" archive="xerces-c-{LibraryVersion}.zip" sha256="c35a6f04e853bde456c65ec38a4496c7ccf60b27c6989ff4e2149db9ea40648c"/>
@@ -15,6 +15,8 @@
             <require path="src\xercesc\sax\HandlerBase.hpp"/>
             <require path="src\xercesc\sax\Dummy.cpp"/>
             <require path="tests\CMakeLists.txt"/>
+            <require path="doc\CMakeLists.txt"/>
+            <require path="doc\Doxyfile.in"/>
          </extract>
          <copy source="{BuildFileDir}\patches\xerces-c\3.3.0\bcc64x-handlerbase-vtable.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-handlerbase-vtable.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <!--
@@ -44,6 +46,31 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-handlerbase-vtable.patch"/>
          </execute>
       </source>
+      <documentation>
+         <doxygen tool="doxygen" output="{DocumentationBuild}\doc\html\apiDocs-3\index.html">
+            <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+            <environment name="CB_BDS" value="{BDS}"/>
+            <argument value="-G"/>
+            <argument value="Ninja"/>
+            <argument value="-Wno-dev"/>
+            <argument value="--fresh"/>
+            <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+            <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+            <argument value="-DDOXYGEN_EXECUTABLE:FILEPATH={Tool:doxygen}"/>
+            <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+            <argument value="-Dnetwork-accessor:STRING=winsock"/>
+            <argument value="-Dtranscoder:STRING=windows"/>
+            <argument value="-Dmessage-loader:STRING=inmemory"/>
+            <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xerces-c-{LibraryVersion}" build="{DocumentationBuild}"/>
+            <execute name="create-api-docs" executable="{Tool:cmake}" workingDirectory="{DocumentationBuild}" showOutput="false">
+               <argument value="--build"/>
+               <argument value="{DocumentationBuild}"/>
+               <argument value="--target"/>
+               <argument value="createapidocs"/>
+            </execute>
+            <require path="{DocumentationOutput}"/>
+         </doxygen>
+      </documentation>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
