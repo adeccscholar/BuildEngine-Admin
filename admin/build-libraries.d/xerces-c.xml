@@ -46,31 +46,6 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-handlerbase-vtable.patch"/>
          </execute>
       </source>
-      <documentation>
-         <doxygen tool="doxygen" output="{DocumentationBuild}\doc\html\apiDocs-3\index.html">
-            <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
-            <environment name="CB_BDS" value="{BDS}"/>
-            <argument value="-G"/>
-            <argument value="Ninja"/>
-            <argument value="-Wno-dev"/>
-            <argument value="--fresh"/>
-            <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
-            <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-            <argument value="-DDOXYGEN_EXECUTABLE:FILEPATH={Tool:doxygen}"/>
-            <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
-            <argument value="-Dnetwork-accessor:STRING=winsock"/>
-            <argument value="-Dtranscoder:STRING=windows"/>
-            <argument value="-Dmessage-loader:STRING=inmemory"/>
-            <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xerces-c-{LibraryVersion}" build="{DocumentationBuild}"/>
-            <execute name="create-api-docs" executable="{Tool:cmake}" workingDirectory="{DocumentationBuild}" showOutput="false">
-               <argument value="--build"/>
-               <argument value="{DocumentationBuild}"/>
-               <argument value="--target"/>
-               <argument value="createapidocs"/>
-            </execute>
-            <require path="{DocumentationOutput}"/>
-         </doxygen>
-      </documentation>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
@@ -159,6 +134,31 @@
             </common>
          </install>
       </build>
+      <documentation>
+         <doxygen tool="doxygen" output="{DocumentationBuild}\doc\html\apiDocs-3\index.html">
+            <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+            <environment name="CB_BDS" value="{BDS}"/>
+            <argument value="-G"/>
+            <argument value="Ninja"/>
+            <argument value="-Wno-dev"/>
+            <argument value="--fresh"/>
+            <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+            <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+            <argument value="-DDOXYGEN_EXECUTABLE:FILEPATH={Tool:doxygen}"/>
+            <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+            <argument value="-Dnetwork-accessor:STRING=winsock"/>
+            <argument value="-Dtranscoder:STRING=windows"/>
+            <argument value="-Dmessage-loader:STRING=inmemory"/>
+            <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xerces-c-{LibraryVersion}" build="{DocumentationBuild}"/>
+            <execute name="create-api-docs" executable="{Tool:cmake}" workingDirectory="{DocumentationBuild}" showOutput="false">
+               <argument value="--build"/>
+               <argument value="{DocumentationBuild}"/>
+               <argument value="--target"/>
+               <argument value="createapidocs"/>
+            </execute>
+            <require path="{DocumentationOutput}"/>
+         </doxygen>
+      </documentation>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
          <tree source="include" target="include" optional="true"/>
          <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
