@@ -1,11 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="13">
    <library id="xerces-c" version="3.3.0" timestamp="2026-08-31T01:00:00Z">
-      <metadata name="Xerces-C++" supplier="Apache Software Foundation" homepage="https://xerces.apache.org/xerces-c/">
-         <license name="Apache License 2.0" spdx="Apache-2.0" licensor="Apache Software Foundation and contributors" file="LICENSE">
-            <summary>Die Apache License 2.0 erlaubt Nutzung, Vervielfältigung, Änderung und Weitergabe in Quell- und Objektform unter Einhaltung der Lizenzbedingungen. Sie enthält eine ausdrückliche Patentlizenz; Markenrechte werden nicht eingeräumt. Bei Weitergabe sind die einschlägigen Lizenz-, Copyright-, Patent-, Marken- und Attributionshinweise sowie eine vorhandene NOTICE-Datei entsprechend den Lizenzbedingungen zu erhalten. Diese Zusammenfassung ersetzt nicht den Original-Lizenztext.</summary>
-         </license>
-      </metadata>
       <source>
          <download url="https://downloads.apache.org/xerces/c/3/sources/xerces-c-{LibraryVersion}.zip" archive="xerces-c-{LibraryVersion}.zip" sha256="c35a6f04e853bde456c65ec38a4496c7ccf60b27c6989ff4e2149db9ea40648c"/>
          <extract format="zip" root="xerces-c-{LibraryVersion}">
