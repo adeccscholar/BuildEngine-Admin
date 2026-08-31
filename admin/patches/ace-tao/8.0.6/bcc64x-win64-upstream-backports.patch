@@ -1,0 +1,83 @@
+diff --git a/ace/SSL/SSL_SOCK_Stream.inl b/ace/SSL/SSL_SOCK_Stream.inl
+--- a/ace/SSL/SSL_SOCK_Stream.inl
++++ b/ace/SSL/SSL_SOCK_Stream.inl
+@@ -13,7 +13,11 @@ ACE_SSL_SOCK_Stream::set_handle (ACE_HANDLE fd)
+     }
+   else
+     {
+-      (void) ::SSL_set_fd (this->ssl_, (int) fd);
++#if defined (ACE_WIN32)
++      (void) ::SSL_set_fd (this->ssl_, static_cast<int>((intptr_t)fd));
++#else
++      (void) ::SSL_set_fd (this->ssl_, fd);
++#endif
+       this->ACE_SSL_SOCK::set_handle (fd);
+       this->stream_.set_handle (fd);
+     }
+diff --git a/ace/SSL/SSL_SOCK_Stream.cpp b/ace/SSL/SSL_SOCK_Stream.cpp
+--- a/ace/SSL/SSL_SOCK_Stream.cpp
++++ b/ace/SSL/SSL_SOCK_Stream.cpp
+@@ -123,9 +123,14 @@ ACE_SSL_SOCK_Stream::recvv (iovec *io_vec,
+ 
+   io_vec->iov_base = nullptr;
+ 
++  int select_width = 0;
++#if !defined (ACE_WIN32)
++  select_width = int (this->get_handle ()) + 1;
++#endif /* ACE_WIN32 */
++
+   // Check the status of the current socket.
+   switch (
+-    ACE_OS::select (int (this->get_handle ()) + 1,
++    ACE_OS::select (select_width,
+                     handle_set,
+                     nullptr,
+                     nullptr,
+diff --git a/ace/SSL/SSL_SOCK_Acceptor.cpp b/ace/SSL/SSL_SOCK_Acceptor.cpp
+--- a/ace/SSL/SSL_SOCK_Acceptor.cpp
++++ b/ace/SSL/SSL_SOCK_Acceptor.cpp
+@@ -130,7 +130,11 @@ ACE_SSL_SOCK_Acceptor::ssl_accept (ACE_SSL_SOCK_Stream &new_stream,
+         {
+           // Must have at least one handle to wait for at this point.
+           ACE_ASSERT (rd_handle.num_set() == 1 || wr_handle.num_set () == 1);
+-          status = ACE::select (int (handle) + 1,
++          int select_width = 0;
++#if !defined (ACE_WIN32)
++          select_width = handle + 1;
++#endif /* ACE_WIN32 */
++          status = ACE::select (select_width,
+                                 &rd_handle,
+                                 &wr_handle,
+                                 nullptr,
+diff --git a/ace/SSL/SSL_SOCK_Connector.cpp b/ace/SSL/SSL_SOCK_Connector.cpp
+--- a/ace/SSL/SSL_SOCK_Connector.cpp
++++ b/ace/SSL/SSL_SOCK_Connector.cpp
+@@ -149,7 +149,11 @@ ACE_SSL_SOCK_Connector::ssl_connect (ACE_SSL_SOCK_Stream &new_stream,
+           ACE_ASSERT (rd_handle.num_set () == 1 || wr_handle.num_set () == 1);
+ 
+           // Block indefinitely if timeout pointer is zero.
+-          status = ACE::select (int (handle) + 1,
++          int select_width = 0;
++#if !defined (ACE_WIN32)
++          select_width = handle + 1;
++#endif /* ACE_WIN32 */
++          status = ACE::select (select_width,
+                                 &rd_handle,
+                                 &wr_handle,
+                                 nullptr,
+diff --git a/protocols/ace/INet/SSL_Proxy_Connector.cpp b/protocols/ace/INet/SSL_Proxy_Connector.cpp
+--- a/protocols/ace/INet/SSL_Proxy_Connector.cpp
++++ b/protocols/ace/INet/SSL_Proxy_Connector.cpp
+@@ -148,7 +148,11 @@ namespace ACE
+                 ACE_ASSERT (rd_handle.num_set () == 1 || wr_handle.num_set () == 1);
+ 
+                 // Block indefinitely if timeout pointer is zero.
+-                status = ACE::select (int (handle) + 1,
++                int select_width = 0;
++#if !defined (ACE_WIN32)
++                select_width = handle + 1;
++#endif /* ACE_WIN32 */
++                status = ACE::select (select_width,
+                                       &rd_handle,
+                                       &wr_handle,
+                                       0,
