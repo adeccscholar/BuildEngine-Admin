@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="11">
-   <library id="xerces-c" version="3.3.0" timestamp="2026-08-30T23:36:00Z">
+   <library id="xerces-c" version="3.3.0" timestamp="2026-08-31T00:01:00Z">
       <source>
          <download url="https://downloads.apache.org/xerces/c/3/sources/xerces-c-{LibraryVersion}.zip" archive="xerces-c-{LibraryVersion}.zip" sha256="c35a6f04e853bde456c65ec38a4496c7ccf60b27c6989ff4e2149db9ea40648c"/>
          <extract format="zip" root="xerces-c-{LibraryVersion}">
@@ -29,14 +29,24 @@
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
-         <!-- Keep the Windows producer deterministic.  Without explicit values,
-              Xerces selects from whatever optional headers/backends happen to be
-              visible on a particular machine. -->
+         <!-- Keep the Windows producer deterministic. -->
          <argument value="-Dnetwork-accessor:STRING=winsock"/>
          <argument value="-Dtranscoder:STRING=windows"/>
          <argument value="-Dmessage-loader:STRING=inmemory"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xerces-c-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <!--
+            Product build and upstream validation are deliberately separated.
+            Xerces-C adds tests/samples to the default ALL target.  The first
+            Release run showed that xerces-c itself builds while only
+            tests/ThreadTest.exe fails at link time.  Build the actual shared
+            library here; build the upstream tests below as test actions.
+         -->
+         <execute name="build-product" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+            <argument value="--build"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="--target"/>
+            <argument value="xerces-c"/>
+         </execute>
          <variant name="Release">
             <variable name="CMakeExportConfiguration" value="release"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -57,8 +67,25 @@
          </variant>
          <install>
             <perVariant>
-               <!-- Xerces builds its upstream tests unconditionally.  Execute
-                    them against the just-built shared DLL before installation. -->
+               <!--
+                  First build ThreadTest on its own with CMake's verbose build
+                  forwarding.  If Release still fails, the BuildEngine test log
+                  now contains the exact BCC64X/linker invocation and diagnostic
+                  instead of only "FAILED: tests/ThreadTest.exe".
+               -->
+               <execute name="build-thread-test" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="--build"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+                  <argument value="--target"/>
+                  <argument value="ThreadTest"/>
+                  <argument value="--verbose"/>
+               </execute>
+               <!-- Build the remaining upstream tests/samples only after the
+                    isolated ThreadTest link has succeeded. -->
+               <execute name="build-upstream-validation" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="--build"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               </execute>
                <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src;{ENV:PATH}"/>
