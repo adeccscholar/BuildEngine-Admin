@@ -56,6 +56,17 @@
       </probe>
    </tool>
 
+   <tool id="doxygen" version="1.18.0" required="when-used">
+      <managed root="doxygen\1.18.0" executable="doxygen.exe">
+         <download url="https://github.com/doxygen/doxygen/releases/download/Release_1_18_0/doxygen-1.18.0.windows.x64.bin.zip"
+                   archive="doxygen-1.18.0.windows.x64.bin.zip"
+                   sha256="e84f54cfd49ef06b0b16536056dbec0c496323de28abcce53a4269463de35eaf"/>
+      </managed>
+      <probe contains="1.18.0">
+         <argument value="--version"/>
+      </probe>
+   </tool>
+
    <tool id="bcc64x" version="20.1.7" required="always">
       <bds executable="bin64\bcc64x.exe"/>
    </tool>
