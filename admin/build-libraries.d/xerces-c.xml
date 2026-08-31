@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="12">
+<buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="13">
    <library id="xerces-c" version="3.3.0" timestamp="2026-08-31T01:00:00Z">
       <metadata name="Xerces-C++" supplier="Apache Software Foundation" homepage="https://xerces.apache.org/xerces-c/">
          <license name="Apache License 2.0" spdx="Apache-2.0" licensor="Apache Software Foundation and contributors" file="LICENSE">
