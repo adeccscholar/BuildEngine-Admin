@@ -1,26 +1,29 @@
 diff --git a/src/xercesc/sax/HandlerBase.hpp b/src/xercesc/sax/HandlerBase.hpp
 --- a/src/xercesc/sax/HandlerBase.hpp
 +++ b/src/xercesc/sax/HandlerBase.hpp
-@@ -357,7 +357,11 @@ public:
-     //@}
- 
-     HandlerBase() {};
-+#if defined(__BORLANDC__) && defined(__clang__)
-+    virtual ~HandlerBase();
-+#else
-     virtual ~HandlerBase() {};
+@@ -1,10 +1,12 @@
+ // ---------------------------------------------------------------------------
+ //  HandlerBase: Inline default implementations
+ // ---------------------------------------------------------------------------
++#if !defined(__BORLANDC__) || !defined(__clang__)
+ inline void HandlerBase::characters(const   XMLCh* const
+                                     , const XMLSize_t)
+ {
+ }
 +#endif
  
- private:
- 	// -----------------------------------------------------------------------
+ inline void HandlerBase::endDocument()
+ {
 diff --git a/src/xercesc/sax/Dummy.cpp b/src/xercesc/sax/Dummy.cpp
 --- a/src/xercesc/sax/Dummy.cpp
 +++ b/src/xercesc/sax/Dummy.cpp
-@@ -32,4 +32,7 @@
+@@ -1,4 +1,9 @@
  #include <xercesc/sax/SAXParseException.hpp>
  
  XERCES_CPP_NAMESPACE_BEGIN
 +#if defined(__BORLANDC__) && defined(__clang__)
-+HandlerBase::~HandlerBase() = default;
++void HandlerBase::characters(const XMLCh* const, const XMLSize_t)
++{
++}
 +#endif
  XERCES_CPP_NAMESPACE_END
