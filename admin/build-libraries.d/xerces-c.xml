@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="11">
-   <library id="xerces-c" version="3.3.0" timestamp="2026-08-31T00:39:00Z">
+   <library id="xerces-c" version="3.3.0" timestamp="2026-08-31T01:00:00Z">
       <source>
          <download url="https://downloads.apache.org/xerces/c/3/sources/xerces-c-{LibraryVersion}.zip" archive="xerces-c-{LibraryVersion}.zip" sha256="c35a6f04e853bde456c65ec38a4496c7ccf60b27c6989ff4e2149db9ea40648c"/>
          <extract format="zip" root="xerces-c-{LibraryVersion}">
@@ -19,15 +19,16 @@
          <copy source="{BuildFileDir}\patches\xerces-c\3.3.0\bcc64x-handlerbase-vtable.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-handlerbase-vtable.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <!--
             BCC64X Release links ThreadTest against the Xerces DLL import library,
-            but HandlerBase is an exported polymorphic class whose constructor,
-            destructor and all virtual member implementations are inline in the
-            upstream header.  Debug links successfully, while Release expects
-            the HandlerBase vtable from libxerces-c.lib and reports it undefined.
+            but HandlerBase is an exported polymorphic class whose virtual member
+            implementations are inline in the upstream header. Debug links, while
+            Release expects the HandlerBase vtable from libxerces-c.lib and reports
+            it undefined.
 
-            Give the BCC64X/Clang path one out-of-line virtual key function by
-            moving HandlerBase::~HandlerBase() into sax/Dummy.cpp.  The patch is
-            intentionally limited to Clang-based Embarcadero builds; all other
-            Xerces platforms retain the upstream inline destructor unchanged.
+            For the BCC64X/Clang path move HandlerBase::characters(), the first
+            virtual member function, out of the header and into sax/Dummy.cpp.
+            This gives the class an out-of-line key-function candidate in the DLL
+            without changing the public API. Other Xerces platforms retain the
+            upstream inline implementation unchanged.
          -->
          <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/>
