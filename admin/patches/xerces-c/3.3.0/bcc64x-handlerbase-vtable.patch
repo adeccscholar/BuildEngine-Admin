@@ -1,7 +1,7 @@
 diff --git a/src/xercesc/sax/HandlerBase.hpp b/src/xercesc/sax/HandlerBase.hpp
 --- a/src/xercesc/sax/HandlerBase.hpp
 +++ b/src/xercesc/sax/HandlerBase.hpp
-@@ -1,10 +1,12 @@
+@@ -376,9 +376,11 @@
  // ---------------------------------------------------------------------------
  //  HandlerBase: Inline default implementations
  // ---------------------------------------------------------------------------
@@ -17,7 +17,9 @@ diff --git a/src/xercesc/sax/HandlerBase.hpp b/src/xercesc/sax/HandlerBase.hpp
 diff --git a/src/xercesc/sax/Dummy.cpp b/src/xercesc/sax/Dummy.cpp
 --- a/src/xercesc/sax/Dummy.cpp
 +++ b/src/xercesc/sax/Dummy.cpp
-@@ -1,4 +1,9 @@
+@@ -31,6 +31,11 @@
+ #include <xercesc/sax/Parser.hpp>
+ #include <xercesc/sax/SAXException.hpp>
  #include <xercesc/sax/SAXParseException.hpp>
  
  XERCES_CPP_NAMESPACE_BEGIN
