@@ -53,6 +53,7 @@
          <environment name="SSL_LIBDIR" value="{InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}"/>
          <environment name="XERCESC_INCDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\include"/>
          <environment name="XERCESC_LIBDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\lib\win64\{Configuration}"/>
+         <environment name="XERCESLIB" value="{XercesLibrary}"/>
          <environment name="BCC32C" value=""/>
          <environment name="BCC64" value=""/>
          <environment name="BCC64X" value="1"/>
@@ -143,11 +144,13 @@
             <variable name="BMakeConfiguration" value="RELEASE"/>
             <variable name="DebugFlag" value=""/>
             <variable name="ReleaseFlag" value="1"/>
+            <variable name="XercesLibrary" value="libxerces-c"/>
          </variant>
          <variant name="Debug">
             <variable name="BMakeConfiguration" value="DEBUG"/>
             <variable name="DebugFlag" value="1"/>
             <variable name="ReleaseFlag" value=""/>
+            <variable name="XercesLibrary" value="libxerces-cd"/>
          </variant>
 
          <install>
