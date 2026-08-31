@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="11">
-   <library id="xerces-c" version="3.3.0" timestamp="2026-08-31T00:01:00Z">
+   <library id="xerces-c" version="3.3.0" timestamp="2026-08-31T00:39:00Z">
       <source>
          <download url="https://downloads.apache.org/xerces/c/3/sources/xerces-c-{LibraryVersion}.zip" archive="xerces-c-{LibraryVersion}.zip" sha256="c35a6f04e853bde456c65ec38a4496c7ccf60b27c6989ff4e2149db9ea40648c"/>
          <extract format="zip" root="xerces-c-{LibraryVersion}">
@@ -12,8 +12,36 @@
             <require path="src\XercesCConfig.cmake.in"/>
             <require path="src\xercesc\util\PlatformUtils.hpp"/>
             <require path="src\xercesc\dom\DOM.hpp"/>
+            <require path="src\xercesc\sax\HandlerBase.hpp"/>
+            <require path="src\xercesc\sax\Dummy.cpp"/>
             <require path="tests\CMakeLists.txt"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\xerces-c\3.3.0\bcc64x-handlerbase-vtable.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-handlerbase-vtable.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            BCC64X Release links ThreadTest against the Xerces DLL import library,
+            but HandlerBase is an exported polymorphic class whose constructor,
+            destructor and all virtual member implementations are inline in the
+            upstream header.  Debug links successfully, while Release expects
+            the HandlerBase vtable from libxerces-c.lib and reports it undefined.
+
+            Give the BCC64X/Clang path one out-of-line virtual key function by
+            moving HandlerBase::~HandlerBase() into sax/Dummy.cpp.  The patch is
+            intentionally limited to Clang-based Embarcadero builds; all other
+            Xerces platforms retain the upstream inline destructor unchanged.
+         -->
+         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-handlerbase-vtable.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-handlerbase-vtable.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -29,18 +57,10 @@
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
-         <!-- Keep the Windows producer deterministic. -->
          <argument value="-Dnetwork-accessor:STRING=winsock"/>
          <argument value="-Dtranscoder:STRING=windows"/>
          <argument value="-Dmessage-loader:STRING=inmemory"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xerces-c-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-         <!--
-            Product build and upstream validation are deliberately separated.
-            Xerces-C adds tests/samples to the default ALL target.  The first
-            Release run showed that xerces-c itself builds while only
-            tests/ThreadTest.exe fails at link time.  Build the actual shared
-            library here; build the upstream tests below as test actions.
-         -->
          <execute name="build-product" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
             <argument value="--build"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -60,19 +80,11 @@
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
-            <!-- Upstream adds a Debug postfix only for MSVC.  BCC64X keeps the
-                 same binary name and isolates configurations by directory. -->
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
          </variant>
          <install>
             <perVariant>
-               <!--
-                  First build ThreadTest on its own with CMake's verbose build
-                  forwarding.  If Release still fails, the BuildEngine test log
-                  now contains the exact BCC64X/linker invocation and diagnostic
-                  instead of only "FAILED: tests/ThreadTest.exe".
-               -->
                <execute name="build-thread-test" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <argument value="--build"/>
                   <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -80,8 +92,6 @@
                   <argument value="ThreadTest"/>
                   <argument value="--verbose"/>
                </execute>
-               <!-- Build the remaining upstream tests/samples only after the
-                    isolated ThreadTest link has succeeded. -->
                <execute name="build-upstream-validation" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <argument value="--build"/>
                   <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
