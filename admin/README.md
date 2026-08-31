@@ -57,3 +57,11 @@ Release gates use the normal published `Win64x` consumer view. Debug gates use `
 The seven gate IDs are `closure`, `math-numerics`, `state-parsing-meta`, `algorithms-containers-data`, `concurrency-async`, `system-io-runtime`, and `foundation-language`. Their source-module mapping and the six external ecosystem exclusions are recorded in `cmake/boost/components.json`.
 
 Boost.Config remains upstream source. The BCC64X policy layer below `cmake/boost/bcc64x-native-clang` only routes Clang-based CodeGear builds to upstream `clang.hpp`. The three compile-only preflights execute before the expensive Boost CMake graph. The generic BCC64X toolchain also exposes BCC64X as the ASM compiler, matching the already verified Context/Coroutine/Fiber toolchain path.
+
+## Modular library contract files
+
+`build-libraries.xml` remains the primary library contract and retains schema version 11. Additional libraries may be placed in `build-libraries.d/*.xml` when keeping every producer contract in the single main file would make changes unnecessarily large and risky.
+
+Each fragment is a complete XML document with the same `<buildLibraries schemaVersion="...">` root as the main contract and one or more ordinary `<library>` children. BuildEngine loads fragment files in deterministic filename order, requires the fragment schema version to match the main file, copies their library nodes into the in-memory main document, and only then executes the existing validation, test-selection, configuration-selection, dependency-resolution and scheduling logic. Duplicate library IDs and invalid dependencies therefore fail through the same existing checks as entries written directly in `build-libraries.xml`.
+
+The fragment mechanism changes only physical administration-file organization. It introduces no second scheduler, no alternate action syntax, and no library-specific execution path. `build-libraries.d/xerces-c.xml` is the first contract using this organization.
