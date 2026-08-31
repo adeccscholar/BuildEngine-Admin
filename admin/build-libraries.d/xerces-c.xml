@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="11">
+   <library id="xerces-c" version="3.3.0" timestamp="2026-08-30T23:36:00Z">
+      <source>
+         <download url="https://downloads.apache.org/xerces/c/3/sources/xerces-c-{LibraryVersion}.zip" archive="xerces-c-{LibraryVersion}.zip" sha256="c35a6f04e853bde456c65ec38a4496c7ccf60b27c6989ff4e2149db9ea40648c"/>
+         <extract format="zip" root="xerces-c-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE"/>
+            <require path="NOTICE"/>
+            <require path="configure.ac"/>
+            <require path="src\CMakeLists.txt"/>
+            <require path="src\XercesCConfig.cmake.in"/>
+            <require path="src\xercesc\util\PlatformUtils.hpp"/>
+            <require path="src\xercesc\dom\DOM.hpp"/>
+            <require path="tests\CMakeLists.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <!-- Keep the Windows producer deterministic.  Without explicit values,
+              Xerces selects from whatever optional headers/backends happen to be
+              visible on a particular machine. -->
+         <argument value="-Dnetwork-accessor:STRING=winsock"/>
+         <argument value="-Dtranscoder:STRING=windows"/>
+         <argument value="-Dmessage-loader:STRING=inmemory"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xerces-c-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <!-- Upstream adds a Debug postfix only for MSVC.  BCC64X keeps the
+                 same binary name and isolates configurations by directory. -->
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <!-- Xerces builds its upstream tests unconditionally.  Execute
+                    them against the just-built shared DLL before installation. -->
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src;{ENV:PATH}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libxerces-c.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libxerces-c.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\xerces-c.pc"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\cmake\XercesCConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\cmake\XercesCConfigVersion.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\cmake\XercesCConfigInternal.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\cmake\XercesCConfigInternal-{CMakeExportConfiguration}.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\xerces-c-{LibraryVersion}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <copy source="{Workspace}\xerces-c-{LibraryVersion}\NOTICE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xercesc\util\PlatformUtils.hpp"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xercesc\util\XercesVersion.hpp"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xercesc\dom\DOM.hpp"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="true"/>
+         <tree source="cmake" target="cmake" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+      </publish>
+      <smoke id="consumer" source="smokes\xerces-c\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xerces-c-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+</buildLibraries>
