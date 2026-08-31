@@ -86,11 +86,11 @@ int main() {
       bool const bRuntime = CheckDomRuntime();
       bSuccess = Check("runtime", bRuntime, "initialize, in-memory parse and DOM traversal") && bSuccess;
    }
-   catch(xercesc::XMLException const& theException) {
-      char* pMessage = xercesc::XMLString::transcode(theException.getMessage());
-      std::string_view const svMessage = pMessage ? std::string_view { pMessage } : std::string_view { "XMLException" };
-      bSuccess = Check("runtime", false, svMessage) && bSuccess;
-      xercesc::XMLString::release(&pMessage);
+   catch(xercesc::XMLException const&) {
+      // CheckDomRuntime owns Xerces initialization. During stack unwinding its
+      // runtime guard has already called Terminate(), so do not invoke Xerces
+      // conversion APIs from this outer catch block.
+      bSuccess = Check("runtime", false, "Xerces XMLException") && bSuccess;
    }
    catch(...) {
       bSuccess = Check("runtime", false, "unknown exception") && bSuccess;
