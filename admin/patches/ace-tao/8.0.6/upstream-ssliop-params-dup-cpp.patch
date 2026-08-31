@@ -1,0 +1,73 @@
+diff --git a/TAO/orbsvcs/orbsvcs/SSLIOP.mpc b/TAO/orbsvcs/orbsvcs/SSLIOP.mpc
+--- a/TAO/orbsvcs/orbsvcs/SSLIOP.mpc
++++ b/TAO/orbsvcs/orbsvcs/SSLIOP.mpc
+@@ -1,5 +1,5 @@
+ // -*- MPC -*-
+-project(SSLIOP) : orbsvcslib, orbsvcs_output, install, security, ssl, pi_server, interceptors, tao_versioning_idl_defaults, ssliop_params_dup, svc_utils {
++project(SSLIOP) : orbsvcslib, orbsvcs_output, install, security, ssl, pi_server, interceptors, tao_versioning_idl_defaults, svc_utils {
+   sharedname   = TAO_SSLIOP
+   idlflags    += -Wb,export_macro=TAO_SSLIOP_Export -Wb,export_include=orbsvcs/SSLIOP/SSLIOP_Export.h -SS
+   dynamicflags += TAO_SSLIOP_BUILD_DLL
+@@ -38,6 +38,7 @@ project(SSLIOP) : orbsvcslib, orbsvcs_output, install, security, ssl, pi_server,
+       ./SSLIOP/SSLIOP_TargetCredentials.cpp
+       ./SSLIOP/SSLIOP_Transport.cpp
+       ./SSLIOP/SSLIOP_Util.cpp
++      ./SSLIOP/params_dup.cpp
+       SSLIOPC.cpp
+     }
+   }
+diff --git a/TAO/orbsvcs/orbsvcs/SSLIOP/params_dup.c b/TAO/orbsvcs/orbsvcs/SSLIOP/params_dup.c
+deleted file mode 100644
+--- a/TAO/orbsvcs/orbsvcs/SSLIOP/params_dup.c
++++ /dev/null
+@@ -1,16 +0,0 @@
+-#include "params_dup.h"
+-
+-#include <openssl/asn1.h>
+-
+-DSA *
+-DSAPARAMS_DUP_WRAPPER_NAME (DSA * dsa)
+-{
+-  return DSAparams_dup (dsa);
+-}
+-
+-DH *
+-DHPARAMS_DUP_WRAPPER_NAME (DH * dh)
+-{
+-  return DHparams_dup (dh);
+-}
+-
+diff --git a/TAO/orbsvcs/orbsvcs/SSLIOP/params_dup.cpp b/TAO/orbsvcs/orbsvcs/SSLIOP/params_dup.cpp
+--- a/TAO/orbsvcs/orbsvcs/SSLIOP/params_dup.cpp
++++ b/TAO/orbsvcs/orbsvcs/SSLIOP/params_dup.cpp
+@@ -1,10 +1,3 @@
+-// MFC style projects on MicroSoft compilers require CPP files
+-// They can't cope with c files (as MFC projects are CPP by
+-// there very nature). Some other platforms incorrectly can't
+-// cope with the openSSL DSAParams_dup/DHparams_dup when compiled
+-// under cpp files (which is why this file duplicates the
+-// params_dup.c file).
+-
+ #include "params_dup.h"
+ #include <openssl/asn1.h>
+ 
+diff --git a/TAO/orbsvcs/orbsvcs/ssliop_params_dup.mpb b/TAO/orbsvcs/orbsvcs/ssliop_params_dup.mpb
+deleted file mode 100644
+--- a/TAO/orbsvcs/orbsvcs/ssliop_params_dup.mpb
++++ /dev/null
+@@ -1,15 +0,0 @@
+-feature(mfc) {
+-  Source_Files(ORBSVCS_COMPONENTS) {
+-    SSLIOP {
+-      ./SSLIOP/params_dup.cpp
+-    }
+-  }
+-}
+-
+-feature(!mfc) {
+-  Source_Files(ORBSVCS_COMPONENTS) {
+-    SSLIOP {
+-      ./SSLIOP/params_dup.c
+-    }
+-  }
+-}
