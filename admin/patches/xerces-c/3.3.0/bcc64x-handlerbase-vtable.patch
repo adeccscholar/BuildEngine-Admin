@@ -16,7 +16,7 @@ diff --git a/src/xercesc/sax/HandlerBase.hpp b/src/xercesc/sax/HandlerBase.hpp
 diff --git a/src/xercesc/sax/Dummy.cpp b/src/xercesc/sax/Dummy.cpp
 --- a/src/xercesc/sax/Dummy.cpp
 +++ b/src/xercesc/sax/Dummy.cpp
-@@ -32,4 +32,8 @@
+@@ -32,4 +32,7 @@
  #include <xercesc/sax/SAXParseException.hpp>
  
  XERCES_CPP_NAMESPACE_BEGIN
