@@ -1,8 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="13">
-   <library id="ace-tao" version="8.0.6" timestamp="2026-09-01T00:58:00Z">
+   <library id="ace-tao" version="8.0.6" timestamp="2026-09-01T02:45:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="xerces-c" version="3.3.0"/>
+      <dependency library="zlib" version="1.3.2"/>
       <source>
          <download url="https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-8_0_6/ACE%2BTAO-{LibraryVersion}.zip" archive="ACE+TAO-{LibraryVersion}.zip" sha256="e741c8b0ec0c7d6747b184d674567b1e73a13bdf2c902485d1299bbf267b3fba"/>
          <extract format="zip" root="ACE_wrappers">
@@ -10,8 +11,10 @@
             <require path="VERSION.txt"/>
             <require path="ace\config-win32.h"/>
             <require path="bin\mwc.pl"/>
+            <require path="bin\MakeProjectCreator\config\zlib.mpb"/>
             <require path="TAO\VERSION.txt"/>
             <require path="TAO\TAO_ACE.mwc"/>
+            <require path="TAO\tao\Compression\zlib\ZlibCompressor.mpc"/>
             <require path="TAO\orbsvcs\Naming_Service\Naming_Service.mpc"/>
             <require path="TAO\orbsvcs\CosEvent_Service\CosEvent_Service.mpc"/>
             <require path="TAO\orbsvcs\Event_Service\Event_Service.mpc"/>
@@ -58,6 +61,20 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch"/>
          </execute>
+         <copy source="{BuildFileDir}\patches\ace-tao\8.0.6\bcc64x-zlib-library-names.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="zlib-library-names-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch"/>
+         </execute>
+         <execute name="zlib-library-names-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch"/>
+         </execute>
       </source>
       <build>
          <environment name="ACE_ROOT" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"/>
@@ -68,6 +85,9 @@
          <environment name="XERCESC_INCDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\include"/>
          <environment name="XERCESC_LIBDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\lib\win64\{Configuration}"/>
          <environment name="XERCESLIB" value="{XercesLibrary}"/>
+         <environment name="ZLIB_ROOT" value="{InstallRoot}\packages\zlib\1.3.2"/>
+         <environment name="ZLIB_INCDIR" value="{InstallRoot}\packages\zlib\1.3.2\include"/>
+         <environment name="ZLIB_LIBDIR" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
          <environment name="BCC32C" value=""/>
          <environment name="BCC64" value=""/>
          <environment name="BCC64X" value="1"/>
@@ -75,7 +95,7 @@
          <environment name="UNICODE" value=""/>
          <environment name="DEBUG" value="{DebugFlag}"/>
          <environment name="RELEASE" value="{ReleaseFlag}"/>
-         <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\lib;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin;{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
+         <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\lib;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin;{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
 
          <execute name="remove-build-tree" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
@@ -97,6 +117,7 @@
                <line value="ssl=1"/>
                <line value="openssl11=1"/>
                <line value="xerces3=1"/>
+               <line value="zlib=1"/>
             </temporaryFile>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\mwc.pl"/>
             <argument value="TAO_ACE.mwc"/>
@@ -104,6 +125,8 @@
             <argument value="bmake"/>
             <argument value="-value_template"/>
             <argument value="xerceslib={XercesLibrary}"/>
+            <argument value="-value_template"/>
+            <argument value="zliblib={ZlibLibrary}"/>
          </target>
          <target name="build-workspace" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\TAO" showOutput="false">
             <argument value="-m"/>
@@ -120,6 +143,8 @@
             <argument value="bmake"/>
             <argument value="-value_template"/>
             <argument value="xerceslib={XercesLibrary}"/>
+            <argument value="-value_template"/>
+            <argument value="zliblib={ZlibLibrary}"/>
          </target>
          <target name="build-naming-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\TAO\orbsvcs\Naming_Service" showOutput="false">
             <argument value="-m"/>
@@ -136,6 +161,8 @@
             <argument value="bmake"/>
             <argument value="-value_template"/>
             <argument value="xerceslib={XercesLibrary}"/>
+            <argument value="-value_template"/>
+            <argument value="zliblib={ZlibLibrary}"/>
          </target>
          <target name="build-cos-event-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\TAO\orbsvcs\CosEvent_Service" showOutput="false">
             <argument value="-m"/>
@@ -152,6 +179,8 @@
             <argument value="bmake"/>
             <argument value="-value_template"/>
             <argument value="xerceslib={XercesLibrary}"/>
+            <argument value="-value_template"/>
+            <argument value="zliblib={ZlibLibrary}"/>
          </target>
          <target name="build-rt-event-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\TAO\orbsvcs\Event_Service" showOutput="false">
             <argument value="-m"/>
@@ -167,12 +196,14 @@
             <variable name="DebugFlag" value=""/>
             <variable name="ReleaseFlag" value="1"/>
             <variable name="XercesLibrary" value="libxerces-c"/>
+            <variable name="ZlibLibrary" value="libz"/>
          </variant>
          <variant name="Debug">
             <variable name="BMakeConfiguration" value="DEBUG"/>
             <variable name="DebugFlag" value="1"/>
             <variable name="ReleaseFlag" value=""/>
             <variable name="XercesLibrary" value="libxerces-c"/>
+            <variable name="ZlibLibrary" value="libzd"/>
          </variant>
 
          <install>
