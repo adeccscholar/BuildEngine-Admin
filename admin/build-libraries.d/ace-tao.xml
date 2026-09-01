@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="13">
-   <library id="ace-tao" version="8.0.6" timestamp="2026-08-31T17:30:00Z">
+   <library id="ace-tao" version="8.0.6" timestamp="2026-09-01T00:41:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="xerces-c" version="3.3.0"/>
       <source>
@@ -43,6 +43,20 @@
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\ace-tao\8.0.6\bcc64x-xerces-modern-borland.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="xerces-modern-borland-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch"/>
+         </execute>
+         <execute name="xerces-modern-borland-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch"/>
          </execute>
       </source>
       <build>
