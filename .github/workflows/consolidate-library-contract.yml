@@ -16,8 +16,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Merge library contracts
-        shell: python
+        shell: bash
         run: |
+          python - <<'PY'
           from pathlib import Path
           import re
 
@@ -36,13 +37,12 @@ jobs:
               end = fragment.rfind('</library>')
               if start < 0 or end < 0:
                   raise SystemExit(f'no library block in {path}')
-              block = fragment[start:end + len('</library>')].rstrip()
-              blocks.append(block)
+              blocks.append(fragment[start:end + len('</library>')].rstrip())
 
           if not blocks:
               raise SystemExit('no library fragments found to consolidate')
 
-          prefix, suffix = text.split(closing)
+          prefix, _ = text.split(closing)
           merged = prefix.rstrip() + '\n' + '\n'.join(blocks) + '\n' + closing + '\n'
           main_path.write_text(merged, encoding='utf-8', newline='\n')
 
@@ -54,30 +54,26 @@ jobs:
           readme = readme_path.read_text(encoding='utf-8')
           replacement = '''## Library contract organization
 
-`admin/build-libraries.xml` is the single normative library graph and package contract. Library definitions are not split into XML fragments. Supporting CMake adapters, patches, smoke sources and helper programs remain separate implementation assets under `admin/`, but every library id, version and dependency is visible in the one canonical XML file.
-
-'''
-          readme, count = re.subn(r'## Modular library contract files\n.*?(?=\n## |\Z)', replacement.rstrip(), readme, flags=re.S)
+`admin/build-libraries.xml` is the single normative library graph and package contract. Library definitions are not split into XML fragments. Supporting CMake adapters, patches, smoke sources and helper programs remain separate implementation assets under `admin/`, but every library id, version and dependency is visible in the one canonical XML file.'''
+          readme, count = re.subn(r'## Modular library contract files\n.*?(?=\n## |\Z)', replacement, readme, flags=re.S)
           if count:
-              readme += '\n' if not readme.endswith('\n') else ''
-              readme_path.write_text(readme, encoding='utf-8', newline='\n')
+              readme_path.write_text(readme.rstrip() + '\n', encoding='utf-8', newline='\n')
 
           todo_path = Path('TODO.md')
           todo = todo_path.read_text(encoding='utf-8')
           todo_replacement = '''## BuildEngine-Vertragsorganisation
 
-`admin/build-libraries.xml` ist der einzige normative Bibliotheks- und Dependency-Vertrag. Aktive Bibliotheksdefinitionen werden nicht auf XML-Fragmente verteilt. CMake-Adapter, Patches, Smoke-Quellen und Hilfsprogramme bleiben als technische Assets unter `admin/` getrennt, waehrend IDs, Versionen, Varianten und der gesamte Dependency-DAG in einer XML-Datei sichtbar und pruefbar bleiben.
-'''
-          todo, count = re.subn(r'## BuildEngine-Vertragsorganisation\n.*?(?=\n## |\Z)', todo_replacement.rstrip(), todo, flags=re.S)
+`admin/build-libraries.xml` ist der einzige normative Bibliotheks- und Dependency-Vertrag. Aktive Bibliotheksdefinitionen werden nicht auf XML-Fragmente verteilt. CMake-Adapter, Patches, Smoke-Quellen und Hilfsprogramme bleiben als technische Assets unter `admin/` getrennt, waehrend IDs, Versionen, Varianten und der gesamte Dependency-DAG in einer XML-Datei sichtbar und pruefbar bleiben.'''
+          todo, count = re.subn(r'## BuildEngine-Vertragsorganisation\n.*?(?=\n## |\Z)', todo_replacement, todo, flags=re.S)
           if count:
-              todo += '\n' if not todo.endswith('\n') else ''
-              todo_path.write_text(todo, encoding='utf-8', newline='\n')
+              todo_path.write_text(todo.rstrip() + '\n', encoding='utf-8', newline='\n')
 
-          workflow = Path('.github/workflows/consolidate-library-contract.yml')
-          workflow.unlink()
+          Path('.github/workflows/consolidate-library-contract.yml').unlink()
+          PY
       - name: Validate consolidation shape
-        shell: python
+        shell: bash
         run: |
+          python - <<'PY'
           from pathlib import Path
           import xml.etree.ElementTree as ET
           path = Path('admin/build-libraries.xml')
@@ -95,6 +91,7 @@ jobs:
           if Path('admin/build-libraries.d').exists():
               raise SystemExit('fragment directory still exists')
           print(f'validated {len(ids)} libraries in canonical contract')
+          PY
       - name: Commit consolidation
         run: |
           git config user.name "adecc BuildEngine automation"
