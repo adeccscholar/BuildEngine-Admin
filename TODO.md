@@ -214,10 +214,7 @@ Für neue Bibliotheken gelten grundsätzlich dieselben Qualitätsziele:
 
 ## BuildEngine-Vertragsorganisation
 
-`admin/build-libraries.xml` bleibt der Hauptvertrag. Zusätzliche Bibliotheken können als vollständige Schema-Dokumente unter `admin/build-libraries.d/*.xml` liegen. BuildEngine führt diese Fragmente deterministisch vor der bestehenden Validierung zusammen. Duplicate-ID-, Dependency-, Tool-, Variant-, Publish- und Smoke-Prüfungen bleiben zentral.
-
-Aktuell nutzen Xerces-C und ACE/TAO diesen Fragmentmechanismus. Weitere größere Pakete sollen bevorzugt ebenfalls als eigenständige Fragmente organisiert werden, statt den Hauptvertrag unnötig weiter aufzublähen.
-
+`admin/build-libraries.xml` ist der einzige normative Bibliotheks- und Dependency-Vertrag. Aktive Bibliotheksdefinitionen werden nicht auf XML-Fragmente verteilt. CMake-Adapter, Patches, Smoke-Quellen und Hilfsprogramme bleiben als technische Assets unter `admin/` getrennt, waehrend IDs, Versionen, Varianten und der gesamte Dependency-DAG in einer XML-Datei sichtbar und pruefbar bleiben.
 ## BuildEngine-interne Folgearbeiten
 
 ### Publish-/Consumer-Ownership
