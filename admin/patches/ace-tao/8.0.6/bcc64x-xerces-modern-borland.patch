@@ -1,0 +1,12 @@
+diff --git a/ace/XML_Utils/XercesString.h b/ace/XML_Utils/XercesString.h
+--- a/ace/XML_Utils/XercesString.h
++++ b/ace/XML_Utils/XercesString.h
+@@ -10,7 +10,7 @@
+ 
+ #include <iosfwd>
+ 
+-#ifdef __BORLANDC__
++#if defined (__BORLANDC__) && !defined (__clang__)
+ using std::memcpy;
+ #endif
+ 
