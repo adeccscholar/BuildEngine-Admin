@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="13">
-   <library id="ace-tao" version="8.0.6" timestamp="2026-08-31T17:30:00Z">
+   <library id="ace-tao" version="8.0.6" timestamp="2026-09-01T00:12:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="xerces-c" version="3.3.0"/>
       <source>
@@ -12,9 +12,9 @@
             <require path="bin\mwc.pl"/>
             <require path="TAO\VERSION.txt"/>
             <require path="TAO\TAO_ACE.mwc"/>
-            <require path="TAO\orbsvcs\Naming_Service"/>
-            <require path="TAO\orbsvcs\CosEvent_Service"/>
-            <require path="TAO\orbsvcs\Event_Service"/>
+            <require path="TAO\orbsvcs\Naming_Service\Naming_Service.mpc"/>
+            <require path="TAO\orbsvcs\CosEvent_Service\CosEvent_Service.mpc"/>
+            <require path="TAO\orbsvcs\Event_Service\Event_Service.mpc"/>
          </extract>
          <copy source="{BuildFileDir}\patches\ace-tao\8.0.6\bcc64x-win64-upstream-backports.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-win64-upstream-backports.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="win64-backports-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
