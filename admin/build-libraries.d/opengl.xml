@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="13">
-   <library id="opengl" version="registry-20260828" timestamp="2026-09-01T12:45:00Z">
+   <library id="opengl" version="registry-20260828" timestamp="2026-09-01T14:43:00Z">
       <metadata name="OpenGL Windows development contract" supplier="Khronos Group / Microsoft" homepage="https://registry.khronos.org/OpenGL/">
          <license name="Khronos Registry / Windows SDK terms" spdx="LicenseRef-Khronos-Registry-and-Windows-SDK"/>
       </metadata>
       <source>
          <download url="https://github.com/KhronosGroup/OpenGL-Registry/archive/1cdd228e34966dd6b95bd203e9f84faba0f371a1.zip" archive="OpenGL-Registry-1cdd228e34966dd6b95bd203e9f84faba0f371a1.zip"/>
          <extract format="zip" root="OpenGL-Registry-1cdd228e34966dd6b95bd203e9f84faba0f371a1">
-            <require path="api\GL\glcorearb.h"/><require path="api\GL\glext.h"/><require path="api\GL\wglext.h"/><require path="api\KHR\khrplatform.h"/>
+            <require path="api\GL\glcorearb.h"/><require path="api\GL\glext.h"/><require path="api\GL\wglext.h"/>
          </extract>
       </source>
       <build testsAffectBuild="false">
@@ -25,8 +25,7 @@
          </perVariant><common>
             <copy source="{BDS}\include\windows\sdk\GL\gl.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL\gl.h" overwrite="true"/>
             <copy source="{Workspace}\OpenGL-Registry-1cdd228e34966dd6b95bd203e9f84faba0f371a1\api\GL" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL" recursive="true" overwrite="true"/>
-            <copy source="{Workspace}\OpenGL-Registry-1cdd228e34966dd6b95bd203e9f84faba0f371a1\api\KHR" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\KHR" recursive="true" overwrite="true"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL\gl.h"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL\glext.h"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL\gl.h"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL\glext.h"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL\wglext.h"/>
          </common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
