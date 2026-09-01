@@ -1,7 +1,7 @@
-diff --git a/bin/MakeProjectCreator/config/zlib.mpb b/bin/MakeProjectCreator/config/zlib.mpb
+diff --git a/MPC/config/zlib.mpb b/MPC/config/zlib.mpb
 index 731935a..58ca233 100644
---- a/bin/MakeProjectCreator/config/zlib.mpb
-+++ b/bin/MakeProjectCreator/config/zlib.mpb
+--- a/MPC/config/zlib.mpb
++++ b/MPC/config/zlib.mpb
 @@ -14,9 +14,11 @@ feature(zlib) {
    macros   += ZLIB
  
