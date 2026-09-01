@@ -19,14 +19,14 @@ set(_objs)
 foreach(_unit rcore rshapes rtextures rtext rmodels raudio)
   set(_obj "${CMAKE_CURRENT_BINARY_DIR}/${_unit}.obj")
   add_custom_command(OUTPUT "${_obj}"
-    COMMAND "${BCC64X_EXECUTABLE}" -q ${_opt} ${_cfgdef} -std=c99 -Wall -D_GNU_SOURCE -DUNICODE -DPLATFORM_DESKTOP_WIN32 -DGRAPHICS_API_OPENGL_33 -DBUILD_LIBTYPE_SHARED -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing -I"${RAYLIB_SOURCE_DIR}/src" -c "${RAYLIB_SOURCE_DIR}/src/${_unit}.c" -o"${_obj}"
+    COMMAND "${BCC64X_EXECUTABLE}" -q ${_opt} ${_cfgdef} -std=c99 -Wall -D_GNU_SOURCE -DUNICODE -DPLATFORM_DESKTOP_WIN32 -DGRAPHICS_API_OPENGL_33 -DBUILD_LIBTYPE_SHARED -Wno-missing-braces -Werror=pointer-arith -fno-strict-aliasing -I "${RAYLIB_SOURCE_DIR}/src" -c "${RAYLIB_SOURCE_DIR}/src/${_unit}.c" -o "${_obj}"
     DEPENDS "${RAYLIB_SOURCE_DIR}/src/${_unit}.c" VERBATIM)
   list(APPEND _objs "${_obj}")
 endforeach()
 set(_dll "${CMAKE_CURRENT_BINARY_DIR}/${_base}.dll")
 set(_lib "${CMAKE_CURRENT_BINARY_DIR}/${_base}.lib")
 add_custom_command(OUTPUT "${_dll}" "${_lib}"
-  COMMAND "${BCC64X_EXECUTABLE}" -q --rsp-quoting=windows -tD -o"${_dll}" ${_objs} "${OPENGL_LIBRARY}" -lgdi32 -lwinmm -lshcore "-Wl,--out-implib,${_lib}"
+  COMMAND "${BCC64X_EXECUTABLE}" -q --rsp-quoting=windows -tD -o "${_dll}" ${_objs} "${OPENGL_LIBRARY}" -lgdi32 -lwinmm -lshcore "-Wl,--out-implib,${_lib}"
   DEPENDS ${_objs} VERBATIM)
 add_custom_target(raylib-direct ALL DEPENDS "${_dll}" "${_lib}")
 install(FILES "${_dll}" DESTINATION "${CMAKE_INSTALL_BINDIR}")
