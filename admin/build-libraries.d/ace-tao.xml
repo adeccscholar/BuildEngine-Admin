@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="13">
-   <library id="ace-tao" version="8.0.6" timestamp="2026-09-01T00:12:00Z">
+   <library id="ace-tao" version="8.0.6" timestamp="2026-08-31T17:30:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="xerces-c" version="3.3.0"/>
       <source>
