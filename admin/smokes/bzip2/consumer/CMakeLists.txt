@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokebzip2 LANGUAGES CXX)
+find_package(BZip2 CONFIG REQUIRED)
+add_executable(bzip2-consumer main.cpp)
+target_compile_features(bzip2-consumer PRIVATE cxx_std_23)
+target_link_libraries(bzip2-consumer PRIVATE BZip2::bzip2)

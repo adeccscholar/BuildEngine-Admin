@@ -1,0 +1,3 @@
+#include <sqlite3.h>
+#include <print>
+int main(){ sqlite3* db=nullptr; bool ok=sqlite3_open(":memory:",&db)==SQLITE_OK; if(ok) ok=sqlite3_exec(db,"create table t(v integer); insert into t values(42);",nullptr,nullptr,nullptr)==SQLITE_OK; sqlite3_stmt* st=nullptr; if(ok) ok=sqlite3_prepare_v2(db,"select v from t",-1,&st,nullptr)==SQLITE_OK && sqlite3_step(st)==SQLITE_ROW && sqlite3_column_int(st,0)==42; if(st) sqlite3_finalize(st); if(db) sqlite3_close(db); std::println("SMOKE|CHECK|roundtrip|{}|SQLite in-memory write/read",ok?"PASS":"FAIL"); std::println("SMOKE|RESULT|{}|SQLite consumer usable",ok?"PASS":"FAIL"); return ok?0:1; }

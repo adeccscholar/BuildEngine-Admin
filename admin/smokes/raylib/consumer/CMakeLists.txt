@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeraylib LANGUAGES CXX)
+find_package(raylib CONFIG REQUIRED)
+add_executable(raylib-consumer main.cpp)
+target_compile_features(raylib-consumer PRIVATE cxx_std_23)
+target_link_libraries(raylib-consumer PRIVATE raylib)
