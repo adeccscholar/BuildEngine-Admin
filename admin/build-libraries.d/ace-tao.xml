@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schemas/build-libraries.xsd" schemaVersion="13">
-   <library id="ace-tao" version="8.0.6" timestamp="2026-09-01T00:41:00Z">
+   <library id="ace-tao" version="8.0.6" timestamp="2026-09-01T00:58:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="xerces-c" version="3.3.0"/>
       <source>
@@ -102,6 +102,8 @@
             <argument value="TAO_ACE.mwc"/>
             <argument value="-type"/>
             <argument value="bmake"/>
+            <argument value="-value_template"/>
+            <argument value="xerceslib={XercesLibrary}"/>
          </target>
          <target name="build-workspace" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\TAO" showOutput="false">
             <argument value="-m"/>
@@ -116,6 +118,8 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\mwc.pl"/>
             <argument value="-type"/>
             <argument value="bmake"/>
+            <argument value="-value_template"/>
+            <argument value="xerceslib={XercesLibrary}"/>
          </target>
          <target name="build-naming-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\TAO\orbsvcs\Naming_Service" showOutput="false">
             <argument value="-m"/>
@@ -130,6 +134,8 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\mwc.pl"/>
             <argument value="-type"/>
             <argument value="bmake"/>
+            <argument value="-value_template"/>
+            <argument value="xerceslib={XercesLibrary}"/>
          </target>
          <target name="build-cos-event-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\TAO\orbsvcs\CosEvent_Service" showOutput="false">
             <argument value="-m"/>
@@ -144,6 +150,8 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\mwc.pl"/>
             <argument value="-type"/>
             <argument value="bmake"/>
+            <argument value="-value_template"/>
+            <argument value="xerceslib={XercesLibrary}"/>
          </target>
          <target name="build-rt-event-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\TAO\orbsvcs\Event_Service" showOutput="false">
             <argument value="-m"/>
@@ -164,7 +172,7 @@
             <variable name="BMakeConfiguration" value="DEBUG"/>
             <variable name="DebugFlag" value="1"/>
             <variable name="ReleaseFlag" value=""/>
-            <variable name="XercesLibrary" value="libxerces-cd"/>
+            <variable name="XercesLibrary" value="libxerces-c"/>
          </variant>
 
          <install>
