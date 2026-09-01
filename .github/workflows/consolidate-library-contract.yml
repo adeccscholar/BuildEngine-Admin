@@ -2,8 +2,20 @@ name: Consolidate library contract
 
 on: [push]
 
+permissions:
+  contents: write
+
 jobs:
   consolidate:
     runs-on: ubuntu-latest
     steps:
-      - run: echo workflow-runner-ready
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python .github/scripts/consolidate_library_contract.py
+      - run: |
+          git config user.name "adecc BuildEngine automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "Consolidate library contracts into canonical XML"
+          git push
