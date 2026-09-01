@@ -15,8 +15,8 @@ set(_obj "${CMAKE_CURRENT_BINARY_DIR}/sqlite3.obj")
 set(_dll "${CMAKE_CURRENT_BINARY_DIR}/${_base}.dll")
 set(_lib "${CMAKE_CURRENT_BINARY_DIR}/${_base}.lib")
 add_custom_command(OUTPUT "${_dll}" "${_lib}"
-  COMMAND "${BCC64X_EXECUTABLE}" -q ${_opt} $<$<NOT:$<CONFIG:Debug>>:-DNDEBUG> -DSQLITE_THREADSAFE=1 "-DSQLITE_API=__declspec(dllexport)" -c "${SQLITE_SOURCE_DIR}/sqlite3.c" -o"${_obj}"
-  COMMAND "${BCC64X_EXECUTABLE}" -q --rsp-quoting=windows -tD -o"${_dll}" "${_obj}" "-Wl,--out-implib,${_lib}"
+  COMMAND "${BCC64X_EXECUTABLE}" -q ${_opt} $<$<NOT:$<CONFIG:Debug>>:-DNDEBUG> -DSQLITE_THREADSAFE=1 "-DSQLITE_API=__declspec(dllexport)" -c "${SQLITE_SOURCE_DIR}/sqlite3.c" -o "${_obj}"
+  COMMAND "${BCC64X_EXECUTABLE}" -q --rsp-quoting=windows -tD -o "${_dll}" "${_obj}" "-Wl,--out-implib,${_lib}"
   DEPENDS "${SQLITE_SOURCE_DIR}/sqlite3.c" VERBATIM)
 add_custom_target(sqlite3-direct ALL DEPENDS "${_dll}" "${_lib}")
 install(FILES "${_dll}" DESTINATION "${CMAKE_INSTALL_BINDIR}")
