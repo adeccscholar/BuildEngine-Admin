@@ -1,0 +1,18 @@
+diff --git a/bin/MakeProjectCreator/config/zlib.mpb b/bin/MakeProjectCreator/config/zlib.mpb
+--- a/bin/MakeProjectCreator/config/zlib.mpb
++++ b/bin/MakeProjectCreator/config/zlib.mpb
+@@ -13,10 +13,12 @@ feature(zlib) {
+   macros   += ZLIB
+ 
+   specific(prop:windows) {
+-    Debug::lit_libs += zlibd
+-    Release::lit_libs += zlib
++    zliblib = zlib
++    Debug::zliblib = zlibd
+   } else {
+-    lit_libs += z
++    zliblib = z
+   }
++
++  lit_libs += $(ZLIBLIB)
+ }
