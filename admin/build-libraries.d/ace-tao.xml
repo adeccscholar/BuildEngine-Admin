@@ -11,7 +11,7 @@
             <require path="VERSION.txt"/>
             <require path="ace\config-win32.h"/>
             <require path="bin\mwc.pl"/>
-            <require path="bin\MakeProjectCreator\config\zlib.mpb"/>
+            <require path="MPC\config\zlib.mpb"/>
             <require path="TAO\VERSION.txt"/>
             <require path="TAO\TAO_ACE.mwc"/>
             <require path="TAO\tao\Compression\zlib\ZlibCompressor.mpc"/>
