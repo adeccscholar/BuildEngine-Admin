@@ -161,6 +161,85 @@ def patch_windows_lld_allow_undefined(meson_root: Path) -> None:
     linkers.write_text(text, encoding="utf-8", newline="\n")
 
 
+def patch_bcc64x_vsenv_detection(meson_root: Path) -> None:
+    """Prevent Meson from auto-activating Visual Studio when BCC64X is configured."""
+    if not is_bcc64x():
+        return
+
+    vsenv = meson_root / "mesonbuild" / "utils" / "vsenv.py"
+    if not vsenv.is_file():
+        raise SystemExit(f"Meson Visual Studio environment helper not found: {vsenv}")
+
+    original = """        if shutil.which('clang-cl'):
+            return False
+"""
+    patched = """        if shutil.which('clang-cl'):
+            return False
+        if shutil.which('bcc64x'):
+            return False
+"""
+
+    text = vsenv.read_text(encoding="utf-8")
+    if patched in text:
+        return
+    if text.count(original) != 1:
+        raise SystemExit(
+            "Meson 1.12.0 BCC64X Visual Studio environment patch context does not match"
+        )
+
+    text = text.replace(original, patched, 1)
+    vsenv.write_text(text, encoding="utf-8", newline="\n")
+
+
+def patch_mesa_glcpp_test_newlines() -> None:
+    """Normalize native Windows CRLF in Mesa's byte-exact GLCPP test driver."""
+    if not is_bcc64x() or len(sys.argv) < 5 or sys.argv[2] != "setup":
+        return
+
+    mesa_root = Path(sys.argv[4]).resolve()
+    test_driver = (
+        mesa_root
+        / "src"
+        / "compiler"
+        / "glsl"
+        / "glcpp"
+        / "tests"
+        / "glcpp_test.py"
+    )
+    if not test_driver.is_file():
+        raise SystemExit(f"Mesa GLCPP test driver not found: {test_driver}")
+
+    original = """    # Bison 3.6 changed '$end' to 'end of file' in its error messages
+    # See: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3181
+    actual = actual.replace('$end', 'end of file')
+
+    if actual == expected:
+"""
+    patched = """    # Bison 3.6 changed '$end' to 'end of file' in its error messages
+    # See: https://gitlab.freedesktop.org/mesa/mesa/-/issues/3181
+    actual = actual.replace('$end', 'end of file')
+
+    # Native Windows stdio expands LF to CRLF. The upstream reference files
+    # are LF-only in the release archive; compare content independently of
+    # that transport-level newline convention.
+    actual = actual.replace('\\r\\n', '\\n')
+    expected = expected.replace('\\r\\n', '\\n')
+
+    if actual == expected:
+"""
+
+    text = test_driver.read_text(encoding="utf-8")
+    if patched in text:
+        return
+    if text.count(original) != 1:
+        raise SystemExit(
+            "Mesa 26.2.1 GLCPP newline compatibility patch context does not match"
+        )
+
+    text = text.replace(original, patched, 1)
+    test_driver.write_text(text, encoding="utf-8", newline="\n")
+
+
 def main() -> None:
     if len(sys.argv) < 3:
         raise SystemExit("usage: meson_bootstrap.py <meson-source-root> <meson arguments...>")
@@ -173,6 +252,8 @@ def main() -> None:
     expose_buildengine_tools()
     patch_bcc64x_lld_detection(meson_root)
     patch_windows_lld_allow_undefined(meson_root)
+    patch_bcc64x_vsenv_detection(meson_root)
+    patch_mesa_glcpp_test_newlines()
 
     sys.path.insert(0, str(meson_root))
     sys.argv = [str(meson_entry), *sys.argv[2:]]
