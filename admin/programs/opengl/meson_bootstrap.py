@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 def configure_bcc64x_library_path() -> None:
-    """Expose available RAD Studio Win64X library roots to BCC64X/Meson."""
+    """Expose available RAD Studio Win64X and Platform SDK library roots to BCC64X/Meson."""
     compiler = os.environ.get("CC", "").strip().strip('"')
     compiler_path = Path(compiler)
     if compiler_path.name.casefold() not in {"bcc64x", "bcc64x.exe"}:
@@ -27,6 +27,7 @@ def configure_bcc64x_library_path() -> None:
 
     candidates = [
         bds / "lib" / "win64x" / "release",
+        bds / "lib" / "psdk",
         bds / "lib" / "win64x" / "release" / "psdk",
     ]
     library_roots = [path for path in candidates if path.is_dir()]
