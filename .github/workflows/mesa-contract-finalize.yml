@@ -1,0 +1,53 @@
+name: Finalize Mesa contract schema
+
+on:
+  push:
+    branches:
+      - mesa-bcc64x-contract
+    paths:
+      - .github/workflows/mesa-contract-finalize.yml
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: mesa-bcc64x-contract
+          fetch-depth: 0
+      - name: Patch schema and metadata license path
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          xsd = Path('admin/schemas/build-libraries.xsd')
+          schema = xsd.read_text(encoding='utf-8')
+          old = '         <xs:enumeration value="cmake"/><xs:enumeration value="perl"/><xs:enumeration value="gmake"/>'
+          new = '         <xs:enumeration value="cmake"/><xs:enumeration value="meson"/><xs:enumeration value="perl"/><xs:enumeration value="gmake"/>'
+          if schema.count(old) != 1:
+              raise SystemExit('targetDriverType insertion point is not unique')
+          xsd.write_text(schema.replace(old, new), encoding='utf-8', newline='\n')
+
+          xml = Path('admin/build-libraries.xml')
+          contract = xml.read_text(encoding='utf-8')
+          old_license = '<license name="Mesa component licenses" file="docs\\license.rst"/>'
+          new_license = '<license name="Mesa component licenses" file="LICENSE-MESA.rst"/>'
+          if contract.count(old_license) != 1:
+              raise SystemExit('Mesa license override is not unique')
+          xml.write_text(contract.replace(old_license, new_license), encoding='utf-8', newline='\n')
+          PY
+          git diff --check
+      - name: Commit final schema details
+        shell: bash
+        run: |
+          git config user.name "BuildEngine contract update"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/mesa-contract-finalize.yml
+          git add admin/build-libraries.xml admin/schemas/build-libraries.xsd
+          git diff --cached --check
+          git commit -m "Complete Mesa Meson contract schema"
+          git push origin HEAD:mesa-bcc64x-contract
