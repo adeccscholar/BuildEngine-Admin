@@ -6,6 +6,7 @@ from __future__ import annotations
 import os
 import runpy
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
@@ -13,6 +14,56 @@ def is_bcc64x() -> bool:
     """Return whether the configured compiler is Embarcadero BCC64X."""
     compiler = os.environ.get("CC", "").strip().strip('"')
     return Path(compiler).name.casefold() in {"bcc64x", "bcc64x.exe"}
+
+
+def expose_buildengine_tools() -> None:
+    """Expose BuildEngine-verified Mesa helper tools through PATH."""
+    tools_state = Path(
+        os.environ.get("BUILDENGINE_TOOLS_STATE", Path.cwd() / "admin" / "tools.xml")
+    ).resolve()
+    if not tools_state.is_file():
+        raise SystemExit(f"BuildEngine tool registry not found: {tools_state}")
+
+    try:
+        root = ET.parse(tools_state).getroot()
+    except (ET.ParseError, OSError) as error:
+        raise SystemExit(f"BuildEngine tool registry cannot be read: {error}") from error
+
+    if root.tag != "tools":
+        raise SystemExit(f"BuildEngine tool registry has unexpected root: {root.tag}")
+
+    tools = {node.get("id", ""): node for node in root.findall("tool")}
+    required = {
+        "winflexbison": ("win_flex.exe", "win_bison.exe"),
+        "pkg-config": ("pkg-config.exe",),
+    }
+
+    directories: list[str] = []
+    for tool_id, expected_names in required.items():
+        node = tools.get(tool_id)
+        if node is None:
+            raise SystemExit(f"BuildEngine tool is not registered: {tool_id}")
+
+        executable = Path(node.get("path", ""))
+        if not executable.is_file():
+            raise SystemExit(
+                f"BuildEngine registered tool executable does not exist: {tool_id}: {executable}"
+            )
+
+        directory = executable.parent
+        for expected_name in expected_names:
+            expected = directory / expected_name
+            if not expected.is_file():
+                raise SystemExit(
+                    f"BuildEngine managed tool companion is missing: {tool_id}: {expected}"
+                )
+
+        directory_text = str(directory)
+        if directory_text.casefold() not in {value.casefold() for value in directories}:
+            directories.append(directory_text)
+
+    existing_path = os.environ.get("PATH", "")
+    os.environ["PATH"] = os.pathsep.join([*directories, existing_path])
 
 
 def patch_bcc64x_lld_detection(meson_root: Path) -> None:
@@ -119,6 +170,7 @@ def main() -> None:
     if not meson_entry.is_file():
         raise SystemExit(f"Meson entry point not found: {meson_entry}")
 
+    expose_buildengine_tools()
     patch_bcc64x_lld_detection(meson_root)
     patch_windows_lld_allow_undefined(meson_root)
 
