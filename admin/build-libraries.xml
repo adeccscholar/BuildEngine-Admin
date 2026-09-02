@@ -2043,7 +2043,7 @@
    </library>
 <library id="opengl" version="26.2.1" timestamp="2026-09-01T23:21:00Z">
       <metadata name="Mesa OpenGL" supplier="Mesa project" homepage="https://mesa3d.org/">
-         <license name="Mesa component licenses" file="docs\license.rst"/>
+         <license name="Mesa component licenses" file="LICENSE-MESA.rst"/>
       </metadata>
       <source>
          <!-- Official Mesa release archive; checksum is published in the Mesa 26.2.1 release notes. -->
