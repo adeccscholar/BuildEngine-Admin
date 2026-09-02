@@ -1,0 +1,32 @@
+name: Apply Mesa BCC64X contract
+
+on:
+  push:
+    branches:
+      - mesa-bcc64x-contract
+    paths:
+      - .github/workflows/mesa-contract-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: mesa-bcc64x-contract
+          fetch-depth: 0
+      - name: Patch canonical contract
+        run: python3 admin/programs/opengl/patch_contract.py
+      - name: Commit canonical contract
+        shell: bash
+        run: |
+          git config user.name "BuildEngine contract update"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/mesa-contract-patch.yml admin/programs/opengl/patch_contract.py
+          git add admin/build-libraries.xml
+          git diff --cached --check
+          git commit -m "Build Mesa OpenGL natively with BCC64X"
+          git push origin HEAD:mesa-bcc64x-contract
