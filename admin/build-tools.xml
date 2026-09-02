@@ -46,10 +46,22 @@
    </tool>
 
    <tool id="python" version="3.14.7" required="always">
-      <managed root="python\3.14.7" executable="python.exe">
+      <managed root="python\3.14.7-build" executable="python.exe">
          <download url="https://www.python.org/ftp/python/3.14.7/python-3.14.7-embed-amd64.zip"
                    archive="python-3.14.7-embed-amd64.zip"
                    sha256="d297e5ff019966817ad8502465176139f2d3d840fa4ed84b13bed399a6ab1f15"/>
+         <extract executable="{ENV:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe">
+            <argument value="-NoProfile"/>
+            <argument value="-NonInteractive"/>
+            <argument value="-ExecutionPolicy"/>
+            <argument value="Bypass"/>
+            <argument value="-File"/>
+            <argument value="{ProductionRoot}\admin\programs\python\extract-build-python.ps1"/>
+            <argument value="{Archive}"/>
+            <argument value="{ManagedRoot}"/>
+            <argument value="{ProductionRoot}\admin\programs\python\python314._pth"/>
+            <argument value="{ProductionRoot}\admin\programs\python\sitecustomize.py"/>
+         </extract>
       </managed>
       <probe contains="Python 3.14.7">
          <argument value="--version"/>
