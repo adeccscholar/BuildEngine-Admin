@@ -120,7 +120,8 @@
       </xs:sequence>
       <xs:attribute name="name" type="xs:string" use="required"/>
       <xs:attribute name="type" type="targetDriverType" use="required"/>
-      <xs:attribute name="executable" type="xs:string" use="required"/>
+      <xs:attribute name="executable" type="xs:string" use="optional"/>
+      <xs:attribute name="tool" type="xs:string" use="optional"/>
       <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
       <xs:attribute name="successExitCode" type="xs:unsignedInt" use="optional" default="0"/>
       <xs:attribute name="showOutput" type="booleanTextType" use="optional" default="false"/>
