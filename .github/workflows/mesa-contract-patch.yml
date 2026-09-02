@@ -24,16 +24,19 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           path = Path('admin/programs/opengl/patch_contract.py')
-          text = path.read_text(encoding='utf-8')
-          old_sub = 'pattern.subn(mesa_block, text, count=1)'
-          new_sub = 'pattern.subn(lambda _match: mesa_block, text, count=1)'
-          if old_sub in text:
-              text = text.replace(old_sub, new_sub)
-          old_pattern = 'pattern = re.compile(r\'<library id="opengl"\\\\b.*?</library>\', re.DOTALL)'
-          new_pattern = 'pattern = re.compile(r\'<library id="opengl".*?</library>\', re.DOTALL)'
-          if old_pattern not in text:
-              raise SystemExit('expected OpenGL selector not found')
-          text = text.replace(old_pattern, new_pattern)
+          lines = path.read_text(encoding='utf-8').splitlines()
+          found = False
+          for index, line in enumerate(lines):
+              if line.startswith('pattern = re.compile('):
+                  lines[index] = 'pattern = re.compile(r\'<library id="opengl".*?</library>\', re.DOTALL)'
+                  found = True
+                  break
+          if not found:
+              raise SystemExit('OpenGL selector line not found')
+          text = '\n'.join(lines) + '\n'
+          text = text.replace(
+              'pattern.subn(mesa_block, text, count=1)',
+              'pattern.subn(lambda _match: mesa_block, text, count=1)')
           path.write_text(text, encoding='utf-8', newline='\n')
           PY
           python3 admin/programs/opengl/patch_contract.py
