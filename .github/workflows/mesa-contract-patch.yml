@@ -19,14 +19,26 @@ jobs:
           ref: mesa-bcc64x-contract
           fetch-depth: 0
       - name: Patch canonical contract
-        run: python3 admin/programs/opengl/patch_contract.py
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('admin/programs/opengl/patch_contract.py')
+          text = path.read_text(encoding='utf-8')
+          old = 'pattern.subn(mesa_block, text, count=1)'
+          new = 'pattern.subn(lambda _match: mesa_block, text, count=1)'
+          if old not in text:
+              raise SystemExit('expected regex replacement expression not found')
+          path.write_text(text.replace(old, new), encoding='utf-8', newline='\n')
+          PY
+          python3 admin/programs/opengl/patch_contract.py
       - name: Commit canonical contract
         shell: bash
         run: |
           git config user.name "BuildEngine contract update"
           git config user.email "actions@users.noreply.github.com"
           git rm .github/workflows/mesa-contract-patch.yml admin/programs/opengl/patch_contract.py
-          git add admin/build-libraries.xml
+          git add admin/build-libraries.xml admin/programs/opengl/meson_bootstrap.py
           git diff --cached --check
           git commit -m "Build Mesa OpenGL natively with BCC64X"
           git push origin HEAD:mesa-bcc64x-contract
