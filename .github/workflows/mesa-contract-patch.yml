@@ -25,11 +25,16 @@ jobs:
           from pathlib import Path
           path = Path('admin/programs/opengl/patch_contract.py')
           text = path.read_text(encoding='utf-8')
-          old = 'pattern.subn(mesa_block, text, count=1)'
-          new = 'pattern.subn(lambda _match: mesa_block, text, count=1)'
-          if old not in text:
-              raise SystemExit('expected regex replacement expression not found')
-          path.write_text(text.replace(old, new), encoding='utf-8', newline='\n')
+          old_sub = 'pattern.subn(mesa_block, text, count=1)'
+          new_sub = 'pattern.subn(lambda _match: mesa_block, text, count=1)'
+          if old_sub in text:
+              text = text.replace(old_sub, new_sub)
+          old_pattern = 'pattern = re.compile(r\'<library id="opengl"\\\\b.*?</library>\', re.DOTALL)'
+          new_pattern = 'pattern = re.compile(r\'<library id="opengl".*?</library>\', re.DOTALL)'
+          if old_pattern not in text:
+              raise SystemExit('expected OpenGL selector not found')
+          text = text.replace(old_pattern, new_pattern)
+          path.write_text(text, encoding='utf-8', newline='\n')
           PY
           python3 admin/programs/opengl/patch_contract.py
       - name: Commit canonical contract
