@@ -59,6 +59,8 @@
          </xs:element>
       </xs:sequence>
       <xs:attribute name="format" type="archiveFormatType" use="required"/><xs:attribute name="root" type="xs:string" use="required"/>
+      <xs:attribute name="merge" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="preserveCurrentArtifact" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
    <xs:complexType name="copyActionType">
       <xs:attribute name="source" type="xs:string" use="required"/><xs:attribute name="target" type="xs:string" use="required"/>
