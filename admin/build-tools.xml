@@ -134,8 +134,10 @@
       </probe>
    </tool>
 
-   <tool id="windows-rc" version="Windows-SDK" required="always">
-      <discover executable="rc.exe" path="true"/>
+   <tool id="windows-rc" version="10.0.28000.0" required="always">
+      <discover executable="rc.exe" path="true">
+         <candidate path="{ProgramFilesX86}\Windows Kits\10\bin\10.0.28000.0\x64\rc.exe"/>
+      </discover>
    </tool>
 
    <tool id="nasm" version="3.02" required="always">
