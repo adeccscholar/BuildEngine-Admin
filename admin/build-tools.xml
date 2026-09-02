@@ -46,7 +46,7 @@
    </tool>
 
    <tool id="python" version="3.14.7" required="always">
-      <managed root="python\3.14.7-build" executable="python.exe">
+      <managed root="python\3.14.7-embedded" executable="python.exe">
          <download url="https://www.python.org/ftp/python/3.14.7/python-3.14.7-embed-amd64.zip"
                    archive="python-3.14.7-embed-amd64.zip"
                    sha256="d297e5ff019966817ad8502465176139f2d3d840fa4ed84b13bed399a6ab1f15"/>
@@ -87,19 +87,18 @@
       </probe>
    </tool>
 
-   <!-- Mesa's native Windows Meson path explicitly prefers win_flex/win_bison. -->
-   <tool id="winflexbison" version="2.5.25" required="always">
-      <managed root="winflexbison\2.5.25" executable="win_flex.exe">
-         <download url="https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip"
-                   archive="win_flex_bison-2.5.25.zip"
-                   sha256="8d324b62be33604b2c45ad1dd34ab93d722534448f55a16ca7292de32b6ac135"/>
+   <!-- 2.5.25 has a documented parallel temp-file race in win_flex on Windows. -->
+   <tool id="winflexbison" version="2.5.24" required="always">
+      <managed root="winflexbison\2.5.24" executable="win_flex.exe">
+         <download url="https://github.com/lexxmark/winflexbison/releases/download/v2.5.24/win_flex_bison-2.5.24.zip"
+                   archive="win_flex_bison-2.5.24.zip"
+                   sha256="39c6086ce211d5415500acc5ed2d8939861ca1696aee48909c7f6daf5122b505"/>
       </managed>
       <probe contains="2.6.4">
          <argument value="--version"/>
       </probe>
    </tool>
 
-   <!-- Mesa documents pkg-config as a Windows build prerequisite. -->
    <tool id="pkg-config" version="0.28-1" runtimeVersion="0.28" required="always">
       <managed root="pkg-config-lite\0.28-1" executable="pkg-config-lite-0.28-1\bin\pkg-config.exe">
          <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download"
@@ -122,29 +121,12 @@
       </probe>
    </tool>
 
-   <tool id="bcc64x" version="20.1.7" required="always">
-      <bds executable="bin64\bcc64x.exe"/>
-   </tool>
-
-   <tool id="embarcadero-make" version="5.43" required="always">
-      <bds executable="bin\make.exe"/>
-   </tool>
-
-   <tool id="llvm-ar" version="20.1.7" required="always">
-      <bds executable="bin64\llvm-ar.exe"/>
-   </tool>
-
-   <tool id="llvm-ranlib" version="20.1.7" required="always">
-      <bds executable="bin64\llvm-ranlib.exe"/>
-   </tool>
-
-   <tool id="ld-lld" version="20.1.7" required="always">
-      <bds executable="bin64\ld.lld.exe"/>
-   </tool>
-
-   <tool id="bcc64x-windres" version="20.1.7" required="always">
-      <bds executable="bin64\bcc64x-windres.exe"/>
-   </tool>
+   <tool id="bcc64x" version="20.1.7" required="always"><bds executable="bin64\bcc64x.exe"/></tool>
+   <tool id="embarcadero-make" version="5.43" required="always"><bds executable="bin\make.exe"/></tool>
+   <tool id="llvm-ar" version="20.1.7" required="always"><bds executable="bin64\llvm-ar.exe"/></tool>
+   <tool id="llvm-ranlib" version="20.1.7" required="always"><bds executable="bin64\llvm-ranlib.exe"/></tool>
+   <tool id="ld-lld" version="20.1.7" required="always"><bds executable="bin64\ld.lld.exe"/></tool>
+   <tool id="bcc64x-windres" version="20.1.7" required="always"><bds executable="bin64\bcc64x-windres.exe"/></tool>
 
    <tool id="tdump" version="RADStudio-13" required="always">
       <discover executable="tdump.exe" path="false">
@@ -165,26 +147,17 @@
             <require path="bin/llvm-cov.exe"/>
          </nativeExtract>
       </managed>
-      <probe contains="LLVM version 20.1.7">
-         <argument value="--version"/>
-      </probe>
+      <probe contains="LLVM version 20.1.7"><argument value="--version"/></probe>
    </tool>
 
    <tool id="windows-rc" version="Windows-SDK" required="always">
-      <discover executable="rc.exe" path="true">
-         <candidate path="{ProgramFilesX86}\Windows Kits\10\bin\*\x64\rc.exe"/>
-      </discover>
+      <discover executable="rc.exe" path="true"><candidate path="{ProgramFilesX86}\Windows Kits\10\bin\*\x64\rc.exe"/></discover>
    </tool>
 
    <tool id="nasm" version="3.02" required="always">
       <managed root="nasm\3.02" executable="nasm-3.02\nasm.exe">
-         <download
-            url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/win64/nasm-3.02-win64.zip"
-            archive="nasm-3.02-win64.zip"
-            sha256="161d0bfaff53c2f9e9f3e69fd0672323ebabafd1268976a5cec11be92a19aee7"/>
+         <download url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/win64/nasm-3.02-win64.zip" archive="nasm-3.02-win64.zip" sha256="161d0bfaff53c2f9e9f3e69fd0672323ebabafd1268976a5cec11be92a19aee7"/>
       </managed>
-      <probe contains="NASM version 3.02">
-         <argument value="-v"/>
-      </probe>
+      <probe contains="NASM version 3.02"><argument value="-v"/></probe>
    </tool>
 </buildTools>
