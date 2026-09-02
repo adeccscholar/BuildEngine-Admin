@@ -14,28 +14,45 @@ def patch_windows_lld_allow_undefined(meson_root: Path) -> None:
     if not linkers.is_file():
         raise SystemExit(f"Meson linker implementation not found: {linkers}")
 
-    original = """    def get_allow_undefined_args(self) -> T.List[str]:
-        if self.has_allow_shlib_undefined:
-            return self._apply_prefix('--allow-shlib-undefined')
-        return []
+    original_probe = """        self.has_allow_shlib_undefined = self._supports_flag('--allow-shlib-undefined', always_args)
 """
-    patched = """    def get_allow_undefined_args(self) -> T.List[str]:
+    patched_probe = """        self.has_allow_shlib_undefined = (
+            not env.machines[for_machine].is_windows()
+            and self._supports_flag('--allow-shlib-undefined', always_args)
+        )
+"""
+
+    previous_method = """    def get_allow_undefined_args(self) -> T.List[str]:
         if self.system == 'windows':
             return []
         if self.has_allow_shlib_undefined:
             return self._apply_prefix('--allow-shlib-undefined')
         return []
 """
+    original_method = """    def get_allow_undefined_args(self) -> T.List[str]:
+        if self.has_allow_shlib_undefined:
+            return self._apply_prefix('--allow-shlib-undefined')
+        return []
+"""
 
     text = linkers.read_text(encoding="utf-8")
-    if patched in text:
+
+    # Migrate an already patched workspace from the previous compatibility
+    # attempt back to the upstream method before applying the real probe fix.
+    if previous_method in text:
+        text = text.replace(previous_method, original_method, 1)
+
+    if patched_probe in text:
+        linkers.write_text(text, encoding="utf-8", newline="\n")
         return
-    if original not in text:
+
+    if original_probe not in text:
         raise SystemExit(
-            "Meson 1.12.0 Windows-LLD compatibility patch context does not match"
+            "Meson 1.12.0 Windows-LLD capability patch context does not match"
         )
 
-    linkers.write_text(text.replace(original, patched, 1), encoding="utf-8", newline="\n")
+    text = text.replace(original_probe, patched_probe, 1)
+    linkers.write_text(text, encoding="utf-8", newline="\n")
 
 
 def main() -> None:
