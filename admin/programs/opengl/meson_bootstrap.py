@@ -3,13 +3,68 @@
 
 from __future__ import annotations
 
+import os
 import runpy
 import sys
 from pathlib import Path
 
 
+def is_bcc64x() -> bool:
+    """Return whether the configured compiler is Embarcadero BCC64X."""
+    compiler = os.environ.get("CC", "").strip().strip('"')
+    return Path(compiler).name.casefold() in {"bcc64x", "bcc64x.exe"}
+
+
+def patch_bcc64x_lld_detection(meson_root: Path) -> None:
+    """Let Meson 1.12.0 detect LLD behind the BCC64X compiler banner."""
+    if not is_bcc64x():
+        return
+
+    detect = meson_root / "mesonbuild" / "linkers" / "detect.py"
+    if not detect.is_file():
+        raise SystemExit(f"Meson linker detection implementation not found: {detect}")
+
+    original_win = """    if 'LLD' in o.split('\\n', maxsplit=1)[0]:
+        if 'compatible with GNU linkers' in o:
+"""
+    patched_win = """    if 'LLD' in o:
+        if 'compatible with GNU linkers' in o:
+"""
+
+    original_nix = """    if 'LLD' in o.split('\\n', maxsplit=1)[0] or 'tiarmlnk' in e:
+"""
+    patched_nix = """    if 'LLD' in o or 'tiarmlnk' in e:
+"""
+
+    text = detect.read_text(encoding="utf-8")
+
+    win_is_patched = patched_win in text
+    nix_is_patched = patched_nix in text
+    if win_is_patched and nix_is_patched:
+        return
+
+    if not win_is_patched:
+        if text.count(original_win) != 1:
+            raise SystemExit(
+                "Meson 1.12.0 Windows LLD detection patch context does not match"
+            )
+        text = text.replace(original_win, patched_win, 1)
+
+    if not nix_is_patched:
+        if text.count(original_nix) != 1:
+            raise SystemExit(
+                "Meson 1.12.0 Unix-like LLD detection patch context does not match"
+            )
+        text = text.replace(original_nix, patched_nix, 1)
+
+    detect.write_text(text, encoding="utf-8", newline="\n")
+
+
 def patch_windows_lld_allow_undefined(meson_root: Path) -> None:
-    """Apply the Meson 1.12.0 Windows-LLD compatibility fix used by BCC64X."""
+    """Do not probe the unsupported GNU allow-undefined switch on Windows LLD."""
+    if not is_bcc64x():
+        return
+
     linkers = meson_root / "mesonbuild" / "linkers" / "linkers.py"
     if not linkers.is_file():
         raise SystemExit(f"Meson linker implementation not found: {linkers}")
@@ -37,8 +92,8 @@ def patch_windows_lld_allow_undefined(meson_root: Path) -> None:
 
     text = linkers.read_text(encoding="utf-8")
 
-    # Migrate an already patched workspace from the previous compatibility
-    # attempt back to the upstream method before applying the real probe fix.
+    # Migrate an already patched workspace from the first compatibility
+    # attempt back to the upstream method before applying the capability fix.
     if previous_method in text:
         text = text.replace(previous_method, original_method, 1)
 
@@ -46,7 +101,7 @@ def patch_windows_lld_allow_undefined(meson_root: Path) -> None:
         linkers.write_text(text, encoding="utf-8", newline="\n")
         return
 
-    if original_probe not in text:
+    if text.count(original_probe) != 1:
         raise SystemExit(
             "Meson 1.12.0 Windows-LLD capability patch context does not match"
         )
@@ -64,6 +119,7 @@ def main() -> None:
     if not meson_entry.is_file():
         raise SystemExit(f"Meson entry point not found: {meson_entry}")
 
+    patch_bcc64x_lld_detection(meson_root)
     patch_windows_lld_allow_undefined(meson_root)
 
     sys.path.insert(0, str(meson_root))
