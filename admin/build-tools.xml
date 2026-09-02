@@ -134,9 +134,9 @@
       </probe>
    </tool>
 
-   <tool id="windows-rc" version="10.0.26100.0" required="always">
+   <tool id="windows-rc" version="Windows-SDK" required="always">
       <discover executable="rc.exe" path="true">
-         <candidate path="{ProgramFilesX86}\Windows Kits\10\bin\10.0.26100.0\x64\rc.exe"/>
+         <candidate path="{ProgramFilesX86}\Windows Kits\10\bin\*\x64\rc.exe"/>
       </discover>
    </tool>
 
