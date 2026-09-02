@@ -45,7 +45,7 @@ jobs:
         run: |
           git config user.name "BuildEngine contract update"
           git config user.email "actions@users.noreply.github.com"
-          git rm .github/workflows/mesa-contract-patch.yml admin/programs/opengl/patch_contract.py
+          git rm -f .github/workflows/mesa-contract-patch.yml admin/programs/opengl/patch_contract.py
           git add admin/build-libraries.xml admin/programs/opengl/meson_bootstrap.py
           git diff --cached --check
           git commit -m "Build Mesa OpenGL natively with BCC64X"
