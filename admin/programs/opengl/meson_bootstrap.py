@@ -10,30 +10,37 @@ from pathlib import Path
 
 
 def configure_bcc64x_library_path() -> None:
-    """Expose the RAD Studio Win64X import-library roots to the BCC64X driver."""
-    compiler = os.environ.get("CC", "")
-    if Path(compiler).name.casefold() != "bcc64x.exe":
+    """Expose available RAD Studio Win64X library roots to BCC64X/Meson."""
+    compiler = os.environ.get("CC", "").strip().strip('"')
+    compiler_path = Path(compiler)
+    if compiler_path.name.casefold() not in {"bcc64x", "bcc64x.exe"}:
         return
 
-    bds = os.environ.get("BDS", "")
-    if not bds:
-        raise SystemExit("BCC64X Meson bootstrap requires BDS from rsvars.bat")
+    bds_value = os.environ.get("BDS", "").strip().strip('"')
+    if bds_value:
+        bds = Path(bds_value)
+    else:
+        try:
+            bds = compiler_path.resolve().parent.parent
+        except OSError:
+            return
 
-    library_roots = [
-        Path(bds) / "lib" / "win64x" / "release",
-        Path(bds) / "lib" / "win64x" / "release" / "psdk",
+    candidates = [
+        bds / "lib" / "win64x" / "release",
+        bds / "lib" / "win64x" / "release" / "psdk",
     ]
-    missing = [path for path in library_roots if not path.is_dir()]
-    if missing:
-        raise SystemExit(
-            "BCC64X Meson bootstrap is missing RAD library roots: "
-            + "; ".join(str(path) for path in missing)
-        )
+    library_roots = [path for path in candidates if path.is_dir()]
+    if not library_roots:
+        return
 
-    existing = [entry for entry in os.environ.get("LIBRARY", "").split(os.pathsep) if entry]
-    known = {str(Path(entry)).casefold() for entry in existing}
-    prefix = [str(path) for path in library_roots if str(path).casefold() not in known]
-    os.environ["LIBRARY"] = os.pathsep.join([*prefix, *existing])
+    existing_library = [entry for entry in os.environ.get("LIBRARY", "").split(os.pathsep) if entry]
+    known = {str(Path(entry)).casefold() for entry in existing_library}
+    library_prefix = [str(path) for path in library_roots if str(path).casefold() not in known]
+    os.environ["LIBRARY"] = os.pathsep.join([*library_prefix, *existing_library])
+
+    existing_ldflags = os.environ.get("LDFLAGS", "").strip()
+    link_prefix = " ".join(f'-L"{path}"' for path in library_roots)
+    os.environ["LDFLAGS"] = f"{link_prefix} {existing_ldflags}".strip()
 
 
 def main() -> None:
