@@ -1,0 +1,60 @@
+name: Update OpenGL multi-source extraction contract
+
+on:
+  push:
+    branches:
+      - opengl-multi-source-extract
+    paths:
+      - .github/workflows/opengl-multi-source-extract.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: opengl-multi-source-extract
+          fetch-depth: 0
+
+      - name: Patch XSD and OpenGL contract
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new, label):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected one match, got {count}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8', newline='\n')
+
+          replace_once(
+              'admin/schemas/build-libraries.xsd',
+              '''      <xs:attribute name="format" type="archiveFormatType" use="required"/><xs:attribute name="root" type="xs:string" use="required"/>\n   </xs:complexType>\n''',
+              '''      <xs:attribute name="format" type="archiveFormatType" use="required"/><xs:attribute name="root" type="xs:string" use="required"/>\n      <xs:attribute name="merge" type="booleanTextType" use="optional" default="false"/>\n      <xs:attribute name="preserveCurrentArtifact" type="booleanTextType" use="optional" default="false"/>\n   </xs:complexType>\n''',
+              'extractActionType')
+
+          replace_once(
+              'admin/build-libraries.xml',
+              '''         <extract format="libarchive" root="meson-1.12.0">\n            <require path="meson.py"/>\n''',
+              '''         <extract format="libarchive" root="meson-1.12.0" merge="true" preserveCurrentArtifact="true">\n            <require path="meson.py"/>\n''',
+              'OpenGL Meson extract')
+          PY
+
+          git diff --check
+
+      - name: Commit contract update
+        shell: bash
+        run: |
+          git config user.name "BuildEngine Admin contract"
+          git config user.email "actions@users.noreply.github.com"
+          git rm .github/workflows/opengl-multi-source-extract.yml
+          git add admin/build-libraries.xml admin/schemas/build-libraries.xsd
+          git diff --cached --check
+          git commit -m "Preserve Mesa across managed Meson extraction"
+          git push origin HEAD:opengl-multi-source-extract
