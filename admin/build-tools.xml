@@ -87,6 +87,30 @@
       </probe>
    </tool>
 
+   <!-- Mesa's native Windows Meson path explicitly prefers win_flex/win_bison. -->
+   <tool id="winflexbison" version="2.5.25" required="always">
+      <managed root="winflexbison\2.5.25" executable="win_flex.exe">
+         <download url="https://github.com/lexxmark/winflexbison/releases/download/v2.5.25/win_flex_bison-2.5.25.zip"
+                   archive="win_flex_bison-2.5.25.zip"
+                   sha256="8d324b62be33604b2c45ad1dd34ab93d722534448f55a16ca7292de32b6ac135"/>
+      </managed>
+      <probe contains="2.6.4">
+         <argument value="--version"/>
+      </probe>
+   </tool>
+
+   <!-- Mesa documents pkg-config as a Windows build prerequisite. -->
+   <tool id="pkg-config" version="0.28-1" runtimeVersion="0.28" required="always">
+      <managed root="pkg-config-lite\0.28-1" executable="pkg-config-lite-0.28-1\bin\pkg-config.exe">
+         <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download"
+                   archive="pkg-config-lite-0.28-1_bin-win32.zip"
+                   sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
+      </managed>
+      <probe contains="0.28">
+         <argument value="--version"/>
+      </probe>
+   </tool>
+
    <tool id="doxygen" version="1.18.0" required="always">
       <managed root="doxygen\1.18.0" executable="doxygen.exe">
          <download url="https://github.com/doxygen/doxygen/releases/download/Release_1_18_0/doxygen-1.18.0.windows.x64.bin.zip"
