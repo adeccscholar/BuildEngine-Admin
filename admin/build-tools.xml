@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildTools xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="schemas/build-tools.xsd"
-            schemaVersion="3">
+            schemaVersion="4">
    <tool id="git" version="2.55.0.3" runtimeVersion="2.55.0.windows.3" required="always">
       <managed root="git\2.55.0.3" executable="cmd\git.exe">
          <download url="https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.3/MinGit-2.55.0.3-64-bit.zip"
@@ -45,7 +45,7 @@
       </probe>
    </tool>
 
-   <tool id="python" version="3.14.7" required="when-used">
+   <tool id="python" version="3.14.7" required="always">
       <managed root="python\3.14.7" executable="python.exe">
          <download url="https://www.python.org/ftp/python/3.14.7/python-3.14.7-embed-amd64.zip"
                    archive="python-3.14.7-embed-amd64.zip"
@@ -56,7 +56,26 @@
       </probe>
    </tool>
 
-   <tool id="doxygen" version="1.18.0" required="when-used">
+   <tool id="meson" version="1.12.0" required="always">
+      <managed root="meson\1.12.0" executable="meson.py">
+         <download url="https://files.pythonhosted.org/packages/source/m/meson/meson-1.12.0.tar.gz"
+                   archive="meson-1.12.0.tar.gz"
+                   sha256="88afe0c20e52030218924ac37d0c81c59b4b5f3ae3752c8c6d7470c7d365886c"/>
+         <nativeExtract format="libarchive" root="meson-1.12.0">
+            <require path="meson.py"/>
+            <require path="mesonbuild\mesonmain.py"/>
+            <require path="COPYING"/>
+         </nativeExtract>
+      </managed>
+      <launcher tool="python">
+         <argument value="{ToolEntry}"/>
+      </launcher>
+      <probe contains="1.12.0">
+         <argument value="--version"/>
+      </probe>
+   </tool>
+
+   <tool id="doxygen" version="1.18.0" required="always">
       <managed root="doxygen\1.18.0" executable="doxygen.exe">
          <download url="https://github.com/doxygen/doxygen/releases/download/Release_1_18_0/doxygen-1.18.0.windows.x64.bin.zip"
                    archive="doxygen-1.18.0.windows.x64.bin.zip"
@@ -75,30 +94,30 @@
       <bds executable="bin\make.exe"/>
    </tool>
 
-   <tool id="llvm-ar" version="20.1.7" required="when-used">
+   <tool id="llvm-ar" version="20.1.7" required="always">
       <bds executable="bin64\llvm-ar.exe"/>
    </tool>
 
-   <tool id="llvm-ranlib" version="20.1.7" required="when-used">
+   <tool id="llvm-ranlib" version="20.1.7" required="always">
       <bds executable="bin64\llvm-ranlib.exe"/>
    </tool>
 
-   <tool id="ld-lld" version="20.1.7" required="when-used">
+   <tool id="ld-lld" version="20.1.7" required="always">
       <bds executable="bin64\ld.lld.exe"/>
    </tool>
 
-   <tool id="bcc64x-windres" version="20.1.7" required="when-used">
+   <tool id="bcc64x-windres" version="20.1.7" required="always">
       <bds executable="bin64\bcc64x-windres.exe"/>
    </tool>
 
-   <tool id="tdump" version="RADStudio-13" required="when-used">
+   <tool id="tdump" version="RADStudio-13" required="always">
       <discover executable="tdump.exe" path="false">
          <candidate path="{BDS}\bin64\tdump.exe"/>
          <candidate path="{BDS}\bin\tdump.exe"/>
       </discover>
    </tool>
 
-   <tool id="llvm-cov" version="20.1.7" required="when-used">
+   <tool id="llvm-cov" version="20.1.7" required="always">
       <managed root="llvm\20.1.7" executable="bin\llvm-cov.exe">
          <download url="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/clang%2Bllvm-20.1.7-x86_64-pc-windows-msvc.tar.xz"
                    archive="clang+llvm-20.1.7-x86_64-pc-windows-msvc.tar.xz"
@@ -115,7 +134,7 @@
       </probe>
    </tool>
 
-   <tool id="windows-rc" version="Windows-SDK" required="when-used">
+   <tool id="windows-rc" version="Windows-SDK" required="always">
       <discover executable="rc.exe" path="true"/>
    </tool>
 
