@@ -39,7 +39,7 @@
 
    <xs:complexType name="nativeExtractType">
       <xs:sequence>
-         <xs:element name="include" type="pathPatternType" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element name="include" type="pathPatternType" minOccurs="0" maxOccurs="unbounded"/>
          <xs:element name="require" type="pathPatternType" minOccurs="1" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="format" type="nativeExtractFormatType" use="required"/>
@@ -78,6 +78,13 @@
       <xs:attribute name="value" type="xs:string" use="required"/>
    </xs:complexType>
 
+   <xs:complexType name="launcherType">
+      <xs:sequence>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="tool" type="xs:string" use="required"/>
+   </xs:complexType>
+
    <xs:complexType name="probeType">
       <xs:sequence>
          <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
@@ -92,6 +99,7 @@
             <xs:element name="bds" type="bdsType"/>
             <xs:element name="discover" type="discoverType"/>
          </xs:choice>
+         <xs:element name="launcher" type="launcherType" minOccurs="0"/>
          <xs:element name="probe" type="probeType" minOccurs="0"/>
       </xs:sequence>
       <xs:attribute name="id" type="xs:string" use="required"/>
