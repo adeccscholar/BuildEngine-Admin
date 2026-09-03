@@ -1770,7 +1770,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-<library id="ace-tao" version="8.0.6" timestamp="2026-09-03T15:15:00Z">
+<library id="ace-tao" version="8.0.6" timestamp="2026-09-03T17:07:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="xerces-c" version="3.3.0"/>
       <dependency library="zlib" version="1.3.2"/>
@@ -1988,6 +1988,7 @@
                   <include pattern="lib/**/*.pdb"/>
                   <include pattern="bin/*.dll"/>
                   <include pattern="bin/*.pdb"/>
+                  <include pattern="bin/*.exe"/>
                </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}" overwrite="true" cleanTarget="true">
                   <include pattern="tao_idl.exe"/>
@@ -2010,6 +2011,10 @@
                   <include pattern="**/tao_rtevent.exe"/>
                   <include pattern="**/tao_rteventd.exe"/>
                </copy>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\ACE_br.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ACE_br.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\tao_idl.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ace_gperf.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}\tao_idl.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}\ace_gperf.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\services\bin\win64\{Configuration}\tao_cosnaming.exe"/>
@@ -2018,14 +2023,12 @@
             </perVariant>
             <common>
                <!-- Header trees retain their relative layout; only public/interface file types are packaged. -->
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\ace" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" recursive="true" overwrite="true" cleanTarget="true">
-                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
-               </copy>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\ace" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" recursive="true" overwrite="true" cleanTarget="true"/>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\TAO\tao" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tao" recursive="true" overwrite="true" cleanTarget="true">
-                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
+                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.cpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
                </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\TAO\orbsvcs\orbsvcs" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\orbsvcs" recursive="true" overwrite="true" cleanTarget="true">
-                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
+                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.cpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
                </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\VERSION.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt" overwrite="true"/>
@@ -2034,6 +2037,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tao" kind="directory"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\orbsvcs" kind="directory"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace\ACE.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace\Intrusive_List.cpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tao\corba.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\orbsvcs\CosNamingC.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
@@ -2045,7 +2049,7 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
          <tree source="include" target="include" optional="true"/>
          <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
-         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb;.exe" optional="true"/>
          <tree source="services\bin\win64\{Configuration}" target="services\bin" optional="true"/>
          <tree source="tools\bin\win64\{Configuration}" target="tools\bin" optional="true"/>
       </publish>
