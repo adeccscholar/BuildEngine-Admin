@@ -1770,7 +1770,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-<library id="ace-tao" version="8.0.6" timestamp="2026-09-03T17:07:00Z">
+<library id="ace-tao" version="8.0.6" timestamp="2026-09-03T15:15:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="xerces-c" version="3.3.0"/>
       <dependency library="zlib" version="1.3.2"/>
@@ -1988,7 +1988,6 @@
                   <include pattern="lib/**/*.pdb"/>
                   <include pattern="bin/*.dll"/>
                   <include pattern="bin/*.pdb"/>
-                  <include pattern="bin/*.exe"/>
                </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}" overwrite="true" cleanTarget="true">
                   <include pattern="tao_idl.exe"/>
@@ -2011,10 +2010,6 @@
                   <include pattern="**/tao_rtevent.exe"/>
                   <include pattern="**/tao_rteventd.exe"/>
                </copy>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\ACE_br.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ACE_br.dll"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\tao_idl.exe"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ace_gperf.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}\tao_idl.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}\ace_gperf.exe"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\services\bin\win64\{Configuration}\tao_cosnaming.exe"/>
@@ -2023,12 +2018,14 @@
             </perVariant>
             <common>
                <!-- Header trees retain their relative layout; only public/interface file types are packaged. -->
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\ace" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" recursive="true" overwrite="true" cleanTarget="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\ace" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" recursive="true" overwrite="true" cleanTarget="true">
+                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
+               </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\TAO\tao" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tao" recursive="true" overwrite="true" cleanTarget="true">
-                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.cpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
+                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
                </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\TAO\orbsvcs\orbsvcs" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\orbsvcs" recursive="true" overwrite="true" cleanTarget="true">
-                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.cpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
+                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
                </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\VERSION.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt" overwrite="true"/>
@@ -2037,7 +2034,6 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tao" kind="directory"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\orbsvcs" kind="directory"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace\ACE.h"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace\Intrusive_List.cpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tao\corba.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\orbsvcs\CosNamingC.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
@@ -2049,7 +2045,7 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
          <tree source="include" target="include" optional="true"/>
          <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
-         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb;.exe" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="true"/>
          <tree source="services\bin\win64\{Configuration}" target="services\bin" optional="true"/>
          <tree source="tools\bin\win64\{Configuration}" target="tools\bin" optional="true"/>
       </publish>
@@ -2512,7 +2508,7 @@
 
    <library id="vtk" version="9.6.2" timestamp="2026-09-03T15:15:00Z">
       <metadata name="VTK" supplier="Kitware / VTK contributors" homepage="https://vtk.org/"><license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="Copyright.txt"/></metadata>
-      <source><download url="https://github.com/Kitware/VTK/archive/f49a1dbafa60b58ef22f6292ec58370453162192.zip" archive="VTK-f49a1dbafa60b58ef22f6292ec58370453162192.zip"/><extract format="zip" root="VTK-f49a1dbafa60b58ef22f6292ec58370453162192"><require path="CMakeLists.txt"/><require path="Copyright.txt"/><require path="Common\Core\CMakeLists.txt"/><require path="Common\DataModel\CMakeLists.txt"/><require path="Filters\Core\CMakeLists.txt"/></extract></source>
+      <source><download url="https://github.com/Kitware/VTK/archive/f49a1dbafa60b58ef22f6292ec58370453162192.zip" archive="VTK-f49a1dbafa60b58ef22f6292ec58370453162192.zip"/><extract format="zip" root="VTK-f49a1dbafa60b58ef22f6292ec58370453162192"><require path="CMakeLists.txt"/><require path="Copyright.txt"/><require path="Common\Core\vtkVersion.h.in"/><require path="Common\DataModel\CMakeLists.txt"/><require path="Filters\Core\CMakeLists.txt"/></extract></source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/><argument value="-DVTK_BUILD_TESTING:BOOL=OFF"/><argument value="-DVTK_GROUP_ENABLE_StandAlone:STRING=DONT_WANT"/><argument value="-DVTK_GROUP_ENABLE_Rendering:STRING=DONT_WANT"/><argument value="-DVTK_GROUP_ENABLE_Web:STRING=DONT_WANT"/><argument value="-DVTK_GROUP_ENABLE_MPI:STRING=DONT_WANT"/><argument value="-DVTK_MODULE_ENABLE_VTK_CommonCore:STRING=YES"/><argument value="-DVTK_MODULE_ENABLE_VTK_CommonDataModel:STRING=YES"/><argument value="-DVTK_MODULE_ENABLE_VTK_FiltersCore:STRING=YES"/><argument value="-DVTK_WRAP_PYTHON:BOOL=OFF"/><argument value="-DVTK_WRAP_JAVA:BOOL=OFF"/>
@@ -2524,39 +2520,14 @@
       <smoke id="consumer" source="smokes\vtk\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="vtk-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-   <library id="onetbb" version="2023.1.0" timestamp="2026-09-03T16:16:56Z">
-      <metadata name="oneTBB" supplier="UXL Foundation" homepage="https://github.com/uxlfoundation/oneTBB">
-         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
-      </metadata>
-      <source>
-         <download url="https://github.com/uxlfoundation/oneTBB/archive/3046c8b0c29df995980003ea24f4d78c80ec0c8d.zip" archive="oneTBB-3046c8b0c29df995980003ea24f4d78c80ec0c8d.zip"/>
-         <extract format="zip" root="oneTBB-3046c8b0c29df995980003ea24f4d78c80ec0c8d">
-            <require path="CMakeLists.txt"/><require path="LICENSE.txt"/><require path="include\oneapi\tbb\version.h"/><require path="src\tbb\CMakeLists.txt"/>
-         </extract>
-      </source>
-      <build testsAffectBuild="false">
-         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
-         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
-         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/><argument value="-DTBB_BUILD:BOOL=ON"/><argument value="-DTBBMALLOC_BUILD:BOOL=OFF"/><argument value="-DTBB_TEST:BOOL=OFF"/><argument value="-DTBB_EXAMPLES:BOOL=OFF"/><argument value="-DTBB4PY_BUILD:BOOL=OFF"/><argument value="-DTBB_STRICT:BOOL=OFF"/><argument value="-DTBB_ENABLE_IPO:BOOL=OFF"/><argument value="-DTBB_INSTALL:BOOL=ON"/><argument value="-DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH:BOOL=ON"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\oneTBB-3046c8b0c29df995980003ea24f4d78c80ec0c8d" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-         <variant name="Release"><variable name="DebugPostfix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant>
-         <variant name="Debug"><variable name="DebugPostfix" value="_debug"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/></variant>
-         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libtbb12{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libtbb12{DebugPostfix}.lib"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\TBB\TBBConfig.cmake"/></perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{Workspace}\oneTBB-3046c8b0c29df995980003ea24f4d78c80ec0c8d\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\oneapi\tbb\parallel_reduce.h"/></common></install>
-      </build>
-      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
-      <smoke id="consumer" source="smokes\onetbb\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="onetbb-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
-   </library>
-
-   <library id="opencv" version="5.0.0" timestamp="2026-09-03T16:16:56Z">
+   <library id="opencv" version="5.0.0" timestamp="2026-09-03T15:15:00Z">
       <dependency library="zlib" version="1.3.2"/>
-      <dependency library="onetbb" version="2023.1.0"/>
       <metadata name="OpenCV" supplier="OpenCV project" homepage="https://opencv.org/"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source><download url="https://github.com/opencv/opencv/archive/40738fb16ceddb5fb3fea747585f7ce6abb0605b.zip" archive="opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b.zip"/><extract format="zip" root="opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b"><require path="CMakeLists.txt"/><require path="LICENSE"/><require path="modules\core\CMakeLists.txt"/><require path="modules\dnn\CMakeLists.txt"/><require path="modules\highgui\CMakeLists.txt"/><require path="modules\videoio\CMakeLists.txt"/></extract><copy source="{BuildFileDir}\patches\opencv\5.0.0\bcc64x-optional-mlas.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch" overwrite="true" preserveCurrentArtifact="true"/><execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch"/></execute><execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false"><argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch"/></execute></source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/><environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DOPENCV_INCLUDE_INSTALL_PATH:STRING=include/opencv5"/><argument value="-DOPENCV_LIB_INSTALL_PATH:STRING=lib/win64/{Configuration}"/><argument value="-DOPENCV_BIN_INSTALL_PATH:STRING=bin/win64/{Configuration}"/><argument value="-DOPENCV_CONFIG_INSTALL_PATH:STRING=lib/win64/{Configuration}/cmake/opencv5"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/><argument value="-DBUILD_LIST:STRING=core,imgproc,geometry,flann,features,video,photo,stereo,ptcloud,calib,dnn,objdetect,imgcodecs,videoio,highgui"/><argument value="-DBUILD_opencv_world:BOOL=OFF"/><argument value="-DBUILD_TESTS:BOOL=OFF"/><argument value="-DBUILD_PERF_TESTS:BOOL=OFF"/><argument value="-DBUILD_EXAMPLES:BOOL=OFF"/><argument value="-DBUILD_DOCS:BOOL=OFF"/><argument value="-DBUILD_opencv_apps:BOOL=OFF"/><argument value="-DBUILD_JAVA:BOOL=OFF"/><argument value="-DBUILD_opencv_python3:BOOL=OFF"/>
-         <argument value="-DOPENCV_DNN_MLAS:BOOL=OFF"/><argument value="-DWITH_ONNXRUNTIME:BOOL=OFF"/><argument value="-DWITH_PROTOBUF:BOOL=ON"/><argument value="-DBUILD_PROTOBUF:BOOL=ON"/><argument value="-DPROTOBUF_UPDATE_FILES:BOOL=OFF"/><argument value="-DOPENCV_DISABLE_THREAD_SUPPORT:BOOL=OFF"/><argument value="-DWITH_OPENCL:BOOL=OFF"/><argument value="-DWITH_CUDA:BOOL=OFF"/><argument value="-DWITH_DIRECTML:BOOL=OFF"/><argument value="-DWITH_TBB:BOOL=ON"/><argument value="-DTBB_DIR:PATH={InstallRoot}\packages\onetbb\2023.1.0\lib\win64\{Configuration}\cmake\TBB"/><argument value="-DWITH_OPENMP:BOOL=OFF"/>
+         <argument value="-DOPENCV_DNN_MLAS:BOOL=OFF"/><argument value="-DWITH_ONNXRUNTIME:BOOL=OFF"/><argument value="-DWITH_PROTOBUF:BOOL=ON"/><argument value="-DBUILD_PROTOBUF:BOOL=ON"/><argument value="-DPROTOBUF_UPDATE_FILES:BOOL=OFF"/><argument value="-DOPENCV_DISABLE_THREAD_SUPPORT:BOOL=ON"/><argument value="-DWITH_OPENCL:BOOL=OFF"/><argument value="-DWITH_CUDA:BOOL=OFF"/><argument value="-DWITH_DIRECTML:BOOL=OFF"/><argument value="-DWITH_TBB:BOOL=OFF"/><argument value="-DWITH_OPENMP:BOOL=OFF"/>
          <argument value="-DWITH_FFMPEG:BOOL=OFF"/><argument value="-DWITH_GSTREAMER:BOOL=OFF"/><argument value="-DWITH_DSHOW:BOOL=OFF"/><argument value="-DWITH_MSMF:BOOL=OFF"/><argument value="-DWITH_QT:BOOL=OFF"/><argument value="-DWITH_GTK:BOOL=OFF"/><argument value="-DWITH_OPENGL:BOOL=OFF"/><argument value="-DWITH_UNIFONT:BOOL=OFF"/>
          <argument value="-DWITH_JPEG:BOOL=ON"/><argument value="-DBUILD_JPEG:BOOL=ON"/><argument value="-DWITH_PNG:BOOL=ON"/><argument value="-DBUILD_PNG:BOOL=ON"/><argument value="-DWITH_TIFF:BOOL=ON"/><argument value="-DBUILD_TIFF:BOOL=ON"/><argument value="-DWITH_WEBP:BOOL=ON"/><argument value="-DBUILD_WEBP:BOOL=ON"/><argument value="-DWITH_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_ZLIB:BOOL=OFF"/><argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/><argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibrary}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
