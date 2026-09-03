@@ -1,0 +1,7 @@
+module BuildEngineSmoke
+{
+   interface Probe
+   {
+      string ping();
+   };
+};
