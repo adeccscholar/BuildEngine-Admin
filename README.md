@@ -1,225 +1,197 @@
-# BuildEngine Administration Contracts
+# BuildEngine-Admin
 
-This repository is one component of the **C++Builder Third-Party Integration project**. The overall project investigates, builds, packages, and documents third-party C and C++ libraries for **Embarcadero C++Builder / BCC64X** in a reproducible way.
+Dieses Repository ist die **deklarative Administrationsschicht** des C++Builder-Third-Party-Integrationsprojekts. Ziel des Gesamtprojekts ist der reproduzierbare Nachweis, in welchem Umfang aktuelle C- und C++-Bibliotheken mit **Embarcadero C++Builder 13 / BCC64X** gebaut, getestet, paketiert und von normalen Consumer-Projekten verwendet werden können.
 
-This repository is **not a program** and it does not contain the BuildEngine executable. It contains the declarative administration and build contracts consumed by BuildEngine.
+Die normative Primärdokumentation des Projekts wird auf Deutsch geführt.
 
-**License:** MIT
+## Rolle im Gesamtprojekt
 
-## Purpose
-
-The repository is the authoritative, version-controlled administration source for the third-party build environment. Its job is to describe **what shall be built and how the generic BuildEngine infrastructure shall invoke the required tools**.
-
-It contains, in particular:
-
-- required build tools and their provisioning/probe contracts;
-- third-party library source, build, install, and artifact contracts;
-- version-independent smoke-test registrations and their applicable library-version ranges;
-- XML schemas for these contracts;
-- generic CMake/BCC64X toolchain and rule files that are shared across libraries.
-
-The repository deliberately does **not** contain library-specific C++ job classes or replacement build systems merely to make a library fit the project. Third-party libraries should use their upstream build systems whenever possible.
-
-## Role in the overall project
-
-The project is larger than this repository:
+Die drei Repositories haben bewusst unterschiedliche Aufgaben:
 
 ```text
-C++Builder Third-Party Integration Project
-|
-+-- BuildEngine program
-|     Executes generic technical actions and schedules work
-|
-+-- BuildEngineAdmin repository        <-- this repository
-|     Declarative tool/library/test contracts
-|
-+-- BuildEngineSmokeTests repository
-|     Version-independent tests and evidence programs
-|
-+-- Third-party upstream sources
-|     Downloaded and built by the workflow
-|
-+-- Installed packages, logs and evidence
-      Results produced by the workflow
+adeccscholar/BuildEngine
+   private C++23-Anwendung
+   Scheduler, generische technische Aktionen, Repository-Sync,
+   Incremental State, Publish und Smoke-Orchestrierung
+
+adeccscholar/BuildEngine-Admin        <-- dieses Repository
+   deklarative Tool- und Bibliotheksverträge
+   XSD-Schemata, CMake-/Toolchain-Adapter, versionsgebundene Patches,
+   kleine paketbezogene Consumer-Smokes
+
+adeccscholar/BuildEngine-Tests
+   komplexere Integrations-, Demonstrations- und Lernwelt
+   bewusst getrennt von den kleinen Package-Acceptance-Smokes
 ```
 
-The administration repository therefore describes and controls part of the process; it is not the process implementation itself.
+Diese Trennung ist verbindlich. Ein kleiner Bibliotheks-Smoke soll lediglich belegen, dass ein veröffentlichtes Paket als Consumer tatsächlich benutzbar ist. Mehrprozess-Szenarien, umfangreiche Demonstrationen und fachlich größere Integrationstests gehören in `BuildEngine-Tests`.
 
-## Repository layout
+## Autoritativer Bibliotheksvertrag
+
+`admin/build-libraries.xml` ist der **einzige normative Bibliotheks- und Dependency-Vertrag**. Aktive Bibliotheksdefinitionen werden nicht in XML-Fragmente aufgeteilt.
+
+Der aktuelle Vertrag verwendet `schemaVersion="13"` und enthält 19 verwaltete Bibliotheks-/Plattformverträge:
 
 ```text
-BuildEngineAdmin/
+pugixml
+zlib
+brotli
+zstd
+xz
+libzip
+libarchive
+openssl
+curl
+boost
+nlohmann-json
+ace-tao
+bzip2
+glew
+opengl
+raylib
+sdl2
+sqlite
+xerces-c
+```
+
+Bibliotheksspezifisches Wissen gehört nach Möglichkeit in diesen XML-Vertrag. Der BuildEngine-Kern implementiert nur **generische** Mechanismen.
+
+## Grundprinzip
+
+Der bevorzugte Pfad lautet:
+
+```text
+offizieller Upstream
+   -> reproduzierbarer Download / Source-Pin
+   -> Extraktion
+   -> ggf. expliziter versionsgebundener Patch
+   -> originales Buildsystem
+   -> BCC64X Build
+   -> Upstream-Tests soweit sinnvoll und technisch möglich
+   -> versioniertes Paket
+   -> explizite Require-Gates
+   -> Publish in den Consumer-Baum
+   -> kleiner Consumer-Smoke
+```
+
+Ein alternativer Compiler oder ein verstecktes Ersatz-Buildsystem darf BCC64X nicht stillschweigend ersetzen. Workarounds mit anderen Toolchains können untersucht und dokumentiert werden, sind aber keine automatische Projektentscheidung.
+
+## Aktuelle BuildEngine-Aktionen
+
+Die XML-Verträge nutzen unter anderem generische Aktionen für:
+
+- Download und Hashprüfung,
+- Archive-Extraktion,
+- CMake-Aufrufe,
+- allgemeine Prozessausführung,
+- Kopieren von Dateien und Verzeichnissen,
+- gefiltertes rekursives Kopieren mit Include-/Exclude-Patterns,
+- Flattening von Verzeichnisbäumen,
+- Bereinigung eines Zielbaums vor dem Kopieren,
+- Auswahl genau einer passenden Datei,
+- Datei-/Verzeichnis-/Pfadprüfung über `<require>`,
+- Publish und Consumer-Smokes.
+
+Die erweiterte Copy-Aktion erlaubt insbesondere, bisherige eigene Python-Paketierungslogik durch deklarative XML-Aktionen plus generische C++-Implementierung zu ersetzen.
+
+## `<require>`: Datei, Verzeichnis oder beliebiger Pfad
+
+Ein eigenständiger `<require>`-Knoten prüft standardmäßig weiterhin eine reguläre Datei:
+
+```xml
+<require path="{PackageRoot}\include\library.h"/>
+```
+
+Das ist kompatibel zu allen bisherigen Verträgen und entspricht implizit:
+
+```xml
+<require path="{PackageRoot}\include\library.h" kind="file"/>
+```
+
+Zusätzlich sind möglich:
+
+```xml
+<require path="{PackageRoot}\include" kind="directory"/>
+<require path="{PackageRoot}\generated-object" kind="any"/>
+```
+
+`kind="directory"` verlangt tatsächlich ein Verzeichnis. `kind="any"` verlangt lediglich einen existierenden Filesystem-Eintrag.
+
+Das innerhalb von `<extract>` verwendete `<require path="..."/>` bleibt bewusst ein **Dateinachweis innerhalb des extrahierten Upstream-Archivs**. Diese Semantik ist vom eigenständigen Install-/Dokumentations-`<require>` getrennt.
+
+## Paketbezogene Smokes und BuildEngine-Tests
+
+Kleine Smokes liegen unter `admin/smokes/<library>/...` und werden durch `<smoke>`-Knoten in `build-libraries.xml` an den jeweiligen Bibliotheksvertrag gebunden. Sie sollen typischerweise nur:
+
+1. ein frisches Consumer-Projekt konfigurieren,
+2. Header finden,
+3. gegen die veröffentlichten Import-/statischen Bibliotheken linken,
+4. bei sinnvoller Runtime einen kleinen Funktionspfad ausführen.
+
+Für ACE/TAO soll dieser Rahmen ausdrücklich klein bleiben. Ein geeigneter Smoke darf beispielsweise eine kleine IDL mit dem paketierten `tao_idl` übersetzen, einen ORB initialisieren und optional den paketierten Naming Service kurz starten, einen Namen registrieren/auflösen und wieder beenden. Eine umfassende CORBA-Testwelt gehört dagegen in `BuildEngine-Tests`.
+
+`admin/smoke-tests.xml` ist nur noch eine Übergangs-/Kompatibilitätsdatei. Komplexe Integrations- und Demo-Szenarien werden nicht zurück in diesen Legacy-Vertrag verschoben.
+
+## Repository-Struktur
+
+```text
+BuildEngine-Admin/
 |-- README.md
-|-- LICENSE
-|-- .gitattributes
-|-- .gitignore
-|-- SHA256SUMS.txt
+|-- TODO.md
+|-- BOOST_1_92_BCC64X_RUNTIME_STATUS.md
+|-- docs/
+|   `-- library-license-sbom.md
 `-- admin/
+    |-- README.md
     |-- build-tools.xml
     |-- build-libraries.xml
     |-- smoke-tests.xml
+    |-- schemas/
     |-- cmake/
-    |   |-- overrides/
-    |   |   `-- bcc64x-rules.cmake
-    |   `-- toolchains/
-    |       `-- bcc64x-buildengine-cxx.cmake
-    `-- schemas/
-        |-- build-tools.xsd
-        |-- build-libraries.xsd
-        `-- smoke-tests.xsd
+    |-- patches/
+    |-- programs/
+    `-- smokes/
 ```
 
-`tools.xml` and `machine-state.xml` are machine-local runtime state. They are not authoritative repository content and must not be overwritten by an administration sync once they exist locally.
+Unter `admin/programs/` dürfen nur technisch begründete Hilfsprogramme verbleiben. Generische Orchestrierung gehört in BuildEngine-C++. Ein konkretes Beispiel für eine weiterhin notwendige Spezialbrücke ist `admin/programs/opengl/meson_bootstrap.py`, das die reale Meson/BCC64X-Kompatibilität für den Mesa-Build herstellt. Dagegen ist `admin/programs/ace-tao/install.py` nach erfolgreicher Ablösung durch den generischen Copy-Vertrag nur noch ein zu entfernender Altbestand.
 
-## Synchronization into a BuildEngine workspace
+## Synchronisation
 
-A local Git worktree is synchronized into the BuildEngine working directory before the full build configuration is evaluated:
+BuildEngine hält einen Git-Worktree des Admin-Repositories unter dem konfigurierten Repository-Root und synchronisiert dessen `admin/`-Baum in den produktiven Arbeitsbereich. Der Git-Checkout ist die autoritative Quelle; der synchronisierte Arbeitsbaum ist kein eigener Git-Checkout.
 
-```text
-<AdminGitWorktree>\admin\
-          |
-          | compare by relative path and content hash
-          v
-<BuildWorkspace>\admin\
-```
+Repositoryverwaltete Dateien werden nach Inhalt synchronisiert. Maschinenlokale Zustandsdateien werden nicht als normative Repositorydaten behandelt.
 
-For repository-managed files:
+## Reproduzierbarkeit und Evidence
 
-- identical path and identical content: no change;
-- new file: copy it into the workspace;
-- changed file: replace it atomically;
-- repository-managed file removed from Git: remove it from the synchronized target;
-- machine-local state files: preserve them;
-- timestamps are not used as content identity;
-- the selected Git commit should be recorded later as build evidence.
+Ein belastbarer Lauf soll mindestens identifizierbar machen:
 
-This allows new libraries, changed library contracts, new tool requirements, or revised smoke-test mappings to become available without recompiling BuildEngine, as long as they use technical actions already supported by the program.
+- BuildEngine-Commit,
+- BuildEngine-Admin-Commit,
+- gegebenenfalls BuildEngine-Tests-Commit,
+- Bibliotheksversion und Source-Pin,
+- Compiler- und Toolversionen,
+- wirksame Buildparameter,
+- angewendete Patches,
+- erzeugte Paketartefakte,
+- Publish-Ergebnis,
+- Test-/Smoke-Ergebnis,
+- Logs und maschinenlokalen Abschlusszustand.
 
-## Bootstrap and managed operation
+Am 3. September 2026 wurde nach der Umstellung der ACE/TAO-Paketierung auf die generische C++-/XML-Copy-Logik ein vollständiger Zielmaschinenlauf mit **295 Jobs, 295 PASS, 0 FAIL, 0 BLOCKED** abgeschlossen. ACE/TAO publizierte dabei 4086 Dateien in den gemeinsamen `Win64x`-Consumer-Baum. Dieser Stand ist die aktuelle funktionale Basis für die nächsten Arbeiten.
 
-The desired startup effort is intentionally small.
+## Nächste Bibliotheken zur Abrundung des Evidenzfelds
 
-If `admin\build-tools.xml` does not yet exist in the workspace, BuildEngine uses only the minimal tool provision available in its working directory to make the administration content available. After synchronization, BuildEngine switches to the synchronized administration tree and performs the full tool phase from `admin\build-tools.xml`.
+Als nächste größere Aufnahmegruppe sind vorgesehen:
 
-Conceptually:
+- SOIL2,
+- OpenCL,
+- VTK,
+- GoogleTest.
 
-```text
-BuildEngine starts
-   |
-   +-- admin/build-tools.xml missing?
-   |      |
-   |      `-- use minimal startup provision required for repository sync
-   |
-   +-- synchronize administration content
-   |
-   +-- synchronize evidence-test content
-   |
-   +-- reload admin/build-tools.xml
-   |
-   +-- provision/probe complete tool set
-   |
-   +-- load admin/build-libraries.xml
-   |
-   +-- build and install third-party libraries
-   |
-   `-- load admin/smoke-tests.xml
-          |
-          `-- schedule applicable evidence tests
-```
+Für diese Bibliotheken existiert bereits historische BCC64X-Evidenz aus dem früheren Evidenz-Test. Die Aufgabe ist deshalb nicht, ihre grundsätzliche Machbarkeit neu zu erfinden, sondern die damaligen Erkenntnisse in den aktuellen reproduzierbaren BuildEngine-Vertrag zu überführen.
 
-The synchronized `admin` tree becomes authoritative after the bootstrap transition.
+GoogleTest besitzt eine andere Rolle als typische Runtime-Bibliotheken: Es ist Testinfrastruktur. Die bisherige statische Bereitstellung wird deshalb erneut geprüft. Wenn Upstream-Struktur, technische Zweckmäßigkeit oder die Vermeidung unnötiger Test-Runtime-DLL-Abhängigkeiten den statischen Vertrag sinnvoll machen, kann diese Ausnahme ausdrücklich akzeptiert und dokumentiert werden.
 
-## Library contracts
+## Lizenz
 
-`build-libraries.xml` describes third-party libraries as data. A library is not represented by a dedicated BuildEngine C++ class.
-
-Typical declarative information includes:
-
-- library identifier and version;
-- official upstream source location and archive metadata;
-- required source files after extraction;
-- CMake arguments and toolchain selection;
-- Release/Debug or other variants;
-- install layout;
-- dependency relationships;
-- expected installed artifacts.
-
-A new library should require only XML changes when its complete workflow can be expressed through existing generic technical actions.
-
-## Smoke-test registration and version ranges
-
-Smoke-test **sources are version-independent** and live in the separate evidence repository. This repository only maps those stable tests to libraries and specifies when they apply.
-
-Example:
-
-```xml
-<library id="pugixml">
-   <smoke id="installed-consumer-charconv"
-          source="pugixml\installed-consumer-charconv"
-          enabled="true"
-          minVersion="1.16">
-      <variant name="Release"/>
-      <variant name="Debug"/>
-   </smoke>
-</library>
-```
-
-Version-range semantics are inclusive:
-
-- no `minVersion` and no `maxVersion`: valid for every version of that library;
-- only `minVersion`: valid from that version onward;
-- only `maxVersion`: valid up to and including that version;
-- both: valid within the closed range `[minVersion, maxVersion]`.
-
-A test version is never encoded in its source directory merely to match a current library release. If version ordering cannot be evaluated reliably, BuildEngine must fail rather than guess.
-
-## Upstream-first integration policy
-
-The purpose of the project is to determine how well current third-party libraries integrate with C++Builder/BCC64X, not to hide incompatibilities behind unrelated replacement build paths.
-
-The preferred sequence is:
-
-```text
-upstream source
-   -> upstream build system
-   -> BCC64X toolchain
-   -> install
-   -> artifact checks
-   -> independent consumer evidence
-```
-
-When real evidence demonstrates a problem, the correction should be classified explicitly as one of:
-
-- a generic BCC64X/toolchain correction;
-- a generic BuildEngine action or capability;
-- a declarative library option;
-- a documented and reproducible source patch when the problem is genuinely library-specific.
-
-## Evidence and reproducibility
-
-The administration data is part of the evidence chain. A reproducible run should be able to identify at least:
-
-- the BuildEngine revision;
-- the administration repository commit;
-- the evidence-test repository commit;
-- the third-party library version/source pin;
-- the compiler/tool versions;
-- the effective build parameters;
-- produced package artifacts;
-- raw build/test logs and final status.
-
-## What this repository is not
-
-This repository is not:
-
-- the BuildEngine application;
-- a fork or mirror of the third-party libraries;
-- the smoke-test or demo source repository;
-- an alternate compiler/toolchain distribution;
-- a collection of library-specific scripts hidden behind XML.
-
-It is the **declarative administration layer** of the larger C++Builder third-party integration and evidence project.
-
-## License
-
-Project-authored content in this repository is licensed under the MIT License. See `LICENSE`.
+Projekt-eigene Inhalte dieses öffentlichen Admin-Repositories stehen unter der MIT-Lizenz, soweit in einzelnen Dateien nichts Abweichendes angegeben ist. Drittanbieterquellen und deren Lizenztexte behalten selbstverständlich ihre jeweiligen Upstream-Lizenzen.
