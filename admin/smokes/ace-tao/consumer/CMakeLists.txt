@@ -11,6 +11,7 @@ endif()
 
 find_library(ACE_LIBRARY NAMES ACE_br ACE REQUIRED)
 find_library(TAO_LIBRARY NAMES TAO_br TAO REQUIRED)
+find_library(TAO_ANYTYPECODE_LIBRARY NAMES TAO_AnyTypeCode_br TAO_AnyTypeCode REQUIRED)
 find_library(TAO_PORTABLESERVER_LIBRARY NAMES TAO_PortableServer_br TAO_PortableServer REQUIRED)
 find_library(TAO_COSNAMING_LIBRARY NAMES TAO_CosNaming_br TAO_CosNaming REQUIRED)
 find_program(TAO_IDL_EXECUTABLE NAMES tao_idl.exe tao_idl REQUIRED)
@@ -50,6 +51,7 @@ target_include_directories(ace-tao-consumer PRIVATE
 target_link_libraries(ace-tao-consumer PRIVATE
    "${ACE_LIBRARY}"
    "${TAO_LIBRARY}"
+   "${TAO_ANYTYPECODE_LIBRARY}"
    "${TAO_PORTABLESERVER_LIBRARY}"
    "${TAO_COSNAMING_LIBRARY}"
 )
