@@ -6,6 +6,9 @@
    <xs:simpleType name="booleanTextType">
       <xs:restriction base="xs:string"><xs:enumeration value="true"/><xs:enumeration value="false"/></xs:restriction>
    </xs:simpleType>
+   <xs:simpleType name="pathProbeKindType">
+      <xs:restriction base="xs:string"><xs:enumeration value="file"/><xs:enumeration value="directory"/><xs:enumeration value="any"/></xs:restriction>
+   </xs:simpleType>
    <xs:simpleType name="cmakeModeType">
       <xs:restriction base="xs:string"><xs:enumeration value="configure"/><xs:enumeration value="build"/><xs:enumeration value="install"/></xs:restriction>
    </xs:simpleType>
@@ -82,6 +85,7 @@
    </xs:complexType>
    <xs:complexType name="requireActionType">
       <xs:attribute name="path" type="xs:string" use="required"/>
+      <xs:attribute name="kind" type="pathProbeKindType" use="optional" default="file"/>
       <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
    </xs:complexType>
