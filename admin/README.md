@@ -1,67 +1,179 @@
-# Administration Data
+# BuildEngine-Admin – technische Administrationsdaten
 
-This directory contains the synchronized **administration contracts** used by BuildEngine as part of the C++Builder Third-Party Integration project.
+Dieser Ordner enthält die synchronisierten Administrationsverträge, die BuildEngine zur Laufzeit für Toolbereitstellung, Bibliotheksbau, Paketierung, Publish und kleine Consumer-Smokes verwendet.
 
-It is not an application and contains no executable BuildEngine logic. Its purpose is to describe required tools, third-party library builds, publish mappings, library consumer smoke tests, schemas, and generic shared build configuration.
+Die normative Bibliotheksdefinition liegt ausschließlich in `build-libraries.xml`. Aktive Bibliotheken werden nicht auf XML-Fragmente verteilt.
 
-The parent repository README defines the complete synchronization, ownership, version-range, and evidence contract.
+## Aktueller Vertragsstand
 
-Machine-local state such as `tools.xml` and `machine-state.xml` is not authoritative Git content and must not be overwritten by repository synchronization once created locally.
+- `build-libraries.xml`: Schema 13
+- `build-tools.xml`: verwaltete Toolbereitstellung
+- `smoke-tests.xml`: nur noch Übergangs-/Kompatibilitätsdatei
+- `schemas/`: XSD-Verträge
+- `cmake/`: generische und bibliotheksbezogene CMake-/Toolchain-Adapter
+- `patches/`: versionsgebundene, reproduzierbare Source-Patches
+- `programs/`: nur noch technisch begründete Hilfsprogramme
+- `smokes/`: kleine paketbezogene Consumer-Smokes
 
-## Managed portable tool archives
+Der aktuelle vollständige Bibliotheksvertrag enthält 19 Einträge: pugixml, zlib, brotli, zstd, xz, libzip, libarchive, openssl, curl, boost, nlohmann-json, ace-tao, bzip2, glew, opengl, raylib, sdl2, sqlite und xerces-c.
 
-Managed tools may declare an external extractor in `build-tools.xml`. The extractor runs only after the archive SHA256 was verified and writes exclusively below the configured BuildEngine tools root.
+## Generische technische Aktionen
 
-The LLVM 20.1.7 coverage tool is sourced from the official portable Windows `tar.xz` archive. `programs/extract-tar-xz.py` extracts only `llvm-cov.exe`, adjacent DLL dependencies, and the license into the managed tool directory. No installer is executed. The operation does not modify the registry, the system or user `PATH`, file associations, installed-program records, or files outside the configured target.
+BuildEngine hält Bibliothekswissen aus dem C++-Kern heraus. XML beschreibt Bibliotheken, C++ implementiert generische Mechanismen.
 
-This Python extractor is the bootstrap bridge until the native libarchive package can be consumed by BuildEngine itself. The managed-tool XML contract is intentionally backend-neutral and remains unchanged when extraction moves into BuildEngine. The current libarchive artifact contract produces `libarchive.dll` with the `libarchive.lib` import library and the unambiguously named `libarchive_static.lib`; it does not produce a separate `tar.lib`.
+Wesentliche aktuelle Aktionen sind:
 
-## Source backpatches
+```text
+download
+extract
+copy
+cmake
+execute
+require
+```
 
-Repository-maintained compatibility patches reside below `patches/<library>/<version>`. A patch is never a source substitute: the XML contract first downloads and completely extracts the verified upstream source, then checks the patch against that exact tree before applying it.
+Hinzu kommen Publish-, Metadata-/SBOM- und Smoke-Orchestrierung auf Library-Ebene.
 
-For libarchive 3.8.9, `bcc64x-modern-borland-compat.patch` limits legacy `__BORLANDC__` compiler workarounds to non-Clang compilers. BCC64X also defines `__clang__` and therefore uses the modern Clang-compatible paths for inline handling, integer types and literals, Windows `lseek`/`mbstate_t` handling, `open` mode arguments, and the corresponding tests. The patch additionally backports the upstream Windows/Clang fix from commit `f75ed3a20526ef4ec2f46ee94216b6efd01eab0a` for `filter_fork_windows.c` and avoids the BCC64X MinGW `ftruncate` macro redefinition in `test_read_data_large.c` without disabling Debug `-Werror`.
+### Erweiterte Copy-Semantik
 
-The repository copy remains the authoritative input. Before validation and application, the source contract copies it to `{Workspace}\\.buildengine\\patches\\<version>`, outside the synchronized `admin` tree. The generic copy action uses `preserveCurrentArtifact="true"`, so `{CurrentArtifact}` continues to identify the completely extracted upstream source.
+`<copy>` kann neben dem einfachen Datei-/Verzeichnis-Kopieren auch gefilterte Paketierungsaufgaben ausdrücken:
 
-## Publish and consumer smoke pipeline
+```xml
+<copy source="..." target="..."
+      recursive="true"
+      overwrite="true"
+      flatten="true"
+      cleanTarget="true"
+      singleFile="false">
+   <include pattern="**/*.dll"/>
+   <include pattern="**/*.pdb"/>
+   <exclude pattern="**/tests/**"/>
+</copy>
+```
 
-Schema 11 keeps publish and simple consumer smoke tests in the same per-library process contract and extends that contract to multiple consumer gates per library. Release and Debug now progress independently through build/test/validation/install. The selected publish configuration (currently Release) continues through `publish -> smoke -> ready:Release`; Debug reaches `ready:Debug` after its own verified install and the shared `install:common` SDK state. `install:common` depends only on the selected publish configuration, so Release never waits for Debug. The aggregate `library:<id>:ready` remains the final library status but no longer serializes the two variants before Release downstream work can start.
+Bedeutung:
 
-The versioned package tree below `install/packages/<id>/<version>` remains the authoritative producer result. The `<publish>` node maps the selected Release artifacts into the shared `install/Win64x` consumer tree. Headers, import libraries, runtime binaries, pkg-config data and CMake package entry points are published without requiring downstream consumers to know the package version directory.
+- `recursive`: rekursive Quellsuche bzw. rekursives Kopieren,
+- `overwrite`: bestehende Zieldateien dürfen ersetzt werden,
+- `flatten`: Verzeichnisstruktur wird nicht übernommen; ausgewählte Dateien landen direkt im Ziel,
+- `cleanTarget`: Zielbaum wird vor dem Kopieren bereinigt,
+- `singleFile`: exakt eine passende Datei muss gefunden werden; sie kann dabei auf den exakten Zielnamen kopiert werden,
+- `<include>` / `<exclude>`: glob-artige Filter; `**` darf Verzeichnisgrenzen überqueren.
 
-Installed CMake package configurations remain in their versioned package directory. Publish creates relative forwarding config files below `Win64x/lib/cmake`, so their original relative target references continue to resolve correctly. `cmake/consumer/BuildEngineConsumer.cmake` adds the shared prefix, include, library, program and module search paths for normal CMake consumers.
+Diese generische Funktion hat den früheren eigenen ACE/TAO-Python-Installationspfad ersetzt. Der reale Zielmaschinenlauf vom 3. September 2026 endete nach dieser Umstellung mit 295/295 PASS.
 
-Downstream build variants depend on the matching `ready:<Configuration>` state. Existing successful schema-10 aggregate install/ready markers are migrated to the new intermediate state files so a scheduler-only DAG change does not unnecessarily rebuild already verified packages.
+### `<require>` und Pfadtypen
 
-Producer CMake builds receive only their declared versioned dependencies. BuildEngine supplies each package root through `CMAKE_PREFIX_PATH`, each `include` directory through `CMAKE_INCLUDE_PATH`, and each `lib/win64/<Configuration>` directory through `CMAKE_LIBRARY_PATH`. This keeps upstream `find_package()`/`find_library()` calls compatible with the versioned package layout without exposing the published consumer-only `Win64x/cmake` module overlay.
+Eigenständige `<require>`-Aktionen unterstützen drei Pfadtypen:
 
-Simple `<smoke>` nodes are usability tests, not additional producer regression suites. Each smoke configures a fresh C++23 consumer with normal `find_package()` calls and compiles/links it against the selected consumer scope. Optional `<run executable="..."/>` children execute one or more real consumer programs first; every run must return zero before the final validator executable is started. The validator then emits the strict `SMOKE|...` protocol. Published scopes execute with `Win64x/bin` on the child-process `PATH`; package scopes use the exact versioned runtime path of their configuration. BuildEngine preserves the complete raw stdout/stderr process log and also writes a full validation log containing every observed line plus the parsed checks and final validation status.
+```xml
+<require path="..."/>
+<require path="..." kind="file"/>
+<require path="..." kind="directory"/>
+<require path="..." kind="any"/>
+```
 
-Complex multi-package integration tests and demos do not belong to these per-library smoke nodes. They are maintained in the existing `BuildEngine-Tests` repository. That repository therefore contains only the larger integration and demo scenarios; the simple package usability smokes live exclusively in this administration repository.
+`file` ist der kompatible Default. `directory` verlangt ein echtes Verzeichnis; `any` akzeptiert jeden existierenden Filesystem-Eintrag.
 
-## Incremental library timestamp and machine state
+Wichtig: Das verschachtelte `<extract><require path="..."/></extract>` ist davon getrennt. Es bleibt ein Dateinachweis innerhalb des vollständig extrahierten Upstream-Archivs und dient der Source-/Archivvalidierung.
 
-Library schema 6 and later require one ISO 8601 `library/@timestamp`. It describes when that complete library contract was provided or changed and must be advanced for every change to its source, build, test, installation, publish, smoke, patch, or artifact requirements.
+## Upstream und Patches
 
-After each successful phase, BuildEngine writes machine-local state beside the corresponding download, variant-build, package, publish, smoke, or ready area. Missing directories, missing states, contract mismatches, or missing published files schedule only the affected phase again. A changed dependency timestamp also invalidates dependent build and package states. `BuildEngine --rebuild` bypasses all current states.
+Repositoryverwaltete Kompatibilitätspatches liegen unter:
 
-## Boost 1.92.0 component evidence contract
+```text
+patches/<library>/<version>/
+```
 
-Schema 11 allows more than one package consumer smoke per library. Boost uses this intentionally to reproduce the seven target-machine evidence areas in both configurations while still producing one coherent upstream CMake graph per configuration.
+Sie sind keine Source-Ersatzpakete. Der normale Ablauf ist:
 
-The production build selects the frozen 148-module set and does not merge historical stage outputs. Release and Debug install into the one versioned package. Boost sets `publish/@requiresAllVariants="true"` because both configuration installs touch the common Boost header tree; publication therefore starts only after the complete package is stable.
+```text
+Upstream herunterladen
+-> Identität prüfen
+-> vollständig extrahieren
+-> Patch gegen genau diesen Stand prüfen
+-> Patch anwenden
+-> originales Buildsystem ausführen
+```
 
-Release gates use the normal published `Win64x` consumer view. Debug gates use `scope="package"`, resolve the actual `BoostConfig.cmake` below `lib/win64/Debug/cmake`, and add the exact package/dependency runtime, include, library and prefix paths to the child CMake process. No global Debug SDK tree is created.
+Ein Patch muss versionsgebunden und reproduzierbar sein. Allgemeine Toolchainprobleme sollen nicht als zufällige bibliotheksspezifische Patches verteilt werden.
 
-The seven gate IDs are `closure`, `math-numerics`, `state-parsing-meta`, `algorithms-containers-data`, `concurrency-async`, `system-io-runtime`, and `foundation-language`. Their source-module mapping and the six external ecosystem exclusions are recorded in `cmake/boost/components.json`.
+## Native Archive-Verarbeitung
 
-Boost.Config remains upstream source. The BCC64X policy layer below `cmake/boost/bcc64x-native-clang` only routes Clang-based CodeGear builds to upstream `clang.hpp`. The three compile-only preflights execute before the expensive Boost CMake graph. The generic BCC64X toolchain also exposes BCC64X as the ASM compiler, matching the already verified Context/Coroutine/Fiber toolchain path.
+Historische eigene Python-Extraktion für `.tar.xz` ist nicht mehr Teil der aktiven Architektur. BuildEngine verarbeitet relevante Archive über die intern verlinkte libarchive-/xz-Funktionalität.
 
-## Modular library contract files
+## Technisch notwendige Spezialprogramme
 
-`build-libraries.xml` remains the primary library contract and retains schema version 11. Additional libraries may be placed in `build-libraries.d/*.xml` when keeping every producer contract in the single main file would make changes unnecessarily large and risky.
+Nicht jedes Hilfsprogramm ist automatisch unerwünschte Orchestrierung. `programs/opengl/meson_bootstrap.py` bleibt bewusst erhalten: Es bildet konkrete Meson/BCC64X-Kompatibilitätsanforderungen für den erfolgreichen Mesa/OpenGL-Build ab und ist keine generische Paketierungslogik.
 
-Each fragment is a complete XML document with the same `<buildLibraries schemaVersion="...">` root as the main contract and one or more ordinary `<library>` children. BuildEngine loads fragment files in deterministic filename order, requires the fragment schema version to match the main file, copies their library nodes into the in-memory main document, and only then executes the existing validation, test-selection, configuration-selection, dependency-resolution and scheduling logic. Duplicate library IDs and invalid dependencies therefore fail through the same existing checks as entries written directly in `build-libraries.xml`.
+`programs/ace-tao/install.py` ist dagegen nach dem erfolgreichen 295/295-Lauf obsolet und soll als nächster Cleanup-Schritt entfernt werden.
 
-The fragment mechanism changes only physical administration-file organization. It introduces no second scheduler, no alternate action syntax, and no library-specific execution path. `build-libraries.d/xerces-c.xml` is the first contract using this organization.
+## Paket- und Publish-Vertrag
+
+Versionierte Producer-Pakete liegen unter:
+
+```text
+install/packages/<id>/<version>/
+```
+
+Der `<publish>`-Knoten bildet die ausgewählte Consumer-Konfiguration in den gemeinsamen Baum ab:
+
+```text
+install/Win64x
+```
+
+Downstream-Consumer sollen nicht wissen müssen, in welchem versionsbezogenen Producer-Verzeichnis eine Bibliothek gebaut wurde.
+
+Release und Debug bleiben getrennte Producer-Varianten. Publish verwendet die im Bibliotheksvertrag festgelegte Konfiguration; bei Paketen, die einen gemeinsamen Header-/SDK-Baum aus mehreren Varianten berühren, kann der Vertrag auf alle Varianten warten.
+
+## Kleine Consumer-Smokes
+
+Die Verzeichnisse unter `smokes/<library>/...` enthalten kleine Package-Acceptance-Tests. Ein Smoke soll den Bibliotheksvertrag beweisen, nicht die spätere Integrations- und Demonstrationswelt duplizieren.
+
+Typischer Umfang:
+
+```text
+frisches Consumer-Projekt
+-> find_package / Include-Pfade
+-> compile
+-> link
+-> kleine Runtime-Funktion
+-> PASS/FAIL-Protokoll
+```
+
+Komplexe Integrationstests und Demonstrationen gehören in das getrennte Repository `BuildEngine-Tests`.
+
+### ACE/TAO-Smoke
+
+Der geplante ACE/TAO-Smoke bleibt bewusst kompakt. Sinnvoll sind:
+
+- eine kleine `.idl`-Datei,
+- Aufruf des paketierten `tao_idl`,
+- Kompilieren/Linken des erzeugten Codes gegen den veröffentlichten ACE/TAO-SDK,
+- `ORB_init`,
+- optional kurzer Start des paketierten Naming Service,
+- einen Namen registrieren und wieder auflösen bzw. dessen Erreichbarkeit nachweisen,
+- Naming Service sauber beenden.
+
+Eine größere CORBA-Mehrprozess-/Service-Testwelt gehört ausdrücklich nach `BuildEngine-Tests`.
+
+## Incremental State
+
+Ein Bibliotheks-`timestamp` beschreibt den Änderungsstand des vollständigen Vertrags. Erfolgreiche Phasen schreiben maschinenlokalen Zustand. Ein unveränderter Vertrag mit passenden Artefakten soll nicht unnötig neu ausgeführt werden; `--rebuild` erzwingt dagegen die erneute Ausführung.
+
+Abhängigkeitstimestamps invalidieren abhängige Producerzustände. Tests, Konfigurationsauswahl und weitere relevante Vertragsparameter werden dort berücksichtigt, wo sie die Gültigkeit eines Ergebnisses tatsächlich beeinflussen.
+
+## Metadata, Lizenz und SBOM
+
+BuildEngine erzeugt aus den im Admin-Vertrag deklarativ hinterlegten Upstream-/Lizenzinformationen Paketmetadaten und CycloneDX-SBOM-Evidence. Der erfolgreiche ACE/TAO-Lauf vom 3. September 2026 erzeugte beispielsweise `LICENSE-INFO.txt` und eine CycloneDX-1.7-SBOM mit sechs Komponenten.
+
+## Nächster Evidenzblock
+
+Nach Abschluss des aktuellen Cleanup-/Smoke-Schritts werden historische, bereits positiv erprobte BCC64X-Kandidaten in den heutigen BuildEngine-Vertrag überführt:
+
+1. SOIL2,
+2. OpenCL,
+3. VTK,
+4. GoogleTest.
+
+GoogleTest wird hinsichtlich Shared-vs-Static bewusst separat bewertet. Da GoogleTest Testinfrastruktur und keine typische Runtime-Abhängigkeit einer Anwendung ist, kann eine statische Bibliothek als dokumentierte Ausnahme akzeptabel sein, wenn dies technisch und upstream-seitig sinnvoll ist.
