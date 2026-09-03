@@ -8,7 +8,7 @@ if(NOT DEFINED SOIL2_SOURCE_DIR OR NOT IS_DIRECTORY "${SOIL2_SOURCE_DIR}")
    message(FATAL_ERROR "SOIL2_SOURCE_DIR must point at the pinned upstream SOIL2 source tree")
 endif()
 
-find_package(OpenGL REQUIRED)
+find_package(OpenGL CONFIG REQUIRED)
 
 add_library(SOIL2 SHARED
    "${SOIL2_SOURCE_DIR}/src/SOIL2/image_DXT.c"
@@ -33,7 +33,7 @@ target_include_directories(SOIL2
       $<BUILD_INTERFACE:${SOIL2_SOURCE_DIR}/src/SOIL2>
       $<INSTALL_INTERFACE:include/SOIL2>
 )
-target_link_libraries(SOIL2 PRIVATE OpenGL::GL)
+target_link_libraries(SOIL2 PRIVATE OpenGL::OpenGL)
 
 install(TARGETS SOIL2
    EXPORT SOIL2Targets
