@@ -1,0 +1,20 @@
+diff --git a/modules/dnn/CMakeLists.txt b/modules/dnn/CMakeLists.txt
+--- a/modules/dnn/CMakeLists.txt
++++ b/modules/dnn/CMakeLists.txt
+@@ -492,6 +492,7 @@
+ # link directly into opencv_dnn. Skipped under Emscripten: MLAS is a native
+ # CPU SGEMM accelerator (asm/intrinsic kernels) and the wasm scalar fallback
+ # offers no benefit for the JS bindings build that produces opencv.js.
++ocv_option(OPENCV_DNN_MLAS "Build the vendored MLAS acceleration layer" ON)
+ set(HAVE_MLAS 0)
+ # Reset status flags + arch booleans
+ foreach(_v OPENCV_DNN_MLAS_ENABLED OPENCV_DNN_MLAS_SKIP_REASON
+@@ -500,7 +501,7 @@ foreach(_v OPENCV_DNN_MLAS_ENABLED OPENCV_DNN_MLAS_SKIP_REASON
+            MLAS_HAS_ASM MLAS_HAS_POWER10 MLAS_HAS_RISCV64_RVV)
+   unset(${_v} CACHE)
+ endforeach()
+-if(NOT EMSCRIPTEN)
++if(OPENCV_DNN_MLAS AND NOT EMSCRIPTEN)
+   add_subdirectory("${OpenCV_SOURCE_DIR}/3rdparty/mlas" "${CMAKE_BINARY_DIR}/3rdparty/mlas")
+ endif()
+ if(HAVE_MLAS)
