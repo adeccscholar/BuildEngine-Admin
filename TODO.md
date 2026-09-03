@@ -1,12 +1,22 @@
 # BuildEngine-Admin TODO
 
-Stand: 2026-09-01
+Stand: 2026-09-03
 
-## Statusbasis
+## Aktuelle belastbare Basis
 
-Der aktuelle BuildEngine-/BCC64X-Stand ist die neue Ausgangsbasis. Bereits erreichte und nicht neu zu erfindende Ergebnisse werden erhalten und nur gezielt erweitert.
+Der aktuelle Zielmaschinenlauf nach Umstellung der ACE/TAO-Paketierung auf die generische C++-/XML-Copy-Logik endete mit:
 
-### Bereits im aktuellen BuildEngine-Vertrag vorhanden
+```text
+jobs=295
+success=295
+failed=0
+blocked=0
+incomplete=0
+```
+
+ACE/TAO wurde dabei erfolgreich gebaut, installiert, publiziert und als Consumer-Vertrag bereitgestellt. Publish übertrug 4086 Dateien in den gemeinsamen `install\Win64x`-Baum.
+
+Der aktuelle Bibliotheksvertrag enthält:
 
 - pugixml 1.16
 - zlib 1.3.2
@@ -14,229 +24,177 @@ Der aktuelle BuildEngine-/BCC64X-Stand ist die neue Ausgangsbasis. Bereits errei
 - Zstd
 - XZ
 - libzip
-- libarchive
+- libarchive 3.8.9
 - OpenSSL 3.5.8
 - curl
 - Boost 1.92.0
-- nlohmann-json
-- Xerces-C 3.3.0
+- nlohmann-json 3.12.0
 - ACE 8.0.6 / TAO 4.0.6
-
-### Aktuell erreichte BCC64X-Evidenz
-
-- Xerces-C 3.3.0: Release und Debug gebaut, Upstream-CTest ausgeführt, installiert und publiziert; DOM-Consumer-Smoke verifiziert.
-- ACE 8.0.6 / TAO 4.0.6: Release und Debug über upstream MPC/BMake mit `BCC64X=1` gebaut.
-- ACE/TAO nutzt die verwalteten Abhängigkeiten OpenSSL 3.5.8 und Xerces-C 3.3.0.
-- `ACE_XML_Utils` ist mit Xerces-C aktiviert und gebaut.
-- Naming Service, COS Event Service und RT Event Service sind in Release und Debug gebaut und installiert.
-- Der zuletzt vollständig durchgelaufene Gesamtplan endete mit 206/206 erfolgreichen Jobs, 0 Fehlern und 0 blockierten Jobs.
-- Die geringe Parallelität innerhalb des ACE/TAO-BMake-Laufs wird vorerst nicht künstlich verändert. Die Auslastung wird erneut bewertet, sobald mehr unabhängige Bibliotheken im Bulk parallel laufen.
-
-## Aktiver Arbeitsblock: ACE/TAO + zlib
-
-Ziel ist die Aktivierung der bereits von ACE/TAO vorgesehenen zlib-Integration, nicht das Erfinden einer künstlichen Abhängigkeit.
-
-1. zlib 1.3.2 ist bereits ein verwaltetes BuildEngine-Paket.
-2. ACE/TAO erhält eine echte Dependency auf zlib 1.3.2.
-3. Im MPC-Featurevertrag wird `zlib=1` aktiviert.
-4. `ZLIB_ROOT`, `ZLIB_INCDIR` und `ZLIB_LIBDIR` werden auf das verwaltete zlib-Paket gesetzt.
-5. Upstream MPC erwartet unter Windows traditionell `zlib.lib` bzw. `zlibd.lib`. Unser BCC64X-zlib-Vertrag liefert dagegen `libz.lib` bzw. `libzd.lib`.
-6. Der Patch `admin/patches/ace-tao/8.0.6/bcc64x-zlib-library-names.patch` macht den MPC-zlib-Librarynamen über die Templatevariable `zliblib` überschreibbar.
-7. Die ACE/TAO-MPC-Aufrufe setzen je Variante `zliblib=libz` bzw. `zliblib=libzd`.
-8. Erwarteter neuer TAO-Baustein ist insbesondere `TAO_ZlibCompressor` aus `TAO/tao/Compression/zlib`.
-9. Nächster Gate: realer Zielmaschinenlauf für Release und Debug. Erst danach die tatsächlich erzeugten BCC64X-Artefaktnamen als `<require>`-Gates festschreiben; keine Namen vorab raten.
-10. Nach PASS: Install-/Publish-Vertrag und Consumer-/Runtime-Smoke für die neue TAO-zlib-Funktion ergänzen, soweit sinnvoll.
-
-## Große Bibliotheks-Roadmap
-
-Die Reihenfolge ist eine Arbeitspriorität, keine Aussage über zwingende technische Abhängigkeiten. Dependencies werden nur eingetragen, wenn sie technisch real bestehen.
-
-### A. Nächste, voraussichtlich überschaubare Pakete
-
-#### 1. SQLite
-
-- Eigenständigen BCC64X-Vertrag anlegen.
-- Aktuelle freigegebene SQLite-Version vor Aufnahme festlegen und SourcePin/SHA256 dokumentieren.
-- Bevorzugt offiziellen Amalgamation-/Source-Stand verwenden.
-- Shared DLL + Import-Library als Standardprodukt; statische Variante nur getrennt und eindeutig benannt, falls benötigt.
-- Release und Debug.
-- Upstream-/Selbsttests soweit mit dem gewählten Sourcepaket praktikabel.
-- Consumer-Smoke: Datenbank erzeugen, Tabelle anlegen, schreiben, lesen, prepared statement und Transaktion.
-- Threading-/Compile-Options explizit dokumentieren, damit das Paket reproduzierbar bleibt.
-
-#### 2. SDL2
-
-- Historische BCC64X-Erfahrungen in den aktuellen BuildEngine-Vertrag übernehmen, nicht neu portieren, solange vorhandene Evidenz reicht.
-- Offizielle Version und SourcePin/SHA256 festlegen.
-- Shared DLL + Import-Library, Release und Debug.
-- Upstream-CMake möglichst unverändert verwenden.
-- Consumer-Smoke mit Fenster/Eventloop; Headless-Teststrategie nur ergänzend, nicht als Ersatz für den realen Windows-Pfad.
-- Frühere Vertragsauffälligkeiten wie fehlender expliziter DOWNLOAD-Schritt nicht übernehmen.
-
-#### 3. OpenGL / Windows-Plattformvertrag
-
-- OpenGL unter Windows nicht als künstliches Third-Party-Sourcepaket behandeln, wenn die eigentliche Plattformbibliothek aus dem Windows SDK kommt.
-- BuildEngine-Vertrag für die reproduzierbare Erkennung und Nutzung von `opengl32`/Windows-SDK definieren.
-- BCC64X Compile-/Link-Smoke für einen minimalen OpenGL-Kontext.
-- Header-, Library- und Runtime-Herkunft dokumentieren.
-- Dieser Vertrag bildet die Basis für weitere Grafikbibliotheken und Beispiele.
-
-#### 4. GLEW
-
-- Gemeint ist die OpenGL Extension Wrangler Library (GLEW); endgültige Version vor Vertragsanlage festlegen.
-- Abhängigkeit auf den OpenGL-Plattformvertrag nur dort modellieren, wo sie für Build/Smoke real benötigt wird.
-- Offiziellen SourcePin/SHA256 dokumentieren.
-- Shared DLL + Import-Library, Release und Debug, sofern Upstream/BCC64X das Produkt sauber unterstützt.
-- Minimaler Consumer-Smoke: OpenGL-Kontext erzeugen, GLEW initialisieren und eine moderne OpenGL-Funktion auflösen.
-- Keine vorgefertigten MSVC-Binaries als Ersatz für einen BCC64X-Build verwenden.
-
-#### 5. raylib
-
-- Offizielle Version und SourcePin/SHA256 festlegen.
-- BCC64X-Build aus Upstream-Quellen untersuchen und möglichst über Upstream-CMake integrieren.
-- Vorher klären, welche Plattform-/Fenster-Backends raylib im gewählten Windows-Build tatsächlich selbst mitbringt und welche externen Abhängigkeiten real sind; keine künstliche GLEW-/SDL-Abhängigkeit anlegen.
-- Shared DLL + Import-Library als bevorzugtes Produkt, Release und Debug, soweit Upstream das unterstützt.
-- Consumer-Smoke: Fenster öffnen, einfache 2D-/3D-Szene rendern, sauber schließen.
-- Danach optional ein kleines Lern-/Demo-Projekt für die C++Builder-Tutorialschiene bereitstellen, getrennt vom Acceptance-Gate.
-
-#### 6. bzip2
-
-- Eigenständigen verwalteten BCC64X-Vertrag erstellen.
-- Danach prüfen, ob das ACE/TAO-Feature `bzip2` sinnvoll zusätzlich aktiviert werden soll.
-- Release/Debug, Shared-/Import-Library-Vertrag und Roundtrip-Smoke.
-
-#### 7. zziplib
-
-- Nach stabilem zlib-Vertrag aufnehmen.
-- SourcePin/SHA256, Release/Debug, Shared-/Import-Library.
-- ZIP-Lese-Smoke und anschließend optional ACE/TAO-Feature `zzip` untersuchen.
-
-#### 8. LZO
-
-- Aktuelle geeignete LZO-Version festlegen und Lizenz-/SourcePin-Dokumentation aufnehmen.
-- C-Build sollte grundsätzlich ein überschaubarer BCC64X-Kandidat sein, muss aber real verifiziert werden.
-- Prüfen, welche der ACE-Features `lzo1` und `lzo2` im aktuellen ACE/TAO-Stand tatsächlich sinnvoll sind.
-- Roundtrip-Kompressions-Smoke.
-
-### B. Größere Grafik-/Visualisierungspakete
-
-#### 9. Skia
-
-- Vorhandene erfolgreiche C++Builder/BCC64X-Erfahrung und bereits erzeugte Bibliotheken als Evidenzbasis sammeln.
-- Ziel bleibt ein echter BCC64X-Build bzw. eine belastbar dokumentierte vorhandene BCC64X-Bibliothek; kein stiller Wechsel auf MSVC als Projektentscheidung.
-- Buildsystem, Third-Party-Abhängigkeiten und Debug/Release-Vertrag getrennt erfassen.
-- Consumer-Smokes für Raster, Text, Pfade und optional GPU/OpenGL.
-- VCL-Einbindung separat von der Kernbibliotheks-QA testen.
-
-#### 10. VTK
-
-- Erst nach Stabilisierung der kleineren Grafik-/Math-/Kompressionsbausteine wieder aufnehmen.
-- Offizielle Version, SourcePin/SHA256 und vollständigen Abhängigkeits-DAG ermitteln.
-- CMake/BCC64X-Kompatibilität schrittweise prüfen; Module zunächst minimal halten, danach gezielt erweitern.
-- Keine alternative Toolchain als Ersatz für das BCC64X-Ziel verwenden.
-- Release/Debug und kleiner Rendering-/Datenmodell-Consumer als Gate.
-
-## Weitere ACE/TAO-Optionen
-
-ACE/TAO kennt neben OpenSSL, Xerces-C und zlib weitere optionale Fremdbibliotheken/Features. Diese werden nicht pauschal aktiviert, sondern erst wenn das jeweilige Paket im BuildEngine sauber verwaltet wird und ein konkreter funktionaler Nutzen besteht.
-
-Kandidaten:
-
 - bzip2
-- zziplib
-- LZO1/LZO2
-- Boost nur bei konkretem ACE/TAO-Nutzen; nicht allein deshalb, weil Boost bereits vorhanden ist
-- GUI-/Toolkit-Features nur bedarfsgerecht, nicht als Vollständigkeitsübung
+- GLEW
+- OpenGL/Mesa
+- raylib
+- SDL2
+- SQLite
+- Xerces-C 3.3.0
 
-Für jede Erweiterung gilt: erst eigenständiges Paket verifizieren, danach echte ACE/TAO-Integration aktivieren, anschließend neuer Zielmaschinenlauf.
+Damit sind die früheren Roadmap-Punkte SQLite, SDL2, OpenGL, GLEW, raylib und bzip2 **kein zukünftiger Neuaufbau mehr**.
 
-## Boost 1.92.0 – bekannte Einschränkung, nicht blockierend
+## Unmittelbarer Abschluss des aktuellen Blocks
 
-Der Boost-Arbeitsblock ist für den aktuellen Third-Party-Fortschritt abgeschlossen.
+1. [ ] `admin/programs/ace-tao/install.py` entfernen. Der reale 295/295-Lauf hat bestätigt, dass die generische C++-/XML-Copy-Implementierung den bisherigen eigenen Python-Installer ersetzt.
+2. [ ] Einen kleinen ACE/TAO-Consumer-Smoke ergänzen.
+3. [ ] Die neue `<require kind="directory">`-Funktion in einem realen Bibliotheksvertrag verwenden und damit auf der Zielmaschine verifizieren.
+4. [ ] Einen unveränderten Folgelauf durchführen und prüfen, welche Phasen korrekt als aktuell erkannt werden.
+5. [ ] Publish-/Consumer-Ownership und unnötige Wiederholungen anhand dieses Folgelaufs bewerten.
 
-Gesichert:
+## ACE/TAO-Smoke – bewusst begrenzter Umfang
 
-- Boost.Iostreams Plain Output/Flush funktioniert.
-- Boost.Serialization Binary Archive funktioniert, auch mit Boost.Iostreams als Streamträger.
-- Locale/codecvt- und `uncaught_exceptions()`-Hypothesen wurden isoliert geprüft und ausgeschlossen.
-- Ein minimaler BCC64X-DLL-Reproducer zeigt die eigentliche Grenze:
-  - DLL `std::ostream::put()` auf einem EXE-eigenen Stream: PASS
-  - DLL `std::ostream::flush()`: PASS
-  - DLL `operator<<('\n')`: reproduzierbare Access Violation `0xC0000005`
-- Boost.Serialization Text Archives benutzen im Destruktionspfad denselben problematischen C++-Stream-Insertion-Pfad.
+Der Smoke darf die spätere Test-/Demowelt in `BuildEngine-Tests` nicht vorwegnehmen.
 
-Entscheidung:
+Akzeptierter kleiner Umfang:
 
-- Reproducer und Dokumentation bleiben erhalten.
-- Der bekannte Crashpfad wird nicht mehr im normalen Acceptance-Gate ausgeführt.
-- Das akzeptierte Boost-BCC64X-Profil umfasst die verifizierten Pfade und schließt Boost.Serialization Text Archives über diese DLL-/`std::ostream`-Grenze ausdrücklich aus.
+- kleine `.idl`-Datei,
+- paketiertes `tao_idl` ausführen,
+- erzeugten Stub-/Skeleton-Code mit BCC64X kompilieren/linken,
+- `ORB_init`,
+- optional paketierten Naming Service starten,
+- einen Namen registrieren und wieder auflösen oder die erwartete Naming-Reaktion prüfen,
+- Prozess sauber beenden.
 
-Details: `BOOST_1_92_BCC64X_RUNTIME_STATUS.md`.
+Nicht in diesen Smoke gehören umfangreiche Mehrprozess-, Ausfall-, SSLIOP-, Event-Service- oder Anwendungsszenarien. Diese werden bewusst in `BuildEngine-Tests` aufgebaut.
 
-## ACE/TAO – eingefrorene Evidenz und Regeln
+## Nächster Evidenz-Abschlussblock
 
-Bereits belegt und nicht neu zu erfinden:
+Nach dem obigen Cleanup werden vier Bibliotheken/Plattformbausteine aufgenommen, die im früheren Evidenz-Test bereits als mit BCC64X grundsätzlich machbar belegt wurden. Ziel ist die Überführung dieser Evidenz in den heutigen reproduzierbaren BuildEngine-Vertrag.
 
-- ACE 8.0.6 / TAO 4.0.6
-- Release-Tag `ACE+TAO-8_0_6`
-- Release-Archiv SHA256 `e741c8b0ec0c7d6747b184d674567b1e73a13bdf2c902485d1299bbf267b3fba`
-- upstream MPC/BMake-Pfad
-- BCC64X-Build mit `BCC64X=1`
-- Buildreihenfolge ACE -> ace_gperf -> TAO_IDL -> TAO core
-- build-lokales `tao_idl.exe` vor TAO-Core
-- installierte `tao_idl.exe` und `ace_gperf.exe` unter `tools/bin`
-- Win64-SSL/select-Korrekturen
-- upstream SSLIOP-`params_dup.cpp`-Korrektur
-- Xerces-C-/`ACE_XML_Utils`-Integration
-- Naming Service, COS Event und RT Event als erreichte Infrastrukturziele
-- OpenSSL 3.5.8 und Xerces-C 3.3.0 als verwaltete Dependencies
+### 1. SOIL2
 
-Historische Revisionsnamen dienen nur als Provenienz und werden nicht in aktive Pfadnamen übernommen.
+- [ ] exakten Upstream/Version/Source-Pin aus der vorhandenen Evidenz rekonstruieren,
+- [ ] Lizenz prüfen und deklarieren,
+- [ ] vorhandenen BCC64X-Buildpfad auf den heutigen Toolchain-Vertrag übertragen,
+- [ ] Release/Debug soweit upstream-seitig sinnvoll,
+- [ ] Produktform Shared/Static anhand Upstream und realem Einsatzzweck festlegen,
+- [ ] kleinen Image-Load-/Texture-relevanten Consumer-Smoke definieren, ohne daraus bereits eine Grafikdemo zu machen.
 
-## Einheitlicher Paket-Acceptance-Vertrag
+### 2. OpenCL
 
-Für neue Bibliotheken gelten grundsätzlich dieselben Qualitätsziele:
+- [ ] klar trennen zwischen OpenCL-Headers/Loader und einem konkreten Vendor-Runtime-Treiber,
+- [ ] die im Evidenz-Test verwendete Implementierung bzw. Header-/Loader-Kombination exakt dokumentieren,
+- [ ] Source-Pin und Lizenz festlegen,
+- [ ] BCC64X Compile-/Link-Vertrag herstellen,
+- [ ] Smoke so gestalten, dass fehlende GPU-/Vendor-Runtime nicht fälschlich den Buildvertrag widerlegt,
+- [ ] wenn eine verfügbare Plattform existiert: minimale Platform-/Device-Abfrage als Runtime-Gate.
 
-1. offizieller Upstream und eindeutig festgelegte Version,
-2. SourcePin mit URL/Tag und SHA256 bzw. gleichwertiger reproduzierbarer Identität,
-3. BCC64X als tatsächliche Zieltoolchain,
-4. Release und Debug in getrennten Buildverzeichnissen,
-5. Shared DLL + Import-Library als Standard, sofern die Bibliothek Shared unterstützt,
-6. statische Produkte nur zusätzlich und eindeutig benannt,
-7. Upstream-Tests nicht ohne Analyse abschalten,
-8. Install-Vertrag mit expliziten `<require>`-Gates,
-9. Publish in den gemeinsamen Consumer-Baum,
-10. Compile-/Link-Smoke und bei sinnvoller Funktion auch Runtime-Smoke,
-11. Patches versionsgebunden und vor Apply mit `git apply --check` geprüft,
-12. keine bibliotheksspezifische Logik in den generischen BuildEngine-Kern verschieben, wenn sie im XML-/Admin-Vertrag beschrieben werden kann,
-13. echte Dependencies im DAG modellieren; keine künstlichen Dependencies nur zur Scheduler-Auslastung,
-14. nach mehreren neuen unabhängigen Paketen einen vollständigen Bulk-Lauf durchführen und Scheduler-/CPU-Auslastung neu bewerten.
+### 3. VTK
 
-## BuildEngine-Vertragsorganisation
+- [ ] vorhandene erfolgreiche Evidenz als Ausgangspunkt verwenden, nicht neu portieren,
+- [ ] damals verwendete VTK-Version, Modulmenge und Abhängigkeiten rekonstruieren,
+- [ ] zunächst exakt den bewiesenen minimalen Modulumfang in den BuildEngine-Vertrag übernehmen,
+- [ ] Release/Debug getrennt,
+- [ ] Upstream-CMake beibehalten,
+- [ ] Consumer-Smoke klein halten: Datenmodell/Algorithmus bzw. minimale Rendering-Initialisierung abhängig vom bewiesenen Profil,
+- [ ] größere VTK-Demos getrennt in `BuildEngine-Tests`.
 
-`admin/build-libraries.xml` ist der einzige normative Bibliotheks- und Dependency-Vertrag. Aktive Bibliotheksdefinitionen werden nicht auf XML-Fragmente verteilt. CMake-Adapter, Patches, Smoke-Quellen und Hilfsprogramme bleiben als technische Assets unter `admin/` getrennt, waehrend IDs, Versionen, Varianten und der gesamte Dependency-DAG in einer XML-Datei sichtbar und pruefbar bleiben.
-## BuildEngine-interne Folgearbeiten
+### 4. GoogleTest
+
+- [ ] exakten bewiesenen Upstream-/Versionsstand ermitteln,
+- [ ] aktuelle Upstream-Empfehlung für Build/Verwendung prüfen,
+- [ ] Shared-vs-Static bewusst neu bewerten,
+- [ ] keine automatische Anwendung der allgemeinen „Shared DLL + Import-Lib“-Regel erzwingen, wenn sie für Testinfrastruktur technisch unpassend ist,
+- [ ] statische Bereitstellung ausdrücklich als zulässige Ausnahme dokumentieren, wenn sie die sinnvollere Form ist,
+- [ ] einfacher Test-Consumer mit mindestens einem erfolgreichen und intern erwarteten Assertion-Pfad.
+
+### GoogleTest – Entscheidungsregel zur statischen Bibliothek
+
+Die allgemeine BuildEngine-Produktpolitik bevorzugt Shared Libraries, wenn eine Bibliothek als normale Runtime-Komponente einer Anwendung gedacht ist und Upstream dies sinnvoll unterstützt.
+
+GoogleTest hat eine andere Rolle:
+
+```text
+Anwendung / Produktionsbibliothek -> normale Runtime-Abhängigkeit
+GoogleTest                         -> Test-/Build-Infrastruktur
+```
+
+Deshalb ist eine statische GoogleTest-Bibliothek kein unerwünschter Sonderweg, wenn:
+
+- Upstream diese Form bevorzugt oder gleichwertig unterstützt,
+- dadurch keine relevante Funktion verloren geht,
+- Testprogramme dadurch einfacher und reproduzierbarer werden,
+- keine künstliche Runtime-DLL-Abhängigkeit nur zur Einhaltung einer allgemeinen Produktregel erzeugt wird.
+
+Die Entscheidung wird nach Prüfung explizit im Bibliotheksvertrag und in der Dokumentation festgehalten.
+
+## Danach: Feld bewerten und schließen
+
+Nach SOIL2, OpenCL, VTK und GoogleTest soll zunächst **kein automatischer Endlos-Ausbau** weiterer Third-Party-Bibliotheken erfolgen. Stattdessen wird der erreichte Evidenzraum bewertet:
+
+- Welche relevanten Buildsysteme wurden abgedeckt?
+- Welche C- und C++-Bibliothekstypen wurden abgedeckt?
+- Welche Grenzen sind echte BCC64X-/RTL-/ABI-Grenzen?
+- Welche Probleme waren nur Buildsystemintegration?
+- Welche Patches sind Upstream-Kandidaten?
+- Welche generischen BuildEngine-Fähigkeiten haben sich als dauerhaft nützlich erwiesen?
+
+Danach wird entschieden, ob weitere Pakete einen zusätzlichen Erkenntniswert liefern.
+
+## Komplexe Test- und Demonstrationswelt
+
+Parallel zur kleinen Package-Acceptance-Schicht wird `BuildEngine-Tests` bewusst als eigenständige Welt weiterentwickelt.
+
+Dort können später unter anderem entstehen:
+
+- komplexere ACE/TAO-Client/Server-Szenarien,
+- Naming-/Event-Service-Demos,
+- SSL/TLS- und Zertifikatsszenarien,
+- OpenGL/raylib/VTK-Grafikbeispiele,
+- OpenCL-Rechenbeispiele,
+- kombinierte Bibliotheks-Integrationen,
+- Tutorial-/Lernprogramme.
+
+Diese Tests dürfen umfangreicher sein und mehrere Pakete kombinieren. Sie sind aber **nicht** Voraussetzung dafür, dass ein einzelner Bibliotheksvertrag als erfolgreich gilt.
+
+## Weiterhin offene BuildEngine-/Admin-Themen
 
 ### Publish-/Consumer-Ownership
 
-Offen bleibt die saubere Eigentümertrennung im gemeinsamen `Win64x`-Consumer-Baum. Der Consumer-Integrationsschritt darf keine von einzelnen Paketen publizierten CMake-Dateien als vermeintlich eigene Altdateien entfernen.
+- [ ] Eigentümertrennung im gemeinsamen `Win64x`-Consumer-Baum weiter untersuchen,
+- [ ] eigene Manifeste für publizierte Dateien/Integrationsdateien prüfen,
+- [ ] fremde Paketdateien niemals als vermeintliche Altdateien löschen,
+- [ ] bei unverändertem Zustand unnötige erneute Publish-Arbeit vermeiden.
 
-Zielbild:
+### Incremental-Verifikation
 
-- eigenes Manifest für `integration:consumer`, z. B. `.buildengine/manifests/integration-consumer.manifest`,
-- Löschen ausschließlich der vom Consumer selbst besessenen Dateien,
-- Kollisionsprüfung gegen Paketmanifeste,
-- danach prüfen, ob unnötige Wiederholungen von Publish-Schritten vollständig verschwinden.
+- [ ] unmittelbar nach dem 295/295-Lauf einen unveränderten zweiten Lauf analysieren,
+- [ ] sicherstellen, dass Source/Build/Test/Install/Publish/Smoke nur bei tatsächlich ungültigem Zustand erneut laufen,
+- [ ] Rebuild-Verhalten weiterhin klar von normalem Incremental-Lauf trennen.
 
-Diese Arbeit ist unabhängig von der ACE/TAO-zlib-Integration und darf deren aktuellen Erfolgsstand nicht vermischen.
+### Generische Copy-Funktion
 
-### Bulk-/Scheduler-Verifikation
+Der neue gefilterte C++-Copy-Pfad ist real durch ACE/TAO belegt. Später mögliche, aber derzeit nicht automatisch einzubauende Erweiterungen:
 
-Nach Aufnahme mehrerer unabhängiger Pakete, insbesondere SQLite, SDL2, GLEW und raylib:
+- [ ] optionales `required` pro Include-Pattern,
+- [ ] geordnete Fallback-Auswahl statt nur `singleFile`, falls ein realer Bibliotheksfall dies benötigt,
+- [ ] Performance/Logging anhand größerer Paketbäume auswerten.
 
-- vollständigen Build-All/Bulk-Lauf ausführen,
-- tatsächliche Worker-/CPU-Auslastung beobachten,
-- Critical Path und Leerlaufphasen dokumentieren,
-- erst dann entscheiden, ob innerhalb großer Einzelpakete wie ACE/TAO zusätzliche Parallelisierung notwendig ist.
+### `<require>`
 
-Ziel ist Gesamtdurchsatz des DAG, nicht maximale Parallelisierung jedes einzelnen Buildwerkzeugs um jeden Preis.
+- [x] reguläre Datei als kompatibler Default,
+- [x] `kind="directory"`,
+- [x] `kind="any"`,
+- [ ] reale `directory`-Verwendung im Bibliotheksvertrag als Zielmaschinen-Evidence,
+- [ ] verschachtelte Extract-Requirements vorerst bewusst dateibezogen lassen.
+
+## Eingefrorene Projektregeln
+
+1. BCC64X bleibt tatsächliche Zieltoolchain.
+2. Kein stiller Ersatz durch MSVC, clang-cl oder MinGW.
+3. Upstream-Buildsysteme werden bevorzugt erhalten.
+4. `admin/build-libraries.xml` bleibt einziger normativer Bibliotheks-/Dependency-Vertrag.
+5. Generische Mechanik gehört in BuildEngine-C++, Bibliothekswissen ins XML/Admin.
+6. Patches sind versionsgebunden und reproduzierbar.
+7. Tests werden nicht ohne Analyse deaktiviert.
+8. Release und Debug bleiben getrennte Varianten, soweit für die Bibliothek sinnvoll.
+9. Shared ist Standard für normale Runtime-Bibliotheken, aber keine dogmatische Regel für Testinfrastruktur wie GoogleTest.
+10. Kleine Package-Smokes und komplexe `BuildEngine-Tests` bleiben bewusst getrennt.
+11. Primärdokumentation ist Deutsch.
