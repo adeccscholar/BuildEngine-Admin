@@ -2467,6 +2467,7 @@
          <cmake source="cmake" target="cmake" optional="true"/>
          <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
       </publish>
+      <!-- Commit erzwingen -->
       <smoke id="consumer" source="smokes\xerces-c\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xerces-c-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
