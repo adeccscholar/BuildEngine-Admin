@@ -62,10 +62,20 @@
       <xs:attribute name="merge" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="preserveCurrentArtifact" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
+   <xs:complexType name="copyPatternType">
+      <xs:attribute name="pattern" type="xs:string" use="required"/>
+   </xs:complexType>
    <xs:complexType name="copyActionType">
+      <xs:sequence>
+         <xs:element name="include" type="copyPatternType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="exclude" type="copyPatternType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
       <xs:attribute name="source" type="xs:string" use="required"/><xs:attribute name="target" type="xs:string" use="required"/>
       <xs:attribute name="recursive" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="overwrite" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="flatten" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="cleanTarget" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="singleFile" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="preserveCurrentArtifact" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
