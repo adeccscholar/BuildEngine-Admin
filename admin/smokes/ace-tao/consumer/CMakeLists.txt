@@ -36,6 +36,13 @@ add_executable(ace-tao-consumer
 )
 set_property(TARGET ace-tao-consumer PROPERTY CXX_SCAN_FOR_MODULES OFF)
 target_compile_features(ace-tao-consumer PRIVATE cxx_std_23)
+
+# ACE's Embarcadero configuration requires the compiler's multi-threaded
+# runtime mode.  Do not emulate this by defining __MT__ manually: -tWM makes
+# the compiler select the matching RTL and defines the compiler contract.
+target_compile_options(ace-tao-consumer PRIVATE -tWM)
+target_link_options(ace-tao-consumer PRIVATE -tWM)
+
 target_include_directories(ace-tao-consumer PRIVATE
    "${ACE_TAO_INCLUDE_DIR}"
    "${TAO_GENERATED_DIR}"
