@@ -27,6 +27,7 @@
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <!--
+            ...
             pugiXML 1.16 upstream CMake options.  The BuildEngine does not
             replace the library's CMakeLists.txt or package-config template.
          -->
