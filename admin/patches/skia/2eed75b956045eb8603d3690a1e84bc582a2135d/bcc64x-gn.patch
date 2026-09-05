@@ -182,15 +182,17 @@ diff --git a/third_party/third_party.gni b/third_party/third_party.gni
 diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 --- a/gn/toolchain/BUILD.gn
 +++ b/gn/toolchain/BUILD.gn
-@@ -6,6 +6,7 @@ declare_args() {
+@@ -6,6 +6,9 @@ declare_args() {
    host_ar = ar
    host_cc = cc
    host_cxx = cxx
 +  python_executable = "python3"
++  bcc64x_rad_lib_dir = ""
++  bcc64x_rad_psdk_lib_dir = ""
  
    if (is_android) {
      _prefix = "$ndk/toolchains/llvm/prebuilt/$ndk_host/bin"
-@@ -211,7 +212,7 @@ template("msvc_toolchain") {
+@@ -211,7 +214,7 @@ template("msvc_toolchain") {
  
      tool("copy") {
        cp_py = rebase_path("../cp.py")
@@ -198,7 +200,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 +      command = "$shell $python_executable \"$cp_py\" {{source}} {{output}}"
        description = "copy {{source}} {{output}}"
      }
-@@ -246,6 +247,10 @@ template("gcc_like_toolchain") {
+@@ -246,6 +249,10 @@ template("gcc_like_toolchain") {
      link = invoker.link
      lib_switch = "-l"
      lib_dir_switch = "-L"
@@ -209,7 +211,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
  
      current_cpu = invoker.cpu
      current_os = invoker.os
-@@ -315,7 +320,7 @@ template("gcc_like_toolchain") {
+@@ -315,7 +322,7 @@ template("gcc_like_toolchain") {
          rspfile = "{{output}}.rsp"
          rspfile_content = "{{inputs}}"
          rm_py = rebase_path("../rm.py")
@@ -218,7 +220,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
        }
  
        outputs =
-@@ -335,7 +340,29 @@ template("gcc_like_toolchain") {
+@@ -335,7 +342,29 @@ template("gcc_like_toolchain") {
      }
  
      tool("solink") {
@@ -228,7 +230,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 +        dllname = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"
 +        libname = "{{root_out_dir}}/{{target_output_name}}.lib"
 +        rspfile = "${dllname}.rsp"
-+        command = "$shell $link --rsp-quoting=windows -L\"%CB_BDS%/lib/win64x/release\" -L\"%CB_BDS%/lib/win64x/release/psdk\" -tD -o$dllname @$rspfile -Wl,--out-implib,$libname"
++        command = "$shell $link --rsp-quoting=windows -L\"$bcc64x_rad_lib_dir\" -L\"$bcc64x_rad_psdk_lib_dir\" -tD -o$dllname @$rspfile -Wl,--out-implib,$libname"
 +        rspfile_content = "{{inputs}} {{libs}} {{solibs}} {{ldflags}}"
 +        outputs = [
 +          dllname,
@@ -242,7 +244,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 +        restat = true
 +        description = "link {{output}}"
 +        if (0 <= link_pool_depth) {
-+          pool = ":link_pool($default_toolchain)"
++          pool = ":link_pool($default_toolchain)",
 +        }
 +      } else {
 +        soname = "{{target_output_name}}{{output_extension}}"
@@ -260,7 +262,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 -      rspfile_content = "{{inputs}}"
 +        rspfile = "{{output}}.rsp"
 +        rspfile_content = "{{inputs}}"
-@@ -363,22 +390,23 @@ template("gcc_like_toolchain") {
+@@ -363,22 +392,23 @@ template("gcc_like_toolchain") {
 -      command = "$link -shared {{ldflags}} $_start_group @$rspfile {{frameworks}} {{solibs}} $_end_group {{libs}} $rpath $_emcc_flags -o {{output}}"
 -      outputs = [ "{{root_out_dir}}/$soname" ]
 -      output_prefix = "lib"
@@ -290,7 +292,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 +        }
        }
      }
-@@ -427,13 +455,13 @@ template("gcc_like_toolchain") {
+@@ -427,13 +457,13 @@ template("gcc_like_toolchain") {
  
      tool("copy") {
        cp_py = rebase_path("../cp.py")
