@@ -12,7 +12,17 @@ diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
 diff --git a/BUILD.gn b/BUILD.gn
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -987,7 +987,11 @@ optional("gpu") {
+@@ -475,6 +475,9 @@ optional("fontmgr_win") {
+   ]
+   public = skia_ports_windows_fonts_public
+   sources = skia_ports_windows_fonts_sources
++  if (skia_use_bcc64x) {
++    libs = [ "Dwrite" ]
++  }
+   if (skia_dwritecore_sdk != "") {
+     defines = [ "DWRITE_CORE" ]
+     if (is_win && is_clang) {
+@@ -987,7 +990,11 @@ optional("gpu") {
          "src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp",
        ]
        if (target_cpu != "arm64") {
@@ -25,7 +35,7 @@ diff --git a/BUILD.gn b/BUILD.gn
        }
      } else {
        sources += [ "src/gpu/ganesh/gl/GrGLMakeNativeInterface_none.cpp" ]
-@@ -1012,11 +1016,19 @@ optional("gpu") {
+@@ -1012,11 +1019,19 @@ optional("gpu") {
      if (skia_enable_direct3d_debug_layer) {
        public_defines += [ "SK_ENABLE_D3D_DEBUG_LAYER" ]
      }
