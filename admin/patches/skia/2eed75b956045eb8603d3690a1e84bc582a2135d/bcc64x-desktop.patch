@@ -137,7 +137,7 @@ diff --git a/third_party/zlib/BUILD.gn b/third_party/zlib/BUILD.gn
 diff --git a/src/utils/win/SkDWrite.h b/src/utils/win/SkDWrite.h
 --- a/src/utils/win/SkDWrite.h
 +++ b/src/utils/win/SkDWrite.h
-@@ -11,8 +11,14 @@
+@@ -11,9 +11,14 @@
  #include "include/core/SkFontStyle.h"
  #include "include/private/SkTemplates.h"
  
