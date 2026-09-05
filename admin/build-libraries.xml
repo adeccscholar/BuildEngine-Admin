@@ -2700,7 +2700,7 @@
       </smoke>
    </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T21:11:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T21:12:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
 
@@ -2716,17 +2716,17 @@
 
       <source>
          <!--
-            Broad Windows desktop source closure.
+            Broad Windows desktop profile.
 
-            Active profile:
+            Active:
                CPU raster / skcms
-               DirectWrite + GDI
-               FreeType custom/embedded/directory fonts + WOFF2
+               DirectWrite + Windows GDI
+               FreeType + WOFF2 + SVG + zlib
                ICU + HarfBuzz + SkUnicode + SkShaper
                PNG / JPEG / WebP / Wuffs
                AVIF
                JPEG XL
-               RAW / DNG
+               DNG
                SVG / Expat
                PDF
                XPS
@@ -2740,10 +2740,11 @@
                SPIR-V validation
                SPIRV-Cross
 
-            zlib is supplied by the BuildEngine zlib 1.3.2 package.
+            Prepared but intentionally inactive on Windows:
+               PIE-X
 
             Deliberately excluded:
-               Android / iOS / macOS specific integrations
+               Android / iOS / macOS integrations
                WebGL / WebGPU / CanvasKit / Emscripten
                Dawn
                ANGLE
@@ -2753,12 +2754,14 @@
                Perfetto / pprof
                developer tools / viewer / fuzzers
 
-            Sources are reproducible build artifacts.
+            zlib is supplied by the BuildEngine zlib 1.3.2 package.
+
+            Source trees are regenerable build artifacts.
             No source backup and no git-sync-deps checkout is used.
          -->
 
          <!-- ======================================================== -->
-         <!-- Compression / text / image / document dependencies.      -->
+         <!-- Compression / text / image / document dependencies.     -->
          <!-- ======================================================== -->
 
          <download
@@ -3157,10 +3160,6 @@
             <argument value="{DownloadsRoot}\skia-deps\libjpeg-turbo-e14cbfaa85529d47f9f55b0f104a579c1061f9ad.tar.gz"/>
          </execute>
 
-         <!--
-            Chromium's pinned libjpeg-turbo checkout keeps the actual
-            libjpeg sources and public header below src/.
-         -->
          <require path="{CurrentArtifact}\third_party\externals\libjpeg-turbo\src\jpeglib.h"/>
          <require path="{CurrentArtifact}\third_party\externals\libjpeg-turbo\src\jconfig.h"/>
          <require path="{CurrentArtifact}\third_party\externals\libjpeg-turbo\src\jmorecfg.h"/>
@@ -3299,7 +3298,6 @@
             <argument value="{DownloadsRoot}\skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
          </execute>
 
-         <!-- Skia's pinned GN target compiles v0.3, not v0.4. -->
          <require path="{CurrentArtifact}\third_party\externals\wuffs\release\c\wuffs-v0.3.c"/>
 
 
@@ -3353,7 +3351,8 @@
             <argument value="{DownloadsRoot}\skia-deps\spirv-headers-942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"/>
          </execute>
 
-         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\spirv.h"/>
+         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.h"/>
+         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.hpp"/>
 
 
          <execute name="mkdir-spirv-tools"
@@ -3504,10 +3503,6 @@
          </execute>
 
 
-         <!--
-            GN is the only remaining small upstream tool acquisition.
-            tools/git-sync-deps is deliberately not used.
-         -->
          <execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
@@ -3608,12 +3603,14 @@
 
                <!-- Windows fonts + FreeType. -->
                <line value="skia_enable_fontmgr_win = true"/>
+               <line value="skia_enable_fontmgr_win_gdi = true"/>
 
                <line value="skia_use_freetype = true"/>
                <line value="skia_use_system_freetype2 = false"/>
                <line value="skia_use_freetype_woff2 = true"/>
                <line value="skia_use_freetype_svg = true"/>
                <line value="skia_use_freetype_zlib = true"/>
+               <line value="skia_use_freetype_zlib_bundled = false"/>
 
                <line value="skia_enable_fontmgr_custom_directory = true"/>
                <line value="skia_enable_fontmgr_custom_embedded = true"/>
@@ -3687,7 +3684,13 @@
 
                <!-- RAW / DNG. -->
                <line value="skia_use_dng_sdk = true"/>
-               <line value="skia_use_piex = true"/>
+
+               <!--
+                  PIE-X is deliberately disabled on Windows by upstream Skia.
+                  The pinned source is retained as part of the prepared source
+                  closure, but we do not override that platform decision.
+               -->
+               <line value="skia_use_piex = false"/>
 
 
                <!-- BuildEngine zlib package. -->
