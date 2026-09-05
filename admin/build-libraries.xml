@@ -2584,9 +2584,9 @@
       <smoke id="consumer" source="smokes\opencv\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="opencv-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-   <library id="cmark-gfm" version="0.29.0.gfm.13" timestamp="2026-09-05T02:15:00Z">
+   <library id="cmark-gfm" version="0.29.0.gfm.13" timestamp="2026-09-05T02:46:00Z">
       <metadata name="cmark-gfm" supplier="GitHub" homepage="https://github.com/github/cmark-gfm">
-         <license name="BSD-style and bundled third-party notices" file="COPYING"/>
+         <license name="BSD-style and bundled third-party notices" file="licenses\cmark-gfm\COPYING"/>
       </metadata>
       <security><repository url="https://github.com/github/cmark-gfm.git" commit="587a12bb54d95ac37241377e6ddc93ea0e45439b"/></security>
       <source>
@@ -2652,8 +2652,8 @@
       </smoke>
    </library>
 
-   <library id="googletest" version="1.17.0" timestamp="2026-09-05T02:15:00Z">
-      <metadata name="GoogleTest" supplier="Google" homepage="https://github.com/google/googletest"><license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE"/></metadata>
+   <library id="googletest" version="1.17.0" timestamp="2026-09-05T02:46:00Z">
+      <metadata name="GoogleTest" supplier="Google" homepage="https://github.com/google/googletest"><license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\googletest\LICENSE"/></metadata>
       <security><repository url="https://github.com/google/googletest.git" commit="52eb8108c5bdec04579160ae17225d66034bd723"/></security>
       <source>
          <download url="https://github.com/google/googletest/archive/52eb8108c5bdec04579160ae17225d66034bd723.zip" archive="googletest-52eb8108c5bdec04579160ae17225d66034bd723.zip"/>
@@ -2696,12 +2696,13 @@
       </publish>
       <smoke id="consumer" scope="package" source="smokes\googletest\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="GoogleTestSmoke.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DGTest_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\GTest"/>
       </smoke>
    </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T02:15:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T02:46:00Z">
       <metadata name="Skia" supplier="Google" homepage="https://skia.org/">
-         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE"/>
+         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\skia\LICENSE"/>
       </metadata>
       <security>
          <repository url="https://github.com/google/skia.git" commit="2eed75b956045eb8603d3690a1e84bc582a2135d"/>
@@ -2786,6 +2787,7 @@
                <line value="skia_use_rust_png_encode = false"/>
                <line value="skia_use_libjpeg_turbo_decode = false"/>
                <line value="skia_use_libjpeg_turbo_encode = false"/>
+               <line value="skia_use_jpeg_gainmaps = false"/>
                <line value="skia_use_libwebp_decode = false"/>
                <line value="skia_use_libwebp_encode = false"/>
                <line value="skia_use_libavif = false"/>

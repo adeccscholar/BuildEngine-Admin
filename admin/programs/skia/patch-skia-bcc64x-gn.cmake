@@ -328,6 +328,26 @@ adecc_replace_once(
 ]=])
 
 # -----------------------------------------------------------------------------
+# Windows import libraries must be passed to the BCC64X driver as literal
+# COFF .lib names.  The generic gcc_like toolchain prefixes libraries with
+# -l, which turns e.g. Ole32.lib into -lOle32.lib and makes lld search for a
+# non-existent Unix-style library name.
+# -----------------------------------------------------------------------------
+adecc_replace_once(
+   "gn/toolchain/BUILD.gn"
+   "BCC64X Windows library switch"
+   [=[    lib_switch = "-l"
+    lib_dir_switch = "-L"
+]=]
+   [=[    lib_switch = "-l"
+    lib_dir_switch = "-L"
+    if (current_os == "win" && skia_use_bcc64x &&
+        current_toolchain == default_toolchain) {
+      lib_switch = ""
+    }
+]=])
+
+# -----------------------------------------------------------------------------
 # Shared-library rule for the BCC64X Windows target. The normal gcc_like
 # solink rule remains untouched for every other target/host configuration.
 # -----------------------------------------------------------------------------

@@ -18,7 +18,7 @@ namespace {
 
    struct cmark_text_deleter {
       void operator()(char* szText) const noexcept {
-         if (szText != nullptr) {
+         if(szText != nullptr) {
             cmark_get_default_mem_allocator()->free(szText);
          }
       }
@@ -30,34 +30,29 @@ namespace {
 
    void AttachExtension(cmark_parser* theParser, char const* szName) {
       cmark_syntax_extension* theExtension = cmark_find_syntax_extension(szName);
-      if (theExtension == nullptr) {
+      if(theExtension == nullptr)
          throw std::runtime_error(std::string { "Missing GFM extension: " } + szName);
-      }
 
-      if (!cmark_parser_attach_syntax_extension(theParser, theExtension)) {
+      if(!cmark_parser_attach_syntax_extension(theParser, theExtension))
          throw std::runtime_error(std::string { "Cannot attach GFM extension: " } + szName);
-      }
    }
 
-   void RequireContains(std::string_view svHtml, std::string_view svNeedle, char const* szFeature) {
-      if (svHtml.find(svNeedle) == std::string_view::npos) {
-         std::fputs("Rendered HTML:\n", stderr);
-         std::fwrite(svHtml.data(), 1, svHtml.size(), stderr);
-         std::fputc('\n', stderr);
-         throw std::runtime_error(std::string { "Rendered HTML does not demonstrate " } + szFeature);
-      }
+   bool CheckContains(std::string_view svHtml, std::string_view svNeedle,
+                      char const* szId, char const* szDetail) {
+      bool const bPassed = svHtml.find(svNeedle) != std::string_view::npos;
+      std::printf("SMOKE|CHECK|%s|%s|%s\n", szId, bPassed ? "PASS" : "FAIL", szDetail);
+      return bPassed;
    }
 
 } // namespace
+
 
 int main() {
    try {
       cmark_gfm_core_extensions_ensure_registered();
 
       cmark_parser_ptr theParser { cmark_parser_new(CMARK_OPT_DEFAULT), &cmark_parser_free };
-      if (!theParser) {
-         throw std::runtime_error("cmark_parser_new failed");
-      }
+      if(!theParser) throw std::runtime_error("cmark_parser_new failed");
 
       std::array<char const*, 5> const arrExtensions {
          "table",
@@ -67,9 +62,7 @@ int main() {
          "tasklist"
       };
 
-      for (char const* szExtension : arrExtensions) {
-         AttachExtension(theParser.get(), szExtension);
-      }
+      for(char const* szExtension : arrExtensions) AttachExtension(theParser.get(), szExtension);
 
       char const szMarkdown[] =
          "# BCC64X cmark-gfm smoke\n\n"
@@ -84,32 +77,32 @@ int main() {
 
       cmark_parser_feed(theParser.get(), szMarkdown, std::strlen(szMarkdown));
       cmark_node_ptr theDocument { cmark_parser_finish(theParser.get()), &cmark_node_free };
-      if (!theDocument) {
-         throw std::runtime_error("cmark_parser_finish failed");
-      }
+      if(!theDocument) throw std::runtime_error("cmark_parser_finish failed");
 
       cmark_llist* theExtensions = cmark_parser_get_syntax_extensions(theParser.get());
       cmark_text_ptr theHtml { cmark_render_html(theDocument.get(), CMARK_OPT_UNSAFE, theExtensions) };
-      if (!theHtml) {
-         throw std::runtime_error("cmark_render_html failed");
-      }
+      if(!theHtml) throw std::runtime_error("cmark_render_html failed");
 
       std::string const strHtml { theHtml.get() };
-      RequireContains(strHtml, "<table>", "table extension");
-      RequireContains(strHtml, "<del>legacy</del>", "strikethrough extension");
-      RequireContains(strHtml, "https://example.com", "autolink extension");
-      RequireContains(strHtml, "<input type=\"checkbox\" checked=\"\" disabled=\"\" />", "checked tasklist item");
-      RequireContains(strHtml, "<input type=\"checkbox\" disabled=\"\" />", "unchecked tasklist item");
-      RequireContains(strHtml, "<em>tagfilter control</em>", "raw HTML control");
-      RequireContains(strHtml, "&lt;xmp>", "tagfilter extension");
+      bool bPassed = true;
+      bPassed &= CheckContains(strHtml, "<table>", "table", "GFM table rendered");
+      bPassed &= CheckContains(strHtml, "<del>legacy</del>", "strikethrough", "GFM strikethrough rendered");
+      bPassed &= CheckContains(strHtml, "https://example.com", "autolink", "GFM autolink rendered");
+      bPassed &= CheckContains(strHtml, "<input type=\"checkbox\" checked=\"\" disabled=\"\" />",
+                               "tasklist-checked", "checked GFM task rendered");
+      bPassed &= CheckContains(strHtml, "<input type=\"checkbox\" disabled=\"\" />",
+                               "tasklist-unchecked", "unchecked GFM task rendered");
+      bPassed &= CheckContains(strHtml, "<em>tagfilter control</em>",
+                               "raw-html", "allowed raw HTML retained");
+      bPassed &= CheckContains(strHtml, "&lt;xmp>", "tagfilter", "dangerous tag filtered");
 
-      std::printf("cmark-gfm BCC64X smoke passed.\n");
-      std::printf("Extensions: table, strikethrough, autolink, tagfilter, tasklist\n");
-      std::printf("Rendered HTML bytes: %zu\n", strHtml.size());
-      return 0;
+      std::printf("SMOKE|RESULT|%s|cmark-gfm C++ consumer and GFM extensions\n",
+                  bPassed ? "PASS" : "FAIL");
+      return bPassed ? 0 : 2;
    }
-   catch (std::exception const& theException) {
-      std::fprintf(stderr, "ERROR: %s\n", theException.what());
+   catch(std::exception const& theException) {
+      std::printf("SMOKE|CHECK|runtime|FAIL|%s\n", theException.what());
+      std::printf("SMOKE|RESULT|FAIL|cmark-gfm consumer raised an exception\n");
       return 1;
    }
 }
