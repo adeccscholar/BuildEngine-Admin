@@ -1,7 +1,28 @@
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -171,7 +171,7 @@ is_loong64 = current_cpu == "loong64"
+ opts("ml3") {
+   enabled = is_x86
+   sources = skia_opts.ml3_sources
+-  if (is_win) {
++  if (is_win && !skia_use_bcc64x) {
+     cflags = [ "/arch:AVX2" ]
+   } else if (current_cpu == "x86") {
+     cflags = [ "-march=haswell" ]
+@@ -183,7 +183,7 @@ opts("ml3") {
+ opts("ml4") {
+   enabled = is_x86
+   sources = skia_opts.ml4_sources
+-  if (is_win) {
++  if (is_win && !skia_use_bcc64x) {
+     cflags = [ "/arch:AVX512" ]
+   } else if (current_cpu == "x86") {
+     cflags = [ "-march=skylake-avx512" ]
 diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
 --- a/gn/BUILDCONFIG.gn
 +++ b/gn/BUILDCONFIG.gn
-@@ -183,6 +183,10 @@ template("component") {
+@@ -189,6 +189,10 @@ template("component") {
    }
  }
  
@@ -12,13 +33,13 @@ diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
  # Default configs
  default_configs = [
    "//gn/skia:default",
-@@ -248,7 +252,13 @@ skia_header_target_default_configs = []
+@@ -247,7 +251,13 @@ if (!is_official_build) {
        [ "//gn/skia:warnings_for_public_headers" ]
  }
  
 -if (is_win) {
 +if (is_win && skia_use_bcc64x) {
-+  # BCC64X is the Windows target compiler.  Skia host tools remain on the
++  # BCC64X is the Windows target compiler. Skia host tools remain on the
 +  # native Windows host toolchain.
 +  set_default_toolchain("//gn/toolchain:gcc_like")
 +  default_toolchain_name = "gcc_like"
@@ -30,7 +51,7 @@ diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
 diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
 --- a/gn/skia/BUILD.gn
 +++ b/gn/skia/BUILD.gn
-@@ -8,6 +8,8 @@ if (is_wasm) {
+@@ -9,6 +9,8 @@ if (is_wasm) {
  
  import("../skia.gni")
  
@@ -39,7 +60,8 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
  declare_args() {
    extra_asmflags = []
    extra_cflags = []
-@@ -52,6 +54,6 @@ config("default") {
+@@ -59,7 +61,7 @@ config("default") {
+   # Disable warnings about unknown attributes.
    # (These unknown attribute warnings are on by default, so we don't make
    # disabling them part of :warnings, as some targets remove :warnings.)
 -  if (is_win && !is_clang) {
@@ -47,7 +69,7 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
      cflags += [
        "/wd5030",
        "/wd5051",
-@@ -66,7 +68,7 @@ config("default") {
+@@ -74,7 +76,7 @@ config("default") {
      cflags += [ "-ffp-contract=off" ]
    }
  
@@ -56,7 +78,7 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
      if (is_clang && current_cpu == "arm64") {
        cflags += [ "--target=arm64-windows" ]
      }
-@@ -406,7 +408,7 @@ config("recover_pointer_overflow") {
+@@ -409,7 +411,7 @@ config("recover_pointer_overflow") {
  
  config("no_exceptions") {
    # Exceptions are disabled by default on Windows.  (Use /EHsc to enable them.)
@@ -65,7 +87,7 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
      cflags_cc = [ "-fno-exceptions" ]
      cflags_objcc = cflags_cc
    }
-@@ -418,14 +420,14 @@ config("warnings") {
+@@ -422,14 +424,14 @@ config("warnings") {
    cflags_objcc = []
  
    if (werror) {
@@ -82,18 +104,17 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
      cflags += [
        "/W3",  # Turn on lots of warnings.
  
-@@ -676,7 +678,9 @@ config("debug_symbols") {
+@@ -684,6 +686,8 @@ config("debug_symbols") {
        "-gline-tables-only",
        "-funwind-tables",  # Helps make in-process backtraces fuller.
      ]
--  } else if (is_win) {
 +  } else if (is_win && is_bcc64x_toolchain) {
 +    cflags = [ "-g" ]
-+  } else if (is_win) {
+   } else if (is_win) {
      cflags = [ "/Z7" ]
      if (is_clang) {
-       cflags += [ "-gcodeview-ghash" ]
-@@ -706,6 +710,6 @@ config("no_rtti") {
+@@ -704,7 +708,7 @@ config("no_rtti") {
+   # -fsanitize=vptr requires RTTI which is enabled as a part of
    # -fsanitize=undefined
    if (sanitize != "ASAN") {
 -    if (is_win) {
@@ -101,7 +122,7 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
        cflags_cc = [ "/GR-" ]
      } else {
        cflags_cc = [ "-fno-rtti" ]
-@@ -717,7 +721,7 @@ config("no_rtti") {
+@@ -715,7 +719,7 @@ config("no_rtti") {
  
  config("optimize") {
    ldflags = []
@@ -110,87 +131,6 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
      cflags = [
        "/O2",
        "/Zc:inline",
-diff --git a/BUILD.gn b/BUILD.gn
---- a/BUILD.gn
-+++ b/BUILD.gn
-@@ -130,6 +130,6 @@ opts("ml3") {
-   enabled = is_x86
-   sources = skia_opts.ml3_sources
--  if (is_win) {
-+  if (is_win && !skia_use_bcc64x) {
-     cflags = [ "/arch:AVX2" ]
-   } else if (current_cpu == "x86") {
-     cflags = [ "-march=haswell" ]
-@@ -143,6 +143,6 @@ opts("ml4") {
-   enabled = is_x86
-   sources = skia_opts.ml4_sources
--  if (is_win) {
-+  if (is_win && !skia_use_bcc64x) {
-     cflags = [ "/arch:AVX512" ]
-   } else if (current_cpu == "x86") {
-     cflags = [ "-march=skylake-avx512" ]
-diff --git a/modules/skcms/BUILD.gn b/modules/skcms/BUILD.gn
---- a/modules/skcms/BUILD.gn
-+++ b/modules/skcms/BUILD.gn
-@@ -31,7 +31,13 @@ arch("skcms_TransformHsw") {
-   enabled = current_cpu == "x64" && target_os != "android"
-   sources = skcms_TransformHsw
-   if (is_win) {
--    if (is_clang) {
-+    if (skia_use_bcc64x) {
-+      cflags = [
-+        "-mavx2",
-+        "-mf16c",
-+        "-ffp-contract=off",
-+      ]
-+    } else if (is_clang) {
-       cflags = [
-         "/clang:-mavx2",
-         "/clang:-mf16c",
-@@ -57,7 +63,16 @@ arch("skcms_TransformSkx") {
-   enabled = current_cpu == "x64" && target_os != "android"
-   sources = skcms_TransformSkx
-   if (is_win) {
--    if (is_clang) {
-+    if (skia_use_bcc64x) {
-+      cflags = [
-+        "-mavx512f",
-+        "-mavx512dq",
-+        "-mavx512cd",
-+        "-mavx512bw",
-+        "-mavx512vl",
-+        "-ffp-contract=off",
-+      ]
-+    } else if (is_clang) {
-       cflags = [
-         "/clang:-mavx512f",
-         "/clang:-mavx512dq",
-diff --git a/src/utils/win/SkDWriteFontFileStream.h b/src/utils/win/SkDWriteFontFileStream.h
---- a/src/utils/win/SkDWriteFontFileStream.h
-+++ b/src/utils/win/SkDWriteFontFileStream.h
-@@ -80,7 +80,7 @@ private:
-     explicit SkDWriteFontFileStreamWrapper(SkStreamAsset* stream);
-     virtual ~SkDWriteFontFileStreamWrapper() { }
- 
--    ULONG fRefCount;
-+    LONG fRefCount;
-     std::unique_ptr<SkStreamAsset> fStream;
-     SkMutex fStreamMutex;
- };
-diff --git a/third_party/third_party.gni b/third_party/third_party.gni
---- a/third_party/third_party.gni
-+++ b/third_party/third_party.gni
-@@ -83,7 +83,9 @@ template("third_party") {
-       if (!defined(cflags)) {
-         cflags = []
-       }
--      if (is_win) {
-+      if (is_win && skia_use_bcc64x && current_toolchain == default_toolchain) {
-+        cflags += [ "-w" ]
-+      } else if (is_win) {
-         cflags += [ "/w" ]
-       } else {
-         cflags += [ "-w" ]
 diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 --- a/gn/toolchain/BUILD.gn
 +++ b/gn/toolchain/BUILD.gn
@@ -204,7 +144,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
  
    if (is_android) {
      _prefix = "$ndk/toolchains/llvm/prebuilt/$ndk_host/bin"
-@@ -211,6 +214,6 @@ template("msvc_toolchain") {
+@@ -219,7 +222,7 @@ declare_args() {
  
      tool("copy") {
        cp_py = rebase_path("../cp.py")
@@ -212,7 +152,8 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 +      command = "$shell $python_executable \"$cp_py\" {{source}} {{output}}"
        description = "copy {{source}} {{output}}"
      }
-@@ -246,6 +249,10 @@ template("gcc_like_toolchain") {
+ 
+@@ -248,6 +251,10 @@ template("gcc_like_toolchain") {
      link = invoker.link
      lib_switch = "-l"
      lib_dir_switch = "-L"
@@ -223,7 +164,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
  
      current_cpu = invoker.cpu
      current_os = invoker.os
-@@ -315,7 +322,7 @@ template("gcc_like_toolchain") {
+@@ -312,7 +319,7 @@ template("gcc_like_toolchain") {
          rspfile = "{{output}}.rsp"
          rspfile_content = "{{inputs}}"
          rm_py = rebase_path("../rm.py")
@@ -232,7 +173,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
        }
  
        outputs =
-@@ -335,12 +342,34 @@ template("gcc_like_toolchain") {
+@@ -330,15 +337,37 @@ template("gcc_like_toolchain") {
      }
  
      tool("solink") {
@@ -274,7 +215,13 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 -      rspfile_content = "{{inputs}}"
 +        rspfile = "{{output}}.rsp"
 +        rspfile_content = "{{inputs}}"
-@@ -363,15 +392,16 @@ template("gcc_like_toolchain") {
+ 
+       # --start-group/--end-group let us link multiple .a {{inputs}}
+       # without worrying about their relative order on the link line.
+@@ -358,19 +387,20 @@ template("gcc_like_toolchain") {
+         _emcc_flags = "-sSIDE_MODULE=1"
+       }
+ 
 -      command = "$link -shared {{ldflags}} $_start_group @$rspfile {{frameworks}} {{solibs}} $_end_group {{libs}} $rpath $_emcc_flags -o {{output}}"
 -      outputs = [ "{{root_out_dir}}/$soname" ]
 -      output_prefix = "lib"
@@ -304,7 +251,8 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 +        }
        }
      }
-@@ -427,12 +457,12 @@ template("gcc_like_toolchain") {
+ 
+@@ -413,13 +443,13 @@ template("gcc_like_toolchain") {
  
      tool("copy") {
        cp_py = rebase_path("../cp.py")
@@ -319,3 +267,66 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 +      command = "$python_executable \"$cp_py\" {{source}} {{output}}"
        description = "copy_bundle_data {{source}} {{output}}"
      }
+ 
+diff --git a/modules/skcms/BUILD.gn b/modules/skcms/BUILD.gn
+--- a/modules/skcms/BUILD.gn
++++ b/modules/skcms/BUILD.gn
+@@ -34,7 +34,13 @@ arch("skcms_TransformHsw") {
+   enabled = current_cpu == "x64" && target_os != "android"
+   sources = skcms_TransformHsw
+   if (is_win) {
+-    if (is_clang) {
++    if (skia_use_bcc64x) {
++      cflags = [
++        "-mavx2",
++        "-mf16c",
++        "-ffp-contract=off",
++      ]
++    } else if (is_clang) {
+       cflags = [
+         "/clang:-mavx2",
+         "/clang:-mf16c",
+@@ -56,7 +62,16 @@ arch("skcms_TransformSkx") {
+   enabled = current_cpu == "x64" && target_os != "android"
+   sources = skcms_TransformSkx
+   if (is_win) {
+-    if (is_clang) {
++    if (skia_use_bcc64x) {
++      cflags = [
++        "-mavx512f",
++        "-mavx512dq",
++        "-mavx512cd",
++        "-mavx512bw",
++        "-mavx512vl",
++        "-ffp-contract=off",
++      ]
++    } else if (is_clang) {
+       cflags = [
+         "/clang:-mavx512f",
+         "/clang:-mavx512dq",
+diff --git a/src/utils/win/SkDWriteFontFileStream.h b/src/utils/win/SkDWriteFontFileStream.h
+--- a/src/utils/win/SkDWriteFontFileStream.h
++++ b/src/utils/win/SkDWriteFontFileStream.h
+@@ -81,7 +81,7 @@ private:
+     explicit SkDWriteFontFileStreamWrapper(SkStreamAsset* stream);
+     virtual ~SkDWriteFontFileStreamWrapper() { }
+ 
+-    ULONG fRefCount;
++    LONG fRefCount;
+     std::unique_ptr<SkStreamAsset> fStream;
+     SkMutex fStreamMutex;
+ };
+diff --git a/third_party/third_party.gni b/third_party/third_party.gni
+--- a/third_party/third_party.gni
++++ b/third_party/third_party.gni
+@@ -92,7 +92,9 @@
+       if (!defined(cflags)) {
+         cflags = []
+       }
+-      if (is_win) {
++      if (is_win && skia_use_bcc64x && current_toolchain == default_toolchain) {
++        cflags += [ "-w" ]
++      } else if (is_win) {
+         cflags += [ "/w" ]
+       } else {
+         cflags += [ "-w" ]
