@@ -2700,7 +2700,8 @@
       </smoke>
    </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T16:32:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T17:35:00Z">
+      <dependency library="opengl" version="26.2.1"/>
       <metadata name="Skia" supplier="Google" homepage="https://skia.org/">
          <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\skia\LICENSE"/>
       </metadata>
@@ -2716,14 +2717,28 @@
             <require path="gn\skia\BUILD.gn"/>
             <require path="gn\toolchain\BUILD.gn"/>
             <require path="modules\skcms\BUILD.gn"/>
+            <require path="modules\skunicode\BUILD.gn"/>
+            <require path="modules\skshaper\BUILD.gn"/>
+            <require path="modules\svg\BUILD.gn"/>
+            <require path="modules\skottie\BUILD.gn"/>
             <require path="src\utils\win\SkDWriteFontFileStream.h"/>
+            <require path="src\gpu\ganesh\gl\win\GrGLMakeWinInterface.cpp"/>
             <require path="third_party\third_party.gni"/>
-            <require path="bin\fetch-gn"/>
+            <require path="third_party\icu\BUILD.gn"/>
+            <require path="third_party\libjpeg-turbo\BUILD.gn"/>
+            <require path="third_party\libwebp\BUILD.gn"/>
+            <require path="third_party\zlib\BUILD.gn"/>
+            <require path="tools\git-sync-deps"/>
             <require path="include\core\SkSurface.h"/>
             <require path="LICENSE"/>
          </extract>
-         <!-- Revision-bound BCC64X GN compatibility patch. No helper program or wrapper is introduced. -->
-         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-gn.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch" overwrite="true" preserveCurrentArtifact="true"/>
+
+         <!-- Proven BCC64X baseline patch from the 374/374 CPU/Raster reference run. -->
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-gn.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"
+               overwrite="true"
+               preserveCurrentArtifact="true"/>
+
          <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/>
             <argument value="--check"/>
@@ -2731,28 +2746,61 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"/>
          </execute>
+
          <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/>
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"/>
          </execute>
-         <!-- CPU/Raster-only evidence profile needs no DEPS synchronization; GN is fetched separately below. -->
-         <execute name="fetch-gn" executable="{Tool:python}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="bin\fetch-gn"/>
+
+         <!-- Desktop feature patch is intentionally separate until the expanded profile is proven. -->
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-desktop.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"
+               overwrite="true"
+               preserveCurrentArtifact="true"/>
+
+         <execute name="desktop-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"/>
+         </execute>
+
+         <execute name="desktop-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"/>
+         </execute>
+
+         <!-- Use Skia's pinned DEPS directly; the upstream tool also fetches GN. -->
+         <execute name="sync-deps" executable="{Tool:python}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <environment name="GIT_EXECUTABLE" value="{Tool:git}"/>
+            <environment name="GIT_SYNC_DEPS_SKIP_EMSDK" value="1"/>
+            <argument value="tools\git-sync-deps"/>
          </execute>
       </source>
+
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_PYTHON" value="{Tool:python}"/>
+         <environment name="CB_SKIA_OPENGL_LIB" value="{InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/>
          <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+
          <!--
-            GN argument file is generated by BuildEngine itself. The complete CPU/Raster
-            product profile therefore remains visible in this XML contract.
+            Windows desktop profile: CPU raster + codecs + text + vector/document
+            modules + Ganesh with the BuildEngine OpenGL package and Direct3D.
+            Graphite/Dawn/Vulkan and Rust codecs remain outside this profile.
          -->
-         <target name="gn-gen" type="generic" executable="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\bin\gn.exe" workingDirectory="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d" showOutput="false">
+         <target name="gn-gen"
+                 type="generic"
+                 executable="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\bin\gn.exe"
+                 workingDirectory="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d"
+                 showOutput="false">
             <temporaryFile id="gn-args" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\args.gn">
                <line value="skia_use_bcc64x = true"/>
                <line value="target_cpu = &quot;x64&quot;"/>
@@ -2763,90 +2811,221 @@
                <line value="python_executable = getenv(&quot;CB_PYTHON&quot;)"/>
                <line value="bcc64x_rad_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release&quot;"/>
                <line value="bcc64x_rad_psdk_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release/psdk&quot;"/>
+               <line value="bcc64x_opengl_lib = getenv(&quot;CB_SKIA_OPENGL_LIB&quot;)"/>
+
                <line value="is_official_build = {SkiaOfficialBuild}"/>
                <line value="is_debug = {SkiaDebug}"/>
                <line value="is_component_build = true"/>
                <line value="is_trivial_abi = false"/>
+
                <line value="skia_enable_tools = false"/>
-               <line value="skia_enable_ganesh = false"/>
+
+               <line value="skia_enable_ganesh = true"/>
                <line value="skia_enable_graphite = false"/>
                <line value="skia_enable_spirv_validation = false"/>
                <line value="skia_use_partition_alloc = false"/>
-               <line value="skia_use_gl = false"/>
-               <line value="skia_use_direct3d = false"/>
+
+               <line value="skia_use_gl = true"/>
+               <line value="skia_use_direct3d = true"/>
                <line value="skia_use_vulkan = false"/>
                <line value="skia_use_dawn = false"/>
-               <line value="skia_enable_pdf = false"/>
-               <line value="skia_enable_svg = false"/>
-               <line value="skia_enable_skottie = false"/>
-               <line value="skia_enable_fontmgr_win = false"/>
-               <line value="skia_use_libpng_decode = false"/>
-               <line value="skia_use_libpng_encode = false"/>
+
+               <line value="skia_enable_pdf = true"/>
+               <line value="skia_enable_svg = true"/>
+               <line value="skia_enable_skottie = true"/>
+               <line value="skia_enable_fontmgr_win = true"/>
+
+               <line value="skia_use_libpng_decode = true"/>
+               <line value="skia_use_libpng_encode = true"/>
                <line value="skia_use_rust_png_decode = false"/>
                <line value="skia_use_rust_png_encode = false"/>
-               <line value="skia_use_libjpeg_turbo_decode = false"/>
-               <line value="skia_use_libjpeg_turbo_encode = false"/>
+
+               <line value="skia_use_libjpeg_turbo_decode = true"/>
+               <line value="skia_use_libjpeg_turbo_encode = true"/>
                <line value="skia_use_jpeg_gainmaps = false"/>
-               <line value="skia_use_libwebp_decode = false"/>
-               <line value="skia_use_libwebp_encode = false"/>
+
+               <line value="skia_use_libwebp_decode = true"/>
+               <line value="skia_use_libwebp_encode = true"/>
+
                <line value="skia_use_libavif = false"/>
                <line value="skia_use_libjxl_decode = false"/>
-               <line value="skia_use_wuffs = false"/>
-               <line value="skia_use_icu = false"/>
-               <line value="skia_use_harfbuzz = false"/>
-               <line value="skia_use_expat = false"/>
-               <line value="skia_use_zlib = false"/>
+               <line value="skia_use_wuffs = true"/>
+
+               <line value="skia_use_icu = true"/>
+               <line value="skia_use_harfbuzz = true"/>
+               <line value="skia_use_expat = true"/>
+               <line value="skia_use_zlib = true"/>
+               <line value="skia_pdf_subset_harfbuzz = true"/>
+
+               <line value="skia_use_system_libjpeg_turbo = false"/>
+               <line value="skia_use_system_libpng = false"/>
+               <line value="skia_use_system_libwebp = false"/>
+               <line value="skia_use_system_expat = false"/>
+               <line value="skia_use_system_zlib = false"/>
+               <line value="skia_use_system_icu = false"/>
+               <line value="skia_use_system_harfbuzz = false"/>
+
                <line value="skia_use_xps = false"/>
                <line value="skia_use_lua = false"/>
                <line value="skia_use_ffmpeg = false"/>
                <line value="skia_use_piex = false"/>
+
                <line value="extra_cflags = [&quot;-DWIN32_LEAN_AND_MEAN&quot;,&quot;-DNOMINMAX&quot;]"/>
             </temporaryFile>
+
             <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
             <argument value="gen"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--script-executable={Tool:python}"/>
          </target>
-         <execute name="ninja-build" executable="{Tool:ninja}" workingDirectory="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d" showOutput="false">
+
+         <execute name="ninja-build"
+                  executable="{Tool:ninja}"
+                  workingDirectory="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d"
+                  showOutput="false">
             <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
-            <argument value="-C"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="skia"/>
+            <argument value="-C"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="skia"/>
+            <argument value="skunicode_core"/>
+            <argument value="skunicode_icu"/>
+            <argument value="skshaper"/>
+            <argument value="svg"/>
+            <argument value="skottie"/>
          </execute>
+
          <variant name="Release">
             <variable name="SkiaOfficialBuild" value="true"/>
             <variable name="SkiaDebug" value="false"/>
          </variant>
+
          <variant name="Debug">
             <variable name="SkiaOfficialBuild" value="false"/>
             <variable name="SkiaDebug" value="true"/>
          </variant>
+
          <install>
             <perVariant>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skia.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skia.dll" overwrite="true"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skia.lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skia.lib" overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skia.dll"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skia.dll"
+                     overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skia.lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skia.lib"
+                     overwrite="true"/>
+
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skunicode_core.dll"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skunicode_core.dll"
+                     overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skunicode_core.lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skunicode_core.lib"
+                     overwrite="true"/>
+
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skunicode_icu.dll"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skunicode_icu.dll"
+                     overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skunicode_icu.lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skunicode_icu.lib"
+                     overwrite="true"/>
+
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skshaper.dll"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skshaper.dll"
+                     overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skshaper.lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skshaper.lib"
+                     overwrite="true"/>
+
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\svg.dll"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\svg.dll"
+                     overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\svg.lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\svg.lib"
+                     overwrite="true"/>
+
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skottie.dll"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skottie.dll"
+                     overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skottie.lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skottie.lib"
+                     overwrite="true"/>
+
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\icudtl.dat"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\icudtl.dat"
+                     overwrite="true"/>
+
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skia.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skia.lib"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skunicode_core.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skunicode_core.lib"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skunicode_icu.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skunicode_icu.lib"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skshaper.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skshaper.lib"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\svg.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\svg.lib"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skottie.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skottie.lib"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\icudtl.dat"/>
             </perVariant>
+
             <common>
-               <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include" recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\skcms" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms" recursive="true" overwrite="true"><include pattern="*.h"/></copy>
-               <copy source="{BuildFileDir}\cmake\skia\SkiaConfig.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake" overwrite="true"/>
-               <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE" overwrite="true"/>
+               <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include"
+                     recursive="true"
+                     overwrite="true"/>
+
+               <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules"
+                     recursive="true"
+                     overwrite="true">
+                  <include pattern="**/*.h"/>
+               </copy>
+
+               <copy source="{BuildFileDir}\cmake\skia\SkiaConfig.cmake"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake"
+                     overwrite="true"/>
+
+               <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE"
+                     overwrite="true"/>
+
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include\core\SkSurface.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms\skcms.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skunicode\include\SkUnicode.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skunicode\include\SkUnicode_icu.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skshaper\include\SkShaper.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\svg\include\SkSVGDOM.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skottie\include\Skottie.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake"/>
             </common>
          </install>
       </build>
+
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
          <tree source="include" target="include" optional="false"/>
          <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dat" optional="false"/>
          <cmake source="lib\cmake" target="lib\cmake" optional="false"/>
       </publish>
-      <smoke id="consumer" scope="package" source="smokes\skia\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="skia-consumer.exe">
+
+      <smoke id="consumer"
+             scope="package"
+             source="smokes\skia\consumer"
+             configuration="Release"
+             cmake="{Tool:cmake}"
+             ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="skia-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-
+   
 </buildLibraries>
