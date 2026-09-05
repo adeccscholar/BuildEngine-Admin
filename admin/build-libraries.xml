@@ -3940,37 +3940,5 @@
             value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-
-      <publish
-         root="Win64x"
-         configuration="Release"
-         consumer="{BuildFileDir}\cmake\consumer">
-
-         <tree source="include" target="include" optional="false"/>
-         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
-         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
-         <files source="bin\win64\{Configuration}" target="bin" extensions=".dat" optional="false"/>
-         <cmake source="lib\cmake" target="lib\cmake" optional="false"/>
-      </publish>
-
-
-      <smoke
-         id="consumer"
-         scope="package"
-         source="smokes\skia\consumer"
-         configuration="Release"
-         cmake="{Tool:cmake}"
-         ninja="{Tool:ninja}"
-         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
-         executable="skia-consumer.exe">
-
-         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
-         <environment name="CB_BDS" value="{BDS}"/>
-
-         <environment
-            name="PATH"
-            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
-      </smoke>
-   </library>
    
 </buildLibraries>
