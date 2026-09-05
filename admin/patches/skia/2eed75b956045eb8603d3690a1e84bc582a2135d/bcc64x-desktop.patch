@@ -395,3 +395,4 @@ diff --git a/src/gpu/vk/vulkanmemoryallocator/BUILD.gn b/src/gpu/vk/vulkanmemory
      cflags = [ "/w" ]
    } else {
      cflags = [ "-w" ]
+   }
