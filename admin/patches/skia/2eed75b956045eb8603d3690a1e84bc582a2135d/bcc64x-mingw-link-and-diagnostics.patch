@@ -85,13 +85,13 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 --- a/gn/toolchain/BUILD.gn
 +++ b/gn/toolchain/BUILD.gn
-@@ -7,7 +7,6 @@
+@@ -7,7 +7,8 @@
    host_cc = cc
    host_cxx = cxx
    python_executable = "python3"
--  bcc64x_rad_lib_dir = ""
--  bcc64x_rad_psdk_lib_dir = ""
-+  bcc64x_mingw_lib_dir = ""
+   bcc64x_rad_lib_dir = ""
+   bcc64x_rad_psdk_lib_dir = ""
++  bcc64x_mingw_lib_dir = getenv("CB_BDS") + "/x86_64-w64-mingw32/lib"
  
    if (is_android) {
 diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
