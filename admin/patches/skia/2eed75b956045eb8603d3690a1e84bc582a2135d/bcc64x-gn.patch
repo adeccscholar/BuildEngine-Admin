@@ -303,7 +303,7 @@ diff --git a/modules/skcms/BUILD.gn b/modules/skcms/BUILD.gn
 +    } else if (is_clang) {
        cflags = [
          "/clang:-mavx512f",
-         "/clang:-mavx512dq",
+         "/clang:-mf16c",
 diff --git a/src/utils/win/SkDWriteFontFileStream.h b/src/utils/win/SkDWriteFontFileStream.h
 --- a/src/utils/win/SkDWriteFontFileStream.h
 +++ b/src/utils/win/SkDWriteFontFileStream.h
@@ -330,3 +330,136 @@ diff --git a/third_party/third_party.gni b/third_party/third_party.gni
          cflags += [ "/w" ]
        } else {
          cflags += [ "-w" ]
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -2165,16 +2165,31 @@
+                  "src/ports/SkImageGeneratorWIC.cpp",
+                  "src/ports/SkLog_win.cpp",
+                ]
+-    libs += [
+-      "Ole32.lib",
+-      "OleAut32.lib",
+-    ]
++    if (skia_use_bcc64x) {
++      libs += [
++        "Ole32",
++        "OleAut32",
++      ]
++    } else {
++      libs += [
++        "Ole32.lib",
++        "OleAut32.lib",
++      ]
++    }
+ 
+     if (!skia_enable_winuwp) {
+-      libs += [
+-        "FontSub.lib",
+-        "User32.lib",
+-        "Usp10.lib",
+-      ]
++      if (skia_use_bcc64x) {
++        libs += [
++          "FontSub",
++          "User32",
++          "Usp10",
++        ]
++      } else {
++        libs += [
++          "FontSub.lib",
++          "User32.lib",
++          "Usp10.lib",
++        ]
++      }
+     }
+   } else {
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -503,7 +503,11 @@
+   public_defines = [ "SK_FONTMGR_GDI_AVAILABLE" ]
+   public = skia_ports_windows_fonts_public
+   sources = skia_ports_fonthost_win_sources
+-  libs = [ "Gdi32.lib" ]
++  if (skia_use_bcc64x) {
++    libs = [ "Gdi32" ]
++  } else {
++    libs = [ "Gdi32.lib" ]
++  }
+ }
+ 
+ if (skia_lex) {
+diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
+--- a/gn/toolchain/BUILD.gn
++++ b/gn/toolchain/BUILD.gn
+@@ -342,5 +342,5 @@
+         dllname = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"
+         libname = "{{root_out_dir}}/{{target_output_name}}.lib"
+         rspfile = "${dllname}.rsp"
+-        command = "$shell $link --rsp-quoting=windows -L\"$bcc64x_rad_lib_dir\" -L\"$bcc64x_rad_psdk_lib_dir\" -tD -o$dllname @$rspfile -Wl,--out-implib,$libname"
++        command = "$shell $link --rsp-quoting=windows -L\"$bcc64x_mingw_lib_dir\" -tD -o$dllname @$rspfile -Wl,--out-implib,$libname"
+         rspfile_content = "{{inputs}} {{libs}} {{solibs}} {{ldflags}}"
+diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
+--- a/gn/toolchain/BUILD.gn
++++ b/gn/toolchain/BUILD.gn
+@@ -251,10 +251,6 @@
+     link = invoker.link
+     lib_switch = "-l"
+     lib_dir_switch = "-L"
+-    if (current_os == "win" && skia_use_bcc64x &&
+-        current_toolchain == default_toolchain) {
+-      lib_switch = ""
+-    }
+ 
+     current_cpu = invoker.cpu
+     current_os = invoker.os
+diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
+--- a/gn/toolchain/BUILD.gn
++++ b/gn/toolchain/BUILD.gn
+@@ -7,7 +7,8 @@
+   host_cc = cc
+   host_cxx = cxx
+   python_executable = "python3"
+   bcc64x_rad_lib_dir = ""
+   bcc64x_rad_psdk_lib_dir = ""
++  bcc64x_mingw_lib_dir = getenv("CB_BDS") + "/x86_64-w64-mingw32/lib"
+ 
+   if (is_android) {
+diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
+--- a/gn/skia/BUILD.gn
++++ b/gn/skia/BUILD.gn
+@@ -477,10 +477,12 @@
+       "-Wvla",
+ 
+       "-Wno-deprecated-declarations",
+-      "-Wno-maybe-uninitialized",
+       "-Wno-psabi",
+       "-Wno-switch-default",  # Warns even when all enum values are covered
+       "-Wno-unused-parameter",  # Re-enabled for header sources
+     ]
++    if (!is_bcc64x_toolchain) {
++      cflags += [ "-Wno-maybe-uninitialized" ]
++    }
+     cflags_cc += [
+       "-Wnon-virtual-dtor",
+diff --git a/include/private/SkFloatingPoint.h b/include/private/SkFloatingPoint.h
+--- a/include/private/SkFloatingPoint.h
++++ b/include/private/SkFloatingPoint.h
+@@ -153,6 +153,6 @@
+ // IEEE defines how float divide behaves for non-finite values and zero-denoms, but C does not,
+ // so we have a helper that suppresses the possible undefined-behavior warnings.
+-#ifdef SK_BUILD_FOR_WIN
++#if defined(SK_BUILD_FOR_WIN) && !(defined(__BORLANDC__) && defined(__clang__))
+ #pragma warning(push)
+ #pragma warning(disable : 4723)
+ #endif
+@@ -165,7 +165,7 @@
+ static constexpr double sk_ieee_double_divide(double numer, double denom) {
+     return numer / denom;
+ }
+-#ifdef SK_BUILD_FOR_WIN
++#if defined(SK_BUILD_FOR_WIN) && !(defined(__BORLANDC__) && defined(__clang__))
+ #pragma warning( pop )
+ #endif
+ 
