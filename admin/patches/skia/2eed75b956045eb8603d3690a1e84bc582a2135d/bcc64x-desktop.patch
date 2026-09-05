@@ -331,7 +331,7 @@ diff --git a/src/ports/SkFontMgr_win_dw.cpp b/src/ports/SkFontMgr_win_dw.cpp
  
      bool same;
  
-@@ -507,7 +509,7 @@ private:
+@@ -507,6 +509,6 @@ private:
      virtual ~FontFallbackRenderer() { }
  
 -    ULONG fRefCount;
@@ -339,7 +339,7 @@ diff --git a/src/ports/SkFontMgr_win_dw.cpp b/src/ports/SkFontMgr_win_dw.cpp
      sk_sp<const SkFontMgr_DirectWrite> fOuter;
      UINT32 fCharacter;
      sk_sp<SkTypeface> fResolvedTypeface;
-@@ -611,7 +613,7 @@ private:
+@@ -611,6 +613,6 @@ private:
      virtual ~FontFallbackSource() { }
  
 -    ULONG fRefCount;
