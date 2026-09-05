@@ -7,9 +7,12 @@ project(BuildEngineSmokeSkia LANGUAGES CXX)
 
 find_package(Skia CONFIG REQUIRED)
 
-if(NOT DEFINED SKIA_OPENGL_RUNTIME_DIR)
-   message(FATAL_ERROR "SKIA_OPENGL_RUNTIME_DIR is required for the Skia desktop package smoke")
-endif()
+find_file(SKIA_OPENGL_RUNTIME_DLL
+   NAMES opengl32.dll
+   PATHS ENV PATH
+   NO_DEFAULT_PATH
+   REQUIRED)
+get_filename_component(SKIA_OPENGL_RUNTIME_DIR "${SKIA_OPENGL_RUNTIME_DLL}" DIRECTORY)
 
 add_executable(skia-consumer main.cpp)
 set_property(TARGET skia-consumer PROPERTY CXX_SCAN_FOR_MODULES OFF)
