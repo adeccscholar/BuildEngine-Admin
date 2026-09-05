@@ -1,0 +1,70 @@
+diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
+--- a/gn/BUILDCONFIG.gn
++++ b/gn/BUILDCONFIG.gn
+@@ -192,6 +192,7 @@ template("component") {
+ 
+ declare_args() {
+   skia_use_bcc64x = false
++  bcc64x_opengl_lib = ""
+ }
+ 
+ # Default configs
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -987,7 +987,11 @@ optional("gpu") {
+         "src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp",
+       ]
+       if (target_cpu != "arm64") {
+-        libs += [ "OpenGL32.lib" ]
++        if (skia_use_bcc64x) {
++          ldflags = [ bcc64x_opengl_lib ]
++        } else {
++          libs += [ "OpenGL32.lib" ]
++        }
+       }
+     } else {
+       sources += [ "src/gpu/ganesh/gl/GrGLMakeNativeInterface_none.cpp" ]
+@@ -1012,11 +1016,19 @@ optional("gpu") {
+     if (skia_enable_direct3d_debug_layer) {
+       public_defines += [ "SK_ENABLE_D3D_DEBUG_LAYER" ]
+     }
+-    libs += [
+-      "d3d12.lib",
+-      "dxgi.lib",
+-      "d3dcompiler.lib",
+-    ]
++    if (skia_use_bcc64x) {
++      libs += [
++        "d3d12",
++        "dxgi",
++        "d3dcompiler",
++      ]
++    } else {
++      libs += [
++        "d3d12.lib",
++        "dxgi.lib",
++        "d3dcompiler.lib",
++      ]
++    }
+   }
+ 
+   cflags_objcc = []
+diff --git a/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp b/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
+--- a/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
++++ b/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
+@@ -19,8 +19,13 @@ sk_sp<const GrGLInterface> MakeWin() {
+     }
+ 
+     struct FreeModule { void operator()(HMODULE m) { (void)FreeLibrary(m); } };
++#if defined(__BORLANDC__) && defined(__clang__)
++    // Use the application-local OpenGL runtime supplied by the BuildEngine package.
++    std::unique_ptr<typename std::remove_pointer<HMODULE>::type, FreeModule> module(
++            LoadLibraryA("opengl32.dll"));
++#else
+     std::unique_ptr<typename std::remove_pointer<HMODULE>::type, FreeModule> module(
+             LoadLibraryExA("opengl32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32));
++#endif
+     if (!module) {
+         return nullptr;
+     }
