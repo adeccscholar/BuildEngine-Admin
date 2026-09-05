@@ -198,3 +198,4 @@ Der neue gefilterte C++-Copy-Pfad ist real durch ACE/TAO belegt. Später möglic
 9. Shared ist Standard für normale Runtime-Bibliotheken, aber keine dogmatische Regel für Testinfrastruktur wie GoogleTest.
 10. Kleine Package-Smokes und komplexe `BuildEngine-Tests` bleiben bewusst getrennt.
 11. Primärdokumentation ist Deutsch.
+12. Source-Bäume sind regenerierbare Artefakte. Ist der Source-State ungültig, wird der alte Source-Baum ersetzt; es gibt keine Sicherungs- oder Rollback-Bäume wie `*.previous`. Ein temporärer `*.extracting`-Baum dient ausschließlich dazu, halb extrahierte Quellen nicht als gültigen Source-Baum sichtbar zu machen.
