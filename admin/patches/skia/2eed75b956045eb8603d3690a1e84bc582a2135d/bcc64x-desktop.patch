@@ -62,6 +62,14 @@ diff --git a/BUILD.gn b/BUILD.gn
    }
  
    cflags_objcc = []
+@@ -1218,6 +1218,6 @@
+       public += skia_graphite_vk_precompile_public
+       sources += skia_graphite_vk_precompile_sources
+     }
+-    if (is_debug) {
++    if (is_debug && skia_enable_spirv_validation) {
+       sources += skia_sksl_validate_spirv_sources
+       deps += [
 diff --git a/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp b/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
 --- a/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
 +++ b/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
@@ -396,3 +404,41 @@ diff --git a/src/gpu/vk/vulkanmemoryallocator/BUILD.gn b/src/gpu/vk/vulkanmemory
    } else {
      cflags = [ "-w" ]
    }
+diff --git a/third_party/externals/d3d12allocator/src/D3D12MemAlloc.cpp b/third_party/externals/d3d12allocator/src/D3D12MemAlloc.cpp
+--- a/third_party/externals/d3d12allocator/src/D3D12MemAlloc.cpp
++++ b/third_party/externals/d3d12allocator/src/D3D12MemAlloc.cpp
+@@ -4096,7 +4096,11 @@
+ HRESULT AllocatorPimpl::Init(const ALLOCATOR_DESC& desc)
+ {
+ #if D3D12MA_DXGI_1_4
++#if defined(__BORLANDC__) && defined(__clang__)
++    desc.pAdapter->QueryInterface(__uuidof(IDXGIAdapter3), reinterpret_cast<void**>(&m_Adapter3));
++#else
+     desc.pAdapter->QueryInterface<IDXGIAdapter3>(&m_Adapter3);
++#endif
+ #endif
+ 
+     HRESULT hr = m_Adapter->GetDesc(&m_AdapterDesc);
+@@ -5199,5 +5203,10 @@
+         inOutResourceDesc.Alignment = smallAlignmentToTry;
++#if defined(__BORLANDC__) && defined(__clang__)
++        D3D12_RESOURCE_ALLOCATION_INFO smallAllocInfo = {};
++        m_Device->GetResourceAllocationInfo(&smallAllocInfo, 0, 1, &inOutResourceDesc);
++#else
+         const D3D12_RESOURCE_ALLOCATION_INFO smallAllocInfo = m_Device->GetResourceAllocationInfo(0, 1, &inOutResourceDesc);
++#endif
+         // Check if alignment requested has been granted.
+         if(smallAllocInfo.Alignment == smallAlignmentToTry)
+         {
+@@ -5207,5 +5216,11 @@
+     }
+ #endif // #if D3D12MA_USE_SMALL_RESOURCE_PLACEMENT_ALIGNMENT
+ 
++#if defined(__BORLANDC__) && defined(__clang__)
++    D3D12_RESOURCE_ALLOCATION_INFO allocInfo = {};
++    m_Device->GetResourceAllocationInfo(&allocInfo, 0, 1, &inOutResourceDesc);
++    return allocInfo;
++#else
+     return m_Device->GetResourceAllocationInfo(0, 1, &inOutResourceDesc);
++#endif
+ }
