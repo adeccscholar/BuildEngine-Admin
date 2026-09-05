@@ -134,3 +134,252 @@ diff --git a/third_party/zlib/BUILD.gn b/third_party/zlib/BUILD.gn
    }
  } else {
    config("zlib_internal_config") {
+diff --git a/src/utils/win/SkDWrite.h b/src/utils/win/SkDWrite.h
+--- a/src/utils/win/SkDWrite.h
++++ b/src/utils/win/SkDWrite.h
+@@ -11,8 +11,14 @@
+ #include "include/core/SkFontStyle.h"
+ #include "include/private/SkTemplates.h"
+ 
+ #include <dwrite.h>
+ #include <winsdkver.h>
+ 
++template <typename Interface>
++HRESULT SkQueryInterface(IUnknown* object, Interface** result) {
++    return object->QueryInterface(__uuidof(Interface), reinterpret_cast<void**>(result));
++}
++
+ class SkString;
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+diff --git a/src/ports/SkTypeface_win_dw.cpp b/src/ports/SkTypeface_win_dw.cpp
+--- a/src/ports/SkTypeface_win_dw.cpp
++++ b/src/ports/SkTypeface_win_dw.cpp
+@@ -38,7 +38,7 @@ using namespace skia_private;
+ 
+ SkFontStyle DWriteFontTypeface::GetStyle(IDWriteFont* font, IDWriteFontFace* fontFace) {
+     SkTScopedComPtr<IDWriteFontFace3> ff3;
+-    fontFace->QueryInterface(&ff3);
++    SkQueryInterface(fontFace, &ff3);
+ 
+     int weight;
+     int width;
+@@ -62,7 +62,7 @@ SkFontStyle DWriteFontTypeface::GetStyle(IDWriteFont* font, IDWriteFontFace* fon
+ 
+     [&weight, &width, &slant, fontFace]() -> void {
+         SkTScopedComPtr<IDWriteFontFace5> fontFace5;
+-        if (FAILED(fontFace->QueryInterface(&fontFace5))) {
++        if (FAILED(SkQueryInterface(fontFace, &fontFace5))) {
+             return;
+         }
+         if (!fontFace5->HasVariations()) {
+@@ -191,29 +191,29 @@ DWriteFontTypeface::DWriteFontTypeface(const SkFontStyle& style,
+     , fPaletteEntryCount(0)
+     , fLoaders(std::move(loaders))
+ {
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace1))) {
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace1))) {
+         // IUnknown::QueryInterface states that if it fails, punk will be set to nullptr.
+         // http://blogs.msdn.com/b/oldnewthing/archive/2004/03/26/96777.aspx
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace1.get());
+     }
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace2))) {
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace2))) {
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace2.get());
+     }
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace3))) {
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace3))) {
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace3.get());
+     }
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace4))) {
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace4))) {
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace4.get());
+     }
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace5))) {
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace5))) {
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace5.get());
+     }
+ #if DWRITE_CORE || (defined(NTDDI_WIN11_ZN) && NTDDI_VERSION >= NTDDI_WIN11_ZN)
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace7))) {
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace7))) {
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace7/*.get()*/);
+     }
+ #endif
+-    if (!SUCCEEDED(fFactory->QueryInterface(&fFactory2))) {
++    if (!SUCCEEDED(SkQueryInterface(fFactory.get(), &fFactory2))) {
+         SkASSERT_RELEASE(nullptr == fFactory2.get());
+     }
+ 
+@@ -317,7 +317,7 @@ int DWriteFontTypeface::onGetResourceName(SkString* resourceName) const {
+                "Could not get font file loader.", numFiles);
+ 
+     SkTScopedComPtr<IDWriteLocalFontFileLoader> localFontFileLoader;
+-    HR_GENERAL(fontFileLoader->QueryInterface(&localFontFileLoader),
++    HR_GENERAL(SkQueryInterface(fontFileLoader.get(), &localFontFileLoader),
+                nullptr, numFiles);
+ 
+     UINT32 fontFilePathLen;
+@@ -644,7 +644,7 @@ sk_sp<SkTypeface> DWriteFontTypeface::onMakeClone(const SkFontArguments& args) c
+                                          &newFontFace5));
+ 
+         SkTScopedComPtr<IDWriteFontFace> newFontFace;
+-        HRN(newFontFace5->QueryInterface(&newFontFace));
++        HRN(SkQueryInterface(newFontFace5.get(), &newFontFace));
+         return DWriteFontTypeface::Make(fFactory.get(),
+                                         newFontFace.get(),
+                                         fDWriteFont.get(),
+@@ -661,7 +661,7 @@ sk_sp<SkTypeface> DWriteFontTypeface::onMakeClone(const SkFontArguments& args) c
+         HRN(fontReference->CreateFontFaceWithSimulations(requestedSimulations, &newFontFace3));
+         if (newFontFace3) {
+             SkTScopedComPtr<IDWriteFontFace> newFontFace;
+-            HRN(newFontFace3->QueryInterface(&newFontFace));
++            HRN(SkQueryInterface(newFontFace3.get(), &newFontFace));
+             return DWriteFontTypeface::Make(fFactory.get(),
+                                             newFontFace.get(),
+                                             fDWriteFont.get(),
+@@ -933,7 +933,7 @@ private:
+     virtual ~StreamFontFileLoader() { }
+ 
+     std::unique_ptr<SkStreamAsset> fStream;
+-    ULONG fRefCount;
++    LONG fRefCount;
+ };
+ 
+ SK_STDMETHODIMP StreamFontFileLoader::QueryInterface(REFIID iid, void** ppvObject) {
+@@ -993,7 +993,7 @@ private:
+     StreamFontFileEnumerator(IDWriteFactory* factory, IDWriteFontFileLoader* fontFileLoader);
+     virtual ~StreamFontFileEnumerator() { }
+ 
+-    ULONG fRefCount;
++    LONG fRefCount;
+ 
+     SkTScopedComPtr<IDWriteFactory> fFactory;
+     SkTScopedComPtr<IDWriteFontFile> fCurrentFile;
+@@ -1090,7 +1090,7 @@ private:
+     { }
+     virtual ~StreamFontCollectionLoader() { }
+ 
+-    ULONG fRefCount;
++    LONG fRefCount;
+     SkTScopedComPtr<IDWriteFontFileLoader> fFontFileLoader;
+ };
+ 
+@@ -1169,7 +1169,7 @@ static HRESULT apply_fontargument_variation(SkTScopedComPtr<IDWriteFontFace>& fo
+                                             const SkFontArguments& args)
+ {
+     SkTScopedComPtr<IDWriteFontFace5> fontFace5;
+-    if (FAILED(fontFace->QueryInterface(&fontFace5)) || !fontFace5->HasVariations()) {
++    if (FAILED(SkQueryInterface(fontFace.get(), &fontFace5)) || !fontFace5->HasVariations()) {
+         return S_OK;
+     }
+ 
+@@ -1193,7 +1193,7 @@ static HRESULT apply_fontargument_variation(SkTScopedComPtr<IDWriteFontFace>& fo
+                                     variation.get(), fontAxisCount,
+                                     &fontFace5_Out));
+     fontFace.reset();
+-    HR(fontFace5_Out->QueryInterface(&fontFace));
++    HR(SkQueryInterface(fontFace5_Out.get(), &fontFace));
+ 
+     return S_OK;
+ }
+diff --git a/src/ports/SkFontMgr_win_dw.cpp b/src/ports/SkFontMgr_win_dw.cpp
+--- a/src/ports/SkFontMgr_win_dw.cpp
++++ b/src/ports/SkFontMgr_win_dw.cpp
+@@ -146,8 +146,10 @@ private:
+     sk_sp<SkTypeface> layoutFallback(const WCHAR* dwFamilyName, DWriteStyle,
+                                      const WCHAR* dwBcp47, UINT32 character,
+                                      DWRITE_FONT_SIMULATIONS allowedSimulations) const;
+     static constexpr DWRITE_FONT_SIMULATIONS kDefaultSimulations =
+-            DWRITE_FONT_SIMULATIONS_BOLD | DWRITE_FONT_SIMULATIONS_OBLIQUE;
++            static_cast<DWRITE_FONT_SIMULATIONS>(
++                    static_cast<int>(DWRITE_FONT_SIMULATIONS_BOLD) |
++                    static_cast<int>(DWRITE_FONT_SIMULATIONS_OBLIQUE));
+ 
+     /** Creates a typeface using a typeface cache. */
+     sk_sp<SkTypeface> makeTypefaceFromDWriteFont(IDWriteFontFace* fontFace,
+@@ -187,10 +189,10 @@ private:
+ 
+ static HRESULT are_same(IUnknown* a, IUnknown* b, bool& same) {
+     SkTScopedComPtr<IUnknown> iunkA;
+-    HRM(a->QueryInterface(&iunkA), "Failed to QI<IUnknown> for a.");
++    HRM(SkQueryInterface(a, &iunkA), "Failed to QI<IUnknown> for a.");
+ 
+     SkTScopedComPtr<IUnknown> iunkB;
+-    HRM(b->QueryInterface(&iunkB), "Failed to QI<IUnknown> for b.");
++    HRM(SkQueryInterface(b, &iunkB), "Failed to QI<IUnknown> for b.");
+ 
+     same = (iunkA.get() == iunkB.get());
+     return S_OK;
+@@ -209,16 +211,16 @@ static bool FindByDWriteFont(SkTypeface* cached, void* ctx) {
+     // IDWriteFontFace5 introduced both Equals and HasVariations
+     SkTScopedComPtr<IDWriteFontFace5> cshFontFace5;
+     SkTScopedComPtr<IDWriteFontFace5> ctxFontFace5;
+-    cshFace->fDWriteFontFace->QueryInterface(&cshFontFace5);
+-    ctxFace->fDWriteFontFace->QueryInterface(&ctxFontFace5);
++    SkQueryInterface(cshFace->fDWriteFontFace.get(), &cshFontFace5);
++    SkQueryInterface(ctxFace->fDWriteFontFace, &ctxFontFace5);
+     if (cshFontFace5 && ctxFontFace5) {
+         return cshFontFace5->Equals(ctxFontFace5.get());
+     }
+ 
+     SkTScopedComPtr<IDWriteFontFace3> cshFontFace3;
+     SkTScopedComPtr<IDWriteFontFace3> ctxFontFace3;
+-    cshFace->fDWriteFontFace->QueryInterface(&cshFontFace3);
+-    ctxFace->fDWriteFontFace->QueryInterface(&ctxFontFace3);
++    SkQueryInterface(cshFace->fDWriteFontFace.get(), &cshFontFace3);
++    SkQueryInterface(ctxFace->fDWriteFontFace, &ctxFontFace3);
+ 
+     bool same;
+ 
+@@ -507,7 +509,7 @@ private:
+     virtual ~FontFallbackRenderer() { }
+ 
+-    ULONG fRefCount;
++    LONG fRefCount;
+     sk_sp<const SkFontMgr_DirectWrite> fOuter;
+     UINT32 fCharacter;
+     sk_sp<SkTypeface> fResolvedTypeface;
+@@ -611,7 +613,7 @@ private:
+     virtual ~FontFallbackSource() { }
+ 
+-    ULONG fRefCount;
++    LONG fRefCount;
+     const WCHAR* fString;
+     UINT32 fLength;
+     const WCHAR* fLocale;
+@@ -658,7 +660,7 @@ sk_sp<SkTypeface> SkFontMgr_DirectWrite::onMatch(const Request& request) const {
+     }
+ 
+     SkTScopedComPtr<IDWriteFontCollection1> fontCollection1;
+-    fFontCollection->QueryInterface(&fontCollection1);
++    SkQueryInterface(fFontCollection.get(), &fontCollection1);
+     if (!fontCollection1) {
+         return this->SkFontMgr::onMatch(request);
+     }
+@@ -668,7 +670,7 @@ sk_sp<SkTypeface> SkFontMgr_DirectWrite::onMatch(const Request& request) const {
+         return this->SkFontMgr::onMatch(request);
+     }
+     SkTScopedComPtr<IDWriteFontSet4> fontSet4;
+-    fontSet->QueryInterface(&fontSet4);
++    SkQueryInterface(fontSet.get(), &fontSet4);
+     if (!fontSet4) {
+         return this->SkFontMgr::onMatch(request);
+     }
+@@ -772,7 +774,7 @@ sk_sp<SkTypeface> SkFontMgr_DirectWrite::onFallback(const Request& request) cons
+ 
+     if (fFontFallback) {
+         SkTScopedComPtr<IDWriteFontFallback1> fontFallback1;
+-        fFontFallback->QueryInterface(&fontFallback1);
++        SkQueryInterface(fFontFallback.get(), &fontFallback1);
+         if (fontFallback1) {
+             bool italicRequested = false;
+             AutoSTMalloc<8, DWRITE_FONT_AXIS_VALUE> dwModel(request.model.size());
+@@ -1183,7 +1185,7 @@ sk_sp<SkFontMgr> SkFontMgr_New_DirectWrite(IDWriteFactory* factory,
+     SkTScopedComPtr<IDWriteFontFallback> systemFontFallback;
+     if (nullptr == fallback) {
+         SkTScopedComPtr<IDWriteFactory2> factory2;
+-        if (!SUCCEEDED(factory->QueryInterface(&factory2))) {
++        if (!SUCCEEDED(SkQueryInterface(factory, &factory2))) {
+             // IUnknown::QueryInterface states that if it fails, punk will be set to nullptr.
+             // http://blogs.msdn.com/b/oldnewthing/archive/2004/03/26/96777.aspx
+             SkASSERT_RELEASE(nullptr == factory2.get());
