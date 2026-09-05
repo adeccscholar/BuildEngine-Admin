@@ -244,7 +244,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 +        restat = true
 +        description = "link {{output}}"
 +        if (0 <= link_pool_depth) {
-+          pool = ":link_pool($default_toolchain)",
++          pool = ":link_pool($default_toolchain)"
 +        }
 +      } else {
 +        soname = "{{target_output_name}}{{output_extension}}"
