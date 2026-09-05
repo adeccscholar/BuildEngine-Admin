@@ -39,7 +39,7 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
  declare_args() {
    extra_asmflags = []
    extra_cflags = []
-@@ -52,7 +54,7 @@ config("default") {
+@@ -52,6 +54,6 @@ config("default") {
    # (These unknown attribute warnings are on by default, so we don't make
    # disabling them part of :warnings, as some targets remove :warnings.)
 -  if (is_win && !is_clang) {
@@ -204,7 +204,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
  
    if (is_android) {
      _prefix = "$ndk/toolchains/llvm/prebuilt/$ndk_host/bin"
-@@ -211,7 +214,7 @@ template("msvc_toolchain") {
+@@ -211,6 +214,6 @@ template("msvc_toolchain") {
  
      tool("copy") {
        cp_py = rebase_path("../cp.py")
@@ -232,7 +232,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
        }
  
        outputs =
-@@ -335,7 +342,29 @@ template("gcc_like_toolchain") {
+@@ -335,12 +342,34 @@ template("gcc_like_toolchain") {
      }
  
      tool("solink") {
@@ -274,7 +274,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 -      rspfile_content = "{{inputs}}"
 +        rspfile = "{{output}}.rsp"
 +        rspfile_content = "{{inputs}}"
-@@ -363,22 +392,23 @@ template("gcc_like_toolchain") {
+@@ -363,15 +392,16 @@ template("gcc_like_toolchain") {
 -      command = "$link -shared {{ldflags}} $_start_group @$rspfile {{frameworks}} {{solibs}} $_end_group {{libs}} $rpath $_emcc_flags -o {{output}}"
 -      outputs = [ "{{root_out_dir}}/$soname" ]
 -      output_prefix = "lib"
@@ -304,7 +304,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
 +        }
        }
      }
-@@ -427,13 +457,13 @@ template("gcc_like_toolchain") {
+@@ -427,12 +457,12 @@ template("gcc_like_toolchain") {
  
      tool("copy") {
        cp_py = rebase_path("../cp.py")
