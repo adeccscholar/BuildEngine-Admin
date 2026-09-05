@@ -1,0 +1,88 @@
+diff --git a/admin/build-libraries.xml b/admin/build-libraries.xml
+--- a/admin/build-libraries.xml
++++ b/admin/build-libraries.xml
+@@ -2702,7 +2702,7 @@
+-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T02:46:00Z">
++   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T12:33:00Z">
+@@ -2727,24 +2727,25 @@
+-         <!-- Technical BCC64X GN adapter; the product feature profile stays below in args.gn. -->
+-         <copy source="{BuildFileDir}\programs\skia\patch-skia-bcc64x-gn.cmake" target="{Workspace}\.buildengine\skia\patch-skia-bcc64x-gn.cmake" overwrite="true" preserveCurrentArtifact="true"/>
+-         <copy source="{BuildFileDir}\programs\skia\bcc64x-compile.cmd" target="{Workspace}\.buildengine\skia\bcc64x-compile.cmd" overwrite="true" preserveCurrentArtifact="true"/>
+-         <copy source="{BuildFileDir}\programs\skia\bcc64x-link.cmd" target="{Workspace}\.buildengine\skia\bcc64x-link.cmd" overwrite="true" preserveCurrentArtifact="true"/>
+-         <copy source="{BuildFileDir}\programs\skia\llvm-ar.cmd" target="{Workspace}\.buildengine\skia\llvm-ar.cmd" overwrite="true" preserveCurrentArtifact="true"/>
+-         <copy source="{BuildFileDir}\programs\skia\python3.cmd" target="{Workspace}\.buildengine\skia\python3.cmd" overwrite="true" preserveCurrentArtifact="true"/>
+-         <copy source="{BuildFileDir}\programs\skia\bcc64x-ucrt-compat.c" target="{Workspace}\.buildengine\skia\bcc64x-ucrt-compat.c" overwrite="true" preserveCurrentArtifact="true"/>
++         <!-- Minimal revision-bound GN compatibility patch. No helper program or wrapper is introduced. -->
++         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-gn.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch" overwrite="true" preserveCurrentArtifact="true"/>
++         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
++            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
++            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"/>
++         </execute>
++         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
++            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
++            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"/>
++         </execute>
+          <!-- CPU/Raster-only evidence profile needs no DEPS synchronization; GN is fetched separately below. -->
+          <execute name="fetch-gn" executable="{Tool:python}" workingDirectory="{CurrentArtifact}" showOutput="false">
+             <argument value="bin\fetch-gn"/>
+          </execute>
+-         <execute name="bcc64x-gn-overlay" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+-            <argument value="-DSKIA_ROOT={CurrentArtifact}"/>
+-            <argument value="-DEXPECTED_REVISION=2eed75b956045eb8603d3690a1e84bc582a2135d"/>
+-            <argument value="-P"/>
+-            <argument value="{Workspace}\.buildengine\skia\patch-skia-bcc64x-gn.cmake"/>
+-         </execute>
+       </source>
+       <build>
+          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+          <environment name="CB_BDS" value="{BDS}"/>
+          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+          <environment name="CB_PYTHON" value="{Tool:python}"/>
+-         <execute name="make-compat-dir" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+-            <argument value="-E"/><argument value="make_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\obj\adecc"/>
+-         </execute>
+-         <execute name="compile-ucrt-compat" executable="{Tool:bcc64x}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+-            <argument value="-std=c17"/><argument value="-tM"/><argument value="-O0"/><argument value="-g"/><argument value="-c"/>
+-            <argument value="{Workspace}\.buildengine\skia\bcc64x-ucrt-compat.c"/><argument value="-oobj\adecc\bcc64x-ucrt-compat.o"/>
+-         </execute>
++         <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+@@ -2760,10 +2761,13 @@
+                <line value="skia_use_bcc64x = true"/>
+                <line value="target_cpu = &quot;x64&quot;"/>
+-               <line value="target_cc = &quot;bcc64x-compile.cmd&quot;"/>
+-               <line value="target_cxx = &quot;bcc64x-compile.cmd&quot;"/>
+-               <line value="target_link = &quot;bcc64x-link.cmd&quot;"/>
+-               <line value="target_ar = &quot;llvm-ar.cmd&quot;"/>
++               <line value="target_cc = &quot;bcc64x&quot;"/>
++               <line value="target_cxx = &quot;bcc64x&quot;"/>
++               <line value="target_link = &quot;bcc64x&quot;"/>
++               <line value="target_ar = &quot;llvm-ar&quot;"/>
++               <line value="python_executable = getenv(&quot;CB_PYTHON&quot;)"/>
++               <line value="bcc64x_rad_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release&quot;"/>
++               <line value="bcc64x_rad_psdk_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release/psdk&quot;"/>
+@@ -2801,22 +2805,18 @@
+                <line value="skia_use_piex = false"/>
+                <line value="extra_cflags = [&quot;-DWIN32_LEAN_AND_MEAN&quot;,&quot;-DNOMINMAX&quot;]"/>
+-               <line value="extra_ldflags = {SkiaExtraLdFlags}"/>
+             </temporaryFile>
+-            <environment name="PATH" value="{Workspace}\.buildengine\skia;{ToolDir:ninja};{ENV:PATH}"/>
++            <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+             <argument value="gen"/>
+             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+             <argument value="--script-executable={Tool:python}"/>
+          </target>
+          <execute name="ninja-build" executable="{Tool:ninja}" workingDirectory="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d" showOutput="false">
+-            <environment name="PATH" value="{Workspace}\.buildengine\skia;{ToolDir:ninja};{ENV:PATH}"/>
++            <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+             <argument value="-C"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="skia"/>
+          </execute>
+          <variant name="Release">
+             <variable name="SkiaOfficialBuild" value="true"/>
+             <variable name="SkiaDebug" value="false"/>
+-            <variable name="SkiaExtraLdFlags" value="[]"/>
+          </variant>
+          <variant name="Debug">
+             <variable name="SkiaOfficialBuild" value="false"/>
+             <variable name="SkiaDebug" value="true"/>
+-            <variable name="SkiaExtraLdFlags" value="[&quot;obj/adecc/bcc64x-ucrt-compat.o&quot;]"/>
+          </variant>
