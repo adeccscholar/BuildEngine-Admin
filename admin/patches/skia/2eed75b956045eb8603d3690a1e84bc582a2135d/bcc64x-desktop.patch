@@ -1,11 +1,12 @@
 diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
 --- a/gn/BUILDCONFIG.gn
 +++ b/gn/BUILDCONFIG.gn
-@@ -192,6 +192,7 @@ template("component") {
+@@ -192,6 +192,8 @@ template("component") {
  
  declare_args() {
    skia_use_bcc64x = false
 +  bcc64x_opengl_lib = ""
++  bcc64x_zlib_lib = ""
  }
  
  # Default configs
@@ -118,22 +119,16 @@ diff --git a/third_party/libwebp/BUILD.gn b/third_party/libwebp/BUILD.gn
 diff --git a/third_party/zlib/BUILD.gn b/third_party/zlib/BUILD.gn
 --- a/third_party/zlib/BUILD.gn
 +++ b/third_party/zlib/BUILD.gn
-@@ -59,6 +59,6 @@ source_set("zlib_adler32_simd") {
-       ]
+@@ -8,7 +8,11 @@ import("zlib.gni")
  
--      if (!is_win || is_clang) {
-+      if (!is_win || is_clang || skia_use_bcc64x) {
-         cflags = [ "-mssse3" ]
-       }
-     }
-@@ -178,9 +178,9 @@ source_set("zlib_crc32_simd") {
-         "../externals/zlib/crc_folding.c",
-       ]
- 
--      if (!is_win || is_clang) {
-+      if (!is_win || is_clang || skia_use_bcc64x) {
-         cflags = [
-           "-msse4.2",
-           "-mpclmul",
-         ]
-       }
+ if (skia_use_system_zlib) {
+   system("zlib") {
+-    libs = [ "z" ]
++    if (skia_use_bcc64x) {
++      ldflags = [ bcc64x_zlib_lib ]
++    } else {
++      libs = [ "z" ]
++    }
+   }
+ } else {
+   config("zlib_internal_config") {
