@@ -1773,7 +1773,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-<library id="ace-tao" version="8.0.6" timestamp="2026-09-04T17:00:00Z">
+<library id="ace-tao" version="8.0.6" timestamp="2026-09-03T15:15:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="xerces-c" version="3.3.0"/>
       <dependency library="zlib" version="1.3.2"/>
@@ -2495,7 +2495,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="soil2" version="1.3.0" timestamp="2026-09-04T17:00:00Z">
+   <library id="soil2" version="1.3.0" timestamp="2026-09-03T15:15:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <metadata name="SOIL2" supplier="Martín Lucas Golini / SpartanJ" homepage="https://github.com/SpartanJ/SOIL2">
          <license name="MIT No Attribution" spdx="MIT-0" file="LICENSE"/>
@@ -2521,7 +2521,7 @@
       <smoke id="consumer" source="smokes\soil2\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="soil2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-   <library id="vtk" version="9.6.2" timestamp="2026-09-04T17:00:00Z">
+   <library id="vtk" version="9.6.2" timestamp="2026-09-03T15:15:00Z">
       <metadata name="VTK" supplier="Kitware / VTK contributors" homepage="https://vtk.org/"><license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="Copyright.txt"/></metadata>
       <source><download url="https://github.com/Kitware/VTK/archive/f49a1dbafa60b58ef22f6292ec58370453162192.zip" archive="VTK-f49a1dbafa60b58ef22f6292ec58370453162192.zip"/><extract format="zip" root="VTK-f49a1dbafa60b58ef22f6292ec58370453162192"><require path="CMakeLists.txt"/><require path="Copyright.txt"/><require path="Common\Core\vtkVersion.h.in"/><require path="Common\DataModel\CMakeLists.txt"/><require path="Filters\Core\CMakeLists.txt"/></extract></source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
@@ -2578,7 +2578,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_videoio500{DebugPostfix}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_highgui500{DebugPostfix}.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_highgui500{DebugPostfix}.lib"/>
-            </perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\licenses" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses" recursive="true" overwrite="true"/><copy source="{Workspace}\opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\core.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\dnn.hpp"/></common></install>
+            </perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\etc\licenses" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses" recursive="true" overwrite="true"/><copy source="{Workspace}\opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\core.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\dnn.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\protobuf-LICENSE"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\SoftFloat-COPYING.txt"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\opencv\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="opencv-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
@@ -2718,6 +2718,7 @@
             <require path="src\utils\win\SkDWriteFontFileStream.h"/>
             <require path="third_party\third_party.gni"/>
             <require path="tools\git-sync-deps"/>
+            <require path="bin\fetch-gn"/>
             <require path="include\core\SkSurface.h"/>
             <require path="LICENSE"/>
          </extract>
@@ -2733,6 +2734,9 @@
             <environment name="GIT_EXECUTABLE" value="{Tool:git}"/>
             <environment name="GIT_SYNC_DEPS_SKIP_EMSDK" value="1"/>
             <argument value="tools\git-sync-deps"/>
+         </execute>
+         <execute name="fetch-gn" executable="{Tool:python}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="bin\fetch-gn"/>
          </execute>
          <execute name="bcc64x-gn-overlay" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="-DSKIA_ROOT={CurrentArtifact}"/>
