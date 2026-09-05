@@ -2584,7 +2584,7 @@
       <smoke id="consumer" source="smokes\opencv\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="opencv-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-   <library id="cmark-gfm" version="0.29.0.gfm.13" timestamp="2026-09-05T00:59:00Z">
+   <library id="cmark-gfm" version="0.29.0.gfm.13" timestamp="2026-09-05T02:15:00Z">
       <metadata name="cmark-gfm" supplier="GitHub" homepage="https://github.com/github/cmark-gfm">
          <license name="BSD-style and bundled third-party notices" file="COPYING"/>
       </metadata>
@@ -2619,23 +2619,23 @@
          <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/></variant>
          <install>
             <perVariant>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\libcmark-gfm.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libcmark-gfm.dll" overwrite="true" singleFile="true"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\libcmark-gfm.lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcmark-gfm.lib" overwrite="true" singleFile="true"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\extensions\libcmark-gfm-extensions.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libcmark-gfm-extensions.dll" overwrite="true" singleFile="true"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\extensions\libcmark-gfm-extensions.lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcmark-gfm-extensions.lib" overwrite="true" singleFile="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\libcmark-gfm.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libcmark-gfm.dll" overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\libcmark-gfm.lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcmark-gfm.lib" overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\extensions\libcmark-gfm-extensions.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libcmark-gfm-extensions.dll" overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\extensions\libcmark-gfm-extensions.lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcmark-gfm-extensions.lib" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libcmark-gfm.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libcmark-gfm-extensions.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcmark-gfm.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcmark-gfm-extensions.lib"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\src\cmark-gfm.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm.h" overwrite="true" singleFile="true"/>
-               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\src\cmark-gfm-extension_api.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm-extension_api.h" overwrite="true" singleFile="true"/>
-               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\extensions\cmark-gfm-core-extensions.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm-core-extensions.h" overwrite="true" singleFile="true"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\src\cmark-gfm_export.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm_export.h" overwrite="true" singleFile="true"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\src\cmark-gfm_version.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm_version.h" overwrite="true" singleFile="true"/>
-               <copy source="{BuildFileDir}\cmake\cmark-gfm\cmark-gfmConfig.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\cmark-gfm\cmark-gfmConfig.cmake" overwrite="true" singleFile="true"/>
-               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\cmark-gfm\COPYING" overwrite="true" singleFile="true"/>
+               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\src\cmark-gfm.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm.h" overwrite="true"/>
+               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\src\cmark-gfm-extension_api.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm-extension_api.h" overwrite="true"/>
+               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\extensions\cmark-gfm-core-extensions.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm-core-extensions.h" overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\src\cmark-gfm_export.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm_export.h" overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\src\cmark-gfm_version.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm_version.h" overwrite="true"/>
+               <copy source="{BuildFileDir}\cmake\cmark-gfm\cmark-gfmConfig.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\cmark-gfm\cmark-gfmConfig.cmake" overwrite="true"/>
+               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\cmark-gfm\COPYING" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\cmark-gfm\cmark-gfmConfig.cmake"/>
             </common>
@@ -2652,7 +2652,7 @@
       </smoke>
    </library>
 
-   <library id="googletest" version="1.17.0" timestamp="2026-09-05T00:59:00Z">
+   <library id="googletest" version="1.17.0" timestamp="2026-09-05T02:15:00Z">
       <metadata name="GoogleTest" supplier="Google" homepage="https://github.com/google/googletest"><license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/google/googletest.git" commit="52eb8108c5bdec04579160ae17225d66034bd723"/></security>
       <source>
@@ -2683,7 +2683,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\GTest\GTestConfig.cmake"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\googletest-52eb8108c5bdec04579160ae17225d66034bd723\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\googletest\LICENSE" overwrite="true" singleFile="true"/>
+               <copy source="{Workspace}\googletest-52eb8108c5bdec04579160ae17225d66034bd723\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\googletest\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\gtest\gtest.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\gmock\gmock.h"/>
             </common>
@@ -2699,7 +2699,7 @@
       </smoke>
    </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T00:59:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T02:15:00Z">
       <metadata name="Skia" supplier="Google" homepage="https://skia.org/">
          <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE"/>
       </metadata>
@@ -2717,7 +2717,6 @@
             <require path="modules\skcms\BUILD.gn"/>
             <require path="src\utils\win\SkDWriteFontFileStream.h"/>
             <require path="third_party\third_party.gni"/>
-            <require path="tools\git-sync-deps"/>
             <require path="bin\fetch-gn"/>
             <require path="include\core\SkSurface.h"/>
             <require path="LICENSE"/>
@@ -2729,12 +2728,7 @@
          <copy source="{BuildFileDir}\programs\skia\llvm-ar.cmd" target="{Workspace}\.buildengine\skia\llvm-ar.cmd" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\programs\skia\python3.cmd" target="{Workspace}\.buildengine\skia\python3.cmd" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\programs\skia\bcc64x-ucrt-compat.c" target="{Workspace}\.buildengine\skia\bcc64x-ucrt-compat.c" overwrite="true" preserveCurrentArtifact="true"/>
-         <!-- Upstream Skia dependency synchronization. This is Skia's own pinned DEPS mechanism. -->
-         <execute name="sync-deps" executable="{Tool:python}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <environment name="GIT_EXECUTABLE" value="{Tool:git}"/>
-            <environment name="GIT_SYNC_DEPS_SKIP_EMSDK" value="1"/>
-            <argument value="tools\git-sync-deps"/>
-         </execute>
+         <!-- CPU/Raster-only evidence profile needs no DEPS synchronization; GN is fetched separately below. -->
          <execute name="fetch-gn" executable="{Tool:python}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="bin\fetch-gn"/>
          </execute>
@@ -2776,6 +2770,8 @@
                <line value="skia_enable_tools = false"/>
                <line value="skia_enable_ganesh = false"/>
                <line value="skia_enable_graphite = false"/>
+               <line value="skia_enable_spirv_validation = false"/>
+               <line value="skia_use_partition_alloc = false"/>
                <line value="skia_use_gl = false"/>
                <line value="skia_use_direct3d = false"/>
                <line value="skia_use_vulkan = false"/>
@@ -2827,16 +2823,16 @@
          </variant>
          <install>
             <perVariant>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skia.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skia.dll" overwrite="true" singleFile="true"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skia.lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skia.lib" overwrite="true" singleFile="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skia.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skia.dll" overwrite="true"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skia.lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skia.lib" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skia.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skia.lib"/>
             </perVariant>
             <common>
                <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include" recursive="true" overwrite="true"/>
                <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\skcms" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms" recursive="true" overwrite="true"><include pattern="*.h"/></copy>
-               <copy source="{BuildFileDir}\cmake\skia\SkiaConfig.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake" overwrite="true" singleFile="true"/>
-               <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE" overwrite="true" singleFile="true"/>
+               <copy source="{BuildFileDir}\cmake\skia\SkiaConfig.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake" overwrite="true"/>
+               <copy source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include\core\SkSurface.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms\skcms.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake"/>
