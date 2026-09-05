@@ -63,7 +63,7 @@ diff --git a/BUILD.gn b/BUILD.gn
 diff --git a/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp b/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
 --- a/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
 +++ b/src/gpu/ganesh/gl/win/GrGLMakeWinInterface.cpp
-@@ -19,8 +19,13 @@ sk_sp<const GrGLInterface> MakeWin() {
+@@ -19,8 +19,14 @@ sk_sp<const GrGLInterface> MakeWin() {
      }
  
      struct FreeModule { void operator()(HMODULE m) { (void)FreeLibrary(m); } };
@@ -109,7 +109,7 @@ diff --git a/third_party/libjpeg-turbo/BUILD.gn b/third_party/libjpeg-turbo/BUIL
 diff --git a/third_party/libwebp/BUILD.gn b/third_party/libwebp/BUILD.gn
 --- a/third_party/libwebp/BUILD.gn
 +++ b/third_party/libwebp/BUILD.gn
-@@ -34,7 +34,7 @@ if (skia_use_system_libwebp) {
+@@ -34,8 +34,8 @@ if (skia_use_system_libwebp) {
        "../externals/libwebp",
      ]
      configs = [ ":libwebp_defines" ]
