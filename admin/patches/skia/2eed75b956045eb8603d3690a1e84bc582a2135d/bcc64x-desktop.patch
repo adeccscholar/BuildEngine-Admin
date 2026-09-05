@@ -442,3 +442,220 @@ diff --git a/third_party/externals/d3d12allocator/src/D3D12MemAlloc.cpp b/third_
      return m_Device->GetResourceAllocationInfo(0, 1, &inOutResourceDesc);
 +#endif
  }
+diff --git a/include/gpu/ganesh/d3d/GrD3DTypes.h b/include/gpu/ganesh/d3d/GrD3DTypes.h
+--- a/include/gpu/ganesh/d3d/GrD3DTypes.h
++++ b/include/gpu/ganesh/d3d/GrD3DTypes.h
+@@ -44,6 +44,49 @@
+     }
+ }
+ 
++static inline D3D12_RESOURCE_DESC GrD3DGetResourceDesc(ID3D12Resource* resource) {
++#if defined(__BORLANDC__) && defined(__clang__)
++    D3D12_RESOURCE_DESC desc = {};
++    resource->GetDesc(&desc);
++    return desc;
++#else
++    return resource->GetDesc();
++#endif
++}
++
++static inline D3D12_DESCRIPTOR_HEAP_DESC GrD3DGetDescriptorHeapDesc(
++        ID3D12DescriptorHeap* heap) {
++#if defined(__BORLANDC__) && defined(__clang__)
++    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
++    heap->GetDesc(&desc);
++    return desc;
++#else
++    return heap->GetDesc();
++#endif
++}
++
++static inline D3D12_CPU_DESCRIPTOR_HANDLE GrD3DGetCPUDescriptorHandleForHeapStart(
++        ID3D12DescriptorHeap* heap) {
++#if defined(__BORLANDC__) && defined(__clang__)
++    D3D12_CPU_DESCRIPTOR_HANDLE handle = {};
++    heap->GetCPUDescriptorHandleForHeapStart(&handle);
++    return handle;
++#else
++    return heap->GetCPUDescriptorHandleForHeapStart();
++#endif
++}
++
++static inline D3D12_GPU_DESCRIPTOR_HANDLE GrD3DGetGPUDescriptorHandleForHeapStart(
++        ID3D12DescriptorHeap* heap) {
++#if defined(__BORLANDC__) && defined(__clang__)
++    D3D12_GPU_DESCRIPTOR_HANDLE handle = {};
++    heap->GetGPUDescriptorHandleForHeapStart(&handle);
++    return handle;
++#else
++    return heap->GetGPUDescriptorHandleForHeapStart();
++#endif
++}
++
+ template <typename T> class gr_cp {
+ public:
+     using element_type = T;
+diff --git a/src/gpu/ganesh/d3d/GrD3DCommandList.cpp b/src/gpu/ganesh/d3d/GrD3DCommandList.cpp
+--- a/src/gpu/ganesh/d3d/GrD3DCommandList.cpp
++++ b/src/gpu/ganesh/d3d/GrD3DCommandList.cpp
+@@ -250,8 +250,8 @@
+ 
+     this->addingWork();
+     ID3D12Resource* dstBuffer = dst->d3dResource();
+-    uint64_t dstSize = dstBuffer->GetDesc().Width;
+-    uint64_t srcSize = srcBuffer->GetDesc().Width;
++    uint64_t dstSize = GrD3DGetResourceDesc(dstBuffer).Width;
++    uint64_t srcSize = GrD3DGetResourceDesc(srcBuffer).Width;
+     if (dstSize == srcSize && srcSize == numBytes) {
+         fCommandList->CopyResource(dstBuffer, srcBuffer);
+     } else {
+diff --git a/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp b/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp
+--- a/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp
++++ b/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp
+@@ -58,7 +58,7 @@
+     // TODO: for 4:2:0 YUV formats we'll need to map two different views, one for Y and one for UV.
+     // For now map the entire resource.
+     D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+-    desc.Format = resource->GetDesc().Format;
++    desc.Format = GrD3DGetResourceDesc(resource).Format;
+     desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+     desc.Texture2D.MostDetailedMip = mostDetailedMip;
+     desc.Texture2D.MipLevels = mipLevels;
+@@ -71,12 +71,12 @@
+         GrD3DGpu* gpu, ID3D12Resource* resource, unsigned int mipSlice) {
+     const GrD3DDescriptorHeap::CPUHandle& descriptor =
+             fShaderViewDescriptorPool.allocateHandle(gpu);
+-    if (resource->GetDesc().Dimension == D3D12_RESOURCE_DIMENSION_BUFFER) {
++    if (GrD3DGetResourceDesc(resource).Dimension == D3D12_RESOURCE_DIMENSION_BUFFER) {
+         // TODO: figure out buffer setup
+         gpu->device()->CreateUnorderedAccessView(resource, nullptr, nullptr, descriptor.fHandle);
+     } else {
+         D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
+-        desc.Format = resource->GetDesc().Format;
++        desc.Format = GrD3DGetResourceDesc(resource).Format;
+         desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+         desc.Texture2D.MipSlice = mipSlice;
+         gpu->device()->CreateUnorderedAccessView(resource, nullptr, &desc, descriptor.fHandle);
+diff --git a/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.cpp b/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.cpp
+--- a/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.cpp
++++ b/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.cpp
+@@ -39,19 +39,19 @@
+     : fHeap(heap)
+     , fHandleIncrementSize(handleIncrementSize)
+     , fUniqueID(GrD3DDescriptorHeapGenID()) {
+-    fCPUHeapStart = fHeap->GetCPUDescriptorHandleForHeapStart();
+-    fGPUHeapStart = fHeap->GetGPUDescriptorHandleForHeapStart();
++    fCPUHeapStart = GrD3DGetCPUDescriptorHandleForHeapStart(fHeap.get());
++    fGPUHeapStart = GrD3DGetGPUDescriptorHandleForHeapStart(fHeap.get());
+ }
+ 
+ GrD3DDescriptorHeap::CPUHandle GrD3DDescriptorHeap::getCPUHandle(unsigned int index) {
+-    SkASSERT(index < fHeap->GetDesc().NumDescriptors);
++    SkASSERT(index < GrD3DGetDescriptorHeapDesc(fHeap.get()).NumDescriptors);
+     D3D12_CPU_DESCRIPTOR_HANDLE handle = fCPUHeapStart;
+     handle.ptr += index * fHandleIncrementSize;
+     return {handle, fUniqueID};
+ }
+ 
+ GrD3DDescriptorHeap::GPUHandle GrD3DDescriptorHeap::getGPUHandle(unsigned int index) {
+-    SkASSERT(index < fHeap->GetDesc().NumDescriptors);
++    SkASSERT(index < GrD3DGetDescriptorHeapDesc(fHeap.get()).NumDescriptors);
+     D3D12_GPU_DESCRIPTOR_HANDLE handle = fGPUHeapStart;
+     handle.ptr += index * fHandleIncrementSize;
+     return {handle, fUniqueID};
+diff --git a/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h b/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h
+--- a/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h
++++ b/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h
+@@ -42,7 +42,7 @@
+     size_t getIndex(const CPUHandle& handle) {
+         SkASSERT(handle.fHeapID == fUniqueID);
+         size_t index = (handle.fHandle.ptr - fCPUHeapStart.ptr) / fHandleIncrementSize;
+-        SkASSERT(index < fHeap->GetDesc().NumDescriptors);
++        SkASSERT(index < GrD3DGetDescriptorHeapDesc(fHeap.get()).NumDescriptors);
+         SkASSERT(handle.fHandle.ptr == fCPUHeapStart.ptr + index * fHandleIncrementSize);
+         return index;
+     }
+@@ -50,7 +50,7 @@
+     size_t getIndex(const GPUHandle& handle) {
+         SkASSERT(handle.fHeapID == fUniqueID);
+         size_t index = (handle.fHandle.ptr - fCPUHeapStart.ptr) / fHandleIncrementSize;
+-        SkASSERT(index < fHeap->GetDesc().NumDescriptors);
++        SkASSERT(index < GrD3DGetDescriptorHeapDesc(fHeap.get()).NumDescriptors);
+         SkASSERT(handle.fHandle.ptr == fCPUHeapStart.ptr + index * fHandleIncrementSize);
+         return index;
+     }
+diff --git a/src/gpu/ganesh/d3d/GrD3DGpu.cpp b/src/gpu/ganesh/d3d/GrD3DGpu.cpp
+--- a/src/gpu/ganesh/d3d/GrD3DGpu.cpp
++++ b/src/gpu/ganesh/d3d/GrD3DGpu.cpp
+@@ -387,7 +387,7 @@
+ 
+     ID3D12Resource* d3dResource = d3dTex->d3dResource();
+     SkASSERT(d3dResource);
+-    D3D12_RESOURCE_DESC desc = d3dResource->GetDesc();
++    D3D12_RESOURCE_DESC desc = GrD3DGetResourceDesc(d3dResource);
+     // Either upload only the first miplevel or all miplevels
+     SkASSERT(1 == mipLevelCount || mipLevelCount == (int)desc.MipLevels);
+ 
+@@ -600,7 +600,7 @@
+         return false;
+     }
+ 
+-    D3D12_RESOURCE_DESC desc = texResource->d3dResource()->GetDesc();
++    D3D12_RESOURCE_DESC desc = GrD3DGetResourceDesc(texResource->d3dResource());
+     D3D12_PLACED_SUBRESOURCE_FOOTPRINT placedFootprint;
+     UINT64 transferTotalBytes;
+     fDevice->GetCopyableFootprints(&desc, 0, 1, 0, &placedFootprint,
+@@ -733,7 +733,7 @@
+ 
+     ID3D12Resource* d3dResource = tex->d3dResource();
+     SkASSERT(d3dResource);
+-    D3D12_RESOURCE_DESC desc = d3dResource->GetDesc();
++    D3D12_RESOURCE_DESC desc = GrD3DGetResourceDesc(d3dResource);
+     // Either upload only the first miplevel or all miplevels
+     SkASSERT(1 == mipLevelCount || mipLevelCount == (int)desc.MipLevels);
+ 
+@@ -873,7 +873,7 @@
+     D3D12_PLACED_SUBRESOURCE_FOOTPRINT placedFootprint = {};
+     ID3D12Resource* d3dResource = d3dTex->d3dResource();
+     SkASSERT(d3dResource);
+-    D3D12_RESOURCE_DESC desc = d3dResource->GetDesc();
++    D3D12_RESOURCE_DESC desc = GrD3DGetResourceDesc(d3dResource);
+     desc.Width = rect.width();
+     desc.Height = rect.height();
+     UINT64 totalBytes;
+@@ -934,7 +934,7 @@
+     SkDEBUGCODE(DXGI_FORMAT format = texResource->dxgiFormat());
+     SkASSERT(GrDxgiFormatBytesPerBlock(format) == GrColorTypeBytesPerPixel(bufferColorType));
+ 
+-    D3D12_RESOURCE_DESC desc = texResource->d3dResource()->GetDesc();
++    D3D12_RESOURCE_DESC desc = GrD3DGetResourceDesc(texResource->d3dResource());
+     desc.Width = rect.width();
+     desc.Height = rect.height();
+     D3D12_PLACED_SUBRESOURCE_FOOTPRINT placedFootprint;
+@@ -1101,7 +1101,7 @@
+     sk_sp<GrD3DTexture> uavTexture;
+     sk_sp<GrD3DTexture> bgraAliasTexture;
+     DXGI_FORMAT originalFormat = d3dTex->dxgiFormat();
+-    D3D12_RESOURCE_DESC originalDesc = d3dTex->d3dResource()->GetDesc();
++    D3D12_RESOURCE_DESC originalDesc = GrD3DGetResourceDesc(d3dTex->d3dResource());
+     // if the format is unordered accessible and resource flag is set, use resource for uav
+     if (caps.isFormatUnorderedAccessible(originalFormat) &&
+         (originalDesc.Flags & D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS)) {
+@@ -1455,7 +1455,7 @@
+ 
+     ID3D12Resource* d3dResource = texture->d3dResource();
+     SkASSERT(d3dResource);
+-    D3D12_RESOURCE_DESC desc = d3dResource->GetDesc();
++    D3D12_RESOURCE_DESC desc = GrD3DGetResourceDesc(d3dResource);
+     unsigned int mipLevelCount = 1;
+     if (backendTexture.hasMipmaps()) {
+         mipLevelCount = SkMipmap::ComputeLevelCount(backendTexture.dimensions()) + 1;
+@@ -1561,7 +1561,7 @@
+ 
+     ID3D12Resource* d3dResource = texture->d3dResource();
+     SkASSERT(d3dResource);
+-    D3D12_RESOURCE_DESC desc = d3dResource->GetDesc();
++    D3D12_RESOURCE_DESC desc = GrD3DGetResourceDesc(d3dResource);
+     unsigned int mipLevelCount = 1;
+     if (backendTexture.hasMipmaps()) {
+         mipLevelCount = SkMipmap::ComputeLevelCount(backendTexture.dimensions().width(),
