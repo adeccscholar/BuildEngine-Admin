@@ -2700,7 +2700,7 @@
       </smoke>
    </library>
 
-    <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T20:16:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-05T21:10:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
 
@@ -2709,67 +2709,103 @@
       </metadata>
 
       <security>
-         <repository url="https://github.com/google/skia.git" commit="2eed75b956045eb8603d3690a1e84bc582a2135d"/>
+         <repository
+            url="https://github.com/google/skia.git"
+            commit="2eed75b956045eb8603d3690a1e84bc582a2135d"/>
       </security>
 
       <source>
          <!--
-            ----------------------------------------------------------------
-            Complete pinned external source archives.
+            Broad Windows desktop source closure.
 
-            These downloads intentionally happen before the Skia archive.
-            The final download/extract therefore restores CurrentArtifact to
-            the real Skia source tree.  No source-tree backup or rollback
-            copy is created.
+            Active profile:
+               CPU raster / skcms
+               DirectWrite + GDI
+               FreeType custom/embedded/directory fonts + WOFF2
+               ICU + HarfBuzz + SkUnicode + SkShaper
+               PNG / JPEG / WebP / Wuffs
+               AVIF
+               JPEG XL
+               RAW / DNG
+               SVG / Expat
+               PDF
+               XPS
+               Skottie / Lottie
+               Ganesh
+               Graphite
+               OpenGL
+               Direct3D 12
+               Vulkan
+               SPIR-V / SPIRV-Cross
 
-            Active desktop profile:
-               d3d12allocator
-               expat
-               harfbuzz
-               icu
-               libjpeg-turbo
-               libpng
-               libwebp
-               wuffs
+            zlib is supplied by the BuildEngine zlib 1.3.2 package.
 
-            zlib deliberately comes from the BuildEngine zlib 1.3.2 package.
+            Deliberately excluded:
+               Android / iOS / macOS specific integrations
+               WebGL / WebGPU / CanvasKit / Emscripten
+               Dawn
+               ANGLE
+               Rust codecs / Fontations / ICU4X
+               FFmpeg
+               Lua
+               Perfetto / pprof
+               developer tools / viewer / fuzzers
 
-            Prepared but currently disabled:
-               brotli
-               freetype
-               highway
-               libjxl
-               libavif
-               libgav1
-               libyuv
-               dng_sdk
-               piex
-
-            This prepares the source closure for later WOFF2/Freetype,
-            JPEG XL, AVIF and RAW support without reintroducing git-sync-deps.
-            ----------------------------------------------------------------
+            Sources are reproducible build artifacts.
+            No source backup and no git-sync-deps checkout is used.
          -->
 
-         <!-- Active desktop closure. -->
+         <!-- --------------------------------------------------------- -->
+         <!-- Active Windows desktop codec / text / document closure.   -->
+         <!-- --------------------------------------------------------- -->
+
+         <download
+            url="https://skia.googlesource.com/external/github.com/google/brotli.git/+archive/6d03dfbedda1615c4cba1211f8d81735575209c8.tar.gz"
+            archive="skia-deps\brotli-6d03dfbedda1615c4cba1211f8d81735575209c8.tar.gz"/>
+
          <download
             url="https://skia.googlesource.com/external/github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git/+archive/169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"
             archive="skia-deps\d3d12allocator-169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"/>
+
+         <download
+            url="https://android.googlesource.com/platform/external/dng_sdk.git/+archive/dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"
+            archive="skia-deps\dng_sdk-dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"/>
 
          <download
             url="https://chromium.googlesource.com/external/github.com/libexpat/libexpat.git/+archive/6154446fccefbf3ca644894f598969113b0c7bcd.tar.gz"
             archive="skia-deps\expat-6154446fccefbf3ca644894f598969113b0c7bcd.tar.gz"/>
 
          <download
+            url="https://chromium.googlesource.com/chromium/src/third_party/freetype2.git/+archive/264b5fbf5b912b39f98d038bf75d39be0a73f21b.tar.gz"
+            archive="skia-deps\freetype-264b5fbf5b912b39f98d038bf75d39be0a73f21b.tar.gz"/>
+
+         <download
             url="https://chromium.googlesource.com/external/github.com/harfbuzz/harfbuzz.git/+archive/9cb1fee51069b206effb4736e443b038d230789d.tar.gz"
             archive="skia-deps\harfbuzz-9cb1fee51069b206effb4736e443b038d230789d.tar.gz"/>
+
+         <download
+            url="https://chromium.googlesource.com/external/github.com/google/highway.git/+archive/457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"
+            archive="skia-deps\highway-457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"/>
 
          <download
             url="https://chromium.googlesource.com/chromium/deps/icu.git/+archive/d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738.tar.gz"
             archive="skia-deps\icu-d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738.tar.gz"/>
 
          <download
+            url="https://skia.googlesource.com/external/github.com/AOMediaCodec/libavif.git/+archive/55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"
+            archive="skia-deps\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"/>
+
+         <download
+            url="https://chromium.googlesource.com/codecs/libgav1.git/+archive/5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"
+            archive="skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
+
+         <download
             url="https://chromium.googlesource.com/chromium/deps/libjpeg_turbo.git/+archive/e14cbfaa85529d47f9f55b0f104a579c1061f9ad.tar.gz"
             archive="skia-deps\libjpeg-turbo-e14cbfaa85529d47f9f55b0f104a579c1061f9ad.tar.gz"/>
+
+         <download
+            url="https://chromium.googlesource.com/external/gitlab.com/wg1/jpeg-xl.git/+archive/332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"
+            archive="skia-deps\libjxl-332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"/>
 
          <download
             url="https://skia.googlesource.com/third_party/libpng.git/+archive/d5515b5b8be3901aac04e5bd8bd5c89f287bcd33.tar.gz"
@@ -2780,204 +2816,109 @@
             archive="skia-deps\libwebp-845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"/>
 
          <download
-            url="https://skia.googlesource.com/external/github.com/google/wuffs-mirror-release-c.git/+archive/e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"
-            archive="skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
-
-         <!-- Prepared compression/font/JPEG-XL closure. -->
-         <download
-            url="https://skia.googlesource.com/external/github.com/google/brotli.git/+archive/6d03dfbedda1615c4cba1211f8d81735575209c8.tar.gz"
-            archive="skia-deps\brotli-6d03dfbedda1615c4cba1211f8d81735575209c8.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/chromium/src/third_party/freetype2.git/+archive/264b5fbf5b912b39f98d038bf75d39be0a73f21b.tar.gz"
-            archive="skia-deps\freetype-264b5fbf5b912b39f98d038bf75d39be0a73f21b.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/external/github.com/google/highway.git/+archive/457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"
-            archive="skia-deps\highway-457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/external/gitlab.com/wg1/jpeg-xl.git/+archive/332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"
-            archive="skia-deps\libjxl-332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"/>
-
-         <!-- Prepared AVIF closure. -->
-         <download
-            url="https://skia.googlesource.com/external/github.com/AOMediaCodec/libavif.git/+archive/55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"
-            archive="skia-deps\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/codecs/libgav1.git/+archive/5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"
-            archive="skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
-
-         <download
             url="https://chromium.googlesource.com/libyuv/libyuv.git/+archive/d248929c059ff7629a85333699717d7a677d8d96.tar.gz"
             archive="skia-deps\libyuv-d248929c059ff7629a85333699717d7a677d8d96.tar.gz"/>
-
-         <!-- Prepared RAW/DNG closure. -->
-         <download
-            url="https://android.googlesource.com/platform/external/dng_sdk.git/+archive/dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"
-            archive="skia-deps\dng_sdk-dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"/>
 
          <download
             url="https://android.googlesource.com/platform/external/piex.git/+archive/bb217acdca1cc0c16b704669dd6f91a1b509c406.tar.gz"
             archive="skia-deps\piex-bb217acdca1cc0c16b704669dd6f91a1b509c406.tar.gz"/>
 
+         <download
+            url="https://skia.googlesource.com/external/github.com/google/wuffs-mirror-release-c.git/+archive/e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"
+            archive="skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
+
+         <!-- --------------------------------------------------------- -->
+         <!-- Direct3D / Vulkan / shader source closure.                -->
+         <!-- --------------------------------------------------------- -->
+
+         <download
+            url="https://chromium.googlesource.com/external/github.com/KhronosGroup/SPIRV-Cross/+archive/b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz"
+            archive="skia-deps\spirv-cross-b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz"/>
+
+         <download
+            url="https://skia.googlesource.com/external/github.com/KhronosGroup/SPIRV-Headers.git/+archive/942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"
+            archive="skia-deps\spirv-headers-942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"/>
+
+         <download
+            url="https://skia.googlesource.com/external/github.com/KhronosGroup/SPIRV-Tools.git/+archive/388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"
+            archive="skia-deps\spirv-tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"/>
+
+         <download
+            url="https://chromium.googlesource.com/external/github.com/KhronosGroup/glslang/+archive/1d47ffa8ac4374a19b302021e216a20f22a3de92.tar.gz"
+            archive="skia-deps\glslang-1d47ffa8ac4374a19b302021e216a20f22a3de92.tar.gz"/>
+
+         <download
+            url="https://chromium.googlesource.com/external/github.com/KhronosGroup/Vulkan-Headers/+archive/f9973cd97e6f3584707e7ef1c425e336f1b92a5b.tar.gz"
+            archive="skia-deps\vulkan-headers-f9973cd97e6f3584707e7ef1c425e336f1b92a5b.tar.gz"/>
+
+         <download
+            url="https://chromium.googlesource.com/external/github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/+archive/eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7.tar.gz"
+            archive="skia-deps\vulkanmemoryallocator-eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7.tar.gz"/>
+
          <!--
-            Skia itself is deliberately downloaded last so CurrentArtifact
-            becomes the Skia source tree after this extraction.
+            Skia itself is downloaded last. The following extraction therefore
+            establishes the actual CurrentArtifact for all subsequent actions.
          -->
          <download
             url="https://github.com/google/skia/archive/2eed75b956045eb8603d3690a1e84bc582a2135d.zip"
             archive="skia-2eed75b956045eb8603d3690a1e84bc582a2135d.zip"/>
 
-         <extract format="zip" root="skia-2eed75b956045eb8603d3690a1e84bc582a2135d">
+         <extract
+            format="zip"
+            root="skia-2eed75b956045eb8603d3690a1e84bc582a2135d">
+
             <require path="BUILD.gn"/>
             <require path="DEPS"/>
+            <require path="LICENSE"/>
+
+            <require path="bin\fetch-gn"/>
+
             <require path="gn\BUILDCONFIG.gn"/>
+            <require path="gn\skia.gni"/>
             <require path="gn\skia\BUILD.gn"/>
             <require path="gn\toolchain\BUILD.gn"/>
+
+            <require path="include\core\SkSurface.h"/>
+
             <require path="modules\skcms\BUILD.gn"/>
             <require path="modules\skunicode\BUILD.gn"/>
             <require path="modules\skshaper\BUILD.gn"/>
             <require path="modules\svg\BUILD.gn"/>
             <require path="modules\skottie\BUILD.gn"/>
+
             <require path="src\utils\win\SkDWriteFontFileStream.h"/>
             <require path="src\gpu\ganesh\gl\win\GrGLMakeWinInterface.cpp"/>
+
             <require path="third_party\third_party.gni"/>
+            <require path="third_party\brotli\BUILD.gn"/>
             <require path="third_party\d3d12allocator\BUILD.gn"/>
+            <require path="third_party\dng_sdk\BUILD.gn"/>
             <require path="third_party\expat\BUILD.gn"/>
+            <require path="third_party\freetype2\BUILD.gn"/>
             <require path="third_party\harfbuzz\BUILD.gn"/>
             <require path="third_party\icu\BUILD.gn"/>
+            <require path="third_party\libavif\BUILD.gn"/>
+            <require path="third_party\libgav1\BUILD.gn"/>
             <require path="third_party\libjpeg-turbo\BUILD.gn"/>
+            <require path="third_party\libjxl\BUILD.gn"/>
             <require path="third_party\libpng\BUILD.gn"/>
             <require path="third_party\libwebp\BUILD.gn"/>
+            <require path="third_party\piex\BUILD.gn"/>
+            <require path="third_party\spirv-cross\BUILD.gn"/>
             <require path="third_party\wuffs\BUILD.gn"/>
-            <require path="third_party\brotli\BUILD.gn"/>
-            <require path="third_party\freetype2\BUILD.gn"/>
-            <require path="third_party\libavif\BUILD.gn"/>
-            <require path="third_party\libjxl\BUILD.gn"/>
             <require path="third_party\zlib\BUILD.gn"/>
-            <require path="bin\fetch-gn"/>
-            <require path="include\core\SkSurface.h"/>
-            <require path="LICENSE"/>
          </extract>
 
-         <!--
-            Rootless pinned Googlesource archives are expanded directly into
-            Skia's expected third_party/externals locations.
-            No git checkout, no git-sync-deps and no backup source tree.
-         -->
+         <!-- --------------------------------------------------------- -->
+         <!-- Rootless upstream archives -> third_party\externals.      -->
+         <!-- --------------------------------------------------------- -->
 
-         <!-- Active: D3D12 Memory Allocator -->
-         <execute name="mkdir-d3d12allocator" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\d3d12allocator"/>
-         </execute>
-         <execute name="extract-d3d12allocator" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\d3d12allocator" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\d3d12allocator-169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"/>
-         </execute>
-
-         <!-- Active: Expat -->
-         <execute name="mkdir-expat" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\expat"/>
-         </execute>
-         <execute name="extract-expat" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\expat" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\expat-6154446fccefbf3ca644894f598969113b0c7bcd.tar.gz"/>
-         </execute>
-
-         <!-- Active: HarfBuzz -->
-         <execute name="mkdir-harfbuzz" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\harfbuzz"/>
-         </execute>
-         <execute name="extract-harfbuzz" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\harfbuzz" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\harfbuzz-9cb1fee51069b206effb4736e443b038d230789d.tar.gz"/>
-         </execute>
-
-         <!-- Active: ICU -->
-         <execute name="mkdir-icu" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\icu"/>
-         </execute>
-         <execute name="extract-icu" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\icu" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\icu-d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738.tar.gz"/>
-         </execute>
-
-         <!-- Active: libjpeg-turbo -->
-         <execute name="mkdir-libjpeg-turbo" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libjpeg-turbo"/>
-         </execute>
-         <execute name="extract-libjpeg-turbo" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libjpeg-turbo" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libjpeg-turbo-e14cbfaa85529d47f9f55b0f104a579c1061f9ad.tar.gz"/>
-         </execute>
-
-         <!-- Active: libpng -->
-         <execute name="mkdir-libpng" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libpng"/>
-         </execute>
-         <execute name="extract-libpng" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libpng" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libpng-d5515b5b8be3901aac04e5bd8bd5c89f287bcd33.tar.gz"/>
-         </execute>
-
-         <!-- Active: libwebp -->
-         <execute name="mkdir-libwebp" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libwebp"/>
-         </execute>
-         <execute name="extract-libwebp" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libwebp" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libwebp-845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"/>
-         </execute>
-
-         <!-- Active: Wuffs -->
-         <execute name="mkdir-wuffs" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\wuffs"/>
-         </execute>
-         <execute name="extract-wuffs" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\wuffs" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
-         </execute>
-
-         <!-- Prepared: Brotli -->
          <execute name="mkdir-brotli" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
             <argument value="{CurrentArtifact}\third_party\externals\brotli"/>
          </execute>
+
          <execute name="extract-brotli" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\brotli" showOutput="false">
             <argument value="-E"/>
             <argument value="tar"/>
@@ -2985,88 +2926,31 @@
             <argument value="{DownloadsRoot}\skia-deps\brotli-6d03dfbedda1615c4cba1211f8d81735575209c8.tar.gz"/>
          </execute>
 
-         <!-- Prepared: FreeType -->
-         <execute name="mkdir-freetype" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <require path="{CurrentArtifact}\third_party\externals\brotli\c\include\brotli\decode.h"/>
+
+
+         <execute name="mkdir-d3d12allocator" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\freetype"/>
+            <argument value="{CurrentArtifact}\third_party\externals\d3d12allocator"/>
          </execute>
-         <execute name="extract-freetype" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\freetype" showOutput="false">
+
+         <execute name="extract-d3d12allocator" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\d3d12allocator" showOutput="false">
             <argument value="-E"/>
             <argument value="tar"/>
             <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\freetype-264b5fbf5b912b39f98d038bf75d39be0a73f21b.tar.gz"/>
+            <argument value="{DownloadsRoot}\skia-deps\d3d12allocator-169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"/>
          </execute>
 
-         <!-- Prepared: Highway -->
-         <execute name="mkdir-highway" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\highway"/>
-         </execute>
-         <execute name="extract-highway" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\highway" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\highway-457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"/>
-         </execute>
+         <require path="{CurrentArtifact}\third_party\externals\d3d12allocator\src\D3D12MemAlloc.h"/>
 
-         <!-- Prepared: JPEG XL -->
-         <execute name="mkdir-libjxl" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libjxl"/>
-         </execute>
-         <execute name="extract-libjxl" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libjxl" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libjxl-332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"/>
-         </execute>
 
-         <!-- Prepared: AVIF -->
-         <execute name="mkdir-libavif" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libavif"/>
-         </execute>
-         <execute name="extract-libavif" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libavif" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"/>
-         </execute>
-
-         <execute name="mkdir-libgav1" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libgav1"/>
-         </execute>
-         <execute name="extract-libgav1" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libgav1" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
-         </execute>
-
-         <execute name="mkdir-libyuv" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libyuv"/>
-         </execute>
-         <execute name="extract-libyuv" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libyuv" showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libyuv-d248929c059ff7629a85333699717d7a677d8d96.tar.gz"/>
-         </execute>
-
-         <!-- Prepared: RAW/DNG -->
          <execute name="mkdir-dng-sdk" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
             <argument value="{CurrentArtifact}\third_party\externals\dng_sdk"/>
          </execute>
+
          <execute name="extract-dng-sdk" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\dng_sdk" showOutput="false">
             <argument value="-E"/>
             <argument value="tar"/>
@@ -3074,11 +2958,207 @@
             <argument value="{DownloadsRoot}\skia-deps\dng_sdk-dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"/>
          </execute>
 
+         <require path="{CurrentArtifact}\third_party\externals\dng_sdk\source\dng_host.h"/>
+
+
+         <execute name="mkdir-expat" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\expat"/>
+         </execute>
+
+         <execute name="extract-expat" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\expat" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\expat-6154446fccefbf3ca644894f598969113b0c7bcd.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\expat\expat\lib\expat.h"/>
+
+
+         <execute name="mkdir-freetype" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\freetype"/>
+         </execute>
+
+         <execute name="extract-freetype" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\freetype" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\freetype-264b5fbf5b912b39f98d038bf75d39be0a73f21b.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\freetype\include\freetype\freetype.h"/>
+
+
+         <execute name="mkdir-harfbuzz" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\harfbuzz"/>
+         </execute>
+
+         <execute name="extract-harfbuzz" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\harfbuzz" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\harfbuzz-9cb1fee51069b206effb4736e443b038d230789d.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\harfbuzz\src\hb.h"/>
+
+
+         <execute name="mkdir-highway" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\highway"/>
+         </execute>
+
+         <execute name="extract-highway" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\highway" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\highway-457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\highway\hwy\highway.h"/>
+
+
+         <execute name="mkdir-icu" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\icu"/>
+         </execute>
+
+         <execute name="extract-icu" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\icu" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\icu-d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\icu\source\common\unicode\utypes.h"/>
+
+
+         <execute name="mkdir-libavif" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libavif"/>
+         </execute>
+
+         <execute name="extract-libavif" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libavif" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\libavif\include\avif\avif.h"/>
+
+
+         <execute name="mkdir-libgav1" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libgav1"/>
+         </execute>
+
+         <execute name="extract-libgav1" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libgav1" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\libgav1\src\gav1\decoder.h"/>
+
+
+         <execute name="mkdir-libjpeg-turbo" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libjpeg-turbo"/>
+         </execute>
+
+         <execute name="extract-libjpeg-turbo" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libjpeg-turbo" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\libjpeg-turbo-e14cbfaa85529d47f9f55b0f104a579c1061f9ad.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\libjpeg-turbo\jpeglib.h"/>
+
+
+         <execute name="mkdir-libjxl" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libjxl"/>
+         </execute>
+
+         <execute name="extract-libjxl" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libjxl" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\libjxl-332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\libjxl\lib\include\jxl\decode.h"/>
+
+
+         <execute name="mkdir-libpng" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libpng"/>
+         </execute>
+
+         <execute name="extract-libpng" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libpng" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\libpng-d5515b5b8be3901aac04e5bd8bd5c89f287bcd33.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\libpng\png.h"/>
+
+
+         <execute name="mkdir-libwebp" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libwebp"/>
+         </execute>
+
+         <execute name="extract-libwebp" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libwebp" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\libwebp-845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\libwebp\src\webp\decode.h"/>
+
+
+         <execute name="mkdir-libyuv" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libyuv"/>
+         </execute>
+
+         <execute name="extract-libyuv" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\libyuv" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\libyuv-d248929c059ff7629a85333699717d7a677d8d96.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\libyuv\include\libyuv.h"/>
+
+
          <execute name="mkdir-piex" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
             <argument value="{CurrentArtifact}\third_party\externals\piex"/>
          </execute>
+
          <execute name="extract-piex" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\piex" showOutput="false">
             <argument value="-E"/>
             <argument value="tar"/>
@@ -3086,14 +3166,144 @@
             <argument value="{DownloadsRoot}\skia-deps\piex-bb217acdca1cc0c16b704669dd6f91a1b509c406.tar.gz"/>
          </execute>
 
-         <!-- Proven BCC64X baseline patch. -->
+         <require path="{CurrentArtifact}\third_party\externals\piex\src\piex.h"/>
+
+
+         <execute name="mkdir-wuffs" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\wuffs"/>
+         </execute>
+
+         <execute name="extract-wuffs" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\wuffs" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\wuffs\release\c\wuffs-v0.4.c"/>
+
+
+         <!-- --------------------------------------------------------- -->
+         <!-- Direct3D / Vulkan / SPIR-V closure.                       -->
+         <!-- --------------------------------------------------------- -->
+
+         <execute name="mkdir-spirv-cross" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\spirv-cross"/>
+         </execute>
+
+         <execute name="extract-spirv-cross" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\spirv-cross" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\spirv-cross-b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_cfg.cpp"/>
+         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_cross.cpp"/>
+         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_glsl.cpp"/>
+         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_hlsl.cpp"/>
+         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_hlsl.hpp"/>
+
+
+         <execute name="mkdir-spirv-headers" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\spirv-headers"/>
+         </execute>
+
+         <execute name="extract-spirv-headers" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\spirv-headers" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\spirv-headers-942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\spirv.h"/>
+
+
+         <execute name="mkdir-spirv-tools" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\spirv-tools"/>
+         </execute>
+
+         <execute name="extract-spirv-tools" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\spirv-tools" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\spirv-tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\spirv-tools\source\val\validate.cpp"/>
+
+
+         <execute name="mkdir-glslang" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\glslang"/>
+         </execute>
+
+         <execute name="extract-glslang" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\glslang" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\glslang-1d47ffa8ac4374a19b302021e216a20f22a3de92.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\glslang\glslang\Public\ShaderLang.h"/>
+
+
+         <execute name="mkdir-vulkan-headers" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\vulkan-headers"/>
+         </execute>
+
+         <execute name="extract-vulkan-headers" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\vulkan-headers" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\vulkan-headers-f9973cd97e6f3584707e7ef1c425e336f1b92a5b.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\vulkan-headers\include\vulkan\vulkan.h"/>
+
+
+         <execute name="mkdir-vulkanmemoryallocator" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\vulkanmemoryallocator"/>
+         </execute>
+
+         <execute name="extract-vulkanmemoryallocator" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\externals\vulkanmemoryallocator" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xzf"/>
+            <argument value="{DownloadsRoot}\skia-deps\vulkanmemoryallocator-eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7.tar.gz"/>
+         </execute>
+
+         <require path="{CurrentArtifact}\third_party\externals\vulkanmemoryallocator\include\vk_mem_alloc.h"/>
+
+
+         <!-- --------------------------------------------------------- -->
+         <!-- BCC64X compatibility patches.                            -->
+         <!-- --------------------------------------------------------- -->
+
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-gn.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"
             overwrite="true"
             preserveCurrentArtifact="true"/>
 
-         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <execute
+            name="patch-check"
+            executable="{Tool:git}"
+            workingDirectory="{CurrentArtifact}"
+            showOutput="false">
             <argument value="apply"/>
             <argument value="--check"/>
             <argument value="--no-index"/>
@@ -3101,21 +3311,29 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"/>
          </execute>
 
-         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <execute
+            name="patch-apply"
+            executable="{Tool:git}"
+            workingDirectory="{CurrentArtifact}"
+            showOutput="false">
             <argument value="apply"/>
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"/>
          </execute>
 
-         <!-- Broad Windows Desktop compatibility patch. -->
+
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-desktop.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"
             overwrite="true"
             preserveCurrentArtifact="true"/>
 
-         <execute name="desktop-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <execute
+            name="desktop-patch-check"
+            executable="{Tool:git}"
+            workingDirectory="{CurrentArtifact}"
+            showOutput="false">
             <argument value="apply"/>
             <argument value="--check"/>
             <argument value="--no-index"/>
@@ -3123,21 +3341,31 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"/>
          </execute>
 
-         <execute name="desktop-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <execute
+            name="desktop-patch-apply"
+            executable="{Tool:git}"
+            workingDirectory="{CurrentArtifact}"
+            showOutput="false">
             <argument value="apply"/>
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"/>
          </execute>
 
+
          <!--
-            GN itself remains the single small upstream binary acquisition.
-            tools/git-sync-deps is deliberately not called.
+            GN is the only remaining small upstream tool acquisition.
+            tools/git-sync-deps is deliberately not used.
          -->
-         <execute name="fetch-gn" executable="{Tool:python}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <execute
+            name="fetch-gn"
+            executable="{Tool:python}"
+            workingDirectory="{CurrentArtifact}"
+            showOutput="false">
             <argument value="bin\fetch-gn"/>
          </execute>
       </source>
+
 
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -3145,7 +3373,6 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_PYTHON" value="{Tool:python}"/>
 
-         <!-- BuildEngine package dependencies used by Skia. -->
          <environment
             name="CB_SKIA_OPENGL_LIB"
             value="{InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/>
@@ -3162,6 +3389,7 @@
             name="PATH"
             value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
+
          <target
             name="gn-gen"
             type="generic"
@@ -3173,6 +3401,10 @@
                id="gn-args"
                path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\args.gn">
 
+               <!-- -------------------------------------------------- -->
+               <!-- BCC64X target toolchain.                           -->
+               <!-- -------------------------------------------------- -->
+
                <line value="skia_use_bcc64x = true"/>
 
                <line value="target_cpu = &quot;x64&quot;"/>
@@ -3182,6 +3414,7 @@
                <line value="target_ar = &quot;llvm-ar&quot;"/>
 
                <line value="python_executable = getenv(&quot;CB_PYTHON&quot;)"/>
+
                <line value="bcc64x_rad_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release&quot;"/>
                <line value="bcc64x_rad_psdk_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release/psdk&quot;"/>
 
@@ -3194,38 +3427,79 @@
                <line value="is_component_build = true"/>
                <line value="is_trivial_abi = false"/>
 
-               <!-- Product/build shape. -->
+
+               <!-- -------------------------------------------------- -->
+               <!-- Product/build shape.                              -->
+               <!-- -------------------------------------------------- -->
+
                <line value="skia_enable_tools = false"/>
                <line value="skia_build_fuzzers = false"/>
                <line value="skia_build_rust_targets = false"/>
                <line value="skia_use_partition_alloc = false"/>
 
-               <!-- Ganesh desktop GPU backends. -->
-               <line value="skia_enable_ganesh = true"/>
-               <line value="skia_enable_graphite = false"/>
-               <line value="skia_enable_spirv_validation = false"/>
+               <line value="skia_enable_precompile = true"/>
+               <line value="skia_enable_discrete_gpu = true"/>
                <line value="skia_enable_gpu_debug_layers = false"/>
+               <line value="skia_generate_workarounds = false"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- CPU raster / color management.                    -->
+               <!-- -------------------------------------------------- -->
+
+               <line value="skia_enable_ganesh = true"/>
+               <line value="skia_enable_graphite = true"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- Windows GPU backends.                             -->
+               <!-- -------------------------------------------------- -->
 
                <line value="skia_use_gl = true"/>
                <line value="skia_use_direct3d = true"/>
-               <line value="skia_use_vulkan = false"/>
+               <line value="skia_use_vulkan = true"/>
+               <line value="skia_use_vma = true"/>
+
+               <line value="skia_enable_spirv_validation = true"/>
+
+               <!--
+                  Dawn and ANGLE are intentionally not part of this desktop
+                  package. Native D3D12, Vulkan and the packaged OpenGL
+                  implementation already provide the relevant Windows GPU
+                  backends without pulling in a second complete graphics stack.
+               -->
                <line value="skia_use_dawn = false"/>
                <line value="skia_use_angle = false"/>
                <line value="skia_use_egl = false"/>
+               <line value="skia_use_epoxy_egl = false"/>
                <line value="skia_use_webgl = false"/>
                <line value="skia_use_webgpu = false"/>
 
-               <!-- Windows font integration. -->
+
+               <!-- -------------------------------------------------- -->
+               <!-- Windows font managers + FreeType.                 -->
+               <!-- -------------------------------------------------- -->
+
                <line value="skia_enable_fontmgr_win = true"/>
-               <line value="skia_use_freetype = false"/>
+
+               <line value="skia_use_freetype = true"/>
+               <line value="skia_use_system_freetype2 = false"/>
+               <line value="skia_use_freetype_woff2 = true"/>
+               <line value="skia_use_freetype_svg = true"/>
+               <line value="skia_use_freetype_zlib = true"/>
+
+               <line value="skia_enable_fontmgr_custom_directory = true"/>
+               <line value="skia_enable_fontmgr_custom_embedded = true"/>
+               <line value="skia_enable_fontmgr_custom_empty = true"/>
+
                <line value="skia_use_fontconfig = false"/>
+               <line value="skia_use_fontations = false"/>
 
-               <!-- PDF / SVG / animation. -->
-               <line value="skia_enable_pdf = true"/>
-               <line value="skia_enable_svg = true"/>
-               <line value="skia_enable_skottie = true"/>
 
-               <!-- Unicode and text shaping. -->
+               <!-- -------------------------------------------------- -->
+               <!-- Unicode / shaping.                                -->
+               <!-- -------------------------------------------------- -->
+
                <line value="skia_use_icu = true"/>
                <line value="skia_use_system_icu = false"/>
                <line value="skia_enable_skunicode = true"/>
@@ -3234,39 +3508,100 @@
                <line value="skia_use_system_harfbuzz = false"/>
                <line value="skia_pdf_subset_harfbuzz = true"/>
 
+               <line value="skia_use_client_icu = false"/>
+               <line value="skia_use_bidi = false"/>
+               <line value="skia_use_icu4x = false"/>
+               <line value="skia_use_libgrapheme = false"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- XML / vector / documents / animation.             -->
+               <!-- -------------------------------------------------- -->
+
                <line value="skia_use_expat = true"/>
                <line value="skia_use_system_expat = false"/>
 
-               <!-- Image codecs. -->
+               <line value="skia_enable_pdf = true"/>
+               <line value="skia_use_xps = true"/>
+
+               <line value="skia_enable_svg = true"/>
+               <line value="skia_enable_skottie = true"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- PNG.                                              -->
+               <!-- -------------------------------------------------- -->
+
                <line value="skia_use_libpng_decode = true"/>
                <line value="skia_use_libpng_encode = true"/>
+               <line value="skia_use_no_png_encode = false"/>
                <line value="skia_use_system_libpng = false"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- JPEG.                                             -->
+               <!-- -------------------------------------------------- -->
 
                <line value="skia_use_libjpeg_turbo_decode = true"/>
                <line value="skia_use_libjpeg_turbo_encode = true"/>
+               <line value="skia_use_no_jpeg_encode = false"/>
                <line value="skia_use_system_libjpeg_turbo = false"/>
-               <line value="skia_use_jpeg_gainmaps = false"/>
+               <line value="skia_use_jpeg_gainmaps = true"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- WebP.                                             -->
+               <!-- -------------------------------------------------- -->
 
                <line value="skia_use_libwebp_decode = true"/>
                <line value="skia_use_libwebp_encode = true"/>
+               <line value="skia_use_no_webp_encode = false"/>
                <line value="skia_use_system_libwebp = false"/>
 
-               <line value="skia_use_wuffs = true"/>
 
-               <!--
-                  zlib is intentionally supplied by the existing BuildEngine
-                  package rather than compiling Skia's own pinned zlib copy.
-               -->
+               <!-- -------------------------------------------------- -->
+               <!-- Wuffs / multi-frame decoding.                     -->
+               <!-- -------------------------------------------------- -->
+
+               <line value="skia_use_wuffs = true"/>
+               <line value="skia_include_multiframe_procs = true"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- AVIF.                                             -->
+               <!-- -------------------------------------------------- -->
+
+               <line value="skia_use_libavif = true"/>
+               <line value="skia_use_crabbyavif = false"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- JPEG XL.                                          -->
+               <!-- -------------------------------------------------- -->
+
+               <line value="skia_use_libjxl_decode = true"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- RAW / DNG.                                        -->
+               <!-- -------------------------------------------------- -->
+
+               <line value="skia_use_dng_sdk = true"/>
+               <line value="skia_use_piex = true"/>
+
+
+               <!-- -------------------------------------------------- -->
+               <!-- BuildEngine zlib package.                         -->
+               <!-- -------------------------------------------------- -->
+
                <line value="skia_use_zlib = true"/>
                <line value="skia_use_system_zlib = true"/>
 
-               <!-- Prepared but not enabled yet. -->
-               <line value="skia_use_libavif = false"/>
-               <line value="skia_use_libjxl_decode = false"/>
-               <line value="skia_use_dng_sdk = false"/>
-               <line value="skia_use_piex = false"/>
 
-               <!-- Rust codecs remain excluded. -->
+               <!-- -------------------------------------------------- -->
+               <!-- Explicitly excluded Rust codec implementations.   -->
+               <!-- -------------------------------------------------- -->
+
                <line value="skia_use_rust_png_decode = false"/>
                <line value="skia_use_rust_png_encode = false"/>
                <line value="skia_use_rust_jpeg_decode = false"/>
@@ -3276,13 +3611,21 @@
                <line value="skia_use_rust_exif = false"/>
                <line value="skia_use_rust_icc = false"/>
 
-               <!-- Explicitly excluded desktop/developer extras. -->
-               <line value="skia_use_xps = false"/>
-               <line value="skia_use_lua = false"/>
-               <line value="skia_use_ffmpeg = false"/>
-               <line value="skia_use_perfetto = false"/>
 
-               <line value="extra_cflags = [&quot;-DWIN32_LEAN_AND_MEAN&quot;,&quot;-DNOMINMAX&quot;]"/>
+               <!-- -------------------------------------------------- -->
+               <!-- Non-product developer integrations.               -->
+               <!-- -------------------------------------------------- -->
+
+               <line value="skia_use_ffmpeg = false"/>
+               <line value="skia_use_lua = false"/>
+               <line value="skia_use_perfetto = false"/>
+               <line value="skia_use_pprof = false"/>
+               <line value="skia_use_sfml = false"/>
+               <line value="skia_enable_vello_shaders = false"/>
+
+
+               <line
+                  value="extra_cflags = [&quot;-DWIN32_LEAN_AND_MEAN&quot;,&quot;-DNOMINMAX&quot;]"/>
             </temporaryFile>
 
             <environment
@@ -3293,6 +3636,7 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--script-executable={Tool:python}"/>
          </target>
+
 
          <execute
             name="ninja-build"
@@ -3315,6 +3659,7 @@
             <argument value="skottie"/>
          </execute>
 
+
          <variant name="Release">
             <variable name="SkiaOfficialBuild" value="true"/>
             <variable name="SkiaDebug" value="false"/>
@@ -3326,6 +3671,7 @@
             <variable name="SkiaDebug" value="true"/>
             <variable name="ZlibLibraryName" value="libzd"/>
          </variant>
+
 
          <install>
             <perVariant>
@@ -3339,6 +3685,7 @@
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skia.lib"
                   overwrite="true"/>
 
+
                <copy
                   source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skunicode_core.dll"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skunicode_core.dll"
@@ -3348,6 +3695,7 @@
                   source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skunicode_core.lib"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skunicode_core.lib"
                   overwrite="true"/>
+
 
                <copy
                   source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skunicode_icu.dll"
@@ -3359,6 +3707,7 @@
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skunicode_icu.lib"
                   overwrite="true"/>
 
+
                <copy
                   source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skshaper.dll"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skshaper.dll"
@@ -3368,6 +3717,7 @@
                   source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skshaper.lib"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skshaper.lib"
                   overwrite="true"/>
+
 
                <copy
                   source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\svg.dll"
@@ -3379,6 +3729,7 @@
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\svg.lib"
                   overwrite="true"/>
 
+
                <copy
                   source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\skottie.dll"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skottie.dll"
@@ -3389,10 +3740,12 @@
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skottie.lib"
                   overwrite="true"/>
 
+
                <copy
                   source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\icudtl.dat"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\icudtl.dat"
                   overwrite="true"/>
+
 
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skia.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skia.lib"/>
@@ -3414,6 +3767,7 @@
 
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\icudtl.dat"/>
             </perVariant>
+
 
             <common>
                <copy
@@ -3470,6 +3824,7 @@
          </install>
       </build>
 
+
       <publish
          root="Win64x"
          configuration="Release"
@@ -3481,6 +3836,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dat" optional="false"/>
          <cmake source="lib\cmake" target="lib\cmake" optional="false"/>
       </publish>
+
 
       <smoke
          id="consumer"
