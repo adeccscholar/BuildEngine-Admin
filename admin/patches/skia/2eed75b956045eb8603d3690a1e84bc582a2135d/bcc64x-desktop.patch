@@ -383,3 +383,15 @@ diff --git a/src/ports/SkFontMgr_win_dw.cpp b/src/ports/SkFontMgr_win_dw.cpp
              // IUnknown::QueryInterface states that if it fails, punk will be set to nullptr.
              // http://blogs.msdn.com/b/oldnewthing/archive/2004/03/26/96777.aspx
              SkASSERT_RELEASE(nullptr == factory2.get());
+
+diff --git a/src/gpu/vk/vulkanmemoryallocator/BUILD.gn b/src/gpu/vk/vulkanmemoryallocator/BUILD.gn
+--- a/src/gpu/vk/vulkanmemoryallocator/BUILD.gn
++++ b/src/gpu/vk/vulkanmemoryallocator/BUILD.gn
+@@ -32,7 +32,7 @@ source_set("vulkanmemoryallocator") {
+ 
+   # Warnings are just noise if we're not maintaining the code.
+-  if (is_win) {
++  if (is_win && !skia_use_bcc64x) {
+     cflags = [ "/w" ]
+   } else {
+     cflags = [ "-w" ]
