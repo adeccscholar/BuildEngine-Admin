@@ -1,0 +1,14 @@
+diff --git a/third_party/freetype2/BUILD.gn b/third_party/freetype2/BUILD.gn
+index 631b909..bbc6703 100644
+--- a/third_party/freetype2/BUILD.gn
++++ b/third_party/freetype2/BUILD.gn
+@@ -26,6 +26,9 @@ if (skia_use_system_freetype2) {
+   system("freetype2") {
+     include_dirs = [ skia_system_freetype2_include_path ]
+     libs = [ skia_system_freetype2_lib ]
++    if (skia_use_bcc64x) {
++      defines = [ "SK_FREETYPE_MINIMUM_RUNTIME_VERSION_IS_BUILD_VERSION=1" ]
++    }
+   }
+ } else {
+   third_party("freetype2") {
