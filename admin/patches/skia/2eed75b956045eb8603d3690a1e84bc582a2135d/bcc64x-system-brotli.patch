@@ -1,0 +1,63 @@
+diff --git a/third_party/brotli/BUILD.gn b/third_party/brotli/BUILD.gn
+index 9594fae..aa761c2 100644
+--- a/third_party/brotli/BUILD.gn
++++ b/third_party/brotli/BUILD.gn
+@@ -5,20 +5,43 @@
+ 
+ import("../third_party.gni")
+ 
+-third_party("brotli") {
+-  public_include_dirs = [ "../externals/brotli/c/include" ]
++declare_args() {
++  skia_use_system_brotli = false
++  bcc64x_brotli_include = ""
++  bcc64x_brotli_common_lib = ""
++  bcc64x_brotli_decode_lib = ""
++}
++
++if (skia_use_system_brotli) {
++  system("brotli") {
++    assert(bcc64x_brotli_include != "",
++           "bcc64x_brotli_include must name the BuildEngine Brotli include directory")
++    assert(bcc64x_brotli_common_lib != "",
++           "bcc64x_brotli_common_lib must name the BuildEngine Brotli common import library")
++    assert(bcc64x_brotli_decode_lib != "",
++           "bcc64x_brotli_decode_lib must name the BuildEngine Brotli decoder import library")
++    include_dirs = [ bcc64x_brotli_include ]
++    libs = [
++      bcc64x_brotli_common_lib,
++      bcc64x_brotli_decode_lib,
++    ]
++  }
++} else {
++  third_party("brotli") {
++    public_include_dirs = [ "../externals/brotli/c/include" ]
+ 
+-  # Brotli is used by freetype and libjxl; they only need to decode brotli.
+-  sources = [
+-    "../externals/brotli/c/common/constants.c",
+-    "../externals/brotli/c/common/context.c",
+-    "../externals/brotli/c/common/dictionary.c",
+-    "../externals/brotli/c/common/platform.c",
+-    "../externals/brotli/c/common/shared_dictionary.c",
+-    "../externals/brotli/c/common/transform.c",
+-    "../externals/brotli/c/dec/bit_reader.c",
+-    "../externals/brotli/c/dec/decode.c",
+-    "../externals/brotli/c/dec/huffman.c",
+-    "../externals/brotli/c/dec/state.c",
+-  ]
++    # Brotli is used by freetype and libjxl; they only need to decode brotli.
++    sources = [
++      "../externals/brotli/c/common/constants.c",
++      "../externals/brotli/c/common/context.c",
++      "../externals/brotli/c/common/dictionary.c",
++      "../externals/brotli/c/common/platform.c",
++      "../externals/brotli/c/common/shared_dictionary.c",
++      "../externals/brotli/c/common/transform.c",
++      "../externals/brotli/c/dec/bit_reader.c",
++      "../externals/brotli/c/dec/decode.c",
++      "../externals/brotli/c/dec/huffman.c",
++      "../externals/brotli/c/dec/state.c",
++    ]
++  }
+ }
