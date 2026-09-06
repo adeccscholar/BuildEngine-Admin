@@ -1,0 +1,13 @@
+diff --git a/BUILD.gn b/BUILD.gn
+index 034088d..d07d110 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -1215,7 +1215,7 @@
+       public += skia_graphite_vk_precompile_public
+       sources += skia_graphite_vk_precompile_sources
+     }
+-    if (is_debug && skia_enable_spirv_validation) {
++    if (is_debug) {
+       sources += skia_sksl_validate_spirv_sources
+       deps += [
+         "//third_party/externals/spirv-tools:spvtools",
