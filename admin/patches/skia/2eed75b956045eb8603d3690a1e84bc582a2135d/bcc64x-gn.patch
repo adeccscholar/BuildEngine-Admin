@@ -303,7 +303,7 @@ diff --git a/modules/skcms/BUILD.gn b/modules/skcms/BUILD.gn
 +    } else if (is_clang) {
        cflags = [
          "/clang:-mavx512f",
-         "/clang:-mf16c",
+         "/clang:-mavx512dq",
 diff --git a/src/utils/win/SkDWriteFontFileStream.h b/src/utils/win/SkDWriteFontFileStream.h
 --- a/src/utils/win/SkDWriteFontFileStream.h
 +++ b/src/utils/win/SkDWriteFontFileStream.h
