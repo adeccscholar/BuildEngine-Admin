@@ -3443,7 +3443,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T00:20:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T15:50:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
 
@@ -3575,7 +3575,6 @@
             url="https://skia.googlesource.com/external/github.com/google/wuffs-mirror-release-c.git/+archive/e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"
             archive="skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
 
-
          <!-- ======================================================== -->
          <!-- Direct3D / Vulkan / shader closure.                      -->
          <!-- ======================================================== -->
@@ -3603,7 +3602,6 @@
          <download
             url="https://chromium.googlesource.com/external/github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/+archive/eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7.tar.gz"
             archive="skia-deps\vulkanmemoryallocator-eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7.tar.gz"/>
-
 
          <!-- ======================================================== -->
          <!-- Skia source archive.                                    -->
@@ -3659,7 +3657,6 @@
             <require path="third_party\zlib\BUILD.gn"/>
          </extract>
 
-
          <!-- ======================================================== -->
          <!-- Populate third_party\externals.                          -->
          <!-- ======================================================== -->
@@ -3685,7 +3682,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\brotli\c\include\brotli\decode.h"/>
 
-
          <execute name="mkdir-d3d12allocator"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -3706,7 +3702,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\d3d12allocator\src\D3D12MemAlloc.h"/>
-
 
          <execute name="mkdir-dng-sdk"
                   executable="{Tool:cmake}"
@@ -3729,7 +3724,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\dng_sdk\source\dng_host.h"/>
 
-
          <execute name="mkdir-expat"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -3750,7 +3744,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\expat\expat\lib\expat.h"/>
-
 
          <execute name="mkdir-freetype"
                   executable="{Tool:cmake}"
@@ -3773,7 +3766,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\freetype\include\freetype\freetype.h"/>
 
-
          <execute name="mkdir-harfbuzz"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -3794,7 +3786,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\harfbuzz\src\hb.h"/>
-
 
          <execute name="mkdir-highway"
                   executable="{Tool:cmake}"
@@ -3817,7 +3808,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\highway\hwy\highway.h"/>
 
-
          <execute name="mkdir-icu"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -3838,7 +3828,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\icu\source\common\unicode\utypes.h"/>
-
 
          <execute name="mkdir-libavif"
                   executable="{Tool:cmake}"
@@ -3861,7 +3850,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\libavif\include\avif\avif.h"/>
 
-
          <execute name="mkdir-libgav1"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -3882,7 +3870,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\libgav1\src\gav1\decoder.h"/>
-
 
          <execute name="mkdir-libjpeg-turbo"
                   executable="{Tool:cmake}"
@@ -3907,7 +3894,6 @@
          <require path="{CurrentArtifact}\third_party\externals\libjpeg-turbo\src\jconfig.h"/>
          <require path="{CurrentArtifact}\third_party\externals\libjpeg-turbo\src\jmorecfg.h"/>
 
-
          <execute name="mkdir-libjxl"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -3929,7 +3915,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\libjxl\lib\include\jxl\decode.h"/>
          <require path="{CurrentArtifact}\third_party\externals\libjxl\lib\lib.gni"/>
-
 
          <execute name="mkdir-libpng"
                   executable="{Tool:cmake}"
@@ -3953,7 +3938,6 @@
          <require path="{CurrentArtifact}\third_party\externals\libpng\png.h"/>
          <require path="{CurrentArtifact}\third_party\externals\libpng\png.c"/>
 
-
          <execute name="mkdir-libwebp"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -3976,7 +3960,6 @@
          <require path="{CurrentArtifact}\third_party\externals\libwebp\src\webp\decode.h"/>
          <require path="{CurrentArtifact}\third_party\externals\libwebp\src\webp\encode.h"/>
 
-
          <execute name="mkdir-libyuv"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -3997,7 +3980,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\libyuv\include\libyuv.h"/>
-
 
          <execute name="mkdir-piex"
                   executable="{Tool:cmake}"
@@ -4021,7 +4003,6 @@
          <require path="{CurrentArtifact}\third_party\externals\piex\src\piex.h"/>
          <require path="{CurrentArtifact}\third_party\externals\piex\src\piex.cc"/>
 
-
          <execute name="mkdir-wuffs"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -4042,7 +4023,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\wuffs\release\c\wuffs-v0.3.c"/>
-
 
          <!-- ======================================================== -->
          <!-- Direct3D / Vulkan / SPIR-V closure.                      -->
@@ -4074,7 +4054,6 @@
          <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_hlsl.cpp"/>
          <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_hlsl.hpp"/>
 
-
          <execute name="mkdir-spirv-headers"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -4097,7 +4076,6 @@
          <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.h"/>
          <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.hpp"/>
 
-
          <execute name="mkdir-spirv-tools"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -4118,7 +4096,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\spirv-tools\source\val\validate.cpp"/>
-
 
          <execute name="mkdir-glslang"
                   executable="{Tool:cmake}"
@@ -4141,7 +4118,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\glslang\glslang\Public\ShaderLang.h"/>
 
-
          <execute name="mkdir-vulkan-headers"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -4162,7 +4138,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\vulkan-headers\include\vulkan\vulkan.h"/>
-
 
          <execute name="mkdir-vulkanmemoryallocator"
                   executable="{Tool:cmake}"
@@ -4185,11 +4160,11 @@
 
          <require path="{CurrentArtifact}\third_party\externals\vulkanmemoryallocator\include\vk_mem_alloc.h"/>
 
-
          <!-- ======================================================== -->
          <!-- BCC64X compatibility patches.                           -->
          <!-- ======================================================== -->
 
+         <!-- Core GN / toolchain integration. -->
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-gn.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"
@@ -4217,7 +4192,7 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"/>
          </execute>
 
-
+         <!-- Broad Windows desktop compatibility. -->
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-desktop.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"
@@ -4245,6 +4220,133 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"/>
          </execute>
 
+         <!--
+            The desktop patch initially introduces the BCC64X zlib library
+            through ldflags.  GN must instead treat the import library as a
+            library input so that it reaches the component DLL link.
+         -->
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-zlib-link.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-link.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="zlib-link-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-link.patch"/>
+         </execute>
+
+         <execute name="zlib-link-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-link.patch"/>
+         </execute>
+
+         <!--
+            BCC64X is a Windows target although it does not define _MSC_VER.
+            Force libgav1's Windows thread implementation instead of pthreads.
+         -->
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-libgav1-winthreads.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="libgav1-winthreads-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"/>
+         </execute>
+
+         <execute name="libgav1-winthreads-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"/>
+         </execute>
+
+         <!--
+            Embarcadero's D3D12 headers expose structure-returning COM methods
+            through explicit RetVal pointer parameters.  Route Skia's affected
+            GetDesc calls through the BCC64X compatibility helpers.
+         -->
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-d3d-getdesc.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="d3d-getdesc-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"/>
+         </execute>
+
+         <execute name="d3d-getdesc-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"/>
+         </execute>
+
+         <!--
+            Prepare Skia's HarfBuzz GN target for an external BuildEngine
+            HarfBuzz package.  The current profile still uses bundled
+            HarfBuzz; this patch is therefore dormant until
+            skia_use_system_harfbuzz is enabled deliberately.
+         -->
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-harfbuzz-system.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-system.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="harfbuzz-system-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-system.patch"/>
+         </execute>
+
+         <execute name="harfbuzz-system-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-system.patch"/>
+         </execute>
 
          <execute name="fetch-gn"
                   executable="{Tool:python}"
@@ -4253,7 +4355,6 @@
             <argument value="bin\fetch-gn"/>
          </execute>
       </source>
-
 
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -4276,7 +4377,6 @@
          <environment
             name="PATH"
             value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
-
 
          <target
             name="gn-gen"
@@ -4312,7 +4412,6 @@
                <line value="is_component_build = true"/>
                <line value="is_trivial_abi = false"/>
 
-
                <!-- Product build shape. -->
                <line value="skia_enable_tools = false"/>
                <line value="skia_build_fuzzers = false"/>
@@ -4323,7 +4422,6 @@
                <line value="skia_enable_discrete_gpu = true"/>
                <line value="skia_enable_gpu_debug_layers = false"/>
                <line value="skia_generate_workarounds = false"/>
-
 
                <!-- CPU / GPU. -->
                <line value="skia_enable_ganesh = true"/>
@@ -4343,7 +4441,6 @@
                <line value="skia_use_webgl = false"/>
                <line value="skia_use_webgpu = false"/>
 
-
                <!-- Windows fonts + FreeType. -->
                <line value="skia_enable_fontmgr_win = true"/>
                <line value="skia_enable_fontmgr_win_gdi = true"/>
@@ -4362,7 +4459,6 @@
                <line value="skia_use_fontconfig = false"/>
                <line value="skia_use_fontations = false"/>
 
-
                <!-- Unicode / shaping. -->
                <line value="skia_use_icu = true"/>
                <line value="skia_use_system_icu = false"/>
@@ -4377,7 +4473,6 @@
                <line value="skia_use_icu4x = false"/>
                <line value="skia_use_libgrapheme = false"/>
 
-
                <!-- XML / vector / documents / animation. -->
                <line value="skia_use_expat = true"/>
                <line value="skia_use_system_expat = false"/>
@@ -4388,13 +4483,11 @@
                <line value="skia_enable_svg = true"/>
                <line value="skia_enable_skottie = true"/>
 
-
                <!-- PNG. -->
                <line value="skia_use_libpng_decode = true"/>
                <line value="skia_use_libpng_encode = true"/>
                <line value="skia_use_no_png_encode = false"/>
                <line value="skia_use_system_libpng = false"/>
-
 
                <!-- JPEG. -->
                <line value="skia_use_libjpeg_turbo_decode = true"/>
@@ -4403,27 +4496,22 @@
                <line value="skia_use_system_libjpeg_turbo = false"/>
                <line value="skia_use_jpeg_gainmaps = true"/>
 
-
                <!-- WebP. -->
                <line value="skia_use_libwebp_decode = true"/>
                <line value="skia_use_libwebp_encode = true"/>
                <line value="skia_use_no_webp_encode = false"/>
                <line value="skia_use_system_libwebp = false"/>
 
-
                <!-- Wuffs / multi-frame. -->
                <line value="skia_use_wuffs = true"/>
                <line value="skia_include_multiframe_procs = true"/>
-
 
                <!-- AVIF. -->
                <line value="skia_use_libavif = true"/>
                <line value="skia_use_crabbyavif = false"/>
 
-
                <!-- JPEG XL. -->
                <line value="skia_use_libjxl_decode = true"/>
-
 
                <!-- RAW / DNG. -->
                <line value="skia_use_dng_sdk = true"/>
@@ -4435,11 +4523,9 @@
                -->
                <line value="skia_use_piex = false"/>
 
-
                <!-- BuildEngine zlib package. -->
                <line value="skia_use_zlib = true"/>
                <line value="skia_use_system_zlib = true"/>
-
 
                <!-- Rust implementations deliberately disabled. -->
                <line value="skia_use_rust_png_decode = false"/>
@@ -4451,7 +4537,6 @@
                <line value="skia_use_rust_exif = false"/>
                <line value="skia_use_rust_icc = false"/>
 
-
                <!-- Non-product developer integrations. -->
                <line value="skia_use_ffmpeg = false"/>
                <line value="skia_use_lua = false"/>
@@ -4459,7 +4544,6 @@
                <line value="skia_use_pprof = false"/>
                <line value="skia_use_sfml = false"/>
                <line value="skia_enable_vello_shaders = false"/>
-
 
                <line
                   value="extra_cflags = [&quot;-DWIN32_LEAN_AND_MEAN&quot;,&quot;-DNOMINMAX&quot;]"/>
@@ -4473,7 +4557,6 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--script-executable={Tool:python}"/>
          </target>
-
 
          <execute
             name="ninja-build"
@@ -4496,7 +4579,6 @@
             <argument value="skottie"/>
          </execute>
 
-
          <variant name="Release">
             <variable name="SkiaOfficialBuild" value="true"/>
             <variable name="SkiaDebug" value="false"/>
@@ -4508,7 +4590,6 @@
             <variable name="SkiaDebug" value="true"/>
             <variable name="ZlibLibraryName" value="libzd"/>
          </variant>
-
 
          <install>
             <perVariant>
@@ -4598,7 +4679,6 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\icudtl.dat"/>
             </perVariant>
 
-
             <common>
                <copy
                   source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\include"
@@ -4654,7 +4734,6 @@
          </install>
       </build>
 
-
       <publish
          root="Win64x"
          configuration="Release"
@@ -4666,7 +4745,6 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dat" optional="false"/>
          <cmake source="lib\cmake" target="lib\cmake" optional="false"/>
       </publish>
-
 
       <smoke
          id="consumer"
