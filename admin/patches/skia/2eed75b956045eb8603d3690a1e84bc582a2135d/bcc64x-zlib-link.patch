@@ -1,10 +1,11 @@
 diff --git a/third_party/zlib/BUILD.gn b/third_party/zlib/BUILD.gn
 --- a/third_party/zlib/BUILD.gn
 +++ b/third_party/zlib/BUILD.gn
-@@ -9,6 +9,6 @@
+@@ -9,7 +9,7 @@
  if (skia_use_system_zlib) {
    system("zlib") {
      if (skia_use_bcc64x) {
+       include_dirs = [ bcc64x_zlib_include ]
 -      ldflags = [ bcc64x_zlib_lib ]
 +      libs = [ bcc64x_zlib_lib ]
      } else {
