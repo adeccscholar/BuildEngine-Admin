@@ -1,0 +1,123 @@
+diff --git a/third_party/brotli/BUILD.gn b/third_party/brotli/BUILD.gn
+--- a/third_party/brotli/BUILD.gn
++++ b/third_party/brotli/BUILD.gn
+@@ -5,21 +5,46 @@
+ 
+ import("../third_party.gni")
+ 
+-third_party("brotli") {
+-  public_include_dirs = [ "../externals/brotli/c/include" ]
+-
+-  # Brotli is used by freetype and libjxl; they only need to decode brotli.
+-  sources = [
+-    "../externals/brotli/c/common/constants.c",
+-    "../externals/brotli/c/common/context.c",
+-    "../externals/brotli/c/common/dictionary.c",
+-    "../externals/brotli/c/common/platform.c",
+-    "../externals/brotli/c/common/shared_dictionary.c",
+-    "../externals/brotli/c/common/transform.c",
+-    "../externals/brotli/c/dec/bit_reader.c",
+-    "../externals/brotli/c/dec/decode.c",
+-    "../externals/brotli/c/dec/huffman.c",
+-    "../externals/brotli/c/dec/state.c",
+-  ]
++declare_args() {
++  skia_use_system_brotli = false
++  bcc64x_brotli_include = ""
++  bcc64x_brotli_common_lib = ""
++  bcc64x_brotli_decode_lib = ""
++}
++
++if (skia_use_system_brotli) {
++  system("brotli") {
++    assert(bcc64x_brotli_include != "",
++           "bcc64x_brotli_include must name the BuildEngine Brotli include directory")
++    assert(bcc64x_brotli_common_lib != "",
++           "bcc64x_brotli_common_lib must name the BuildEngine Brotli common import library")
++    assert(bcc64x_brotli_decode_lib != "",
++           "bcc64x_brotli_decode_lib must name the BuildEngine Brotli decoder import library")
++    include_dirs = [ bcc64x_brotli_include ]
++    libs = [
++      bcc64x_brotli_common_lib,
++      bcc64x_brotli_decode_lib,
++    ]
++  }
++} else {
++  third_party("brotli") {
++    public_include_dirs = [ "../externals/brotli/c/include" ]
++
++    # Brotli is used by freetype and libjxl; they only need to decode brotli.
++    sources = [
++      "../externals/brotli/c/common/constants.c",
++      "../externals/brotli/c/common/context.c",
++      "../externals/brotli/c/common/dictionary.c",
++      "../externals/brotli/c/common/platform.c",
++      "../externals/brotli/c/common/shared_dictionary.c",
++      "../externals/brotli/c/common/transform.c",
++      "../externals/brotli/c/dec/bit_reader.c",
++      "../externals/brotli/c/dec/decode.c",
++      "../externals/brotli/c/dec/huffman.c",
++      "../externals/brotli/c/dec/state.c",
++    ]
++  }
+ }
+diff --git a/third_party/libpng/BUILD.gn b/third_party/libpng/BUILD.gn
+--- a/third_party/libpng/BUILD.gn
++++ b/third_party/libpng/BUILD.gn
+@@ -6,13 +6,25 @@
+ import("../../gn/skia.gni")
+ 
+ declare_args() {
+   skia_use_system_libpng = is_official_build && !is_canvaskit
++  bcc64x_libpng_include = ""
++  bcc64x_libpng_lib = ""
+ }
+ 
+ import("../third_party.gni")
+ 
+ if (skia_use_system_libpng) {
+   system("libpng") {
+-    libs = [ "png" ]
++    if (skia_use_bcc64x) {
++      assert(bcc64x_libpng_include != "",
++             "bcc64x_libpng_include must name the BuildEngine libpng include directory")
++      assert(bcc64x_libpng_lib != "",
++             "bcc64x_libpng_lib must name the BuildEngine libpng import library")
++      include_dirs = [ bcc64x_libpng_include ]
++      libs = [ bcc64x_libpng_lib ]
++    } else {
++      libs = [ "png" ]
++    }
+   }
+ } else {
+   third_party("libpng") {
+diff --git a/third_party/libjpeg-turbo/BUILD.gn b/third_party/libjpeg-turbo/BUILD.gn
+--- a/third_party/libjpeg-turbo/BUILD.gn
++++ b/third_party/libjpeg-turbo/BUILD.gn
+@@ -6,13 +6,25 @@
+ import("../../gn/skia.gni")
+ 
+ declare_args() {
+   skia_use_system_libjpeg_turbo = is_official_build && !is_canvaskit
++  bcc64x_libjpeg_include = ""
++  bcc64x_libjpeg_lib = ""
+ }
+ 
+ import("../third_party.gni")
+ 
+ if (skia_use_system_libjpeg_turbo) {
+   system("libjpeg") {
+-    libs = [ "jpeg" ]
++    if (skia_use_bcc64x) {
++      assert(bcc64x_libjpeg_include != "",
++             "bcc64x_libjpeg_include must name the BuildEngine libjpeg-turbo include directory")
++      assert(bcc64x_libjpeg_lib != "",
++             "bcc64x_libjpeg_lib must name the BuildEngine libjpeg-turbo import library")
++      include_dirs = [ bcc64x_libjpeg_include ]
++      libs = [ bcc64x_libjpeg_lib ]
++    } else {
++      libs = [ "jpeg" ]
++    }
+   }
+ } else {
+   source_set("libjpeg_headers") {
