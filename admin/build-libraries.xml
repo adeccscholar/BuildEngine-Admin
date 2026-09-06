@@ -2700,7 +2700,7 @@
       </smoke>
    </library>
 
-<library id="libjpeg-turbo" version="3.2.0" timestamp="2026-09-06T03:30:00Z">
+<library id="libjpeg-turbo" version="3.2.0" timestamp="2026-09-06T04:41:00Z">
    <source>
       <download
          url="https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/{LibraryVersion}/libjpeg-turbo-{LibraryVersion}.tar.gz"
@@ -2709,13 +2709,13 @@
 
       <extract format="libarchive" root="libjpeg-turbo-{LibraryVersion}">
          <require path="CMakeLists.txt"/>
-         <require path="jpeglib.h"/>
-         <require path="turbojpeg.h"/>
+         <require path="src\jpeglib.h"/>
+         <require path="src\turbojpeg.h"/>
          <require path="LICENSE.md"/>
       </extract>
    </source>
 
-   <build>
+   <build testsAffectBuild="true">
       <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
       <environment name="CB_BDS" value="{BDS}"/>
 
@@ -2724,15 +2724,25 @@
       <argument value="-Wno-dev"/>
       <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
       <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+
       <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
 
       <argument value="-DENABLE_SHARED:BOOL=ON"/>
       <argument value="-DENABLE_STATIC:BOOL=OFF"/>
+
+      <!--
+         SIMD remains deliberately separate from the first BCC64X proof.
+         NASM is available in the tool contract and can be enabled as the
+         next controlled extension after the baseline has passed.
+      -->
       <argument value="-DWITH_SIMD:BOOL=OFF"/>
+
       <argument value="-DWITH_TURBOJPEG:BOOL=ON"/>
-      <argument value="-DWITH_TOOLS:BOOL=OFF"/>
-      <argument value="-DWITH_TESTS:BOOL=OFF"/>
+
+      <!-- Upstream regression tests depend on the command line tools. -->
+      <argument value="-DWITH_TOOLS:BOOL={TestsEnabled}"/>
+      <argument value="-DWITH_TESTS:BOOL={TestsEnabled}"/>
 
       <cmake
          mode="configure"
@@ -2767,9 +2777,20 @@
                executable="{Tool:cmake}"
                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
+            <execute
+               name="test"
+               test="true"
+               executable="{ToolDir:cmake}\ctest.exe"
+               workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+               showOutput="false">
+               <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+               <argument value="--output-on-failure"/>
+            </execute>
+
             <require
                path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
                kind="directory"/>
+
             <require
                path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
                kind="directory"/>
@@ -2781,18 +2802,41 @@
                target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"
                overwrite="true"/>
 
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\jpeglib.h"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\turbojpeg.h"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"/>
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\jpeglib.h"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\turbojpeg.h"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"/>
          </common>
       </install>
    </build>
 
-   <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+   <publish
+      root="Win64x"
+      configuration="Release"
+      consumer="{BuildFileDir}\cmake\consumer">
+
       <tree source="include" target="include" optional="true"/>
-      <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
-      <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
-      <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+
+      <files
+         source="lib\win64\{Configuration}"
+         target="lib"
+         extensions=".lib"
+         optional="true"/>
+
+      <files
+         source="bin\win64\{Configuration}"
+         target="bin"
+         extensions=".dll;.exe;.pdb"
+         optional="true"/>
+
+      <cmake
+         source="lib\win64\{Configuration}\cmake"
+         target="lib\cmake"
+         optional="true"/>
    </publish>
 
    <smoke
@@ -2803,6 +2847,7 @@
       ninja="{Tool:ninja}"
       toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
       executable="libjpeg-turbo-consumer.exe">
+
       <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
       <environment name="CB_BDS" value="{BDS}"/>
    </smoke>
@@ -3128,8 +3173,7 @@
    </smoke>
 </library>
 
-
-<library id="freetype" version="2.14.3" timestamp="2026-09-06T04:31:00Z">
+<library id="freetype" version="2.14.3" timestamp="2026-09-06T04:41:00Z">
    <dependency library="zlib" version="1.3.2"/>
    <dependency library="bzip2" version="1.0.8"/>
    <dependency library="brotli" version="1.2.0"/>
@@ -3142,9 +3186,7 @@
          archive="freetype-{LibraryVersion}.tar.xz"
          sha256="36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f"/>
 
-      <extract
-         format="libarchive"
-         root="freetype-{LibraryVersion}">
+      <extract format="libarchive" root="freetype-{LibraryVersion}">
          <require path="CMakeLists.txt"/>
          <require path="include\freetype\freetype.h"/>
          <require path="include\ft2build.h"/>
@@ -3167,10 +3209,6 @@
 
       <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
 
-      <!--
-         Every supported external dependency is explicit.
-         No optional dependency probing is allowed to decide product shape.
-      -->
       <argument value="-DFT_DISABLE_ZLIB:BOOL=OFF"/>
       <argument value="-DFT_REQUIRE_ZLIB:BOOL=ON"/>
 
@@ -3183,10 +3221,6 @@
       <argument value="-DFT_DISABLE_BROTLI:BOOL=OFF"/>
       <argument value="-DFT_REQUIRE_BROTLI:BOOL=ON"/>
 
-      <!--
-         HarfBuzz is a mandatory BuildEngine dependency.
-         Dynamic runtime discovery is deliberately disabled.
-      -->
       <argument value="-DFT_DISABLE_HARFBUZZ:BOOL=OFF"/>
       <argument value="-DFT_DYNAMIC_HARFBUZZ:BOOL=OFF"/>
       <argument value="-DFT_REQUIRE_HARFBUZZ:BOOL=ON"/>
@@ -3208,7 +3242,6 @@
       <variant name="Release">
          <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
          <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
-
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
       </variant>
@@ -3216,9 +3249,7 @@
       <variant name="Debug">
          <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
          <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
-
          <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
-
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
       </variant>
@@ -3242,7 +3273,7 @@
                overwrite="true"/>
 
             <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ft2build.h"/>
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\freetype2\ft2build.h"/>
 
             <require
                path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\freetype2\freetype"
@@ -3259,10 +3290,7 @@
       configuration="Release"
       consumer="{BuildFileDir}\cmake\consumer">
 
-      <tree
-         source="include"
-         target="include"
-         optional="true"/>
+      <tree source="include" target="include" optional="true"/>
 
       <files
          source="lib\win64\{Configuration}"
