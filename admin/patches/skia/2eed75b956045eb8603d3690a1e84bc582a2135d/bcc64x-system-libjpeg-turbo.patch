@@ -1,5 +1,4 @@
 diff --git a/third_party/libjpeg-turbo/BUILD.gn b/third_party/libjpeg-turbo/BUILD.gn
-index ed55841..8760c56 100644
 --- a/third_party/libjpeg-turbo/BUILD.gn
 +++ b/third_party/libjpeg-turbo/BUILD.gn
 @@ -7,13 +7,24 @@ import("../../gn/skia.gni")
@@ -21,7 +20,7 @@ index ed55841..8760c56 100644
 +      assert(bcc64x_libjpeg_lib != "",
 +             "bcc64x_libjpeg_lib must name the BuildEngine libjpeg-turbo import library")
 +      include_dirs = [ bcc64x_libjpeg_include ]
-+      libs = [ bcc64x_libjpeg_lib ]
++      ldflags = [ bcc64x_libjpeg_lib ]
 +    } else {
 +      libs = [ "jpeg" ]
 +    }
