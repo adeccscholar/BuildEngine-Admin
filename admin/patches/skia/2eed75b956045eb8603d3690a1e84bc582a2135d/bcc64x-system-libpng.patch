@@ -1,0 +1,30 @@
+diff --git a/third_party/libpng/BUILD.gn b/third_party/libpng/BUILD.gn
+index 1176db6..c1760a8 100644
+--- a/third_party/libpng/BUILD.gn
++++ b/third_party/libpng/BUILD.gn
+@@ -7,13 +7,24 @@ import("../../gn/skia.gni")
+ 
+ declare_args() {
+   skia_use_system_libpng = is_official_build && !is_canvaskit
++  bcc64x_libpng_include = ""
++  bcc64x_libpng_lib = ""
+ }
+ 
+ import("../third_party.gni")
+ 
+ if (skia_use_system_libpng) {
+   system("libpng") {
+-    libs = [ "png" ]
++    if (skia_use_bcc64x) {
++      assert(bcc64x_libpng_include != "",
++             "bcc64x_libpng_include must name the BuildEngine libpng include directory")
++      assert(bcc64x_libpng_lib != "",
++             "bcc64x_libpng_lib must name the BuildEngine libpng import library")
++      include_dirs = [ bcc64x_libpng_include ]
++      libs = [ bcc64x_libpng_lib ]
++    } else {
++      libs = [ "png" ]
++    }
+   }
+ } else {
+   third_party("libpng") {
