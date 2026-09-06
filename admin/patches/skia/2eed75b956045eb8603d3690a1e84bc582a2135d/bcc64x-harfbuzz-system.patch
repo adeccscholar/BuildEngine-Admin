@@ -1,0 +1,39 @@
+diff --git a/third_party/harfbuzz/BUILD.gn b/third_party/harfbuzz/BUILD.gn
+--- a/third_party/harfbuzz/BUILD.gn
++++ b/third_party/harfbuzz/BUILD.gn
+@@ -7,14 +7,31 @@ import("../third_party.gni")
+ 
+ declare_args() {
+   skia_use_system_harfbuzz = is_official_build && !is_canvaskit
++  bcc64x_harfbuzz_include = ""
++  bcc64x_harfbuzz_lib = ""
++  bcc64x_harfbuzz_subset_lib = ""
+ }
+ 
+ if (skia_use_system_harfbuzz) {
+   system("harfbuzz") {
+-    include_dirs = [ "/usr/include/harfbuzz" ]
+-    libs = [ "harfbuzz" ]
+-    if (skia_pdf_subset_harfbuzz) {
+-      libs += [ "harfbuzz-subset" ]
++    if (skia_use_bcc64x) {
++      assert(bcc64x_harfbuzz_include != "",
++             "bcc64x_harfbuzz_include must name the BuildEngine HarfBuzz include directory")
++      assert(bcc64x_harfbuzz_lib != "",
++             "bcc64x_harfbuzz_lib must name the BuildEngine HarfBuzz import library")
++      include_dirs = [ bcc64x_harfbuzz_include ]
++      libs = [ bcc64x_harfbuzz_lib ]
++      if (skia_pdf_subset_harfbuzz) {
++        assert(bcc64x_harfbuzz_subset_lib != "",
++               "bcc64x_harfbuzz_subset_lib must name the BuildEngine HarfBuzz subset import library")
++        libs += [ bcc64x_harfbuzz_subset_lib ]
++      }
++    } else {
++      include_dirs = [ "/usr/include/harfbuzz" ]
++      libs = [ "harfbuzz" ]
++      if (skia_pdf_subset_harfbuzz) {
++        libs += [ "harfbuzz-subset" ]
++      }
+     }
+   }
+ } else {
