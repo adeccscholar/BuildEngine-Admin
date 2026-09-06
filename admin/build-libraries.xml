@@ -4774,29 +4774,29 @@
             <argument value="skottie"/>
          </execute>
 
-         <variant name="Release">
-            <variable name="SkiaOfficialBuild" value="true"/>
-            <variable name="SkiaDebug" value="false"/>
+<variant name="Release">
+   <variable name="SkiaOfficialBuild" value="true"/>
+   <variable name="SkiaDebug" value="false"/>
 
-            <variable name="ZlibLibraryName" value="libz"/>
-            <variable name="LibPngLibraryName" value="libpng16"/>
-            <variable name="LibJpegLibraryName" value="libjpeg"/>
-            <variable name="HarfBuzzLibraryName" value="harfbuzz"/>
-            <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subset"/>
-            <variable name="FreeTypeLibraryName" value="freetype"/>
-         </variant>
+   <variable name="ZlibLibraryName" value="libz"/>
+   <variable name="LibPngLibraryName" value="libpng16"/>
+   <variable name="LibJpegLibraryName" value="libjpeg"/>
+   <variable name="HarfBuzzLibraryName" value="harfbuzz"/>
+   <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subset"/>
+   <variable name="FreeTypeLibraryName" value="libfreetype"/>
+</variant>
 
-         <variant name="Debug">
-            <variable name="SkiaOfficialBuild" value="false"/>
-            <variable name="SkiaDebug" value="true"/>
+<variant name="Debug">
+   <variable name="SkiaOfficialBuild" value="false"/>
+   <variable name="SkiaDebug" value="true"/>
 
-            <variable name="ZlibLibraryName" value="libzd"/>
-            <variable name="LibPngLibraryName" value="libpng16d"/>
-            <variable name="LibJpegLibraryName" value="libjpegd"/>
-            <variable name="HarfBuzzLibraryName" value="harfbuzzd"/>
-            <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subsetd"/>
-            <variable name="FreeTypeLibraryName" value="freetyped"/>
-         </variant>
+   <variable name="ZlibLibraryName" value="libzd"/>
+   <variable name="LibPngLibraryName" value="libpng16d"/>
+   <variable name="LibJpegLibraryName" value="libjpegd"/>
+   <variable name="HarfBuzzLibraryName" value="harfbuzzd"/>
+   <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subsetd"/>
+   <variable name="FreeTypeLibraryName" value="libfreetyped"/>
+</variant>
 
          <install>
             <perVariant>
