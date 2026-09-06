@@ -1,5 +1,6 @@
-#include <jpeglib.h>
+#include <stddef.h>
 #include <stdio.h>
+#include <jpeglib.h>
 
 int main(void)
 {
