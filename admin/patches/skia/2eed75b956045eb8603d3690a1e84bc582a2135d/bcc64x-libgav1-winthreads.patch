@@ -1,0 +1,15 @@
+diff --git a/third_party/externals/libgav1/src/utils/threadpool.cc b/third_party/externals/libgav1/src/utils/threadpool.cc
+--- a/third_party/externals/libgav1/src/utils/threadpool.cc
++++ b/third_party/externals/libgav1/src/utils/threadpool.cc
+@@ -16,1 +16,1 @@
+-#if defined(_MSC_VER)
++#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
+@@ -68,1 +68,1 @@
+-#if defined(_MSC_VER)
++#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
+@@ -78,1 +78,1 @@
+-#if defined(_MSC_VER)
++#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
+@@ -87,1 +87,1 @@
+-#if defined(_MSC_VER)
++#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
