@@ -1,0 +1,22 @@
+diff --git a/third_party/third_party.gni b/third_party/third_party.gni
+index 1fe96e9..3c6feed 100644
+--- a/third_party/third_party.gni
++++ b/third_party/third_party.gni
+@@ -107,7 +107,17 @@ template("system") {
+   config(target_name + "_public") {
+     forward_variables_from(invoker, "*", [])
+   }
++
++  if (skia_use_bcc64x && defined(invoker.ldflags)) {
++    config(target_name + "_bcc64x_link") {
++      ldflags = invoker.ldflags
++    }
++  }
++
+   group(target_name) {
+     public_configs = [ ":" + target_name + "_public" ]
++    if (skia_use_bcc64x && defined(invoker.ldflags)) {
++      all_dependent_configs = [ ":" + target_name + "_bcc64x_link" ]
++    }
+   }
+ }
