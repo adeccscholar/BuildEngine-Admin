@@ -3494,7 +3494,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T22:30:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T22:31:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -4781,8 +4781,8 @@
    <variable name="ZlibLibraryName" value="libz"/>
    <variable name="LibPngLibraryName" value="libpng16"/>
    <variable name="LibJpegLibraryName" value="libjpeg"/>
-   <variable name="HarfBuzzLibraryName" value="harfbuzz"/>
-   <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subset"/>
+   <variable name="HarfBuzzLibraryName" value="libharfbuzz"/>
+   <variable name="HarfBuzzSubsetLibraryName" value="libharfbuzz-subset"/>
    <variable name="FreeTypeLibraryName" value="libfreetype"/>
 </variant>
 
@@ -4793,8 +4793,8 @@
    <variable name="ZlibLibraryName" value="libzd"/>
    <variable name="LibPngLibraryName" value="libpng16d"/>
    <variable name="LibJpegLibraryName" value="libjpegd"/>
-   <variable name="HarfBuzzLibraryName" value="harfbuzzd"/>
-   <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subsetd"/>
+   <variable name="HarfBuzzLibraryName" value="libharfbuzzd"/>
+   <variable name="HarfBuzzSubsetLibraryName" value="libharfbuzz-subsetd"/>
    <variable name="FreeTypeLibraryName" value="libfreetyped"/>
 </variant>
 
