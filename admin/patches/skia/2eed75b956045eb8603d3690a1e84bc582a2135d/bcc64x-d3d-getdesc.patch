@@ -1,7 +1,7 @@
 diff --git a/include/gpu/ganesh/d3d/GrD3DTypes.h b/include/gpu/ganesh/d3d/GrD3DTypes.h
 --- a/include/gpu/ganesh/d3d/GrD3DTypes.h
 +++ b/include/gpu/ganesh/d3d/GrD3DTypes.h
-@@ -5,6 +5,27 @@
+@@ -28,6 +28,27 @@
  
  class GrD3DGpu;
  
@@ -32,7 +32,7 @@ diff --git a/include/gpu/ganesh/d3d/GrD3DTypes.h b/include/gpu/ganesh/d3d/GrD3DT
 diff --git a/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp b/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp
 --- a/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp
 +++ b/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp
-@@ -4,7 +4,7 @@
+@@ -58,7 +58,7 @@
      // TODO: for 4:2:0 YUV formats we'll need to map two different views, one for Y and one for UV.
      // For now map the entire resource.
      D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
@@ -41,7 +41,7 @@ diff --git a/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp b/src/gpu/ganesh/d
      desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
      desc.Texture2D.MostDetailedMip = mostDetailedMip;
      desc.Texture2D.MipLevels = mipLevels;
-@@ -17,12 +17,13 @@ GrD3DDescriptorHeap::CPUHandle GrD3DCpuDescriptorManager::createUnorderedAccessV
+@@ -71,12 +71,13 @@ GrD3DDescriptorHeap::CPUHandle GrD3DCpuDescriptorManager::createUnorderedAccessV
          GrD3DGpu* gpu, ID3D12Resource* resource, unsigned int mipSlice) {
      const GrD3DDescriptorHeap::CPUHandle& descriptor =
              fShaderViewDescriptorPool.allocateHandle(gpu);
@@ -60,7 +60,7 @@ diff --git a/src/gpu/ganesh/d3d/GrD3DCpuDescriptorManager.cpp b/src/gpu/ganesh/d
 diff --git a/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h b/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h
 --- a/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h
 +++ b/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h
-@@ -8,7 +8,7 @@
+@@ -42,7 +42,7 @@
      size_t getIndex(const CPUHandle& handle) {
          SkASSERT(handle.fHeapID == fUniqueID);
          size_t index = (handle.fHandle.ptr - fCPUHeapStart.ptr) / fHandleIncrementSize;
@@ -69,7 +69,7 @@ diff --git a/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h b/src/gpu/ganesh/d3d/GrD3D
          SkASSERT(handle.fHandle.ptr == fCPUHeapStart.ptr + index * fHandleIncrementSize);
          return index;
      }
-@@ -16,7 +16,7 @@
+@@ -50,7 +50,7 @@
      size_t getIndex(const GPUHandle& handle) {
          SkASSERT(handle.fHeapID == fUniqueID);
          size_t index = (handle.fHandle.ptr - fCPUHeapStart.ptr) / fHandleIncrementSize;
@@ -81,7 +81,7 @@ diff --git a/src/gpu/ganesh/d3d/GrD3DDescriptorHeap.h b/src/gpu/ganesh/d3d/GrD3D
 diff --git a/src/gpu/ganesh/d3d/GrD3DGpu.cpp b/src/gpu/ganesh/d3d/GrD3DGpu.cpp
 --- a/src/gpu/ganesh/d3d/GrD3DGpu.cpp
 +++ b/src/gpu/ganesh/d3d/GrD3DGpu.cpp
-@@ -7,7 +7,7 @@ bool GrD3DGpu::isTestingOnlyBackendTexture(const GrBackendTexture& tex) const {
+@@ -1637,7 +1637,7 @@
      if (!textureResource) {
          return false;
      }
