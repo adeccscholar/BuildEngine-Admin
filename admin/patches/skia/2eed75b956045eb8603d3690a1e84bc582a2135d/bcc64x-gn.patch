@@ -303,7 +303,7 @@ diff --git a/modules/skcms/BUILD.gn b/modules/skcms/BUILD.gn
 +    } else if (is_clang) {
        cflags = [
          "/clang:-mavx512f",
-         "/clang:-mavx512dq",
+         "/clang:-mf16c",
 diff --git a/src/utils/win/SkDWriteFontFileStream.h b/src/utils/win/SkDWriteFontFileStream.h
 --- a/src/utils/win/SkDWriteFontFileStream.h
 +++ b/src/utils/win/SkDWriteFontFileStream.h
@@ -484,3 +484,24 @@ diff --git a/include/private/SkAttributes.h b/include/private/SkAttributes.h
  #    define SK_NEVER_INLINE __declspec(noinline)
  #  else
  #    define SK_NEVER_INLINE SK_ATTRIBUTE(noinline)
+diff --git a/gn/portable/BUILD.gn b/gn/portable/BUILD.gn
+--- a/gn/portable/BUILD.gn
++++ b/gn/portable/BUILD.gn
+@@ -4,7 +4,7 @@
+ # found in the LICENSE file.
+ 
+ config("add_exceptions") {
+-  if (is_win) {
++  if (is_win && !skia_use_bcc64x) {
+     cflags_cc = [ "/EHsc" ]
+   } else {
+     cflags_cc = [ "-fexceptions" ]
+@@ -12,7 +12,7 @@
+ }
+ 
+ config("add_rtti") {
+-  if (is_win) {
++  if (is_win && !skia_use_bcc64x) {
+     cflags_cc = [ "/GR" ]
+   } else {
+     cflags_cc = [ "-frtti" ]
