@@ -1,0 +1,12 @@
+diff --git a/src/gpu/ganesh/d3d/GrD3DGpu.cpp b/src/gpu/ganesh/d3d/GrD3DGpu.cpp
+--- a/src/gpu/ganesh/d3d/GrD3DGpu.cpp
++++ b/src/gpu/ganesh/d3d/GrD3DGpu.cpp
+@@ -1640,1 +1640,7 @@
+-    return !(textureResource->GetDesc().Flags & D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
++#if defined(__BORLANDC__) && defined(__clang__)
++    D3D12_RESOURCE_DESC theDesc{};
++    textureResource->GetDesc(&theDesc);
++    return !(theDesc.Flags & D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
++#else
++    return !(textureResource->GetDesc().Flags & D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
++#endif
