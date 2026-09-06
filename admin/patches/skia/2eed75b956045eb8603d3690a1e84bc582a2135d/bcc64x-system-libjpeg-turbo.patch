@@ -1,0 +1,30 @@
+diff --git a/third_party/libjpeg-turbo/BUILD.gn b/third_party/libjpeg-turbo/BUILD.gn
+index ed55841..8760c56 100644
+--- a/third_party/libjpeg-turbo/BUILD.gn
++++ b/third_party/libjpeg-turbo/BUILD.gn
+@@ -7,13 +7,24 @@ import("../../gn/skia.gni")
+ 
+ declare_args() {
+   skia_use_system_libjpeg_turbo = is_official_build && !is_canvaskit
++  bcc64x_libjpeg_include = ""
++  bcc64x_libjpeg_lib = ""
+ }
+ 
+ import("../third_party.gni")
+ 
+ if (skia_use_system_libjpeg_turbo) {
+   system("libjpeg") {
+-    libs = [ "jpeg" ]
++    if (skia_use_bcc64x) {
++      assert(bcc64x_libjpeg_include != "",
++             "bcc64x_libjpeg_include must name the BuildEngine libjpeg-turbo include directory")
++      assert(bcc64x_libjpeg_lib != "",
++             "bcc64x_libjpeg_lib must name the BuildEngine libjpeg-turbo import library")
++      include_dirs = [ bcc64x_libjpeg_include ]
++      libs = [ bcc64x_libjpeg_lib ]
++    } else {
++      libs = [ "jpeg" ]
++    }
+   }
+ } else {
+   source_set("libjpeg_headers") {
