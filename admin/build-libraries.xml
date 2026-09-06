@@ -2962,7 +2962,7 @@
    </smoke>
 </library>
 
-<library id="harfbuzz" version="14.4.0" timestamp="2026-09-06T04:30:00Z">
+<library id="harfbuzz" version="14.4.0" timestamp="2026-09-06T17:10:00Z">
 
    <metadata
       name="HarfBuzz"
@@ -3087,6 +3087,25 @@
                executable="{Tool:cmake}"
                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
+            <!--
+               HarfBuzz' CMake export contains Threads::Threads in the
+               public link interface when CMake detects pthread support.
+
+               The upstream generated package file does not call
+               find_dependency(Threads), so preserve the generated export
+               as harfbuzzTargets.cmake and install a small package wrapper
+               as harfbuzzConfig.cmake.
+            -->
+            <copy
+               source="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"
+               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzTargets.cmake"
+               overwrite="true"/>
+
+            <copy
+               source="{BuildFileDir}\cmake\harfbuzz\harfbuzzConfig.cmake"
+               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"
+               overwrite="true"/>
+
             <require
                path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
                kind="directory"/>
@@ -3098,6 +3117,15 @@
             <require
                path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz"
                kind="directory"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzTargets.cmake"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig-{CMakeExportConfiguration}.cmake"/>
 
             <require
                path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig"
@@ -3124,6 +3152,7 @@
                path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
          </common>
       </install>
+
    </build>
 
    <publish
