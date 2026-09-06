@@ -26,10 +26,10 @@ diff --git a/include/gpu/ganesh/d3d/GrD3DTypes.h b/include/gpu/ganesh/d3d/GrD3DT
 +#endif
 +}
 +
-  /** Check if the argument is non-null, and if so, call obj->AddRef() and return obj.
-   */
+ /** Check if the argument is non-null, and if so, call obj->AddRef() and return obj.
+  */
  template <typename T> static inline T* GrSafeComAddRef(T* obj) {
- diff --git a/src/gpu/ganesh/d3d/GrD3DGpu.cpp b/src/gpu/ganesh/d3d/GrD3DGpu.cpp
+diff --git a/src/gpu/ganesh/d3d/GrD3DGpu.cpp b/src/gpu/ganesh/d3d/GrD3DGpu.cpp
 --- a/src/gpu/ganesh/d3d/GrD3DGpu.cpp
 +++ b/src/gpu/ganesh/d3d/GrD3DGpu.cpp
 @@ -1640,1 +1640,1 @@
