@@ -3443,12 +3443,19 @@
    </smoke>
 </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T15:50:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T16:31:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
+      <dependency library="brotli" version="1.2.0"/>
+      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libpng" version="1.6.58"/>
+      <dependency library="harfbuzz" version="14.4.0"/>
+      <dependency library="freetype" version="2.14.3"/>
 
       <metadata name="Skia" supplier="Google" homepage="https://skia.org/">
-         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\skia\LICENSE"/>
+         <license name="BSD 3-Clause"
+                  spdx="BSD-3-Clause"
+                  file="licenses\skia\LICENSE"/>
       </metadata>
 
       <security>
@@ -3460,6 +3467,23 @@
       <source>
          <!--
             Broad Windows desktop profile.
+
+            BuildEngine-provided external dependencies:
+               OpenGL 26.2.1
+               zlib 1.3.2
+               Brotli 1.2.0
+               libjpeg-turbo 3.2.0
+               libpng 1.6.58
+               HarfBuzz 14.4.0
+               FreeType 2.14.3
+
+            These components are NOT downloaded or rebuilt inside Skia.
+            Their exact package versions are represented by BuildEngine
+            dependencies above.
+
+            Bundled Skia dependencies remain pinned to the commits selected
+            by this Skia revision.  Their pins are additionally recorded in
+            bundled-components.json for later SBOM generation.
 
             Active:
                CPU raster / skcms
@@ -3497,19 +3521,13 @@
                Perfetto / pprof
                developer tools / viewer / fuzzers
 
-            zlib is supplied by the BuildEngine zlib 1.3.2 package.
-
             Source trees are regenerable build artifacts.
             No source backup and no git-sync-deps checkout is used.
          -->
 
          <!-- ======================================================== -->
-         <!-- Compression / text / image / document dependencies.     -->
+         <!-- Bundled compression / text / image dependencies.         -->
          <!-- ======================================================== -->
-
-         <download
-            url="https://skia.googlesource.com/external/github.com/google/brotli.git/+archive/6d03dfbedda1615c4cba1211f8d81735575209c8.tar.gz"
-            archive="skia-deps\brotli-6d03dfbedda1615c4cba1211f8d81735575209c8.tar.gz"/>
 
          <download
             url="https://skia.googlesource.com/external/github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git/+archive/169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"
@@ -3522,14 +3540,6 @@
          <download
             url="https://chromium.googlesource.com/external/github.com/libexpat/libexpat.git/+archive/6154446fccefbf3ca644894f598969113b0c7bcd.tar.gz"
             archive="skia-deps\expat-6154446fccefbf3ca644894f598969113b0c7bcd.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/chromium/src/third_party/freetype2.git/+archive/264b5fbf5b912b39f98d038bf75d39be0a73f21b.tar.gz"
-            archive="skia-deps\freetype-264b5fbf5b912b39f98d038bf75d39be0a73f21b.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/external/github.com/harfbuzz/harfbuzz.git/+archive/9cb1fee51069b206effb4736e443b038d230789d.tar.gz"
-            archive="skia-deps\harfbuzz-9cb1fee51069b206effb4736e443b038d230789d.tar.gz"/>
 
          <download
             url="https://chromium.googlesource.com/external/github.com/google/highway.git/+archive/457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"
@@ -3548,16 +3558,8 @@
             archive="skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
 
          <download
-            url="https://chromium.googlesource.com/chromium/deps/libjpeg_turbo.git/+archive/e14cbfaa85529d47f9f55b0f104a579c1061f9ad.tar.gz"
-            archive="skia-deps\libjpeg-turbo-e14cbfaa85529d47f9f55b0f104a579c1061f9ad.tar.gz"/>
-
-         <download
             url="https://chromium.googlesource.com/external/gitlab.com/wg1/jpeg-xl.git/+archive/332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"
             archive="skia-deps\libjxl-332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"/>
-
-         <download
-            url="https://skia.googlesource.com/third_party/libpng.git/+archive/d5515b5b8be3901aac04e5bd8bd5c89f287bcd33.tar.gz"
-            archive="skia-deps\libpng-d5515b5b8be3901aac04e5bd8bd5c89f287bcd33.tar.gz"/>
 
          <download
             url="https://chromium.googlesource.com/webm/libwebp.git/+archive/845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"
@@ -3658,29 +3660,10 @@
          </extract>
 
          <!-- ======================================================== -->
-         <!-- Populate third_party\externals.                          -->
+         <!-- Populate bundled third_party\externals only.             -->
+         <!-- BuildEngine package dependencies are deliberately        -->
+         <!-- absent from this section.                               -->
          <!-- ======================================================== -->
-
-         <execute name="mkdir-brotli"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\brotli"/>
-         </execute>
-
-         <execute name="extract-brotli"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\brotli"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\brotli-6d03dfbedda1615c4cba1211f8d81735575209c8.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\brotli\c\include\brotli\decode.h"/>
 
          <execute name="mkdir-d3d12allocator"
                   executable="{Tool:cmake}"
@@ -3744,48 +3727,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\expat\expat\lib\expat.h"/>
-
-         <execute name="mkdir-freetype"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\freetype"/>
-         </execute>
-
-         <execute name="extract-freetype"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\freetype"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\freetype-264b5fbf5b912b39f98d038bf75d39be0a73f21b.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\freetype\include\freetype\freetype.h"/>
-
-         <execute name="mkdir-harfbuzz"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\harfbuzz"/>
-         </execute>
-
-         <execute name="extract-harfbuzz"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\harfbuzz"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\harfbuzz-9cb1fee51069b206effb4736e443b038d230789d.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\harfbuzz\src\hb.h"/>
 
          <execute name="mkdir-highway"
                   executable="{Tool:cmake}"
@@ -3871,29 +3812,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\libgav1\src\gav1\decoder.h"/>
 
-         <execute name="mkdir-libjpeg-turbo"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libjpeg-turbo"/>
-         </execute>
-
-         <execute name="extract-libjpeg-turbo"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\libjpeg-turbo"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libjpeg-turbo-e14cbfaa85529d47f9f55b0f104a579c1061f9ad.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\libjpeg-turbo\src\jpeglib.h"/>
-         <require path="{CurrentArtifact}\third_party\externals\libjpeg-turbo\src\jconfig.h"/>
-         <require path="{CurrentArtifact}\third_party\externals\libjpeg-turbo\src\jmorecfg.h"/>
-
          <execute name="mkdir-libjxl"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -3915,28 +3833,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\libjxl\lib\include\jxl\decode.h"/>
          <require path="{CurrentArtifact}\third_party\externals\libjxl\lib\lib.gni"/>
-
-         <execute name="mkdir-libpng"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libpng"/>
-         </execute>
-
-         <execute name="extract-libpng"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\libpng"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libpng-d5515b5b8be3901aac04e5bd8bd5c89f287bcd33.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\libpng\png.h"/>
-         <require path="{CurrentArtifact}\third_party\externals\libpng\png.c"/>
 
          <execute name="mkdir-libwebp"
                   executable="{Tool:cmake}"
@@ -4161,10 +4057,9 @@
          <require path="{CurrentArtifact}\third_party\externals\vulkanmemoryallocator\include\vk_mem_alloc.h"/>
 
          <!-- ======================================================== -->
-         <!-- BCC64X compatibility patches.                           -->
+         <!-- BCC64X compatibility / system integration patches.      -->
          <!-- ======================================================== -->
 
-         <!-- Core GN / toolchain integration. -->
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-gn.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"
@@ -4192,7 +4087,6 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"/>
          </execute>
 
-         <!-- Broad Windows desktop compatibility. -->
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-desktop.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"
@@ -4220,11 +4114,6 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"/>
          </execute>
 
-         <!--
-            The desktop patch initially introduces the BCC64X zlib library
-            through ldflags.  GN must instead treat the import library as a
-            library input so that it reaches the component DLL link.
-         -->
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-zlib-link.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-link.patch"
@@ -4253,16 +4142,16 @@
          </execute>
 
          <!--
-            BCC64X is a Windows target although it does not define _MSC_VER.
-            Force libgav1's Windows thread implementation instead of pthreads.
+            Route Brotli, libpng and libjpeg-turbo through the already
+            built and tested BuildEngine packages.
          -->
          <copy
-            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-libgav1-winthreads.patch"
-            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-dependencies.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dependencies.patch"
             overwrite="true"
             preserveCurrentArtifact="true"/>
 
-         <execute name="libgav1-winthreads-patch-check"
+         <execute name="system-dependencies-patch-check"
                   executable="{Tool:git}"
                   workingDirectory="{CurrentArtifact}"
                   showOutput="false">
@@ -4270,57 +4159,20 @@
             <argument value="--check"/>
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dependencies.patch"/>
          </execute>
 
-         <execute name="libgav1-winthreads-patch-apply"
+         <execute name="system-dependencies-patch-apply"
                   executable="{Tool:git}"
                   workingDirectory="{CurrentArtifact}"
                   showOutput="false">
             <argument value="apply"/>
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dependencies.patch"/>
          </execute>
 
-         <!--
-            Embarcadero's D3D12 headers expose structure-returning COM methods
-            through explicit RetVal pointer parameters.  Route Skia's affected
-            GetDesc calls through the BCC64X compatibility helpers.
-         -->
-         <copy
-            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-d3d-getdesc.patch"
-            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"
-            overwrite="true"
-            preserveCurrentArtifact="true"/>
-
-         <execute name="d3d-getdesc-patch-check"
-                  executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="apply"/>
-            <argument value="--check"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"/>
-         </execute>
-
-         <execute name="d3d-getdesc-patch-apply"
-                  executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="apply"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"/>
-         </execute>
-
-         <!--
-            Prepare Skia's HarfBuzz GN target for an external BuildEngine
-            HarfBuzz package.  The current profile still uses bundled
-            HarfBuzz; this patch is therefore dormant until
-            skia_use_system_harfbuzz is enabled deliberately.
-         -->
+         <!-- HarfBuzz BuildEngine package integration. -->
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-harfbuzz-system.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-system.patch"
@@ -4348,6 +4200,62 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-system.patch"/>
          </execute>
 
+         <!-- libgav1 must use its Windows threading implementation. -->
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-libgav1-winthreads.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="libgav1-winthreads-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"/>
+         </execute>
+
+         <execute name="libgav1-winthreads-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"/>
+         </execute>
+
+         <!-- Embarcadero D3D12 structure-return ABI compatibility. -->
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-d3d-getdesc.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="d3d-getdesc-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"/>
+         </execute>
+
+         <execute name="d3d-getdesc-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"/>
+         </execute>
+
          <execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
@@ -4362,10 +4270,12 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_PYTHON" value="{Tool:python}"/>
 
+         <!-- OpenGL. -->
          <environment
             name="CB_SKIA_OPENGL_LIB"
             value="{InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/>
 
+         <!-- zlib. -->
          <environment
             name="CB_SKIA_ZLIB_INCLUDE"
             value="{InstallRoot}\packages\zlib\1.3.2\include"/>
@@ -4374,9 +4284,67 @@
             name="CB_SKIA_ZLIB_LIB"
             value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
 
+         <!-- Brotli. -->
+         <environment
+            name="CB_SKIA_BROTLI_INCLUDE"
+            value="{InstallRoot}\packages\brotli\1.2.0\include"/>
+
+         <environment
+            name="CB_SKIA_BROTLI_COMMON_LIB"
+            value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
+
+         <environment
+            name="CB_SKIA_BROTLI_DECODE_LIB"
+            value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
+
+         <!-- libpng. -->
+         <environment
+            name="CB_SKIA_LIBPNG_INCLUDE"
+            value="{InstallRoot}\packages\libpng\1.6.58\include"/>
+
+         <environment
+            name="CB_SKIA_LIBPNG_LIB"
+            value="{InstallRoot}\packages\libpng\1.6.58\lib\win64\{Configuration}\{LibPngLibraryName}.lib"/>
+
+         <!-- libjpeg-turbo. -->
+         <environment
+            name="CB_SKIA_LIBJPEG_INCLUDE"
+            value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\include"/>
+
+         <environment
+            name="CB_SKIA_LIBJPEG_LIB"
+            value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\{Configuration}\{LibJpegLibraryName}.lib"/>
+
+         <!-- HarfBuzz. -->
+         <environment
+            name="CB_SKIA_HARFBUZZ_INCLUDE"
+            value="{InstallRoot}\packages\harfbuzz\14.4.0\include\harfbuzz"/>
+
+         <environment
+            name="CB_SKIA_HARFBUZZ_LIB"
+            value="{InstallRoot}\packages\harfbuzz\14.4.0\lib\win64\{Configuration}\{HarfBuzzLibraryName}.lib"/>
+
+         <environment
+            name="CB_SKIA_HARFBUZZ_SUBSET_LIB"
+            value="{InstallRoot}\packages\harfbuzz\14.4.0\lib\win64\{Configuration}\{HarfBuzzSubsetLibraryName}.lib"/>
+
+         <!-- FreeType. -->
+         <environment
+            name="CB_SKIA_FREETYPE_INCLUDE"
+            value="{InstallRoot}\packages\freetype\2.14.3\include\freetype2"/>
+
+         <environment
+            name="CB_SKIA_FREETYPE_LIB"
+            value="{InstallRoot}\packages\freetype\2.14.3\lib\win64\{Configuration}\{FreeTypeLibraryName}.lib"/>
+
+         <!--
+            Runtime DLL resolution for all BuildEngine package dependencies.
+            They remain separate packages; no dependency DLL is copied into
+            the Skia package here.
+         -->
          <environment
             name="PATH"
-            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\brotli\1.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.58\bin\win64\{Configuration};{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
          <target
             name="gn-gen"
@@ -4403,9 +4371,28 @@
                <line value="bcc64x_rad_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release&quot;"/>
                <line value="bcc64x_rad_psdk_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release/psdk&quot;"/>
 
+               <!-- BuildEngine package locations. -->
                <line value="bcc64x_opengl_lib = getenv(&quot;CB_SKIA_OPENGL_LIB&quot;)"/>
+
                <line value="bcc64x_zlib_include = getenv(&quot;CB_SKIA_ZLIB_INCLUDE&quot;)"/>
                <line value="bcc64x_zlib_lib = getenv(&quot;CB_SKIA_ZLIB_LIB&quot;)"/>
+
+               <line value="bcc64x_brotli_include = getenv(&quot;CB_SKIA_BROTLI_INCLUDE&quot;)"/>
+               <line value="bcc64x_brotli_common_lib = getenv(&quot;CB_SKIA_BROTLI_COMMON_LIB&quot;)"/>
+               <line value="bcc64x_brotli_decode_lib = getenv(&quot;CB_SKIA_BROTLI_DECODE_LIB&quot;)"/>
+
+               <line value="bcc64x_libpng_include = getenv(&quot;CB_SKIA_LIBPNG_INCLUDE&quot;)"/>
+               <line value="bcc64x_libpng_lib = getenv(&quot;CB_SKIA_LIBPNG_LIB&quot;)"/>
+
+               <line value="bcc64x_libjpeg_include = getenv(&quot;CB_SKIA_LIBJPEG_INCLUDE&quot;)"/>
+               <line value="bcc64x_libjpeg_lib = getenv(&quot;CB_SKIA_LIBJPEG_LIB&quot;)"/>
+
+               <line value="bcc64x_harfbuzz_include = getenv(&quot;CB_SKIA_HARFBUZZ_INCLUDE&quot;)"/>
+               <line value="bcc64x_harfbuzz_lib = getenv(&quot;CB_SKIA_HARFBUZZ_LIB&quot;)"/>
+               <line value="bcc64x_harfbuzz_subset_lib = getenv(&quot;CB_SKIA_HARFBUZZ_SUBSET_LIB&quot;)"/>
+
+               <line value="skia_system_freetype2_include_path = getenv(&quot;CB_SKIA_FREETYPE_INCLUDE&quot;)"/>
+               <line value="skia_system_freetype2_lib = getenv(&quot;CB_SKIA_FREETYPE_LIB&quot;)"/>
 
                <line value="is_official_build = {SkiaOfficialBuild}"/>
                <line value="is_debug = {SkiaDebug}"/>
@@ -4441,12 +4428,17 @@
                <line value="skia_use_webgl = false"/>
                <line value="skia_use_webgpu = false"/>
 
-               <!-- Windows fonts + FreeType. -->
+               <!-- Windows fonts + BuildEngine FreeType. -->
                <line value="skia_enable_fontmgr_win = true"/>
                <line value="skia_enable_fontmgr_win_gdi = true"/>
 
                <line value="skia_use_freetype = true"/>
-               <line value="skia_use_system_freetype2 = false"/>
+               <line value="skia_use_system_freetype2 = true"/>
+
+               <!--
+                  WOFF2/SVG/zlib support is already configured in the
+                  BuildEngine FreeType 2.14.3 package.
+               -->
                <line value="skia_use_freetype_woff2 = true"/>
                <line value="skia_use_freetype_svg = true"/>
                <line value="skia_use_freetype_zlib = true"/>
@@ -4465,7 +4457,7 @@
                <line value="skia_enable_skunicode = true"/>
 
                <line value="skia_use_harfbuzz = true"/>
-               <line value="skia_use_system_harfbuzz = false"/>
+               <line value="skia_use_system_harfbuzz = true"/>
                <line value="skia_pdf_subset_harfbuzz = true"/>
 
                <line value="skia_use_client_icu = false"/>
@@ -4483,45 +4475,48 @@
                <line value="skia_enable_svg = true"/>
                <line value="skia_enable_skottie = true"/>
 
-               <!-- PNG. -->
+               <!-- BuildEngine libpng package. -->
                <line value="skia_use_libpng_decode = true"/>
                <line value="skia_use_libpng_encode = true"/>
                <line value="skia_use_no_png_encode = false"/>
-               <line value="skia_use_system_libpng = false"/>
+               <line value="skia_use_system_libpng = true"/>
 
-               <!-- JPEG. -->
+               <!-- BuildEngine libjpeg-turbo package. -->
                <line value="skia_use_libjpeg_turbo_decode = true"/>
                <line value="skia_use_libjpeg_turbo_encode = true"/>
                <line value="skia_use_no_jpeg_encode = false"/>
-               <line value="skia_use_system_libjpeg_turbo = false"/>
+               <line value="skia_use_system_libjpeg_turbo = true"/>
                <line value="skia_use_jpeg_gainmaps = true"/>
 
-               <!-- WebP. -->
+               <!-- Bundled WebP. -->
                <line value="skia_use_libwebp_decode = true"/>
                <line value="skia_use_libwebp_encode = true"/>
                <line value="skia_use_no_webp_encode = false"/>
                <line value="skia_use_system_libwebp = false"/>
 
-               <!-- Wuffs / multi-frame. -->
+               <!-- Bundled Wuffs / multi-frame. -->
                <line value="skia_use_wuffs = true"/>
                <line value="skia_include_multiframe_procs = true"/>
 
-               <!-- AVIF. -->
+               <!-- Bundled AVIF. -->
                <line value="skia_use_libavif = true"/>
                <line value="skia_use_crabbyavif = false"/>
 
-               <!-- JPEG XL. -->
+               <!-- Bundled JPEG XL. -->
                <line value="skia_use_libjxl_decode = true"/>
 
-               <!-- RAW / DNG. -->
+               <!-- Bundled RAW / DNG. -->
                <line value="skia_use_dng_sdk = true"/>
 
                <!--
                   PIE-X is deliberately disabled on Windows by upstream Skia.
                   The pinned source is retained as part of the prepared source
-                  closure, but we do not override that platform decision.
+                  closure and SBOM input, but is not active in the product.
                -->
                <line value="skia_use_piex = false"/>
+
+               <!-- BuildEngine Brotli package. -->
+               <line value="skia_use_system_brotli = true"/>
 
                <!-- BuildEngine zlib package. -->
                <line value="skia_use_zlib = true"/>
@@ -4551,7 +4546,7 @@
 
             <environment
                name="PATH"
-               value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\brotli\1.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.58\bin\win64\{Configuration};{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="gen"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -4566,7 +4561,7 @@
 
             <environment
                name="PATH"
-               value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\brotli\1.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.58\bin\win64\{Configuration};{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="-C"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -4582,13 +4577,25 @@
          <variant name="Release">
             <variable name="SkiaOfficialBuild" value="true"/>
             <variable name="SkiaDebug" value="false"/>
+
             <variable name="ZlibLibraryName" value="libz"/>
+            <variable name="LibPngLibraryName" value="libpng16"/>
+            <variable name="LibJpegLibraryName" value="jpeg"/>
+            <variable name="HarfBuzzLibraryName" value="harfbuzz"/>
+            <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subset"/>
+            <variable name="FreeTypeLibraryName" value="freetype"/>
          </variant>
 
          <variant name="Debug">
             <variable name="SkiaOfficialBuild" value="false"/>
             <variable name="SkiaDebug" value="true"/>
+
             <variable name="ZlibLibraryName" value="libzd"/>
+            <variable name="LibPngLibraryName" value="libpng16d"/>
+            <variable name="LibJpegLibraryName" value="jpegd"/>
+            <variable name="HarfBuzzLibraryName" value="harfbuzzd"/>
+            <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subsetd"/>
+            <variable name="FreeTypeLibraryName" value="freetyped"/>
          </variant>
 
          <install>
@@ -4726,10 +4733,21 @@
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE"
                   overwrite="true"/>
 
+               <!--
+                  Machine-readable input for later package/SBOM generation.
+                  This records only the libraries intentionally bundled inside
+                  the Skia build. BuildEngine dependencies come from the DAG.
+               -->
+               <copy
+                  source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bundled-components.json"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json"
+                  overwrite="true"/>
+
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include\core\SkSurface.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms\skcms.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json"/>
             </common>
          </install>
       </build>
@@ -4744,6 +4762,9 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dat" optional="false"/>
          <cmake source="lib\cmake" target="lib\cmake" optional="false"/>
+
+         <!-- Preserve bundled-component evidence in the published package. -->
+         <tree source="sbom" target="sbom" optional="false"/>
       </publish>
 
       <smoke
@@ -4761,7 +4782,7 @@
 
          <environment
             name="PATH"
-            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
+            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{InstallRoot}\packages\brotli\1.2.0\bin\win64\Release;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Release;{InstallRoot}\packages\libpng\1.6.58\bin\win64\Release;{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\Release;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
    
