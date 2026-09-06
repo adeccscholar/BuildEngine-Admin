@@ -2917,18 +2917,233 @@
    </smoke>
 </library>
 
-<library id="freetype" version="2.14.3" timestamp="2026-09-06T03:30:00Z">
+<library id="harfbuzz" version="14.4.0" timestamp="2026-09-06T04:30:00Z">
+
+   <metadata
+      name="HarfBuzz"
+      supplier="HarfBuzz Project"
+      homepage="https://harfbuzz.github.io/">
+      <license
+         name="Old MIT"
+         spdx="MIT"
+         file="COPYING"/>
+   </metadata>
+
+   <security>
+      <repository
+         url="https://github.com/harfbuzz/harfbuzz.git"
+         ref="14.4.0"/>
+   </security>
+
+   <source>
+      <download
+         url="https://github.com/harfbuzz/harfbuzz/releases/download/{LibraryVersion}/harfbuzz-{LibraryVersion}.tar.xz"
+         archive="harfbuzz-{LibraryVersion}.tar.xz"
+         sha256="2357ed966c6ced7bfa720b0640c0231065af01158fbea215093ffa15aed44371"/>
+
+      <extract
+         format="libarchive"
+         root="harfbuzz-{LibraryVersion}">
+         <require path="CMakeLists.txt"/>
+         <require path="meson.build"/>
+         <require path="src\hb.h"/>
+         <require path="src\hb-subset.h"/>
+         <require path="src\harfbuzz-config.cmake.in"/>
+         <require path="COPYING"/>
+      </extract>
+   </source>
+
+   <build>
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+
+      <argument value="-G"/>
+      <argument value="Ninja"/>
+      <argument value="-Wno-dev"/>
+      <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+      <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+      <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+
+      <!--
+         Explicit dependency policy:
+         HarfBuzz is the producer below FreeType and therefore must not
+         discover FreeType or optional platform frameworks automatically.
+      -->
+      <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+
+      <argument value="-DHB_HAVE_FREETYPE:BOOL=OFF"/>
+      <argument value="-DHB_HAVE_CAIRO:BOOL=OFF"/>
+      <argument value="-DHB_HAVE_GRAPHITE2:BOOL=OFF"/>
+      <argument value="-DHB_HAVE_GLIB:BOOL=OFF"/>
+      <argument value="-DHB_HAVE_ICU:BOOL=OFF"/>
+      <argument value="-DHB_HAVE_GOBJECT:BOOL=OFF"/>
+      <argument value="-DHB_HAVE_INTROSPECTION:BOOL=OFF"/>
+
+      <argument value="-DHB_HAVE_UNISCRIBE:BOOL=OFF"/>
+      <argument value="-DHB_HAVE_GDI:BOOL=OFF"/>
+      <argument value="-DHB_HAVE_DIRECTWRITE:BOOL=OFF"/>
+
+      <!-- Core shaping + subset required by Skia. -->
+      <argument value="-DHB_BUILD_SUBSET:BOOL=ON"/>
+
+      <!--
+         Keep the first package contract narrow and deterministic.
+         Raster/vector/GPU are independent newer HarfBuzz modules and are
+         not required by Skia's shaping/subsetting dependency.
+      -->
+      <argument value="-DHB_BUILD_RASTER:BOOL=OFF"/>
+      <argument value="-DHB_BUILD_VECTOR:BOOL=OFF"/>
+      <argument value="-DHB_BUILD_GPU:BOOL=OFF"/>
+      <argument value="-DHB_BUILD_GPU_DEMO:STRING=OFF"/>
+
+      <!-- Utilities require additional optional dependencies. -->
+      <argument value="-DHB_BUILD_UTILS:BOOL=OFF"/>
+
+      <cmake
+         mode="configure"
+         executable="{Tool:cmake}"
+         source="{Workspace}\harfbuzz-{LibraryVersion}"
+         build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+      <cmake
+         mode="build"
+         executable="{Tool:cmake}"
+         build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+      <variant name="Release">
+         <variable name="CMakeExportConfiguration" value="release"/>
+
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+         <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+      </variant>
+
+      <variant name="Debug">
+         <variable name="CMakeExportConfiguration" value="debug"/>
+
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+         <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+         <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+
+         <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+      </variant>
+
+      <install>
+         <perVariant>
+            <cmake
+               mode="install"
+               executable="{Tool:cmake}"
+               build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+               kind="directory"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+               kind="directory"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz"
+               kind="directory"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig"
+               kind="directory"/>
+         </perVariant>
+
+         <common>
+            <copy
+               source="{Workspace}\harfbuzz-{LibraryVersion}\COPYING"
+               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+               overwrite="true"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz"
+               kind="directory"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb.h"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset.h"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+         </common>
+      </install>
+   </build>
+
+   <publish
+      root="Win64x"
+      configuration="Release"
+      consumer="{BuildFileDir}\cmake\consumer">
+
+      <tree
+         source="include"
+         target="include"
+         optional="true"/>
+
+      <files
+         source="lib\win64\{Configuration}"
+         target="lib"
+         extensions=".lib"
+         optional="true"/>
+
+      <files
+         source="bin\win64\{Configuration}"
+         target="bin"
+         extensions=".dll;.exe;.pdb"
+         optional="true"/>
+
+      <tree
+         source="lib\win64\{Configuration}\pkgconfig"
+         target="lib\pkgconfig"
+         optional="true"/>
+
+      <cmake
+         source="lib\win64\{Configuration}\cmake"
+         target="lib\cmake"
+         optional="true"/>
+   </publish>
+
+   <smoke
+      id="consumer"
+      source="smokes\harfbuzz\consumer"
+      configuration="Release"
+      cmake="{Tool:cmake}"
+      ninja="{Tool:ninja}"
+      toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+      executable="harfbuzz-consumer.exe">
+
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+   </smoke>
+</library>
+
+<library id="freetype" version="2.14.3" timestamp="2026-09-06T04:30:00Z">
    <dependency library="zlib" version="1.3.2"/>
    <dependency library="bzip2" version="1.0.8"/>
    <dependency library="brotli" version="1.2.0"/>
    <dependency library="libpng" version="1.6.58"/>
+   <dependency library="harfbuzz" version="14.4.0"/>
 
    <source>
       <download
-         url="https://download.savannah.gnu.org/releases/freetype/freetype-{LibraryVersion}.tar.xz"
-         archive="freetype-{LibraryVersion}.tar.xz"/>
+         url="https://sourceforge.net/projects/freetype/files/freetype2/{LibraryVersion}/freetype-{LibraryVersion}.tar.xz/download"
+         archive="freetype-{LibraryVersion}.tar.xz"
+         sha256="36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f"/>
 
-      <extract format="libarchive" root="freetype-{LibraryVersion}">
+      <extract
+         format="libarchive"
+         root="freetype-{LibraryVersion}">
          <require path="CMakeLists.txt"/>
          <require path="include\freetype\freetype.h"/>
          <require path="include\ft2build.h"/>
@@ -2945,18 +3160,39 @@
       <argument value="-Wno-dev"/>
       <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
       <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+
       <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
 
       <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
 
+      <!--
+         Every supported external dependency is explicit.
+         No optional dependency probing is allowed to decide product shape.
+      -->
+      <argument value="-DFT_DISABLE_ZLIB:BOOL=OFF"/>
       <argument value="-DFT_REQUIRE_ZLIB:BOOL=ON"/>
-      <argument value="-DFT_REQUIRE_BZIP2:BOOL=ON"/>
-      <argument value="-DFT_REQUIRE_PNG:BOOL=ON"/>
-      <argument value="-DFT_REQUIRE_BROTLI:BOOL=ON"/>
-      <argument value="-DFT_DISABLE_HARFBUZZ:BOOL=ON"/>
 
-      <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\bzip2\1.0.8;{InstallRoot}\packages\brotli\1.2.0;{InstallRoot}\packages\libpng\1.6.58"/>
+      <argument value="-DFT_DISABLE_BZIP2:BOOL=OFF"/>
+      <argument value="-DFT_REQUIRE_BZIP2:BOOL=ON"/>
+
+      <argument value="-DFT_DISABLE_PNG:BOOL=OFF"/>
+      <argument value="-DFT_REQUIRE_PNG:BOOL=ON"/>
+
+      <argument value="-DFT_DISABLE_BROTLI:BOOL=OFF"/>
+      <argument value="-DFT_REQUIRE_BROTLI:BOOL=ON"/>
+
+      <!--
+         HarfBuzz is a mandatory BuildEngine dependency.
+         Dynamic runtime discovery is deliberately disabled.
+      -->
+      <argument value="-DFT_DISABLE_HARFBUZZ:BOOL=OFF"/>
+      <argument value="-DFT_DYNAMIC_HARFBUZZ:BOOL=OFF"/>
+      <argument value="-DFT_REQUIRE_HARFBUZZ:BOOL=ON"/>
+
+      <argument
+         value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\bzip2\1.0.8;{InstallRoot}\packages\brotli\1.2.0;{InstallRoot}\packages\libpng\1.6.58;{InstallRoot}\packages\harfbuzz\14.4.0"/>
+
       <cmake
          mode="configure"
          executable="{Tool:cmake}"
@@ -2971,6 +3207,7 @@
       <variant name="Release">
          <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
          <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
       </variant>
@@ -2978,7 +3215,9 @@
       <variant name="Debug">
          <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
          <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+
          <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
       </variant>
@@ -3001,21 +3240,50 @@
                target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"
                overwrite="true"/>
 
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ft2build.h"/>
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ft2build.h"/>
+
             <require
                path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\freetype2\freetype"
                kind="directory"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"/>
          </common>
       </install>
    </build>
 
-   <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
-      <tree source="include" target="include" optional="true"/>
-      <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
-      <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
-      <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
-      <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+   <publish
+      root="Win64x"
+      configuration="Release"
+      consumer="{BuildFileDir}\cmake\consumer">
+
+      <tree
+         source="include"
+         target="include"
+         optional="true"/>
+
+      <files
+         source="lib\win64\{Configuration}"
+         target="lib"
+         extensions=".lib"
+         optional="true"/>
+
+      <files
+         source="bin\win64\{Configuration}"
+         target="bin"
+         extensions=".dll;.exe;.pdb"
+         optional="true"/>
+
+      <tree
+         source="lib\win64\{Configuration}\pkgconfig"
+         target="lib\pkgconfig"
+         optional="true"/>
+
+      <cmake
+         source="lib\win64\{Configuration}\cmake"
+         target="lib\cmake"
+         optional="true"/>
    </publish>
 
    <smoke
@@ -3026,6 +3294,7 @@
       ninja="{Tool:ninja}"
       toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
       executable="freetype-consumer.exe">
+
       <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
       <environment name="CB_BDS" value="{BDS}"/>
    </smoke>
