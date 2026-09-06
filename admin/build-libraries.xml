@@ -3494,7 +3494,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T19:45:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T22:09:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -4138,6 +4138,38 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gn.patch"/>
          </execute>
 
+         <!--
+            Propagate raw BCC64X linker flags from Skia system dependency
+            targets through source_set/group dependency chains to the final
+            shared-library link.
+         -->
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-link-propagation.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-link-propagation.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="system-link-propagation-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-link-propagation.patch"/>
+         </execute>
+
+         <execute name="system-link-propagation-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-link-propagation.patch"/>
+         </execute>
+
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-desktop.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"
@@ -4163,6 +4195,38 @@
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-desktop.patch"/>
+         </execute>
+
+         <!--
+            Restore the pinned Skia Vulkan debug validator source/dependency
+            condition. bcc64x-desktop.patch had incorrectly tied this block
+            to skia_enable_spirv_validation.
+         -->
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-debug-spirv-validator.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-debug-spirv-validator.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="debug-spirv-validator-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-debug-spirv-validator.patch"/>
+         </execute>
+
+         <execute name="debug-spirv-validator-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-debug-spirv-validator.patch"/>
          </execute>
 
          <copy
@@ -4716,7 +4780,7 @@
 
             <variable name="ZlibLibraryName" value="libz"/>
             <variable name="LibPngLibraryName" value="libpng16"/>
-            <variable name="LibJpegLibraryName" value="jpeg"/>
+            <variable name="LibJpegLibraryName" value="libjpeg"/>
             <variable name="HarfBuzzLibraryName" value="harfbuzz"/>
             <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subset"/>
             <variable name="FreeTypeLibraryName" value="freetype"/>
@@ -4728,7 +4792,7 @@
 
             <variable name="ZlibLibraryName" value="libzd"/>
             <variable name="LibPngLibraryName" value="libpng16d"/>
-            <variable name="LibJpegLibraryName" value="jpegd"/>
+            <variable name="LibJpegLibraryName" value="libjpegd"/>
             <variable name="HarfBuzzLibraryName" value="harfbuzzd"/>
             <variable name="HarfBuzzSubsetLibraryName" value="harfbuzz-subsetd"/>
             <variable name="FreeTypeLibraryName" value="freetyped"/>
@@ -4920,6 +4984,6 @@
             name="PATH"
             value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{InstallRoot}\packages\brotli\1.2.0\bin\win64\Release;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Release;{InstallRoot}\packages\libpng\1.6.58\bin\win64\Release;{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\Release;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
-   </library>
+   </library> 
    
 </buildLibraries>
