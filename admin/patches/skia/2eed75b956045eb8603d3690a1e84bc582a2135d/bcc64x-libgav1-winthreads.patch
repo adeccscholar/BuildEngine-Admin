@@ -1,15 +1,44 @@
 diff --git a/third_party/externals/libgav1/src/utils/threadpool.cc b/third_party/externals/libgav1/src/utils/threadpool.cc
 --- a/third_party/externals/libgav1/src/utils/threadpool.cc
 +++ b/third_party/externals/libgav1/src/utils/threadpool.cc
-@@ -16,1 +16,1 @@
+@@ -14,9 +14,9 @@
+ 
+ #include "src/utils/threadpool.h"
+ 
 -#if defined(_MSC_VER)
 +#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
-@@ -68,1 +68,1 @@
+ #include <process.h>
+ #include <windows.h>
+ #else  // defined(_MSC_VER)
+ #include <pthread.h>
+ #endif  // defined(_MSC_VER)
+@@ -137,26 +137,26 @@
+   // Joins with the running thread.
+   void Join();
+ 
+  private:
 -#if defined(_MSC_VER)
 +#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
-@@ -78,1 +78,1 @@
+   static unsigned int __stdcall ThreadBody(void* arg);
+ #else
+   static void* ThreadBody(void* arg);
+ #endif
+ 
+   void SetupName();
+   void Run();
+ 
+   ThreadPool* pool_;
 -#if defined(_MSC_VER)
 +#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
-@@ -87,1 +87,1 @@
+   HANDLE handle_;
+ #else
+   pthread_t thread_;
+ #endif
+ };
+ 
+ ThreadPool::WorkerThread::WorkerThread(ThreadPool* pool) : pool_(pool) {}
+ 
 -#if defined(_MSC_VER)
 +#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
+ 
+ bool ThreadPool::WorkerThread::Start() {
