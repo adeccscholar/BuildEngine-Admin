@@ -2956,8 +2956,7 @@
       <argument value="-DFT_REQUIRE_BROTLI:BOOL=ON"/>
       <argument value="-DFT_DISABLE_HARFBUZZ:BOOL=ON"/>
 
-      <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\bzip2\1.0.8;{InstallRoot}\packages\brotli;{InstallRoot}\packages\libpng\1.6.58"/>
-
+      <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\bzip2\1.0.8;{InstallRoot}\packages\brotli\1.2.0;{InstallRoot}\packages\libpng\1.6.58"/>
       <cmake
          mode="configure"
          executable="{Tool:cmake}"
