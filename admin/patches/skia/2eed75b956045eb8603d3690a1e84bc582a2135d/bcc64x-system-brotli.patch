@@ -1,5 +1,5 @@
 diff --git a/third_party/brotli/BUILD.gn b/third_party/brotli/BUILD.gn
-index 9594fae..aa761c2 100644
+index 9594fae..e566743 100644
 --- a/third_party/brotli/BUILD.gn
 +++ b/third_party/brotli/BUILD.gn
 @@ -5,20 +5,43 @@
@@ -24,7 +24,7 @@ index 9594fae..aa761c2 100644
 +    assert(bcc64x_brotli_decode_lib != "",
 +           "bcc64x_brotli_decode_lib must name the BuildEngine Brotli decoder import library")
 +    include_dirs = [ bcc64x_brotli_include ]
-+    libs = [
++    ldflags = [
 +      bcc64x_brotli_common_lib,
 +      bcc64x_brotli_decode_lib,
 +    ]
