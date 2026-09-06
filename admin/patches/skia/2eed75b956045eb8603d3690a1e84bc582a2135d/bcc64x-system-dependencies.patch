@@ -1,26 +1,13 @@
 diff --git a/third_party/brotli/BUILD.gn b/third_party/brotli/BUILD.gn
+index 9594fae..aa761c2 100644
 --- a/third_party/brotli/BUILD.gn
 +++ b/third_party/brotli/BUILD.gn
-@@ -5,21 +5,46 @@
+@@ -5,20 +5,43 @@
  
  import("../third_party.gni")
  
 -third_party("brotli") {
 -  public_include_dirs = [ "../externals/brotli/c/include" ]
--
--  # Brotli is used by freetype and libjxl; they only need to decode brotli.
--  sources = [
--    "../externals/brotli/c/common/constants.c",
--    "../externals/brotli/c/common/context.c",
--    "../externals/brotli/c/common/dictionary.c",
--    "../externals/brotli/c/common/platform.c",
--    "../externals/brotli/c/common/shared_dictionary.c",
--    "../externals/brotli/c/common/transform.c",
--    "../externals/brotli/c/dec/bit_reader.c",
--    "../externals/brotli/c/dec/decode.c",
--    "../externals/brotli/c/dec/huffman.c",
--    "../externals/brotli/c/dec/state.c",
--  ]
 +declare_args() {
 +  skia_use_system_brotli = false
 +  bcc64x_brotli_include = ""
@@ -45,7 +32,20 @@ diff --git a/third_party/brotli/BUILD.gn b/third_party/brotli/BUILD.gn
 +} else {
 +  third_party("brotli") {
 +    public_include_dirs = [ "../externals/brotli/c/include" ]
-+
+ 
+-  # Brotli is used by freetype and libjxl; they only need to decode brotli.
+-  sources = [
+-    "../externals/brotli/c/common/constants.c",
+-    "../externals/brotli/c/common/context.c",
+-    "../externals/brotli/c/common/dictionary.c",
+-    "../externals/brotli/c/common/platform.c",
+-    "../externals/brotli/c/common/shared_dictionary.c",
+-    "../externals/brotli/c/common/transform.c",
+-    "../externals/brotli/c/dec/bit_reader.c",
+-    "../externals/brotli/c/dec/decode.c",
+-    "../externals/brotli/c/dec/huffman.c",
+-    "../externals/brotli/c/dec/state.c",
+-  ]
 +    # Brotli is used by freetype and libjxl; they only need to decode brotli.
 +    sources = [
 +      "../externals/brotli/c/common/constants.c",
@@ -61,41 +61,11 @@ diff --git a/third_party/brotli/BUILD.gn b/third_party/brotli/BUILD.gn
 +    ]
 +  }
  }
-diff --git a/third_party/libpng/BUILD.gn b/third_party/libpng/BUILD.gn
---- a/third_party/libpng/BUILD.gn
-+++ b/third_party/libpng/BUILD.gn
-@@ -6,13 +6,25 @@
- import("../../gn/skia.gni")
- 
- declare_args() {
-   skia_use_system_libpng = is_official_build && !is_canvaskit
-+  bcc64x_libpng_include = ""
-+  bcc64x_libpng_lib = ""
- }
- 
- import("../third_party.gni")
- 
- if (skia_use_system_libpng) {
-   system("libpng") {
--    libs = [ "png" ]
-+    if (skia_use_bcc64x) {
-+      assert(bcc64x_libpng_include != "",
-+             "bcc64x_libpng_include must name the BuildEngine libpng include directory")
-+      assert(bcc64x_libpng_lib != "",
-+             "bcc64x_libpng_lib must name the BuildEngine libpng import library")
-+      include_dirs = [ bcc64x_libpng_include ]
-+      libs = [ bcc64x_libpng_lib ]
-+    } else {
-+      libs = [ "png" ]
-+    }
-   }
- } else {
-   third_party("libpng") {
 diff --git a/third_party/libjpeg-turbo/BUILD.gn b/third_party/libjpeg-turbo/BUILD.gn
+index 866ec4d..f904477 100644
 --- a/third_party/libjpeg-turbo/BUILD.gn
 +++ b/third_party/libjpeg-turbo/BUILD.gn
-@@ -6,13 +6,25 @@
- import("../../gn/skia.gni")
+@@ -7,13 +7,24 @@ import("../../gn/skia.gni")
  
  declare_args() {
    skia_use_system_libjpeg_turbo = is_official_build && !is_canvaskit
@@ -121,3 +91,33 @@ diff --git a/third_party/libjpeg-turbo/BUILD.gn b/third_party/libjpeg-turbo/BUIL
    }
  } else {
    source_set("libjpeg_headers") {
+diff --git a/third_party/libpng/BUILD.gn b/third_party/libpng/BUILD.gn
+index 3b4128e..0722361 100644
+--- a/third_party/libpng/BUILD.gn
++++ b/third_party/libpng/BUILD.gn
+@@ -7,13 +7,24 @@ import("../../gn/skia.gni")
+ 
+ declare_args() {
+   skia_use_system_libpng = is_official_build && !is_canvaskit
++  bcc64x_libpng_include = ""
++  bcc64x_libpng_lib = ""
+ }
+ 
+ import("../third_party.gni")
+ 
+ if (skia_use_system_libpng) {
+   system("libpng") {
+-    libs = [ "png" ]
++    if (skia_use_bcc64x) {
++      assert(bcc64x_libpng_include != "",
++             "bcc64x_libpng_include must name the BuildEngine libpng include directory")
++      assert(bcc64x_libpng_lib != "",
++             "bcc64x_libpng_lib must name the BuildEngine libpng import library")
++      include_dirs = [ bcc64x_libpng_include ]
++      libs = [ bcc64x_libpng_lib ]
++    } else {
++      libs = [ "png" ]
++    }
+   }
+ } else {
+   third_party("libpng") {
