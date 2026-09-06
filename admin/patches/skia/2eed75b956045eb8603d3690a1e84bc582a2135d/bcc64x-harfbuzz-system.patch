@@ -1,7 +1,7 @@
 diff --git a/third_party/harfbuzz/BUILD.gn b/third_party/harfbuzz/BUILD.gn
 --- a/third_party/harfbuzz/BUILD.gn
 +++ b/third_party/harfbuzz/BUILD.gn
-@@ -7,14 +7,31 @@ import("../third_party.gni")
+@@ -8,14 +8,31 @@ import("../third_party.gni")
  
  declare_args() {
    skia_use_system_harfbuzz = is_official_build && !is_canvaskit
@@ -22,11 +22,11 @@ diff --git a/third_party/harfbuzz/BUILD.gn b/third_party/harfbuzz/BUILD.gn
 +      assert(bcc64x_harfbuzz_lib != "",
 +             "bcc64x_harfbuzz_lib must name the BuildEngine HarfBuzz import library")
 +      include_dirs = [ bcc64x_harfbuzz_include ]
-+      libs = [ bcc64x_harfbuzz_lib ]
++      ldflags = [ bcc64x_harfbuzz_lib ]
 +      if (skia_pdf_subset_harfbuzz) {
 +        assert(bcc64x_harfbuzz_subset_lib != "",
 +               "bcc64x_harfbuzz_subset_lib must name the BuildEngine HarfBuzz subset import library")
-+        libs += [ bcc64x_harfbuzz_subset_lib ]
++        ldflags += [ bcc64x_harfbuzz_subset_lib ]
 +      }
 +    } else {
 +      include_dirs = [ "/usr/include/harfbuzz" ]
