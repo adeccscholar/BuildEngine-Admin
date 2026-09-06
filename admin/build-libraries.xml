@@ -2707,7 +2707,7 @@
          archive="libjpeg-turbo-{LibraryVersion}.tar.gz"
          sha256="6f30092cef9fb839779646608f4ee14ae3cbac989c47fa05e841b0841f09878e"/>
 
-      <extract format="tar.gz" root="libjpeg-turbo-{LibraryVersion}">
+      <extract format="libarchive" root="libjpeg-turbo-{LibraryVersion}">
          <require path="CMakeLists.txt"/>
          <require path="jpeglib.h"/>
          <require path="turbojpeg.h"/>
@@ -2817,7 +2817,7 @@
          archive="libpng-{LibraryVersion}.tar.xz"
          sha256="28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"/>
 
-      <extract format="tar.xz" root="libpng-{LibraryVersion}">
+      <extract format="libarchive" root="libpng-{LibraryVersion}">
          <require path="CMakeLists.txt"/>
          <require path="png.h"/>
          <require path="pngconf.h"/>
@@ -2928,7 +2928,7 @@
          url="https://download.savannah.gnu.org/releases/freetype/freetype-{LibraryVersion}.tar.xz"
          archive="freetype-{LibraryVersion}.tar.xz"/>
 
-      <extract format="tar.xz" root="freetype-{LibraryVersion}">
+      <extract format="libarchive" root="freetype-{LibraryVersion}">
          <require path="CMakeLists.txt"/>
          <require path="include\freetype\freetype.h"/>
          <require path="include\ft2build.h"/>
@@ -3040,7 +3040,7 @@
          url="https://download.osgeo.org/libtiff/tiff-{LibraryVersion}.tar.xz"
          archive="tiff-{LibraryVersion}.tar.xz"/>
 
-      <extract format="tar.xz" root="tiff-{LibraryVersion}">
+      <extract format="libarchive" root="tiff-{LibraryVersion}">
          <require path="CMakeLists.txt"/>
          <require path="libtiff\tiffio.h"/>
          <require path="LICENSE.md"/>
