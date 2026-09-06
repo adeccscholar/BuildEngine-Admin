@@ -2962,245 +2962,267 @@
    </smoke>
 </library>
 
-<library id="harfbuzz" version="14.4.0" timestamp="2026-09-06T17:10:00Z">
+   <library id="harfbuzz" version="14.4.0" timestamp="2026-09-06T17:30:00Z">
 
-   <metadata
-      name="HarfBuzz"
-      supplier="HarfBuzz Project"
-      homepage="https://harfbuzz.github.io/">
-      <license
-         name="Old MIT"
-         spdx="MIT"
-         file="COPYING"/>
-   </metadata>
+      <metadata
+         name="HarfBuzz"
+         supplier="HarfBuzz Project"
+         homepage="https://harfbuzz.github.io/">
+         <license
+            name="Old MIT"
+            spdx="MIT"
+            file="COPYING"/>
+      </metadata>
 
-   <security>
-      <repository
-         url="https://github.com/harfbuzz/harfbuzz.git"
-         ref="14.4.0"/>
-   </security>
+      <security>
+         <repository
+            url="https://github.com/harfbuzz/harfbuzz.git"
+            ref="14.4.0"/>
+      </security>
 
-   <source>
-      <download
-         url="https://github.com/harfbuzz/harfbuzz/releases/download/{LibraryVersion}/harfbuzz-{LibraryVersion}.tar.xz"
-         archive="harfbuzz-{LibraryVersion}.tar.xz"
-         sha256="2357ed966c6ced7bfa720b0640c0231065af01158fbea215093ffa15aed44371"/>
+      <source>
+         <download
+            url="https://github.com/harfbuzz/harfbuzz/releases/download/{LibraryVersion}/harfbuzz-{LibraryVersion}.tar.xz"
+            archive="harfbuzz-{LibraryVersion}.tar.xz"
+            sha256="2357ed966c6ced7bfa720b0640c0231065af01158fbea215093ffa15aed44371"/>
 
-      <extract
-         format="libarchive"
-         root="harfbuzz-{LibraryVersion}">
-         <require path="CMakeLists.txt"/>
-         <require path="meson.build"/>
-         <require path="src\hb.h"/>
-         <require path="src\hb-subset.h"/>
-         <require path="src\harfbuzz-config.cmake.in"/>
-         <require path="COPYING"/>
-      </extract>
-   </source>
+         <extract
+            format="libarchive"
+            root="harfbuzz-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="meson.build"/>
+            <require path="src\hb.h"/>
+            <require path="src\hb-subset.h"/>
+            <require path="src\hb-subset-serialize.h"/>
+            <require path="src\hb-subset-depend.h"/>
+            <require path="src\harfbuzz-config.cmake.in"/>
+            <require path="COPYING"/>
+         </extract>
+      </source>
 
-   <build>
-      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
-      <environment name="CB_BDS" value="{BDS}"/>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
 
-      <argument value="-G"/>
-      <argument value="Ninja"/>
-      <argument value="-Wno-dev"/>
-      <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
-      <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-      <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
-      <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
 
-      <!--
-         Explicit dependency policy:
-         HarfBuzz is the producer below FreeType and therefore must not
-         discover FreeType or optional platform frameworks automatically.
-      -->
-      <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <!--
+            Explicit dependency policy:
+            HarfBuzz is the producer below FreeType and therefore must not
+            discover FreeType or optional platform frameworks automatically.
+         -->
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
 
-      <argument value="-DHB_HAVE_FREETYPE:BOOL=OFF"/>
-      <argument value="-DHB_HAVE_CAIRO:BOOL=OFF"/>
-      <argument value="-DHB_HAVE_GRAPHITE2:BOOL=OFF"/>
-      <argument value="-DHB_HAVE_GLIB:BOOL=OFF"/>
-      <argument value="-DHB_HAVE_ICU:BOOL=OFF"/>
-      <argument value="-DHB_HAVE_GOBJECT:BOOL=OFF"/>
-      <argument value="-DHB_HAVE_INTROSPECTION:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_FREETYPE:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_CAIRO:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_GRAPHITE2:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_GLIB:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_ICU:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_GOBJECT:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_INTROSPECTION:BOOL=OFF"/>
 
-      <argument value="-DHB_HAVE_UNISCRIBE:BOOL=OFF"/>
-      <argument value="-DHB_HAVE_GDI:BOOL=OFF"/>
-      <argument value="-DHB_HAVE_DIRECTWRITE:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_UNISCRIBE:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_GDI:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_DIRECTWRITE:BOOL=OFF"/>
 
-      <!-- Core shaping + subset required by Skia. -->
-      <argument value="-DHB_BUILD_SUBSET:BOOL=ON"/>
+         <!-- Core shaping + subset required by Skia. -->
+         <argument value="-DHB_BUILD_SUBSET:BOOL=ON"/>
 
-      <!--
-         Keep the first package contract narrow and deterministic.
-         Raster/vector/GPU are independent newer HarfBuzz modules and are
-         not required by Skia's shaping/subsetting dependency.
-      -->
-      <argument value="-DHB_BUILD_RASTER:BOOL=OFF"/>
-      <argument value="-DHB_BUILD_VECTOR:BOOL=OFF"/>
-      <argument value="-DHB_BUILD_GPU:BOOL=OFF"/>
-      <argument value="-DHB_BUILD_GPU_DEMO:STRING=OFF"/>
+         <!--
+            Keep the first package contract narrow and deterministic.
+            Raster/vector/GPU are independent newer HarfBuzz modules and are
+            not required by Skia's shaping/subsetting dependency.
+         -->
+         <argument value="-DHB_BUILD_RASTER:BOOL=OFF"/>
+         <argument value="-DHB_BUILD_VECTOR:BOOL=OFF"/>
+         <argument value="-DHB_BUILD_GPU:BOOL=OFF"/>
+         <argument value="-DHB_BUILD_GPU_DEMO:STRING=OFF"/>
 
-      <!-- Utilities require additional optional dependencies. -->
-      <argument value="-DHB_BUILD_UTILS:BOOL=OFF"/>
+         <!-- Utilities require additional optional dependencies. -->
+         <argument value="-DHB_BUILD_UTILS:BOOL=OFF"/>
 
-      <cmake
-         mode="configure"
-         executable="{Tool:cmake}"
-         source="{Workspace}\harfbuzz-{LibraryVersion}"
-         build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake
+            mode="configure"
+            executable="{Tool:cmake}"
+            source="{Workspace}\harfbuzz-{LibraryVersion}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
-      <cmake
-         mode="build"
-         executable="{Tool:cmake}"
-         build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake
+            mode="build"
+            executable="{Tool:cmake}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
-      <variant name="Release">
-         <variable name="CMakeExportConfiguration" value="release"/>
+         <variant name="Release">
+            <variable name="CMakeExportConfiguration" value="release"/>
 
-         <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
-         <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
-         <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
 
-         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
-         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
-      </variant>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
 
-      <variant name="Debug">
-         <variable name="CMakeExportConfiguration" value="debug"/>
+         <variant name="Debug">
+            <variable name="CMakeExportConfiguration" value="debug"/>
 
-         <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
-         <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
-         <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
 
-         <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
 
-         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
-         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
-      </variant>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
 
-      <install>
-         <perVariant>
-            <cmake
-               mode="install"
-               executable="{Tool:cmake}"
-               build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <install>
+            <perVariant>
+               <cmake
+                  mode="install"
+                  executable="{Tool:cmake}"
+                  build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
-            <!--
-               HarfBuzz' CMake export contains Threads::Threads in the
-               public link interface when CMake detects pthread support.
+               <!--
+                  HarfBuzz' CMake export contains Threads::Threads in the
+                  public link interface when CMake detects pthread support.
 
-               The upstream generated package file does not call
-               find_dependency(Threads), so preserve the generated export
-               as harfbuzzTargets.cmake and install a small package wrapper
-               as harfbuzzConfig.cmake.
-            -->
-            <copy
-               source="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"
-               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzTargets.cmake"
-               overwrite="true"/>
+                  The upstream generated package file does not call
+                  find_dependency(Threads), so preserve the generated export
+                  as harfbuzzTargets.cmake and install a small package wrapper
+                  as harfbuzzConfig.cmake.
+               -->
+               <copy
+                  source="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzTargets.cmake"
+                  overwrite="true"/>
 
-            <copy
-               source="{BuildFileDir}\cmake\harfbuzz\harfbuzzConfig.cmake"
-               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"
-               overwrite="true"/>
+               <copy
+                  source="{BuildFileDir}\cmake\harfbuzz\harfbuzzConfig.cmake"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"
+                  overwrite="true"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
-               kind="directory"/>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                  kind="directory"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
-               kind="directory"/>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                  kind="directory"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz"
-               kind="directory"/>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz"
+                  kind="directory"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"/>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzTargets.cmake"/>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzTargets.cmake"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig-{CMakeExportConfiguration}.cmake"/>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig-{CMakeExportConfiguration}.cmake"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig"
-               kind="directory"/>
-         </perVariant>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig"
+                  kind="directory"/>
+            </perVariant>
 
-         <common>
-            <copy
-               source="{Workspace}\harfbuzz-{LibraryVersion}\COPYING"
-               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
-               overwrite="true"/>
+            <common>
+               <!--
+                  HarfBuzz 14.4.0's community-maintained CMake installation
+                  installs hb-subset.h and hb-subset-serialize.h but omits
+                  hb-subset-depend.h even though hb-subset.h includes it.
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz"
-               kind="directory"/>
+                  Meson's public subset-header list contains all three.
+                  Complete the installed CMake package here rather than
+                  weakening the consumer smoke test.
+               -->
+               <copy
+                  source="{Workspace}\harfbuzz-{LibraryVersion}\src\hb-subset-depend.h"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset-depend.h"
+                  overwrite="true"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb.h"/>
+               <copy
+                  source="{Workspace}\harfbuzz-{LibraryVersion}\COPYING"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                  overwrite="true"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset.h"/>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz"
+                  kind="directory"/>
 
-            <require
-               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
-         </common>
-      </install>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb.h"/>
 
-   </build>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset.h"/>
 
-   <publish
-      root="Win64x"
-      configuration="Release"
-      consumer="{BuildFileDir}\cmake\consumer">
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset-serialize.h"/>
 
-      <tree
-         source="include"
-         target="include"
-         optional="true"/>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset-depend.h"/>
 
-      <files
-         source="lib\win64\{Configuration}"
-         target="lib"
-         extensions=".lib"
-         optional="true"/>
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
 
-      <files
-         source="bin\win64\{Configuration}"
-         target="bin"
-         extensions=".dll;.exe;.pdb"
-         optional="true"/>
+      </build>
 
-      <tree
-         source="lib\win64\{Configuration}\pkgconfig"
-         target="lib\pkgconfig"
-         optional="true"/>
+      <publish
+         root="Win64x"
+         configuration="Release"
+         consumer="{BuildFileDir}\cmake\consumer">
 
-      <cmake
-         source="lib\win64\{Configuration}\cmake"
-         target="lib\cmake"
-         optional="true"/>
-   </publish>
+         <tree
+            source="include"
+            target="include"
+            optional="true"/>
 
-   <smoke
-      id="consumer"
-      source="smokes\harfbuzz\consumer"
-      configuration="Release"
-      cmake="{Tool:cmake}"
-      ninja="{Tool:ninja}"
-      toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
-      executable="harfbuzz-consumer.exe">
+         <files
+            source="lib\win64\{Configuration}"
+            target="lib"
+            extensions=".lib"
+            optional="true"/>
 
-      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
-      <environment name="CB_BDS" value="{BDS}"/>
-   </smoke>
-</library>
+         <files
+            source="bin\win64\{Configuration}"
+            target="bin"
+            extensions=".dll;.exe;.pdb"
+            optional="true"/>
+
+         <tree
+            source="lib\win64\{Configuration}\pkgconfig"
+            target="lib\pkgconfig"
+            optional="true"/>
+
+         <cmake
+            source="lib\win64\{Configuration}\cmake"
+            target="lib\cmake"
+            optional="true"/>
+      </publish>
+
+      <smoke
+         id="consumer"
+         source="smokes\harfbuzz\consumer"
+         configuration="Release"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="harfbuzz-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
 
 <library id="freetype" version="2.14.3" timestamp="2026-09-06T04:41:00Z">
    <dependency library="zlib" version="1.3.2"/>
@@ -3472,7 +3494,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T16:31:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T17:30:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -3511,7 +3533,7 @@
             dependencies above.
 
             Bundled Skia dependencies remain pinned to the commits selected
-            by this Skia revision.  Their pins are additionally recorded in
+            by this Skia revision. Their pins are additionally recorded in
             bundled-components.json for later SBOM generation.
 
             Active:
@@ -4171,16 +4193,20 @@
          </execute>
 
          <!--
-            Route Brotli, libpng and libjpeg-turbo through the already
+            Route Brotli, libjpeg-turbo and libpng through the already
             built and tested BuildEngine packages.
+
+            Keep each integration in an independent patch so every patch can
+            be checked against exactly one pinned upstream GN file.
          -->
+
          <copy
-            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-dependencies.patch"
-            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dependencies.patch"
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-brotli.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-brotli.patch"
             overwrite="true"
             preserveCurrentArtifact="true"/>
 
-         <execute name="system-dependencies-patch-check"
+         <execute name="system-brotli-patch-check"
                   executable="{Tool:git}"
                   workingDirectory="{CurrentArtifact}"
                   showOutput="false">
@@ -4188,17 +4214,71 @@
             <argument value="--check"/>
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dependencies.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-brotli.patch"/>
          </execute>
 
-         <execute name="system-dependencies-patch-apply"
+         <execute name="system-brotli-patch-apply"
                   executable="{Tool:git}"
                   workingDirectory="{CurrentArtifact}"
                   showOutput="false">
             <argument value="apply"/>
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dependencies.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-brotli.patch"/>
+         </execute>
+
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-libjpeg-turbo.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjpeg-turbo.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="system-libjpeg-turbo-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjpeg-turbo.patch"/>
+         </execute>
+
+         <execute name="system-libjpeg-turbo-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjpeg-turbo.patch"/>
+         </execute>
+
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-libpng.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libpng.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="system-libpng-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libpng.patch"/>
+         </execute>
+
+         <execute name="system-libpng-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libpng.patch"/>
          </execute>
 
          <!-- HarfBuzz BuildEngine package integration. -->
