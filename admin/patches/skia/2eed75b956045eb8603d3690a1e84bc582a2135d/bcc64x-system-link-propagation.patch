@@ -51,7 +51,7 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
 diff --git a/gn/skia.gni b/gn/skia.gni
 --- a/gn/skia.gni
 +++ b/gn/skia.gni
-@@ -273,7 +273,24 @@ template("skia_shared_library") {
+@@ -273,7 +273,25 @@ template("skia_shared_library") {
  template("skia_component") {
    skia_target(target_name) {
      assert(!defined(configs), "No set_defaults(skia_target)")
