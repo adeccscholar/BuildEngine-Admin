@@ -21,22 +21,29 @@ index 1fe96e9..3c6feed 100644
    }
  }
 
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -133,4 +133,7 @@ config("skia_library") {
+   visibility = [ "./*" ]
+   defines = [ "SKIA_IMPLEMENTATION=1" ]
++  if (is_component_build && skia_use_bcc64x) {
++    cflags = [ "-fvisibility=default" ]
++  }
+ }
+
 diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
 --- a/gn/skia/BUILD.gn
 +++ b/gn/skia/BUILD.gn
-@@ -119,8 +119,10 @@ config("default") {
+@@ -119,8 +119,11 @@ config("default") {
    } else {
--    cflags += [
--      "-fPIC",
--      "-fvisibility=hidden",
--    ]
--    cflags_cc += [ "-fvisibility-inlines-hidden" ]
-+    cflags += [ "-fPIC" ]
+     cflags += [
+       "-fPIC",
+       "-fvisibility=hidden",
+     ]
+     cflags_cc += [ "-fvisibility-inlines-hidden" ]
 +    if (is_bcc64x_toolchain) {
 +      ldflags += [ "-Wl,--export-all-symbols" ]
-+    } else {
-+      cflags += [ "-fvisibility=hidden" ]
-+      cflags_cc += [ "-fvisibility-inlines-hidden" ]
 +    }
      cflags_cc += [ "-std=c++20" ]
    }
