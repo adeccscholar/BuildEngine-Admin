@@ -2700,7 +2700,7 @@
       </smoke>
    </library>
 
-   <library id="catch2" version="3.16.0" timestamp="2026-09-08T04:26:00Z">
+   <library id="catch2" version="3.16.0" timestamp="2026-09-07T22:47:39Z">
       <metadata
          name="Catch2"
          supplier="Catch2 Authors"
@@ -2739,10 +2739,6 @@
             <require path="CMake\Catch2Config.cmake.in"/>
             <require path="extras\Catch.cmake"/>
 
-            <!--
-               Verify the real upstream SelfTest source closure.
-               <require> validates files, not directory presence.
-            -->
             <require path="tests\CMakeLists.txt"/>
             <require path="tests\SelfTest\TestRegistrations.cpp"/>
          </extract>
@@ -2768,21 +2764,26 @@
          <argument
             value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
 
-         <!--
-            Catch2 is normally consumed as a static test framework.
-            Do not invent a DLL build merely to follow the general shared
-            library default used for normal runtime libraries.
-         -->
          <argument
             value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
 
          <!--
-            Catch2 v3 upstream SelfTest contract.
+            Catch2 3.16 still treats every compiler defining __BORLANDC__
+            as the historic Embarcadero compiler family and therefore enables
+            CATCH_CONFIG_POLYFILL_ISNAN.
 
-            Upstream enables CATCH_BUILD_TESTING only for a development
-            build. Keep the upstream tests enabled when BuildEngine tests
-            are enabled. Werror is explicitly disabled because compiler
-            warnings are not part of the package compatibility contract.
+            That polyfill calls std::_isnan(), which is not provided by the
+            modern BCC64X 20.1.7 standard-library environment.
+
+            Catch2 itself provides CATCH_CONFIG_NO_POLYFILL_ISNAN as the
+            override for this autodetection. Use that supported preprocessor
+            contract instead of modifying Catch2 sources.
+         -->
+         <argument
+            value="-DCMAKE_CXX_FLAGS:STRING=-DCATCH_CONFIG_NO_POLYFILL_ISNAN"/>
+
+         <!--
+            Catch2 v3 upstream SelfTest contract.
          -->
          <argument
             value="-DCATCH_DEVELOPMENT_BUILD:BOOL={TestsEnabled}"/>
@@ -2826,9 +2827,6 @@
          <argument
             value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
 
-         <!--
-            Exercise the package under the BuildEngine C++23 profile.
-         -->
          <argument
             value="-DCMAKE_CXX_STANDARD:STRING=23"/>
 
