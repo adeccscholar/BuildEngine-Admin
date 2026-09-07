@@ -20,3 +20,32 @@ index 1fe96e9..3c6feed 100644
 +    }
    }
  }
+
+diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
+--- a/gn/skia/BUILD.gn
++++ b/gn/skia/BUILD.gn
+@@ -119,8 +119,8 @@ config("default") {
+   } else {
+-    cflags += [
+-      "-fPIC",
+-      "-fvisibility=hidden",
+-    ]
+-    cflags_cc += [ "-fvisibility-inlines-hidden" ]
++    cflags += [ "-fPIC" ]
++    if (!is_bcc64x_toolchain) {
++      cflags += [ "-fvisibility=hidden" ]
++      cflags_cc += [ "-fvisibility-inlines-hidden" ]
++    }
+     cflags_cc += [ "-std=c++20" ]
+   }
+
+diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
+--- a/gn/toolchain/BUILD.gn
++++ b/gn/toolchain/BUILD.gn
+@@ -340,5 +340,5 @@ template("gcc_like_toolchain") {
+         dllname = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"
+         libname = "{{root_out_dir}}/{{target_output_name}}.lib"
+         rspfile = "${dllname}.rsp"
+-        command = "$shell $link --rsp-quoting=windows -L\"$bcc64x_rad_lib_dir\" -L\"$bcc64x_rad_psdk_lib_dir\" -tD -o$dllname @$rspfile -Wl,--out-implib,$libname"
++        command = "$shell $link --rsp-quoting=windows -L\"$bcc64x_rad_lib_dir\" -L\"$bcc64x_rad_psdk_lib_dir\" -tD -o$dllname @$rspfile -Wl,--export-all-symbols -Wl,--out-implib,$libname"
+         rspfile_content = "{{inputs}} {{libs}} {{solibs}} {{ldflags}}"
