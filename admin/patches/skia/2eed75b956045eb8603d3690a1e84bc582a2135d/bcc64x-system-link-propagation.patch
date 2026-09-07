@@ -24,7 +24,7 @@ index 1fe96e9..3c6feed 100644
 diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
 --- a/gn/skia/BUILD.gn
 +++ b/gn/skia/BUILD.gn
-@@ -119,8 +119,12 @@ config("default") {
+@@ -119,8 +119,10 @@ config("default") {
    } else {
 -    cflags += [
 -      "-fPIC",
