@@ -117,3 +117,21 @@ diff --git a/third_party/externals/spirv-tools/BUILD.gn b/third_party/externals/
 +    rebase_path(inc_file, spvtools_action_path_base),
    ]
  }
+@@ -198,7 +207,7 @@ config("spvtools_internal_config") {
+   ]
+ 
+   cflags = []
+-  if (is_clang) {
++  if (is_clang || (defined(skia_use_bcc64x) && skia_use_bcc64x)) {
+     cflags += [
+       "-Wno-implicit-fallthrough",
+       "-Wno-newline-eof",
+@@ -213,7 +222,7 @@ config("spvtools_internal_config") {
+     cflags += [ "/Zc:__cplusplus" ]
+   }
+ 
+-  if (!is_win) {
++  if (!is_win || (defined(skia_use_bcc64x) && skia_use_bcc64x)) {
+     cflags += [ "-std=c++17" ]
+   } else {
+     cflags += [ "/std:c++17" ]
