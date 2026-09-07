@@ -4,8 +4,8 @@
 
 # RAD Studio 13 Florence / BCC64X / Win64 Modern.
 # BuildEngine BCC64X C/C++ profile derived from the proven project toolchain.
-# It contains only generic compiler/linker integration.  It does not add
-# library-specific workarounds.  ASM uses the same BCC64X driver, matching the
+# It contains only generic compiler/linker integration. It does not add
+# library-specific workarounds. ASM uses the same BCC64X driver, matching the
 # proven Boost.Context/Coroutine/Fiber toolchain path.
 
 if(NOT DEFINED ENV{CB_BCC64X} OR "$ENV{CB_BCC64X}" STREQUAL "")
@@ -16,15 +16,28 @@ if(NOT DEFINED ENV{CB_BDS} OR "$ENV{CB_BDS}" STREQUAL "")
 endif()
 
 get_filename_component(_TP_CMAKE_ROOT "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+get_filename_component(_BUILDENGINE_PRODUCTION_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 set(_BCC64X_RULE_OVERRIDE "${_TP_CMAKE_ROOT}/overrides/bcc64x-rules.cmake")
-set(_BCC64X_UCRT_COMPAT_HELPER "${CMAKE_CURRENT_LIST_DIR}/bcc64x-ucrt-compat.cmake")
 
 if(NOT EXISTS "${_BCC64X_RULE_OVERRIDE}")
    message(FATAL_ERROR "BCC64X rule override is missing: ${_BCC64X_RULE_OVERRIDE}")
 endif()
-if(NOT EXISTS "${_BCC64X_UCRT_COMPAT_HELPER}")
-   message(FATAL_ERROR "BCC64X UCRT compatibility integration is missing: ${_BCC64X_UCRT_COMPAT_HELPER}")
+
+# The compatibility archive is provisioned once by BuildEngine's build-tools
+# contract. Select the newest versioned generated-tool directory and only
+# consume the resulting archive here; CMake does not generate it.
+file(GLOB _BCC64X_UCRT_COMPAT_CANDIDATES
+   "${_BUILDENGINE_PRODUCTION_ROOT}/tools/bcc64x-ucrt-compat/*/libbcc64x-ucrt-compat.a")
+if(NOT _BCC64X_UCRT_COMPAT_CANDIDATES)
+   message(FATAL_ERROR
+      "BCC64X UCRT compatibility tool is missing below ${_BUILDENGINE_PRODUCTION_ROOT}/tools/bcc64x-ucrt-compat")
 endif()
+list(SORT _BCC64X_UCRT_COMPAT_CANDIDATES COMPARE NATURAL ORDER DESCENDING)
+list(GET _BCC64X_UCRT_COMPAT_CANDIDATES 0 BCC64X_UCRT_COMPAT_LIBRARY)
+set(BCC64X_UCRT_COMPAT_LIBRARY
+   "${BCC64X_UCRT_COMPAT_LIBRARY}"
+   CACHE INTERNAL "BCC64X Win64 UCRT compatibility archive" FORCE)
+unset(_BCC64X_UCRT_COMPAT_CANDIDATES)
 
 set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_SYSTEM_PROCESSOR x86_64)
@@ -47,18 +60,12 @@ set(CMAKE_ASM_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X assembler driver
 set(CMAKE_C_COMPILER   "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C compiler" FORCE)
 set(CMAKE_CXX_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C++ compiler" FORCE)
 
-include("${_BCC64X_UCRT_COMPAT_HELPER}")
-AdeccPrepareBcc64xUcrtCompat(BCC64X_UCRT_COMPAT_LIBRARY)
-set(BCC64X_UCRT_COMPAT_LIBRARY
-   "${BCC64X_UCRT_COMPAT_LIBRARY}"
-   CACHE INTERNAL "BCC64X Win64 UCRT compatibility archive" FORCE)
-
 set(CMAKE_USER_MAKE_RULES_OVERRIDE
    "${_BCC64X_RULE_OVERRIDE}"
    CACHE FILEPATH "BCC64X CMake rule override" FORCE)
 
 # Configuration-specific optimization and preprocessor flags are supplied by
-# the BuildEngine build-variant contract.  The toolchain does not override them.
+# the BuildEngine build-variant contract. The toolchain does not override them.
 
 set(CMAKE_TRY_COMPILE_CONFIGURATION Release CACHE STRING "" FORCE)
 
@@ -70,3 +77,4 @@ if(NOT _BCC64X_TOOLCHAIN_SUMMARY_EMITTED)
    set_property(GLOBAL PROPERTY ADECC_BCC64X_TOOLCHAIN_SUMMARY_EMITTED TRUE)
 endif()
 unset(_BCC64X_TOOLCHAIN_SUMMARY_EMITTED)
+unset(_BUILDENGINE_PRODUCTION_ROOT)
