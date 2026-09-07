@@ -84,7 +84,7 @@ diff --git a/modules/skcms/BUILD.gn b/modules/skcms/BUILD.gn
 +    public_configs = [ ":bcc64x_skcms_dll_public" ]
 +  }
    if (!is_win || is_clang) {
-     cflags = [ "-std=c11" ]
+     cflags += [ "-std=c11" ]
    }
    if (target_cpu != "x64" || target_os == "android") {
 -    defines = [
