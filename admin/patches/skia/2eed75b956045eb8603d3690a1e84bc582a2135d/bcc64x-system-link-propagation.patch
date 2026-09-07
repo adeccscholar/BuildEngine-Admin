@@ -48,6 +48,36 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
      cflags_cc += [ "-std=c++20" ]
    }
 
+diff --git a/gn/skia.gni b/gn/skia.gni
+--- a/gn/skia.gni
++++ b/gn/skia.gni
+@@ -273,7 +273,24 @@ template("skia_shared_library") {
+ template("skia_component") {
+   skia_target(target_name) {
+     assert(!defined(configs), "No set_defaults(skia_target)")
++    # BCC64X uses a hybrid component build. Only components with an audited
++    # DLL ABI are shared; implementation-only components stay static and are
++    # linked into their consuming component.
++    _bcc64x_shared_component =
++        target_name == "skia" ||
++        target_name == "skunicode_core" ||
++        target_name == "skunicode_icu" ||
++        target_name == "skunicode_client_icu" ||
++        target_name == "skunicode_bidi" ||
++        target_name == "skunicode_libgrapheme" ||
++        target_name == "skunicode_icu4x" ||
++        target_name == "skshaper" ||
++        target_name == "svg" ||
++        target_name == "skottie"
+     _skia_target_type = "component"
++    if (skia_use_bcc64x && is_component_build &&
++        !_bcc64x_shared_component) {
++      _skia_target_type = "static_library"
++    }
+     forward_variables_from(invoker, "*")
+   }
+ }
+
 diff --git a/modules/skcms/BUILD.gn b/modules/skcms/BUILD.gn
 --- a/modules/skcms/BUILD.gn
 +++ b/modules/skcms/BUILD.gn
