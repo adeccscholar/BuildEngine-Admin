@@ -2700,6 +2700,463 @@
       </smoke>
    </library>
 
+   <library id="catch2" version="3.16.0" timestamp="2026-09-07T22:20:00Z">
+      <metadata
+         name="Catch2"
+         supplier="Catch2 Authors"
+         homepage="https://github.com/catchorg/Catch2">
+         <license
+            name="Boost Software License 1.0"
+            spdx="BSL-1.0"
+            file="licenses\catch2\LICENSE.txt"/>
+      </metadata>
+
+      <security>
+         <repository
+            url="https://github.com/catchorg/Catch2.git"
+            ref="v3.16.0"
+            commit="317ac1ed4c0bb6e6b91eafc817e05c488feffcb3"/>
+      </security>
+
+      <source>
+         <download
+            url="https://github.com/catchorg/Catch2/archive/refs/tags/v3.16.0.zip"
+            archive="catch2-{LibraryVersion}.zip"/>
+
+         <extract
+            format="zip"
+            root="Catch2-{LibraryVersion}">
+
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE.txt"/>
+
+            <require path="src\CMakeLists.txt"/>
+            <require path="src\catch2\catch_all.hpp"/>
+            <require path="src\catch2\catch_session.hpp"/>
+            <require path="src\catch2\catch_test_macros.hpp"/>
+            <require path="src\catch2\catch_template_test_macros.hpp"/>
+
+            <require path="CMake\Catch2Config.cmake.in"/>
+            <require path="extras\Catch.cmake"/>
+
+            <require path="tests\SelfTest"/>
+         </extract>
+      </source>
+
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+
+         <argument
+            value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+
+         <argument
+            value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+
+         <argument
+            value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+
+         <argument
+            value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+
+         <argument
+            value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+
+         <!--
+            Catch2 v3 upstream test contract.
+
+            CATCH_BUILD_TESTING is intentionally tied to BuildEngine's test
+            switch. CATCH_DEVELOPMENT_BUILD is required by upstream for the
+            SelfTest project, while Werror is explicitly disabled because
+            warnings are not part of the package compatibility contract.
+         -->
+         <argument
+            value="-DCATCH_DEVELOPMENT_BUILD:BOOL={TestsEnabled}"/>
+
+         <argument
+            value="-DCATCH_BUILD_TESTING:BOOL={TestsEnabled}"/>
+
+         <argument
+            value="-DBUILD_TESTING:BOOL={TestsEnabled}"/>
+
+         <argument
+            value="-DCATCH_ENABLE_WERROR:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_BUILD_EXAMPLES:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_BUILD_EXTRA_TESTS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_BUILD_FUZZERS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_BUILD_BENCHMARKS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_ENABLE_CONFIGURE_TESTS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_ENABLE_CMAKE_HELPER_TESTS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_ENABLE_REPRODUCIBLE_BUILD:BOOL=ON"/>
+
+         <argument
+            value="-DCATCH_INSTALL_DOCS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_INSTALL_EXTRAS:BOOL=ON"/>
+
+         <argument
+            value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
+
+         <!--
+            Build and test Catch2 as modern C++ in our environment even
+            though upstream's public minimum language requirement is older.
+         -->
+         <argument
+            value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+
+         <argument
+            value="-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"/>
+
+         <argument
+            value="-DCMAKE_CXX_EXTENSIONS:BOOL=OFF"/>
+
+         <cmake
+            mode="configure"
+            executable="{Tool:cmake}"
+            source="{Workspace}\Catch2-{LibraryVersion}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <cmake
+            mode="build"
+            executable="{Tool:cmake}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <argument
+               value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+
+            <argument
+               value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+
+            <argument
+               value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+
+            <argument
+               value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+
+         <variant name="Debug">
+            <argument
+               value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+
+            <argument
+               value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+
+            <argument
+               value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+
+            <argument
+               value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <execute
+                  name="upstream-tests"
+                  test="true"
+                  executable="{ToolDir:cmake}\ctest.exe"
+                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                  showOutput="false">
+
+                  <environment
+                     name="CTEST_PARALLEL_LEVEL"
+                     value="{TestJobs}"/>
+
+                  <environment
+                     name="PATH"
+                     value="{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+
+                  <argument value="--output-on-failure"/>
+               </execute>
+
+               <cmake
+                  mode="install"
+                  executable="{Tool:cmake}"
+                  build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\catch2\catch_all.hpp"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\catch2\catch_test_macros.hpp"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\catch2\catch_template_test_macros.hpp"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                  kind="directory"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\Catch2\Catch2Config.cmake"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\Catch2\Catch2ConfigVersion.cmake"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\Catch2\Catch2Targets.cmake"/>
+            </perVariant>
+
+            <common>
+               <copy
+                  source="{Workspace}\Catch2-{LibraryVersion}\LICENSE.txt"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\catch2\LICENSE.txt"
+                  overwrite="true"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\catch2\LICENSE.txt"/>
+            </common>
+         </install>
+      </build>
+
+      <publish
+         root="Win64x"
+         configuration="Release"
+         consumer="{BuildFileDir}\cmake\consumer">
+
+         <tree
+            source="include"
+            target="include"
+            optional="false"/>
+
+         <files
+            source="lib\win64\{Configuration}"
+            target="lib"
+            extensions=".a;.lib"
+            optional="false"/>
+
+         <cmake
+            source="lib\win64\{Configuration}\cmake"
+            target="lib\cmake"
+            optional="false"/>
+
+         <tree
+            source="licenses"
+            target="licenses"
+            optional="false"/>
+      </publish>
+
+      <smoke
+         id="consumer"
+         scope="package"
+         source="smokes\catch2\consumer"
+         configuration="Release"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="catch2-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+
+      <smoke
+         id="consumer"
+         scope="package"
+         source="smokes\catch2\consumer"
+         configuration="Debug"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="catch2-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+
+   <library id="bitmapplusplus" version="1.1.1" timestamp="2026-09-07T22:21:00Z">
+      <metadata
+         name="BitmapPlusPlus"
+         supplier="Bader-Eddine Ouaich and contributors"
+         homepage="https://github.com/baderouaich/BitmapPlusPlus">
+
+         <license
+            name="MIT License"
+            spdx="MIT"
+            file="licenses\bitmapplusplus\LICENSE.md"/>
+      </metadata>
+
+      <security>
+         <repository
+            url="https://github.com/baderouaich/BitmapPlusPlus.git"
+            ref="v1.1.1"
+            commit="f41f55cf93e0945fb98ab98940174138712e235e"/>
+      </security>
+
+      <source>
+         <download
+            url="https://github.com/baderouaich/BitmapPlusPlus/archive/refs/tags/v1.1.1.zip"
+            archive="bitmapplusplus-{LibraryVersion}.zip"/>
+
+         <extract
+            format="zip"
+            root="BitmapPlusPlus-{LibraryVersion}">
+
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE.md"/>
+
+            <require path="lib\CMakeLists.txt"/>
+            <require path="lib\include\BitmapPlusPlus.hpp"/>
+
+            <require path="examples\CMakeLists.txt"/>
+         </extract>
+      </source>
+
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+
+         <!--
+            Use the unmodified upstream CMake project. BitmapPlusPlus is
+            header-only; the configure/build phase therefore validates its
+            upstream CMake contract but intentionally produces no library.
+         -->
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+
+         <argument
+            value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+
+         <argument
+            value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+
+         <argument
+            value="-DBPP_BUILD_EXAMPLES:BOOL=OFF"/>
+
+         <cmake
+            mode="configure"
+            executable="{Tool:cmake}"
+            source="{Workspace}\BitmapPlusPlus-{LibraryVersion}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <cmake
+            mode="build"
+            executable="{Tool:cmake}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+         </variant>
+
+         <install>
+            <common>
+               <!--
+                  Upstream intentionally provides no install() contract.
+                  Preserve the original header unchanged and add only the
+                  BuildEngine package-discovery metadata.
+               -->
+               <copy
+                  source="{Workspace}\BitmapPlusPlus-{LibraryVersion}\lib\include\BitmapPlusPlus.hpp"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\BitmapPlusPlus.hpp"
+                  overwrite="true"/>
+
+               <copy
+                  source="{Workspace}\BitmapPlusPlus-{LibraryVersion}\LICENSE.md"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\bitmapplusplus\LICENSE.md"
+                  overwrite="true"/>
+
+               <copy
+                  source="{BuildFileDir}\cmake\bitmapplusplus\BitmapPlusPlusConfig.cmake"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfig.cmake"
+                  overwrite="true"/>
+
+               <copy
+                  source="{BuildFileDir}\cmake\bitmapplusplus\BitmapPlusPlusConfigVersion.cmake"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfigVersion.cmake"
+                  overwrite="true"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\BitmapPlusPlus.hpp"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\bitmapplusplus\LICENSE.md"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfig.cmake"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfigVersion.cmake"/>
+            </common>
+         </install>
+      </build>
+
+      <publish
+         root="Win64x"
+         configuration="Release"
+         consumer="{BuildFileDir}\cmake\consumer">
+
+         <tree
+            source="include"
+            target="include"
+            optional="false"/>
+
+         <cmake
+            source="lib\cmake"
+            target="lib\cmake"
+            optional="false"/>
+
+         <tree
+            source="licenses"
+            target="licenses"
+            optional="false"/>
+      </publish>
+
+      <smoke
+         id="consumer"
+         scope="package"
+         source="smokes\bitmapplusplus\consumer"
+         configuration="Release"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="bitmapplusplus-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+
+      <smoke
+         id="consumer"
+         scope="package"
+         source="smokes\bitmapplusplus\consumer"
+         configuration="Debug"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="bitmapplusplus-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+
 <library id="libjpeg-turbo" version="3.2.0" timestamp="2026-09-06T04:41:00Z">
    <source>
       <download
