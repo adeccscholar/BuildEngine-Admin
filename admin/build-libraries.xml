@@ -3494,7 +3494,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="153" timestamp="2026-09-07T16:52:00Z">
+   <library id="skia" version="153" timestamp="2026-09-07T17:06:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -4140,42 +4140,6 @@
          </execute>
 
          <!--
-            BCC64X Win64 Modern UCRT compatibility.
-
-            BCC64X 20.1.7's shipped libucrt.a contains both API-set import
-            providers and local libucrt_extra implementations for a small
-            set of math functions. DLL links can otherwise retain invalid
-            API-set imports such as fabsf. BuildEngine provides a generated
-            compatibility archive from the locally installed toolchain.
-         -->
-         <copy
-            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-ucrt-compat.patch"
-            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ucrt-compat.patch"
-            overwrite="true"
-            preserveCurrentArtifact="true"/>
-
-         <execute name="ucrt-compat-patch-check"
-                  executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="apply"/>
-            <argument value="--check"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ucrt-compat.patch"/>
-         </execute>
-
-         <execute name="ucrt-compat-patch-apply"
-                  executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="apply"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ucrt-compat.patch"/>
-         </execute>
-
-         <!--
             Propagate raw BCC64X linker flags from Skia system dependency
             targets through source_set/group dependency chains to the final
             shared-library link.
@@ -4641,7 +4605,14 @@
 
                <line value="bcc64x_rad_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release&quot;"/>
                <line value="bcc64x_rad_psdk_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release/psdk&quot;"/>
-               <line value="bcc64x_ucrt_compat_library = getenv(&quot;CB_BCC64X_UCRT_COMPAT&quot;)"/>
+
+               <!--
+                  Use Skia's existing extra_ldflags contract to place the
+                  BuildEngine-generated BCC64X UCRT compatibility archive
+                  on every target link. No additional Skia source patch is
+                  required for the UCRT compatibility archive.
+               -->
+               <line value="extra_ldflags = [getenv(&quot;CB_BCC64X_UCRT_COMPAT&quot;)]"/>
 
                <!-- BuildEngine package locations. -->
                <line value="bcc64x_opengl_lib = getenv(&quot;CB_SKIA_OPENGL_LIB&quot;)"/>
