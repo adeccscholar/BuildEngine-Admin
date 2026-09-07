@@ -2700,7 +2700,7 @@
       </smoke>
    </library>
 
-   <library id="catch2" version="3.16.0" timestamp="2026-09-07T22:20:00Z">
+   <library id="catch2" version="3.16.0" timestamp="2026-09-08T04:26:00Z">
       <metadata
          name="Catch2"
          supplier="Catch2 Authors"
@@ -2739,7 +2739,12 @@
             <require path="CMake\Catch2Config.cmake.in"/>
             <require path="extras\Catch.cmake"/>
 
-            <require path="tests\SelfTest"/>
+            <!--
+               Verify the real upstream SelfTest source closure.
+               <require> validates files, not directory presence.
+            -->
+            <require path="tests\CMakeLists.txt"/>
+            <require path="tests\SelfTest\TestRegistrations.cpp"/>
          </extract>
       </source>
 
@@ -2763,15 +2768,20 @@
          <argument
             value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
 
+         <!--
+            Catch2 is normally consumed as a static test framework.
+            Do not invent a DLL build merely to follow the general shared
+            library default used for normal runtime libraries.
+         -->
          <argument
             value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
 
          <!--
-            Catch2 v3 upstream test contract.
+            Catch2 v3 upstream SelfTest contract.
 
-            CATCH_BUILD_TESTING is intentionally tied to BuildEngine's test
-            switch. CATCH_DEVELOPMENT_BUILD is required by upstream for the
-            SelfTest project, while Werror is explicitly disabled because
+            Upstream enables CATCH_BUILD_TESTING only for a development
+            build. Keep the upstream tests enabled when BuildEngine tests
+            are enabled. Werror is explicitly disabled because compiler
             warnings are not part of the package compatibility contract.
          -->
          <argument
@@ -2817,8 +2827,7 @@
             value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
 
          <!--
-            Build and test Catch2 as modern C++ in our environment even
-            though upstream's public minimum language requirement is older.
+            Exercise the package under the BuildEngine C++23 profile.
          -->
          <argument
             value="-DCMAKE_CXX_STANDARD:STRING=23"/>
@@ -2983,7 +2992,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-
+   
    <library id="bitmapplusplus" version="1.1.1" timestamp="2026-09-07T22:22:00Z">
       <metadata
          name="BitmapPlusPlus"
