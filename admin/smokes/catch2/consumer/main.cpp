@@ -5,12 +5,10 @@
 #include <catch2/catch_template_test_macros.hpp>
 
 #include <array>
+#include <deque>
 #include <print>
 #include <string_view>
 #include <vector>
-
-template <typename T>
-using Buffer = std::vector<T>;
 
 TEST_CASE("Catch2 basic assertions", "[buildengine]") {
    std::array<int, 4> const aiValues{1, 2, 3, 4};
@@ -21,7 +19,7 @@ TEST_CASE("Catch2 basic assertions", "[buildengine]") {
 TEMPLATE_PRODUCT_TEST_CASE(
    "Catch2 Clang 20 template product path",
    "[buildengine][template-product]",
-   (std::vector, Buffer),
+   (std::vector, std::deque),
    (int, double)) {
    TestType theValues{};
    REQUIRE(theValues.empty());
