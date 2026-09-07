@@ -11,3 +11,109 @@ index 034088d..d07d110 100644
        sources += skia_sksl_validate_spirv_sources
        deps += [
          "//third_party/externals/spirv-tools:spvtools",
+
+diff --git a/third_party/externals/spirv-tools/BUILD.gn b/third_party/externals/spirv-tools/BUILD.gn
+--- a/third_party/externals/spirv-tools/BUILD.gn
++++ b/third_party/externals/spirv-tools/BUILD.gn
+@@ -33,4 +33,13 @@
+ spirv_headers = spirv_tools_spirv_headers_dir
++
++# BuildEngine/BCC64X: pass native absolute paths to Python actions. The
++# managed Windows build must not depend on the process working directory
++# when scripts consume paths supplied through args.
++spvtools_action_path_base = root_build_dir
++if (defined(skia_use_bcc64x) && skia_use_bcc64x) {
++  spvtools_action_path_base = ""
++}
++
+ spirv_is_winuwp = is_win && target_os == "winuwp"
+ 
+ action("spvtools_core_tables") {
+@@ -42,19 +51,19 @@
+ 
+   # Extended instruction set grammar files
+   grammar_dir = "${spirv_headers}/include/spirv/unified1"
+-  f0=rebase_path("${grammar_dir}/extinst.debuginfo.grammar.json", root_build_dir)
+-  f1=rebase_path("${grammar_dir}/extinst.glsl.std.450.grammar.json", root_build_dir)
+-  f2=rebase_path("${grammar_dir}/extinst.nonsemantic.clspvreflection.grammar.json", root_build_dir)
+-  f3=rebase_path("${grammar_dir}/extinst.nonsemantic.shader.debuginfo.100.grammar.json", root_build_dir)
+-  f4=rebase_path("${grammar_dir}/extinst.nonsemantic.vkspreflection.grammar.json", root_build_dir)
+-  f5=rebase_path("${grammar_dir}/extinst.opencl.debuginfo.100.grammar.json", root_build_dir)
+-  f6=rebase_path("${grammar_dir}/extinst.opencl.std.100.grammar.json", root_build_dir)
+-  f7=rebase_path("${grammar_dir}/extinst.spv-amd-gcn-shader.grammar.json", root_build_dir)
+-  f8=rebase_path("${grammar_dir}/extinst.spv-amd-shader-ballot.grammar.json", root_build_dir)
+-  f9=rebase_path("${grammar_dir}/extinst.spv-amd-shader-explicit-vertex-parameter.grammar.json", root_build_dir)
+-  f10=rebase_path("${grammar_dir}/extinst.spv-amd-shader-trinary-minmax.grammar.json", root_build_dir)
+-  f11=rebase_path("${grammar_dir}/extinst.nonsemantic.graph.debuginfo.grammar.json", root_build_dir)
+-  f12=rebase_path("${grammar_dir}/extinst.arm.experimental-ml-operations.grammar.json", root_build_dir)
++  f0=rebase_path("${grammar_dir}/extinst.debuginfo.grammar.json", spvtools_action_path_base)
++  f1=rebase_path("${grammar_dir}/extinst.glsl.std.450.grammar.json", spvtools_action_path_base)
++  f2=rebase_path("${grammar_dir}/extinst.nonsemantic.clspvreflection.grammar.json", spvtools_action_path_base)
++  f3=rebase_path("${grammar_dir}/extinst.nonsemantic.shader.debuginfo.100.grammar.json", spvtools_action_path_base)
++  f4=rebase_path("${grammar_dir}/extinst.nonsemantic.vkspreflection.grammar.json", spvtools_action_path_base)
++  f5=rebase_path("${grammar_dir}/extinst.opencl.debuginfo.100.grammar.json", spvtools_action_path_base)
++  f6=rebase_path("${grammar_dir}/extinst.opencl.std.100.grammar.json", spvtools_action_path_base)
++  f7=rebase_path("${grammar_dir}/extinst.spv-amd-gcn-shader.grammar.json", spvtools_action_path_base)
++  f8=rebase_path("${grammar_dir}/extinst.spv-amd-shader-ballot.grammar.json", spvtools_action_path_base)
++  f9=rebase_path("${grammar_dir}/extinst.spv-amd-shader-explicit-vertex-parameter.grammar.json", spvtools_action_path_base)
++  f10=rebase_path("${grammar_dir}/extinst.spv-amd-shader-trinary-minmax.grammar.json", spvtools_action_path_base)
++  f11=rebase_path("${grammar_dir}/extinst.nonsemantic.graph.debuginfo.grammar.json", spvtools_action_path_base)
++  f12=rebase_path("${grammar_dir}/extinst.arm.experimental-ml-operations.grammar.json", spvtools_action_path_base)
+ 
+   sources = [
+     "utils/Table/__init__.py",
+@@ -83,7 +92,7 @@
+   ]
+   args = [
+     "--spirv-core-grammar",
+-    rebase_path("${grammar_dir}/spirv.core.grammar.json", root_build_dir),
++    rebase_path("${grammar_dir}/spirv.core.grammar.json", spvtools_action_path_base),
+     "--extinst=,${f0}",
+     "--extinst=,${f1}",
+     "--extinst=,${f2}",
+@@ -98,9 +107,9 @@
+     "--extinst=,${f11}",
+     "--extinst=,${f12}",
+     "--core-tables-body-output",
+-    rebase_path(core_tables_body_file, root_build_dir),
++    rebase_path(core_tables_body_file, spvtools_action_path_base),
+     "--core-tables-header-output",
+-    rebase_path(core_tables_header_file, root_build_dir)
++    rebase_path(core_tables_header_file, spvtools_action_path_base)
+   ]
+ }
+ 
+@@ -115,9 +124,9 @@
+ 
+     args = [
+       "--extinst-grammar",
+-      rebase_path(invoker.grammar_file, root_build_dir),
++      rebase_path(invoker.grammar_file, spvtools_action_path_base),
+       "--extinst-output-path",
+-      rebase_path(extinst_output_path, root_build_dir),
++      rebase_path(extinst_output_path, spvtools_action_path_base),
+     ]
+     inputs = [ invoker.grammar_file ]
+     outputs = [ "${extinst_output_path}" ]
+@@ -135,9 +144,9 @@
+   outputs = [ inc_file ]
+   args = [
+     "--xml",
+-    rebase_path(xml_file, root_build_dir),
++    rebase_path(xml_file, spvtools_action_path_base),
+     "--generator",
+-    rebase_path(inc_file, root_build_dir),
++    rebase_path(inc_file, spvtools_action_path_base),
+   ]
+ }
+ 
+@@ -149,7 +158,7 @@
+ 
+   outputs = [ inc_file ]
+   args = [
+-    rebase_path(changes_file, root_build_dir),
+-    rebase_path(inc_file, root_build_dir),
++    rebase_path(changes_file, spvtools_action_path_base),
++    rebase_path(inc_file, spvtools_action_path_base),
+   ]
+ }
