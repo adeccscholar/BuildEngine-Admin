@@ -2984,7 +2984,7 @@
       </smoke>
    </library>
 
-   <library id="bitmapplusplus" version="1.1.1" timestamp="2026-09-07T22:21:00Z">
+   <library id="bitmapplusplus" version="1.1.1" timestamp="2026-09-07T22:22:00Z">
       <metadata
          name="BitmapPlusPlus"
          supplier="Bader-Eddine Ouaich and contributors"
@@ -3022,90 +3022,55 @@
          </extract>
       </source>
 
-      <build>
-         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
-         <environment name="CB_BDS" value="{BDS}"/>
+      <!--
+         BitmapPlusPlus is a header-only C++ library.
+
+         Upstream defines only an INTERFACE target and intentionally creates
+         no binary artifact. Therefore this package uses BuildEngine's direct
+         install contract rather than inventing configuration-specific build
+         or install artifacts.
+
+         BCC64X compatibility is verified independently for Release and Debug
+         by the package consumer smokes below.
+      -->
+      <install>
+         <copy
+            source="{Workspace}\BitmapPlusPlus-{LibraryVersion}\lib\include\BitmapPlusPlus.hpp"
+            target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\BitmapPlusPlus.hpp"
+            overwrite="true"/>
+
+         <copy
+            source="{Workspace}\BitmapPlusPlus-{LibraryVersion}\LICENSE.md"
+            target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\bitmapplusplus\LICENSE.md"
+            overwrite="true"/>
 
          <!--
-            Use the unmodified upstream CMake project. BitmapPlusPlus is
-            header-only; the configure/build phase therefore validates its
-            upstream CMake contract but intentionally produces no library.
+            Upstream 1.1.1 has no install()/package-config contract.
+            These files add only package discovery metadata; the upstream
+            header itself remains unmodified.
          -->
-         <argument value="-G"/>
-         <argument value="Ninja"/>
-         <argument value="-Wno-dev"/>
+         <copy
+            source="{BuildFileDir}\cmake\bitmapplusplus\BitmapPlusPlusConfig.cmake"
+            target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfig.cmake"
+            overwrite="true"/>
 
-         <argument
-            value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <copy
+            source="{BuildFileDir}\cmake\bitmapplusplus\BitmapPlusPlusConfigVersion.cmake"
+            target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfigVersion.cmake"
+            overwrite="true"/>
 
-         <argument
-            value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <require
+            path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\BitmapPlusPlus.hpp"/>
 
-         <argument
-            value="-DBPP_BUILD_EXAMPLES:BOOL=OFF"/>
+         <require
+            path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\bitmapplusplus\LICENSE.md"/>
 
-         <cmake
-            mode="configure"
-            executable="{Tool:cmake}"
-            source="{Workspace}\BitmapPlusPlus-{LibraryVersion}"
-            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <require
+            path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfig.cmake"/>
 
-         <cmake
-            mode="build"
-            executable="{Tool:cmake}"
-            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-
-         <variant name="Release">
-            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
-            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
-         </variant>
-
-         <variant name="Debug">
-            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
-            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
-         </variant>
-
-         <install>
-            <common>
-               <!--
-                  Upstream intentionally provides no install() contract.
-                  Preserve the original header unchanged and add only the
-                  BuildEngine package-discovery metadata.
-               -->
-               <copy
-                  source="{Workspace}\BitmapPlusPlus-{LibraryVersion}\lib\include\BitmapPlusPlus.hpp"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\BitmapPlusPlus.hpp"
-                  overwrite="true"/>
-
-               <copy
-                  source="{Workspace}\BitmapPlusPlus-{LibraryVersion}\LICENSE.md"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\bitmapplusplus\LICENSE.md"
-                  overwrite="true"/>
-
-               <copy
-                  source="{BuildFileDir}\cmake\bitmapplusplus\BitmapPlusPlusConfig.cmake"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfig.cmake"
-                  overwrite="true"/>
-
-               <copy
-                  source="{BuildFileDir}\cmake\bitmapplusplus\BitmapPlusPlusConfigVersion.cmake"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfigVersion.cmake"
-                  overwrite="true"/>
-
-               <require
-                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\BitmapPlusPlus.hpp"/>
-
-               <require
-                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\bitmapplusplus\LICENSE.md"/>
-
-               <require
-                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfig.cmake"/>
-
-               <require
-                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfigVersion.cmake"/>
-            </common>
-         </install>
-      </build>
+         <require
+            path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\BitmapPlusPlus\BitmapPlusPlusConfigVersion.cmake"/>
+      </install>
 
       <publish
          root="Win64x"
@@ -3156,7 +3121,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-
+   
 <library id="libjpeg-turbo" version="3.2.0" timestamp="2026-09-06T04:41:00Z">
    <source>
       <download
