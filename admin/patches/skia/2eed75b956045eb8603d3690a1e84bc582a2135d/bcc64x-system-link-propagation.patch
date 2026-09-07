@@ -24,7 +24,7 @@ index 1fe96e9..3c6feed 100644
 diff --git a/BUILD.gn b/BUILD.gn
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -133,4 +133,7 @@ config("skia_library") {
+@@ -133,3 +133,6 @@ config("skia_library") {
    visibility = [ "./*" ]
    defines = [ "SKIA_IMPLEMENTATION=1" ]
 +  if (is_component_build && skia_use_bcc64x) {
@@ -47,3 +47,34 @@ diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
 +    }
      cflags_cc += [ "-std=c++20" ]
    }
+
+diff --git a/modules/skcms/BUILD.gn b/modules/skcms/BUILD.gn
+--- a/modules/skcms/BUILD.gn
++++ b/modules/skcms/BUILD.gn
+@@ -83,13 +83,25 @@ arch("skcms_TransformSkx") {
+   }
+ }
+ 
++config("bcc64x_skcms_dll_public") {
++  defines = [ "SKCMS_DLL" ]
++}
++
+ static_library("skcms") {
+   cflags = []
++  defines = []
++  if (skia_use_bcc64x && is_component_build) {
++    defines += [
++      "SKCMS_DLL",
++      "SKCMS_IMPLEMENTATION",
++    ]
++    public_configs = [ ":bcc64x_skcms_dll_public" ]
++  }
+   if (!is_win || is_clang) {
+     cflags += [ "-std=c11" ]
+   }
+   if (target_cpu != "x64" || target_os == "android") {
+-    defines = [
++    defines += [
+       "SKCMS_DISABLE_HSW",
+       "SKCMS_DISABLE_SKX",
+     ]
