@@ -86,9 +86,21 @@ Damit ist die Fehlerursache unterhalb der Bibliotheksebene reproduziert.
 
 ## BuildEngine-Workaround
 
-Der Workaround wird nicht als Skia-Quellpatch umgesetzt. BuildEngine erzeugt ein kleines Compat-Archiv deterministisch aus der **lokal installierten** BCC64X-`libucrt.a`. Es werden keine Embarcadero-Objektdateien oder Archive in diesem Repository gespeichert.
+Der Workaround wird nicht als Skia-Quellpatch und nicht über ein PowerShell-Hilfsskript umgesetzt. Die vollständige Provisioning-Logik liegt im BuildEngine-Toolvertrag.
 
-Der CMake-BCC64X-Vertrag hängt das erzeugte Archiv vor die normalen Runtime-Bibliotheken. Dadurch werden echte Referenzen auf die fünf betroffenen Symbole bereits durch die lokale `libucrt_extra`-Implementierung aufgelöst.
+`admin/build-tools.xml` deklariert ein generiertes Tool `bcc64x-ucrt-compat`. Der Vertrag enthält:
+
+- das lokal installierte BCC64X-`llvm-ar` als Archiver,
+- die lokal installierte `x86_64-w64-mingw32/lib/libucrt.a` als Quellarchiv,
+- genau die vier verifizierten `libucrt_extra`-Members,
+- das versionierte Zielverzeichnis unter dem BuildEngine-Tools-Root,
+- `libbcc64x-ucrt-compat.a` als registrierten Tool-Entry.
+
+BuildEngine erzeugt dieses Archiv selbst. Existiert der versionierte Tool-Entry bereits und ist er nicht älter als die Quell-`libucrt.a`, wird keine Generierung ausgeführt. Andernfalls extrahiert BuildEngine die deklarierten Members mit `llvm-ar`, prüft die extrahierten Dateien, erzeugt das Compat-Archiv in einem temporären Verzeichnis und promotet es erst nach erfolgreichem Abschluss in den endgültigen Toolpfad.
+
+Damit wird das Archiv einmal pro Toolversion und Produktionsumgebung bereitgestellt und anschließend wiederverwendet. Es werden keine Embarcadero-Objektdateien oder Archive im Repository gespeichert.
+
+Der generische CMake-BCC64X-Vertrag konsumiert nur das bereits bereitgestellte Tool und hängt dessen Archiv vor die normalen Runtime-Bibliotheken. CMake selbst erzeugt kein Compat-Archiv mehr.
 
 Der Workaround gilt für Win64-BCC64X-Linkvorgänge allgemein und ist nicht auf Debug beschränkt. Debug machte den Fehler lediglich sichtbar, weil Optimierung bei `fabsf` häufig eine externe Referenz vermeidet.
 
