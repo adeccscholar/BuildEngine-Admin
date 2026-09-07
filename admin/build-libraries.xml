@@ -3494,7 +3494,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T22:42:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T22:43:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -5074,6 +5074,24 @@
             name="PATH"
             value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{InstallRoot}\packages\brotli\1.2.0\bin\win64\Release;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Release;{InstallRoot}\packages\libpng\1.6.58\bin\win64\Release;{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\Release;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
+	  <smoke
+         id="consumer"
+         scope="package"
+         source="smokes\skia\consumer"
+         configuration="Debug"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="skia-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+
+         <environment
+            name="PATH"
+            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{InstallRoot}\packages\brotli\1.2.0\bin\win64\Release;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Release;{InstallRoot}\packages\libpng\1.6.58\bin\win64\Release;{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\Release;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Release;{ENV:PATH}"/>
+      </smoke>
+	  
    </library> 
    
 </buildLibraries>
