@@ -103,7 +103,7 @@
       <managed root="pkg-config-lite\0.28-1" executable="pkg-config-lite-0.28-1\bin\pkg-config.exe">
          <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download"
                    archive="pkg-config-lite-0.28-1_bin-win32.zip"
-                   sha256="2038c49d23b5ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
+                   sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
       </managed>
       <probe contains="0.28">
          <argument value="--version"/>
