@@ -3494,7 +3494,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T22:41:00Z">
+   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T22:42:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -4955,6 +4955,44 @@
                   recursive="true"
                   overwrite="true"/>
 
+               <!--
+                  Transitive headers required by the public SVG/Skottie API.
+                  skresources and sksg remain implementation libraries; only
+                  their headers required by public Skia module headers are
+                  installed into the consumer SDK.
+               -->
+               <copy
+                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\skresources\include"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skresources\include"
+                  recursive="true"
+                  overwrite="true"/>
+
+               <copy
+                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\sksg\include"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\sksg\include"
+                  recursive="true"
+                  overwrite="true"/>
+
+               <copy
+                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\src\core\SkTHash.h"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkTHash.h"
+                  overwrite="true"/>
+
+               <copy
+                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\src\core\SkChecksum.h"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkChecksum.h"
+                  overwrite="true"/>
+
+               <copy
+                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\src\core\SkMathPriv.h"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkMathPriv.h"
+                  overwrite="true"/>
+
+               <copy
+                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\src\core\SkUTF.h"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkUTF.h"
+                  overwrite="true"/>
+				  
                <copy
                   source="{BuildFileDir}\cmake\skia\SkiaConfig.cmake"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake"
@@ -4977,6 +5015,26 @@
 
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include\core\SkSurface.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms\skcms.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json"/>
+			   
+			   <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include\core\SkSurface.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms\skcms.h"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skunicode\include\SkUnicode_icu.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skshaper\include\SkShaper.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\svg\include\SkSVGDOM.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skottie\include\Skottie.h"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skresources\include\SkResources.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\sksg\include\SkSGRenderNode.h"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkTHash.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkChecksum.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkMathPriv.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkUTF.h"/>
+
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json"/>
