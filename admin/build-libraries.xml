@@ -3494,7 +3494,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="2eed75b956045eb8603d3690a1e84bc582a2135d" timestamp="2026-09-06T22:45:00Z">
+   <library id="skia" version="153" timestamp="2026-09-06T22:46:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -3509,11 +3509,12 @@
                   file="licenses\skia\LICENSE"/>
       </metadata>
 
-      <security>
-         <repository
-            url="https://github.com/google/skia.git"
-            commit="2eed75b956045eb8603d3690a1e84bc582a2135d"/>
-      </security>
+<security>
+   <repository
+      url="https://github.com/google/skia.git"
+      ref="chrome/m153"
+      commit="2eed75b956045eb8603d3690a1e84bc582a2135d"/>
+</security>
 
       <source>
          <!--
