@@ -3494,7 +3494,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="153" timestamp="2026-09-06T22:46:00Z">
+   <library id="skia" version="153" timestamp="2026-09-07T16:52:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -3509,12 +3509,12 @@
                   file="licenses\skia\LICENSE"/>
       </metadata>
 
-<security>
-   <repository
-      url="https://github.com/google/skia.git"
-      ref="chrome/m153"
-      commit="2eed75b956045eb8603d3690a1e84bc582a2135d"/>
-</security>
+      <security>
+         <repository
+            url="https://github.com/google/skia.git"
+            ref="chrome/m153"
+            commit="2eed75b956045eb8603d3690a1e84bc582a2135d"/>
+      </security>
 
       <source>
          <!--
@@ -4140,6 +4140,42 @@
          </execute>
 
          <!--
+            BCC64X Win64 Modern UCRT compatibility.
+
+            BCC64X 20.1.7's shipped libucrt.a contains both API-set import
+            providers and local libucrt_extra implementations for a small
+            set of math functions. DLL links can otherwise retain invalid
+            API-set imports such as fabsf. BuildEngine provides a generated
+            compatibility archive from the locally installed toolchain.
+         -->
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-ucrt-compat.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ucrt-compat.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+
+         <execute name="ucrt-compat-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ucrt-compat.patch"/>
+         </execute>
+
+         <execute name="ucrt-compat-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ucrt-compat.patch"/>
+         </execute>
+
+         <!--
             Propagate raw BCC64X linker flags from Skia system dependency
             targets through source_set/group dependency chains to the final
             shared-library link.
@@ -4503,6 +4539,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_PYTHON" value="{Tool:python}"/>
+         <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
 
          <!-- OpenGL. -->
          <environment
@@ -4604,6 +4641,7 @@
 
                <line value="bcc64x_rad_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release&quot;"/>
                <line value="bcc64x_rad_psdk_lib_dir = getenv(&quot;CB_BDS&quot;) + &quot;/lib/win64x/release/psdk&quot;"/>
+               <line value="bcc64x_ucrt_compat_library = getenv(&quot;CB_BCC64X_UCRT_COMPAT&quot;)"/>
 
                <!-- BuildEngine package locations. -->
                <line value="bcc64x_opengl_lib = getenv(&quot;CB_SKIA_OPENGL_LIB&quot;)"/>
@@ -4807,29 +4845,29 @@
             <argument value="skottie"/>
          </execute>
 
-<variant name="Release">
-   <variable name="SkiaOfficialBuild" value="true"/>
-   <variable name="SkiaDebug" value="false"/>
+         <variant name="Release">
+            <variable name="SkiaOfficialBuild" value="true"/>
+            <variable name="SkiaDebug" value="false"/>
 
-   <variable name="ZlibLibraryName" value="libz"/>
-   <variable name="LibPngLibraryName" value="libpng16"/>
-   <variable name="LibJpegLibraryName" value="libjpeg"/>
-   <variable name="HarfBuzzLibraryName" value="libharfbuzz"/>
-   <variable name="HarfBuzzSubsetLibraryName" value="libharfbuzz-subset"/>
-   <variable name="FreeTypeLibraryName" value="libfreetype"/>
-</variant>
+            <variable name="ZlibLibraryName" value="libz"/>
+            <variable name="LibPngLibraryName" value="libpng16"/>
+            <variable name="LibJpegLibraryName" value="libjpeg"/>
+            <variable name="HarfBuzzLibraryName" value="libharfbuzz"/>
+            <variable name="HarfBuzzSubsetLibraryName" value="libharfbuzz-subset"/>
+            <variable name="FreeTypeLibraryName" value="libfreetype"/>
+         </variant>
 
-<variant name="Debug">
-   <variable name="SkiaOfficialBuild" value="false"/>
-   <variable name="SkiaDebug" value="true"/>
+         <variant name="Debug">
+            <variable name="SkiaOfficialBuild" value="false"/>
+            <variable name="SkiaDebug" value="true"/>
 
-   <variable name="ZlibLibraryName" value="libzd"/>
-   <variable name="LibPngLibraryName" value="libpng16d"/>
-   <variable name="LibJpegLibraryName" value="libjpegd"/>
-   <variable name="HarfBuzzLibraryName" value="libharfbuzzd"/>
-   <variable name="HarfBuzzSubsetLibraryName" value="libharfbuzz-subsetd"/>
-   <variable name="FreeTypeLibraryName" value="libfreetyped"/>
-</variant>
+            <variable name="ZlibLibraryName" value="libzd"/>
+            <variable name="LibPngLibraryName" value="libpng16d"/>
+            <variable name="LibJpegLibraryName" value="libjpegd"/>
+            <variable name="HarfBuzzLibraryName" value="libharfbuzzd"/>
+            <variable name="HarfBuzzSubsetLibraryName" value="libharfbuzz-subsetd"/>
+            <variable name="FreeTypeLibraryName" value="libfreetyped"/>
+         </variant>
 
          <install>
             <perVariant>
@@ -4993,7 +5031,7 @@
                   source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\src\core\SkUTF.h"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkUTF.h"
                   overwrite="true"/>
-				  
+
                <copy
                   source="{BuildFileDir}\cmake\skia\SkiaConfig.cmake"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake"
@@ -5016,13 +5054,6 @@
 
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include\core\SkSurface.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms\skcms.h"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Skia\SkiaConfig.cmake"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json"/>
-			   
-			   <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include\core\SkSurface.h"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms\skcms.h"/>
-
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skunicode\include\SkUnicode_icu.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skshaper\include\SkShaper.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\svg\include\SkSVGDOM.h"/>
@@ -5070,12 +5101,14 @@
 
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
 
          <environment
             name="PATH"
             value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{InstallRoot}\packages\brotli\1.2.0\bin\win64\Release;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Release;{InstallRoot}\packages\libpng\1.6.58\bin\win64\Release;{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\Release;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
-	  <smoke
+
+      <smoke
          id="consumer"
          scope="package"
          source="smokes\skia\consumer"
@@ -5087,12 +5120,12 @@
 
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
 
          <environment
             name="PATH"
-            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{InstallRoot}\packages\brotli\1.2.0\bin\win64\Release;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Release;{InstallRoot}\packages\libpng\1.6.58\bin\win64\Release;{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\Release;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Release;{ENV:PATH}"/>
+            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Debug;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Debug;{InstallRoot}\packages\brotli\1.2.0\bin\win64\Debug;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Debug;{InstallRoot}\packages\libpng\1.6.58\bin\win64\Debug;{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\Debug;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Debug;{ENV:PATH}"/>
       </smoke>
-	  
-   </library> 
+   </library>
    
 </buildLibraries>
