@@ -2700,7 +2700,7 @@
       </smoke>
    </library>
 
-   <library id="catch2" version="3.16.0" timestamp="2026-09-07T23:15:00Z">
+   <library id="catch2" version="3.16.0" timestamp="2026-09-08T01:20:00Z">
       <metadata
          name="Catch2"
          supplier="Catch2 Authors"
@@ -2769,37 +2769,32 @@
             value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
 
          <!--
-            Catch2 3.16 still treats every compiler defining __BORLANDC__
+            Catch2 3.16 identifies every compiler defining __BORLANDC__
             as the historic Embarcadero compiler family and therefore enables
             CATCH_CONFIG_POLYFILL_ISNAN.
 
-            That polyfill calls std::_isnan(), which is not provided by the
+            That polyfill calls std::_isnan(), which is not available in the
             modern BCC64X 20.1.7 standard-library environment.
 
-            Catch2 itself provides CATCH_CONFIG_NO_POLYFILL_ISNAN as the
-            override for this autodetection. Use that supported preprocessor
-            contract instead of modifying Catch2 sources.
+            Catch2 provides CATCH_CONFIG_NO_POLYFILL_ISNAN as the supported
+            negative override, so no source patch is required.
 
-            Catch2's UTF-8 SelfTests also require ordinary narrow string
-            literals to contain UTF-8 bytes. BCC64X 20.1.7 defaults these
-            literals to the Windows execution code page. This was reproduced
-            independently with a minimal UTF-8 source probe:
+            Catch2's UTF-8 SelfTests contain real Unicode characters in
+            ordinary narrow string literals and expect UTF-8 bytes.
+
+            Machine-proven with BCC64X 20.1.7:
 
                default                              -> 9A
                -fborland-input-code-page=65001      -> 9A
                -fborland-exec-code-page=65001       -> C5 A1
 
-            Therefore only the BCC64X execution code page is set to UTF-8.
-            The generic Clang -finput-charset/-fexec-charset options did not
-            change the observed BCC64X behaviour and are intentionally not
-            part of this contract.
+            Therefore Catch2 uses UTF-8 as BCC64X execution code page.
+            Generic Clang -finput-charset/-fexec-charset options did not
+            change the observed BCC64X behaviour and are intentionally absent.
          -->
          <argument
             value="-DCMAKE_CXX_FLAGS:STRING=-DCATCH_CONFIG_NO_POLYFILL_ISNAN -fborland-exec-code-page=65001"/>
 
-         <!--
-            Catch2 v3 upstream SelfTest contract.
-         -->
          <argument
             value="-DCATCH_DEVELOPMENT_BUILD:BOOL={TestsEnabled}"/>
 
@@ -2989,6 +2984,18 @@
 
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+
+         <!--
+            Catch2 installs its CMake package relative to CMAKE_INSTALL_LIBDIR.
+            Our variant layout therefore places it below
+            lib/win64/{Configuration}/cmake/Catch2.
+
+            A package smoke uses the package root as CMAKE_PREFIX_PATH, so the
+            variant-specific config location is supplied explicitly instead of
+            relocating Catch2's generated CMake export files.
+         -->
+         <argument
+            value="-DCatch2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\Catch2"/>
       </smoke>
 
       <smoke
@@ -3003,6 +3010,9 @@
 
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+
+         <argument
+            value="-DCatch2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\Catch2"/>
       </smoke>
    </library>
    
