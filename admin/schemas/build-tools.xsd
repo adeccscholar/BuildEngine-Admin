@@ -58,6 +58,22 @@
       <xs:attribute name="executable" type="xs:string" use="required"/>
    </xs:complexType>
 
+   <xs:complexType name="generatedArchiveType">
+      <xs:sequence>
+         <xs:element name="member" type="pathPatternType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="tool" type="xs:string" use="required"/>
+      <xs:attribute name="source" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="generatedType">
+      <xs:sequence>
+         <xs:element name="archive" type="generatedArchiveType"/>
+      </xs:sequence>
+      <xs:attribute name="root" type="xs:string" use="required"/>
+      <xs:attribute name="entry" type="xs:string" use="required"/>
+   </xs:complexType>
+
    <xs:complexType name="bdsType">
       <xs:attribute name="executable" type="xs:string" use="required"/>
    </xs:complexType>
@@ -96,6 +112,7 @@
       <xs:sequence>
          <xs:choice>
             <xs:element name="managed" type="managedType"/>
+            <xs:element name="generated" type="generatedType"/>
             <xs:element name="bds" type="bdsType"/>
             <xs:element name="discover" type="discoverType"/>
          </xs:choice>
