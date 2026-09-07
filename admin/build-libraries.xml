@@ -2700,11 +2700,12 @@
       </smoke>
    </library>
 
-   <library id="catch2" version="3.16.0" timestamp="2026-09-07T22:47:39Z">
+   <library id="catch2" version="3.16.0" timestamp="2026-09-07T23:15:00Z">
       <metadata
          name="Catch2"
          supplier="Catch2 Authors"
          homepage="https://github.com/catchorg/Catch2">
+
          <license
             name="Boost Software License 1.0"
             spdx="BSL-1.0"
@@ -2778,9 +2779,23 @@
             Catch2 itself provides CATCH_CONFIG_NO_POLYFILL_ISNAN as the
             override for this autodetection. Use that supported preprocessor
             contract instead of modifying Catch2 sources.
+
+            Catch2's UTF-8 SelfTests also require ordinary narrow string
+            literals to contain UTF-8 bytes. BCC64X 20.1.7 defaults these
+            literals to the Windows execution code page. This was reproduced
+            independently with a minimal UTF-8 source probe:
+
+               default                              -> 9A
+               -fborland-input-code-page=65001      -> 9A
+               -fborland-exec-code-page=65001       -> C5 A1
+
+            Therefore only the BCC64X execution code page is set to UTF-8.
+            The generic Clang -finput-charset/-fexec-charset options did not
+            change the observed BCC64X behaviour and are intentionally not
+            part of this contract.
          -->
          <argument
-            value="-DCMAKE_CXX_FLAGS:STRING=-DCATCH_CONFIG_NO_POLYFILL_ISNAN"/>
+            value="-DCMAKE_CXX_FLAGS:STRING=-DCATCH_CONFIG_NO_POLYFILL_ISNAN -fborland-exec-code-page=65001"/>
 
          <!--
             Catch2 v3 upstream SelfTest contract.
