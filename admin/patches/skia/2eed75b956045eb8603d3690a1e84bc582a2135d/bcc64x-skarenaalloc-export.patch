@@ -18,3 +18,24 @@ diff --git a/src/core/SkArenaAlloc.h b/src/core/SkArenaAlloc.h
  public:
      SkArenaAlloc(char* block, size_t blockSize, size_t firstHeapAllocation);
  
+diff --git a/src/core/SkDevice.h b/src/core/SkDevice.h
+--- a/src/core/SkDevice.h
++++ b/src/core/SkDevice.h
+@@ -22,6 +22,7 @@
+ #include "include/core/SkSpan.h"
+ #include "include/core/SkSurfaceProps.h"
+ #include "include/private/SkAssert.h"
++#include "include/private/SkAPI.h"
+ #include "include/private/SkNoncopyable.h"
+ #include "include/private/SkTArray.h"
+ #include "src/core/SkMatrixPriv.h"
+@@ -94,7 +95,7 @@ struct SkStrikeDeviceInfo {
+  * stack of transforms. Instead, it has a single active transform that is modified as needed by
+  * SkCanvas. However, SkDevices are the means by which SkCanvas manages the clip stack because each
+  * layer's clip stack starts anew (although the layer's results are then clipped by its parent's
+  * stack when it is restored).
+  */
+-class SkDevice : public SkRefCnt {
++class SK_SPI SkDevice : public SkRefCnt {
+ public:
+     SkDevice(const SkImageInfo&, const SkSurfaceProps&);
