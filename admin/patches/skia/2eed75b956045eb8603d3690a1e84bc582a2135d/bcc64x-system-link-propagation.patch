@@ -32,22 +32,6 @@ diff --git a/BUILD.gn b/BUILD.gn
 +  }
  }
 
-diff --git a/gn/skia/BUILD.gn b/gn/skia/BUILD.gn
---- a/gn/skia/BUILD.gn
-+++ b/gn/skia/BUILD.gn
-@@ -119,8 +119,11 @@ config("default") {
-   } else {
-     cflags += [
-       "-fPIC",
-       "-fvisibility=hidden",
-     ]
-     cflags_cc += [ "-fvisibility-inlines-hidden" ]
-+    if (is_bcc64x_toolchain) {
-+      ldflags += [ "-Wl,--export-all-symbols" ]
-+    }
-     cflags_cc += [ "-std=c++20" ]
-   }
-
 diff --git a/gn/skia.gni b/gn/skia.gni
 --- a/gn/skia.gni
 +++ b/gn/skia.gni
@@ -100,7 +84,7 @@ diff --git a/modules/skcms/BUILD.gn b/modules/skcms/BUILD.gn
 +    public_configs = [ ":bcc64x_skcms_dll_public" ]
 +  }
    if (!is_win || is_clang) {
-     cflags += [ "-std=c11" ]
+     cflags = [ "-std=c11" ]
    }
    if (target_cpu != "x64" || target_os == "android") {
 -    defines = [
