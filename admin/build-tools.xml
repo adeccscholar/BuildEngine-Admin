@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildTools xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="schemas/build-tools.xsd"
-            schemaVersion="4">
+            schemaVersion="5">
    <tool id="git" version="2.55.0.3" runtimeVersion="2.55.0.windows.3" required="always">
       <managed root="git\2.55.0.3" executable="cmd\git.exe">
          <download url="https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.3/MinGit-2.55.0.3-64-bit.zip"
@@ -103,7 +103,7 @@
       <managed root="pkg-config-lite\0.28-1" executable="pkg-config-lite-0.28-1\bin\pkg-config.exe">
          <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download"
                    archive="pkg-config-lite-0.28-1_bin-win32.zip"
-                   sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
+                   sha256="2038c49d23b5ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
       </managed>
       <probe contains="0.28">
          <argument value="--version"/>
@@ -127,6 +127,18 @@
    <tool id="llvm-ranlib" version="20.1.7" required="always"><bds executable="bin64\llvm-ranlib.exe"/></tool>
    <tool id="ld-lld" version="20.1.7" required="always"><bds executable="bin64\ld.lld.exe"/></tool>
    <tool id="bcc64x-windres" version="20.1.7" required="always"><bds executable="bin64\bcc64x-windres.exe"/></tool>
+
+   <tool id="bcc64x-ucrt-compat" version="20.1.7-compat1" runtimeVersion="20.1.7" required="always">
+      <generated root="bcc64x-ucrt-compat\20.1.7-compat1" entry="libbcc64x-ucrt-compat.a">
+         <archive tool="{BDS}\bin64\llvm-ar.exe"
+                  source="{BDS}\x86_64-w64-mingw32\lib\libucrt.a">
+            <member path="lib64_libucrt_extra_a-fabsf.o"/>
+            <member path="lib64_libucrt_extra_a-nextafterl.o"/>
+            <member path="lib64_libucrt_extra_a-nexttoward.o"/>
+            <member path="lib64_libucrt_extra_a-nexttowardf.o"/>
+         </archive>
+      </generated>
+   </tool>
 
    <tool id="tdump" version="RADStudio-13" required="always">
       <discover executable="tdump.exe" path="false">
