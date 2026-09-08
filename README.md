@@ -2,11 +2,37 @@
 
 Dieses Repository ist die **deklarative Administrationsschicht** des C++Builder-Third-Party-Integrationsprojekts. Ziel des Gesamtprojekts ist der reproduzierbare Nachweis, in welchem Umfang aktuelle C- und C++-Bibliotheken mit **Embarcadero C++Builder 13 / BCC64X** gebaut, getestet, paketiert und von normalen Consumer-Projekten verwendet werden können.
 
-Die normative Primärdokumentation des Projekts wird auf Deutsch geführt.
+Die normative Primärdokumentation wird auf Deutsch geführt.
+
+## Aktueller Status: Contract Freeze vor Clean-Room-Test
+
+Der funktionale Admin-Vertrag ist vor einem abschließenden vollständigen Clean-Room-Test eingefroren.
+
+Verifizierter unveränderter Folgelauf:
+
+```text
+[SUMMARY] jobs=471, current=451, passed=20, failed=0, blocked=0, incomplete=0
+Machine state: jobs=471, success=471, failed=0, blocked=0, incomplete=0
+```
+
+Damit sind **451/451 Library-Tasks als CURRENT** bestätigt.
+
+Funktionale Baselines vor den reinen Dokumentationsänderungen:
+
+```text
+BuildEngine       268504010b54245124005fde968400f57b6514b5
+BuildEngine-Admin f7c6183cf7dc4d2b56bbc7da8b5a963eb911e97f
+```
+
+Verbindliches Freeze-Dokument:
+
+```text
+docs/FREEZE_CLEANROOM.md
+```
+
+Bis zum Clean-Room-Abschluss werden keine Laufzeitverträge, Patches, Tools, Smokes, Source-Pins oder Library-Timestamps geändert.
 
 ## Rolle im Gesamtprojekt
-
-Die drei Repositories haben bewusst unterschiedliche Aufgaben:
 
 ```text
 adeccscholar/BuildEngine
@@ -17,20 +43,26 @@ adeccscholar/BuildEngine
 adeccscholar/BuildEngine-Admin        <-- dieses Repository
    deklarative Tool- und Bibliotheksverträge
    XSD-Schemata, CMake-/Toolchain-Adapter, versionsgebundene Patches,
-   kleine paketbezogene Consumer-Smokes
+   Security-Metadaten und kleine paketbezogene Consumer-Smokes
 
 adeccscholar/BuildEngine-Tests
    komplexere Integrations-, Demonstrations- und Lernwelt
-   bewusst getrennt von den kleinen Package-Acceptance-Smokes
 ```
 
-Diese Trennung ist verbindlich. Ein kleiner Bibliotheks-Smoke soll lediglich belegen, dass ein veröffentlichtes Paket als Consumer tatsächlich benutzbar ist. Mehrprozess-Szenarien, umfangreiche Demonstrationen und fachlich größere Integrationstests gehören in `BuildEngine-Tests`.
+Diese Trennung ist verbindlich.
 
 ## Autoritativer Bibliotheksvertrag
 
-`admin/build-libraries.xml` ist der **einzige normative Bibliotheks- und Dependency-Vertrag**. Aktive Bibliotheksdefinitionen werden nicht in XML-Fragmente aufgeteilt.
+`admin/build-libraries.xml` ist der **einzige normative Bibliotheks- und Dependency-Vertrag**.
 
-Der aktuelle Vertrag verwendet `schemaVersion="13"` und enthält 19 verwaltete Bibliotheks-/Plattformverträge:
+Aktueller Stand:
+
+```text
+schemaVersion = 14
+22 Bibliotheks-/Plattformverträge
+```
+
+Enthalten sind:
 
 ```text
 pugixml
@@ -52,146 +84,104 @@ raylib
 sdl2
 sqlite
 xerces-c
+soil2
+vtk
+opencv
 ```
 
-Bibliotheksspezifisches Wissen gehört nach Möglichkeit in diesen XML-Vertrag. Der BuildEngine-Kern implementiert nur **generische** Mechanismen.
+OpenCL und GoogleTest bleiben bewusst Nachfolgearbeit nach dem Freeze.
 
 ## Grundprinzip
 
-Der bevorzugte Pfad lautet:
-
 ```text
 offizieller Upstream
-   -> reproduzierbarer Download / Source-Pin
-   -> Extraktion
-   -> ggf. expliziter versionsgebundener Patch
-   -> originales Buildsystem
-   -> BCC64X Build
-   -> Upstream-Tests soweit sinnvoll und technisch möglich
-   -> versioniertes Paket
-   -> explizite Require-Gates
-   -> Publish in den Consumer-Baum
-   -> kleiner Consumer-Smoke
+-> reproduzierbarer Download / Source-Pin
+-> Extraktion
+-> ggf. expliziter versionsgebundener Patch
+-> originales Buildsystem
+-> BCC64X Build
+-> Upstream-Tests soweit sinnvoll
+-> versioniertes Paket
+-> explizite Require-Gates
+-> Publish in den Consumer-Baum
+-> kleiner Consumer-Smoke
 ```
 
-Ein alternativer Compiler oder ein verstecktes Ersatz-Buildsystem darf BCC64X nicht stillschweigend ersetzen. Workarounds mit anderen Toolchains können untersucht und dokumentiert werden, sind aber keine automatische Projektentscheidung.
+Ein alternativer Compiler darf BCC64X nicht stillschweigend ersetzen.
 
-## Aktuelle BuildEngine-Aktionen
+## Generische technische Aktionen
 
-Die XML-Verträge nutzen unter anderem generische Aktionen für:
-
-- Download und Hashprüfung,
-- Archive-Extraktion,
-- CMake-Aufrufe,
-- allgemeine Prozessausführung,
-- Kopieren von Dateien und Verzeichnissen,
-- gefiltertes rekursives Kopieren mit Include-/Exclude-Patterns,
-- Flattening von Verzeichnisbäumen,
-- Bereinigung eines Zielbaums vor dem Kopieren,
-- Auswahl genau einer passenden Datei,
-- Datei-/Verzeichnis-/Pfadprüfung über `<require>`,
-- Publish und Consumer-Smokes.
-
-Die erweiterte Copy-Aktion erlaubt insbesondere, bisherige eigene Python-Paketierungslogik durch deklarative XML-Aktionen plus generische C++-Implementierung zu ersetzen.
-
-## `<require>`: Datei, Verzeichnis oder beliebiger Pfad
-
-Ein eigenständiger `<require>`-Knoten prüft standardmäßig weiterhin eine reguläre Datei:
-
-```xml
-<require path="{PackageRoot}\include\library.h"/>
-```
-
-Das ist kompatibel zu allen bisherigen Verträgen und entspricht implizit:
-
-```xml
-<require path="{PackageRoot}\include\library.h" kind="file"/>
-```
-
-Zusätzlich sind möglich:
-
-```xml
-<require path="{PackageRoot}\include" kind="directory"/>
-<require path="{PackageRoot}\generated-object" kind="any"/>
-```
-
-`kind="directory"` verlangt tatsächlich ein Verzeichnis. `kind="any"` verlangt lediglich einen existierenden Filesystem-Eintrag.
-
-Das innerhalb von `<extract>` verwendete `<require path="..."/>` bleibt bewusst ein **Dateinachweis innerhalb des extrahierten Upstream-Archivs**. Diese Semantik ist vom eigenständigen Install-/Dokumentations-`<require>` getrennt.
-
-## Paketbezogene Smokes und BuildEngine-Tests
-
-Kleine Smokes liegen unter `admin/smokes/<library>/...` und werden durch `<smoke>`-Knoten in `build-libraries.xml` an den jeweiligen Bibliotheksvertrag gebunden. Sie sollen typischerweise nur:
-
-1. ein frisches Consumer-Projekt konfigurieren,
-2. Header finden,
-3. gegen die veröffentlichten Import-/statischen Bibliotheken linken,
-4. bei sinnvoller Runtime einen kleinen Funktionspfad ausführen.
-
-Für ACE/TAO soll dieser Rahmen ausdrücklich klein bleiben. Ein geeigneter Smoke darf beispielsweise eine kleine IDL mit dem paketierten `tao_idl` übersetzen, einen ORB initialisieren und optional den paketierten Naming Service kurz starten, einen Namen registrieren/auflösen und wieder beenden. Eine umfassende CORBA-Testwelt gehört dagegen in `BuildEngine-Tests`.
-
-`admin/smoke-tests.xml` ist nur noch eine Übergangs-/Kompatibilitätsdatei. Komplexe Integrations- und Demo-Szenarien werden nicht zurück in diesen Legacy-Vertrag verschoben.
-
-## Repository-Struktur
+Der aktuelle XML-Vertrag nutzt unter anderem:
 
 ```text
-BuildEngine-Admin/
-|-- README.md
-|-- TODO.md
-|-- BOOST_1_92_BCC64X_RUNTIME_STATUS.md
-|-- docs/
-|   `-- library-license-sbom.md
-`-- admin/
-    |-- README.md
-    |-- build-tools.xml
-    |-- build-libraries.xml
-    |-- smoke-tests.xml
-    |-- schemas/
-    |-- cmake/
-    |-- patches/
-    |-- programs/
-    `-- smokes/
+download
+extract
+copy
+cmake
+execute
+require
+target
 ```
 
-Unter `admin/programs/` dürfen nur technisch begründete Hilfsprogramme verbleiben. Generische Orchestrierung gehört in BuildEngine-C++. Ein konkretes Beispiel für eine weiterhin notwendige Spezialbrücke ist `admin/programs/opengl/meson_bootstrap.py`, das die reale Meson/BCC64X-Kompatibilität für den Mesa-Build herstellt. Dagegen ist `admin/programs/ace-tao/install.py` nach erfolgreicher Ablösung durch den generischen Copy-Vertrag nur noch ein zu entfernender Altbestand.
+Schema 14 erlaubt optionale technische Graph-Metadaten (`id`, `dependsOn`). Ohne `dependsOn` bleibt die historische serielle Vorgängerbeziehung bestehen; neue Parallelisierung wird vor dem Clean-Room-Test nicht mehr in die Library-Verträge eingebracht.
 
-## Synchronisation
+## Copy und Require
 
-BuildEngine hält einen Git-Worktree des Admin-Repositories unter dem konfigurierten Repository-Root und synchronisiert dessen `admin/`-Baum in den produktiven Arbeitsbereich. Der Git-Checkout ist die autoritative Quelle; der synchronisierte Arbeitsbaum ist kein eigener Git-Checkout.
+`<copy>` unterstützt einfache und gefilterte Paketierungsoperationen, unter anderem recursive, overwrite, include/exclude, flatten, cleanTarget und singleFile.
 
-Repositoryverwaltete Dateien werden nach Inhalt synchronisiert. Maschinenlokale Zustandsdateien werden nicht als normative Repositorydaten behandelt.
+Eigenständige `<require>`-Knoten unterstützen:
+
+```xml
+<require path="..."/>
+<require path="..." kind="file"/>
+<require path="..." kind="directory"/>
+<require path="..." kind="any"/>
+```
+
+Das in `<extract>` verschachtelte `<require>` bleibt dateibezogene Source-Evidence.
+
+## Paketbezogene Smokes
+
+Kleine Smokes liegen unter `admin/smokes/<library>/...`. Sie sollen nur den veröffentlichten Consumer-Vertrag beweisen. Komplexe Mehrprozess- und Integrationsszenarien gehören in `BuildEngine-Tests`.
+
+## Technisch notwendige Spezialprogramme
+
+`admin/programs/opengl/meson_bootstrap.py` bleibt eine bewusst akzeptierte Mesa/Meson/BCC64X-Kompatibilitätsbrücke. Generische Orchestrierung gehört dagegen in den BuildEngine-Kern.
 
 ## Reproduzierbarkeit und Evidence
 
-Ein belastbarer Lauf soll mindestens identifizierbar machen:
+Ein belastbarer Clean-Room-Nachweis soll mindestens identifizieren:
 
 - BuildEngine-Commit,
 - BuildEngine-Admin-Commit,
-- gegebenenfalls BuildEngine-Tests-Commit,
+- BuildEngine-Tests-Commit soweit verwendet,
+- Schema-Version,
 - Bibliotheksversion und Source-Pin,
 - Compiler- und Toolversionen,
 - wirksame Buildparameter,
 - angewendete Patches,
-- erzeugte Paketartefakte,
-- Publish-Ergebnis,
-- Test-/Smoke-Ergebnis,
-- Logs und maschinenlokalen Abschlusszustand.
+- Paket-/Publish-Ergebnisse,
+- Test-/Smoke-Ergebnisse,
+- Machine-State-Zusammenfassung,
+- unveränderten zweiten Lauf mit vollständigem CURRENT-Nachweis.
 
-Am 3. September 2026 wurde nach der Umstellung der ACE/TAO-Paketierung auf die generische C++-/XML-Copy-Logik ein vollständiger Zielmaschinenlauf mit **295 Jobs, 295 PASS, 0 FAIL, 0 BLOCKED** abgeschlossen. ACE/TAO publizierte dabei 4086 Dateien in den gemeinsamen `Win64x`-Consumer-Baum. Dieser Stand ist die aktuelle funktionale Basis für die nächsten Arbeiten.
+## Freeze-Regel
 
-## Nächste Bibliotheken zur Abrundung des Evidenzfelds
+Bis zum Clean-Room-Abschluss sind ausschließlich Dokumentations- und Evidence-Änderungen erlaubt. Findet der Clean-Room-Test einen funktionalen Fehler, wird nur die minimal notwendige Korrektur durchgeführt; danach beginnt die vollständige Freeze-Verifikation erneut.
 
-Als nächste größere Aufnahmegruppe sind vorgesehen:
+## Wichtige Dokumente
 
-- SOIL2,
-- OpenCL,
-- VTK,
-- GoogleTest.
-
-Für diese Bibliotheken existiert bereits historische BCC64X-Evidenz aus dem früheren Evidenz-Test. Die Aufgabe ist deshalb nicht, ihre grundsätzliche Machbarkeit neu zu erfinden, sondern die damaligen Erkenntnisse in den aktuellen reproduzierbaren BuildEngine-Vertrag zu überführen.
-
-GoogleTest besitzt eine andere Rolle als typische Runtime-Bibliotheken: Es ist Testinfrastruktur. Die bisherige statische Bereitstellung wird deshalb erneut geprüft. Wenn Upstream-Struktur, technische Zweckmäßigkeit oder die Vermeidung unnötiger Test-Runtime-DLL-Abhängigkeiten den statischen Vertrag sinnvoll machen, kann diese Ausnahme ausdrücklich akzeptiert und dokumentiert werden.
+```text
+README.md
+TODO.md
+docs/FREEZE_CLEANROOM.md
+docs/bcc64x-library-integration-findings.md
+docs/bcc64x-ucrt-runtime-link-bug.md
+docs/catch2-bcc64x-integration.md
+docs/library-license-sbom.md
+admin/README.md
+```
 
 ## Lizenz
 
-Projekt-eigene Inhalte dieses öffentlichen Admin-Repositories stehen unter der MIT-Lizenz, soweit in einzelnen Dateien nichts Abweichendes angegeben ist. Drittanbieterquellen und deren Lizenztexte behalten selbstverständlich ihre jeweiligen Upstream-Lizenzen.
+Projekt-eigene Inhalte dieses öffentlichen Admin-Repositories stehen unter der MIT-Lizenz, soweit in einzelnen Dateien nichts Abweichendes angegeben ist. Drittanbieterquellen und deren Lizenztexte behalten ihre jeweiligen Upstream-Lizenzen.
