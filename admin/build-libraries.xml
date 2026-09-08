@@ -2022,13 +2022,34 @@
             <common>
                <!-- Header trees retain their relative layout; only public/interface file types are packaged. -->
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\ace" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" recursive="true" overwrite="true" cleanTarget="true">
-                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
+                  <include pattern="**/*.h"/>
+				  <include pattern="**/*.hpp"/>
+				  <include pattern="**/*.inl"/>
+				  <include pattern="**/*.ipp"/>
+				  <include pattern="**/*.tpp"/>
+				  <include pattern="**/*.idl"/>
+				  <include pattern="**/*.pidl"/>
+				  <include pattern="**/*.cpp"/>
                </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\TAO\tao" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tao" recursive="true" overwrite="true" cleanTarget="true">
-                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
+                  <include pattern="**/*.h"/>
+				  <include pattern="**/*.hpp"/>
+				  <include pattern="**/*.inl"/>
+				  <include pattern="**/*.ipp"/>
+				  <include pattern="**/*.tpp"/>
+				  <include pattern="**/*.idl"/>
+				  <include pattern="**/*.pidl"/>
+				  <include pattern="**/*.cpp"/>
                </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\TAO\orbsvcs\orbsvcs" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\orbsvcs" recursive="true" overwrite="true" cleanTarget="true">
-                  <include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/>
+                  <include pattern="**/*.h"/>
+				  <include pattern="**/*.hpp"/>
+				  <include pattern="**/*.inl"/>
+				  <include pattern="**/*.ipp"/>
+				  <include pattern="**/*.tpp"/>
+				  <include pattern="**/*.idl"/>
+				  <include pattern="**/*.pidl"/>
+				  <include pattern="**/*.cpp"/>
                </copy>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\VERSION.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt" overwrite="true"/>
@@ -2523,7 +2544,15 @@
 
    <library id="vtk" version="9.6.2" timestamp="2026-09-03T15:15:00Z">
       <metadata name="VTK" supplier="Kitware / VTK contributors" homepage="https://vtk.org/"><license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="Copyright.txt"/></metadata>
-      <source><download url="https://github.com/Kitware/VTK/archive/f49a1dbafa60b58ef22f6292ec58370453162192.zip" archive="VTK-f49a1dbafa60b58ef22f6292ec58370453162192.zip"/><extract format="zip" root="VTK-f49a1dbafa60b58ef22f6292ec58370453162192"><require path="CMakeLists.txt"/><require path="Copyright.txt"/><require path="Common\Core\vtkVersion.h.in"/><require path="Common\DataModel\CMakeLists.txt"/><require path="Filters\Core\CMakeLists.txt"/></extract></source>
+      <source>
+	  <download url="https://github.com/Kitware/VTK/archive/f49a1dbafa60b58ef22f6292ec58370453162192.zip" archive="VTK-f49a1dbafa60b58ef22f6292ec58370453162192.zip"/><extract format="zip" root="VTK-f49a1dbafa60b58ef22f6292ec58370453162192">
+	  <require path="CMakeLists.txt"/>
+	  <require path="Copyright.txt"/>
+	  <require path="Common\Core\vtkVersion.h"/>
+	  <require path="Common\DataModel\CMakeLists.txt"/>
+	  <require path="Filters\Core\CMakeLists.txt"/>
+	  </extract>
+	  </source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/><argument value="-DVTK_BUILD_TESTING:BOOL=OFF"/><argument value="-DVTK_GROUP_ENABLE_StandAlone:STRING=DONT_WANT"/><argument value="-DVTK_GROUP_ENABLE_Rendering:STRING=DONT_WANT"/><argument value="-DVTK_GROUP_ENABLE_Web:STRING=DONT_WANT"/><argument value="-DVTK_GROUP_ENABLE_MPI:STRING=DONT_WANT"/><argument value="-DVTK_MODULE_ENABLE_VTK_CommonCore:STRING=YES"/><argument value="-DVTK_MODULE_ENABLE_VTK_CommonDataModel:STRING=YES"/><argument value="-DVTK_MODULE_ENABLE_VTK_FiltersCore:STRING=YES"/><argument value="-DVTK_WRAP_PYTHON:BOOL=OFF"/><argument value="-DVTK_WRAP_JAVA:BOOL=OFF"/>
