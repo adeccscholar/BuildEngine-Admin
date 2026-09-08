@@ -4,33 +4,23 @@ Dieses Repository ist die **deklarative Administrationsschicht** des C++Builder-
 
 Die normative Primärdokumentation wird auf Deutsch geführt.
 
-## Aktueller Status: Contract Freeze vor Clean-Room-Test
+## Aktueller Status
 
-Der funktionale Admin-Vertrag ist vor einem abschließenden vollständigen Clean-Room-Test eingefroren.
+Der frühere Freeze vor dem Clean-Room-Test wurde am 8. September 2026 im BuildEngine-Kern gezielt für zwei Abschlussfunktionen wieder geöffnet:
 
-Verifizierter unveränderter Folgelauf:
+1. zentrale Doxygen-Dokumentation auf Basis der tatsächlich publizierten Dateien,
+2. Task-basierte Performance-Evidence (`buildlog_*.log`).
+
+Der **Admin-Vertrag selbst bleibt funktional unverändert**. Es wurden dafür keine Library-Timestamps, Source-Pins, Patches, Buildparameter, Smokes oder Schemas geändert.
+
+Letzte verifizierte Runtime-Evidence vor diesem Core-Funktionsblock:
 
 ```text
 [SUMMARY] jobs=471, current=451, passed=20, failed=0, blocked=0, incomplete=0
 Machine state: jobs=471, success=471, failed=0, blocked=0, incomplete=0
 ```
 
-Damit sind **451/451 Library-Tasks als CURRENT** bestätigt.
-
-Funktionale Baselines vor den reinen Dokumentationsänderungen:
-
-```text
-BuildEngine       268504010b54245124005fde968400f57b6514b5
-BuildEngine-Admin f7c6183cf7dc4d2b56bbc7da8b5a963eb911e97f
-```
-
-Verbindliches Freeze-Dokument:
-
-```text
-docs/FREEZE_CLEANROOM.md
-```
-
-Bis zum Clean-Room-Abschluss werden keine Laufzeitverträge, Patches, Tools, Smokes, Source-Pins oder Library-Timestamps geändert.
+Diese Evidence ist die Basis des vorherigen Funktionsstands und muss nach der neuen Doxygen-/Performance-Erweiterung erneut bestätigt werden.
 
 ## Rolle im Gesamtprojekt
 
@@ -38,7 +28,7 @@ Bis zum Clean-Room-Abschluss werden keine Laufzeitverträge, Patches, Tools, Smo
 adeccscholar/BuildEngine
    private C++23-Anwendung
    Scheduler, generische technische Aktionen, Repository-Sync,
-   Incremental State, Publish und Smoke-Orchestrierung
+   Incremental State, Publish, Dokumentation und Smoke-Orchestrierung
 
 adeccscholar/BuildEngine-Admin        <-- dieses Repository
    deklarative Tool- und Bibliotheksverträge
@@ -89,7 +79,7 @@ vtk
 opencv
 ```
 
-OpenCL und GoogleTest bleiben bewusst Nachfolgearbeit nach dem Freeze.
+OpenCL und GoogleTest bleiben Nachfolgearbeit nach dem Clean-Room-Abschluss.
 
 ## Grundprinzip
 
@@ -105,6 +95,7 @@ offizieller Upstream
 -> explizite Require-Gates
 -> Publish in den Consumer-Baum
 -> kleiner Consumer-Smoke
+-> zentrale Doxygen-Dokumentation, wenn aktiviert
 ```
 
 Ein alternativer Compiler darf BCC64X nicht stillschweigend ersetzen.
@@ -123,7 +114,28 @@ require
 target
 ```
 
-Schema 14 erlaubt optionale technische Graph-Metadaten (`id`, `dependsOn`). Ohne `dependsOn` bleibt die historische serielle Vorgängerbeziehung bestehen; neue Parallelisierung wird vor dem Clean-Room-Test nicht mehr in die Library-Verträge eingebracht.
+Schema 14 erlaubt optionale technische Graph-Metadaten (`id`, `dependsOn`). Ohne `dependsOn` bleibt die historische serielle Vorgängerbeziehung bestehen.
+
+## Publish-Manifest und Doxygen
+
+Die Publish-Manifeste haben neben ihrer Ownership-/Incremental-Rolle jetzt eine weitere generische Verwendung im BuildEngine-Kern: Bei `WithDoxygen=true` bilden sie die **autoritative Dateiliste für die öffentliche API-Dokumentation**.
+
+Für eine publizierte Bibliothek liest BuildEngine:
+
+```text
+<PublishRoot>\.buildengine\manifests\<library>.manifest
+```
+
+und übergibt daraus die dokumentierbaren tatsächlich veröffentlichten Header-, IDL- und C++-Moduldateien an Doxygen. Dadurch wird nicht versehentlich der gesamte gemeinsame Consumer-Baum einer Library zugerechnet.
+
+Die zentrale Ausgabe liegt im Production Root:
+
+```text
+documentation\index.html
+documentation\<library>\<version>\html\index.html
+```
+
+`admin/build-tools.xml` enthält bereits den verwalteten Doxygen-Vertrag (aktuell 1.18.0); für diese Erweiterung war keine Tool-/Schemaänderung erforderlich.
 
 ## Copy und Require
 
@@ -162,12 +174,14 @@ Ein belastbarer Clean-Room-Nachweis soll mindestens identifizieren:
 - angewendete Patches,
 - Paket-/Publish-Ergebnisse,
 - Test-/Smoke-Ergebnisse,
+- zentrale Doxygen-Ausgabe,
+- `buildlog_*.log` als Performance-Evidence,
 - Machine-State-Zusammenfassung,
 - unveränderten zweiten Lauf mit vollständigem CURRENT-Nachweis.
 
-## Freeze-Regel
+## Nächster Freeze
 
-Bis zum Clean-Room-Abschluss sind ausschließlich Dokumentations- und Evidence-Änderungen erlaubt. Findet der Clean-Room-Test einen funktionalen Fehler, wird nur die minimal notwendige Korrektur durchgeführt; danach beginnt die vollständige Freeze-Verifikation erneut.
+Vor dem vollständigen Clean-Room-Test wird der neue Core-Stand lokal mit BCC64X kompiliert und mit `WithDoxygen=true` verifiziert. Danach wird ein neuer gemeinsamer Freeze-Basispunkt dokumentiert. Bis dahin bleiben Admin-Library-Verträge funktional unverändert.
 
 ## Wichtige Dokumente
 
