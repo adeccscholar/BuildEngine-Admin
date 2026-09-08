@@ -2020,7 +2020,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\services\bin\win64\{Configuration}\tao_rtevent.exe"/>
             </perVariant>
             <common>
-               <!-- Header trees retain their relative layout; only public/interface file types are packaged. -->
+               <!-- x Header trees retain their relative layout; only public/interface file types are packaged. -->
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\ace" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" recursive="true" overwrite="true" cleanTarget="true">
                   <include pattern="**/*.h"/>
 				  <include pattern="**/*.hpp"/>
