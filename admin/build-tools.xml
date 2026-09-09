@@ -37,7 +37,7 @@
       <managed root="perl\5.42.2.1" executable="perl\bin\perl.exe">
          <download url="https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_54221_64bit/strawberry-perl-5.42.2.1-64bit-portable.zip"
                    archive="strawberry-perl-5.42.2.1-64bit-portable.zip"
-                   sha256="32d83be90cf04b807cfb9477482bc36302cdee6f5b04cf57e81adecbd8f07898"/>
+                   sha256="32d83be90cf04b807cfb9477482bc36302cdee6f5b04f57e81adecbd8f07898"/>
       </managed>
       <probe contains="v5.42.2">
          <argument value="-e"/>
@@ -72,7 +72,7 @@
       <managed root="meson\1.12.0" executable="meson.py">
          <download url="https://files.pythonhosted.org/packages/source/m/meson/meson-1.12.0.tar.gz"
                    archive="meson-1.12.0.tar.gz"
-                   sha256="88afe0c20e52030218924ac37d0c81c59b4b5f3ae3752c8c6d7470c7d365886c"/>
+                   sha256="88afe0c20e52030218924ac37d0c81c59b4f5ae3752c8c6d7470c7d365886c"/>
          <nativeExtract format="libarchive" root="meson-1.12.0">
             <require path="meson.py"/>
             <require path="mesonbuild\mesonmain.py"/>
@@ -118,6 +118,52 @@
       </managed>
       <probe contains="1.18.0">
          <argument value="--version"/>
+      </probe>
+   </tool>
+
+   <!--
+      Portable helper used to unpack NSIS-based documentation tools without
+      installing them into Windows.  The release digest is published by the
+      upstream 7-Zip GitHub release metadata.
+   -->
+   <tool id="7zip" version="26.03" required="always">
+      <managed root="7zip\26.03" executable="7zr.exe">
+         <download url="https://github.com/ip7z/7zip/releases/download/26.03/7zr.exe"
+                   archive="7zr-26.03.exe"
+                   sha256="ad4c82fadcbdf93c03b4fc440f300509c7d60c5c2f4d183e35d9d70d6957037d"/>
+         <extract executable="{ENV:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe">
+            <argument value="-NoProfile"/>
+            <argument value="-NonInteractive"/>
+            <argument value="-ExecutionPolicy"/>
+            <argument value="Bypass"/>
+            <argument value="-Command"/>
+            <argument value="$ErrorActionPreference='Stop'; New-Item -ItemType Directory -Force -Path '{ManagedRoot}' | Out-Null; Copy-Item -LiteralPath '{Archive}' -Destination '{ManagedRoot}\7zr.exe' -Force"/>
+         </extract>
+      </managed>
+      <probe contains="26.03">
+         <argument value="i"/>
+      </probe>
+   </tool>
+
+   <!--
+      Graphviz is a documentation tool, not a BCC64X target artifact.  The
+      official Windows NSIS package is hash-pinned and extracted portably with
+      the managed 7zr helper; no system installation or PATH mutation occurs.
+   -->
+   <tool id="graphviz" version="16.1.0" required="when-used">
+      <managed root="graphviz\16.1.0" executable="bin\dot.exe">
+         <download url="https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/16.1.0/windows_10_cmake_Release_graphviz-install-16.1.0-win64.exe"
+                   archive="graphviz-install-16.1.0-win64.exe"
+                   sha256="46f3b8b412a79915cf8e08bdce6542401bd9efca98ce282f3c5c5b56211e1761"/>
+         <extract executable="{Tool:7zip}">
+            <argument value="x"/>
+            <argument value="{Archive}"/>
+            <argument value="-o{ManagedRoot}"/>
+            <argument value="-y"/>
+         </extract>
+      </managed>
+      <probe contains="graphviz version 16.1.0">
+         <argument value="-V"/>
       </probe>
    </tool>
 
