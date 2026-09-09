@@ -83,14 +83,21 @@
 
    <!--
       Graphviz is part of the reproducible documentation toolchain, not a BCC64X target artifact.
-      The official Windows ZIP is extracted by BuildEngine's built-in ZIP support and kept as a
-      complete tree so dot.exe can resolve its renderer/layout plugins and runtime DLLs.
+      The official Windows ZIP is extracted in-process with libarchive. CPack puts the complete
+      distribution below Graphviz-15.1.1-win64; stripping that package root keeps a stable managed
+      layout while preserving all tools, libraries, renderer/layout plugins and runtime DLLs.
    -->
    <tool id="graphviz" version="15.1.1" required="always">
       <managed root="graphviz\15.1.1" executable="bin\dot.exe">
          <download url="https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/15.1.1/windows_10_cmake_Release_Graphviz-15.1.1-win64.zip"
                    archive="Graphviz-15.1.1-win64.zip"
                    sha256="e8256ef077e601d9f284378d96cd17faa7910832cf6bb85c43005e66ec2f255e"/>
+         <nativeExtract format="libarchive" root="Graphviz-15.1.1-win64">
+            <require path="bin\dot.exe"/>
+            <require path="bin\config6"/>
+            <require path="bin\gvplugin_core.dll"/>
+            <require path="bin\gvplugin_dot_layout.dll"/>
+         </nativeExtract>
       </managed>
       <probe contains="graphviz version 15.1.1"><argument value="-V"/></probe>
    </tool>
