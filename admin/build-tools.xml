@@ -26,7 +26,7 @@
       <managed root="ninja\1.13.2" executable="ninja.exe">
          <download url="https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-win.zip"
                    archive="ninja-1.13.2.zip"
-                   sha256="07fc8261b42b20e71d1720b39068c2e14ffcee6396b76fb460b78dc65"/>
+                   sha256="07fc8261b42b20e71d1720b39068c2e14ffcee6396b76fb7a795fb460b78dc65"/>
       </managed>
       <probe contains="1.13.2">
          <argument value="--version"/>
@@ -121,6 +121,7 @@
       </probe>
    </tool>
 
+   <!-- Portable helper for extracting the official Graphviz Windows package without installation. -->
    <tool id="7zip" version="26.03" required="always">
       <managed root="7zip\26.03" executable="7zr.exe">
          <download url="https://github.com/ip7z/7zip/releases/download/26.03/7zr.exe"
@@ -140,7 +141,8 @@
       </probe>
    </tool>
 
-   <tool id="graphviz" version="16.1.0" required="when-used">
+   <!-- Graphviz is part of the reproducible documentation toolchain, not a BCC64X target artifact. -->
+   <tool id="graphviz" version="16.1.0" required="always">
       <managed root="graphviz\16.1.0" executable="bin\dot.exe">
          <download url="https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/16.1.0/windows_10_cmake_Release_graphviz-install-16.1.0-win64.exe"
                    archive="graphviz-install-16.1.0-win64.exe"
