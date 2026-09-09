@@ -8,18 +8,14 @@
                    archive="MinGit-2.55.0.3-64-bit.zip"
                    sha256="f48e2d2dc74a24454adc6d8fd0ac25bf9c2386f19cfb06202b9465aaad4f9f05"/>
       </managed>
-      <probe contains="git version 2.55.0.windows.3">
-         <argument value="--version"/>
-      </probe>
+      <probe contains="git version 2.55.0.windows.3"><argument value="--version"/></probe>
    </tool>
 
    <tool id="cmake" version="4.1.1" required="always">
       <discover executable="cmake.exe" path="false">
          <candidate path="{USERPROFILE}\Documents\Embarcadero\Studio\37.0\CatalogRepository\CMake-cb\4.1.1\bin\cmake.exe"/>
       </discover>
-      <probe contains="cmake version 4.1.1">
-         <argument value="--version"/>
-      </probe>
+      <probe contains="cmake version 4.1.1"><argument value="--version"/></probe>
    </tool>
 
    <tool id="ninja" version="1.13.2" required="always">
@@ -28,9 +24,7 @@
                    archive="ninja-1.13.2.zip"
                    sha256="07fc8261b42b20e71d1720b39068c2e14ffcee6396b76fb7a795fb460b78dc65"/>
       </managed>
-      <probe contains="1.13.2">
-         <argument value="--version"/>
-      </probe>
+      <probe contains="1.13.2"><argument value="--version"/></probe>
    </tool>
 
    <tool id="perl" version="5.42.2.1" runtimeVersion="5.42.2" required="always">
@@ -39,10 +33,7 @@
                    archive="strawberry-perl-5.42.2.1-64bit-portable.zip"
                    sha256="32d83be90cf04b807cfb9477482bc36302cdee6f5b04cf57e81adecbd8f07898"/>
       </managed>
-      <probe contains="v5.42.2">
-         <argument value="-e"/>
-         <argument value="print $^V"/>
-      </probe>
+      <probe contains="v5.42.2"><argument value="-e"/><argument value="print $^V"/></probe>
    </tool>
 
    <tool id="python" version="3.14.7" required="always">
@@ -51,112 +42,57 @@
                    archive="python-3.14.7-embed-amd64.zip"
                    sha256="d297e5ff019966817ad8502465176139f2d3d840fa4ed84b13bed399a6ab1f15"/>
          <extract executable="{ENV:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe">
-            <argument value="-NoProfile"/>
-            <argument value="-NonInteractive"/>
-            <argument value="-ExecutionPolicy"/>
-            <argument value="Bypass"/>
-            <argument value="-File"/>
-            <argument value="{ProductionRoot}\admin\programs\python\extract-build-python.ps1"/>
-            <argument value="{Archive}"/>
-            <argument value="{ManagedRoot}"/>
-            <argument value="{ProductionRoot}\admin\programs\python\python314._pth"/>
-            <argument value="{ProductionRoot}\admin\programs\python\sitecustomize.py"/>
+            <argument value="-NoProfile"/><argument value="-NonInteractive"/><argument value="-ExecutionPolicy"/><argument value="Bypass"/><argument value="-File"/>
+            <argument value="{ProductionRoot}\admin\programs\python\extract-build-python.ps1"/><argument value="{Archive}"/><argument value="{ManagedRoot}"/>
+            <argument value="{ProductionRoot}\admin\programs\python\python314._pth"/><argument value="{ProductionRoot}\admin\programs\python\sitecustomize.py"/>
          </extract>
       </managed>
-      <probe contains="Python 3.14.7">
-         <argument value="--version"/>
-      </probe>
+      <probe contains="Python 3.14.7"><argument value="--version"/></probe>
    </tool>
 
    <tool id="meson" version="1.12.0" required="always">
       <managed root="meson\1.12.0" executable="meson.py">
-         <download url="https://files.pythonhosted.org/packages/source/m/meson/meson-1.12.0.tar.gz"
-                   archive="meson-1.12.0.tar.gz"
-                   sha256="88afe0c20e52030218924ac37d0c81c59b4b5f3ae3752c8c6d7470c7d365886c"/>
-         <nativeExtract format="libarchive" root="meson-1.12.0">
-            <require path="meson.py"/>
-            <require path="mesonbuild\mesonmain.py"/>
-            <require path="COPYING"/>
-         </nativeExtract>
+         <download url="https://files.pythonhosted.org/packages/source/m/meson/meson-1.12.0.tar.gz" archive="meson-1.12.0.tar.gz" sha256="88afe0c20e52030218924ac37d0c81c59b4b5f3ae3752c8c6d7470c7d365886c"/>
+         <nativeExtract format="libarchive" root="meson-1.12.0"><require path="meson.py"/><require path="mesonbuild\mesonmain.py"/><require path="COPYING"/></nativeExtract>
       </managed>
-      <launcher tool="python">
-         <argument value="{ToolEntry}"/>
-      </launcher>
-      <probe contains="1.12.0">
-         <argument value="--version"/>
-      </probe>
+      <launcher tool="python"><argument value="{ToolEntry}"/></launcher>
+      <probe contains="1.12.0"><argument value="--version"/></probe>
    </tool>
 
    <!-- 2.5.25 has a documented parallel temp-file race in win_flex on Windows. -->
    <tool id="winflexbison" version="2.5.24" required="always">
       <managed root="winflexbison\2.5.24" executable="win_flex.exe">
-         <download url="https://github.com/lexxmark/winflexbison/releases/download/v2.5.24/win_flex_bison-2.5.24.zip"
-                   archive="win_flex_bison-2.5.24.zip"
-                   sha256="39c6086ce211d5415500acc5ed2d8939861ca1696aee48909c7f6daf5122b505"/>
+         <download url="https://github.com/lexxmark/winflexbison/releases/download/v2.5.24/win_flex_bison-2.5.24.zip" archive="win_flex_bison-2.5.24.zip" sha256="39c6086ce211d5415500acc5ed2d8939861ca1696aee48909c7f6daf5122b505"/>
       </managed>
-      <probe contains="2.6.4">
-         <argument value="--version"/>
-      </probe>
+      <probe contains="2.6.4"><argument value="--version"/></probe>
    </tool>
 
    <tool id="pkg-config" version="0.28-1" runtimeVersion="0.28" required="always">
       <managed root="pkg-config-lite\0.28-1" executable="pkg-config-lite-0.28-1\bin\pkg-config.exe">
-         <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download"
-                   archive="pkg-config-lite-0.28-1_bin-win32.zip"
-                   sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
+         <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download" archive="pkg-config-lite-0.28-1_bin-win32.zip" sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
       </managed>
-      <probe contains="0.28">
-         <argument value="--version"/>
-      </probe>
+      <probe contains="0.28"><argument value="--version"/></probe>
    </tool>
 
    <tool id="doxygen" version="1.18.0" required="always">
       <managed root="doxygen\1.18.0" executable="doxygen.exe">
-         <download url="https://github.com/doxygen/doxygen/releases/download/Release_1_18_0/doxygen-1.18.0.windows.x64.bin.zip"
-                   archive="doxygen-1.18.0.windows.x64.bin.zip"
-                   sha256="e84f54cfd49ef06b0b16536056dbec0c496323de28abcce53a4269463de35eaf"/>
+         <download url="https://github.com/doxygen/doxygen/releases/download/Release_1_18_0/doxygen-1.18.0.windows.x64.bin.zip" archive="doxygen-1.18.0.windows.x64.bin.zip" sha256="e84f54cfd49ef06b0b16536056dbec0c496323de28abcce53a4269463de35eaf"/>
       </managed>
-      <probe contains="1.18.0">
-         <argument value="--version"/>
-      </probe>
+      <probe contains="1.18.0"><argument value="--version"/></probe>
    </tool>
 
-   <!-- Portable helper for extracting the official Graphviz Windows package without installation. -->
-   <tool id="7zip" version="26.03" required="always">
-      <managed root="7zip\26.03" executable="7zr.exe">
-         <download url="https://github.com/ip7z/7zip/releases/download/26.03/7zr.exe"
-                   archive="7zr-26.03.exe"
-                   sha256="ad4c82fadcbdf93c03b4fc440f300509c7d60c5c2f4d183e35d9d70d6957037d"/>
-         <extract executable="{ENV:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe">
-            <argument value="-NoProfile"/>
-            <argument value="-NonInteractive"/>
-            <argument value="-ExecutionPolicy"/>
-            <argument value="Bypass"/>
-            <argument value="-Command"/>
-            <argument value="$ErrorActionPreference='Stop'; New-Item -ItemType Directory -Force -Path '{ManagedRoot}' | Out-Null; Copy-Item -LiteralPath '{Archive}' -Destination '{ManagedRoot}\7zr.exe' -Force"/>
-         </extract>
+   <!--
+      Graphviz is part of the reproducible documentation toolchain, not a BCC64X target artifact.
+      The official Windows ZIP is extracted by BuildEngine's built-in ZIP support and kept as a
+      complete tree so dot.exe can resolve its renderer/layout plugins and runtime DLLs.
+   -->
+   <tool id="graphviz" version="15.1.1" required="always">
+      <managed root="graphviz\15.1.1" executable="bin\dot.exe">
+         <download url="https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/15.1.1/windows_10_cmake_Release_Graphviz-15.1.1-win64.zip"
+                   archive="Graphviz-15.1.1-win64.zip"
+                   sha256="e8256ef077e601d9f284378d96cd17faa7910832cf6bb85c43005e66ec2f255e"/>
       </managed>
-      <probe contains="26.03">
-         <argument value="i"/>
-      </probe>
-   </tool>
-
-   <!-- Graphviz is part of the reproducible documentation toolchain, not a BCC64X target artifact. -->
-   <tool id="graphviz" version="16.1.0" required="always">
-      <managed root="graphviz\16.1.0" executable="bin\dot.exe">
-         <download url="https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/16.1.0/windows_10_cmake_Release_graphviz-install-16.1.0-win64.exe"
-                   archive="graphviz-install-16.1.0-win64.exe"
-                   sha256="46f3b8b412a79915cf8e08bdce6542401bd9efca98ce282f3c5c5b56211e1761"/>
-         <extract executable="{Tool:7zip}">
-            <argument value="x"/>
-            <argument value="{Archive}"/>
-            <argument value="-o{ManagedRoot}"/>
-            <argument value="-y"/>
-         </extract>
-      </managed>
-      <probe contains="graphviz version 16.1.0">
-         <argument value="-V"/>
-      </probe>
+      <probe contains="graphviz version 15.1.1"><argument value="-V"/></probe>
    </tool>
 
    <tool id="bcc64x" version="20.1.7" required="always"><bds executable="bin64\bcc64x.exe"/></tool>
@@ -168,34 +104,20 @@
 
    <tool id="bcc64x-ucrt-compat" version="20.1.7-compat1" runtimeVersion="20.1.7" required="always">
       <generated root="bcc64x-ucrt-compat\20.1.7-compat1" entry="libbcc64x-ucrt-compat.a">
-         <archive tool="{BDS}\bin64\llvm-ar.exe"
-                  source="{BDS}\x86_64-w64-mingw32\lib\libucrt.a">
-            <member path="lib64_libucrt_extra_a-fabsf.o"/>
-            <member path="lib64_libucrt_extra_a-nextafterl.o"/>
-            <member path="lib64_libucrt_extra_a-nexttoward.o"/>
-            <member path="lib64_libucrt_extra_a-nexttowardf.o"/>
+         <archive tool="{BDS}\bin64\llvm-ar.exe" source="{BDS}\x86_64-w64-mingw32\lib\libucrt.a">
+            <member path="lib64_libucrt_extra_a-fabsf.o"/><member path="lib64_libucrt_extra_a-nextafterl.o"/><member path="lib64_libucrt_extra_a-nexttoward.o"/><member path="lib64_libucrt_extra_a-nexttowardf.o"/>
          </archive>
       </generated>
    </tool>
 
    <tool id="tdump" version="RADStudio-13" required="always">
-      <discover executable="tdump.exe" path="false">
-         <candidate path="{BDS}\bin64\tdump.exe"/>
-         <candidate path="{BDS}\bin\tdump.exe"/>
-      </discover>
+      <discover executable="tdump.exe" path="false"><candidate path="{BDS}\bin64\tdump.exe"/><candidate path="{BDS}\bin\tdump.exe"/></discover>
    </tool>
 
    <tool id="llvm-cov" version="20.1.7" required="always">
       <managed root="llvm\20.1.7" executable="bin\llvm-cov.exe">
-         <download url="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/clang%2Bllvm-20.1.7-x86_64-pc-windows-msvc.tar.xz"
-                   archive="clang+llvm-20.1.7-x86_64-pc-windows-msvc.tar.xz"
-                   sha256="34a66bb4891584b32d32bbe5f129e345899b255593dab2c359b730b92e304b3e"/>
-         <nativeExtract format="libarchive" root="clang+llvm-20.1.7-x86_64-pc-windows-msvc">
-            <include path="bin/llvm-cov.exe"/>
-            <include path="bin/*.dll"/>
-            <include path="LICENSE.TXT"/>
-            <require path="bin/llvm-cov.exe"/>
-         </nativeExtract>
+         <download url="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/clang%2Bllvm-20.1.7-x86_64-pc-windows-msvc.tar.xz" archive="clang+llvm-20.1.7-x86_64-pc-windows-msvc.tar.xz" sha256="34a66bb4891584b32d32bbe5f129e345899b255593dab2c359b730b92e304b3e"/>
+         <nativeExtract format="libarchive" root="clang+llvm-20.1.7-x86_64-pc-windows-msvc"><include path="bin/llvm-cov.exe"/><include path="bin/*.dll"/><include path="LICENSE.TXT"/><require path="bin/llvm-cov.exe"/></nativeExtract>
       </managed>
       <probe contains="LLVM version 20.1.7"><argument value="--version"/></probe>
    </tool>
@@ -205,9 +127,7 @@
    </tool>
 
    <tool id="nasm" version="3.02" required="always">
-      <managed root="nasm\3.02" executable="nasm-3.02\nasm.exe">
-         <download url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/win64/nasm-3.02-win64.zip" archive="nasm-3.02-win64.zip" sha256="161d0bfaff53c2f9e9f3e69fd0672323ebabafd1268976a5cec11be92a19aee7"/>
-      </managed>
+      <managed root="nasm\3.02" executable="nasm-3.02\nasm.exe"><download url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/win64/nasm-3.02-win64.zip" archive="nasm-3.02-win64.zip" sha256="161d0bfaff53c2f9e9f3e69fd0672323ebabafd1268976a5cec11be92a19aee7"/></managed>
       <probe contains="NASM version 3.02"><argument value="-v"/></probe>
    </tool>
 </buildTools>
