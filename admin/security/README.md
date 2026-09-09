@@ -1,27 +1,10 @@
 # BuildEngine Security-Bewertungen
 
-Dieser Bereich enthaelt die **gemeinsam verteilbare Bewertungsebene fuer die konkrete BuildEngine-Bibliotheks- und Buildkonfiguration**.
+Dieser Bereich enthaelt die **zentrale, verteilbare Bewertung der konkreten BuildEngine-Bibliotheks- und Buildkonfiguration**.
 
-Er ist ausdruecklich von spaeteren anwendungsspezifischen Bewertungen getrennt.
+Eine anwendungsspezifische Bewertung existiert im aktuellen Ausbaustand noch nicht.
 
-## Ebenen
-
-1. **Provider-Daten**
-   - OSV/CVE/GHSA-Rohdaten und Identitaeten.
-   - Werden nicht durch lokale Bewertungen veraendert.
-
-2. **BuildEngine-Buildbewertung (dieser Bereich)**
-   - Bewertung einer Schwachstelle fuer die von BuildEngine konkret erzeugte Bibliothek.
-   - Diese zentrale Bewertung wird im `BuildEngine-Manager` direkt bearbeitet.
-   - Sie darf ueber `BuildEngine-Admin` verteilt werden, wenn die Bewertung fuer die gemeinsame Buildkonfiguration belastbar ist.
-   - Beispiel: Eine curl-Schwachstelle betrifft ausschliesslich HTTP/2, waehrend die BuildEngine-Konfiguration `USE_NGHTTP2=OFF` setzt.
-
-3. **Anwendungsbewertung (spaeter, nicht hier)**
-   - Bewertung der tatsaechlichen Nutzung innerhalb einer konkreten Anwendung.
-   - Liegt spaeter unter dem lokalen Build-/Arbeitsbereich und wird **nicht** ueber `BuildEngine-Admin` verteilt.
-   - Beispiel: Eine betroffene API ist zwar Bestandteil der Bibliothek, wird von Anwendung X aber nicht aufgerufen.
-
-## Gemeinsame Datenbank
+## Eine gemeinsame Datenbank
 
 Die zentrale BuildEngine-Bewertung verwendet genau eine SQLite-Datenbank:
 
@@ -29,62 +12,104 @@ Die zentrale BuildEngine-Bewertung verwendet genau eine SQLite-Datenbank:
 admin\security\build-assessments.sqlite
 ```
 
-Die Datenbank enthaelt gemeinsam:
-
-- Provider-Findings,
-- BuildEngine-Findings,
-- Bewertungsrevisionen,
-- Sprachen,
-- lokalisierte Referenzwerte,
-- Review-Queue und Views.
-
-Es gibt **keine zweite Datenbank nur fuer Referenzwerte**. `schema.sql` und `reference-data.sql` sind lediglich die textuell nachvollziehbaren Bootstrap-/Migrationsvertraege fuer dieselbe SQLite-Datei.
-
-## Verteilung und Bearbeitung
-
-Die synchronisierte, fuer Server und andere Leser gedachte Kopie liegt im Production Root unter:
+Im laufenden BuildEngine-Arbeitsbereich liegt dieselbe Datenbank nach dem Admin-Sync unter:
 
 ```text
 <ProductionRoot>\admin\security\build-assessments.sqlite
 ```
 
-Der `BuildEngine-Manager` darf die zentrale Bewertung bearbeiten. Damit ein Repository-Sync keine gerade geoeffnete Datenbank ueberschreibt, arbeitet der Manager mit einer editierbaren Kopie unter:
+Die Datenbank enthaelt gemeinsam:
+
+- Provider-Findings,
+- BuildEngine-/Bibliotheks-Findings,
+- Bewertungsrevisionen,
+- Sprachen,
+- lokalisierte Referenzwerte,
+- Review-Queue und Views.
+
+Es gibt **keine zweite Datenbank nur fuer Referenzwerte** und aktuell auch **keine zweite Arbeitsdatenbank unter `build`**. `schema.sql` und `reference-data.sql` sind textuell nachvollziehbare Bootstrap-/Migrationsvertraege fuer dieselbe SQLite-Datei.
+
+## Repository als Verteilungsquelle
+
+Die Datei im `BuildEngine-Admin`-Repository ist die verteilte Referenzversion:
 
 ```text
-<BuildRoot>\security\shared\build-assessments.sqlite
+BuildEngine-Admin\admin\security\build-assessments.sqlite
 ```
 
-Diese Arbeitskopie **ist die zentrale Bewertungsebene**, keine persoenliche oder anwendungsspezifische Bewertung. Sie wird aus der vom Admin-Repository verteilten Datenbank initialisiert bzw. aktualisiert.
+Der normale Repository-Sync kopiert diese Datei nach:
 
-Nach einer Review kann der Manager den geprueften Stand mit **Fuer Admin-Verteilung bereitstellen** in den konfigurierten Admin-Repository-Checkout schreiben, typischerweise:
+```text
+<ProductionRoot>\admin\security\build-assessments.sqlite
+```
+
+Wenn die Repository-Version aktualisiert wurde, **darf und soll** sie die vorhandene Datenbank im Arbeitsbereich ueberschreiben. So werden zentral gepflegte Sprachen, Wertebereiche, Provider-Findings und Bibliotheksbewertungen an andere Installationen verteilt.
+
+Die Datenbank darf daher im Repository-Sync **nicht** als `preserve` behandelt werden.
+
+## Zentrale Bearbeitung
+
+`BuildEngine-Manager` oeffnet die Datenbank unter
+
+```text
+<ProductionRoot>\admin\security\build-assessments.sqlite
+```
+
+lesend und schreibend. Dort werden:
+
+- neue CVE-/Provider-Findings aus dem Monitoring uebernommen,
+- Bibliotheks-Findings aktualisiert,
+- zentrale Bewertungen als Revisionen gespeichert,
+- Sprache und lokalisierte Werte aus derselben Datenbank geladen.
+
+`BuildEngine-Server` oeffnet dieselbe Datei ausschliesslich read-only und zeigt die zentral verteilte Bewertung an.
+
+## Rueckverteilung
+
+Nach einer geprueften zentralen Aenderung kopiert der Manager die Datenbank bewusst in den ausgecheckten Admin-Repository-Arbeitsbaum:
 
 ```text
 <RepositoriesRoot>\BuildEngine-Admin\admin\security\build-assessments.sqlite
 ```
 
-Danach erfolgt ein normaler Git-Review/Commit. Auf diesem Weg koennen technisch belastbare Ausschluesse oder Risikobewertungen fuer die gemeinsame BuildEngine-Konfiguration von allen Nutzern uebernommen und vom read-only Server angezeigt werden.
+Danach folgen normaler Git-Review, Commit und Push. Erst damit wird die neue Version zur verteilten Referenz fuer andere BuildEngine-Arbeitsbereiche.
 
 ## Sprache
 
-Sprachen sind keine freien Texte, sondern Datensaetze mit stabiler ID in `language`.
+Sprachen sind Datensaetze mit stabiler ID in `language`.
 
-Die Referenzwerte besitzen ebenfalls stabile IDs und werden ueber `reference_value_text` pro Sprache lokalisiert. Der Server liest seine Standardsprache aus `BuildEngine.xml`, z. B.:
+Die Referenzwerte besitzen ebenfalls stabile IDs und werden ueber `reference_value_text` pro Sprache lokalisiert.
+
+Der Server liest seine Standardsprache aus `BuildEngine.xml`, z. B.:
 
 ```xml
 <parameters serverLanguage="de" ... />
 ```
 
-Der Sprachcode wird auf `language.code` aufgeloest. Der Manager kann seine aktuelle Anzeigesprache unabhaengig davon aus der `language`-Tabelle auswaehlen.
+Der Manager liest seine Startsprache aus `managerLanguage`. Fehlt dieser Eintrag, gilt Englisch (`en`). Beide Sprachcodes werden auf `language.code` aufgeloest.
 
 Deutsch (`id=1`, `code=de`) und Englisch (`id=2`, `code=en`) sind initial enthalten.
+
+## Aktueller fachlicher Umfang
+
+Bewertet wird ausschliesslich die konkrete BuildEngine-Bibliothekskonfiguration, z. B.:
+
+- betroffene Funktion beim Build deaktiviert,
+- betroffene Komponente nicht gebaut,
+- betroffene Komponente nicht ausgeliefert,
+- Exploit-Voraussetzung in der Buildkonfiguration nicht vorhanden,
+- lokaler Patch vorhanden,
+- aktualisierte Version enthaelt den Fix.
+
+Anwendungsspezifische Aussagen sind nicht Bestandteil dieses Modells und werden erst in einer spaeteren Ausbaustufe eingefuehrt.
 
 ## Versionierte Begleitdateien
 
 - `schema.sql` — kanonisches Schema der SQLite-Datenbank.
-- `reference-data.sql` — initiale Sprachen und lokalisierte Werte fuer Anwendbarkeit, Exposition, effektives Risiko, Entscheidung, Begruendung und Verteilungsstatus.
-- `build-assessments.sqlite` — versionierte gemeinsame Bewertungsdatenbank.
+- `reference-data.sql` — initiale Sprachen und lokalisierte Werte fuer Anwendbarkeit, Exposition, effektives Risiko, Entscheidung und Begruendung.
+- `build-assessments.sqlite` — versionierte zentrale Bewertungsdatenbank.
 
-Schema und Referenzwerte bleiben auch neben der binaeren SQLite-Datei im Repository. So sind Aufbau, Migrationen und Reviews nachvollziehbar.
+Schema und Referenzwerte bleiben neben der binaeren SQLite-Datei im Repository, damit Aufbau, Migrationen und Reviews nachvollziehbar sind.
 
 ## Grundsaetze
 
@@ -96,4 +121,3 @@ Schema und Referenzwerte bleiben auch neben der binaeren SQLite-Datei im Reposit
 - Unbekannte Findings werden automatisch in die Review-Queue aufgenommen.
 - `not applicable` ist nicht dasselbe wie `false positive`.
 - Die zentrale Datenbank darf nur Buildkonfigurationsaussagen enthalten.
-- Anwendungsspezifische Aussagen duerfen nicht in diese Datenbank publiziert werden.
