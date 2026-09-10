@@ -91,14 +91,15 @@ CREATE TABLE IF NOT EXISTS osv_observation (
    fingerprint TEXT NOT NULL,
    fix_available INTEGER NOT NULL DEFAULT 0 CHECK(fix_available IN (0,1)),
    affected_versions_json TEXT NOT NULL DEFAULT '[]',
+   fixed_versions_json TEXT NOT NULL DEFAULT '[]',
+   last_affected_json TEXT NOT NULL DEFAULT '[]',
    ranges_json TEXT NOT NULL DEFAULT '[]',
    aliases_json TEXT NOT NULL DEFAULT '[]',
    credits_json TEXT NOT NULL DEFAULT '[]',
    database_specific_json TEXT NOT NULL DEFAULT '{}',
    severity_json TEXT NOT NULL DEFAULT '[]',
    raw_json TEXT NOT NULL DEFAULT '{}',
-   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id),
-   UNIQUE(provider_finding_id, fingerprint)
+   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id)
 );
 
 CREATE TABLE IF NOT EXISTS nvd_observation (
@@ -122,8 +123,7 @@ CREATE TABLE IF NOT EXISTS nvd_observation (
    configurations_json TEXT NOT NULL DEFAULT '[]',
    references_json TEXT NOT NULL DEFAULT '[]',
    raw_json TEXT NOT NULL DEFAULT '{}',
-   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id),
-   UNIQUE(provider_finding_id, fingerprint)
+   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id)
 );
 
 CREATE TABLE IF NOT EXISTS epss_observation (
@@ -135,8 +135,7 @@ CREATE TABLE IF NOT EXISTS epss_observation (
    epss_score REAL,
    percentile REAL,
    raw_json TEXT NOT NULL DEFAULT '{}',
-   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id),
-   UNIQUE(provider_finding_id, fingerprint)
+   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id)
 );
 
 CREATE TABLE IF NOT EXISTS kev_observation (
@@ -156,8 +155,7 @@ CREATE TABLE IF NOT EXISTS kev_observation (
    required_action TEXT,
    notes TEXT,
    raw_json TEXT NOT NULL DEFAULT '{}',
-   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id),
-   UNIQUE(provider_finding_id, fingerprint)
+   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id)
 );
 
 CREATE TABLE IF NOT EXISTS build_finding (
@@ -183,14 +181,7 @@ CREATE TABLE IF NOT EXISTS build_finding (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS ux_build_finding_identity
-   ON build_finding(
-      library_id,
-      library_version,
-      component_name,
-      IFNULL(component_version, ''),
-      IFNULL(identity_commit, ''),
-      provider_finding_id
-   );
+   ON build_finding(library_id, library_version, component_name, IFNULL(component_version, ''), IFNULL(identity_commit, ''), provider_finding_id);
 
 CREATE TABLE IF NOT EXISTS assessment (
    id INTEGER PRIMARY KEY,
@@ -218,139 +209,52 @@ CREATE TABLE IF NOT EXISTS assessment (
    UNIQUE(finding_id, revision)
 );
 
-CREATE INDEX IF NOT EXISTS ix_build_finding_library
-   ON build_finding(library_id, library_version, is_current);
-CREATE INDEX IF NOT EXISTS ix_assessment_finding
-   ON assessment(finding_id, revision DESC);
-CREATE INDEX IF NOT EXISTS ix_reference_value_category
-   ON reference_value(category_id, sort_order, id);
-CREATE INDEX IF NOT EXISTS ix_osv_observation_finding
-   ON osv_observation(provider_finding_id, id DESC);
-CREATE INDEX IF NOT EXISTS ix_nvd_observation_finding
-   ON nvd_observation(provider_finding_id, id DESC);
-CREATE INDEX IF NOT EXISTS ix_epss_observation_finding
-   ON epss_observation(provider_finding_id, id DESC);
-CREATE INDEX IF NOT EXISTS ix_kev_observation_finding
-   ON kev_observation(provider_finding_id, id DESC);
+CREATE INDEX IF NOT EXISTS ix_build_finding_library ON build_finding(library_id, library_version, is_current);
+CREATE INDEX IF NOT EXISTS ix_assessment_finding ON assessment(finding_id, revision DESC);
+CREATE INDEX IF NOT EXISTS ix_reference_value_category ON reference_value(category_id, sort_order, id);
+CREATE INDEX IF NOT EXISTS ix_osv_observation_finding ON osv_observation(provider_finding_id, id DESC);
+CREATE INDEX IF NOT EXISTS ix_nvd_observation_finding ON nvd_observation(provider_finding_id, id DESC);
+CREATE INDEX IF NOT EXISTS ix_epss_observation_finding ON epss_observation(provider_finding_id, id DESC);
+CREATE INDEX IF NOT EXISTS ix_kev_observation_finding ON kev_observation(provider_finding_id, id DESC);
 
 CREATE VIEW IF NOT EXISTS current_assessment AS
-SELECT a.*
-FROM assessment AS a
-JOIN (
-   SELECT finding_id, MAX(revision) AS revision
-   FROM assessment
-   GROUP BY finding_id
-) AS latest
-ON latest.finding_id = a.finding_id
-AND latest.revision = a.revision;
+SELECT a.* FROM assessment a
+JOIN (SELECT finding_id, MAX(revision) revision FROM assessment GROUP BY finding_id) latest
+ON latest.finding_id=a.finding_id AND latest.revision=a.revision;
 
 CREATE VIEW IF NOT EXISTS latest_osv_observation AS
-SELECT o.*
-FROM osv_observation AS o
-JOIN (
-   SELECT provider_finding_id, MAX(id) AS id
-   FROM osv_observation
-   GROUP BY provider_finding_id
-) AS latest ON latest.id=o.id;
-
+SELECT o.* FROM osv_observation o
+JOIN (SELECT provider_finding_id, MAX(id) id FROM osv_observation GROUP BY provider_finding_id) latest ON latest.id=o.id;
 CREATE VIEW IF NOT EXISTS latest_nvd_observation AS
-SELECT o.*
-FROM nvd_observation AS o
-JOIN (
-   SELECT provider_finding_id, MAX(id) AS id
-   FROM nvd_observation
-   GROUP BY provider_finding_id
-) AS latest ON latest.id=o.id;
-
+SELECT o.* FROM nvd_observation o
+JOIN (SELECT provider_finding_id, MAX(id) id FROM nvd_observation GROUP BY provider_finding_id) latest ON latest.id=o.id;
 CREATE VIEW IF NOT EXISTS latest_epss_observation AS
-SELECT o.*
-FROM epss_observation AS o
-JOIN (
-   SELECT provider_finding_id, MAX(id) AS id
-   FROM epss_observation
-   GROUP BY provider_finding_id
-) AS latest ON latest.id=o.id;
-
+SELECT o.* FROM epss_observation o
+JOIN (SELECT provider_finding_id, MAX(id) id FROM epss_observation GROUP BY provider_finding_id) latest ON latest.id=o.id;
 CREATE VIEW IF NOT EXISTS latest_kev_observation AS
-SELECT o.*
-FROM kev_observation AS o
-JOIN (
-   SELECT provider_finding_id, MAX(id) AS id
-   FROM kev_observation
-   GROUP BY provider_finding_id
-) AS latest ON latest.id=o.id;
+SELECT o.* FROM kev_observation o
+JOIN (SELECT provider_finding_id, MAX(id) id FROM kev_observation GROUP BY provider_finding_id) latest ON latest.id=o.id;
 
 CREATE VIEW IF NOT EXISTS current_external_vulnerability AS
-SELECT
-   pf.id AS provider_finding_id,
-   pf.primary_id,
-   oo.observed_at AS osv_observed_at,
-   oo.source_modified AS osv_source_modified,
-   oo.fix_available,
-   oo.affected_versions_json,
-   oo.ranges_json,
-   no.observed_at AS nvd_observed_at,
-   no.source_last_modified AS nvd_last_modified,
-   no.vuln_status AS nvd_status,
-   no.cvss_version,
-   no.cvss_base_score,
-   no.cvss_base_severity,
-   no.cvss_vector,
-   no.cvss_exploitability_score,
-   no.cvss_impact_score,
-   eo.observed_at AS epss_observed_at,
-   eo.score_date AS epss_date,
-   eo.epss_score,
-   eo.percentile AS epss_percentile,
-   ko.observed_at AS kev_observed_at,
-   ko.is_known_exploited,
-   ko.date_added AS kev_date_added,
-   ko.due_date AS kev_due_date,
-   ko.known_ransomware_campaign_use,
-   ko.required_action AS kev_required_action
-FROM provider_finding AS pf
-LEFT JOIN latest_osv_observation AS oo ON oo.provider_finding_id=pf.id
-LEFT JOIN latest_nvd_observation AS no ON no.provider_finding_id=pf.id
-LEFT JOIN latest_epss_observation AS eo ON eo.provider_finding_id=pf.id
-LEFT JOIN latest_kev_observation AS ko ON ko.provider_finding_id=pf.id;
+SELECT pf.id provider_finding_id,pf.primary_id,
+ oo.observed_at osv_observed_at,oo.source_modified osv_source_modified,oo.fix_available,oo.affected_versions_json,oo.fixed_versions_json,oo.last_affected_json,oo.ranges_json,
+ no.observed_at nvd_observed_at,no.source_last_modified nvd_last_modified,no.vuln_status nvd_status,no.cvss_version,no.cvss_base_score,no.cvss_base_severity,no.cvss_vector,no.cvss_exploitability_score,no.cvss_impact_score,
+ eo.observed_at epss_observed_at,eo.score_date epss_date,eo.epss_score,eo.percentile epss_percentile,
+ ko.observed_at kev_observed_at,ko.is_known_exploited,ko.date_added kev_date_added,ko.due_date kev_due_date,ko.known_ransomware_campaign_use,ko.required_action kev_required_action
+FROM provider_finding pf
+LEFT JOIN latest_osv_observation oo ON oo.provider_finding_id=pf.id
+LEFT JOIN latest_nvd_observation no ON no.provider_finding_id=pf.id
+LEFT JOIN latest_epss_observation eo ON eo.provider_finding_id=pf.id
+LEFT JOIN latest_kev_observation ko ON ko.provider_finding_id=pf.id;
 
 CREATE VIEW IF NOT EXISTS review_queue AS
-SELECT
-   f.id AS finding_id,
-   f.library_id,
-   f.library_version,
-   f.component_name,
-   f.component_version,
-   f.identity_commit,
-   pf.provider,
-   pf.advisory_id,
-   f.provider_severity,
-   pf.primary_id,
-   pf.summary,
-   a.id AS assessment_id,
-   a.revision AS assessment_revision,
-   a.applicability_id,
-   a.exposure_id,
-   a.effective_risk_id,
-   a.decision_id,
-   a.reason_id,
-   a.publication_state_id,
-   a.evidence_fingerprint AS assessment_evidence_fingerprint,
-   f.build_contract_fingerprint,
-   f.sbom_sha256
-FROM build_finding AS f
-JOIN provider_finding AS pf
-  ON pf.id = f.provider_finding_id
-LEFT JOIN current_assessment AS a
-  ON a.finding_id = f.id
-WHERE f.is_current = 1;
+SELECT f.id finding_id,f.library_id,f.library_version,f.component_name,f.component_version,f.identity_commit,pf.provider,pf.advisory_id,f.provider_severity,pf.primary_id,pf.summary,
+ a.id assessment_id,a.revision assessment_revision,a.applicability_id,a.exposure_id,a.effective_risk_id,a.decision_id,a.reason_id,a.publication_state_id,a.evidence_fingerprint assessment_evidence_fingerprint,f.build_contract_fingerprint,f.sbom_sha256
+FROM build_finding f JOIN provider_finding pf ON pf.id=f.provider_finding_id
+LEFT JOIN current_assessment a ON a.finding_id=f.id WHERE f.is_current=1;
 
 CREATE VIEW IF NOT EXISTS shared_current_assessment AS
-SELECT a.*
-FROM current_assessment AS a
-JOIN reference_value AS publication_state
-  ON publication_state.id = a.publication_state_id
-JOIN reference_category AS publication_category
-  ON publication_category.id = publication_state.category_id
-WHERE publication_category.code = 'publication-state'
-  AND publication_state.code = 'shared';
+SELECT a.* FROM current_assessment a
+JOIN reference_value publication_state ON publication_state.id=a.publication_state_id
+JOIN reference_category publication_category ON publication_category.id=publication_state.category_id
+WHERE publication_category.code='publication-state' AND publication_state.code='shared';
