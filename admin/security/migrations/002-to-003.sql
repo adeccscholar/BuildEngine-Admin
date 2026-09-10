@@ -9,14 +9,15 @@ CREATE TABLE IF NOT EXISTS osv_observation (
    fingerprint TEXT NOT NULL,
    fix_available INTEGER NOT NULL DEFAULT 0 CHECK(fix_available IN (0,1)),
    affected_versions_json TEXT NOT NULL DEFAULT '[]',
+   fixed_versions_json TEXT NOT NULL DEFAULT '[]',
+   last_affected_json TEXT NOT NULL DEFAULT '[]',
    ranges_json TEXT NOT NULL DEFAULT '[]',
    aliases_json TEXT NOT NULL DEFAULT '[]',
    credits_json TEXT NOT NULL DEFAULT '[]',
    database_specific_json TEXT NOT NULL DEFAULT '{}',
    severity_json TEXT NOT NULL DEFAULT '[]',
    raw_json TEXT NOT NULL DEFAULT '{}',
-   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id),
-   UNIQUE(provider_finding_id, fingerprint)
+   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id)
 );
 
 CREATE TABLE IF NOT EXISTS nvd_observation (
@@ -40,8 +41,7 @@ CREATE TABLE IF NOT EXISTS nvd_observation (
    configurations_json TEXT NOT NULL DEFAULT '[]',
    references_json TEXT NOT NULL DEFAULT '[]',
    raw_json TEXT NOT NULL DEFAULT '{}',
-   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id),
-   UNIQUE(provider_finding_id, fingerprint)
+   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id)
 );
 
 CREATE TABLE IF NOT EXISTS epss_observation (
@@ -53,8 +53,7 @@ CREATE TABLE IF NOT EXISTS epss_observation (
    epss_score REAL,
    percentile REAL,
    raw_json TEXT NOT NULL DEFAULT '{}',
-   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id),
-   UNIQUE(provider_finding_id, fingerprint)
+   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id)
 );
 
 CREATE TABLE IF NOT EXISTS kev_observation (
@@ -74,8 +73,7 @@ CREATE TABLE IF NOT EXISTS kev_observation (
    required_action TEXT,
    notes TEXT,
    raw_json TEXT NOT NULL DEFAULT '{}',
-   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id),
-   UNIQUE(provider_finding_id, fingerprint)
+   FOREIGN KEY(provider_finding_id) REFERENCES provider_finding(id)
 );
 
 CREATE INDEX IF NOT EXISTS ix_osv_observation_finding ON osv_observation(provider_finding_id, id DESC);
@@ -103,33 +101,11 @@ SELECT o.* FROM kev_observation o
 JOIN (SELECT provider_finding_id, MAX(id) id FROM kev_observation GROUP BY provider_finding_id) latest ON latest.id=o.id;
 
 CREATE VIEW current_external_vulnerability AS
-SELECT
-   pf.id AS provider_finding_id,
-   pf.primary_id,
-   oo.observed_at AS osv_observed_at,
-   oo.source_modified AS osv_source_modified,
-   oo.fix_available,
-   oo.affected_versions_json,
-   oo.ranges_json,
-   no.observed_at AS nvd_observed_at,
-   no.source_last_modified AS nvd_last_modified,
-   no.vuln_status AS nvd_status,
-   no.cvss_version,
-   no.cvss_base_score,
-   no.cvss_base_severity,
-   no.cvss_vector,
-   no.cvss_exploitability_score,
-   no.cvss_impact_score,
-   eo.observed_at AS epss_observed_at,
-   eo.score_date AS epss_date,
-   eo.epss_score,
-   eo.percentile AS epss_percentile,
-   ko.observed_at AS kev_observed_at,
-   ko.is_known_exploited,
-   ko.date_added AS kev_date_added,
-   ko.due_date AS kev_due_date,
-   ko.known_ransomware_campaign_use,
-   ko.required_action AS kev_required_action
+SELECT pf.id provider_finding_id,pf.primary_id,
+ oo.observed_at osv_observed_at,oo.source_modified osv_source_modified,oo.fix_available,oo.affected_versions_json,oo.fixed_versions_json,oo.last_affected_json,oo.ranges_json,
+ no.observed_at nvd_observed_at,no.source_last_modified nvd_last_modified,no.vuln_status nvd_status,no.cvss_version,no.cvss_base_score,no.cvss_base_severity,no.cvss_vector,no.cvss_exploitability_score,no.cvss_impact_score,
+ eo.observed_at epss_observed_at,eo.score_date epss_date,eo.epss_score,eo.percentile epss_percentile,
+ ko.observed_at kev_observed_at,ko.is_known_exploited,ko.date_added kev_date_added,ko.due_date kev_due_date,ko.known_ransomware_campaign_use,ko.required_action kev_required_action
 FROM provider_finding pf
 LEFT JOIN latest_osv_observation oo ON oo.provider_finding_id=pf.id
 LEFT JOIN latest_nvd_observation no ON no.provider_finding_id=pf.id
