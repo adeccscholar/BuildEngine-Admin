@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:simpleType name="booleanText">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="true"/>
+         <xs:enumeration value="false"/>
+      </xs:restriction>
+   </xs:simpleType>
+
+   <xs:complexType name="defineType">
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="value" type="xs:string" use="optional" default="1"/>
+   </xs:complexType>
+
+   <xs:complexType name="excludeType">
+      <xs:attribute name="pattern" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="libraryType">
+      <xs:sequence>
+         <xs:element name="define" type="defineType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="exclude" type="excludeType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+      <xs:attribute name="doxygen" type="booleanText" use="optional"/>
+      <xs:attribute name="source" type="booleanText" use="optional"/>
+      <xs:attribute name="inlineSource" type="booleanText" use="optional"/>
+      <xs:attribute name="publicOnly" type="booleanText" use="optional"/>
+   </xs:complexType>
+
+   <xs:element name="buildDocumentation">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="define" type="defineType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="exclude" type="excludeType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="library" type="libraryType" minOccurs="0" maxOccurs="unbounded"/>
+         </xs:sequence>
+         <xs:attribute name="schemaVersion" use="required" fixed="1"/>
+         <xs:attribute name="doxygen" type="booleanText" use="optional" default="true"/>
+         <xs:attribute name="source" type="booleanText" use="optional" default="false"/>
+         <xs:attribute name="inlineSource" type="booleanText" use="optional" default="false"/>
+         <xs:attribute name="publicOnly" type="booleanText" use="optional" default="false"/>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>
