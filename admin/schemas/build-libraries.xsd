@@ -54,6 +54,7 @@
          <xs:element name="license" type="licenseMetadataType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="name" type="xs:string" use="optional"/>
+      <xs:attribute name="category" type="xs:string" use="optional"/>
       <xs:attribute name="supplier" type="xs:string" use="optional"/>
       <xs:attribute name="homepage" type="xs:anyURI" use="optional"/>
    </xs:complexType>
