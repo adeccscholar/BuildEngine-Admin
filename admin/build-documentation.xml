@@ -10,14 +10,14 @@
       Central documentation policy for every library in the sibling
       build-libraries.xml contract.
 
-      A library does not need an entry here to be documented.  The root profile
-      is inherited by every library.  <library> nodes are overrides only.
+      A library does not need an entry here to be documented. The root profile
+      is inherited by every library. <library> nodes are overrides only.
 
-      doxygen="false" disables only Doxygen for the selected library.  The
+      doxygen="false" disables only Doxygen for the selected library. The
       BuildEngine still generates the library information page, license
       information and SBOM view when documentation is enabled globally.
 
-      These definitions affect Doxygen preprocessing only.  They never change
+      These definitions affect Doxygen preprocessing only. They never change
       the compiler, target ABI or library build contract.
    -->
 
@@ -33,5 +33,38 @@
       <define name="BOOST_FUSION_HAS_VARIADIC_MAP" value="1"/>
       <define name="BOOST_FUSION_HAS_VARIADIC_SET" value="1"/>
       <define name="BOOST_FUSION_HAS_VARIADIC_TUPLE" value="1"/>
+      <exclude pattern="*/libs/*/test/*"/>
+      <exclude pattern="*/libs/*/example/*"/>
+      <exclude pattern="*/libs/*/examples/*"/>
+      <exclude pattern="*/libs/*/doc/example/*"/>
+      <exclude pattern="*/tools/*"/>
+   </library>
+
+   <library id="skia" publicOnly="true">
+      <exclude pattern="*/tests/*"/>
+      <exclude pattern="*/gm/*"/>
+      <exclude pattern="*/bench/*"/>
+      <exclude pattern="*/fuzz/*"/>
+      <exclude pattern="*/tools/*"/>
+      <exclude pattern="*/infra/*"/>
+      <exclude pattern="*/third_party/*"/>
+   </library>
+
+   <library id="ace-tao" publicOnly="true">
+      <exclude pattern="*/tests/*"/>
+      <exclude pattern="*/examples/*"/>
+      <exclude pattern="*/performance-tests/*"/>
+      <exclude pattern="*/performance_tests/*"/>
+      <exclude pattern="*/bin/*"/>
+      <exclude pattern="*/MPC/*"/>
+   </library>
+
+   <library id="opencv" publicOnly="true">
+      <exclude pattern="*/modules/*/test/*"/>
+      <exclude pattern="*/modules/*/perf/*"/>
+      <exclude pattern="*/samples/*"/>
+      <exclude pattern="*/apps/*"/>
+      <exclude pattern="*/doc/tutorials/*"/>
+      <exclude pattern="*/3rdparty/*"/>
    </library>
 </buildDocumentation>
