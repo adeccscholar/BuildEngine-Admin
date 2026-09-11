@@ -1744,6 +1744,11 @@
          <argument value="-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"/>
          <run executable="boost-evidence-runtime.exe"/>
       </smoke>
+	  <documentation
+        doxygen="true"
+        source="false"
+        inlineSource="false"
+        publicOnly="true"/>
    </library>
    <library id="nlohmann-json" version="3.12.0" timestamp="2026-08-29T17:38:02Z">
       <source>
@@ -2078,7 +2083,13 @@
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="PATH" value="{InstallRoot}\Win64x\tools\bin;{InstallRoot}\Win64x\services\bin;{ENV:PATH}"/>
       </smoke>
+	  <documentation
+        doxygen="true"
+        source="false"
+        inlineSource="false"
+        publicOnly="true"/>
    </library>
+
 <library id="bzip2" version="1.0.8" timestamp="2026-09-01T14:43:00Z">
       <metadata name="bzip2" supplier="Julian Seward / sourceware.org"><license name="bzip2 License" spdx="bzip2-1.0.6" file="LICENSE"/></metadata>
       <security>
@@ -2611,6 +2622,11 @@
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\opencv\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="opencv-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
+	  <documentation
+        doxygen="true"
+        source="false"
+        inlineSource="false"
+        publicOnly="true"/>
    </library>
 
    <library id="cmark-gfm" version="0.29.0.gfm.13" timestamp="2026-09-05T02:46:00Z">
