@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<buildDocumentation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:noNamespaceSchemaLocation="schemas/build-documentation.xsd"
+                    schemaVersion="1"
+                    doxygen="true"
+                    source="false"
+                    inlineSource="false"
+                    publicOnly="false">
+   <!--
+      Central documentation policy for every library in the sibling
+      build-libraries.xml contract.
+
+      A library does not need an entry here to be documented.  The root profile
+      is inherited by every library.  <library> nodes are overrides only.
+
+      doxygen="false" disables only Doxygen for the selected library.  The
+      BuildEngine still generates the library information page, license
+      information and SBOM view when documentation is enabled globally.
+
+      These definitions affect Doxygen preprocessing only.  They never change
+      the compiler, target ABI or library build contract.
+   -->
+
+   <library id="boost" publicOnly="true">
+      <!-- Proven BCC64X documentation model: Clang 20 / C++23. -->
+      <define name="__clang__" value="1"/>
+      <define name="__clang_major__" value="20"/>
+      <define name="__clang_minor__" value="1"/>
+      <define name="__cplusplus" value="202302L"/>
+      <define name="BOOST_FUSION_HAS_VARIADIC_DEQUE" value="1"/>
+      <define name="BOOST_FUSION_HAS_VARIADIC_VECTOR" value="1"/>
+      <define name="BOOST_FUSION_HAS_VARIADIC_LIST" value="1"/>
+      <define name="BOOST_FUSION_HAS_VARIADIC_MAP" value="1"/>
+      <define name="BOOST_FUSION_HAS_VARIADIC_SET" value="1"/>
+      <define name="BOOST_FUSION_HAS_VARIADIC_TUPLE" value="1"/>
+   </library>
+</buildDocumentation>
