@@ -1,14 +1,14 @@
-# `build-libraries.xml` – aktueller Vertragsleitfaden
+# `build-libraries.xml` – Current Contract Guide
 
-**Stand:** 3. September 2026  
+**Status date:** September 3, 2026  
 **Schema:** 13  
-**Primärsprache:** Deutsch
+**Documentation language:** English
 
-Dieses Dokument beschreibt die aktuelle Semantik von `admin/build-libraries.xml`. Die XSD-Datei `admin/schemas/build-libraries.xsd` ist die formale Strukturdefinition; dieses Dokument erklärt die fachliche Bedeutung.
+This document describes the semantics of `admin/build-libraries.xml` at the documented Schema-13 state. The XSD file `admin/schemas/build-libraries.xsd` is the formal structural definition; this document explains the technical meaning. For the current Schema-14 contract, also see `server-docs/build-libraries.md`.
 
-## 1. Grundidee
+## 1. Core idea
 
-`build-libraries.xml` ist der einzige normative Bibliotheks- und Dependency-Vertrag des Projekts.
+`build-libraries.xml` is the project's single normative library and dependency contract.
 
 ```xml
 <buildLibraries schemaVersion="13">
@@ -18,21 +18,21 @@ Dieses Dokument beschreibt die aktuelle Semantik von `admin/build-libraries.xml`
 </buildLibraries>
 ```
 
-Jede Bibliothek beschreibt deklarativ:
+Each library declaratively describes:
 
-- ID und Version,
-- Änderungszeitpunkt des vollständigen Vertrags,
-- Dependencies,
-- Metadaten/Lizenzen,
-- Upstream-Quelle,
-- Build/Varianten,
-- Install/Paketierung,
-- Publish,
-- kleine Package-Smokes.
+- ID and version,
+- modification timestamp of the complete contract,
+- dependencies,
+- metadata/licenses,
+- upstream source,
+- build/variants,
+- install/packaging,
+- publish,
+- small package smokes.
 
-## 2. Library-Knoten
+## 2. Library node
 
-Beispiel:
+Example:
 
 ```xml
 <library id="example" version="1.2.3" timestamp="2026-09-03T12:00:00Z">
@@ -40,7 +40,7 @@ Beispiel:
 </library>
 ```
 
-`timestamp` wird erhöht, wenn sich der wirksame Library-Vertrag ändert, also beispielsweise Quelle, Buildoptionen, Patch, Installlayout, Require-Gates, Publish oder Smoke.
+`timestamp` is advanced when the effective library contract changes, for example source, build options, patch, install layout, require gates, publish, or smoke behavior.
 
 ## 3. Dependencies
 
@@ -48,17 +48,17 @@ Beispiel:
 <dependency library="zlib" version="1.3.2"/>
 ```
 
-Dependencies werden nur modelliert, wenn eine echte technische Abhängigkeit existiert. Sie dienen nicht dazu, Scheduler-Reihenfolgen künstlich zu erzwingen.
+Dependencies are modeled only where a real technical dependency exists. They are not used to force artificial scheduler ordering.
 
-BuildEngine stellt abhängigen Producer-Builds die verwalteten Package-Pfade über Environment/CMake-Suchpfade bereit.
+BuildEngine supplies managed package paths to dependent producer builds through environment/CMake search paths.
 
-## 4. Metadaten und Lizenz
+## 4. Metadata and licensing
 
-Bibliotheken können Upstream- und Lizenzinformationen deklarieren. Diese Daten fließen in Paketmetadaten, `LICENSE-INFO.txt` und CycloneDX-SBOM-Evidence ein.
+Libraries can declare upstream and license information. This data feeds package metadata, `LICENSE-INFO.txt`, and CycloneDX SBOM evidence.
 
 ## 5. Source
 
-Ein Source-Vertrag besteht aus generischen Aktionen, typischerweise:
+A source contract consists of generic actions, typically:
 
 ```xml
 <source>
@@ -76,7 +76,7 @@ Ein Source-Vertrag besteht aus generischen Aktionen, typischerweise:
 <download url="..." archive="..." sha256="..."/>
 ```
 
-`sha256` wird verwendet, wenn ein stabiler Upstream-Hash verfügbar ist bzw. der Vertrag eine feste Archividentität verlangt.
+`sha256` is used where a stable upstream hash is available or the contract requires a fixed archive identity.
 
 ### Extract
 
@@ -86,13 +86,13 @@ Ein Source-Vertrag besteht aus generischen Aktionen, typischerweise:
 </extract>
 ```
 
-Unterstützte Formate umfassen ZIP sowie libarchive-basierte Archive.
+Supported formats include ZIP and libarchive-based archives.
 
-Wichtig: Das **verschachtelte** `<extract><require>` ist derzeit bewusst ein Dateinachweis im extrahierten Upstream-Artefakt. Es ist nicht identisch mit der allgemeinen späteren `<require>`-Action.
+Important: the **nested** `<extract><require>` is deliberately file evidence inside the extracted upstream artifact. It is not identical to the general later `<require>` action.
 
 ## 6. Build
 
-Ein typischer Build-Vertrag enthält:
+A typical build contract contains:
 
 ```xml
 <build>
@@ -108,7 +108,7 @@ Ein typischer Build-Vertrag enthält:
 </build>
 ```
 
-Release und Debug verwenden getrennte Buildverzeichnisse. Gemeinsame Argumente stehen im Hauptknoten; Varianten enthalten nur die Unterschiede.
+Release and Debug use separate build directories. Shared arguments live on the main node; variants contain only their differences.
 
 ## 7. CMake
 
@@ -127,7 +127,7 @@ Release und Debug verwenden getrennte Buildverzeichnisse. Gemeinsame Argumente s
        build="..."/>
 ```
 
-Der CMake-Pfad ersetzt das Upstream-CMake-Projekt nicht. BuildEngine erzeugt lediglich den reproduzierbaren Aufruf und die Dependency-Umgebung.
+The CMake path does not replace the upstream CMake project. BuildEngine only creates the reproducible invocation and dependency environment.
 
 ## 8. Execute
 
@@ -142,23 +142,23 @@ Der CMake-Pfad ersetzt das Upstream-CMake-Projekt nicht. BuildEngine erzeugt led
 </execute>
 ```
 
-`execute` ist generisch und wird für reale Upstream-Tools, Testtreiber oder notwendige Buildsystem-Kommandos verwendet.
+`execute` is generic and is used for real upstream tools, test drivers, or necessary build-system commands.
 
 ## 9. Copy
 
-### Einfache Kopie
+### Simple copy
 
 ```xml
 <copy source="..." target="..." overwrite="true"/>
 ```
 
-### Rekursive Kopie
+### Recursive copy
 
 ```xml
 <copy source="..." target="..." recursive="true" overwrite="true"/>
 ```
 
-### Gefilterte Kopie
+### Filtered copy
 
 ```xml
 <copy source="..."
@@ -173,62 +173,62 @@ Der CMake-Pfad ersetzt das Upstream-CMake-Projekt nicht. BuildEngine erzeugt led
 </copy>
 ```
 
-Semantik:
+Semantics:
 
-- `recursive`: rekursive Suche/Kopie,
-- `overwrite`: vorhandene Zieldateien ersetzen,
-- `flatten`: ausgewählte Dateien ohne ursprüngliche Unterverzeichnisse im Ziel ablegen,
-- `cleanTarget`: Ziel vor der Operation bereinigen,
-- `singleFile`: exakt eine ausgewählte Quelldatei verlangen und auf den angegebenen Zielpfad kopieren,
-- `<include pattern="...">`: positive Auswahl,
-- `<exclude pattern="...">`: nachgelagerte Ausschlüsse.
+- `recursive`: recursive search/copy,
+- `overwrite`: replace existing target files,
+- `flatten`: place selected files in the target without their original subdirectories,
+- `cleanTarget`: clean the target before the operation,
+- `singleFile`: require exactly one selected source file and copy it to the specified target path,
+- `<include pattern="...">`: positive selection,
+- `<exclude pattern="...">`: subsequent exclusions.
 
-Pattern-Verhalten:
+Pattern behavior:
 
-- `*` überquert keine Verzeichnisgrenze,
-- `**` darf über Unterverzeichnisse laufen,
-- `?` steht für ein einzelnes Nicht-Trennzeichen,
-- Windows-Semantik wird ASCII-case-insensitiv behandelt.
+- `*` does not cross a directory boundary,
+- `**` may cross subdirectories,
+- `?` represents one non-separator character,
+- Windows semantics are treated ASCII-case-insensitively.
 
-Bei `flatten` führen kollidierende Dateinamen zu einem Fehler statt zu stillem Überschreiben.
+With `flatten`, colliding file names produce an error rather than a silent overwrite.
 
-Die erweiterte Copy-Funktion ist real durch die ACE/TAO-Paketierung belegt. Der vollständige Zielmaschinenlauf nach Ablösung des Python-Installers endete mit 295/295 PASS.
+The extended copy function is proven by the ACE/TAO packaging path. The complete target-machine run after removal of the Python installer ended with 295/295 PASS.
 
 ## 10. `preserveCurrentArtifact`
 
-Mehrere Actions verändern normalerweise `{CurrentArtifact}`. Wenn eine technische Hilfsoperation diesen Kontext nicht übernehmen soll, kann der Vertrag – wo unterstützt – `preserveCurrentArtifact="true"` setzen.
+Several actions normally modify `{CurrentArtifact}`. Where supported, a technical helper operation that should not take over this context can set `preserveCurrentArtifact="true"`.
 
 ## 11. Require
 
-### Historischer und weiterhin gültiger Default
+### Historical and still-valid default
 
 ```xml
 <require path="...\file.dll"/>
 ```
 
-ist identisch zu:
+is identical to:
 
 ```xml
 <require path="...\file.dll" kind="file"/>
 ```
 
-### Verzeichnis
+### Directory
 
 ```xml
 <require path="...\include" kind="directory"/>
 ```
 
-Der Pfad muss existieren und tatsächlich ein Verzeichnis sein.
+The path must exist and actually be a directory.
 
-### Beliebiger Filesystem-Eintrag
+### Any filesystem entry
 
 ```xml
 <require path="...\generated" kind="any"/>
 ```
 
-Der Pfad muss lediglich existieren.
+The path only has to exist.
 
-Zulässige Werte:
+Allowed values:
 
 ```text
 file
@@ -236,21 +236,21 @@ directory
 any
 ```
 
-## 12. Testgebundene Aktionen
+## 12. Test-bound actions
 
-Aktionen können mit:
+Actions can be coupled to the global test selection with:
 
 ```xml
 test="true"
 ```
 
-an die globale Testauswahl gekoppelt werden. Optional kann über `phase` zwischen Test- und Validierungsrollen unterschieden werden, sofern der jeweilige Action-Typ dies erlaubt.
+Where supported by the action type, `phase` can additionally distinguish test and validation roles.
 
-Upstream-Tests werden nicht ohne Analyse entfernt; wenn die Produktform einzelne Upstream-Tests logisch ausschließt, wird dies dokumentiert.
+Upstream tests are not removed without analysis. If the product form logically excludes individual upstream tests, that decision is documented.
 
 ## 13. Install
 
-Bei kompilierten Bibliotheken:
+For compiled libraries:
 
 ```xml
 <install>
@@ -263,7 +263,7 @@ Bei kompilierten Bibliotheken:
 </install>
 ```
 
-`perVariant` verarbeitet Release-/Debug-spezifische Artefakte. `common` verarbeitet gemeinsame Header, Lizenztexte oder andere konfigurationsunabhängige Inhalte.
+`perVariant` processes Release/Debug-specific artifacts. `common` processes shared headers, license texts, or other configuration-independent content.
 
 ## 14. Publish
 
@@ -277,13 +277,13 @@ Bei kompilierten Bibliotheken:
 </publish>
 ```
 
-Publish projiziert das versionierte Producer-Paket in den gemeinsamen Consumer-Baum. Das versionierte Paket bleibt autoritativ.
+Publish projects the versioned producer package into the shared consumer tree. The versioned package remains authoritative.
 
-`requiresAllVariants="true"` kann verwendet werden, wenn Publish erst nach vollständig stabilem gemeinsamen SDK-Baum beginnen darf.
+`requiresAllVariants="true"` can be used when publishing must wait until the complete shared SDK tree is stable.
 
 ## 15. Smoke
 
-Kleine Smokes werden direkt am Library-Knoten registriert:
+Small smokes are registered directly on the library node:
 
 ```xml
 <smoke id="consumer"
@@ -299,40 +299,40 @@ Kleine Smokes werden direkt am Library-Knoten registriert:
 </smoke>
 ```
 
-Smokes sind keine zweite Upstream-Test-Suite. Sie beweisen die Nutzbarkeit des installierten/publizierten Pakets.
+Smokes are not a second upstream test suite. They prove usability of the installed/published package.
 
-Komplexere Integrationstests und Demos gehören nach `BuildEngine-Tests`.
+More complex integration tests and demos belong in `BuildEngine-Tests`.
 
-## 16. ACE/TAO als Referenzfall für den erweiterten Vertrag
+## 16. ACE/TAO as a reference case for the extended contract
 
-ACE/TAO nutzt den generischen XML-Vertrag für eine komplexe Paketierung:
+ACE/TAO uses the generic XML contract for complex packaging:
 
 - Release/Debug,
-- viele import libraries und DLLs,
-- rekursive gefilterte Kopien,
-- Flattening,
-- Tools wie `tao_idl` und `ace_gperf`,
-- kanonisch benannte Service-Executables,
-- Headerbäume,
-- Lizenz-/Versionsdateien,
-- Publish in den gemeinsamen SDK-Baum.
+- many import libraries and DLLs,
+- recursive filtered copies,
+- flattening,
+- tools such as `tao_idl` and `ace_gperf`,
+- canonically named service executables,
+- header trees,
+- license/version files,
+- publishing into the shared SDK tree.
 
-Damit ist der frühere eigene Python-Installer technisch nicht mehr erforderlich.
+The former custom Python installer is therefore no longer technically required.
 
-## 17. Aktuelle Produktpolitik
+## 17. Current product policy
 
-Für normale Runtime-Bibliotheken gilt Shared DLL + Import-Library als bevorzugte Produktform, wenn Upstream dies sinnvoll unterstützt.
+For normal runtime libraries, Shared DLL + import library is the preferred product form where upstream supports it meaningfully.
 
-Static ist erlaubt, wenn es technisch begründet ist. GoogleTest wird bewusst als Testinfrastruktur separat bewertet und kann eine dokumentierte statische Ausnahme erhalten.
+Static is permitted where technically justified. GoogleTest is deliberately assessed separately as test infrastructure and may receive a documented static exception.
 
-## 18. Änderungsdisziplin
+## 18. Change discipline
 
-Bei Änderungen an `build-libraries.xml` gilt:
+When changing `build-libraries.xml`:
 
-1. vollständigen aktuellen XML-Stand verwenden,
-2. keine Rekonstruktion aus Teilfragmenten,
-3. Library-Timestamp bei wirksamer Änderung fortschreiben,
-4. XSD und Implementierung synchron halten,
-5. Patches versionsgebunden halten,
-6. realen Zielmaschinenlauf durchführen,
-7. erst danach neue Artefaktnamen/Verträge als bewiesen dokumentieren.
+1. use the complete current XML state,
+2. do not reconstruct it from partial fragments,
+3. advance the library timestamp for an effective change,
+4. keep XSD and implementation synchronized,
+5. keep patches version-bound,
+6. perform a real target-machine run,
+7. only then document new artifact names/contracts as proven.
