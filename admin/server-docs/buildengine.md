@@ -2,19 +2,33 @@
 
 BuildEngine is a declarative build orchestration system for reproducible C and C++ third-party library builds. Its current Windows integration is centered on Embarcadero C++Builder and the modern BCC64X toolchain. Library knowledge belongs in synchronized XML contracts, while the executable evaluates those contracts, prepares tools, creates a technical dependency graph, executes technical steps, and records the resulting state.
 
+> This page is also a renderer acceptance document. It intentionally exercises standard Markdown, GitHub-flavored Markdown, syntax highlighting, Mermaid, links, tables, block quotes, inline code, task lists, strikethrough, and C++23 examples.
+
+## Renderer acceptance checklist
+
+- [x] Headings and paragraphs
+- [x] **Bold**, *italic*, and `inline code`
+- [x] Tables
+- [x] Task lists
+- [x] ~~Strikethrough~~
+- [x] Automatic links: https://github.com/adeccscholar
+- [x] Syntax-highlighted fenced code
+- [x] Mermaid diagrams
+- [x] Nested lists and block quotes
+
 ## Main responsibilities
 
 BuildEngine separates configuration, orchestration, execution, evidence, and presentation:
 
-- **Configuration** resolves the production root, tools, repositories, build contracts, concurrency, tests, and documentation settings.
-- **Repository synchronization** updates the administration content before build evaluation.
-- **Tool preparation** discovers or installs tools described by the administration contract.
-- **Library contracts** define source acquisition, build variants, installation, publication, smoke tests, metadata, and documentation.
-- **The process scheduler** executes the technical dependency graph with a bounded worker count.
-- **Technical step state** is the authoritative incremental state for library work.
-- **Metadata generation** creates license information and CycloneDX SBOM data.
-- **Documentation generation** publishes library information and, where enabled, Doxygen API documentation.
-- **The server** presents the resulting packages, documentation, SBOMs, usage information, and security evidence without becoming a second build-state authority.
+1. **Configuration** resolves the production root, tools, repositories, build contracts, concurrency, tests, and documentation settings.
+2. **Repository synchronization** updates the administration content before build evaluation.
+3. **Tool preparation** discovers or installs tools described by the administration contract.
+4. **Library contracts** define source acquisition, build variants, installation, publication, smoke tests, metadata, and documentation.
+5. **The process scheduler** executes the technical dependency graph with a bounded worker count.
+6. **Technical step state** is the authoritative incremental state for library work.
+7. **Metadata generation** creates license information and CycloneDX SBOM data.
+8. **Documentation generation** publishes library information and, where enabled, Doxygen API documentation.
+9. **The server** presents resulting packages, documentation, SBOMs, usage information, and security evidence without becoming a second build-state authority.
 
 ## Execution flow
 
@@ -27,14 +41,30 @@ flowchart TD
    E --> F[Load library build contracts]
    F --> G[Create library DAG]
    G --> H[Evaluate technical step state]
-   H --> I[Execute required technical actions]
-   I --> J[Install and publish artifacts]
-   J --> K[Generate metadata and documentation]
-   K --> L[Run configured smoke tests]
-   L --> M[Write machine-state summary]
+   H --> I{Current?}
+   I -- yes --> J[Validate evidence]
+   I -- no --> K[Execute required technical actions]
+   K --> L[Install and publish artifacts]
+   L --> M[Generate metadata and documentation]
+   M --> N[Run configured smoke tests]
+   J --> N
+   N --> O[Write machine-state summary]
 ```
 
 The diagram is intentionally part of this document so the server can verify Mermaid selection independently from plain Markdown rendering.
+
+## Dependency relationships
+
+```mermaid
+graph LR
+   Admin[Admin XML contracts] --> Engine[BuildEngine]
+   Engine --> Scheduler[ProcessScheduler]
+   Scheduler --> Jobs[Technical jobs]
+   Jobs --> Install[Installed packages]
+   Install --> Metadata[SBOM and license metadata]
+   Metadata --> Server[BuildEngine Server]
+   Install --> Server
+```
 
 ## Core orchestration
 
@@ -57,9 +87,33 @@ int BuildEngine::Run() {
 
 The production implementation contains the complete error handling, tool preparation, scheduler execution, heartbeat handling, metadata, documentation, and smoke-test logic. The fragment above is deliberately shortened for documentation.
 
+## Modern C++23 direction
+
+BuildEngine prefers modern C++23 facilities over older idioms whenever the compiler and target library support them. Examples include ranges, concepts, `std::span`, `std::string_view`, designated initializers, structured bindings, `std::optional`, `std::format`, and value-oriented APIs.
+
+A small C++23 example:
+
+```cpp
+#include <concepts>
+#include <ranges>
+#include <span>
+
+ template<typename value_ty>
+ concept integral_value = std::integral<value_ty> && !std::same_as<value_ty, bool>;
+
+ template<integral_value value_ty>
+ [[nodiscard]] value_ty Sum(std::span<value_ty const> const spValues) {
+    return std::ranges::fold_left(spValues, value_ty {}, std::plus {});
+ }
+```
+
+The example is intentionally language-marked so Highlight.js selection can be verified on this page.
+
 ## Incremental state
 
 BuildEngine distinguishes technical state from generated evidence. A library is not considered current merely because a file happens to exist. Technical steps are evaluated against their recorded state and fingerprints; output validation is evidence about the result, not an alternative state machine.
+
+> **State rule:** technical step state is authoritative. Evidence validation can reject an otherwise current result, but it does not create a second independent state authority.
 
 This distinction is especially important for large builds because a changed library timestamp, source input, build contract, tool version, or other fingerprint input can invalidate only the work that must actually run again.
 
@@ -99,6 +153,34 @@ A typical conceptual shape is:
 | `SmokeJobBuilder` | Consumer/integration smoke tests |
 | `BuildEngine-Common` | Shared repository, HTTP, security, package, and utility services |
 
+## Failure model
+
+A useful conceptual distinction is:
+
+- a **technical action failure** means the action itself did not complete successfully;
+- a **dependency failure** means the job could not run because a prerequisite failed;
+- a **validation failure** means recorded/current technical state exists but required evidence is missing or invalid;
+- a **not-current state** means the scheduler must execute the affected technical step again.
+
+Nested example:
+
+- Library
+  - Source
+    - Download
+    - Extract
+  - Build
+    - Release
+    - Debug
+  - Install
+  - Metadata
+  - Documentation
+
 ## Design principle
 
 The system is intentionally contract-driven. Compiler-specific integration remains explicit and testable, while reusable orchestration logic should stay generic. In the current third-party project, alternative compiler paths are not silently substituted for BCC64X: compatibility problems must remain visible so the integration result is meaningful.
+
+## Related server documentation
+
+- [Server and REST API](/manual/server.md)
+- [Configuration and command line](/manual/configuration.md)
+- [Generated library documentation index](/index.html)
