@@ -62,7 +62,7 @@
    <!-- 2.5.25 has a documented parallel temp-file race in win_flex on Windows. -->
    <tool id="winflexbison" version="2.5.24" required="always">
       <managed root="winflexbison\2.5.24" executable="win_flex.exe">
-         <download url="https://github.com/lexxmark/winflexbison/releases/download/v2.5.24/win_flex_bison-2.5.24.zip" archive="win_flex_bison-2.5.24.zip" sha256="39c6086ce211d5415500acc5ed2d8939861ca1696aee48909c7f6daf5122b505"/>
+         <download url="https://github.com/lexxmark/winflexbison/releases/download/v2.5.24/win_flex_bison-2.5.24.zip" archive="winflexbison-2.5.24.zip" sha256="39c6086ce211d5415500acc5ed2d8939861ca1696aee48909c7f6daf5122b505"/>
       </managed>
       <probe contains="2.6.4"><argument value="--version"/></probe>
    </tool>
@@ -102,23 +102,23 @@
          <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v1.txt">
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="update-package-database"/>
-               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/CTAN/systems/win32/miktex/tm/packages/"/>
+               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
             </command>
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="check-update"/>
-               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/CTAN/systems/win32/miktex/tm/packages/"/>
+               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
                <success code="0"/><success code="100"/>
             </command>
             <!-- Resolve the five missing dependencies reported by Basic MiKTeX 25.12 itself. -->
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="install"/>
-               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/CTAN/systems/win32/miktex/tm/packages/"/>
+               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
                <argument value="ms"/><argument value="showframe"/><argument value="sttools"/><argument value="thailatex"/><argument value="luxi"/>
             </command>
             <!-- Doxygen Release_1_18_0: header.tex + doxygen.sty + default PDFLaTeX fonts. -->
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="install"/>
-               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/CTAN/systems/win32/miktex/tm/packages/"/>
+               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
                <argument value="ltxbase"/><argument value="latex-tools"/><argument value="graphics"/><argument value="amsfonts"/><argument value="psnfss"/>
                <argument value="infwarerr"/><argument value="float"/><argument value="varwidth"/><argument value="xcolor"/><argument value="colortbl"/>
                <argument value="xltabular"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/>
