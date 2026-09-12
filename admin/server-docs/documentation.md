@@ -257,7 +257,20 @@ refman.tex
 
 BuildEngine uses managed MiKTeX 25.12 on Windows. MiKTeX is declared as `required="when-used"`; it is provisioned only when at least one library has an effective LaTeX profile.
 
-The managed installation uses the official MiKTeX Basic Installer in unattended portable mode. The installation remains below the BuildEngine tools root and does not require a machine-wide MiKTeX installation.
+The managed installation uses the official MiKTeX Basic Installer in unattended private mode. Registry integration is disabled and the MiKTeX install, configuration and data roots are all placed explicitly below `tools/miktex/25.12`. The BuildEngine PDF pipeline therefore does not depend on a machine-wide MiKTeX installation or user-profile MiKTeX state.
+
+Conceptually the managed setup is equivalent to:
+
+```text
+basic-miktex-25.12-x64.exe
+   --private
+   --unattended
+   --no-registry
+   --paper-size=A4
+   --user-install=<ManagedRoot>\texmfs\install
+   --user-config=<ManagedRoot>\texmfs\config
+   --user-data=<ManagedRoot>\texmfs\data
+```
 
 PDF compilation uses the MiKTeX compiler driver `texify`:
 
