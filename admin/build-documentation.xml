@@ -33,6 +33,45 @@
       <define name="BOOST_FUSION_HAS_VARIADIC_MAP" value="1"/>
       <define name="BOOST_FUSION_HAS_VARIADIC_SET" value="1"/>
       <define name="BOOST_FUSION_HAS_VARIADIC_TUPLE" value="1"/>
+
+      <!--
+         Boost 1.92 documentation modes. These names are taken from the
+         libraries' own Doxyfile/Jamfile contracts. They select deliberately
+         simplified public declarations and suppress implementation-only code.
+      -->
+      <define name="DOXYGEN_INVOKED" value=""/>
+      <define name="DOXYGEN_SHOULD_SKIP_THIS" value=""/>
+      <define name="DOXYGEN_NO_DISPATCH" value=""/>
+      <define name="DOXYGEN_NO_IMPL" value=""/>
+      <define name="DOXYGEN_NO_DETAIL" value=""/>
+      <define name="DOXYGEN_NO_CONCEPT_MEMBERS" value=""/>
+      <define name="DOXYGEN_NO_TRAITS_SPECIALIZATIONS" value=""/>
+      <define name="DOXYGEN_NO_STRATEGY_SPECIALIZATIONS" value=""/>
+      <define name="DOXYGEN_NO_SPECIALIZATIONS" value=""/>
+      <define name="BOOST_CONCEPT_REQUIRES(x)" value=""/>
+      <define name="BOOST_CONCEPT_ASSERT(x)" value=""/>
+
+      <define name="BOOST_ALGORITHM_DOXYGEN" value="1"/>
+      <define name="BOOST_BEAST_DOXYGEN" value="1"/>
+      <define name="BOOST_BEAST_USE_POSIX_FILE" value="1"/>
+      <define name="BOOST_BEAST_USE_WIN32_FILE" value="1"/>
+      <define name="BOOST_BEAST_SPLIT_COMPILATION" value="1"/>
+      <define name="GENERATING_DOCUMENTATION" value="1"/>
+      <define name="BOOST_BIMAP_DOXYGEN_WILL_NOT_PROCESS_THE_FOLLOWING_LINES" value="1"/>
+      <define name="BOOST_BIMAP_ONLY_DOXYGEN_WILL_PROCESS_THE_FOLLOWING_LINES" value="1"/>
+      <define name="BOOST_COMPUTE_DOXYGEN_INVOKED" value="1"/>
+      <define name="BOOST_CONTAINER_DOXYGEN_INVOKED" value="1"/>
+      <define name="BOOST_FILESYSTEM_DOXYGEN" value="1"/>
+      <define name="BOOST_HANA_DOXYGEN_INVOKED" value="1"/>
+      <define name="BOOST_HISTOGRAM_DOXYGEN_INVOKED" value="1"/>
+      <define name="BOOST_INTERPROCESS_DOXYGEN_INVOKED" value="1"/>
+      <define name="BOOST_JSON_DOCS" value="1"/>
+      <define name="BOOST_LOG_DOXYGEN_PASS" value="1"/>
+      <define name="BOOST_NOWIDE_DOXYGEN" value="1"/>
+      <define name="BOOST_PARSER_DOXYGEN" value="1"/>
+      <define name="BOOST_PARSER_USE_CONCEPTS" value="1"/>
+      <define name="BOOST_TEST_DOXYGEN_DOC__" value="1"/>
+
       <exclude pattern="*/libs/*/test/*"/>
       <exclude pattern="*/libs/*/example/*"/>
       <exclude pattern="*/libs/*/examples/*"/>
