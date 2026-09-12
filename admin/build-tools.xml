@@ -96,6 +96,53 @@
       <probe contains="graphviz version 15.1.1"><argument value="-V"/></probe>
    </tool>
 
+   <!-- Local browser assets used by the BuildEngine Server Markdown view. -->
+   <tool id="web-mermaid" version="11.17.2" required="always">
+      <managed root="web\mermaid\11.17.2" executable="dist\mermaid.esm.min.mjs">
+         <download url="https://cdn.jsdelivr.net/npm/mermaid@11.17.2/dist/mermaid.min.js"
+                   archive="web-mermaid-11.17.2.js"
+                   sha256="581ed7d74bd9048d0e3a91363927d72ef22942d7722546b27f7cc29e35390eb8"/>
+         <extract executable="{ENV:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe">
+            <argument value="-NoProfile"/><argument value="-NonInteractive"/><argument value="-ExecutionPolicy"/><argument value="Bypass"/><argument value="-File"/>
+            <argument value="{ProductionRoot}\admin\programs\web\install-web-asset.ps1"/>
+            <argument value="-Archive"/><argument value="{Archive}"/><argument value="-ManagedRoot"/><argument value="{ManagedRoot}"/>
+            <argument value="-RelativePath"/><argument value="mermaid.min.js"/>
+            <argument value="-AdditionalSource"/><argument value="{ProductionRoot}\admin\programs\web\mermaid.esm.min.mjs"/>
+            <argument value="-AdditionalRelativePath"/><argument value="dist\mermaid.esm.min.mjs"/>
+         </extract>
+      </managed>
+   </tool>
+
+   <tool id="web-highlight" version="11.12.0" required="always">
+      <managed root="web\highlight\11.12.0" executable="highlight.min.js">
+         <download url="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js"
+                   archive="web-highlight-11.12.0.js"
+                   sha256="8ab71eb09c51f501e5e25157d9cff100e46cc29bcbfc744d0b746d451fca7f53"/>
+         <extract executable="{ENV:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe">
+            <argument value="-NoProfile"/><argument value="-NonInteractive"/><argument value="-ExecutionPolicy"/><argument value="Bypass"/><argument value="-File"/>
+            <argument value="{ProductionRoot}\admin\programs\web\install-web-asset.ps1"/>
+            <argument value="-Archive"/><argument value="{Archive}"/><argument value="-ManagedRoot"/><argument value="{ManagedRoot}"/>
+            <argument value="-RelativePath"/><argument value="highlight.min.js"/>
+            <argument value="-AdditionalSource"/><argument value="{ProductionRoot}\admin\programs\web\github.min.css"/>
+            <argument value="-AdditionalRelativePath"/><argument value="styles\github.min.css"/>
+         </extract>
+      </managed>
+   </tool>
+
+   <tool id="web-mathjax" version="3.2.2" required="always">
+      <managed root="web\mathjax\3.2.2" executable="es5\tex-svg.js">
+         <download url="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"
+                   archive="web-mathjax-3.2.2-tex-svg.js"
+                   sha256="d4295dc33744836935c1399feece5159577b34c5c8ffb9f1c6324cd82e03a882"/>
+         <extract executable="{ENV:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe">
+            <argument value="-NoProfile"/><argument value="-NonInteractive"/><argument value="-ExecutionPolicy"/><argument value="Bypass"/><argument value="-File"/>
+            <argument value="{ProductionRoot}\admin\programs\web\install-web-asset.ps1"/>
+            <argument value="-Archive"/><argument value="{Archive}"/><argument value="-ManagedRoot"/><argument value="{ManagedRoot}"/>
+            <argument value="-RelativePath"/><argument value="es5\tex-svg.js"/>
+         </extract>
+      </managed>
+   </tool>
+
    <tool id="bcc64x" version="20.1.7" required="always"><bds executable="bin64\bcc64x.exe"/></tool>
    <tool id="embarcadero-make" version="5.43" required="always"><bds executable="bin\make.exe"/></tool>
    <tool id="llvm-ar" version="20.1.7" required="always"><bds executable="bin64\llvm-ar.exe"/></tool>
