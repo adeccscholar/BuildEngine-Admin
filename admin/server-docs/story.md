@@ -4,9 +4,9 @@ BuildEngine began as a technical experiment around a simple but important questi
 
 The original seminar title was **"C++Builder 13, Back in the Future"**. That title described the immediate subject very well: a development environment with a long history had received a modern Clang/LLVM-based Win64 toolchain, and we wanted evidence for what that meant in practice rather than another marketing claim.
 
-But the underlying question was always larger than one product. C++ itself is still regularly described as old, legacy, or something that should gradually disappear behind newer languages. That is one reason our general C++ streams now run under the title **"C++ neu entdecken: Moderner als du denkst | Live Coding & Talk"** — rediscovering C++ as something more modern than many people assume.
+But the underlying question was always larger than one product. C++ itself is still regularly described as old, legacy, or something that should gradually disappear behind newer languages. That is one reason our general C++ streams now run under the title **"Rediscover C++: More Modern Than You Think | Live Coding & Talk"**.
 
-The same line of thought also appears in the books **"C++ neu denken"** and **"Architektur, die bleibt"**. They are not detached side projects. They formulate in a more systematic way a lesson that became increasingly visible during the experiments: learning new C++ features is useful, but the more interesting question is how those features allow us to formulate software differently — and how architecture can remain stable while technology continues to evolve.
+The same line of thought also appears in the books **"Rethinking C++" ("C++ neu denken")** and **"Architecture That Lasts" ("Architektur, die bleibt")**. They are not detached side projects. They formulate in a more systematic way a lesson that became increasingly visible during the experiments: learning new C++ features is useful, but the more interesting question is how those features allow us to formulate software differently — and how architecture can remain stable while technology continues to evolve.
 
 BuildEngine has grown far beyond the first compiler-evidence question. It now connects compiler integration, reproducible third-party builds, central component production, package creation, license evidence, SBOMs, vulnerability monitoring, risk assessment, documentation, native UI, REST services, package distribution, and a shared modern C++ architecture.
 
@@ -94,11 +94,11 @@ into:
 
 > **Which responsibility can this feature express more precisely, and what kind of architecture does that make possible?**
 
-That is the transition from learning modern C++ to **thinking C++ anew**.
+That is the transition from learning modern C++ to **rethinking C++**.
 
-### "C++ neu denken"
+### "Rethinking C++" ("C++ neu denken")
 
-This development is the central idea of the book **"C++ neu denken — Wie C++23 aus Typen, Concepts und Ranges ein neues Architekturmodell formt"**.
+This development is the central idea of the book **"Rethinking C++ — How C++23 Forms a New Architectural Model from Types, Concepts, and Ranges" ("C++ neu denken — Wie C++23 aus Typen, Concepts und Ranges ein neues Architekturmodell formt")**.
 
 The book deliberately does not treat modern C++ as a catalogue of features. Its thesis is that modern C++ changes the place where architecture can be formulated. A business value can become a real type. A prerequisite can become a Concept. Repeated variation can become a Policy. Data movement can become a Range. A technical representation can be converted at a controlled boundary. Resource responsibility can be tied to lifetime through RAII.
 
@@ -112,7 +112,7 @@ That is also why experience is not the enemy of modernity. Experience becomes mo
 
 The path from streams and experiments to reusable library components is part of the book itself. Many building blocks did not begin as a finished architecture. They grew through practical work, live coding, failure, correction, generalization, and explanation. The stream shows the open process; the book condenses it into a coherent architectural line.
 
-### From "C++ neu denken" to "Architektur, die bleibt"
+### From "Rethinking C++" to "Architecture That Lasts"
 
 But the C++ question leads naturally to a larger one.
 
@@ -120,7 +120,7 @@ If types, Concepts, ranges, policies, explicit processes, controlled boundaries,
 
 > **How can a system absorb change without losing its identity?**
 
-That is the subject of **"Architektur, die bleibt"**.
+That is the subject of **"Architecture That Lasts" ("Architektur, die bleibt")**.
 
 The second book deliberately moves one level above individual language facilities. It is not a book about Microservices, containers, REST, cloud platforms, or one current framework. Those can all be useful implementation choices, but they are not architecture by themselves.
 
@@ -139,11 +139,11 @@ C++Builder 13 evidence
 harder modern-C++ experiments
         |
         v
-C++ neu denken
+Rethinking C++
 language facilities as architectural vocabulary
         |
         v
-Architektur, die bleibt
+Architecture That Lasts
 stable meaning under technological change
         |
         v
@@ -457,7 +457,7 @@ The presentation changes, but the interpretation does not.
 
 That is a small architectural decision with a large practical effect. It allows the project to demonstrate different C++Builder application styles without fragmenting the underlying engineering model.
 
-It is also a concrete example of the line developed in **"Architektur, die bleibt"**: the outer topology may change while the structure carrying meaning should remain coherent. Console, VCL manager, and HTTP server are different projections and technical forms. They should not become three independent domain models.
+It is also a concrete example of the line developed in **"Architecture That Lasts" ("Architektur, die bleibt")**: the outer topology may change while the structure carrying meaning should remain coherent. Console, VCL manager, and HTTP server are different projections and technical forms. They should not become three independent domain models.
 
 ## 16. More than an SBOM: licenses and provenance
 
@@ -641,9 +641,9 @@ The second proof is about C++ itself:
 
 > **A modern C++ application can be the generalized orchestration layer for build, metadata, documentation, server, and native UI functionality rather than merely the code being compiled by CI.**
 
-The increasingly demanding tests added another lesson: modern C++ is not only a longer feature list. Concepts, ranges, templates, policies, RAII, value types, and controlled conversions give us a richer architectural vocabulary. That is the line condensed in **"C++ neu denken"**: we do not have to discard what we know, but we should be willing to reconsider where responsibilities can now be expressed more precisely.
+The increasingly demanding tests added another lesson: modern C++ is not only a longer feature list. Concepts, ranges, templates, policies, RAII, value types, and controlled conversions give us a richer architectural vocabulary. That is the line condensed in **"Rethinking C++" ("C++ neu denken")**: we do not have to discard what we know, but we should be willing to reconsider where responsibilities can now be expressed more precisely.
 
-And that leads to the broader architectural proof expressed in **"Architektur, die bleibt"**: a system is not modern because its outer technology is new. It is sustainable when its underlying structure can absorb change without losing identity.
+And that leads to the broader architectural proof expressed in **"Architecture That Lasts" ("Architektur, die bleibt")**: a system is not modern because its outer technology is new. It is sustainable when its underlying structure can absorb change without losing identity.
 
 The third proof is organisational:
 
@@ -685,9 +685,9 @@ The original evidence test asked whether C++Builder 13 could come back into the 
 
 The harder tests then raised a second question: if the language and toolchain can do all of this, **should we continue to formulate our systems as if they could not?**
 
-That is where "Back in the Future" meets **"C++ neu denken"**.
+That is where "Back in the Future" meets **"Rethinking C++"**.
 
-And once we ask how those new forms can remain coherent across years of technical change, the question becomes the one behind **"Architektur, die bleibt"**.
+And once we ask how those new forms can remain coherent across years of technical change, the question becomes the one behind **"Architecture That Lasts"**.
 
 The project that grew from those questions now asks something broader:
 
