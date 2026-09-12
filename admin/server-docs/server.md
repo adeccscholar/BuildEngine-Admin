@@ -15,13 +15,21 @@ Related project documentation:
 
 ## Transport and scope
 
-Version 1 binds to the IPv4 loopback interface only. The default endpoint is:
+The server deliberately uses HTTP for its current presentation and machine interface. This is a design decision for the intended deployment model, not a limitation of the underlying networking stack.
+
+The default endpoint is deliberately local:
 
 ```text
 http://127.0.0.1:8765/
 ```
 
-Only HTTP `GET` requests are accepted by the current server implementation. The browser UI and REST-style JSON endpoints share the same local server.
+The current version 1 implementation binds to the IPv4 loopback interface only. The broader deployment model is intentionally restricted as well: a BuildEngine server should either remain on localhost or be bound to an explicitly selected internal address/server identity whose network exposure is controlled by the operator. If an internal address is used, responsibility for keeping that endpoint behind the appropriate firewall and network boundary belongs to the deployment environment.
+
+HTTP is appropriate for that deliberately constrained environment because introducing HTTPS would also introduce certificate provisioning, trust configuration, renewal/rotation, expiration handling, and operational ownership. Those concerns are intentionally kept outside this project's current scope.
+
+The server architecture is not coupled to plain HTTP. The Boost.Asio/Beast based transport can be extended to HTTPS without changing the repository, rendering, REST, package, or security service layers. Such an extension would primarily add TLS transport and certificate configuration. The absence of HTTPS in the current implementation should therefore be understood as a scope and operational-responsibility decision, not as an architectural restriction.
+
+Only HTTP `GET` requests are accepted by the current server implementation. The browser UI and REST-style JSON endpoints share the same server.
 
 ## Browser routes
 
@@ -54,8 +62,8 @@ Static generated documentation is served from the BuildEngine documentation root
 ```mermaid
 flowchart LR
    B[Browser or local client] --> H[HTTP listener]
-   H --> V{Valid loopback host?}
-   V -- no --> F[403 response]
+   H --> V{Permitted interface and host?}
+   V -- no --> F[Rejected request]
    V -- yes --> R{Route type}
    R -->|Machine API| J[JSON response]
    R -->|Dashboard/UI| P[Rendered HTML page]
@@ -129,7 +137,7 @@ A status response has the following conceptual shape:
   "port": 8765,
   "productionRoot": "D:/local/embarcadero/test_v3",
   "documentationRoot": "D:/local/embarcadero/test_v3/documentation",
-  "transport": "HTTP over local loopback only"
+  "transport": "HTTP on a deliberately restricted interface"
 }
 ```
 
@@ -222,9 +230,9 @@ Subdirectories are supported. A Markdown file can reference an image with a norm
 
 When the page is served below `/manual/`, the browser resolves the reference to `/manual/images/architecture/buildengine-overview.png`. The server maps that route only to the synchronized `admin/server-docs/images` tree and rejects path traversal. Supported browser image formats are SVG, PNG, JPEG, GIF, and WebP.
 
-The normal Admin repository synchronization transfers the complete image tree recursively into the production Admin tree. Image files deliberately use a timestamp rule rather than the normal Admin SHA comparison: an existing production image is copied again only when the repository-side file is newer than the production copy. Other Admin contract files continue to use SHA-256 equality for synchronization.
+The normal Admin repository synchronization transfers the complete image tree recursively into the production Admin tree. Images follow exactly the same SHA-256 content rule as the other synchronized Admin files: a missing image is copied, an image with the same SHA-256 remains unchanged, and an image whose content hash differs is replaced. File timestamps do not determine image synchronization.
 
-This keeps image deployment inexpensive without introducing a second documentation-copy pipeline.
+This keeps synchronization deterministic and avoids a second documentation-copy or state mechanism.
 
 ## Links between Markdown documents
 
@@ -302,15 +310,18 @@ That separation makes the HTTP server a presentation surface rather than a secon
 
 ## Security boundary
 
-The current server is intentionally local-only.
+The intended security boundary is a deliberately restricted network endpoint rather than TLS termination inside BuildEngine itself.
 
-- Host validation accepts loopback hosts.
+- The default and current version 1 implementation uses the loopback interface.
+- A broader deployment should use only an explicitly selected internal interface/server identity and remain behind the operator's firewall or equivalent network boundary.
+- HTTP is an explicit design choice for this constrained deployment model, not a technical limitation.
+- HTTPS can be added at the transport layer if a deployment requires it, but certificate lifecycle and trust management are intentionally outside the present project scope.
+- Host and interface restrictions remain part of the transport boundary.
 - Documentation path traversal is rejected.
 - Managed browser asset paths are constrained.
 - Manual image paths are constrained to `admin/server-docs/images` and accepted image formats.
 - Machine endpoints validate library coordinates through the repository layer.
 - The server is read-only with respect to BuildEngine build state.
-- External transport is a separate concern and should not be inferred from the local HTTP listener.
 
 ## Related documentation
 
