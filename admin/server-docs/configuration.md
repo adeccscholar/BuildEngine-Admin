@@ -2,11 +2,12 @@
 
 [TOC|Content]
 
-BuildEngine combines a local XML parameter file with synchronized administration contracts. The local file selects the production tree, concurrency, repositories, feature switches, and contract locations; the Admin repository supplies the detailed tool, library, documentation, smoke-test, schema, and security definitions.
+BuildEngine combines a local XML parameter file with synchronized administration contracts. The local file selects the production tree, concurrency, repositories, feature switches, server endpoint, and contract locations; the Admin repository supplies the detailed tool, library, documentation, smoke-test, schema, and security definitions.
 
 Related reference documents:
 
 - [Documentation contract](documentation.md)
+- [Server and REST interface](server.md)
 - [Tool contract `build-tools.xml`](build-tools.md)
 - [Library contract `build-libraries.xml`](build-libraries.md)
 - [Tool overview](tools.md)
@@ -28,6 +29,9 @@ A representative structure is:
       queueLength="8"
       testJobs="4"
       serverLanguage="en"
+      serverAddress="127.0.0.1"
+      serverName="localhost"
+      serverPort="8765"
       managerLanguage="en"
       WithTests="true"
       WithSmokeTests="true"
@@ -66,7 +70,7 @@ A representative structure is:
 </buildEngine>
 ```
 
-The exact local worker counts and feature switches are deployment choices; the example above explains the structure rather than prescribing one machine configuration.
+The exact local worker counts, endpoint values, and feature switches are deployment choices; the example above explains the structure rather than prescribing one machine configuration.
 
 ## Important parameter groups
 
@@ -74,11 +78,16 @@ The exact local worker counts and feature switches are deployment choices; the e
 | --- | --- |
 | `companyName` | Branding used by generated documentation |
 | `rsvars` | C++Builder environment initialization script |
-| `root` | BuildEngine production root |
+| `root` | BuildEngine production root and central repository view used by the server |
 | `heartbeatSeconds` | Heartbeat interval for long-running work |
 | `workers` | Maximum concurrent scheduler workers |
 | `queueLength` | Scheduler queue capacity |
 | `testJobs` | Parallelism made available to supported test runners |
+| `serverLanguage` | Default server presentation language |
+| `serverAddress` | Concrete local IP interface for the HTTP listener; default `127.0.0.1` |
+| `serverName` | Logical DNS/server identity accepted by the server and used in URLs; default `localhost` |
+| `serverPort` | HTTP TCP port, range `1..65535`; default `8765` |
+| `managerLanguage` | Initial manager UI language |
 | `WithTests` | Enables upstream/library tests |
 | `WithSmokeTests` | Enables BuildEngine consumer smoke tests |
 | `WithDoc` | Enables generated library information documentation |
@@ -93,6 +102,30 @@ The exact local worker counts and feature switches are deployment choices; the e
 | `installRoot` | Installed package root |
 | `repositoriesRoot` | Local administration repository checkouts |
 | `logsRoot` | BuildEngine log hierarchy |
+
+### Server endpoint contract
+
+The server endpoint belongs to the central `BuildEngine.xml` configuration instead of a server-specific configuration file:
+
+```xml
+serverAddress="10.20.30.15"
+serverName="buildengine.intern.example"
+serverPort="8765"
+```
+
+`serverAddress` is intentionally an explicit interface address. Wildcard bindings such as `0.0.0.0` or `::` are rejected by the current server because they make the actual exposure less explicit. `serverName` is validated against the HTTP `Host` header together with the configured address.
+
+The safe default remains `127.0.0.1` / `localhost`. A non-loopback value is intended for a protected internal network whose firewall and routing boundary are controlled by the operator.
+
+HTTP itself is a deliberate deployment decision. HTTPS could be added to the Boost.Asio/Beast transport without changing the central repository model, but that would add certificate provisioning, trust, renewal, rotation, and operational responsibility. Those concerns are intentionally outside the current BuildEngine server contract.
+
+The standalone `BuildEngineDocServer` can load the central values with:
+
+```text
+BuildEngineDocServer.exe --config D:\path\BuildEngine.xml
+```
+
+If `BuildEngine.xml` exists in its working directory, it is used automatically. Runtime options `--root`, `--address`, `--name`, and `--port` are explicit overrides for one invocation, not a second persistent source of truth.
 
 `WithDoxygen=false` is a hard stop for the central Doxygen pipeline. `WithLatex`, however, is an inheritable local default. `admin/build-documentation.xml` may override it for the project, and a library may independently override it again with `latex="true"` or `latex="false"`.
 
@@ -184,6 +217,7 @@ The separation is intentional:
 | Concern | Local configuration | Synchronized Admin contract |
 | --- | --- | --- |
 | Production root | Yes | No |
+| Server interface/name/port | Yes | No |
 | Worker count | Yes | No |
 | Repository locations | Yes | Repository content itself is synchronized |
 | Tool definitions | No | Yes |
@@ -194,6 +228,8 @@ The separation is intentional:
 | Security metadata | No | Yes |
 
 This prevents local machine settings from becoming a hidden second source of library/build knowledge while still allowing the local machine to supply deployment defaults.
+
+The server reinforces the same principle. It does not create a server-specific database or copy of packages/documentation. It opens the central production tree through the shared `BuildEngineRepository`, so browser pages and REST responses are views of the same package metadata, SBOMs, generated documentation, PDFs, security evidence, and synchronized Admin content used elsewhere in BuildEngine.
 
 ## Command line
 
@@ -292,7 +328,9 @@ The CLI already parses `--lib` and `--libversion` for commands such as `--check`
 
 ## Configuration validation checklist
 
-- [ ] Production root points to the intended tree.
+- [ ] Production root points to the intended central tree.
+- [ ] Server address, server name, and port describe the intended deployment boundary.
+- [ ] Any non-loopback server address is protected by the intended firewall/network policy.
 - [ ] Admin synchronization is configured.
 - [ ] `build-tools.xml` and `build-libraries.xml` are available after synchronization.
 - [ ] Worker and queue settings match the target machine.
@@ -303,4 +341,4 @@ The CLI already parses `--lib` and `--libversion` for commands such as `--check`
 
 ## Related documentation
 
-Use the relative links at the top of this page to move between configuration, tool, library and documentation contracts. Generated library documentation starts at `/index.html`.
+Use the relative links at the top of this page to move between configuration, server, tool, library and documentation contracts. Generated library documentation starts at `/index.html`.
