@@ -62,14 +62,14 @@
    <!-- 2.5.25 has a documented parallel temp-file race in win_flex on Windows. -->
    <tool id="winflexbison" version="2.5.24" required="always">
       <managed root="winflexbison\2.5.24" executable="win_flex.exe">
-         <download url="https://github.com/lexxmark/winflexbison/releases/download/v2.5.24/win_flex_bison-2.5.24.zip" archive="win_flex_bison-2.5.24.zip" sha256="39c6086ce211d5415500acc5ed2d8939861ca1696aee48909c7f6daf5122b505"/>
+         <download url="https://github.com/lexxmark/winflexbison/releases/download/v2.5.24/win64/win_flex_bison-2.5.24.zip" archive="win_flex_bison-2.5.24.zip" sha256="39c6086ce211d5415500acc5ed2d8939861ca1696aee48909c7f6daf5122b505"/>
       </managed>
       <probe contains="2.6.4"><argument value="--version"/></probe>
    </tool>
 
    <tool id="pkg-config" version="0.28-1" runtimeVersion="0.28" required="always">
       <managed root="pkg-config-lite\0.28-1" executable="pkg-config-lite-0.28-1\bin\pkg-config.exe">
-         <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download" archive="pkg-config-lite-0.28-1_bin-win32.zip" sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
+         <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download" archive="pkg-config-lite-0.28-1.zip" sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
       </managed>
       <probe contains="0.28"><argument value="--version"/></probe>
    </tool>
@@ -79,6 +79,26 @@
          <download url="https://github.com/doxygen/doxygen/releases/download/Release_1_18_0/doxygen-1.18.0.windows.x64.bin.zip" archive="doxygen-1.18.0.windows.x64.bin.zip" sha256="e84f54cfd49ef06b0b16536056dbec0c496323de28abcce53a4269463de35eaf"/>
       </managed>
       <probe contains="1.18.0"><argument value="--version"/></probe>
+   </tool>
+
+   <!--
+      MiKTeX is provisioned only when the effective documentation contract asks
+      for LaTeX/PDF output.  The official Basic Installer is executed in
+      unattended portable mode, keeping the complete runtime below tools/.
+   -->
+   <tool id="miktex" version="25.12" required="when-used">
+      <managed root="miktex\25.12" executable="texmfs\install\miktex\bin\x64\texify.exe">
+         <download url="https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/basic-miktex-25.12-x64.exe"
+                   archive="basic-miktex-25.12-x64.exe"
+                   sha256="14b42dd9f4b4a7813a8bfd69c8f99316c2888cc4ee26f631f397e163d85d6c62"/>
+         <extract executable="{Archive}">
+            <argument value="--private"/>
+            <argument value="--unattended"/>
+            <argument value="--paper-size=A4"/>
+            <argument value="--portable={ManagedRoot}"/>
+         </extract>
+      </managed>
+      <probe contains="MiKTeX"><argument value="--version"/></probe>
    </tool>
 
    <!--
