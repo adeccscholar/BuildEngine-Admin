@@ -106,16 +106,27 @@ A compact way to read that architecture is **Core → Transfer → Edge**.
 
 ```mermaid
 flowchart LR
-   EdgeIn["Edge<br/>files · databases · UI · APIs"]
-   TransferIn["Transfer<br/>conversion · Source/Sink · Ranges"]
    Core["Core<br/>domain types · rules · invariants"]
-   TransferOut["Transfer<br/>projection · adapters · Ranges"]
-   EdgeOut["Edge<br/>grids · reports · files · services"]
+   Transfer["Transfer<br/>conversion · projection · adapters"]
+   Edge["Edge<br/>UI · databases · files · APIs · frameworks"]
 
-   EdgeIn --> TransferIn --> Core --> TransferOut --> EdgeOut
+   Core <--> Transfer <--> Edge
 ```
 
-The **Core** carries domain meaning, stable types, rules, and invariants. The **Edge** contains technical reality: frameworks, database drivers, files, UI controls, protocols, and external formats. The **Transfer** between them must be explicit rather than accidental. Controlled conversion, projection, adapters, Sources and Sinks define the transition, while Ranges provide a common language for moving typed values without forcing every intermediate step into a materialized container.
+The **Core** carries domain meaning, stable types, rules, and invariants. The **Edge** contains technical reality: frameworks, database drivers, files, UI controls, protocols, and external formats. The **Transfer** between them must be explicit rather than accidental. Controlled conversion, projection and adapters define the transition instead of allowing framework types or transport formats to become the domain model by accident.
+
+The same idea can be viewed from the movement of data: **Source → Transfer → Sink**.
+
+```mermaid
+flowchart LR
+   Source["Source<br/>database · file · API · generator"]
+   Transfer["Transfer<br/>typed Range · transform · conversion"]
+   Sink["Sink<br/>grid · file · report · database · service"]
+
+   Source --> Transfer --> Sink
+```
+
+Source and Sink are roles, not framework base classes. A database query can be a Source, a file can be a Source or Sink, a grid can be a Sink, and a service can be either depending on direction. The Transfer stays explicit: typed values move through Ranges, transformations and controlled conversions rather than disappearing into a generic runtime container.
 
 This is also where variadic templates become more than a language trick. They allow complete type sequences to become design objects. A database row, a tuple, a conversion path, a parameter set, a file record, or a grid row can be described from the same statically known type structure. Instead of falling back to untyped lists or runtime boxes, relationships between heterogeneous values can remain visible to the compiler.
 
@@ -262,7 +273,18 @@ We wanted the essential knowledge to be expressed in a small number of declarati
 
 The contracts therefore do more than drive execution. **They document the prerequisites and parameters of the build at the same time.**
 
-XML is important here precisely because it gives us a flexible but structured contract language. Elements and attributes can describe tools, versions, dependencies, actions, variants, parameters, tests, publication rules, and documentation without turning every library into new C++ control flow. Schemas can validate that vocabulary, while inheritance and optional attributes allow common structure to stay common and library-specific differences to remain local.
+XML is important here because it gives us a **human-readable, structured contract language**. The files are intended to be opened, read, reviewed, diffed, commented, discussed, and maintained by engineers. Elements and attributes can describe tools, versions, dependencies, actions, variants, parameters, tests, publication rules, and documentation without turning every library into new C++ control flow. XSD schemas make the vocabulary mechanically verifiable without giving up that readability.
+
+This is deliberately **not** an argument that XML is the preferred format for machine-to-machine communication. BuildEngine uses XML where humans define and review durable technical contracts. Runtime communication and distributed interfaces have different requirements and may use very different mechanisms. The same project roster contains TAO/CORBA precisely because a typed distributed-object protocol solves a completely different problem from a human-maintained build contract. REST/JSON resources in the BuildEngine server are another example of a transport/presentation boundary with different priorities.
+
+The distinction is intentional:
+
+```mermaid
+flowchart LR
+   Human["Engineer<br/>read · review · edit · diff"] --> XML["XML contract<br/>human-readable · schema-validatable"]
+   XML --> Engine["Generic C++ engine"]
+   Engine --> Runtime["Runtime / external interfaces<br/>REST · JSON · CORBA · native APIs"]
+```
 
 Within the vocabulary understood by the engine, changing a library version, adding a dependency, selecting another build variant, adjusting an upstream option, or defining another tool path becomes a data change rather than a new orchestration implementation.
 
@@ -274,7 +296,7 @@ flowchart LR
    Jobs --> Evidence["State · packages · SBOM · licenses · documentation"]
 ```
 
-That is the flexibility we were looking for: **the stable execution model remains in C++, while changing technical knowledge is represented declaratively in XML.**
+That is the flexibility we were looking for: **the stable execution model remains in C++, while changing technical knowledge is represented declaratively in XML in a form that people can still understand directly.**
 
 A generalized C++ application interprets those contracts and turns them into technical jobs and dependency graphs.
 
@@ -704,7 +726,7 @@ And the CI lesson is deliberately modest:
 
 > **The innovation is not Continuous Integration. The useful experiment is concentrating fragmented CI knowledge into a small declarative model and letting one generalized C++ implementation execute that model efficiently.**
 
-XML is a decisive part of that concentration. It keeps the changing knowledge flexible and inspectable while the generalized engine remains stable. Instead of hard-coding every library, BuildEngine turns much of the ecosystem-specific variation into validated data.
+XML is a decisive part of that concentration. It keeps the changing knowledge flexible, inspectable and **human-readable** while the generalized engine remains stable. Instead of hard-coding every library, BuildEngine turns much of the ecosystem-specific variation into validated data. That choice is about maintainable engineering contracts, not about prescribing XML for machine-to-machine communication.
 
 ## 24. The project is still evolving
 
@@ -720,6 +742,7 @@ The goal is not a frozen showcase. The goal is a working system that continues t
 - modern C++ as something more capable than the common "legacy" stereotype suggests;
 - learning new C++ features and then asking what they change in our way of designing software;
 - Core, Transfer, and Edge as a way to separate stable meaning from technical reality;
+- Source, Transfer, and Sink as explicit roles for typed data movement;
 - Ranges as a language for typed data movement and variadic templates as a language for heterogeneous type structures;
 - the efficiency gains and stronger cost model enabled by modern C++ since C++11;
 - evolutionary development rather than compulsory reinvention — keep what still carries, rethink what can now be expressed better;
@@ -727,7 +750,8 @@ The goal is not a frozen showcase. The goal is a working system that continues t
 - upstream-first third-party integration;
 - central, project-independent production of reusable native components;
 - portable managed tools instead of undocumented machine installation state;
-- flexible, schema-validatable XML contracts instead of library-specific orchestration code;
+- flexible, human-readable, schema-validatable XML contracts instead of library-specific orchestration code;
+- transport and machine-to-machine protocols chosen independently for their own requirements;
 - a small number of declarative contracts instead of CI knowledge spread across scripts and responsibilities;
 - one technical source of truth from which build, state, metadata, licenses, SBOM, and documentation can be derived;
 - maximum useful parallelism while preserving dependency correctness;
