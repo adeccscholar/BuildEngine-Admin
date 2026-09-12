@@ -25,6 +25,16 @@
       the compiler, target ABI or library build contract.
    -->
 
+   <!--
+      Generated HTML is served by BuildEngine Server. Use the managed MathJax
+      3 package through the stable /js namespace instead of Doxygen's CDN.
+      The configured directory contains es5/tex-svg.js.
+   -->
+   <option name="USE_MATHJAX" value="YES"/>
+   <option name="MATHJAX_VERSION" value="MathJax_3"/>
+   <option name="MATHJAX_FORMAT" value="SVG"/>
+   <option name="MATHJAX_RELPATH" value="/js/mathjax/es5"/>
+
    <library id="boost" publicOnly="true">
       <!-- Proven BCC64X documentation model: Clang 20 / C++23. -->
       <define name="__clang__" value="1"/>
