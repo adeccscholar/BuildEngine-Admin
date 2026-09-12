@@ -1,62 +1,58 @@
-# BuildEngine-Dokumentationsvertrag
+# BuildEngine Documentation Contract
 
-BuildEngine behandelt Dokumentation als reproduzierbares Buildprodukt. Die Dokumentationspipeline trennt lokale Grundeinstellungen, synchronisierte Projektregeln, Doxygen-Erzeugung, PDF-Kompilierung und die reine Serverdarstellung.
+[TOC|Content]
 
-Zentrale Dateien:
+BuildEngine treats documentation as a reproducible build product. The documentation pipeline separates local base settings, synchronized project rules, Doxygen generation, PDF compilation, and read-only server presentation.
 
-- `BuildEngine.xml` – lokale Grundeinstellungen
-- `admin/build-documentation.xml` – synchronisierter Dokumentationsvertrag
-- `admin/schemas/build-documentation.xsd` – XML-Schema
-- `admin/build-tools.xml` – Doxygen, Graphviz, MiKTeX und Browser-Ressourcen
+Central files:
 
-Verwandte Dokumente:
+- `BuildEngine.xml` – local base settings
+- `admin/build-documentation.xml` – synchronized documentation contract
+- `admin/schemas/build-documentation.xsd` – XML schema
+- `admin/build-tools.xml` – Doxygen, Graphviz, MiKTeX, and browser resources
 
-- [BuildEngine-Konfiguration](configuration.md)
-- [Werkzeugvertrag `build-tools.xml`](build-tools.md)
-- [Werkzeugübersicht](tools.md)
-- [Bibliotheksvertrag `build-libraries.xml`](build-libraries.md)
+Related documents:
 
-## Grundprinzip
+- [BuildEngine configuration](configuration.md)
+- [Tool contract `build-tools.xml`](build-tools.md)
+- [Tool overview](tools.md)
+- [Library contract `build-libraries.xml`](build-libraries.md)
 
-Die zentrale API-Dokumentation folgt diesem Ablauf:
+## Basic principle
+
+Central API documentation follows this pipeline:
 
 ```mermaid
 flowchart TD
-   C[BuildEngine.xml + build-documentation.xml] --> G[Dokumentationsprofil auflösen]
-   G --> D[Doxyfile erzeugen]
-   D --> X[Doxygen - genau ein Lauf]
+   C[BuildEngine.xml + build-documentation.xml] --> G[Resolve documentation profile]
+   G --> D[Generate Doxyfile]
+   D --> X[Doxygen - exactly one run]
    X --> H[HTML]
-   X -->|wenn latex=true| L[LaTeX]
+   X -->|when latex=true| L[LaTeX]
    L --> M[MiKTeX texify]
    M --> P[PDF]
-   H --> I[zentraler Dokumentationsindex]
+   H --> I[Central documentation index]
 ```
 
-**Wesentliche Regel:** Wenn LaTeX benötigt wird, erzeugt derselbe Doxygen-Lauf gleichzeitig HTML und LaTeX. Es gibt keinen zweiten Doxygen-Durchlauf für PDF.
+**Essential rule:** when LaTeX is required, the same Doxygen run produces HTML and LaTeX. There is no second Doxygen run for PDF.
 
-MiKTeX ist ein eigener nachgelagerter technischer Schritt, weil eine Änderung der MiKTeX-Version nur die PDF-Kompilierung und nicht die Doxygen-Analyse erneut ausführen soll.
+MiKTeX is a separate downstream technical step so a MiKTeX version change reruns only PDF compilation and not Doxygen analysis.
 
-## Konfigurationsebenen
+## Configuration layers
 
-Die effektive Dokumentationskonfiguration wird aus mehreren Ebenen gebildet:
+The effective documentation configuration is resolved from several layers:
 
-```text
-BuildEngine.xml
-   WithDoc
-   WithDoxygen
-   WithLatex          = lokale LaTeX-Grundeinstellung
-        ↓
-build-documentation.xml
-   Rootprofil         = synchronisierte Defaults/Overrides
-        ↓
-<library ...>         = konkrete Library-Overrides
+```mermaid
+flowchart TD
+   Local["BuildEngine.xml<br/>WithDoc · WithDoxygen · WithLatex"] --> Root["build-documentation.xml<br/>root defaults / overrides"]
+   Root --> Library["library override<br/>optional per-library refinement"]
 ```
 
-Eine Library benötigt keinen eigenen `<library>`-Eintrag. Ohne Override erbt sie das Rootprofil.
+A library does not require its own `<library>` entry. Without an override, it inherits the root profile.
 
 ## `BuildEngine.xml`
 
-Beispiel:
+Example:
 
 ```xml
 <parameters
@@ -68,31 +64,31 @@ Beispiel:
 
 ### `WithDoc`
 
-Aktiviert BuildEngine-generierte Informationsdokumentation wie Übersichtsseiten, Projekttexte, Lizenzinformationen und SBOM-Verknüpfungen.
+Enables BuildEngine-generated information documentation such as overview pages, project texts, license information, and SBOM links.
 
-Standard: `false`.
+Default: `false`.
 
 ### `WithDoxygen`
 
-Erlaubt die zentrale Doxygen-API-Dokumentation.
+Permits central Doxygen API documentation.
 
-Standard: `false`.
+Default: `false`.
 
-Ist `WithDoxygen="false"`, gibt es weder zentral erzeugtes Doxygen-HTML noch Doxygen-LaTeX/PDF.
+If `WithDoxygen="false"`, neither central Doxygen HTML nor Doxygen LaTeX/PDF is generated.
 
 ### `WithLatex`
 
-`WithLatex` ist die **lokale Grundeinstellung** für LaTeX/PDF, kein absoluter Master-Schalter.
+`WithLatex` is the **local base setting** for LaTeX/PDF, not an absolute master switch.
 
-Standard: `true`.
+Default: `true`.
 
-Die Auflösung ist:
+Resolution order:
 
-1. Startwert ist `BuildEngine.xml/@WithLatex`.
-2. Ein optionales `buildDocumentation/@latex` überschreibt diesen Default projektweit.
-3. Ein optionales `<library latex="...">` überschreibt den Wert für genau diese Library.
+1. Start with `BuildEngine.xml/@WithLatex`.
+2. Optional `buildDocumentation/@latex` overrides this default for the synchronized project.
+3. Optional `<library latex="...">` overrides the value for exactly that library.
 
-Beispiel – global normalerweise PDF, Boost aber nicht:
+Example – PDF normally enabled, but disabled for Boost:
 
 ```xml
 <!-- BuildEngine.xml -->
@@ -104,7 +100,7 @@ WithLatex="true"
 <library id="boost" latex="false"/>
 ```
 
-Beispiel – global normalerweise kein PDF, pugiXML aber ausdrücklich doch:
+Example – PDF normally disabled, but explicitly enabled for pugiXML:
 
 ```xml
 <!-- BuildEngine.xml -->
@@ -116,11 +112,11 @@ WithLatex="false"
 <library id="pugixml" latex="true"/>
 ```
 
-`WithDoxygen=false` kann durch `latex=true` nicht überwunden werden, weil LaTeX aus Doxygen erzeugt wird.
+`WithDoxygen=false` cannot be overridden by `latex=true`, because the LaTeX tree is produced by Doxygen.
 
 ## `build-documentation.xml`
 
-Grundform:
+Basic form:
 
 ```xml
 <buildDocumentation
@@ -141,24 +137,24 @@ Grundform:
 </buildDocumentation>
 ```
 
-`latex` am Root ist optional. Fehlt das Attribut, wird `WithLatex` aus `BuildEngine.xml` als Default verwendet.
+The root `latex` attribute is optional. If it is absent, `WithLatex` from `BuildEngine.xml` is used as the default.
 
-## Root- und Library-Attribute
+## Root and library attributes
 
-| Attribut | Standard/Vererbung | Bedeutung |
+| Attribute | Default / inheritance | Meaning |
 | --- | --- | --- |
-| `schemaVersion` | erforderlich, aktuell `1` | Vertragsversion. |
-| `doxygen` | Root: `true` | Aktiviert Doxygen für das Profil. |
-| `latex` | Root: erbt `WithLatex` | Aktiviert die zusätzliche LaTeX-Ausgabe im selben Doxygen-Lauf. |
-| `source` | Root: `false` | Doxygen Source Browser. |
-| `inlineSource` | Root: `false` | Quelltext inline; impliziert `source=true`. |
-| `publicOnly` | Root: `false` | Reduziert API-Sicht auf öffentliche Bereiche und ergänzt Standard-Excludes. |
+| `schemaVersion` | required, currently `1` | Contract version. |
+| `doxygen` | root: `true` | Enables Doxygen for the profile. |
+| `latex` | root: inherits `WithLatex` | Enables additional LaTeX output in the same Doxygen run. |
+| `source` | root: `false` | Enables the Doxygen source browser. |
+| `inlineSource` | root: `false` | Shows source inline; implies `source=true`. |
+| `publicOnly` | root: `false` | Reduces the API view to public areas and adds standard exclusions. |
 
-Library-Attribute überschreiben jeweils den geerbten Wert.
+Library attributes override the inherited value individually.
 
 ## `<define>`
 
-`define` beschreibt Präprozessor-Makros ausschließlich für die Doxygen-Sicht.
+`define` describes preprocessor macros for the Doxygen view only.
 
 ```xml
 <define name="__cplusplus" value="202302L"/>
@@ -166,27 +162,27 @@ Library-Attribute überschreiben jeweils den geerbten Wert.
 <define name="DOXYGEN_INVOKED"/>
 ```
 
-Semantik:
+Semantics:
 
-- fehlendes `value` → normales vordefiniertes Makro; Doxygen behandelt es wie einen gesetzten Define,
-- `value=""` → explizit leere Ersetzung,
-- nichtleerer Wert → exakte Ersetzung,
-- function-like Makros werden unterstützt.
+- missing `value` → ordinary predefined macro; Doxygen treats it as defined,
+- `value=""` → explicitly empty replacement,
+- non-empty value → exact replacement,
+- function-like macros are supported.
 
-Diese Definitionen ändern **nicht** Compiler, ABI oder den Library-Build. Sie sind ausschließlich Dokumentationswissen.
+These definitions do **not** change the compiler, ABI, or library build. They are documentation knowledge only.
 
 ## `<option>`
 
-`option` setzt einen Doxygen-Konfigurationswert nach Erzeugung des generischen Doxyfiles und überschreibt daher bewusst dessen Default.
+`option` sets a Doxygen configuration value after the generic Doxyfile is generated and therefore deliberately overrides its default.
 
 ```xml
 <option name="SHOW_INCLUDE_FILES" value="NO"/>
 <option name="CALL_GRAPH" value="YES"/>
 ```
 
-Der Name darf nur Buchstaben, Ziffern und `_` enthalten. Zeilenumbrüche in Namen oder Werten sind nicht zulässig.
+The name may contain only letters, digits, and `_`. Line breaks are not permitted in names or values.
 
-Library-spezifische Doxygen-Optionen sollten nur dort gesetzt werden, wo sich die Library tatsächlich vom gemeinsamen Profil unterscheidet.
+Library-specific Doxygen options should be used only where a library actually differs from the shared profile.
 
 ## `<exclude>`
 
@@ -196,20 +192,20 @@ Library-spezifische Doxygen-Optionen sollten nur dort gesetzt werden, wo sich di
 <exclude pattern="*/detail/*"/>
 ```
 
-Excludes filtern publizierte Doxygen-Eingaben. Bei `publicOnly=true` ergänzt BuildEngine typische interne Bereiche wie `detail`, `impl`, `preprocessed`, `aux_` und `cpp03`.
+Exclusions filter published Doxygen inputs. When `publicOnly=true`, BuildEngine also adds typical internal areas such as `detail`, `impl`, `preprocessed`, `aux_`, and `cpp03`.
 
-## Gemeinsames Doxyfile
+## Shared Doxyfile
 
-BuildEngine generiert genau ein Doxyfile für die zentrale API-Dokumentation einer Library.
+BuildEngine generates exactly one Doxyfile for a library's central API documentation.
 
-Wenn LaTeX **nicht** aktiv ist:
+When LaTeX is **not** active:
 
 ```text
 GENERATE_HTML = YES
 GENERATE_LATEX = NO
 ```
 
-Wenn LaTeX aktiv ist:
+When LaTeX is active:
 
 ```text
 GENERATE_HTML = YES
@@ -221,33 +217,33 @@ LATEX_BATCHMODE = YES
 PAPER_TYPE = a4
 ```
 
-Danach wird Doxygen **einmal** ausgeführt und erzeugt in diesem Lauf:
+Doxygen is then run **once**, producing in that run:
 
 ```text
 <DocumentationRoot>/<library>/<version>/html/
-<DocumentationRoot>/<library>/<version>/latex/   # nur wenn aktiviert
+<DocumentationRoot>/<library>/<version>/latex/   # only when enabled
 ```
 
-Damit stammen HTML und LaTeX aus exakt derselben Analyse und demselben Quellzustand.
+HTML and LaTeX therefore originate from exactly the same analysis and source state.
 
-## Doxygen-HTML
+## Doxygen HTML
 
-Das gemeinsame Profil erzeugt unter anderem:
+The shared profile produces, among other things:
 
-- HTML-Suche,
-- Tree View,
-- Source Browser nach Profil,
-- Klassen- und Kollaborationsgraphen,
-- Include-/Included-by-Graphen,
-- Verzeichnishierarchie,
-- Graphviz-SVG,
-- zentrale Projekt-/Lizenz-/SBOM-Seiten.
+- HTML search,
+- tree view,
+- source browser according to profile,
+- class and collaboration graphs,
+- include and included-by graphs,
+- directory hierarchy,
+- Graphviz SVG,
+- central project/license/SBOM pages.
 
-Call- und Caller-Graphen bleiben standardmäßig aus, weil sie bei großen Third-Party-Projekten sehr teuer und häufig wenig hilfreich sind. Sie können gezielt über `<option>` aktiviert werden.
+Call and caller graphs remain disabled by default because they can be very expensive for large third-party projects and are often of limited value. They can be enabled deliberately through `<option>`.
 
 ## MathJax
 
-Doxygen-HTML verwendet den von BuildEngine verwalteten MathJax-3-Bestand:
+Doxygen HTML uses the MathJax 3 distribution managed by BuildEngine:
 
 ```xml
 <option name="USE_MATHJAX" value="YES"/>
@@ -256,113 +252,144 @@ Doxygen-HTML verwendet den von BuildEngine verwalteten MathJax-3-Bestand:
 <option name="MATHJAX_RELPATH" value="/js/mathjax/es5"/>
 ```
 
-Damit greift die zentrale Dokumentation nicht auf ein externes CDN zu. Der BuildEngine Server stellt `/js/mathjax/...` aus dem Managed Tool `web-mathjax` bereit.
+This keeps central documentation independent of an external CDN. BuildEngine Server serves `/js/mathjax/...` from the managed `web-mathjax` tool.
 
 ## Graphviz
 
-Graphviz ist Teil der reproduzierbaren Dokumentationswerkzeugkette. Seine Version beeinflusst den Doxygen-State, weil sich erzeugte Diagramme mit einer Graphviz-Version ändern können.
+Graphviz is part of the reproducible documentation toolchain. Its version affects Doxygen state because generated diagrams can change with the Graphviz version.
 
-Die aktuell verwalteten Werkzeuge stehen in [tools.md](tools.md).
+The currently managed tools are listed in [tools.md](tools.md).
 
-## MiKTeX und PDF
+## MiKTeX and PDF
 
-MiKTeX ist in `build-tools.xml` als `required="when-used"` definiert. Es wird nur benötigt, wenn mindestens eine Library effektiv `latex=true` hat.
+MiKTeX is defined in `build-tools.xml` as `required="when-used"`. It is required only if at least one library effectively has `latex=true`.
 
-Der Doxygen-Lauf hat zu diesem Zeitpunkt den LaTeX-Baum bereits erzeugt. MiKTeX führt **keinen Doxygen-Aufruf** aus, sondern kompiliert ausschließlich `refman.tex`:
+At that point Doxygen has already generated the LaTeX tree. MiKTeX performs **no Doxygen invocation**; it only compiles `refman.tex`:
 
 ```text
 texify --pdf --batch --max-iterations=5 --tex-option=--disable-installer refman.tex
 ```
 
-Automatische Paketinstallation ist während des PDF-Builds deaktiviert. Fehlt ein benötigtes TeX-Paket, ist das ein reproduzierbarer Tool-Provisionierungsfehler und wird nicht durch einen stillen Download im Build verdeckt.
+Automatic package installation is disabled during PDF generation. A missing TeX package is therefore a reproducible tool-provisioning error rather than a hidden download during the build.
 
-Das veröffentlichte PDF liegt unter:
+The published PDF is written below:
 
 ```text
 <DocumentationRoot>/<library>/<version>/pdf/<library>-<version>.pdf
 ```
 
-## Technische States
+## Technical states
 
-Es gibt **keinen eigenen LaTeX-Doxygen-State mehr**. HTML und LaTeX gehören zum selben Doxygen-Erzeugungsschritt.
+There is **no separate LaTeX-Doxygen state**. HTML and LaTeX belong to the same Doxygen generation step.
 
 ```mermaid
 flowchart LR
-   S[Source / Publish / Metadata] --> D[Doxygen-State]
+   S[Source / Publish / Metadata] --> D[Doxygen state]
    D --> H[HTML]
    D --> L[optional LaTeX]
-   L --> P[PDF-State / MiKTeX]
-   H --> I[zentraler Index]
+   L --> P[PDF state / MiKTeX]
+   H --> I[Central index]
 ```
 
-### Doxygen-State
+### Doxygen state
 
-Der Doxygen-State berücksichtigt insbesondere:
+The Doxygen state includes, among other things:
 
-- Library-ID, Version und Timestamp,
-- Doxygen-Version,
-- Graphviz-Version,
-- effektives Doxygen-Profil,
-- ob zusätzlich LaTeX benötigt wird,
-- Publish-Manifest,
-- Lizenzinformationen,
-- SBOM-Eingaben.
+- library ID, version, and timestamp,
+- Doxygen version,
+- Graphviz version,
+- effective Doxygen profile,
+- whether additional LaTeX output is required,
+- publish manifest,
+- license information,
+- SBOM inputs.
 
-Eine Änderung `latex=false -> true` muss den Doxygen-State invalidieren, weil derselbe Lauf nun einen zusätzlichen Output erzeugen muss.
+Changing `latex=false -> true` must invalidate Doxygen state because the same Doxygen run now has to produce an additional output.
 
-Eine MiKTeX-Versionsänderung darf den Doxygen-State dagegen **nicht** invalidieren.
+A MiKTeX version change, on the other hand, must **not** invalidate Doxygen state.
 
-### PDF-State
+### PDF state
 
-Der PDF-State berücksichtigt:
+The PDF state includes:
 
-- die von Doxygen erzeugten stabilen LaTeX-Quelldateien,
-- die MiKTeX-Version.
+- stable LaTeX source files generated by Doxygen,
+- MiKTeX version.
 
-MiKTeX-Ausgaben wie `.aux`, `.log` oder das erzeugte `refman.pdf` sind nicht Teil des eigenen Input-Fingerprints. Der PDF-Schritt darf sich nicht durch seine eigene Ausgabe selbst invalidieren.
+MiKTeX outputs such as `.aux`, `.log`, or the generated `refman.pdf` are not part of their own input fingerprint. The PDF step must not invalidate itself through its own output.
 
-## Zentraler Dokumentationsindex
+## Central documentation index
 
-`documentation/index.html` ist eine aggregierte Sicht und kein Beweis für die Aktualität einer einzelnen Library-Dokumentation.
+`documentation/index.html` is an aggregate view and is not evidence that one library's documentation is current.
 
-Der Index wird deshalb billig aus bereits vorhandenen Library-Dokumentationen rekonstruiert. Ein fehlender zentraler Index darf nicht alle teuren Doxygen-Schritte invalidieren.
+The index is therefore reconstructed cheaply from existing library documentation. A missing central index must not invalidate all expensive Doxygen steps.
 
-## Markdown-Dokumentation des Projekts
+The generated central index is English and provides compact navigation actions for library documentation, license information, and CycloneDX SBOMs.
 
-Projekt-Markdowns liegen synchronisiert unter:
+## Project Markdown documentation
+
+Project Markdown files are synchronized below:
 
 ```text
 admin/server-docs/
 ```
 
-Der Server liest sie bei jeder HTTP-Anfrage direkt aus diesem synchronisierten Verzeichnis. Es gibt keine Kopie und keinen Markdown-Cache, der nach einer Repository-Synchronisation aktualisiert werden müsste.
+The server reads them directly from this synchronized directory on every HTTP request. There is no copied Markdown tree and no Markdown cache that must be refreshed after repository synchronization.
 
-Relative Markdown-Links werden bewusst verwendet:
+Relative Markdown links are deliberately used:
 
 ```markdown
-[Werkzeuge](tools.md)
-[Tool-Vertrag](build-tools.md)
-[Bibliotheksvertrag](build-libraries.md)
+[Tools](tools.md)
+[Tool contract](build-tools.md)
+[Library contract](build-libraries.md)
 ```
 
-Wird beispielsweise `documentation.md` als `/manual/documentation.md` angezeigt, löst der Browser `tools.md` zu `/manual/tools.md` auf. Der Server rendert das Ziel wieder live als Markdown.
+For example, when `documentation.md` is displayed as `/manual/documentation.md`, the browser resolves `tools.md` to `/manual/tools.md`. The normal server fallback then renders that synchronized Markdown source live.
 
-## Aktuelle Projekt-Markdowns
+### Table of contents directive
 
-Die Dokumentation besteht mindestens aus:
+The BuildEngine Markdown prereader supports a project-specific table-of-contents directive:
 
-- `story.md` – Projektgeschichte und Zielsetzung,
-- `buildengine.md` – Architektur und BuildEngine-Konzept,
-- `server.md` – HTTP/REST-Server,
-- `configuration.md` – lokale Konfiguration und CLI,
-- `documentation.md` – dieser Dokumentationsvertrag,
-- `build-tools.md` – XML-Vertrag der Werkzeuge,
-- `build-libraries.md` – XML-Vertrag der Libraries,
-- `tools.md` – Übersicht der tatsächlich verwendeten Werkzeuge.
+```markdown
+[TOC|Content]
+```
 
-## Beispiele
+The text after `TOC|` is the visible TOC title and can be changed, for example:
 
-### HTML und PDF standardmäßig aktiv
+```markdown
+[TOC|Overview]
+[TOC|Table of Contents]
+```
+
+The directive is evaluated only outside fenced code blocks. When present, the prereader:
+
+1. creates a dedicated anchor immediately before the generated table of contents,
+2. collects ATX headings (`#` through `######`) following the directive,
+3. gives every collected heading a deterministic document-unique anchor,
+4. creates a nested list that follows the heading hierarchy,
+5. inserts a `Back to <TOC title>` link before every heading on the shallowest section level following the directive.
+
+Our project documents place `[TOC|Content]` immediately after the document's initial `#` title. The document title therefore stays outside the TOC, while the `##` sections form its top level and receive `Back to Content` links.
+
+Anchors are generated by the renderer rather than authored manually in Markdown. This keeps navigation stable within one document state, prevents duplicate heading text from colliding, and avoids enabling unsafe raw HTML in cmark-gfm merely for anchor generation.
+
+## Current project Markdown files
+
+The live project documentation consists of:
+
+- `story.md` – project story and engineering motivation,
+- `buildengine.md` – architecture and BuildEngine concept,
+- `server.md` – HTTP/REST server,
+- `configuration.md` – local configuration and CLI,
+- `documentation.md` – this documentation contract,
+- `build-tools.md` – XML tool contract,
+- `build-libraries.md` – XML library contract,
+- `tools.md` – overview of the tools actually used.
+
+The public project documentation is maintained in English. Original titles of referenced works may additionally be shown in their original language where useful.
+
+## Examples
+
+### HTML and PDF enabled by default
 
 ```xml
 <!-- BuildEngine.xml -->
@@ -377,9 +404,9 @@ WithLatex="true"
 </buildDocumentation>
 ```
 
-Ergebnis: ein Doxygen-Lauf erzeugt HTML und LaTeX; MiKTeX erzeugt danach PDF.
+Result: one Doxygen run generates HTML and LaTeX; MiKTeX then generates the PDF.
 
-### Nur HTML für Boost
+### HTML only for Boost
 
 ```xml
 <library id="boost" publicOnly="true" latex="false">
@@ -387,9 +414,9 @@ Ergebnis: ein Doxygen-Lauf erzeugt HTML und LaTeX; MiKTeX erzeugt danach PDF.
 </library>
 ```
 
-Ergebnis: derselbe zentrale Doxygen-Pfad erzeugt für Boost nur HTML; MiKTeX wird für Boost nicht ausgeführt.
+Result: the same central Doxygen path generates HTML only for Boost; MiKTeX is not run for Boost.
 
-### PDF nur für ausgewählte Library trotz lokalem Default `false`
+### PDF only for a selected library despite a local default of `false`
 
 ```xml
 <!-- BuildEngine.xml -->
@@ -401,17 +428,17 @@ WithLatex="false"
 <library id="pugixml" latex="true"/>
 ```
 
-Ergebnis: pugiXML erzeugt HTML + LaTeX in einem Doxygen-Lauf und anschließend PDF; andere Libraries erben `false`, sofern der Root-Vertrag nichts anderes vorgibt.
+Result: pugiXML produces HTML + LaTeX in one Doxygen run and then a PDF; other libraries inherit `false` unless the root contract specifies otherwise.
 
-## Pflegegrundsatz
+## Maintenance rule
 
-Die Markdown-Dokumentation ist Teil des Projekts und wird zusammen mit Code und XML-Verträgen gepflegt.
+Markdown documentation is part of the project and is maintained together with code and XML contracts.
 
-Daraus folgt:
+Therefore:
 
-1. Neue XML-Parameter werden in der zugehörigen Markdown-Referenz dokumentiert.
-2. Neue Werkzeuge oder Versions-/Rollenänderungen werden in [tools.md](tools.md) nachgeführt.
-3. Änderungen an `build-tools.xml` werden in [build-tools.md](build-tools.md) berücksichtigt.
-4. Änderungen am Library-Vertrag werden in [build-libraries.md](build-libraries.md) berücksichtigt.
-5. Änderungen an Dokumentationspipeline, Serverdarstellung oder Linkverhalten werden hier bzw. in [server.md](server.md) beschrieben.
-6. Die Dokumentation wird nicht erst nachträglich als separate Aufgabe betrachtet, sondern ist Bestandteil derselben Änderung.
+1. New XML parameters are documented in the corresponding Markdown reference.
+2. New tools or version/role changes are reflected in [tools.md](tools.md).
+3. Changes to `build-tools.xml` are reflected in [build-tools.md](build-tools.md).
+4. Changes to the library contract are reflected in [build-libraries.md](build-libraries.md).
+5. Changes to documentation generation, Markdown preprocessing, server presentation, or link behavior are reflected here and, where appropriate, in [server.md](server.md).
+6. Public-facing project Markdown remains English unless a document explicitly serves another language audience.
