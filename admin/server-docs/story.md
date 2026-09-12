@@ -2,7 +2,11 @@
 
 BuildEngine began as a technical experiment around a simple but important question: **is C++Builder 13, with the modern BCC64X toolchain, again able to participate as a normal member of the contemporary C++ ecosystem?**
 
-The project has grown far beyond that first question. It now connects compiler integration, reproducible third-party builds, package production, SBOMs, vulnerability monitoring, risk assessment, documentation, native UI, REST services, package distribution, and a shared C++ architecture.
+The original seminar title was **"C++Builder 13, Back in the Future"**. That title described the immediate subject very well: a development environment with a long history had received a modern Clang/LLVM-based Win64 toolchain, and we wanted evidence for what that meant in practice rather than another marketing claim.
+
+But the underlying question was always larger than one product. C++ itself is still regularly described as old, legacy, or something that should gradually disappear behind newer languages. That is one reason our general C++ streams now run under the title **"C++ neu entdecken: Moderner als du denkst | Live Coding & Talk"** — rediscovering C++ as something more modern than many people assume.
+
+BuildEngine has grown far beyond the first compiler-evidence question. It now connects compiler integration, reproducible third-party builds, central component production, package creation, license evidence, SBOMs, vulnerability monitoring, risk assessment, documentation, native UI, REST services, package distribution, and a shared modern C++ architecture.
 
 The common idea behind all of those steps is what we now call **staying ahead of the wave**.
 
@@ -10,9 +14,7 @@ The wave is not one particular technology. It is the moment when a new compiler,
 
 The objective is therefore not merely to react faster. It is to prepare the technical path before the event occurs.
 
-## 1. C++ Back in the Future
-
-The starting point predates BuildEngine itself. In our seminars and live sessions we used the phrase **C++ Back in the Future** to describe what we saw in C++Builder 13.
+## 1. C++Builder 13, Back in the Future
 
 For many years C++Builder carried a historical burden in the perception of the wider C++ community. Even though it remained productive for substantial Windows applications, it was often seen as a separate ecosystem: a tool associated with older Borland compilers, special library ports, proprietary build mechanics, and an environment that modern open-source C++ projects did not naturally target.
 
@@ -24,13 +26,21 @@ The question is no longer whether C++Builder has a completely separate C++ langu
 
 That distinction became the first mission of the project.
 
-## 2. The integration proof
+At the same time, the wider C++ discussion matters. The words *old* and *legacy* are often attached to C++ as if age and technical state were the same thing. They are not. Modern C++23, ranges, concepts, value-oriented APIs, RAII, compile-time programming, modules of reusable infrastructure, modern Clang/LLVM tooling, contemporary package ecosystems, web interfaces, native GUIs, and highly parallel build orchestration have little in common with the image many people still associate with C++ from decades ago.
+
+So the first story began with C++Builder, but it increasingly became another practical example of a broader statement:
+
+> **C++ is old enough to have history, but that does not make modern C++ legacy technology.**
+
+## 2. The evidence test
 
 A few carefully chosen libraries would have been enough to demonstrate that BCC64X can compile modern C++. That was not enough for us.
 
 A credible ecosystem test needs diversity. It has to cross different build systems, dependency models, API styles, language generations, code generators, Windows integration points, and runtime models.
 
-We therefore worked through libraries from very different areas: parsing and data formats, compression and archives, TLS and networking, graphics and multimedia, testing, databases, computer vision, large C++ framework libraries, and distributed middleware. The growing set included projects such as pugiXML, zlib, libzip, libarchive, OpenSSL, curl, nlohmann/json, cmark-gfm, GoogleTest, SDL2, Skia, OpenCV, Boost, SQLite, raylib, and ACE/TAO.
+The original evidence phase therefore concentrated almost exclusively on that question. In approximately **ten days we worked through twenty libraries**. The purpose was not yet to create a general CI product or a complete component-management platform. The purpose was evidence: find out how far BCC64X really reaches into the contemporary C and C++ ecosystem, and make the failures visible instead of explaining them away.
+
+We worked through libraries from very different areas: parsing and data formats, compression and archives, TLS and networking, graphics and multimedia, testing, databases, computer vision, large C++ framework libraries, and distributed middleware. The growing set included projects such as pugiXML, zlib, libzip, libarchive, OpenSSL, curl, nlohmann/json, cmark-gfm, GoogleTest, SDL2, Skia, OpenCV, Boost, SQLite, raylib, and ACE/TAO.
 
 The important result was not that every project "just compiled". In fact, the failures were often more useful than an immediate success.
 
@@ -50,9 +60,142 @@ The project deliberately does not hide such evidence behind another compiler. If
 
 That proof has succeeded strongly enough to change the premise of the discussion: **C++Builder 13 can again be treated as a full member of the modern C++ family.** It can build and consume substantial contemporary open-source C and C++ software, including projects that exercise far more than a trivial compiler test.
 
-## 3. From experiments to BuildEngine
+## 3. From evidence to centrally produced components
 
-At first, individual integrations naturally produce commands, scripts, local assumptions, and one-off fixes. That is useful during exploration, but it is not a sustainable result.
+Once the evidence test worked, another question became more interesting than the original experiment:
+
+> **Why should the result remain a collection of successful experiments instead of becoming the central, project-independent way in which important native components of an application landscape are produced and documented?**
+
+That changed the target substantially.
+
+Instead of building a dependency separately inside each application project, BuildEngine increasingly became responsible for producing reusable, versioned components centrally. A library should be acquired, verified, built, tested, installed, documented, packaged, and described once according to an explicit contract, then consumed by the applications that need it.
+
+That also meant that the build prerequisites themselves had to become part of the reproducible environment.
+
+BuildEngine therefore provisions required tools centrally. Where possible, those tools are **not installed system-wide and not registered globally**. They are downloaded or discovered, verified, kept inside the BuildEngine production tree, and referenced through internal tool variables such as `{Tool:cmake}`, `{Tool:ninja}`, or `{Tool:perl}`.
+
+That approach has several advantages:
+
+- the build does not depend on a developer remembering which global tools were installed;
+- multiple versions can be managed deliberately;
+- tools do not need to modify machine-wide registration merely to participate in a build;
+- the effective tool path is part of the BuildEngine model;
+- and a clean-room machine can reconstruct the environment from the contracts instead of from tribal knowledge.
+
+The same principle applies to compiler-adjacent tools, documentation tools, code generators, browser resources, and other utilities. The environment should explain itself.
+
+## 4. CI was not the invention
+
+Continuous Integration is not new, and BuildEngine does not pretend to have invented it.
+
+In fact, many of the problems that led to BuildEngine are familiar precisely because mature CI environments already exist everywhere.
+
+During the evidence work I repeatedly encountered a characteristic pattern. A build pipeline often grows by following the development process step by step. One team owns source acquisition, another owns the compiler environment, DevOps specialists maintain CI jobs, individual projects add shell or PowerShell scripts, configuration is distributed across YAML files, and yet another process handles packaging, deployment, documentation, or security scanning.
+
+None of those techniques is wrong by itself. The problem appears when **the knowledge required to reproduce one component is distributed across too many places and too many responsibilities**.
+
+A single library may involve:
+
+- a download script;
+- a patch script;
+- a YAML job definition;
+- environment setup;
+- a CMake invocation;
+- a test command;
+- an installation script;
+- packaging rules;
+- documentation steps;
+- and a separate deployment or publishing process.
+
+The next library may use a completely different build system.
+
+Our current set includes ordinary CMake projects, Meson projects, Skia with GN/Ninja, and ACE/TAO with MPC workspace generation through `mwc.pl` before the generated BMake projects are built. Perl, Python, Make variants, code generators, resource compilers, and project-specific tooling all appear in the same landscape.
+
+That diversity is normal in the C and C++ ecosystem. A CI system that assumes one universal upstream build tool therefore does not remove complexity; it merely moves the complexity into scripts around the CI definition.
+
+And those scripts were one of the main reasons the **centralized tool model** became important to us.
+
+## 5. Fewer contracts, one source of truth
+
+Our answer was not to eliminate scripts at any cost. Some tools genuinely need them. The goal was to stop using scripts as the place where the architecture itself is hidden.
+
+We wanted the essential knowledge to be expressed in a small number of declarative XML contracts:
+
+- which tool is required and how it is obtained;
+- which library version is used;
+- where its source comes from;
+- how that source is verified;
+- which dependencies exist;
+- which build parameters are required;
+- which variants are built;
+- which tests are executed;
+- which files are installed and published;
+- which license evidence belongs to the component;
+- which documentation profile applies;
+- and which technical state makes a result current.
+
+The contracts therefore do more than drive execution. **They document the prerequisites and parameters of the build at the same time.**
+
+A generalized C++ application interprets those contracts and turns them into technical jobs and dependency graphs.
+
+That was an important design choice. We did not want two truths in the CI process: one truth in documentation and another in scripts, or one in YAML and another in a release handbook. Wherever possible, the data that controls the process should also be the data from which its documentation, state, metadata, and evidence are derived.
+
+There was also a pragmatic reason for implementing the orchestrator in C++:
+
+> **C++ is the language we know best.**
+
+Using it allowed us to reuse existing components, model ownership and concurrency explicitly, share functionality with native and server applications, and keep the orchestration engine itself within the modern C++ story we were trying to demonstrate.
+
+## 6. Efficiency is part of reproducibility
+
+Reproducibility must not mean deliberately wasting machine resources.
+
+A second design target was therefore **maximum useful parallelism while respecting real dependencies**.
+
+Release and Debug variants of one library should be able to run concurrently when they do not depend on each other. Independent libraries should be able to progress at the same time. A downstream library, however, must wait for the upstream package it actually requires. Tests can use their own bounded parallelism. Expensive documentation should not rerun because an unrelated aggregate index changed.
+
+That naturally leads to a dependency graph rather than a serial script:
+
+```mermaid
+flowchart LR
+   S[Source] --> BR[Build Release]
+   S --> BD[Build Debug]
+   BR --> IR[Install Release]
+   BD --> ID[Install Debug]
+   IR --> P[Publish / package]
+   ID --> P
+   P --> M[Metadata]
+   P --> D[Documentation]
+   M --> D
+```
+
+The scheduler can exploit the graph, but it cannot violate it.
+
+The goal is not "parallel at all costs". It is to use CPU, I/O, network, and waiting time efficiently without turning concurrency into another source of nondeterminism.
+
+## 7. Thirty days later: a different application
+
+The evidence test took roughly ten days and covered twenty libraries.
+
+The application that grew out of it took roughly **thirty further days of development** to reach the current level of functionality. At that point the BuildEngine contract directly manages **32 libraries**, while further components arrive through upstream dependency structures — **Skia alone currently brings another 18 dependencies into that picture**.
+
+Those numbers are useful not as a benchmark against another CI product, but because they show how quickly the scope changed. The original objective was evidence for one compiler. The current system is managing a reproducible component landscape, its tools, dependencies, metadata, documentation, security information, packages, and several presentation surfaces.
+
+That development speed was possible partly because BuildEngine did not start from an empty repository.
+
+We reused and generalized building blocks that already existed in our work, including concepts such as:
+
+- process creation and process-output handling;
+- asynchronous output collection;
+- `BlockedQueue`-style producer/consumer infrastructure;
+- filesystem and hashing helpers;
+- XML processing;
+- Markdown rendering;
+- and other reusable utility components.
+
+That is itself part of the C++ story. Reuse does not only mean consuming external libraries. It also means building an internal vocabulary of dependable components from which the next application can be assembled faster.
+
+## 8. From experiments to BuildEngine
 
 A successful build on one development machine answers only one question: *did it work here once?*
 
@@ -66,11 +209,12 @@ For production use we need stronger questions answered:
 - Which Release and Debug variants were created?
 - Which files were installed and published?
 - Which tests and independent consumers succeeded?
+- Which licenses apply?
 - Can the same state be recreated on another machine?
 
 BuildEngine grew out of that need.
 
-Instead of turning every library into a new hard-coded C++ workflow, the project increasingly moved knowledge into declarative XML contracts. The engine provides generic execution: repository synchronization, tool provisioning, source acquisition, dependency graphs, scheduler execution, state handling, package installation, smoke tests, documentation, metadata, and later security analysis.
+Instead of turning every library into a new hard-coded C++ workflow, the project increasingly moved library-specific knowledge into declarative XML contracts. The engine provides generic execution: repository synchronization, tool provisioning, source acquisition, dependency graphs, scheduler execution, state handling, package installation, smoke tests, documentation, metadata, and later security analysis.
 
 The third-party library becomes data wherever possible. The engine remains infrastructure.
 
@@ -84,7 +228,7 @@ upstream source
    -> independent consumer evidence
 ```
 
-## 4. BuildEngine was public from the beginning
+## 9. BuildEngine was public from the beginning
 
 BuildEngine was not developed as an invisible internal utility and only presented after completion. I showed and discussed its development in my streams from the beginning.
 
@@ -96,7 +240,7 @@ This also meant that design weaknesses became visible in public. Console output,
 
 That openness influenced the next stage of the project.
 
-## 5. The console discussion changed the demonstration
+## 10. The console discussion changed the demonstration
 
 BuildEngine was initially and naturally a console application. For a build orchestration system that is a perfectly reasonable technical interface. Command-line programs compose well, are scriptable, and make automation straightforward.
 
@@ -108,7 +252,7 @@ Technically, I disagree with the idea that a command line is obsolete. But the c
 
 If the claim is that modern C++Builder belongs in today's C++ world, then we should demonstrate more than compiler and build-system compatibility. We should also demonstrate that the same modern C++ core can support comfortable native desktop software and contemporary service interfaces.
 
-## 6. A deliberate VCL application
+## 11. A deliberate VCL application
 
 The graphical BuildEngine manager therefore has a specific role in the story.
 
@@ -120,7 +264,7 @@ The user can work with library selections, build variants, status, output, secur
 
 This demonstrates an important point: modern C++ and productive native UI development are not competing ideas.
 
-## 7. Why add a server to a C++ build tool?
+## 12. Why add a server to a C++ build tool?
 
 The server began from another part of the same argument.
 
@@ -143,11 +287,34 @@ The server initially provided a local overview of the library repository and mac
 
 The result is no longer merely a status page. The server has become a read-only presentation and distribution layer for the BuildEngine production tree.
 
-## 8. Documentation as part of the running system
+## 13. The tool contract also extends the server
+
+An interesting consequence of the centralized tool model appeared when the server gained richer documentation capabilities.
+
+The same mechanism that describes compilers, build tools, generators, and documentation tools can also describe **browser-side resources required by the BuildEngine environment**.
+
+The tool contract now includes managed resources for:
+
+- syntax highlighting;
+- Mermaid diagrams;
+- MathJax mathematical notation;
+- Doxygen;
+- Graphviz;
+- and MiKTeX when PDF documentation is required.
+
+The server does not need hard-coded knowledge of where those resources were manually installed. It resolves them through the same managed tool definitions used by the rest of BuildEngine.
+
+That is a small example of why centralizing tool knowledge matters. Once the information exists structurally, a new subsystem can reuse it instead of inventing another configuration mechanism.
+
+## 14. Documentation as part of the running system
 
 The Markdown integration extended that idea again.
 
-Documentation should not be a detached collection of files that happens to describe the system. The manually maintained BuildEngine documents live in the synchronized administration repository and are rendered directly by the running server. Markdown is parsed on request, while optional browser capabilities such as syntax highlighting, Mermaid diagrams, and mathematical notation are loaded only where needed.
+Documentation should not be a detached collection of files that happens to describe the system. The manually maintained BuildEngine documents live in the synchronized administration repository and are rendered **directly** by the running server. A changed Markdown file is therefore the changed documentation; there is no second copied manual tree that has to be refreshed.
+
+This became especially convenient because **cmark-gfm was already in our library roster**. Instead of introducing a foreign documentation stack, we could use another component that BuildEngine was already capable of building, packaging, and consuming.
+
+Markdown is parsed on request. Normal links between Markdown files work directly, so documents can form a connected manual instead of isolated pages. Optional browser capabilities such as syntax highlighting, Mermaid diagrams, and mathematical notation are loaded only where needed.
 
 Generated library documentation remains available beside those project documents.
 
@@ -156,18 +323,22 @@ This gives the server a central documentation role:
 ```text
 BuildEngine Server
    |
-   +-- project documentation
+   +-- live project Markdown
+   |     `-- relative links between documents
    +-- generated library documentation
    +-- package and version information
    +-- SBOMs
+   +-- license information and overviews
    +-- risk/security views
    +-- REST/JSON resources
    `-- package download
 ```
 
-Documentation, evidence, software inventory, and distributable artifacts are therefore presented from the same production state instead of living in unrelated places.
+Documentation, evidence, software inventory, license information, and distributable artifacts are therefore presented from the same production state instead of living in unrelated places.
 
-## 9. One model, several front ends
+And the documentation follows the same single-source principle as the build contracts: whenever a technical contract changes, the corresponding Markdown reference is changed with it.
+
+## 15. One model, several front ends
 
 Once console, VCL application, and web server all existed, another architectural consequence became unavoidable.
 
@@ -193,7 +364,47 @@ The presentation changes, but the interpretation does not.
 
 That is a small architectural decision with a large practical effect. It allows the project to demonstrate different C++Builder application styles without fragmenting the underlying engineering model.
 
-## 10. The second story: staying ahead of the wave
+## 16. More than an SBOM: licenses and provenance
+
+A Software Bill of Materials is an important part of this model because it answers the inventory question in a machine-readable form. But an SBOM alone is not the complete architecture of component responsibility.
+
+From the beginning, another important requirement was to collect the **license information** associated with the components as well.
+
+That means more than recording one SPDX identifier. BuildEngine collects the available upstream license evidence, package metadata, bundled-component information, dependency information, and generated summaries so that the component can be reviewed as a technical and legal unit instead of as an unexplained DLL.
+
+A component name and version alone do not tell us:
+
+- the exact source state;
+- the build profile;
+- enabled and disabled features;
+- applied patches;
+- compiler and runtime assumptions;
+- dependency decisions;
+- verification results;
+- installation layout;
+- license evidence;
+- bundled third-party components;
+- or the prepared replacement route.
+
+For BuildEngine, the stronger source of truth is the versioned build and library metadata together with the technical evidence produced from it. SBOM, license overview, package metadata, and documentation are important **derived control and interchange artifacts**.
+
+That direction of information flow matters:
+
+```text
+versioned metadata + source provenance + build contract + evidence
+                         |
+                         +--> packages
+                         +--> SBOM
+                         +--> license overview
+                         +--> documentation
+                         +--> security identity
+                         +--> dependency views
+                         `--> reproducible replacement
+```
+
+This reflects a principle I have followed since the 1990s: information that can be represented structurally should not be copied manually into multiple documents. The structure should become an active source from which dependent artifacts can be produced and checked.
+
+## 17. The second story: staying ahead of the wave
 
 While the integration proof was growing, another purpose of BuildEngine became increasingly important.
 
@@ -201,13 +412,13 @@ My first practical encounter with this topic did not begin with the Cyber Resili
 
 A regulatory assessment in the customer's environment led to extensive discussion about criticality, dependencies, responsibilities, and the technical evidence that could be produced. What struck me was not that security and operational resilience were unimportant. Quite the opposite. The frustrating part was how much highly qualified engineering time can be consumed when technical facts have to be reconstructed after the question has already become urgent.
 
-Which third-party component is actually used? Which version? Where did it come from? Which runtime DLL is shipped? Which features were enabled? Who is responsible for updates? Can the new release still be built? What needs to be retested?
+Which third-party component is actually used? Which version? Where did it come from? Which runtime DLL is shipped? Which features were enabled? Which licenses apply? Who is responsible for updates? Can the new release still be built? What needs to be retested?
 
 Those are engineering questions. They should not first be asked in a crisis meeting.
 
 That experience became one of the reasons for the principle we now describe as **staying ahead of the wave**.
 
-## 11. What is the wave?
+## 18. What is the wave?
 
 The wave is the combination of events that can turn an unmanaged dependency into urgent work:
 
@@ -236,40 +447,7 @@ flowchart LR
 
 The difference is fundamental. A reactive organisation starts with discovery. A prepared organisation starts with assessment.
 
-## 12. SBOM: essential, but not the architecture
-
-A Software Bill of Materials is an important part of this model because it answers the inventory question in a machine-readable form. But the SBOM is not the complete architecture of software-supply-chain management.
-
-A component name and version alone do not tell us:
-
-- the exact source state;
-- the build profile;
-- enabled and disabled features;
-- applied patches;
-- compiler and runtime assumptions;
-- dependency decisions;
-- verification results;
-- installation layout;
-- or the prepared replacement route.
-
-For BuildEngine, the stronger source of truth is the versioned build and library metadata together with the technical evidence produced from it. The SBOM is an important **derived control and interchange artifact**.
-
-That direction of information flow matters:
-
-```text
-versioned metadata + source provenance + build contract + evidence
-                         |
-                         +--> packages
-                         +--> SBOM
-                         +--> documentation
-                         +--> security identity
-                         +--> dependency views
-                         `--> reproducible replacement
-```
-
-This reflects a principle I have followed since the 1990s: information that can be represented structurally should not be copied manually into multiple documents. The structure should become an active source from which dependent artifacts can be produced and checked.
-
-## 13. DORA, NIS2, and the Cyber Resilience Act
+## 19. DORA, NIS2, and the Cyber Resilience Act
 
 The regulatory environment makes this engineering direction more relevant, not less.
 
@@ -281,9 +459,9 @@ But the technical lesson is independent of that legal classification:
 
 > **Product responsibility is difficult to exercise if component knowledge and replacement capability have to be reconstructed only after a problem appears.**
 
-A manufacturer or development organisation that already knows its software inventory, provenance, build conditions, dependencies, tests, and update path is in a fundamentally better position than one that has only a binary artifact and an old release note.
+A manufacturer or development organisation that already knows its software inventory, provenance, build conditions, dependencies, tests, licenses, and update path is in a fundamentally better position than one that has only a binary artifact and an old release note.
 
-## 14. Scanners are controls, not the steering wheel
+## 20. Scanners are controls, not the steering wheel
 
 This is not an argument against vulnerability scanners, SBOM scanners, binary scanners, OSV, NVD, EUVD, or similar sources. They are essential controls.
 
@@ -312,7 +490,7 @@ The scanner then answers a much better question than *"What do we actually have?
 
 It can answer: **"Is what we deliberately manage still safe, and does the shipped reality still match our declared state?"**
 
-## 15. From vulnerability finding to decision
+## 21. From vulnerability finding to decision
 
 The security monitor is evolving in exactly that direction.
 
@@ -334,7 +512,7 @@ This is also where VEX becomes important. A database match is not automatically 
 
 The objective is therefore neither to suppress findings nor to turn every CVE into an emergency. It is to make the assessment explicit and evidence-based.
 
-## 16. Speed is created by preparation
+## 22. Speed is created by preparation
 
 Regulation, security review, and supply-chain management are often described as forces that make software development slower.
 
@@ -342,7 +520,7 @@ I think that conclusion confuses documentation after the event with engineering 
 
 If a new library version requires days of research because nobody knows how the old one was built, security work is slow.
 
-If version, source, patches, dependencies, build parameters, package layout, tests, and consumers are already known, an update is not a new research project. It is another execution of a controlled process.
+If version, source, patches, dependencies, build parameters, package layout, tests, consumers, licenses, and tools are already known, an update is not a new research project. It is another execution of a controlled process.
 
 That is the same engineering attitude behind an answer I gave decades ago when asked about the difference between our highly productive IDV group and the traditional EDV organisation:
 
@@ -352,9 +530,9 @@ The sentence was deliberately provocative. The real principle was never to skip 
 
 That is what **staying ahead of the wave** means in BuildEngine.
 
-## 17. One project, two proofs
+## 23. One project, several connected proofs
 
-Looking back, BuildEngine now provides two connected proofs.
+Looking back, BuildEngine now provides several connected proofs.
 
 The first is technical and directly about C++Builder:
 
@@ -362,15 +540,23 @@ The first is technical and directly about C++Builder:
 
 The breadth of successfully built and consumed open-source libraries demonstrates that this is not a claim based on one carefully prepared example. C++Builder can work with contemporary upstream code, modern build systems, C++23 consumers, large dependency graphs, networking, graphics, TLS, databases, and middleware.
 
-That is the practical meaning of **C++ Back in the Future**: not nostalgia for an old tool, but a modern toolchain reconnecting with the wider C++ family.
+That is the practical meaning of **C++Builder 13, Back in the Future**: not nostalgia for an old tool, but a modern toolchain reconnecting with the wider C++ family.
 
-The second proof is organisational:
+The second proof is about C++ itself:
+
+> **A modern C++ application can be the generalized orchestration layer for build, metadata, documentation, server, and native UI functionality rather than merely the code being compiled by CI.**
+
+The third proof is organisational:
 
 > **Knowing how to build a dependency is part of knowing how to own it.**
 
-BuildEngine turns component integration into a repeatable technical state: source, provenance, build, tests, package, SBOM, documentation, security identity, risk view, and replacement path become connected rather than separate after-the-fact activities.
+BuildEngine turns component integration into a repeatable technical state: source, provenance, tools, build, tests, package, SBOM, licenses, documentation, security identity, risk view, and replacement path become connected rather than separate after-the-fact activities.
 
-## 18. The project is still evolving
+And the CI lesson is deliberately modest:
+
+> **The innovation is not Continuous Integration. The useful experiment is concentrating fragmented CI knowledge into a small declarative model and letting one generalized C++ implementation execute that model efficiently.**
+
+## 24. The project is still evolving
 
 None of this makes the project finished.
 
@@ -381,11 +567,22 @@ That is intentional.
 The goal is not a frozen showcase. The goal is a working system that continues to test the central ideas under real change:
 
 - modern C++Builder as part of the wider C++ ecosystem;
+- modern C++ as something more capable than the common "legacy" stereotype suggests;
 - upstream-first third-party integration;
-- reproducible evidence instead of one-off success;
+- central, project-independent production of reusable native components;
+- portable managed tools instead of undocumented machine installation state;
+- a small number of declarative contracts instead of CI knowledge spread across scripts and responsibilities;
+- one technical source of truth from which build, state, metadata, licenses, SBOM, and documentation can be derived;
+- maximum useful parallelism while preserving dependency correctness;
 - shared C++ domain logic across console, native UI, and web interfaces;
-- metadata before manual reconstruction;
+- live Markdown documentation with links and managed rendering capabilities;
 - SBOM and scanners as strong controls;
 - and a prepared technical replacement path before the next wave arrives.
 
-**C++ is back in the future. The next step is to stay ahead of it.**
+The original evidence test asked whether C++Builder 13 could come back into the modern C++ ecosystem.
+
+The project that grew from it now asks something broader:
+
+> **What happens when we stop treating C++ as the legacy part of the system and instead use modern C++ to organize the system itself?**
+
+**C++Builder 13 is back in the future. C++ may be more modern than you think. The next step is to stay ahead of the wave.**
