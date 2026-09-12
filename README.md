@@ -1,58 +1,58 @@
 # BuildEngine-Admin
 
-Dieses Repository ist die **deklarative Administrationsschicht** des C++Builder-Third-Party-Integrationsprojekts. Ziel des Gesamtprojekts ist der reproduzierbare Nachweis, in welchem Umfang aktuelle C- und C++-Bibliotheken mit **Embarcadero C++Builder 13 / BCC64X** gebaut, getestet, paketiert und von normalen Consumer-Projekten verwendet werden können.
+This repository is the **declarative administration layer** of the C++Builder third-party integration project. The overall project aims to provide reproducible evidence of the extent to which current C and C++ libraries can be built, tested, packaged, and consumed by normal consumer projects with **Embarcadero C++Builder 13 / BCC64X**.
 
-Die normative Primärdokumentation wird auf Deutsch geführt.
+The project documentation is maintained in English so the project is accessible to the wider C and C++ community.
 
-## Aktueller Status
+## Current status
 
-Der frühere Freeze vor dem Clean-Room-Test wurde am 8. September 2026 im BuildEngine-Kern gezielt für zwei Abschlussfunktionen wieder geöffnet:
+The earlier freeze before the clean-room test was deliberately reopened in the BuildEngine core on September 8, 2026 for two final functions:
 
-1. zentrale Doxygen-Dokumentation auf Basis der tatsächlich publizierten Dateien,
-2. Task-basierte Performance-Evidence (`buildlog_*.log`).
+1. central Doxygen documentation based on the files actually published,
+2. task-based performance evidence (`buildlog_*.log`).
 
-Der **Admin-Vertrag selbst bleibt funktional unverändert**. Es wurden dafür keine Library-Timestamps, Source-Pins, Patches, Buildparameter, Smokes oder Schemas geändert.
+The **Admin contract itself remains functionally unchanged** for that work. No library timestamps, source pins, patches, build parameters, smoke tests, or schemas were changed for those two functions.
 
-Letzte verifizierte Runtime-Evidence vor diesem Core-Funktionsblock:
+Last verified runtime evidence before this core-function block:
 
 ```text
 [SUMMARY] jobs=471, current=451, passed=20, failed=0, blocked=0, incomplete=0
 Machine state: jobs=471, success=471, failed=0, blocked=0, incomplete=0
 ```
 
-Diese Evidence ist die Basis des vorherigen Funktionsstands und muss nach der neuen Doxygen-/Performance-Erweiterung erneut bestätigt werden.
+This evidence is the baseline of the preceding functional state and must be reconfirmed after the Doxygen/performance extension.
 
-## Rolle im Gesamtprojekt
+## Role in the overall project
 
 ```text
 adeccscholar/BuildEngine
-   private C++23-Anwendung
-   Scheduler, generische technische Aktionen, Repository-Sync,
-   Incremental State, Publish, Dokumentation und Smoke-Orchestrierung
+   private C++23 application
+   Scheduler, generic technical actions, repository synchronization,
+   incremental state, publish, documentation, and smoke orchestration
 
-adeccscholar/BuildEngine-Admin        <-- dieses Repository
-   deklarative Tool- und Bibliotheksverträge
-   XSD-Schemata, CMake-/Toolchain-Adapter, versionsgebundene Patches,
-   Security-Metadaten und kleine paketbezogene Consumer-Smokes
+adeccscholar/BuildEngine-Admin        <-- this repository
+   declarative tool and library contracts
+   XSD schemas, CMake/toolchain adapters, version-bound patches,
+   security metadata, and small package-related consumer smokes
 
 adeccscholar/BuildEngine-Tests
-   komplexere Integrations-, Demonstrations- und Lernwelt
+   more complex integration, demonstration, and learning environment
 ```
 
-Diese Trennung ist verbindlich.
+This separation is binding.
 
-## Autoritativer Bibliotheksvertrag
+## Authoritative library contract
 
-`admin/build-libraries.xml` ist der **einzige normative Bibliotheks- und Dependency-Vertrag**.
+`admin/build-libraries.xml` is the **single normative library and dependency contract**.
 
-Aktueller Stand:
+Current state:
 
 ```text
 schemaVersion = 14
-22 Bibliotheks-/Plattformverträge
+22 library/platform contracts
 ```
 
-Enthalten sind:
+Included:
 
 ```text
 pugixml
@@ -79,30 +79,30 @@ vtk
 opencv
 ```
 
-OpenCL und GoogleTest bleiben Nachfolgearbeit nach dem Clean-Room-Abschluss.
+OpenCL and GoogleTest remain follow-up work after clean-room completion.
 
-## Grundprinzip
+## Core principle
 
 ```text
-offizieller Upstream
--> reproduzierbarer Download / Source-Pin
--> Extraktion
--> ggf. expliziter versionsgebundener Patch
--> originales Buildsystem
--> BCC64X Build
--> Upstream-Tests soweit sinnvoll
--> versioniertes Paket
--> explizite Require-Gates
--> Publish in den Consumer-Baum
--> kleiner Consumer-Smoke
--> zentrale Doxygen-Dokumentation, wenn aktiviert
+official upstream
+-> reproducible download / source pin
+-> extraction
+-> explicit version-bound patch when required
+-> original build system
+-> BCC64X build
+-> upstream tests where meaningful
+-> versioned package
+-> explicit require gates
+-> publish into the consumer tree
+-> small consumer smoke
+-> central Doxygen documentation when enabled
 ```
 
-Ein alternativer Compiler darf BCC64X nicht stillschweigend ersetzen.
+An alternative compiler must never silently replace BCC64X.
 
-## Generische technische Aktionen
+## Generic technical actions
 
-Der aktuelle XML-Vertrag nutzt unter anderem:
+The current XML contract uses actions including:
 
 ```text
 download
@@ -114,34 +114,34 @@ require
 target
 ```
 
-Schema 14 erlaubt optionale technische Graph-Metadaten (`id`, `dependsOn`). Ohne `dependsOn` bleibt die historische serielle Vorgängerbeziehung bestehen.
+Schema 14 permits optional technical graph metadata (`id`, `dependsOn`). Without `dependsOn`, the historical serial predecessor relationship remains in effect.
 
-## Publish-Manifest und Doxygen
+## Publish manifest and Doxygen
 
-Die Publish-Manifeste haben neben ihrer Ownership-/Incremental-Rolle jetzt eine weitere generische Verwendung im BuildEngine-Kern: Bei `WithDoxygen=true` bilden sie die **autoritative Dateiliste für die öffentliche API-Dokumentation**.
+Besides their ownership/incremental role, publish manifests now have another generic use in the BuildEngine core: with `WithDoxygen=true`, they form the **authoritative file list for public API documentation**.
 
-Für eine publizierte Bibliothek liest BuildEngine:
+For a published library, BuildEngine reads:
 
 ```text
 <PublishRoot>\.buildengine\manifests\<library>.manifest
 ```
 
-und übergibt daraus die dokumentierbaren tatsächlich veröffentlichten Header-, IDL- und C++-Moduldateien an Doxygen. Dadurch wird nicht versehentlich der gesamte gemeinsame Consumer-Baum einer Library zugerechnet.
+and passes the documentable, actually published header, IDL, and C++ module files from that manifest to Doxygen. This prevents the entire shared consumer tree from accidentally being attributed to one library.
 
-Die zentrale Ausgabe liegt im Production Root:
+Central output resides in the production root:
 
 ```text
 documentation\index.html
 documentation\<library>\<version>\html\index.html
 ```
 
-`admin/build-tools.xml` enthält bereits den verwalteten Doxygen-Vertrag (aktuell 1.18.0); für diese Erweiterung war keine Tool-/Schemaänderung erforderlich.
+`admin/build-tools.xml` already contains the managed Doxygen contract (currently 1.18.0); no tool/schema change was required for this extension.
 
-## Copy und Require
+## Copy and require
 
-`<copy>` unterstützt einfache und gefilterte Paketierungsoperationen, unter anderem recursive, overwrite, include/exclude, flatten, cleanTarget und singleFile.
+`<copy>` supports simple and filtered packaging operations, including recursive, overwrite, include/exclude, flatten, cleanTarget, and singleFile.
 
-Eigenständige `<require>`-Knoten unterstützen:
+Standalone `<require>` nodes support:
 
 ```xml
 <require path="..."/>
@@ -150,40 +150,40 @@ Eigenständige `<require>`-Knoten unterstützen:
 <require path="..." kind="any"/>
 ```
 
-Das in `<extract>` verschachtelte `<require>` bleibt dateibezogene Source-Evidence.
+The `<require>` nested inside `<extract>` remains file-based source evidence.
 
-## Paketbezogene Smokes
+## Package-related smokes
 
-Kleine Smokes liegen unter `admin/smokes/<library>/...`. Sie sollen nur den veröffentlichten Consumer-Vertrag beweisen. Komplexe Mehrprozess- und Integrationsszenarien gehören in `BuildEngine-Tests`.
+Small smokes live below `admin/smokes/<library>/...`. They prove only the published consumer contract. Complex multi-process and integration scenarios belong in `BuildEngine-Tests`.
 
-## Technisch notwendige Spezialprogramme
+## Technically necessary special programs
 
-`admin/programs/opengl/meson_bootstrap.py` bleibt eine bewusst akzeptierte Mesa/Meson/BCC64X-Kompatibilitätsbrücke. Generische Orchestrierung gehört dagegen in den BuildEngine-Kern.
+`admin/programs/opengl/meson_bootstrap.py` remains a deliberately accepted Mesa/Meson/BCC64X compatibility bridge. Generic orchestration belongs in the BuildEngine core instead.
 
-## Reproduzierbarkeit und Evidence
+## Reproducibility and evidence
 
-Ein belastbarer Clean-Room-Nachweis soll mindestens identifizieren:
+A credible clean-room proof should identify at least:
 
-- BuildEngine-Commit,
-- BuildEngine-Admin-Commit,
-- BuildEngine-Tests-Commit soweit verwendet,
-- Schema-Version,
-- Bibliotheksversion und Source-Pin,
-- Compiler- und Toolversionen,
-- wirksame Buildparameter,
-- angewendete Patches,
-- Paket-/Publish-Ergebnisse,
-- Test-/Smoke-Ergebnisse,
-- zentrale Doxygen-Ausgabe,
-- `buildlog_*.log` als Performance-Evidence,
-- Machine-State-Zusammenfassung,
-- unveränderten zweiten Lauf mit vollständigem CURRENT-Nachweis.
+- BuildEngine commit,
+- BuildEngine-Admin commit,
+- BuildEngine-Tests commit where used,
+- schema version,
+- library version and source pin,
+- compiler and tool versions,
+- effective build parameters,
+- applied patches,
+- package/publish results,
+- test/smoke results,
+- central Doxygen output,
+- `buildlog_*.log` as performance evidence,
+- machine-state summary,
+- an unchanged second run proving full CURRENT state.
 
-## Nächster Freeze
+## Next freeze
 
-Vor dem vollständigen Clean-Room-Test wird der neue Core-Stand lokal mit BCC64X kompiliert und mit `WithDoxygen=true` verifiziert. Danach wird ein neuer gemeinsamer Freeze-Basispunkt dokumentiert. Bis dahin bleiben Admin-Library-Verträge funktional unverändert.
+Before the complete clean-room test, the new core state is compiled locally with BCC64X and verified with `WithDoxygen=true`. A new common freeze baseline is then documented. Until then, Admin library contracts remain functionally unchanged.
 
-## Wichtige Dokumente
+## Important documents
 
 ```text
 README.md
@@ -196,6 +196,8 @@ docs/library-license-sbom.md
 admin/README.md
 ```
 
-## Lizenz
+The live project documentation served by BuildEngine Server is maintained under `admin/server-docs/` and uses the `[TOC|Content]` navigation directive.
 
-Projekt-eigene Inhalte dieses öffentlichen Admin-Repositories stehen unter der MIT-Lizenz, soweit in einzelnen Dateien nichts Abweichendes angegeben ist. Drittanbieterquellen und deren Lizenztexte behalten ihre jeweiligen Upstream-Lizenzen.
+## License
+
+Project-owned content in this public Admin repository is licensed under the MIT License unless an individual file states otherwise. Third-party sources and their license texts retain their respective upstream licenses.
