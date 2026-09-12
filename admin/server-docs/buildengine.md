@@ -1,5 +1,7 @@
 # BuildEngine
 
+[TOC|Content]
+
 BuildEngine is a declarative build orchestration system for reproducible C and C++ third-party library builds. Its current Windows integration is centered on Embarcadero C++Builder and the modern BCC64X toolchain. Library knowledge belongs in synchronized XML contracts, while the executable evaluates those contracts, prepares tools, creates a technical dependency graph, executes technical steps, and records the resulting state.
 
 Related reference documents:
@@ -207,7 +209,7 @@ The maintenance rule is therefore:
 - changes to HTTP/Markdown behavior update [server.md](server.md),
 - architectural consequences are reflected in this document.
 
-Relative links between these Markdown files are used so the documentation remains navigable inside the server's `/manual/` namespace.
+Relative links between these Markdown files are used so the documentation remains navigable inside the server's `/manual/` namespace. Live project documents use `[TOC|Content]` after the document title so the renderer can generate consistent in-document navigation.
 
 ## Failure model
 
