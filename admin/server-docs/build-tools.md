@@ -107,6 +107,21 @@ Important additional variables include:
 
 MiKTeX uses this path because the official Basic Installer is an executable rather than a normal ZIP archive.
 
+### Long-running provisioning feedback
+
+External tool installers can take substantially longer than ordinary archive extraction. MiKTeX is the current important example: first-time private provisioning can run for tens of minutes and later package acquisition can extend that time further.
+
+BuildEngine therefore treats the existing tool activity as a long-running observable operation instead of adding a second progress mechanism:
+
+- before an external managed-tool installer starts, BuildEngine prints an explicit notice that the provisioning step can take a long time;
+- the normal heartbeat continues to show the active `tool:<id>` operation;
+- every installer output line refreshes the activity detail, so the latest available installer message remains visible;
+- the heartbeat reports the elapsed runtime of the active operation;
+- if an installer emits a numeric percentage such as `42%`, BuildEngine maps that value onto the existing progress model and the heartbeat shows the percentage;
+- if the installer does not expose a percentage, BuildEngine does **not** invent estimated progress.
+
+This distinction is intentional. Liveness, elapsed time, and the latest installer message are reliable even for opaque installers; a percentage is shown only when the external process provides one.
+
 ### Native extraction with `<nativeExtract>`
 
 Archives can be extracted through the integrated libarchive path:
@@ -224,7 +239,7 @@ A tool update must not invalidate unrelated library builds globally. A version s
 </tool>
 ```
 
-The Doxygen phase resolves the effective documentation profile to determine whether LaTeX is required. Doxygen produces HTML and, when needed, LaTeX in **one run**. MiKTeX is required only for the downstream PDF step. See the [documentation contract](documentation.md) for details.
+The Doxygen phase resolves the effective documentation profile to determine whether LaTeX is required. Doxygen produces HTML and, when needed, LaTeX in **one run**. MiKTeX is required only for the downstream PDF step. Its initial private installation is expected to be one of the longest tool-provisioning operations, which is why the generic external-installer feedback described above is important. See the [documentation contract](documentation.md) for details.
 
 ## Maintenance rule
 
