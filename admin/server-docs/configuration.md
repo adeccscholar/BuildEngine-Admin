@@ -2,6 +2,8 @@
 
 BuildEngine combines a local XML parameter file with synchronized administration contracts. The local file selects the production tree, concurrency, repositories, feature switches, and contract locations; the Admin repository supplies the detailed tool, library, documentation, smoke-test, schema, and security definitions.
 
+For the complete documentation profile, Doxygen, MathJax, LaTeX and MiKTeX contract, see [BuildEngine Documentation Contract](/manual/documentation.md).
+
 ## BuildEngine.xml
 
 The executable uses `BuildEngine.xml` next to the executable unless another configuration file is supplied as the final command-line argument.
@@ -24,6 +26,7 @@ A representative structure is:
       WithSmokeTests="true"
       WithDoc="true"
       WithDoxygen="true"
+      WithLatex="true"
       configurations="All"
       bootstrapTools="build-tools.xml"
       buildTools="admin\build-tools.xml"
@@ -73,6 +76,7 @@ The exact local worker counts and feature switches are deployment choices; the e
 | `WithSmokeTests` | Enables BuildEngine consumer smoke tests |
 | `WithDoc` | Enables generated library information documentation |
 | `WithDoxygen` | Permits Doxygen API documentation |
+| `WithLatex` | Permits the independent Doxygen LaTeX/MiKTeX PDF branch; default is `true` |
 | `configurations` | Default build variants, for example `All` |
 | `buildTools` | Synchronized managed-tool contract |
 | `toolsState` | Generated effective tool state |
@@ -82,6 +86,8 @@ The exact local worker counts and feature switches are deployment choices; the e
 | `installRoot` | Installed package root |
 | `repositoriesRoot` | Local administration repository checkouts |
 | `logsRoot` | BuildEngine log hierarchy |
+
+`WithLatex` does not imply `WithDoxygen`. PDF generation requires both switches plus an effective `latex="true"` documentation profile. Setting `WithLatex="false"` leaves HTML Doxygen untouched and prevents MiKTeX from being requested solely for documentation.
 
 ## Concurrency model
 
@@ -109,7 +115,9 @@ For a four-worker scheduler, $N_{workers}=4$.
 
 ### `admin/build-tools.xml`
 
-Defines reproducible tools and browser assets. A tool may be discovered from an existing installation or managed by BuildEngine through download, extraction/generation, launcher, and probe steps. Examples include Git, CMake, Ninja, Doxygen, Graphviz, compiler tools, and the managed JavaScript resources used by the documentation server.
+Defines reproducible tools and browser assets. A tool may be discovered from an existing installation or managed by BuildEngine through download, extraction/generation, launcher, and probe steps. Examples include Git, CMake, Ninja, Doxygen, Graphviz, MiKTeX, compiler tools, and the managed JavaScript resources used by the documentation server.
+
+MiKTeX is a `when-used` tool. It is provisioned only when the effective documentation configuration actually enables LaTeX/PDF for at least one library.
 
 ### `admin/build-libraries.xml`
 
@@ -134,7 +142,9 @@ A reduced example illustrates the shared-contract/variant model:
 
 ### `admin/build-documentation.xml`
 
-Defines the shared documentation profile and library-specific overrides. It controls whether Doxygen is used, source visibility, public-only extraction, predefined macros, Doxygen options, and exclusion patterns.
+Defines the shared documentation profile and library-specific overrides. It controls whether Doxygen and LaTeX/PDF are used, source visibility, public-only extraction, predefined macros, Doxygen options, and exclusion patterns.
+
+The root profile is inherited by every library. A library node is an override, not an allow-list. The complete parameter reference and examples are documented in [BuildEngine Documentation Contract](/manual/documentation.md).
 
 ### `admin/smoke-tests.xml`
 
@@ -163,7 +173,8 @@ The separation is intentional:
 | Repository locations | Yes | Repository content itself is synchronized |
 | Tool definitions | No | Yes |
 | Library versions and build contracts | No | Yes |
-| Documentation profiles | No | Yes |
+| Documentation master switches | Yes | No |
+| Documentation profiles and library overrides | No | Yes |
 | Smoke-test definitions | No | Yes |
 | Security metadata | No | Yes |
 
@@ -271,8 +282,9 @@ The CLI already parses `--lib` and `--libversion` for commands such as `--check`
 - [ ] `build-tools.xml` and `build-libraries.xml` are available after synchronization.
 - [ ] Worker and queue settings match the target machine.
 - [ ] Required test/documentation switches are explicit.
+- [ ] `WithLatex` matches the desired PDF policy for the machine.
 - [ ] `tools.xml` and technical state are treated as generated state rather than hand-authored library knowledge.
 
 ## Related documentation
 
-Project documents are available through the documentation buttons at the top of every server page. Generated library documentation starts at `/index.html`.
+The full documentation contract is available at `/manual/documentation.md`. Other project documents are available through the documentation buttons at the top of every server page. Generated library documentation starts at `/index.html`.
