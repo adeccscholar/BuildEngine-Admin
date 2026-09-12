@@ -94,14 +94,11 @@
                    archive="basic-miktex-25.12-x64.exe"
                    sha256="14b42dd9f4b4a7813a8bfd69c8f99316c2888cc4ee26f631f397e163d85d6c62"/>
          <extract executable="{Archive}">
-            <argument value="--portable"/>
+            <argument value="--portable={ManagedRoot}"/>
             <argument value="--unattended"/>
             <argument value="--no-registry"/>
             <argument value="--no-additional-roots"/>
             <argument value="--paper-size=A4"/>
-            <argument value="--user-install={ManagedRoot}\texmfs\install"/>
-            <argument value="--user-config={ManagedRoot}\texmfs\config"/>
-            <argument value="--user-data={ManagedRoot}\texmfs\data"/>
          </extract>
       </managed>
       <probe contains="MiKTeX"><argument value="--version"/></probe>
