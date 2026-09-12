@@ -17,6 +17,7 @@ Related documents:
 - [Tool contract `build-tools.xml`](build-tools.md)
 - [Tool overview](tools.md)
 - [Library contract `build-libraries.xml`](build-libraries.md)
+- [Integrated third-party libraries](libraries.md)
 
 ## Basic principle
 
@@ -266,13 +267,15 @@ The currently managed tools are listed in [tools.md](tools.md).
 
 MiKTeX is defined in `build-tools.xml` as `required="when-used"`. It is required only if at least one library effectively has `latex=true`.
 
-The managed MiKTeX installation is deliberately portable and isolated below `toolsRoot` rather than installed as the current Windows user's MiKTeX. The contract uses `--portable`, `--no-registry`, `--no-additional-roots`, and explicit managed config/data/install roots. This prevents an existing MiKTeX installation under the user's AppData or Programs directories from becoming an implicit second tool source.
+The managed MiKTeX installation is deliberately portable and isolated below `toolsRoot` rather than installed as the current Windows user's MiKTeX. The installer receives the managed root through `--portable=<ManagedRoot>` together with `--unattended`, `--no-registry`, `--no-additional-roots`, and the project paper-size setting. MiKTeX therefore owns its configuration, data, packages, and executable tree inside that portable root instead of using an existing user or machine installation.
 
 The current managed root is:
 
 ```text
 <toolsRoot>/miktex/25.12-portable
 ```
+
+Isolation also applies to execution, not only installation. BuildEngine starts managed MiKTeX processes with a process-local environment whose `PATH` begins with the managed MiKTeX executable directory and contains only the explicitly admitted managed/system locations required by that process tree. Child processes such as `initexmf` and `pdftex` inherit the same isolated environment. BuildEngine does not modify the user's or machine's `PATH`, does not remove another MiKTeX installation, and does not require an existing MiKTeX installation to be changed or uninstalled.
 
 MiKTeX still maintains mutable shared runtime data inside that portable tree. In particular, a first `pdflatex` use may need to create the shared `pdflatex.fmt` format file. Multiple first-use `texify` processes must not race while creating that common file.
 
@@ -366,6 +369,7 @@ Relative Markdown links are deliberately used:
 [Tools](tools.md)
 [Tool contract](build-tools.md)
 [Library contract](build-libraries.md)
+[Integrated libraries](libraries.md)
 ```
 
 For example, when `documentation.md` is displayed as `/manual/documentation.md`, the browser resolves `tools.md` to `/manual/tools.md`. The normal server fallback then renders that synchronized Markdown source live.
@@ -408,6 +412,7 @@ The live project documentation consists of:
 - `documentation.md` – this documentation contract,
 - `build-tools.md` – XML tool contract,
 - `build-libraries.md` – XML library contract,
+- `libraries.md` – public inventory and integration findings for the currently managed third-party libraries,
 - `tools.md` – overview of the tools actually used.
 
 The public project documentation is maintained in English. Original titles of referenced works may additionally be shown in their original language where useful.
@@ -464,6 +469,7 @@ Therefore:
 1. New XML parameters are documented in the corresponding Markdown reference.
 2. New tools or version/role changes are reflected in [tools.md](tools.md).
 3. Changes to `build-tools.xml` are reflected in [build-tools.md](build-tools.md).
-4. Changes to the library contract are reflected in [build-libraries.md](build-libraries.md).
-5. Changes to documentation generation, Markdown preprocessing, server presentation, or link behavior are reflected here and, where appropriate, in [server.md](server.md).
-6. Public-facing project Markdown remains English unless a document explicitly serves another language audience.
+4. Changes to the library contract are reflected in [build-libraries.md](build-libraries.md) and, whenever they affect inventory, dependencies, settings, patches, repairs, or integration behavior, in [libraries.md](libraries.md).
+5. Deeper diagnostic and evidence changes for library integration are kept synchronized with the internal `docs/bcc64x-library-integration-findings.md` engineering record.
+6. Changes to documentation generation, Markdown preprocessing, server presentation, or link behavior are reflected here and, where appropriate, in [server.md](server.md).
+7. Public-facing project Markdown remains English unless a document explicitly serves another language audience.
