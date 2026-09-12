@@ -1,20 +1,6 @@
 # BuildEngine Server
 
-BuildEngine Server is the read-only HTTP presentation and machine-interface layer for a BuildEngine production tree. It exposes library/package metadata, generated documentation, SBOM data, dependency and usage information, security results, package export, and a small browser UI. It does not replace the BuildEngine scheduler or technical step-state model.
-
-> This document is also an integration test for server-side Markdown rendering and browser-side syntax highlighting. It deliberately contains tables, task lists, links, JSON, HTTP, C++23, and Mermaid examples.
-
-## Renderer acceptance checklist
-
-- [x] Markdown headings, paragraphs, links, lists and tables
-- [x] GitHub-flavored task lists
-- [x] Syntax highlighting for HTTP
-- [x] Syntax highlighting for JSON
-- [x] Syntax highlighting for C++23
-- [x] Mermaid rendering
-- [x] No MathJax requirement on this page
-
-The last point is deliberate: loading this document should not require the MathJax browser asset.
+BuildEngine Server is the read-only HTTP presentation and machine-interface layer for a BuildEngine production tree. It exposes library/package metadata, generated documentation, SBOM data, dependency and usage information, security results, package export, project documentation, and a browser UI. It does not replace the BuildEngine scheduler or technical step-state model.
 
 ## Transport and scope
 
@@ -39,7 +25,8 @@ Only HTTP `GET` requests are accepted by the current server implementation. The 
 | `/package/{library}/{version}/` | Package detail and export link |
 | `/security/` | Security overview |
 | `/security/{library}/{version}/` | Security analysis detail |
-| `/manual/buildengine.md` | BuildEngine architecture and renderer test document |
+| `/manual/story.md` | Project story and engineering motivation |
+| `/manual/buildengine.md` | BuildEngine architecture |
 | `/manual/server.md` | This server and REST API document |
 | `/manual/configuration.md` | Configuration and CLI reference |
 | `/index.html` | Generated central library documentation index |
@@ -56,10 +43,10 @@ flowchart LR
    V -- yes --> R{Route type}
    R -->|Machine API| J[JSON response]
    R -->|Dashboard/UI| P[Rendered HTML page]
-   R -->|Markdown| M[cmark-gfm]
+   R -->|Project Markdown| M[cmark-gfm]
    M --> A[Feature analysis]
    A --> P
-   R -->|Static documentation| S[File response]
+   R -->|Generated documentation| S[File response]
    R -->|Browser assets| W[Managed /js resource]
 ```
 
@@ -100,7 +87,7 @@ GET /api/v1/sbom/{library}/{version}
 GET /api/v1/risk/{library}/{version}
 ```
 
-The SBOM response is the installed CycloneDX document. The risk endpoint combines provider findings with the server-side assessment model.
+The SBOM response is the installed CycloneDX document. The risk endpoint combines provider findings with the shared assessment model from BuildEngine-Common.
 
 ### Package export
 
@@ -133,7 +120,7 @@ Values shown with ellipses depend on the running server build.
 
 ## Request dispatch
 
-The HTTP server evaluates machine routes first, then browser/static resources. The important separation is visible in simplified form below:
+The HTTP server evaluates machine routes first, then browser and documentation resources. The important separation is visible in simplified form below:
 
 ```cpp
 if(WriteMachineApi(theSocket, theRequest, vecSegments)) {
@@ -146,18 +133,19 @@ else if(/* explicit browser route */) {
    // Render dashboard, libraries, packages or security page.
 }
 else {
-   // Resolve a file below DocumentationRoot.
+   // Resolve project Markdown or generated documentation.
 }
 ```
 
-The actual implementation uses C++23 throughout the project and favors value semantics, `std::string_view`, `std::filesystem`, ranges, structured bindings, `std::optional`, and other modern facilities over older pointer-heavy interfaces where practical.
+The implementation uses modern C++23 throughout the project and favors value semantics, `std::string_view`, `std::filesystem`, ranges, structured bindings, `std::optional`, and other modern facilities over older pointer-heavy interfaces where practical.
 
 ## Markdown rendering pipeline
 
-Markdown is rendered only when a requested file has a Markdown extension. The renderer API is intentionally neutral: applications include a header that exposes strings, paths, a feature mask, and rendering functions, while cmark-gfm and its runtime loading remain private to the renderer implementation.
+The four project documents are maintained directly in the synchronized Admin repository below `admin/server-docs`. A request for `/manual/*.md` resolves to that synchronized source file and renders its current contents on demand. There is no second manually maintained Markdown copy below the generated documentation tree.
 
 ```mermaid
 sequenceDiagram
+   participant Admin as admin/server-docs
    participant Browser
    participant Server
    participant Renderer as MarkdownRenderer
@@ -165,24 +153,19 @@ sequenceDiagram
    participant Assets as Managed browser assets
 
    Browser->>Server: GET /manual/server.md
+   Server->>Admin: resolve current Markdown source
    Server->>Renderer: RenderFile(...)
    Renderer->>Renderer: Analyze source features
    Renderer->>CMark: Parse + render GFM
    CMark-->>Renderer: HTML body
    Renderer-->>Server: HTML + feature mask
-   Server->>Server: Build passive page shell
-   Browser-->>Server: Request only selected /js assets
+   Server-->>Browser: Complete page
+   Browser->>Server: Request selected /js assets
    Server->>Assets: Resolve registered tool roots
    Assets-->>Browser: JavaScript/CSS
 ```
 
-Before the final HTML page is assembled, the Markdown source is inspected for feature requirements:
-
-- fenced source code with a language requests syntax highlighting;
-- a fenced `mermaid` block requests Mermaid;
-- supported mathematical delimiters request MathJax.
-
-The page renderer then emits only the required `/js/...` resources. This reproduces the passive-renderer approach used by the earlier adecc documentation generator and makes the browser resource layer replaceable independently of Markdown parsing.
+The Markdown source is inspected for browser capabilities required by the page. Language-marked source blocks enable syntax highlighting, Mermaid diagrams enable Mermaid, and supported mathematical delimiters enable MathJax. Only the required browser resources are emitted for each rendered page.
 
 ## Managed browser resources
 
@@ -202,23 +185,28 @@ The server maps these stable URLs to the currently registered managed tool roots
 | Mermaid | `/js/mermaid/...` | A `mermaid` fence exists |
 | MathJax | `/js/mathjax/...` | Supported math delimiters are detected |
 
-## Documentation synchronization
+## Project and generated documentation
 
-The three manually authored server documents are maintained in the synchronized Admin repository:
+The manually authored project documents are synchronized with the Admin repository:
 
 ```text
+admin/server-docs/story.md
 admin/server-docs/buildengine.md
 admin/server-docs/server.md
 admin/server-docs/configuration.md
 ```
 
-At server initialization they are copied into:
+They are read and rendered directly from that synchronized tree.
 
-```text
-<ProductionRoot>/documentation/manual/
-```
+Generated per-library documentation remains below the normal BuildEngine documentation root and is served by the same HTTP server. This gives the running server one entry point for both evolving project documentation and generated third-party library documentation without mixing their source locations.
 
-The server validates the cmark-gfm runtime before publishing these pages. A missing renderer runtime therefore fails visibly instead of leaving apparently available Markdown routes that cannot actually be rendered.
+The cmark-gfm runtime is validated when the server is initialized. A missing renderer runtime therefore fails visibly instead of leaving apparently available Markdown routes that cannot be rendered.
+
+## Shared service layer
+
+The server deliberately does not duplicate repository, security, package, or rendering logic. These capabilities live in BuildEngine-Common and can be consumed by the console application and the VCL manager as well.
+
+That separation makes the HTTP server a presentation surface rather than a second domain implementation. For example, the risk assessment exposed as HTML and JSON is the same assessment model available to the other BuildEngine front ends.
 
 ## Security boundary
 
@@ -233,6 +221,4 @@ The current server is intentionally local-only.
 
 ## Related documentation
 
-- [BuildEngine architecture](/manual/buildengine.md)
-- [Configuration and command line](/manual/configuration.md)
-- [Generated library documentation index](/index.html)
+Project documents are available through the documentation buttons at the top of every server page. Generated library documentation starts at `/index.html`.
