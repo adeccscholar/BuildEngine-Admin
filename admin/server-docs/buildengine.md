@@ -85,6 +85,22 @@ int BuildEngine::Run() {
 
 The production implementation contains the complete error handling, tool preparation, scheduler execution, heartbeat handling, metadata, documentation, and smoke-test logic. The fragment above is deliberately shortened for documentation.
 
+## Heartbeat semantics
+
+The heartbeat deliberately separates **worker utilization** from **logical job state**. A logical job can remain in the scheduler's `running` state while its technical steps move through transitions; that job-state count is therefore not a worker count and may legitimately be larger than the configured worker pool.
+
+The first heartbeat field instead counts active technical `:action:` activities, which correspond to worker-executed steps. It is therefore bounded by the configured scheduler worker count. `open` is the separate count of all non-terminal logical jobs (`pending + ready + job-running`).
+
+For example:
+
+```text
+[HEARTBEAT] running=4/4, open=32, ready=0, pending=12, current=406, passed=22, failed=0, blocked=0
+```
+
+means that all four workers are currently occupied while 32 logical jobs have not yet reached a terminal state. `open` and `running` intentionally answer different questions and must not be derived from the same counter.
+
+The following activity lines identify the actual worker operations and retain elapsed time, latest activity age, and process-reported progress where available.
+
 ## Modern C++23 direction
 
 BuildEngine prefers modern C++23 facilities over older idioms whenever the compiler and target library support them. Examples include ranges, concepts, `std::span`, `std::string_view`, designated initializers, structured bindings, `std::optional`, `std::format`, and value-oriented APIs.
@@ -144,7 +160,8 @@ flowchart LR
    G[Generate documentation inputs + Doxyfile] --> D[Doxygen - one run]
    D --> H[HTML]
    D -->|effective latex=true| L[LaTeX]
-   L --> M[MiKTeX texify]
+   R[One MiKTeX runtime preflight] --> M[MiKTeX texify]
+   L --> M
    M --> P[PDF]
 ```
 
@@ -153,9 +170,10 @@ The key distinction is between **Doxygen output selection** and **PDF compilatio
 - HTML is always requested for a Doxygen-enabled profile.
 - LaTeX is an additional output of the same Doxygen invocation when the effective `latex` setting is true.
 - MiKTeX does not rerun Doxygen; it consumes `latex/refman.tex` and related generated files.
+- Before per-library PDF jobs can run, one shared MiKTeX preflight initializes common runtime state such as the `pdflatex` format; independent PDF jobs remain parallel after that prerequisite.
 - The PDF state contains the MiKTeX version, while the Doxygen state does not.
 
-This avoids duplicate parsing of large source trees such as Boost or ACE/TAO and keeps invalidation aligned with the actual technical dependency.
+This avoids duplicate parsing of large source trees such as Boost or ACE/TAO, prevents first-use MiKTeX runtime races across parallel PDF jobs, and keeps invalidation aligned with the actual technical dependency.
 
 The complete contract is documented in [documentation.md](documentation.md).
 
@@ -233,6 +251,7 @@ Nested example:
   - Metadata
   - Documentation
     - Doxygen HTML + optional LaTeX
+    - shared MiKTeX runtime preflight when PDF is required
     - optional MiKTeX PDF
 
 ## Design principle
