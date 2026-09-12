@@ -34,6 +34,7 @@
       </xs:sequence>
       <xs:attribute name="id" type="xs:string" use="required"/>
       <xs:attribute name="doxygen" type="booleanText" use="optional"/>
+      <xs:attribute name="latex" type="booleanText" use="optional"/>
       <xs:attribute name="source" type="booleanText" use="optional"/>
       <xs:attribute name="inlineSource" type="booleanText" use="optional"/>
       <xs:attribute name="publicOnly" type="booleanText" use="optional"/>
@@ -49,6 +50,7 @@
          </xs:sequence>
          <xs:attribute name="schemaVersion" use="required" fixed="1"/>
          <xs:attribute name="doxygen" type="booleanText" use="optional" default="true"/>
+         <xs:attribute name="latex" type="booleanText" use="optional" default="true"/>
          <xs:attribute name="source" type="booleanText" use="optional" default="false"/>
          <xs:attribute name="inlineSource" type="booleanText" use="optional" default="false"/>
          <xs:attribute name="publicOnly" type="booleanText" use="optional" default="false"/>
