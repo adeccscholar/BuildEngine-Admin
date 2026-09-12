@@ -1,36 +1,36 @@
-# TODO – Boost Versions-Upgrade und Discovery
+# TODO – Boost Version Upgrade and Discovery
 
-## Reihenfolge
+## Sequence
 
-Dieser Punkt wird **erst nach Abschluss des aktuellen Boost-1.92.0-Nachweises und nach Integration der weiteren vorgesehenen Third-Party-Libraries** umgesetzt.
+This item is implemented **only after completion of the current Boost 1.92.0 proof and after integration of the other planned third-party libraries**.
 
-Aktuelle Priorität:
+Current priority:
 
-1. Boost 1.92.0 vollständig über Build, Install, Publish und alle Release-/Debug-Evidence-Gates abschließen.
-2. Weitere Bibliotheken in die BuildEngine aufnehmen und jeweils über denselben reproduzierbaren Paket-/Consumer-Vertrag verifizieren.
-3. Danach Boost-Version-Discovery und Upgrade-Preflight automatisieren.
+1. Complete Boost 1.92.0 through build, install, publish, and all Release/Debug evidence gates.
+2. Add further libraries to BuildEngine and verify each through the same reproducible package/consumer contract.
+3. Then automate Boost version discovery and upgrade preflight.
 
-## Ziel
+## Goal
 
-Ein Wechsel auf eine neue Boost-Version soll nicht durch blindes Übernehmen des 1.92.0-Profils erfolgen. Die BuildEngine soll die neue Upstream-Version inventarisieren und die Abweichungen zum zuletzt akzeptierten Boost-Profil sichtbar machen.
+Moving to a new Boost version must not be done by blindly copying the 1.92.0 profile. BuildEngine should inventory the new upstream version and make differences from the last accepted Boost profile visible.
 
-## Geplanter Upgrade-Preflight
+## Planned upgrade preflight
 
-Für eine neue Boost-Version:
+For a new Boost version:
 
-- offizielles Upstream-Artefakt und SHA-256 neu pinnen;
-- logische Boost-Libraries und CMake-Source-Module aus der Upstream-Metadatenstruktur neu inventarisieren;
-- Diff gegen das zuletzt akzeptierte Profil erzeugen: hinzugefügt, entfernt, umbenannt, Metadaten-/Targetänderungen;
-- externe Ökosystem-Abhängigkeiten wie OpenCL, MPI und Python neu bewerten;
-- binäre Komponentenfamilien und CMake-Targettypen neu bestimmen bzw. verifizieren;
-- insbesondere Änderungen zwischen SHARED-/STATIC-/INTERFACE-Targets sichtbar machen;
-- Boost.Config/BCC64X native-Clang-Preflight ohne historische Annahmen erneut ausführen;
-- prüfen, ob der lokale Boost.Config-Adapter weiterhin erforderlich ist oder Upstream BCC64X inzwischen selbst korrekt klassifiziert;
-- erst nach erfolgreichem Preflight den neuen kanonischen Komponentenvertrag erzeugen/akzeptieren;
-- anschließend den vollständigen Release-/Debug-Produktionsgraphen sowie alle Component-/Runtime-Gates ausführen.
+- pin the official upstream artifact and SHA-256 again;
+- re-inventory logical Boost libraries and CMake source modules from the upstream metadata structure;
+- generate a diff against the last accepted profile: added, removed, renamed, metadata/target changes;
+- reassess external ecosystem dependencies such as OpenCL, MPI, and Python;
+- redetermine or verify binary component families and CMake target types;
+- make changes between SHARED/STATIC/INTERFACE targets visible in particular;
+- rerun the Boost.Config/BCC64X native-Clang preflight without historical assumptions;
+- check whether the local Boost.Config adapter is still required or upstream now classifies BCC64X correctly itself;
+- create/accept the new canonical component contract only after a successful preflight;
+- then execute the complete Release/Debug production graph and all component/runtime gates.
 
-## Leitprinzip
+## Guiding principle
 
-Die generische Boost-Engine bleibt versionsunabhängig. Versionsgebunden sind ausschließlich das akzeptierte Komponentenprofil, die erwarteten Artefakte/Targettypen und dokumentierte externe Ausschlüsse.
+The generic Boost engine remains version-independent. Only the accepted component profile, expected artifacts/target types, and documented external exclusions are version-bound.
 
-Eine neue Version darf deshalb nicht allein deshalb als vollständig unterstützt gelten, weil der alte 1.92.0-Komponentensatz weiterhin baut.
+A new version therefore must not be considered fully supported merely because the old 1.92.0 component set still builds.
