@@ -1,26 +1,26 @@
-# BuildEngine-Admin – technische Administrationsdaten
+# BuildEngine-Admin – Technical Administration Data
 
-**Stand:** 8. September 2026  
-**Status:** eingefrorener Vertragsstand vor abschließendem Clean-Room-Test
+**Status date:** September 8, 2026  
+**Status:** frozen contract state before the final clean-room test
 
-Dieser Ordner enthält die Administrationsverträge, die BuildEngine zur Laufzeit für Toolbereitstellung, Bibliotheksbau, Paketierung, Publish und kleine Consumer-Smokes synchronisiert und verwendet.
+This directory contains the administration contracts that BuildEngine synchronizes and uses at runtime for tool provisioning, library builds, packaging, publishing, and small consumer smokes.
 
-Die normative Bibliotheksdefinition liegt ausschließlich in:
+The normative library definition resides exclusively in:
 
 ```text
 build-libraries.xml
 ```
 
-Aktive Bibliotheken werden nicht auf XML-Fragmente verteilt.
+Active libraries are not distributed across XML fragments.
 
-## Aktueller Vertragsstand
+## Current contract state
 
 ```text
 build-libraries.xml : Schema 14
-Library-Verträge    : 22
+Library contracts   : 22
 ```
 
-Enthalten:
+Included:
 
 ```text
 pugixml
@@ -47,67 +47,67 @@ vtk
 opencv
 ```
 
-Weitere zentrale Inhalte:
+Other central content:
 
 ```text
-build-tools.xml    verwaltete Toolbereitstellung
-smoke-tests.xml    Übergangs-/Kompatibilitätsdatei
-schemas/           XSD-Verträge
-cmake/             generische und bibliotheksbezogene CMake-/Toolchain-Adapter
-patches/           versionsgebundene Source-Patches
-programs/          technisch begründete Spezialbrücken
-smokes/            kleine paketbezogene Consumer-Smokes
+build-tools.xml    managed tool provisioning
+smoke-tests.xml    transitional/compatibility file
+schemas/           XSD contracts
+cmake/             generic and library-specific CMake/toolchain adapters
+patches/           version-bound source patches
+programs/          technically justified special bridges
+smokes/            small package-related consumer smokes
 ```
 
-## Verifizierter Freeze-Stand
+## Verified freeze state
 
-Der letzte unveränderte Zielmaschinen-Folgelauf mit diesem funktionalen Admin-Vertrag lieferte:
+The last unchanged follow-up run on the target machine with this functional Admin contract produced:
 
 ```text
 [SUMMARY] jobs=471, current=451, passed=20, failed=0, blocked=0, incomplete=0
 Machine state: jobs=471, success=471, failed=0, blocked=0, incomplete=0
 ```
 
-Damit wurden 451/451 Library-Tasks als `CURRENT` bestätigt.
+This confirmed 451/451 library tasks as `CURRENT`.
 
-Funktionale Baselines vor den reinen Dokumentationsänderungen:
+Functional baselines before documentation-only changes:
 
 ```text
 BuildEngine       268504010b54245124005fde968400f57b6514b5
 BuildEngine-Admin f7c6183cf7dc4d2b56bbc7da8b5a963eb911e97f
 ```
 
-Ausführliche Freeze-Regeln stehen in:
+Detailed freeze rules are documented in:
 
 ```text
 ../docs/FREEZE_CLEANROOM.md
 ../TODO.md
 ```
 
-## Grundprinzip
+## Core principle
 
-BuildEngine hält Bibliothekswissen aus dem C++-Kern heraus. XML beschreibt Bibliotheken; C++ implementiert generische Mechanismen.
+BuildEngine keeps library knowledge out of the C++ core. XML describes libraries; C++ implements generic mechanisms.
 
-Bevorzugter Ablauf:
+Preferred flow:
 
 ```text
-Upstream / Source-Pin
--> Download und Hash-/Identitätsprüfung
--> Extraktion
--> ggf. versionsgebundener Patch
--> originales Buildsystem
--> BCC64X Build
--> Tests / Validation soweit sinnvoll
--> Install
--> Require-Gates
--> Publish
--> Package-Smoke
--> Ready
+Upstream / source pin
+-> download and hash/identity verification
+-> extraction
+-> optional version-bound patch
+-> original build system
+-> BCC64X build
+-> tests / validation where meaningful
+-> install
+-> require gates
+-> publish
+-> package smoke
+-> ready
 ```
 
-## Generische technische Actions
+## Generic technical actions
 
-Aktuell verwendete generische Action-Typen umfassen unter anderem:
+Currently used generic action types include:
 
 ```text
 download
@@ -119,37 +119,37 @@ require
 target
 ```
 
-Schema 14 erlaubt zusätzlich optionale Graph-Metadaten:
+Schema 14 additionally permits optional graph metadata:
 
 ```text
 id
 dependsOn
 ```
 
-Semantik:
+Semantics:
 
-- fehlt `dependsOn`, bleibt die historische serielle Vorgängerbeziehung bestehen,
-- explizit leeres `dependsOn` bedeutet keine lokale Vorgängerabhängigkeit,
-- explizite Dependencies referenzieren derzeit vorher definierte technische Actions mit stabiler ID.
+- if `dependsOn` is absent, the historical serial predecessor relationship remains in effect,
+- explicitly empty `dependsOn` means no local predecessor dependency,
+- explicit dependencies currently reference previously defined technical actions through stable IDs.
 
-Bis nach dem Clean-Room-Test werden keine neuen Parallelisierungsstrukturen in den Library-Verträgen eingeführt.
+No new parallelization structures are introduced into library contracts until after the clean-room test.
 
-## Erweiterte Copy-Semantik
+## Extended copy semantics
 
-`<copy>` unterstützt neben einfachen Datei-/Verzeichnis-Kopien auch generische Paketierungsoperationen:
+Besides simple file/directory copies, `<copy>` supports generic packaging operations including:
 
 - `recursive`,
 - `overwrite`,
-- Include-/Exclude-Patterns,
+- include/exclude patterns,
 - `flatten`,
 - `cleanTarget`,
 - `singleFile`.
 
-Diese generische Funktion ersetzt die frühere eigene ACE/TAO-Python-Paketierung.
+This generic capability replaces the former ACE/TAO-specific Python packaging path.
 
-## `<require>` und Pfadtypen
+## `<require>` and path kinds
 
-Eigenständige `<require>`-Actions unterstützen:
+Standalone `<require>` actions support:
 
 ```xml
 <require path="..."/>
@@ -158,112 +158,112 @@ Eigenständige `<require>`-Actions unterstützen:
 <require path="..." kind="any"/>
 ```
 
-`file` bleibt der kompatible Default. `directory` verlangt ein echtes Verzeichnis; `any` akzeptiert jeden existierenden Filesystem-Eintrag.
+`file` remains the compatible default. `directory` requires a real directory; `any` accepts any existing filesystem entry.
 
-Das verschachtelte `<extract><require path="..."/></extract>` bleibt ein Dateinachweis des extrahierten Upstream-Artefakts.
+The nested `<extract><require path="..."/></extract>` remains file evidence for the extracted upstream artifact.
 
-## Upstream, Sources und Patches
+## Upstream, sources, and patches
 
-Repositoryverwaltete Kompatibilitätspatches liegen versionsbezogen unter:
+Repository-managed compatibility patches are version-bound below:
 
 ```text
 patches/<library>/<version>/
 ```
 
-Der Ablauf bleibt:
+The flow remains:
 
 ```text
-Upstream herunterladen
--> Identität prüfen
--> vollständig extrahieren
--> Patch gegen genau diesen Stand prüfen
--> Patch anwenden
--> originales Buildsystem ausführen
+download upstream
+-> verify identity
+-> extract completely
+-> check patch against exactly that state
+-> apply patch
+-> execute original build system
 ```
 
-Source-Bäume sind regenerierbare Artefakte. Ein temporärer Extract-Baum darf nie als gültige Source sichtbar werden.
+Source trees are regenerable artifacts. A temporary extraction tree must never become visible as a valid source tree.
 
-## Native Archive-Verarbeitung
+## Native archive processing
 
-Historische eigene generische Python-Extraktion für `.tar.xz` ist nicht mehr Teil der aktiven Architektur. BuildEngine nutzt die intern verfügbare libarchive-/xz-Funktionalität.
+The historical custom generic Python extraction path for `.tar.xz` is no longer part of the active architecture. BuildEngine uses its internally available libarchive/xz functionality.
 
-## Technisch notwendige Spezialprogramme
+## Technically necessary special programs
 
-`programs/opengl/meson_bootstrap.py` bleibt bewusst erhalten. Es bildet konkrete Mesa/Meson/BCC64X-Kompatibilitätsanforderungen ab und ist keine allgemeine Paketierungslogik.
+`programs/opengl/meson_bootstrap.py` deliberately remains. It implements concrete Mesa/Meson/BCC64X compatibility requirements and is not general packaging logic.
 
-Der frühere ACE/TAO-Python-Installer ist nicht mehr Teil des aktiven Vertrags.
+The former ACE/TAO Python installer is no longer part of the active contract.
 
-## Paket- und Publish-Vertrag
+## Package and publish contract
 
-Versionierte Producer-Pakete liegen unter:
+Versioned producer packages reside below:
 
 ```text
 install/packages/<id>/<version>/
 ```
 
-Publish bildet daraus den gemeinsamen Consumer-Baum:
+Publish maps those packages into the shared consumer tree:
 
 ```text
 install/Win64x
 ```
 
-Der versionierte Producer-Baum bleibt autoritativ. Eine vollständige Ownership-/Manifest-Trennung des gemeinsamen Consumer-Baums ist Nachfolgearbeit nach dem Clean-Room-Test.
+The versioned producer tree remains authoritative. Complete ownership/manifest separation of the shared consumer tree is follow-up work after the clean-room test.
 
-## Kleine Consumer-Smokes
+## Small consumer smokes
 
-`smokes/<library>/...` enthält kleine Package-Acceptance-Tests. Ziel ist nur der Beweis des veröffentlichten Consumer-Vertrags:
+`smokes/<library>/...` contains small package-acceptance tests. Their only purpose is to prove the published consumer contract:
 
 ```text
 configure
 -> compile
 -> link
--> kleiner Runtime-Pfad
+-> small runtime path
 -> PASS
 ```
 
-Komplexe Mehrprozess-, Integrations- und Demo-Szenarien gehören in `BuildEngine-Tests`.
+Complex multi-process, integration, and demo scenarios belong in `BuildEngine-Tests`.
 
-Der ACE/TAO-Smoke ist bereits als kleiner IDL-/ORB-/Naming-Pfad umgesetzt.
+The ACE/TAO smoke is already implemented as a small IDL/ORB/Naming path.
 
-## Produktform
+## Product form
 
-Für normale Runtime-Bibliotheken ist Shared DLL + Import-Library der bevorzugte Standard, soweit technisch sinnvoll.
+For normal runtime libraries, Shared DLL + import library is the preferred default where technically meaningful.
 
-Static ist als dokumentierte Ausnahme zulässig. GoogleTest wird erst nach dem Freeze bewusst hinsichtlich Static-vs-Shared bewertet.
+Static is permitted as a documented exception. GoogleTest will be deliberately reassessed for Static vs Shared only after the freeze.
 
-## Incremental State
+## Incremental state
 
-Der Library-`timestamp` beschreibt den Änderungsstand des wirksamen Vertrags. Während des Freeze werden Library-Timestamps nicht verändert.
+The library `timestamp` describes the revision of the effective contract. Library timestamps remain unchanged during the freeze.
 
-Die fortlaufende Incremental-State-Autorität liegt im BuildEngine-Kern bei technischen Step-Markern. Der verifizierte Folgelauf mit 451/451 `CURRENT` bestätigt den aktuellen Vertrag.
+Ongoing incremental-state authority resides in the BuildEngine core through technical step markers. The verified follow-up run with 451/451 `CURRENT` confirms the current contract.
 
-## Freeze-Regel
+## Freeze rule
 
-Bis zum Abschluss des vollständigen Clean-Room-Tests sind in diesem `admin/`-Baum keine funktionalen Änderungen zulässig.
+No functional changes are permitted in this `admin/` tree until the complete clean-room test has finished.
 
-Insbesondere nicht ändern:
+In particular, do not change:
 
 - `build-libraries.xml`,
 - `build-tools.xml`,
 - XSDs,
-- Patches,
-- CMake-/Toolchain-Adapter,
-- Programme,
-- Smokes,
-- Source-Pins,
-- Hashes,
-- Library-Timestamps,
-- Build-/Test-/Install-/Publishparameter.
+- patches,
+- CMake/toolchain adapters,
+- programs,
+- smokes,
+- source pins,
+- hashes,
+- library timestamps,
+- build/test/install/publish parameters.
 
-Findet der Clean-Room-Test einen funktionalen Fehler, wird nur die minimal notwendige Korrektur vorgenommen; anschließend muss der vollständige Clean-Room-Test mit einer neuen dokumentierten Freeze-Basis wiederholt werden.
+If the clean-room test finds a functional error, only the minimally necessary correction is made; the complete clean-room test must then be repeated against a newly documented freeze baseline.
 
-## Nach dem Clean-Room-Test
+## After the clean-room test
 
-Erst danach wieder aufnehmen:
+Only then resume:
 
 - OpenCL,
-- GoogleTest und Static-vs-Shared-Entscheidung,
-- weitere Security-Identitäten,
-- Publish-Ownership,
-- neue explizite DAG-Parallelisierung,
-- weitere Bibliotheken nur bei zusätzlichem Erkenntniswert.
+- GoogleTest and the Static-vs-Shared decision,
+- further security identities,
+- publish ownership,
+- new explicit DAG parallelization,
+- further libraries only where they add new evidence.
