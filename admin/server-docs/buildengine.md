@@ -2,20 +2,6 @@
 
 BuildEngine is a declarative build orchestration system for reproducible C and C++ third-party library builds. Its current Windows integration is centered on Embarcadero C++Builder and the modern BCC64X toolchain. Library knowledge belongs in synchronized XML contracts, while the executable evaluates those contracts, prepares tools, creates a technical dependency graph, executes technical steps, and records the resulting state.
 
-> This page is also a renderer acceptance document. It intentionally exercises standard Markdown, GitHub-flavored Markdown, syntax highlighting, Mermaid, links, tables, block quotes, inline code, task lists, strikethrough, and C++23 examples.
-
-## Renderer acceptance checklist
-
-- [x] Headings and paragraphs
-- [x] **Bold**, *italic*, and `inline code`
-- [x] Tables
-- [x] Task lists
-- [x] ~~Strikethrough~~
-- [x] Automatic links: https://github.com/adeccscholar
-- [x] Syntax-highlighted fenced code
-- [x] Mermaid diagrams
-- [x] Nested lists and block quotes
-
 ## Main responsibilities
 
 BuildEngine separates configuration, orchestration, execution, evidence, and presentation:
@@ -50,8 +36,6 @@ flowchart TD
    J --> N
    N --> O[Write machine-state summary]
 ```
-
-The diagram is intentionally part of this document so the server can verify Mermaid selection independently from plain Markdown rendering.
 
 ## Dependency relationships
 
@@ -95,19 +79,18 @@ A small C++23 example:
 
 ```cpp
 #include <concepts>
+#include <functional>
 #include <ranges>
 #include <span>
 
- template<typename value_ty>
- concept integral_value = std::integral<value_ty> && !std::same_as<value_ty, bool>;
+template<typename value_ty>
+concept integral_value = std::integral<value_ty> && !std::same_as<value_ty, bool>;
 
- template<integral_value value_ty>
- [[nodiscard]] value_ty Sum(std::span<value_ty const> const spValues) {
-    return std::ranges::fold_left(spValues, value_ty {}, std::plus {});
- }
+template<integral_value value_ty>
+[[nodiscard]] value_ty Sum(std::span<value_ty const> const spValues) {
+   return std::ranges::fold_left(spValues, value_ty {}, std::plus {});
+}
 ```
-
-The example is intentionally language-marked so Highlight.js selection can be verified on this page.
 
 ## Incremental state
 
@@ -115,7 +98,7 @@ BuildEngine distinguishes technical state from generated evidence. A library is 
 
 > **State rule:** technical step state is authoritative. Evidence validation can reject an otherwise current result, but it does not create a second independent state authority.
 
-This distinction is especially important for large builds because a changed library timestamp, source input, build contract, tool version, or other fingerprint input can invalidate only the work that must actually run again.
+This distinction is especially important for large builds because a changed library timestamp, source input, build contract, tool version, or other fingerprint input should invalidate only the work that actually has to run again.
 
 ## Build variants
 
@@ -151,7 +134,27 @@ A typical conceptual shape is:
 | `MetadataJob` | License and CycloneDX metadata |
 | `CentralDocumentationJob` | Library documentation and Doxygen integration |
 | `SmokeJobBuilder` | Consumer/integration smoke tests |
-| `BuildEngine-Common` | Shared repository, HTTP, security, package, and utility services |
+| `BuildEngine-Common` | Shared repository, HTTP, security, package, Markdown, and utility services |
+
+## Shared architecture
+
+BuildEngine is no longer only one console executable. The project now has several presentation surfaces: the command-line application, the VCL-based manager, and the local HTTP/REST server. They must not develop separate interpretations of libraries, packages, security findings, or risk state.
+
+Shared domain and infrastructure functionality therefore belongs in `BuildEngine-Common`. The same classes can be consumed by the console application, the graphical VCL application, and the server. Risk assessment is an important example: the assessment model should have one implementation even though its results can be presented in a console table, a native Windows UI, JSON, or an HTML page.
+
+```mermaid
+graph TD
+   Common[BuildEngine-Common DLL]
+   Console[BuildEngine Console] --> Common
+   Manager[VCL Manager] --> Common
+   Server[HTTP / REST Server] --> Common
+   Common --> Repository[Repository and package model]
+   Common --> Risk[Risk assessment]
+   Common --> Markdown[Markdown rendering]
+   Common --> Export[Package export]
+```
+
+This separation keeps presentation technology replaceable while the technical interpretation remains consistent.
 
 ## Failure model
 
@@ -177,10 +180,11 @@ Nested example:
 
 ## Design principle
 
-The system is intentionally contract-driven. Compiler-specific integration remains explicit and testable, while reusable orchestration logic should stay generic. In the current third-party project, alternative compiler paths are not silently substituted for BCC64X: compatibility problems must remain visible so the integration result is meaningful.
+The system is intentionally contract-driven. Compiler-specific integration remains explicit and verifiable, while reusable orchestration logic should stay generic. In the current third-party project, alternative compiler paths are not silently substituted for BCC64X: compatibility problems must remain visible so the integration result is meaningful.
 
-## Related server documentation
+## Related documentation
 
+- [Project story: C++ Back in the Future and Staying Ahead of the Wave](/manual/story.md)
 - [Server and REST API](/manual/server.md)
 - [Configuration and command line](/manual/configuration.md)
 - [Generated library documentation index](/index.html)
