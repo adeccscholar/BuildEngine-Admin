@@ -1,15 +1,17 @@
-# BuildEngine-Vertrag `build-tools.xml`
+# BuildEngine Contract `build-tools.xml`
 
-`admin/build-tools.xml` beschreibt die Werkzeuge, die BuildEngine für Bootstrap, Quellbeschaffung, Build, Tests, Dokumentation und Serverdarstellung verwendet. Die Datei ist deklarativer Bestandteil des synchronisierten Admin-Vertrags. Werkzeugwissen soll deshalb hier und nicht in bibliotheksspezifischen C++-Sonderfällen liegen.
+[TOC|Content]
 
-Verwandte Dokumente:
+`admin/build-tools.xml` describes the tools BuildEngine uses for bootstrap, source acquisition, builds, tests, documentation, and server presentation. The file is a declarative part of the synchronized Admin contract. Tool knowledge therefore belongs here rather than in library-specific C++ special cases.
 
-- [Werkzeugübersicht](tools.md)
-- [Bibliotheksvertrag `build-libraries.xml`](build-libraries.md)
-- [Dokumentationsvertrag](documentation.md)
-- [BuildEngine-Konfiguration](configuration.md)
+Related documents:
 
-## Grundstruktur
+- [Tool overview](tools.md)
+- [Library contract `build-libraries.xml`](build-libraries.md)
+- [Documentation contract](documentation.md)
+- [BuildEngine configuration](configuration.md)
+
+## Basic structure
 
 ```xml
 <buildTools xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -21,30 +23,30 @@ Verwandte Dokumente:
 </buildTools>
 ```
 
-Das Schema liegt unter `admin/schemas/build-tools.xsd`.
+The schema is located at `admin/schemas/build-tools.xsd`.
 
 ## `<tool>`
 
-Jedes Werkzeug besitzt mindestens:
+Every tool has at least the following attributes:
 
-| Attribut | Bedeutung |
+| Attribute | Meaning |
 | --- | --- |
-| `id` | Eindeutige logische Werkzeug-ID, z. B. `cmake`, `ninja`, `doxygen`, `miktex`. |
-| `version` | Vom Vertrag erwartete/provisionierte Version. |
-| `runtimeVersion` | Optional abweichende Version, die als effektive Runtime-Version registriert wird. |
-| `required` | `always` oder `when-used`. |
+| `id` | Unique logical tool ID, for example `cmake`, `ninja`, `doxygen`, or `miktex`. |
+| `version` | Version expected/provisioned by the contract. |
+| `runtimeVersion` | Optional different version registered as the effective runtime version. |
+| `required` | `always` or `when-used`. |
 
 ### `required="always"`
 
-Das Werkzeug gehört zur allgemeinen BuildEngine-Werkzeugpalette und wird während der normalen Tool-Vorbereitung aufgelöst und geprüft.
+The tool is part of the general BuildEngine tool set and is resolved and checked during normal tool preparation.
 
 ### `required="when-used"`
 
-Das Werkzeug wird nur provisioniert, wenn ein aktiver Vertrag es tatsächlich benötigt. Beispiel: `miktex` wird nur angefordert, wenn wenigstens eine Library effektiv PDF-Dokumentation erzeugt.
+The tool is provisioned only when an active contract actually requires it. For example, `miktex` is requested only when at least one library effectively produces PDF documentation.
 
-## Genau eine Bereitstellungsart
+## Exactly one provisioning mode
 
-Ein `<tool>` enthält genau eine der folgenden Alternativen:
+A `<tool>` contains exactly one of the following alternatives:
 
 ```text
 managed | generated | bds | discover
@@ -52,7 +54,7 @@ managed | generated | bds | discover
 
 ### `<managed>`
 
-BuildEngine lädt und verwaltet das Werkzeug selbst.
+BuildEngine downloads and manages the tool itself.
 
 ```xml
 <tool id="ninja" version="1.13.2" required="always">
@@ -68,24 +70,24 @@ BuildEngine lädt und verwaltet das Werkzeug selbst.
 </tool>
 ```
 
-| Attribut | Bedeutung |
+| Attribute | Meaning |
 | --- | --- |
-| `root` | Relativer Zielpfad unter `toolsRoot`. |
-| `executable` | Relativer Entry-Point innerhalb des Managed Roots. |
+| `root` | Relative destination path below `toolsRoot`. |
+| `executable` | Relative entry point inside the managed root. |
 
 #### `<download>`
 
-| Attribut | Bedeutung |
+| Attribute | Meaning |
 | --- | --- |
-| `url` | Downloadquelle; BuildEngine-Variablen dürfen verwendet werden. |
-| `archive` | Dateiname im Downloadbereich. |
-| `sha256` | Erwarteter SHA-256-Hash. Der Hash ist Teil des reproduzierbaren Liefervertrags. |
+| `url` | Download source; BuildEngine variables may be used. |
+| `archive` | File name in the download area. |
+| `sha256` | Expected SHA-256 hash. The hash is part of the reproducible delivery contract. |
 
-Ein Download gilt nicht allein aufgrund eines vorhandenen Dateinamens als vertrauenswürdig; der deklarierte Hash ist maßgeblich.
+A download is not trusted merely because a file with the expected name exists; the declared hash is authoritative.
 
-### Externe Installation/Extraktion mit `<extract>`
+### External installation/extraction with `<extract>`
 
-Ein Managed Tool kann nach dem verifizierten Download einen externen Installations- oder Extraktionsprozess ausführen:
+A managed tool can execute an external installer or extraction process after the verified download:
 
 ```xml
 <extract executable="{Archive}">
@@ -94,20 +96,20 @@ Ein Managed Tool kann nach dem verifizierten Download einen externen Installatio
 </extract>
 ```
 
-Verfügbare zusätzliche Variablen sind insbesondere:
+Important additional variables include:
 
-| Variable | Bedeutung |
+| Variable | Meaning |
 | --- | --- |
-| `{Archive}` | Vollständiger Pfad des verifizierten Downloads. |
-| `{ManagedRoot}` | Aufgelöster Zielroot des Werkzeugs. |
-| `{ToolId}` | Werkzeug-ID. |
-| `{ToolVersion}` | Vertragsversion des Werkzeugs. |
+| `{Archive}` | Full path of the verified download. |
+| `{ManagedRoot}` | Resolved destination root of the tool. |
+| `{ToolId}` | Tool ID. |
+| `{ToolVersion}` | Contract version of the tool. |
 
-MiKTeX verwendet diesen Weg, weil der offizielle Basic Installer eine EXE und kein gewöhnliches ZIP-Archiv ist.
+MiKTeX uses this path because the official Basic Installer is an executable rather than a normal ZIP archive.
 
-### Native Extraktion mit `<nativeExtract>`
+### Native extraction with `<nativeExtract>`
 
-Archive können durch den integrierten libarchive-Pfad extrahiert werden:
+Archives can be extracted through the integrated libarchive path:
 
 ```xml
 <nativeExtract format="libarchive" root="meson-1.12.0">
@@ -116,11 +118,11 @@ Archive können durch den integrierten libarchive-Pfad extrahiert werden:
 </nativeExtract>
 ```
 
-Optionale `<include>`-Muster begrenzen den extrahierten Inhalt. `<require>` definiert Dateien, die nach der Extraktion zwingend vorhanden sein müssen.
+Optional `<include>` patterns restrict the extracted content. `<require>` defines files that must exist after extraction.
 
 ### `<generated>`
 
-BuildEngine kann ein Werkzeugartefakt aus bereits vorhandenen Dateien generieren. Der aktuelle Anwendungsfall ist die BCC64X-UCRT-Kompatibilitätsbibliothek.
+BuildEngine can generate a tool artifact from already available files. The current use case is the BCC64X UCRT compatibility library.
 
 ```xml
 <tool id="bcc64x-ucrt-compat" version="20.1.7-compat1" required="always">
@@ -134,11 +136,11 @@ BuildEngine kann ein Werkzeugartefakt aus bereits vorhandenen Dateien generieren
 </tool>
 ```
 
-Der erzeugte Stand wird nur erneuert, wenn der deklarative Vertrag oder die Quelle dies erforderlich macht.
+The generated state is refreshed only when the declarative contract or its source requires it.
 
 ### `<bds>`
 
-Werkzeuge, die Bestandteil der installierten C++Builder/RAD-Studio-Umgebung sind, werden relativ zu `{BDS}` aufgelöst:
+Tools that are part of the installed C++Builder/RAD Studio environment are resolved relative to `{BDS}`:
 
 ```xml
 <tool id="bcc64x" version="20.1.7" required="always">
@@ -146,11 +148,11 @@ Werkzeuge, die Bestandteil der installierten C++Builder/RAD-Studio-Umgebung sind
 </tool>
 ```
 
-Das ist ausdrücklich keine alternative Compilerwahl: im BCC64X-Projekt bleibt der konfigurierte C++Builder-Toolchainpfad maßgeblich.
+This is explicitly not an alternative compiler selection: in the BCC64X project, the configured C++Builder toolchain path remains authoritative.
 
 ### `<discover>`
 
-Bereits installierte Werkzeuge können über deklarierte Kandidaten gefunden werden:
+Already installed tools can be found through declarative candidates:
 
 ```xml
 <discover executable="rc.exe" path="true">
@@ -158,11 +160,11 @@ Bereits installierte Werkzeuge können über deklarierte Kandidaten gefunden wer
 </discover>
 ```
 
-`path="true"` erlaubt zusätzlich die Suche über die effektive Umgebung. Kandidaten unterstützen die von BuildEngine vorgesehenen Variablen und Wildcards.
+`path="true"` additionally permits lookup through the effective environment. Candidates support BuildEngine variables and wildcards.
 
 ## `<launcher>`
 
-Ein Werkzeug kann über ein anderes Werkzeug gestartet werden. Meson ist beispielsweise ein Python-Programm:
+A tool can be started through another tool. Meson, for example, is a Python program:
 
 ```xml
 <launcher tool="python">
@@ -170,11 +172,11 @@ Ein Werkzeug kann über ein anderes Werkzeug gestartet werden. Meson ist beispie
 </launcher>
 ```
 
-BuildEngine validiert den Launcher-Graphen auf unbekannte Werkzeuge und Zyklen.
+BuildEngine validates the launcher graph for unknown tools and cycles.
 
 ## `<probe>`
 
-Nach Auflösung oder Provisionierung kann ein Werkzeug mit einem Versions-/Funktionsprobe geprüft werden:
+After resolution or provisioning, a tool can be checked with a version/function probe:
 
 ```xml
 <probe contains="cmake version 4.1.1">
@@ -182,38 +184,36 @@ Nach Auflösung oder Provisionierung kann ein Werkzeug mit einem Versions-/Funkt
 </probe>
 ```
 
-Der Prozess muss erfolgreich enden und die erwartete Zeichenfolge liefern. Erst danach wird das Werkzeug in `admin/tools.xml` als effektiver Tool-State registriert.
+The process must finish successfully and return the expected text. Only then is the tool registered in `admin/tools.xml` as effective tool state.
 
-## Managed Tool State
+## Managed tool state
 
-`admin/build-tools.xml` ist der Soll-Vertrag. `admin/tools.xml` ist erzeugter Zustand. Die beiden Dateien haben unterschiedliche Rollen:
+`admin/build-tools.xml` is the desired-state contract. `admin/tools.xml` is generated state. They have different roles:
 
-```text
-build-tools.xml  = deklarative Quelle
-       ↓
-Download / Discovery / Generate / Probe
-       ↓
-tools.xml        = auf dieser Maschine tatsächlich aufgelöster Zustand
+```mermaid
+flowchart TD
+   Contract["build-tools.xml<br/>declarative source"] --> Resolve["Download / Discovery / Generate / Probe"]
+   Resolve --> State["tools.xml<br/>effective state on this machine"]
 ```
 
-`tools.xml` darf deshalb nicht als zweite handgepflegte Quelle für Werkzeugwissen verwendet werden.
+`tools.xml` must therefore not become a second manually maintained source of tool knowledge.
 
-## Versionsänderungen
+## Version changes
 
-Bei einem Werkzeugupdate müssen mindestens geprüft werden:
+For a tool update, at least the following must be checked:
 
-1. Version und ggf. `runtimeVersion`.
-2. Download-URL.
-3. Archiv-/Installername.
+1. Version and, where applicable, `runtimeVersion`.
+2. Download URL.
+3. Archive/installer name.
 4. SHA-256.
-5. erwarteter Entry-Point.
-6. Probe und erwartete Ausgabe.
-7. Auswirkungen auf technische Fingerprints der Verbraucher.
-8. Dokumentation in [tools.md](tools.md), falls sich Rolle oder Version ändert.
+5. Expected entry point.
+6. Probe and expected output.
+7. Effects on technical fingerprints of consumers.
+8. Documentation in [tools.md](tools.md) if the role or version changes.
 
-Ein Toolupdate darf nicht pauschal unabhängige Library-Builds invalidieren. Die Version soll nur in die States einfließen, deren Ergebnis tatsächlich davon abhängt.
+A tool update must not invalidate unrelated library builds globally. A version should affect only states whose results actually depend on that tool.
 
-## MiKTeX als Beispiel für `when-used`
+## MiKTeX as a `when-used` example
 
 ```xml
 <tool id="miktex" version="25.12" required="when-used">
@@ -224,8 +224,8 @@ Ein Toolupdate darf nicht pauschal unabhängige Library-Builds invalidieren. Die
 </tool>
 ```
 
-Die Doxygen-Phase entscheidet anhand des effektiven Dokumentationsprofils, ob LaTeX benötigt wird. Doxygen erzeugt HTML und LaTeX gegebenenfalls in **einem Lauf**. MiKTeX wird nur für den nachgelagerten PDF-Schritt benötigt. Details stehen im [Dokumentationsvertrag](documentation.md).
+The Doxygen phase resolves the effective documentation profile to determine whether LaTeX is required. Doxygen produces HTML and, when needed, LaTeX in **one run**. MiKTeX is required only for the downstream PDF step. See the [documentation contract](documentation.md) for details.
 
-## Pflegegrundsatz
+## Maintenance rule
 
-Änderungen am Werkzeugvertrag und Änderungen an seiner Bedeutung werden zusammen dokumentiert. `build-tools.xml`, dieses Dokument und [tools.md](tools.md) sollen deshalb als eine fachliche Einheit gepflegt werden.
+Changes to the tool contract and changes to its meaning are documented together. `build-tools.xml`, this document, and [tools.md](tools.md) are maintained as one coherent technical unit.
