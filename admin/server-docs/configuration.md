@@ -1,5 +1,7 @@
 # BuildEngine Configuration and Command Line
 
+[TOC|Content]
+
 BuildEngine combines a local XML parameter file with synchronized administration contracts. The local file selects the production tree, concurrency, repositories, feature switches, and contract locations; the Admin repository supplies the detailed tool, library, documentation, smoke-test, schema, and security definitions.
 
 Related reference documents:
