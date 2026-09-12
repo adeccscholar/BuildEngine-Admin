@@ -1,17 +1,19 @@
-# BuildEngine-Vertrag `build-libraries.xml`
+# BuildEngine Contract `build-libraries.xml`
 
-`admin/build-libraries.xml` ist der zentrale deklarative Buildvertrag für die von BuildEngine verwalteten C/C++-Bibliotheken. Hier werden Versionen, Abhängigkeiten, Quellen, Buildaktionen, Installationsregeln, Veröffentlichung, Smoke Tests, Security-Metadaten und optional noch vorhandene Upstream-Dokumentationsphasen beschrieben.
+[TOC|Content]
 
-Verwandte Dokumente:
+`admin/build-libraries.xml` is the central declarative build contract for the C and C++ libraries managed by BuildEngine. It describes versions, dependencies, sources, build actions, installation rules, publication, smoke tests, security metadata, and any remaining optional upstream documentation phases.
 
-- [Werkzeugvertrag `build-tools.xml`](build-tools.md)
-- [Werkzeugübersicht](tools.md)
-- [Dokumentationsvertrag](documentation.md)
-- [BuildEngine-Konfiguration](configuration.md)
+Related documents:
 
-Das Schema liegt in `admin/schemas/build-libraries.xsd`. Der aktuelle Vertrag verwendet `schemaVersion="14"`.
+- [Tool contract `build-tools.xml`](build-tools.md)
+- [Tool overview](tools.md)
+- [Documentation contract](documentation.md)
+- [BuildEngine configuration](configuration.md)
 
-## Grundstruktur
+The schema is located at `admin/schemas/build-libraries.xsd`. The current contract uses `schemaVersion="14"`.
+
+## Basic structure
 
 ```xml
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -29,30 +31,30 @@ Das Schema liegt in `admin/schemas/build-libraries.xsd`. Der aktuelle Vertrag ve
 </buildLibraries>
 ```
 
-`library/@id` ist innerhalb des Vertrags eindeutig.
+`library/@id` is unique within the contract.
 
 ## `<library>`
 
-| Attribut | Bedeutung |
+| Attribute | Meaning |
 | --- | --- |
-| `id` | Eindeutige Library-ID innerhalb von BuildEngine. |
-| `version` | Exakte, vom Vertrag gebaute Version. |
-| `timestamp` | Änderungszeitpunkt des Library-Vertrags. Er ist Bestandteil technischer Zustände und darf nur geändert werden, wenn der Library-Vertrag tatsächlich geändert wurde. |
+| `id` | Unique library ID within BuildEngine. |
+| `version` | Exact version built by the contract. |
+| `timestamp` | Modification time of the library contract. It is part of technical state and must be changed only when the technical contract of that library actually changes. |
 
-Versionsnummern gehören nicht in Build-/Installationspfade, wenn der Pfad bereits aus den Vertragsvariablen gebildet wird. Die Version bleibt Vertragsdaten und wird über Variablen in Pfade eingesetzt.
+Version numbers should not be duplicated unnecessarily in build/install path constants when the path is already formed from contract variables. The version remains contract data and is inserted into paths through variables.
 
-## Abhängigkeiten
+## Dependencies
 
 ```xml
 <dependency library="openssl" version="3.5.8"/>
 <dependency library="zlib" version="1.3.2"/>
 ```
 
-Eine Dependency beschreibt eine explizite BuildEngine-Abhängigkeit. BuildEngine kann daraus den DAG, Installationsvoraussetzungen, Metadaten, SBOM-Beziehungen und Dokumentation ableiten.
+A dependency describes an explicit BuildEngine dependency. BuildEngine can derive DAG relationships, installation prerequisites, metadata, SBOM relationships, and documentation from it.
 
-Abhängigkeiten dürfen nicht durch zufällige Dateifunde ersetzt werden: der Vertrag bleibt autoritativ.
+Dependencies must not be replaced by accidental file discovery: the contract remains authoritative.
 
-## Metadaten
+## Metadata
 
 ```xml
 <metadata name="Example Library"
@@ -65,20 +67,20 @@ Abhängigkeiten dürfen nicht durch zufällige Dateifunde ersetzt werden: der Ve
 </metadata>
 ```
 
-| Feld | Zweck |
+| Field | Purpose |
 | --- | --- |
-| `name` | Anzeigename. |
-| `category` | Gruppierung in UI und Dokumentation. |
-| `supplier` | Upstream-Hersteller/-Projekt. |
-| `homepage` | Upstream-Projektseite. |
-| `license/@name` | Lesbarer Lizenzname. |
-| `license/@spdx` | SPDX-Identifier, soweit eindeutig. |
-| `license/@licensor` | Optionaler Lizenzgeber. |
-| `license/@file` | Lizenzdatei im Source-/Package-Kontext. |
+| `name` | Display name. |
+| `category` | Grouping in UI and documentation. |
+| `supplier` | Upstream vendor/project. |
+| `homepage` | Upstream project page. |
+| `license/@name` | Human-readable license name. |
+| `license/@spdx` | SPDX identifier where unambiguous. |
+| `license/@licensor` | Optional licensor. |
+| `license/@file` | License file in source/package context. |
 
-Diese Metadaten fließen in Paketinformationen, SBOM und Dokumentation ein.
+This metadata flows into package information, SBOMs, and documentation.
 
-## Security-Metadaten
+## Security metadata
 
 ```xml
 <security>
@@ -87,19 +89,19 @@ Diese Metadaten fließen in Paketinformationen, SBOM und Dokumentation ein.
 </security>
 ```
 
-`ref` identifiziert typischerweise den Upstream-Tag. Optional kann ein `commit` angegeben werden, wenn ein exakter Commit Teil des Security-/Source-Vertrags ist.
+`ref` typically identifies the upstream tag. An optional `commit` can be supplied when an exact commit is part of the security/source contract.
 
-Security-Metadaten ersetzen nicht den Source-Hash. Repository-Identität, Release-Tag/Commit und heruntergeladenes Archiv sind unterschiedliche Evidenzebenen.
+Security metadata does not replace the source hash. Repository identity, release tag/commit, and the downloaded archive are different evidence layers.
 
 ## `<source>`
 
-Die Source-Phase besteht aus deklarativen technischen Aktionen. Unterstützt werden unter anderem:
+The source phase consists of declarative technical actions. Supported actions include:
 
 ```text
 download | extract | copy | execute | target
 ```
 
-Aktionen können über `id` und `dependsOn` einen technischen DAG bilden. Ohne explizite Graph-Metadaten gilt die deklarierte Reihenfolge.
+Actions can form a technical DAG through `id` and `dependsOn`. Without explicit graph metadata, the declared order applies.
 
 ### `<download>`
 
@@ -109,7 +111,7 @@ Aktionen können über `id` und `dependsOn` einen technischen DAG bilden. Ohne e
           sha256="..."/>
 ```
 
-`sha256` ist optional im Schema, soll für reproduzierbare externe Source-Downloads aber grundsätzlich gesetzt werden, sofern Upstream eine stabile Release-Datei bereitstellt.
+`sha256` is optional in the schema but should normally be present for reproducible external source downloads whenever upstream provides a stable release artifact.
 
 ### `<extract>`
 
@@ -119,15 +121,15 @@ Aktionen können über `id` und `dependsOn` einen technischen DAG bilden. Ohne e
 </extract>
 ```
 
-Unterstützte Formate sind `zip`, `gzip`, `gz` und `libarchive`.
+Supported formats are `zip`, `gzip`, `gz`, and `libarchive`.
 
-| Attribut | Bedeutung |
+| Attribute | Meaning |
 | --- | --- |
-| `root` | Erwarteter Archivroot. |
-| `merge` | Inhalt mit vorhandenem Arbeitsbestand zusammenführen. |
-| `preserveCurrentArtifact` | Aktuelles Aktionsartefakt für folgende Schritte erhalten. |
+| `root` | Expected archive root. |
+| `merge` | Merge content into an existing workspace. |
+| `preserveCurrentArtifact` | Preserve the current action artifact for following steps. |
 
-`<require>` prüft erwartete Dateien/Verzeichnisse unmittelbar nach der Extraktion.
+`<require>` verifies expected files/directories immediately after extraction.
 
 ### `<copy>`
 
@@ -139,7 +141,7 @@ Unterstützte Formate sind `zip`, `gzip`, `gz` und `libarchive`.
 </copy>
 ```
 
-Optionen:
+Options include:
 
 - `recursive`
 - `overwrite`
@@ -162,19 +164,19 @@ Optionen:
 </execute>
 ```
 
-`showOutput` steuert, ob Prozessausgabe direkt sichtbar ist. Der vollständige Prozesslauf bleibt im BuildEngine-Logging nachvollziehbar.
+`showOutput` controls whether process output is shown directly. The complete process run remains available through BuildEngine logging.
 
 ### `<target>`
 
-`target` ist der deklarative, evaluierte Prozessadapter für bekannte Buildtreiber.
+`target` is the declarative evaluated process adapter for known build drivers.
 
-Unterstützte `type`-Werte im Library-Schema:
+Supported `type` values in the library schema are:
 
 ```text
 generic, cmake, meson, perl, gmake, python, bmake
 ```
 
-Beispiel:
+Example:
 
 ```xml
 <target name="build"
@@ -186,13 +188,13 @@ Beispiel:
 </target>
 ```
 
-`tool` referenziert eine logische Werkzeug-ID aus [build-tools.xml](build-tools.md). Alternativ kann ein explizites `executable` verwendet werden, wenn der Vertrag dies erfordert.
+`tool` references a logical tool ID from [build-tools.xml](build-tools.md). An explicit `executable` can be used instead when the contract requires it.
 
-`<parameter>` stellt treiberspezifische Parameter bereit. `<temporaryFile>` kann temporäre Textdateien aus `<line>`-Einträgen materialisieren. Doppelte geschweifte Klammern in Target-Zeilen erzeugen literale Klammern.
+`<parameter>` supplies driver-specific parameters. `<temporaryFile>` can materialize temporary text files from `<line>` entries. Double braces in target lines produce literal braces.
 
-## `<build>` und Varianten
+## `<build>` and variants
 
-Buildparameter, die für alle Varianten gleich sind, gehören auf die gemeinsame Ebene. Varianten enthalten nur die Unterschiede.
+Build parameters that are common to all variants belong on the shared level. Variants contain only the differences.
 
 ```xml
 <build>
@@ -216,35 +218,35 @@ Buildparameter, die für alle Varianten gleich sind, gehören auf die gemeinsame
 </build>
 ```
 
-Das Modell ist bewusst **ein Buildvertrag mit mehreren Varianten**, nicht zwei voneinander unabhängige Buildverträge.
+The model deliberately represents **one build contract with multiple variants**, not two independent build contracts.
 
 ### `testsAffectBuild`
 
-`testsAffectBuild="true"` bedeutet, dass die Testeinstellung bereits den Build-Fingerprint beeinflusst. Das soll nur gesetzt werden, wenn die Buildkonfiguration selbst durch aktivierte/deaktivierte Tests verändert wird.
+`testsAffectBuild="true"` means that the test setting already affects the build fingerprint. It should be set only when the build configuration itself changes as a result of tests being enabled or disabled.
 
-## Direkte Installation ohne Build
+## Direct installation without a build
 
-Für Header-only oder anderweitig nicht zu übersetzende Libraries kann statt `<build>` ein direkter `<install>`-Block verwendet werden. Unterstützte Aktionen sind dort `execute`, `target`, `copy` und `require`.
+For header-only libraries or libraries that otherwise do not require compilation, a direct `<install>` block can be used instead of `<build>`. Supported actions there are `execute`, `target`, `copy`, and `require`.
 
-## Test- und Validation-Aktionen
+## Test and validation actions
 
-Mehrere Aktionstypen besitzen:
+Several action types support:
 
 ```xml
 test="true" phase="test"
 ```
 
-oder
+or:
 
 ```xml
 test="true" phase="validation"
 ```
 
-Damit werden technische Aktionen semantisch einer Test-/Validierungsphase zugeordnet. Tests sollen nicht leichtfertig deaktiviert werden; ein Fehlschlag wird zuerst analysiert.
+This assigns technical actions semantically to a test/validation phase. Tests should not be disabled casually; failures are investigated first.
 
 ## Installation
 
-Bei normalen Buildverträgen wird Installation in zwei Ebenen getrennt:
+For normal build contracts, installation is split into two levels:
 
 ```xml
 <install>
@@ -257,13 +259,13 @@ Bei normalen Buildverträgen wird Installation in zwei Ebenen getrennt:
 </install>
 ```
 
-`perVariant` verarbeitet Release/Debug-spezifische Artefakte. `common` verarbeitet gemeinsame Header, CMake-Metadaten, Lizenzen oder andere variantsunabhängige Dateien.
+`perVariant` processes Release/Debug-specific artifacts. `common` processes shared headers, CMake metadata, licenses, or other variant-independent files.
 
-Shared Libraries mit DLL plus Importbibliothek sind im Projekt die Standardform. Statische Artefakte müssen, wenn sie zusätzlich erzeugt werden, klar unterscheidbar benannt sein.
+Shared libraries with DLL plus import library are the project default. Static artifacts, when additionally produced, must have clearly distinguishable names.
 
-## Veröffentlichung mit `<publish>`
+## Publication with `<publish>`
 
-`publish` erzeugt den konsumierbaren SDK-/Package-Sichtbereich aus dem installierten Bestand.
+`publish` creates the consumable SDK/package view from the installed state.
 
 ```xml
 <publish root="..."
@@ -276,15 +278,15 @@ Shared Libraries mit DLL plus Importbibliothek sind im Projekt die Standardform.
 </publish>
 ```
 
-Unterstützte Einträge:
+Supported entries:
 
-- `<tree>` – kompletter Teilbaum
-- `<files>` – dateitypbasierte Veröffentlichung
-- `<cmake>` – CMake-Paketinformationen
+- `<tree>` – complete subtree
+- `<files>` – file-type-based publication
+- `<cmake>` – CMake package information
 
-`optional="true"` erlaubt bewusst fehlende optionale Artefakte. Das darf nicht verwendet werden, um eigentlich notwendige Buildfehler zu kaschieren.
+`optional="true"` deliberately allows an optional artifact to be absent. It must not be used to hide a build failure for a required artifact.
 
-## Library-lokale Smoke Tests
+## Library-local smoke tests
 
 ```xml
 <smoke id="basic"
@@ -300,19 +302,19 @@ Unterstützte Einträge:
 </smoke>
 ```
 
-`scope` ist `published` oder `package`. Smoke Tests prüfen den konsumierbaren Zustand und sollen nicht durch interne Buildverzeichnisse zufällig erfolgreich werden.
+`scope` is either `published` or `package`. Smoke tests validate the consumable state and must not succeed accidentally through internal build directories.
 
-## `<documentation>` im Library-Vertrag
+## `<documentation>` in the library contract
 
-Der Library-Vertrag besitzt historisch optionale `doc`- und `doxygen`-Phasen. Diese werden derzeit noch unabhängig unterstützt, bis die betroffenen Upstream-Verträge bereinigt sind.
+Historically, the library contract contains optional `doc` and `doxygen` phases. They are still supported independently until the affected upstream contracts have been cleaned up.
 
-Die **zentrale BuildEngine-API-Dokumentation** wird dagegen durch [build-documentation.xml](documentation.md) gesteuert. Dort werden Doxygen-Profil, Source-Sicht, Excludes und PDF/LaTeX geregelt.
+The **central BuildEngine API documentation** is controlled by [build-documentation.xml](documentation.md). It defines the Doxygen profile, source visibility, exclusions, and PDF/LaTeX behavior.
 
-Insbesondere gilt: wenn zentrale PDF-Dokumentation aktiv ist, erzeugt **derselbe Doxygen-Lauf HTML und LaTeX**. Es gibt keinen zweiten Doxygen-Lauf für PDF.
+In particular, when central PDF documentation is enabled, **the same Doxygen run produces HTML and LaTeX**. There is no second Doxygen run for PDF.
 
-## BuildEngine-Variablen
+## BuildEngine variables
 
-Verträge verwenden aufgelöste Variablen statt fest kodierter Maschinenpfade. Typische Beispiele sind:
+Contracts use resolved variables instead of hard-coded machine paths. Typical examples are:
 
 ```text
 {LibraryId}
@@ -328,29 +330,29 @@ Verträge verwenden aufgelöste Variablen statt fest kodierter Maschinenpfade. T
 {ENV:<name>}
 ```
 
-Konkrete Variablen hängen vom jeweiligen Aktionskontext ab. Pfade und Befehle sollen deklarativ aus diesen Werten zusammengesetzt werden.
+The concrete variables available depend on the action context. Paths and commands should be assembled declaratively from these values.
 
-## Technischer Zustand
+## Technical state
 
-BuildEngine entscheidet nicht primär anhand vorhandener Ausgabedateien, ob ein Schritt aktuell ist. Autoritativ sind die technischen Step-States mit Library-Timestamp und Fingerprint. Die Existenz notwendiger Ergebnisdateien ist zusätzliche Evidenz.
+BuildEngine does not primarily decide whether a step is current by looking at output files. Technical step-state records with library timestamp and fingerprint are authoritative. The existence of required result files is additional evidence.
 
-Daraus folgen zwei Regeln:
+Two rules follow:
 
-1. Ein vorhandenes Artefakt ohne passenden Step-State macht einen Schritt nicht automatisch aktuell.
-2. Ein unabhängiger Vertragswechsel darf nicht über einen globalen Sammel-Fingerprint alle Libraries neu bauen.
+1. An existing artifact without the matching step state does not automatically make a step current.
+2. An independent contract change must not force all libraries to rebuild through a global aggregate fingerprint.
 
-## Änderungsregeln
+## Change rules
 
-Bei Änderungen an einem Library-Vertrag:
+When changing a library contract:
 
-1. Nur die tatsächlich betroffene Library ändern.
-2. `timestamp` dieser Library aktualisieren, wenn sich ihr technischer Vertrag geändert hat.
-3. Keine Versionsnummern unnötig in Pfadkonstanten duplizieren.
-4. Toolchain und BCC64X-Integrationsziel nicht still durch alternative Compiler ersetzen.
-5. Tests nicht ohne Analyse abschalten.
-6. Source-Hashes, Patchbindung und Security-Evidenz aktualisieren, wenn sich die Source-Version ändert.
-7. Diese Markdown-Dokumentation erweitern, wenn sich Semantik oder XML-Vokabular ändert.
+1. Change only the library that is actually affected.
+2. Update that library's `timestamp` when its technical contract changes.
+3. Do not duplicate version numbers unnecessarily in path constants.
+4. Do not silently replace the BCC64X integration target with an alternative compiler/toolchain.
+5. Do not disable tests without analysis.
+6. Update source hashes, patch binding, and security evidence when the source version changes.
+7. Extend this Markdown documentation when semantics or XML vocabulary change.
 
-## Pflegegrundsatz
+## Maintenance rule
 
-`build-libraries.xml`, sein XSD und dieses Dokument werden gemeinsam gepflegt. Neue XML-Funktionen gelten erst dann als vollständig integriert, wenn ihre Semantik auch hier dokumentiert ist.
+`build-libraries.xml`, its XSD, and this document are maintained together. A new XML feature is considered fully integrated only when its semantics are documented here as well.
