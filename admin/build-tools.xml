@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildTools xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="schemas/build-tools.xsd"
-            schemaVersion="5">
+            schemaVersion="6">
    <tool id="git" version="2.55.0.3" runtimeVersion="2.55.0.windows.3" required="always">
       <managed root="git\2.55.0.3" executable="cmd\git.exe">
          <download url="https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.3/MinGit-2.55.0.3-64-bit.zip"
@@ -69,7 +69,7 @@
 
    <tool id="pkg-config" version="0.28-1" runtimeVersion="0.28" required="always">
       <managed root="pkg-config-lite\0.28-1" executable="pkg-config-lite-0.28-1\bin\pkg-config.exe">
-         <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download" archive="pkg-config-lite-0.28-1_bin-win32.zip" sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
+         <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download" archive="pkg-config-lite-0.28-1_bin-win32.zip" sha256="2038c49d23b5ca9e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
       </managed>
       <probe contains="0.28"><argument value="--version"/></probe>
    </tool>
@@ -83,10 +83,9 @@
 
    <!--
       MiKTeX is provisioned only when the effective documentation contract asks
-      for LaTeX/PDF output. Use the portable installer mode so the managed tool
-      does not inherit an existing per-user MiKTeX configuration from AppData.
-      The distinct managed root intentionally invalidates the earlier private
-      installation contract and forces one clean portable provisioning pass.
+      for LaTeX/PDF output. The managed preparation contract is tied to Doxygen
+      1.18.0 and installs its explicit LaTeX package surface before any PDF job.
+      Library PDF jobs keep automatic package installation disabled.
    -->
    <tool id="miktex" version="25.12" required="when-used">
       <managed root="miktex\25.12-portable" executable="texmfs\install\miktex\bin\x64\texify.exe">
@@ -100,6 +99,54 @@
             <argument value="--no-additional-roots"/>
             <argument value="--paper-size=A4"/>
          </extract>
+         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v1.txt">
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
+               <argument value="packages"/><argument value="update-package-database"/>
+               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/CTAN/systems/win32/miktex/tm/packages/"/>
+            </command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
+               <argument value="packages"/><argument value="check-update"/>
+               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/CTAN/systems/win32/miktex/tm/packages/"/>
+               <success code="0"/><success code="100"/>
+            </command>
+            <!-- Resolve the five missing dependencies reported by Basic MiKTeX 25.12 itself. -->
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
+               <argument value="packages"/><argument value="install"/>
+               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/CTAN/systems/win32/miktex/tm/packages/"/>
+               <argument value="ms"/><argument value="showframe"/><argument value="sttools"/><argument value="thailatex"/><argument value="luxi"/>
+            </command>
+            <!--
+               Doxygen Release_1_18_0 direct/default LaTeX contract:
+               header.tex + doxygen.sty + default PDFLaTeX font selection.
+               MiKTeX resolves transitive dependencies of these explicit package IDs.
+            -->
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
+               <argument value="packages"/><argument value="install"/>
+               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/CTAN/systems/win32/miktex/tm/packages/"/>
+               <argument value="ltxbase"/><argument value="latex-tools"/><argument value="graphics"/><argument value="amsfonts"/><argument value="psnfss"/>
+               <argument value="infwarerr"/><argument value="float"/><argument value="varwidth"/><argument value="xcolor"/><argument value="colortbl"/>
+               <argument value="xltabular"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/>
+               <argument value="hanging"/><argument value="ifpdf"/><argument value="adjustbox"/><argument value="stackengine"/>
+               <argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
+               <argument value="ifxetex"/><argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/>
+               <argument value="fancyhdr"/><argument value="natbib"/><argument value="tocloft"/><argument value="hyperref"/>
+               <argument value="caption"/><argument value="etoc"/>
+            </command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
+               <argument value="packages"/><argument value="verify"/>
+               <argument value="ltxbase"/><argument value="latex-tools"/><argument value="graphics"/><argument value="amsfonts"/><argument value="psnfss"/>
+               <argument value="infwarerr"/><argument value="float"/><argument value="varwidth"/><argument value="xcolor"/><argument value="colortbl"/>
+               <argument value="xltabular"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/>
+               <argument value="hanging"/><argument value="ifpdf"/><argument value="adjustbox"/><argument value="stackengine"/>
+               <argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
+               <argument value="ifxetex"/><argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/>
+               <argument value="fancyhdr"/><argument value="natbib"/><argument value="tocloft"/><argument value="hyperref"/>
+               <argument value="caption"/><argument value="etoc"/>
+            </command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
+               <argument value="fndb"/><argument value="refresh"/>
+            </command>
+         </prepare>
       </managed>
       <probe contains="MiKTeX"><argument value="--version"/></probe>
    </tool>

@@ -46,6 +46,25 @@
       <xs:attribute name="root" type="xs:string" use="required"/>
    </xs:complexType>
 
+   <xs:complexType name="prepareSuccessType">
+      <xs:attribute name="code" type="xs:unsignedInt" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="prepareCommandType">
+      <xs:sequence>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="success" type="prepareSuccessType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="prepareType">
+      <xs:sequence>
+         <xs:element name="command" type="prepareCommandType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="marker" type="xs:string" use="required"/>
+   </xs:complexType>
+
    <xs:complexType name="managedType">
       <xs:sequence>
          <xs:element name="download" type="downloadType"/>
@@ -53,6 +72,7 @@
             <xs:element name="extract" type="externalExtractType"/>
             <xs:element name="nativeExtract" type="nativeExtractType"/>
          </xs:choice>
+         <xs:element name="prepare" type="prepareType" minOccurs="0"/>
       </xs:sequence>
       <xs:attribute name="root" type="xs:string" use="required"/>
       <xs:attribute name="executable" type="xs:string" use="required"/>
