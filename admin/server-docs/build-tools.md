@@ -16,7 +16,7 @@ Related documents:
 ```xml
 <buildTools xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="schemas/build-tools.xsd"
-            schemaVersion="5">
+            schemaVersion="6">
    <tool id="ninja" version="1.13.2" required="always">
       ...
    </tool>
@@ -42,7 +42,7 @@ The tool is part of the general BuildEngine tool set and is resolved and checked
 
 ### `required="when-used"`
 
-The tool is provisioned only when an active contract actually requires it. For example, `miktex` is requested only when at least one library effectively produces PDF documentation.
+The tool is provisioned only when an active contract actually requires it. `miktex`, for example, is requested only when at least one library effectively produces PDF documentation.
 
 ## Exactly one provisioning mode
 
@@ -107,20 +107,45 @@ Important additional variables include:
 
 MiKTeX uses this path because the official Basic Installer is an executable rather than a normal ZIP archive.
 
+### Managed post-provisioning with `<prepare>`
+
+Schema version 6 adds a declarative post-provisioning phase for managed tools. It runs after the managed entry point exists and before the normal tool probe.
+
+```xml
+<prepare marker=".buildengine\example-v1.txt">
+   <command executable="bin\tool.exe">
+      <argument value="prepare"/>
+   </command>
+   <command executable="bin\tool.exe">
+      <argument value="check"/>
+      <success code="0"/>
+      <success code="100"/>
+   </command>
+</prepare>
+```
+
+The contract has the following semantics:
+
+- `marker` is a relative file below the managed tool root.
+- `command/@executable` is a relative executable below the same managed root.
+- `<argument>` values are resolved through the normal BuildEngine variables.
+- without `<success>`, only exit code `0` is accepted;
+- one or more `<success code="...">` entries replace that default, allowing tool-specific non-error result codes;
+- each command runs in the strict process-local managed-tool environment rather than inheriting the host `PATH`;
+- each command receives its own process log;
+- the resolved preparation contract is written to the marker only after every command succeeded.
+
+The marker is not merely a Boolean flag. Its content is the resolved preparation contract. If the version, executable, arguments, accepted exit codes, or command list changes, the stored content no longer matches and preparation runs again. This keeps preparation idempotent without introducing hidden state outside the managed tool root.
+
+`<prepare>` is deliberately generic. MiKTeX package preparation is its first user, but the BuildEngine implementation contains no MiKTeX-specific preparation branch.
+
 ### Long-running provisioning feedback
 
-External tool installers can take substantially longer than ordinary archive extraction. MiKTeX is the current important example: first-time portable provisioning can run for tens of minutes and package preparation can extend that time further.
+External tool installers and managed preparation can take substantially longer than ordinary archive extraction. MiKTeX is the current important example.
 
-BuildEngine therefore treats the existing tool activity as a long-running observable operation instead of adding a second progress mechanism:
+BuildEngine uses the existing tool activity and heartbeat rather than inventing a second progress mechanism. The activity operation changes as provisioning moves through download, extraction, preparation, and probe. Preparation commands are exposed as `prepare-N/M`; individual process logs retain their stdout/stderr and timing information.
 
-- before an external managed-tool installer starts, BuildEngine prints an explicit notice that the provisioning step can take a long time;
-- the normal heartbeat continues to show the active `tool:<id>` operation;
-- every installer output line refreshes the activity detail, so the latest available installer message remains visible;
-- the heartbeat reports the elapsed runtime of the active operation;
-- if an installer emits a numeric percentage such as `42%`, BuildEngine maps that value onto the existing progress model and the heartbeat shows the percentage;
-- if the installer does not expose a percentage, BuildEngine does **not** invent estimated progress.
-
-This distinction is intentional. Liveness, elapsed time, and the latest installer message are reliable even for opaque installers; a percentage is shown only when the external process provides one.
+A percentage is only shown if the external process actually provides one. BuildEngine does not invent estimated progress for opaque installers or package managers.
 
 ### Native extraction with `<nativeExtract>`
 
@@ -191,7 +216,7 @@ BuildEngine validates the launcher graph for unknown tools and cycles.
 
 ## `<probe>`
 
-After resolution or provisioning, a tool can be checked with a version/function probe:
+After resolution, provisioning, and optional managed preparation, a tool can be checked with a version/function probe:
 
 ```xml
 <probe contains="cmake version 4.1.1">
@@ -207,13 +232,15 @@ The process must finish successfully and return the expected text. Only then is 
 
 ```mermaid
 flowchart TD
-   Contract["build-tools.xml<br/>declarative source"] --> Resolve["Download / Discovery / Generate / Probe"]
-   Resolve --> State["tools.xml<br/>effective state on this machine"]
+   Contract["build-tools.xml<br/>declarative source"] --> Resolve["Download / Discovery / Generate"]
+   Resolve --> Prepare["optional managed preparation"]
+   Prepare --> Probe["Probe"]
+   Probe --> State["tools.xml<br/>effective state on this machine"]
 ```
 
 `tools.xml` must therefore not become a second manually maintained source of tool knowledge.
 
-For managed tools, the configured `root` is also part of the physical desired state. If the expected entry point does not exist below that root, BuildEngine provisions the tool there. This is used deliberately when an installation contract changes in a way that requires a clean physical installation rather than reuse of an older tree.
+For managed tools, the configured `root` is part of the physical desired state. The preparation marker lives inside that root as well; no preparation state is stored in another user profile or external installation.
 
 ## Version changes
 
@@ -224,15 +251,16 @@ For a tool update, at least the following must be checked:
 3. Archive/installer name.
 4. SHA-256.
 5. Expected entry point.
-6. Probe and expected output.
-7. Effects on technical fingerprints of consumers.
-8. Documentation in [tools.md](tools.md) if the role or version changes.
+6. Optional preparation contract and marker version.
+7. Probe and expected output.
+8. Effects on technical fingerprints of consumers.
+9. Documentation in [tools.md](tools.md) if the role or version changes.
 
 A tool update must not invalidate unrelated library builds globally. A version should affect only states whose results actually depend on that tool.
 
-## MiKTeX as a `when-used` example
+## MiKTeX as a `when-used` and `<prepare>` example
 
-MiKTeX must be isolated from any MiKTeX installation already present in the Windows user profile. The managed contract therefore uses the official portable installer mode rather than the installer's `--private` mode:
+MiKTeX must be isolated from any MiKTeX installation already present on the machine. The managed contract uses the official portable installer mode:
 
 ```xml
 <tool id="miktex" version="25.12" required="when-used">
@@ -240,25 +268,48 @@ MiKTeX must be isolated from any MiKTeX installation already present in the Wind
             executable="texmfs\install\miktex\bin\x64\texify.exe">
       <download .../>
       <extract executable="{Archive}">
-         <argument value="--portable"/>
+         <argument value="--portable={ManagedRoot}"/>
          <argument value="--unattended"/>
          <argument value="--no-registry"/>
          <argument value="--no-additional-roots"/>
          <argument value="--paper-size=A4"/>
-         <argument value="--user-install={ManagedRoot}\texmfs\install"/>
-         <argument value="--user-config={ManagedRoot}\texmfs\config"/>
-         <argument value="--user-data={ManagedRoot}\texmfs\data"/>
       </extract>
+      <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v1.txt">
+         ...
+      </prepare>
    </managed>
 </tool>
 ```
 
-The distinction matters: `--private` means a per-user installation and can therefore interact with an existing MiKTeX user configuration. BuildEngine requires a project-managed tool that does not inherit the host user's MiKTeX roots. `--portable` plus `--no-additional-roots` expresses that requirement explicitly.
+The portable installer contract intentionally does **not** combine `--portable` with `--user-install`, `--user-config`, or `--user-data`. The managed root itself owns the portable configuration, data, package, and executable trees.
 
-The root changed from the earlier `miktex\25.12` contract to `miktex\25.12-portable` even though the upstream MiKTeX version is still 25.12. This is intentional: the previous tree may already contain a per-user/private installation. A new managed root makes the required entry point absent and therefore forces one clean provisioning run under the corrected portable contract instead of silently accepting the old tree.
+The process environment is isolated as well. BuildEngine does not modify the user or machine `PATH`, does not reuse an external MiKTeX executable tree, and does not require another MiKTeX installation to be changed or removed.
 
-The Doxygen phase resolves the effective documentation profile to determine whether LaTeX is required. Doxygen produces HTML and, when needed, LaTeX in **one run**. MiKTeX is required only for the downstream PDF step. Before library PDFs are compiled, one shared runtime preflight initializes mutable MiKTeX state such as the `pdflatex` format; independent library PDF jobs remain parallel after that prerequisite. See the [documentation contract](documentation.md) for details.
+### Doxygen 1.18.0 package contract
+
+The MiKTeX preparation marker is explicitly tied to `Doxygen 1.18.0`. Preparation performs the following steps serially before MiKTeX is registered as ready:
+
+1. update the MiKTeX package database from the configured repository;
+2. perform a package update check; exit code `100` is accepted because MiKTeX defines it as "updates available" rather than a technical failure;
+3. resolve the dependency warnings emitted by the Basic MiKTeX 25.12 portable installation (`ms`, `showframe`, `sttools`, `thailatex`, `luxi`);
+4. install the explicit package surface required by the pinned Doxygen 1.18.0 LaTeX templates and the project's default PDFLaTeX font path;
+5. verify the declared Doxygen package set;
+6. refresh the MiKTeX file-name database.
+
+The direct Doxygen package set is derived from the pinned upstream `templates/latex/header.tex`, `templates/latex/doxygen.sty`, and the default translator/font configuration. It includes the LaTeX base/tools/graphics families and explicit packages such as `infwarerr`, `float`, `varwidth`, `xcolor`, `colortbl`, `xltabular`, `tabularray`, `fancyvrb`, `multirow`, `hanging`, `ifpdf`, `adjustbox`, `stackengine`, `enumitem`, `alphalph`, `ulem`, `iftex`, `ifxetex`, `wasysym`, `geometry`, `changepage`, `fancyhdr`, `natbib`, `tocloft`, `hyperref`, `caption`, and `etoc`. `psnfss` supplies the default Helvetica/Courier font packages.
+
+MiKTeX resolves transitive dependencies while installing these declared package IDs. This contract is for the project's current default Doxygen/PDFLaTeX path. If a Doxygen language translator that needs an additional TeX package is enabled, that package must be added deliberately to the version-bound contract.
+
+The package repository is explicitly selected instead of being inherited from an unrelated user configuration. The package repository contents themselves are not yet cryptographically pinned package-by-package; if byte-identical TeX package provenance becomes a hard clean-room requirement, the next hardening step is a mirrored or otherwise content-pinned MiKTeX package repository.
+
+The Doxygen phase produces HTML and, when requested, LaTeX in **one run**. The shared runtime preflight remains responsible only for mutable runtime initialization such as creation of `pdflatex.fmt`. It is not the package discovery mechanism. Actual library PDF jobs continue to use:
+
+```text
+texify --pdf --batch --max-iterations=5 --tex-option=--disable-installer refman.tex
+```
+
+A missing package during a library PDF job therefore means the explicit provisioning contract is incomplete; the build does not silently extend its package set during parallel execution.
 
 ## Maintenance rule
 
-Changes to the tool contract and changes to its meaning are documented together. `build-tools.xml`, this document, and [tools.md](tools.md) are maintained as one coherent technical unit.
+Changes to the tool contract and changes to its meaning are documented together. `build-tools.xml`, this document, [tools.md](tools.md), and the relevant pipeline documentation are maintained as one coherent technical unit.
