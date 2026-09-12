@@ -91,8 +91,8 @@ A managed tool can execute an external installer or extraction process after the
 
 ```xml
 <extract executable="{Archive}">
-   <argument value="--private"/>
    <argument value="--unattended"/>
+   ...
 </extract>
 ```
 
@@ -109,7 +109,7 @@ MiKTeX uses this path because the official Basic Installer is an executable rath
 
 ### Long-running provisioning feedback
 
-External tool installers can take substantially longer than ordinary archive extraction. MiKTeX is the current important example: first-time private provisioning can run for tens of minutes and later package acquisition can extend that time further.
+External tool installers can take substantially longer than ordinary archive extraction. MiKTeX is the current important example: first-time portable provisioning can run for tens of minutes and package preparation can extend that time further.
 
 BuildEngine therefore treats the existing tool activity as a long-running observable operation instead of adding a second progress mechanism:
 
@@ -213,6 +213,8 @@ flowchart TD
 
 `tools.xml` must therefore not become a second manually maintained source of tool knowledge.
 
+For managed tools, the configured `root` is also part of the physical desired state. If the expected entry point does not exist below that root, BuildEngine provisions the tool there. This is used deliberately when an installation contract changes in a way that requires a clean physical installation rather than reuse of an older tree.
+
 ## Version changes
 
 For a tool update, at least the following must be checked:
@@ -230,16 +232,32 @@ A tool update must not invalidate unrelated library builds globally. A version s
 
 ## MiKTeX as a `when-used` example
 
+MiKTeX must be isolated from any MiKTeX installation already present in the Windows user profile. The managed contract therefore uses the official portable installer mode rather than the installer's `--private` mode:
+
 ```xml
 <tool id="miktex" version="25.12" required="when-used">
-   <managed root="miktex\25.12"
+   <managed root="miktex\25.12-portable"
             executable="texmfs\install\miktex\bin\x64\texify.exe">
-      ...
+      <download .../>
+      <extract executable="{Archive}">
+         <argument value="--portable"/>
+         <argument value="--unattended"/>
+         <argument value="--no-registry"/>
+         <argument value="--no-additional-roots"/>
+         <argument value="--paper-size=A4"/>
+         <argument value="--user-install={ManagedRoot}\texmfs\install"/>
+         <argument value="--user-config={ManagedRoot}\texmfs\config"/>
+         <argument value="--user-data={ManagedRoot}\texmfs\data"/>
+      </extract>
    </managed>
 </tool>
 ```
 
-The Doxygen phase resolves the effective documentation profile to determine whether LaTeX is required. Doxygen produces HTML and, when needed, LaTeX in **one run**. MiKTeX is required only for the downstream PDF step. Its initial private installation is expected to be one of the longest tool-provisioning operations, which is why the generic external-installer feedback described above is important. See the [documentation contract](documentation.md) for details.
+The distinction matters: `--private` means a per-user installation and can therefore interact with an existing MiKTeX user configuration. BuildEngine requires a project-managed tool that does not inherit the host user's MiKTeX roots. `--portable` plus `--no-additional-roots` expresses that requirement explicitly.
+
+The root changed from the earlier `miktex\25.12` contract to `miktex\25.12-portable` even though the upstream MiKTeX version is still 25.12. This is intentional: the previous tree may already contain a per-user/private installation. A new managed root makes the required entry point absent and therefore forces one clean provisioning run under the corrected portable contract instead of silently accepting the old tree.
+
+The Doxygen phase resolves the effective documentation profile to determine whether LaTeX is required. Doxygen produces HTML and, when needed, LaTeX in **one run**. MiKTeX is required only for the downstream PDF step. Before library PDFs are compiled, one shared runtime preflight initializes mutable MiKTeX state such as the `pdflatex` format; independent library PDF jobs remain parallel after that prerequisite. See the [documentation contract](documentation.md) for details.
 
 ## Maintenance rule
 
