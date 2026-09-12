@@ -2,6 +2,15 @@
 
 BuildEngine Server is the read-only HTTP presentation and machine-interface layer for a BuildEngine production tree. It exposes library/package metadata, generated documentation, SBOM data, dependency and usage information, security results, package export, project documentation, and a browser UI. It does not replace the BuildEngine scheduler or technical step-state model.
 
+Related project documentation:
+
+- [BuildEngine architecture](buildengine.md)
+- [Configuration and CLI](configuration.md)
+- [Documentation contract](documentation.md)
+- [Tool contract](build-tools.md)
+- [Library contract](build-libraries.md)
+- [Tool overview](tools.md)
+
 ## Transport and scope
 
 Version 1 binds to the IPv4 loopback interface only. The default endpoint is:
@@ -29,6 +38,10 @@ Only HTTP `GET` requests are accepted by the current server implementation. The 
 | `/manual/buildengine.md` | BuildEngine architecture |
 | `/manual/server.md` | This server and REST API document |
 | `/manual/configuration.md` | Configuration and CLI reference |
+| `/manual/documentation.md` | Documentation, Doxygen, LaTeX and PDF contract |
+| `/manual/build-tools.md` | `build-tools.xml` contract reference |
+| `/manual/build-libraries.md` | `build-libraries.xml` contract reference |
+| `/manual/tools.md` | Current BuildEngine tool overview |
 | `/index.html` | Generated central library documentation index |
 
 Static generated documentation is served from the BuildEngine documentation root after the explicit application routes have been evaluated.
@@ -141,7 +154,7 @@ The implementation uses modern C++23 throughout the project and favors value sem
 
 ## Markdown rendering pipeline
 
-The four project documents are maintained directly in the synchronized Admin repository below `admin/server-docs`. A request for `/manual/*.md` resolves to that synchronized source file and renders its current contents on demand. There is no second manually maintained Markdown copy below the generated documentation tree.
+Project documentation is maintained directly in the synchronized Admin repository below `admin/server-docs`. A request for `/manual/*.md` resolves to that synchronized source file and renders its current contents on demand. There is no second manually maintained Markdown copy below the generated documentation tree.
 
 ```mermaid
 sequenceDiagram
@@ -166,6 +179,20 @@ sequenceDiagram
 ```
 
 The Markdown source is inspected for browser capabilities required by the page. Language-marked source blocks enable syntax highlighting, Mermaid diagrams enable Mermaid, and supported mathematical delimiters enable MathJax. Only the required browser resources are emitted for each rendered page.
+
+## Links between Markdown documents
+
+Relative Markdown links are supported and are the preferred way to connect project documentation:
+
+```markdown
+[Tool overview](tools.md)
+[Tool contract](build-tools.md)
+[Library contract](build-libraries.md)
+```
+
+When the current document is served as `/manual/documentation.md`, the browser resolves `tools.md` to `/manual/tools.md`. The normal server fallback then resolves the corresponding file from `admin/server-docs` and renders it live.
+
+This keeps project documentation relocatable inside the `/manual/` namespace and avoids hard-coded host names or ports.
 
 ## Managed browser resources
 
@@ -194,6 +221,10 @@ admin/server-docs/story.md
 admin/server-docs/buildengine.md
 admin/server-docs/server.md
 admin/server-docs/configuration.md
+admin/server-docs/documentation.md
+admin/server-docs/build-tools.md
+admin/server-docs/build-libraries.md
+admin/server-docs/tools.md
 ```
 
 They are read and rendered directly from that synchronized tree.
@@ -201,6 +232,20 @@ They are read and rendered directly from that synchronized tree.
 Generated per-library documentation remains below the normal BuildEngine documentation root and is served by the same HTTP server. This gives the running server one entry point for both evolving project documentation and generated third-party library documentation without mixing their source locations.
 
 The cmark-gfm runtime is validated when the server is initialized. A missing renderer runtime therefore fails visibly instead of leaving apparently available Markdown routes that cannot be rendered.
+
+## Documentation maintenance rule
+
+The project Markdown files are part of the implementation contract. Code, XML schema and Markdown documentation are maintained together.
+
+Examples:
+
+- a new `build-tools.xml` construct also updates [build-tools.md](build-tools.md),
+- a new or changed tool also updates [tools.md](tools.md),
+- a new `build-libraries.xml` construct also updates [build-libraries.md](build-libraries.md),
+- documentation-pipeline changes also update [documentation.md](documentation.md),
+- HTTP, rendering or link behavior changes also update this document.
+
+Documentation is therefore not a release-afterthought; it is maintained as part of the same change that modifies the corresponding behavior.
 
 ## Shared service layer
 
@@ -221,4 +266,4 @@ The current server is intentionally local-only.
 
 ## Related documentation
 
-Project documents are available through the documentation buttons at the top of every server page. Generated library documentation starts at `/index.html`.
+Use the relative links at the top of this page to navigate through the project documentation. Generated library documentation starts at `/index.html`.
