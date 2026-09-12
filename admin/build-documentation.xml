@@ -13,9 +13,13 @@
       A library does not need an entry here to be documented. The root profile
       is inherited by every library. <library> nodes are overrides only.
 
-      doxygen="false" disables only Doxygen for the selected library. The
-      BuildEngine still generates the library information page, license
-      information and SBOM view when documentation is enabled globally.
+      For <define>, an omitted value means a normal predefined macro (Doxygen
+      treats this as =1). value="" means an explicit empty replacement.
+      Function-like macro names and replacement text containing spaces are
+      supported and are quoted when the generated Doxyfile is written.
+
+      <option> writes a Doxygen configuration value after the generated base
+      profile and therefore deliberately overrides the generic defaults.
 
       These definitions affect Doxygen preprocessing only. They never change
       the compiler, target ABI or library build contract.
@@ -34,51 +38,200 @@
       <define name="BOOST_FUSION_HAS_VARIADIC_SET" value="1"/>
       <define name="BOOST_FUSION_HAS_VARIADIC_TUPLE" value="1"/>
 
-      <!--
-         Boost 1.92 documentation modes. These names are taken from the
-         libraries' own Doxyfile/Jamfile contracts. They select deliberately
-         simplified public declarations and suppress implementation-only code.
+      <!-- Boost.Geometry 1.92 documentation view. -->
+      <define name="BOOST_CONCEPT_REQUIRES(x)" value=""/>
+      <define name="BOOST_CONCEPT_ASSERT(x)" value=""/>
+      <define name="DOXYGEN_SHOULD_SKIP_THIS"/>
+      <define name="DOXYGEN_NO_DISPATCH"/>
+      <define name="DOXYGEN_NO_IMPL"/>
+      <define name="DOXYGEN_NO_DETAIL"/>
+      <define name="DOXYGEN_NO_CONCEPT_MEMBERS"/>
+      <define name="DOXYGEN_NO_TRAITS_SPECIALIZATIONS"/>
+      <define name="DOXYGEN_NO_STRATEGY_SPECIALIZATIONS"/>
+      <define name="DOXYGEN_NO_SPECIALIZATIONS"/>
+      <define name="DOXYGEN_INVOKED"/>
 
-         Function-like PREDEFINED replacements are intentionally added only
-         after the central generator can preserve empty/whitespace replacement
-         text exactly. Object-like switches are safe with the current contract.
-      -->
-      <define name="DOXYGEN_INVOKED" value=""/>
-      <define name="DOXYGEN_SHOULD_SKIP_THIS" value=""/>
-      <define name="DOXYGEN_NO_DISPATCH" value=""/>
-      <define name="DOXYGEN_NO_IMPL" value=""/>
-      <define name="DOXYGEN_NO_DETAIL" value=""/>
-      <define name="DOXYGEN_NO_CONCEPT_MEMBERS" value=""/>
-      <define name="DOXYGEN_NO_TRAITS_SPECIALIZATIONS" value=""/>
-      <define name="DOXYGEN_NO_STRATEGY_SPECIALIZATIONS" value=""/>
-      <define name="DOXYGEN_NO_SPECIALIZATIONS" value=""/>
-
+      <!-- Library-specific documentation modes used by Boost 1.92. -->
       <define name="BOOST_ALGORITHM_DOXYGEN" value="1"/>
-      <define name="BOOST_BEAST_DOXYGEN" value="1"/>
+      <define name="BOOST_BEAST_DOXYGEN"/>
       <define name="BOOST_BEAST_USE_POSIX_FILE" value="1"/>
       <define name="BOOST_BEAST_USE_WIN32_FILE" value="1"/>
       <define name="BOOST_BEAST_SPLIT_COMPILATION" value="1"/>
-      <define name="GENERATING_DOCUMENTATION" value="1"/>
-      <define name="BOOST_BIMAP_DOXYGEN_WILL_NOT_PROCESS_THE_FOLLOWING_LINES" value="1"/>
-      <define name="BOOST_BIMAP_ONLY_DOXYGEN_WILL_PROCESS_THE_FOLLOWING_LINES" value="1"/>
-      <define name="BOOST_COMPUTE_DOXYGEN_INVOKED" value="1"/>
-      <define name="BOOST_CONTAINER_DOXYGEN_INVOKED" value="1"/>
-      <define name="BOOST_FILESYSTEM_DOXYGEN" value="1"/>
-      <define name="BOOST_HANA_DOXYGEN_INVOKED" value="1"/>
-      <define name="BOOST_HISTOGRAM_DOXYGEN_INVOKED" value="1"/>
-      <define name="BOOST_INTERPROCESS_DOXYGEN_INVOKED" value="1"/>
-      <define name="BOOST_JSON_DOCS" value="1"/>
-      <define name="BOOST_LOG_DOXYGEN_PASS" value="1"/>
-      <define name="BOOST_NOWIDE_DOXYGEN" value="1"/>
+      <define name="GENERATING_DOCUMENTATION"/>
+      <define name="BOOST_BIMAP_DOXYGEN_WILL_NOT_PROCESS_THE_FOLLOWING_LINES"/>
+      <define name="BOOST_BIMAP_ONLY_DOXYGEN_WILL_PROCESS_THE_FOLLOWING_LINES"/>
+      <define name="BOOST_COMPUTE_DOXYGEN_INVOKED"/>
+      <define name="BOOST_CONTAINER_DOXYGEN_INVOKED"/>
+      <define name="BOOST_HANA_DOXYGEN_INVOKED"/>
+      <define name="BOOST_HISTOGRAM_DOXYGEN_INVOKED"/>
+      <define name="BOOST_INTERPROCESS_DOXYGEN_INVOKED"/>
+      <define name="BOOST_JSON_DOCS"/>
+      <define name="BOOST_LOG_DOXYGEN_PASS"/>
+      <define name="BOOST_NOWIDE_DOXYGEN"/>
       <define name="BOOST_PARSER_DOXYGEN" value="1"/>
       <define name="BOOST_PARSER_USE_CONCEPTS" value="1"/>
+      <define name="BOOST_PFR_DOXYGEN_INVOKED" value="1"/>
+      <define name="BOOST_STACKTRACE_DOXYGEN_INVOKED"/>
       <define name="BOOST_TEST_DOXYGEN_DOC__" value="1"/>
+      <define name="BOOST_MYSQL_DOXYGEN"/>
+      <define name="__cpp_char8_t"/>
 
+      <!-- Common Boost macro simplifications used by several 1.92 Doxyfiles. -->
+      <define name="BOOST_FORCEINLINE" value="inline"/>
+      <define name="BOOST_SYMBOL_VISIBLE" value=""/>
+      <define name="BOOST_ATTRIBUTE_NODISCARD" value="[[nodiscard]]"/>
+      <define name="BOOST_INLINE_VARIABLE" value="inline"/>
+      <define name="BOOST_CONSTEXPR" value="constexpr"/>
+      <define name="BOOST_CXX14_CONSTEXPR" value="constexpr"/>
+      <define name="BOOST_CONSTEXPR_OR_CONST" value="constexpr"/>
+      <define name="BOOST_INLINE_CONSTEXPR" value="inline constexpr"/>
+      <define name="BOOST_STATIC_CONSTEXPR" value="static constexpr"/>
+      <define name="BOOST_NOEXCEPT" value="noexcept"/>
+      <define name="BOOST_NOEXCEPT_IF(T)" value="noexcept(T)"/>
+      <define name="BOOST_NOEXCEPT_OR_NOTHROW" value="noexcept"/>
+      <define name="BOOST_RV_REF(T)" value="T&amp;&amp;"/>
+      <define name="BOOST_FWD_REF(T)" value="T&amp;&amp;"/>
+      <define name="BOOST_COPY_ASSIGN_REF(T)" value="T const&amp;"/>
+      <define name="BOOST_NESTED_TEMPLATE" value="template"/>
+      <define name="BOOST_STATIC_ASSERT(x)" value=""/>
+      <define name="BOOST_STATIC_ASSERT_MSG(x,y)" value=""/>
+      <define name="BOOST_STATIC_CONSTANT(x,y)" value="static constexpr x y"/>
+      <define name="BOOST_DEFAULTED_FUNCTION(x,y)" value="x = default;"/>
+      <define name="BOOST_DELETED_FUNCTION(x)" value="x = delete;"/>
+      <define name="BOOST_EXPLICIT_OPERATOR_BOOL()" value="explicit operator bool() const;"/>
+      <define name="BOOST_EXPLICIT_OPERATOR_BOOL_NOEXCEPT()" value="explicit operator bool() const noexcept;"/>
+      <define name="BOOST_CONSTEXPR_EXPLICIT_OPERATOR_BOOL()" value="explicit constexpr operator bool() const noexcept;"/>
+
+      <!-- Boost.Beast / Asio documentation substitutions. -->
+      <define name="BOOST_BEAST_DECL" value=""/>
+      <define name="BOOST_BEAST_ASYNC_RESULT1(t)" value="__deduced__"/>
+      <define name="BOOST_BEAST_ASYNC_RESULT2(t)" value="__deduced__"/>
+      <define name="BOOST_BEAST_ASYNC_TPARAM1" value="class"/>
+      <define name="BOOST_BEAST_ASYNC_TPARAM2" value="class"/>
+      <define name="BOOST_ASIO_INITFN_RESULT_TYPE(t,a)" value="auto"/>
+      <define name="BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(t,a)" value="__deduced__"/>
+      <define name="BOOST_ASIO_COMPLETION_TOKEN_FOR(sig)" value="class"/>
+      <define name="BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(ex)" value=""/>
+      <define name="BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(ex)" value=" =__deduced__"/>
+
+      <!-- Boost.Container documentation substitutions. -->
+      <define name="insert_const_ref_type" value=" const T&amp;"/>
+      <define name="BOOST_CONTAINER_IMPDEF(T)" value="implementation_defined"/>
+      <define name="BOOST_CONTAINER_SEEDOC(T)" value="see_documentation"/>
+      <define name="BOOST_RV_REF_BEG" value=""/>
+      <define name="BOOST_RV_REF_END" value="&amp;&amp;"/>
+      <define name="BOOST_RV_REF_BEG_IF_CXX11" value=""/>
+      <define name="BOOST_RV_REF_END_IF_CXX11" value="&amp;&amp;"/>
+      <define name="BOOST_CONTAINER_NODISCARD" value="[[nodiscard]] "/>
+      <define name="BOOST_NORETURN" value="[[noreturn]] "/>
+      <define name="BOOST_INTRUSIVE_OPTION_CONSTANT(OPTION_NAME, TYPE, VALUE, CONSTANT_NAME)" value="template&lt;TYPE VALUE&gt; struct OPTION_NAME{};"/>
+      <define name="BOOST_INTRUSIVE_OPTION_TYPE(OPTION_NAME, TYPE, TYPEDEF_EXPR, TYPEDEF_NAME)" value="template&lt;class TYPE&gt; struct OPTION_NAME{};"/>
+      <define name="BOOST_CONTAINER_DOC1ST(T1,T2)" value="T1"/>
+      <define name="BOOST_CONTAINER_DOCIGN(T)" value=""/>
+      <define name="BOOST_CONTAINER_DOCONLY(T)" value="T"/>
+      <define name="BOOST_CONTAINER_SCOPEDALLOC_DUMMYTRUE" value=""/>
+      <define name="BOOST_CONTAINER_SCOPEDALLOC_ALLINNER" value="InnerAllocs..."/>
+      <define name="BOOST_CONTAINER_SCOPEDALLOC_ALLINNERCLASS" value="typename... InnerAllocs"/>
+      <define name="BOOST_CONTAINER_DECL" value=""/>
+      <define name="BOOST_CONTAINER_CONSTANT_VAR" value="static constexpr "/>
+      <define name="BOOST_CONTAINER_FORCEINLINE" value="inline"/>
+
+      <!-- Boost.Interprocess documentation substitutions. -->
+      <define name="BOOST_INTERPROCESS_IMPDEF(T)" value="implementation_defined"/>
+      <define name="BOOST_INTERPROCESS_SEEDOC(T)" value="see_documentation"/>
+      <define name="BOOST_INTERPROCESS_DOC1ST(T1,T2)" value="T1"/>
+      <define name="BOOST_INTERPROCESS_DOCIGN(T)" value=""/>
+      <define name="BOOST_INTERPROCESS_I(T)" value=","/>
+      <define name="BOOST_INTERPROCESS_ENABLE_MOVE_EMULATION(a)" value=" "/>
+      <define name="BOOST_INTERPROCESS_NODISCARD" value="[[nodiscard]] "/>
+      <define name="BOOST_INTERPROCESS_FORCEINLINE" value="inline"/>
+      <define name="op_nullptr_t" value="std::nullptr_t"/>
+
+      <!-- Boost.Log documentation substitutions. -->
+      <define name="BOOST_LOG_NO_VTABLE" value=""/>
+      <define name="BOOST_APPEND_EXPLICIT_TEMPLATE_TYPE(x)" value=""/>
+      <define name="BOOST_LOG_UNIQUE_IDENTIFIER_NAME(x)" value="anonymous"/>
+      <define name="BOOST_LOG_USE_NATIVE_SYSLOG" value="1"/>
+      <define name="BOOST_PARAMETER_KEYWORD(x,y)" value="keyword y;"/>
+      <define name="BOOST_LOG_AUX_VOID_DEFAULT" value="= void"/>
+      <define name="BOOST_LOG_CONSOLE_SINK_FRONTEND_INTERNAL" value="sinks::synchronous_sink"/>
+      <define name="BOOST_LOG_FILE_SINK_FRONTEND_INTERNAL" value="sinks::synchronous_sink"/>
+      <define name="BOOST_LOG_NAMESPACE" value="log"/>
+      <define name="BOOST_LOG_OPEN_NAMESPACE" value="namespace log {"/>
+      <define name="BOOST_LOG_CLOSE_NAMESPACE" value="}"/>
+      <define name="BOOST_LOG_USE_CHAR"/>
+      <define name="BOOST_LOG_USE_WCHAR_T"/>
+      <define name="BOOST_LOG_API" value=""/>
+      <define name="BOOST_LOG_SETUP_API" value=""/>
+
+      <!-- Boost.JSON / Test / Nowide / Stacktrace substitutions. -->
+      <define name="BOOST_JSON_DECL" value=""/>
+      <define name="BOOST_JSON_INLINE_VARIABLE(v,t)" value="constexpr t v;"/>
+      <define name="BOOST_TEST_DECL" value=""/>
+      <define name="BOOST_NOWIDE_DECL" value=""/>
+      <define name="stl_type_info" value="std::type_info"/>
+      <define name="BOOST_STACKTRACE_FUNCTION" value="inline"/>
+
+      <!-- Boost.MySQL 1.92 documentation-only API simplifications. -->
+      <define name="BOOST_PFR_ENABLED" value="1"/>
+      <define name="BOOST_PFR_CORE_NAME_ENABLED" value="1"/>
+      <define name="BOOST_DEPRECATED(a)" value=""/>
+      <define name="BOOST_MYSQL_RETURN_TYPE(...)" value=""/>
+      <define name="BOOST_MYSQL_CONSTEVAL" value="consteval"/>
+      <define name="BOOST_MYSQL_CXX14"/>
+      <define name="BOOST_MYSQL_WRITABLE_FIELD_TUPLE" value="class"/>
+      <define name="BOOST_MYSQL_FIELD_VIEW_FORWARD_ITERATOR" value="class"/>
+      <define name="BOOST_MYSQL_EXECUTION_REQUEST" value="class"/>
+      <define name="BOOST_MYSQL_RESULTS_TYPE" value="class"/>
+      <define name="BOOST_MYSQL_EXECUTION_STATE_TYPE" value="class"/>
+      <define name="BOOST_MYSQL_OUTPUT_STRING" value="class"/>
+      <define name="BOOST_MYSQL_FORMATTABLE" value="class"/>
+      <define name="BOOST_MYSQL_STATIC_ROW" value="class"/>
+      <define name="BOOST_MYSQL_PIPELINE_REQUEST_TYPE" value="class"/>
+      <define name="BOOST_MYSQL_PIPELINE_STAGE_TYPE" value="class"/>
+      <define name="BOOST_MYSQL_WRITABLE_FIELD" value="class"/>
+      <define name="BOOST_MYSQL_DECL" value=""/>
+      <define name="BOOST_MYSQL_HAS_LOCAL_TIME" value=""/>
+
+      <!--
+         Combined Boost run: keep EXTRACT_ALL from the central generator so
+         undocumented public API is not lost, but otherwise use the common
+         public-reference presentation settings from Boost's own Doxyfiles.
+      -->
+      <option name="SKIP_FUNCTION_MACROS" value="NO"/>
+      <option name="SEARCH_INCLUDES" value="NO"/>
+      <option name="HIDE_FRIEND_COMPOUNDS" value="YES"/>
+      <option name="SHOW_INCLUDE_FILES" value="NO"/>
+      <option name="INLINE_INFO" value="NO"/>
+      <option name="SORT_MEMBER_DOCS" value="NO"/>
+      <option name="SHOW_USED_FILES" value="NO"/>
+      <option name="DISTRIBUTE_GROUP_DOC" value="YES"/>
+      <option name="CASE_SENSE_NAMES" value="YES"/>
+
+      <!-- Generic non-API material. publicOnly adds detail/impl/preprocessed/aux_/cpp03. -->
+      <exclude pattern="*/test/*"/>
+      <exclude pattern="*/tests/*"/>
+      <exclude pattern="*/example/*"/>
+      <exclude pattern="*/examples/*"/>
+      <exclude pattern="*/bench/*"/>
+      <exclude pattern="*/benchmark/*"/>
+      <exclude pattern="*/performance/*"/>
+      <exclude pattern="*/performance_tests/*"/>
       <exclude pattern="*/libs/*/test/*"/>
+      <exclude pattern="*/libs/*/tests/*"/>
       <exclude pattern="*/libs/*/example/*"/>
       <exclude pattern="*/libs/*/examples/*"/>
+      <exclude pattern="*/libs/*/bench/*"/>
+      <exclude pattern="*/libs/*/benchmark/*"/>
       <exclude pattern="*/libs/*/doc/example/*"/>
       <exclude pattern="*/tools/*"/>
+
+      <!-- Boost.MySQL explicitly excludes large generated/server tables from its 1.92 reference build. -->
+      <exclude pattern="*/boost/mysql/mysql_server_errc.hpp"/>
+      <exclude pattern="*/boost/mysql/mariadb_server_errc.hpp"/>
+      <exclude pattern="*/boost/mysql/mysql_collations.hpp"/>
+      <exclude pattern="*/boost/mysql/mariadb_collations.hpp"/>
+      <exclude pattern="*/boost/mysql/src.hpp"/>
    </library>
 
    <library id="skia" publicOnly="true">
