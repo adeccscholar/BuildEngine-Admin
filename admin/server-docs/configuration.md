@@ -76,7 +76,7 @@ The exact local worker counts and feature switches are deployment choices; the e
 | `WithSmokeTests` | Enables BuildEngine consumer smoke tests |
 | `WithDoc` | Enables generated library information documentation |
 | `WithDoxygen` | Permits Doxygen API documentation |
-| `WithLatex` | Permits the independent Doxygen LaTeX/MiKTeX PDF branch; default is `true` |
+| `WithLatex` | Local default for the independent Doxygen LaTeX/MiKTeX PDF branch; default is `true` |
 | `configurations` | Default build variants, for example `All` |
 | `buildTools` | Synchronized managed-tool contract |
 | `toolsState` | Generated effective tool state |
@@ -87,7 +87,7 @@ The exact local worker counts and feature switches are deployment choices; the e
 | `repositoriesRoot` | Local administration repository checkouts |
 | `logsRoot` | BuildEngine log hierarchy |
 
-`WithLatex` does not imply `WithDoxygen`. PDF generation requires both switches plus an effective `latex="true"` documentation profile. Setting `WithLatex="false"` leaves HTML Doxygen untouched and prevents MiKTeX from being requested solely for documentation.
+`WithDoxygen=false` is a hard stop for the central Doxygen pipeline. `WithLatex`, however, is an inheritable local default. `admin/build-documentation.xml` may override it for the project, and a library may independently override it again with `latex="true"` or `latex="false"`. MiKTeX is requested only if at least one Doxygen-enabled library resolves to effective `latex=true`.
 
 ## Concurrency model
 
@@ -117,7 +117,7 @@ For a four-worker scheduler, $N_{workers}=4$.
 
 Defines reproducible tools and browser assets. A tool may be discovered from an existing installation or managed by BuildEngine through download, extraction/generation, launcher, and probe steps. Examples include Git, CMake, Ninja, Doxygen, Graphviz, MiKTeX, compiler tools, and the managed JavaScript resources used by the documentation server.
 
-MiKTeX is a `when-used` tool. It is provisioned only when the effective documentation configuration actually enables LaTeX/PDF for at least one library.
+MiKTeX is a `when-used` tool. It is provisioned only when the effective documentation configuration enables LaTeX/PDF for at least one library.
 
 ### `admin/build-libraries.xml`
 
@@ -144,7 +144,7 @@ A reduced example illustrates the shared-contract/variant model:
 
 Defines the shared documentation profile and library-specific overrides. It controls whether Doxygen and LaTeX/PDF are used, source visibility, public-only extraction, predefined macros, Doxygen options, and exclusion patterns.
 
-The root profile is inherited by every library. A library node is an override, not an allow-list. The complete parameter reference and examples are documented in [BuildEngine Documentation Contract](/manual/documentation.md).
+The root profile is inherited by every library. For `latex`, omission at the root means inheritance from local `WithLatex`; a root `latex` value overrides that local default for the synchronized project, and a library node may override it again. A library node is an override, not an allow-list. The complete parameter reference and examples are documented in [BuildEngine Documentation Contract](/manual/documentation.md).
 
 ### `admin/smoke-tests.xml`
 
@@ -173,12 +173,12 @@ The separation is intentional:
 | Repository locations | Yes | Repository content itself is synchronized |
 | Tool definitions | No | Yes |
 | Library versions and build contracts | No | Yes |
-| Documentation master switches | Yes | No |
-| Documentation profiles and library overrides | No | Yes |
+| Documentation capability/default settings | Yes | Project and library overrides |
+| Documentation profiles | No | Yes |
 | Smoke-test definitions | No | Yes |
 | Security metadata | No | Yes |
 
-This prevents local machine settings from becoming a hidden second source of library/build knowledge.
+This prevents local machine settings from becoming a hidden second source of library/build knowledge while still allowing the local machine to supply deployment defaults.
 
 ## Command line
 
@@ -282,7 +282,7 @@ The CLI already parses `--lib` and `--libversion` for commands such as `--check`
 - [ ] `build-tools.xml` and `build-libraries.xml` are available after synchronization.
 - [ ] Worker and queue settings match the target machine.
 - [ ] Required test/documentation switches are explicit.
-- [ ] `WithLatex` matches the desired PDF policy for the machine.
+- [ ] `WithLatex` has the intended local default and any project/library overrides are deliberate.
 - [ ] `tools.xml` and technical state are treated as generated state rather than hand-authored library knowledge.
 
 ## Related documentation
