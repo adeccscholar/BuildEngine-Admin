@@ -38,6 +38,10 @@
          Boost 1.92 documentation modes. These names are taken from the
          libraries' own Doxyfile/Jamfile contracts. They select deliberately
          simplified public declarations and suppress implementation-only code.
+
+         Function-like PREDEFINED replacements are intentionally added only
+         after the central generator can preserve empty/whitespace replacement
+         text exactly. Object-like switches are safe with the current contract.
       -->
       <define name="DOXYGEN_INVOKED" value=""/>
       <define name="DOXYGEN_SHOULD_SKIP_THIS" value=""/>
@@ -48,8 +52,6 @@
       <define name="DOXYGEN_NO_TRAITS_SPECIALIZATIONS" value=""/>
       <define name="DOXYGEN_NO_STRATEGY_SPECIALIZATIONS" value=""/>
       <define name="DOXYGEN_NO_SPECIALIZATIONS" value=""/>
-      <define name="BOOST_CONCEPT_REQUIRES(x)" value=""/>
-      <define name="BOOST_CONCEPT_ASSERT(x)" value=""/>
 
       <define name="BOOST_ALGORITHM_DOXYGEN" value="1"/>
       <define name="BOOST_BEAST_DOXYGEN" value="1"/>
