@@ -181,10 +181,3 @@ Nested example:
 ## Design principle
 
 The system is intentionally contract-driven. Compiler-specific integration remains explicit and verifiable, while reusable orchestration logic should stay generic. In the current third-party project, alternative compiler paths are not silently substituted for BCC64X: compatibility problems must remain visible so the integration result is meaningful.
-
-## Related documentation
-
-- [Project story: C++ Back in the Future and Staying Ahead of the Wave](/manual/story.md)
-- [Server and REST API](/manual/server.md)
-- [Configuration and command line](/manual/configuration.md)
-- [Generated library documentation index](/index.html)
