@@ -266,7 +266,15 @@ The currently managed tools are listed in [tools.md](tools.md).
 
 MiKTeX is defined in `build-tools.xml` as `required="when-used"`. It is required only if at least one library effectively has `latex=true`.
 
-MiKTeX has process-global/user-profile runtime state in addition to the managed executable tree. In particular, a first `pdflatex` use may need to create the shared `pdflatex.fmt` format file. Multiple first-use `texify` processes must not race while creating that common file.
+The managed MiKTeX installation is deliberately portable and isolated below `toolsRoot` rather than installed as the current Windows user's MiKTeX. The contract uses `--portable`, `--no-registry`, `--no-additional-roots`, and explicit managed config/data/install roots. This prevents an existing MiKTeX installation under the user's AppData or Programs directories from becoming an implicit second tool source.
+
+The current managed root is:
+
+```text
+<toolsRoot>/miktex/25.12-portable
+```
+
+MiKTeX still maintains mutable shared runtime data inside that portable tree. In particular, a first `pdflatex` use may need to create the shared `pdflatex.fmt` format file. Multiple first-use `texify` processes must not race while creating that common file.
 
 BuildEngine therefore schedules exactly one shared job named:
 
