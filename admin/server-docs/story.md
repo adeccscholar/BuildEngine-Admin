@@ -102,9 +102,53 @@ This development is the central idea of the book **"Rethinking C++ — How C++23
 
 The book deliberately does not treat modern C++ as a catalogue of features. Its thesis is that modern C++ changes the place where architecture can be formulated. A business value can become a real type. A prerequisite can become a Concept. Repeated variation can become a Policy. Data movement can become a Range. A technical representation can be converted at a controlled boundary. Resource responsibility can be tied to lifetime through RAII.
 
+A compact way to read that architecture is **Core → Transfer → Edge**.
+
+```mermaid
+flowchart LR
+   EdgeIn["Edge<br/>files · databases · UI · APIs"]
+   TransferIn["Transfer<br/>conversion · Source/Sink · Ranges"]
+   Core["Core<br/>domain types · rules · invariants"]
+   TransferOut["Transfer<br/>projection · adapters · Ranges"]
+   EdgeOut["Edge<br/>grids · reports · files · services"]
+
+   EdgeIn --> TransferIn --> Core --> TransferOut --> EdgeOut
+```
+
+The **Core** carries domain meaning, stable types, rules, and invariants. The **Edge** contains technical reality: frameworks, database drivers, files, UI controls, protocols, and external formats. The **Transfer** between them must be explicit rather than accidental. Controlled conversion, projection, adapters, Sources and Sinks define the transition, while Ranges provide a common language for moving typed values without forcing every intermediate step into a materialized container.
+
+This is also where variadic templates become more than a language trick. They allow complete type sequences to become design objects. A database row, a tuple, a conversion path, a parameter set, a file record, or a grid row can be described from the same statically known type structure. Instead of falling back to untyped lists or runtime boxes, relationships between heterogeneous values can remain visible to the compiler.
+
+```mermaid
+flowchart LR
+   Types["Variadic type sequence"] --> Tuple["tuple-like value"]
+   Types --> DB["database row"]
+   Types --> File["file record"]
+   Types --> Grid["grid projection"]
+   Types --> Params["parameter space"]
+   DB --> Range["typed Range"]
+   File --> Range
+   Range --> Core["Core model"]
+   Core --> Grid
+```
+
+Ranges complement that type-level structure on the movement side. They describe **how values flow** from a Source through transformations to a Sink. A database query can remain a Source, a transformation can stay lazy, and a grid or file can remain a Sink. The architecture does not pretend that these worlds are identical; it gives them a common, typed language for transfer.
+
 The compiler does not become the architect. Architecture remains a human responsibility. But the compiler can become a much stronger **partner in checking architecture** if we formulate assumptions in forms it can understand.
 
 That perspective also explains why our increasingly demanding tests mattered beyond C++Builder itself. Every successful test of Concepts, ranges, generic type structures, compile-time relationships, value semantics, or library composition did more than add another check mark to a feature matrix. It increased the confidence that we could use the modern language to structure real systems in a different way.
+
+### Efficiency became part of the argument
+
+The evolution since C++11 strengthened another reason for using C++ in this role: **efficient abstraction became easier to express directly**.
+
+C++ had always been designed around predictable costs, but C++11 changed important parts of the cost model. Move semantics and rvalue references made ownership transfer explicit and avoided many unnecessary copies. Variadic templates made generic heterogeneous structures possible without falling back to runtime indirection. `constexpr` and `type_traits` moved more work and validation into compile time. Lambdas made local behavior composable, and standardized concurrency gave threads, atomics, futures, and synchronization a portable standard vocabulary.
+
+Later standards continued that direction. Concepts can reject invalid structures before runtime. Policies can select behavior without requiring virtual dispatch. `std::optional`, `std::variant`, and `std::expected` make alternatives and error states explicit. Ranges can compose transformations lazily and avoid premature materialization.
+
+So "modern C++" is not merely more expressive. In many situations it makes it easier to write abstractions that preserve the traditional C++ expectation that costs remain visible and unnecessary runtime work can be avoided.
+
+That matters for BuildEngine. Orchestration is not only configuration parsing. It includes dependency graphs, filesystem traversal, hashing, process management, concurrent queues, output processing, metadata, HTTP services, documentation generation, and native UI integration. Using one language that can express high-level structure while still giving direct control over lifetime, ownership, concurrency, and cost is a practical advantage rather than an ideological choice.
 
 The book also makes an important qualification that belongs in this story: C++ develops **evolutionarily**. Existing knowledge remains valuable. New facilities do not automatically replace old concepts; they expand the space of possible designs. Modern C++ architecture therefore does not mean using every new feature everywhere. It means choosing the expression that best matches a responsibility — sometimes a simple value, sometimes a Concept, sometimes a Range, sometimes a Policy, sometimes a virtual base class, and sometimes a deliberate runtime decision.
 
@@ -132,23 +176,12 @@ This is precisely the problem we encountered in third-party builds and CI enviro
 
 In that sense, BuildEngine became a practical meeting point between the two books:
 
-```text
-C++Builder 13 evidence
-        |
-        v
-harder modern-C++ experiments
-        |
-        v
-Rethinking C++
-language facilities as architectural vocabulary
-        |
-        v
-Architecture That Lasts
-stable meaning under technological change
-        |
-        v
-BuildEngine
-contracts + reusable core + replaceable tools/front ends
+```mermaid
+flowchart TD
+   Evidence["C++Builder 13 evidence"] --> Experiments["Harder modern-C++ experiments"]
+   Experiments --> Rethink["Rethinking C++<br/>language facilities as architectural vocabulary"]
+   Rethink --> Architecture["Architecture That Lasts<br/>stable meaning under technological change"]
+   Architecture --> BuildEngine["BuildEngine<br/>contracts + reusable core + replaceable tools and front ends"]
 ```
 
 The books are therefore not a detour from the BuildEngine story. They describe the thinking that the experiments increasingly forced us to make explicit.
@@ -229,6 +262,20 @@ We wanted the essential knowledge to be expressed in a small number of declarati
 
 The contracts therefore do more than drive execution. **They document the prerequisites and parameters of the build at the same time.**
 
+XML is important here precisely because it gives us a flexible but structured contract language. Elements and attributes can describe tools, versions, dependencies, actions, variants, parameters, tests, publication rules, and documentation without turning every library into new C++ control flow. Schemas can validate that vocabulary, while inheritance and optional attributes allow common structure to stay common and library-specific differences to remain local.
+
+Within the vocabulary understood by the engine, changing a library version, adding a dependency, selecting another build variant, adjusting an upstream option, or defining another tool path becomes a data change rather than a new orchestration implementation.
+
+```mermaid
+flowchart LR
+   XML["XML contracts<br/>tools · libraries · variants · dependencies"] --> Model["Generic C++ model"]
+   Model --> DAG["Dependency graph"]
+   DAG --> Jobs["Build · test · install · document · publish"]
+   Jobs --> Evidence["State · packages · SBOM · licenses · documentation"]
+```
+
+That is the flexibility we were looking for: **the stable execution model remains in C++, while changing technical knowledge is represented declaratively in XML.**
+
 A generalized C++ application interprets those contracts and turns them into technical jobs and dependency graphs.
 
 That was an important design choice. We did not want two truths in the CI process: one truth in documentation and another in scripts, or one in YAML and another in a release handbook. Wherever possible, the data that controls the process should also be the data from which its documentation, state, metadata, and evidence are derived.
@@ -265,6 +312,8 @@ flowchart LR
 The scheduler can exploit the graph, but it cannot violate it.
 
 The goal is not "parallel at all costs". It is to use CPU, I/O, network, and waiting time efficiently without turning concurrency into another source of nondeterminism.
+
+This is another place where modern C++ fits the problem well. Move-aware data structures, RAII, standard concurrency primitives, generic algorithms, ranges, and explicit ownership make it possible to build a scheduler and its surrounding infrastructure with relatively high-level abstractions while retaining direct control over lifetime and cost.
 
 ## 7. Thirty days later: a different application
 
@@ -313,12 +362,12 @@ The third-party library becomes data wherever possible. The engine remains infra
 
 That separation matters because the project is not trying to create a private replacement ecosystem. The preferred route remains:
 
-```text
-upstream source
-   -> upstream build system
-   -> BCC64X
-   -> verified install
-   -> independent consumer evidence
+```mermaid
+flowchart LR
+   Upstream["Upstream source"] --> BuildSystem["Upstream build system"]
+   BuildSystem --> BCC64X["BCC64X"]
+   BCC64X --> Install["Verified install"]
+   Install --> Consumer["Independent consumer evidence"]
 ```
 
 ## 9. BuildEngine was public from the beginning
@@ -413,18 +462,15 @@ Generated library documentation remains available beside those project documents
 
 This gives the server a central documentation role:
 
-```text
-BuildEngine Server
-   |
-   +-- live project Markdown
-   |     `-- relative links between documents
-   +-- generated library documentation
-   +-- package and version information
-   +-- SBOMs
-   +-- license information and overviews
-   +-- risk/security views
-   +-- REST/JSON resources
-   `-- package download
+```mermaid
+flowchart LR
+   Server["BuildEngine Server"] --> Markdown["Live Markdown<br/>relative document links"]
+   Server --> Docs["Generated library docs"]
+   Server --> Packages["Packages & versions"]
+   Server --> Evidence["SBOMs & licenses"]
+   Server --> Security["Risk & security"]
+   Server --> API["REST / JSON"]
+   Server --> Download["Package download"]
 ```
 
 Documentation, evidence, software inventory, license information, and distributable artifacts are therefore presented from the same production state instead of living in unrelated places.
@@ -485,16 +531,15 @@ For BuildEngine, the stronger source of truth is the versioned build and library
 
 That direction of information flow matters:
 
-```text
-versioned metadata + source provenance + build contract + evidence
-                         |
-                         +--> packages
-                         +--> SBOM
-                         +--> license overview
-                         +--> documentation
-                         +--> security identity
-                         +--> dependency views
-                         `--> reproducible replacement
+```mermaid
+flowchart LR
+   Truth["Versioned metadata<br/>source provenance<br/>build contract<br/>evidence"] --> Package[Packages]
+   Truth --> SBOM[SBOM]
+   Truth --> License[License overview]
+   Truth --> Docs[Documentation]
+   Truth --> Security[Security identity]
+   Truth --> Dependencies[Dependency views]
+   Truth --> Replacement[Reproducible replacement]
 ```
 
 This reflects a principle I have followed since the 1990s: information that can be represented structurally should not be copied manually into multiple documents. The structure should become an active source from which dependent artifacts can be produced and checked.
@@ -591,16 +636,16 @@ The security monitor is evolving in exactly that direction.
 
 A useful monitor should not stop at `AFFECTED`. It should help structure the next engineering decision:
 
-```text
-current version
-   -> findings
-   -> affected feature / build relevance
-   -> fixed release or upstream fix
-   -> candidate availability
-   -> candidate vulnerability comparison
-   -> rebuild path
-   -> tests and consumer evidence
-   -> package / release decision
+```mermaid
+flowchart LR
+   Current["Current version"] --> Finding["Findings"]
+   Finding --> Relevance["Affected feature / build relevance"]
+   Relevance --> Fix["Fixed release or upstream fix"]
+   Fix --> Candidate["Candidate availability"]
+   Candidate --> Compare["Candidate vulnerability comparison"]
+   Compare --> Rebuild["Rebuild path"]
+   Rebuild --> Test["Tests & consumer evidence"]
+   Test --> Decision["Package / release decision"]
 ```
 
 This is also where VEX becomes important. A database match is not automatically proof that the concrete product is exploitable. Build configuration, selected backend, compiled features, runtime dependencies, and actual code paths matter.
@@ -643,6 +688,10 @@ The second proof is about C++ itself:
 
 The increasingly demanding tests added another lesson: modern C++ is not only a longer feature list. Concepts, ranges, templates, policies, RAII, value types, and controlled conversions give us a richer architectural vocabulary. That is the line condensed in **"Rethinking C++" ("C++ neu denken")**: we do not have to discard what we know, but we should be willing to reconsider where responsibilities can now be expressed more precisely.
 
+The Core → Transfer → Edge model makes that practical. The Core owns meaning and invariants. The Edge accepts changing technical reality. Transfer is where conversion, projection and typed data movement are made explicit. Ranges and variadic templates are important because they let both **movement** and **heterogeneous structure** remain part of the type-aware architecture instead of disappearing into generic runtime containers.
+
+The language evolution since C++11 adds the efficiency argument: modern C++ can express ownership transfer, compile-time structure, concurrency and lazy data movement while avoiding many unnecessary copies, allocations and runtime indirections. That makes C++ particularly suitable for a tool such as BuildEngine, where orchestration, infrastructure and presentation layers meet.
+
 And that leads to the broader architectural proof expressed in **"Architecture That Lasts" ("Architektur, die bleibt")**: a system is not modern because its outer technology is new. It is sustainable when its underlying structure can absorb change without losing identity.
 
 The third proof is organisational:
@@ -654,6 +703,8 @@ BuildEngine turns component integration into a repeatable technical state: sourc
 And the CI lesson is deliberately modest:
 
 > **The innovation is not Continuous Integration. The useful experiment is concentrating fragmented CI knowledge into a small declarative model and letting one generalized C++ implementation execute that model efficiently.**
+
+XML is a decisive part of that concentration. It keeps the changing knowledge flexible and inspectable while the generalized engine remains stable. Instead of hard-coding every library, BuildEngine turns much of the ecosystem-specific variation into validated data.
 
 ## 24. The project is still evolving
 
@@ -668,11 +719,15 @@ The goal is not a frozen showcase. The goal is a working system that continues t
 - modern C++Builder as part of the wider C++ ecosystem;
 - modern C++ as something more capable than the common "legacy" stereotype suggests;
 - learning new C++ features and then asking what they change in our way of designing software;
+- Core, Transfer, and Edge as a way to separate stable meaning from technical reality;
+- Ranges as a language for typed data movement and variadic templates as a language for heterogeneous type structures;
+- the efficiency gains and stronger cost model enabled by modern C++ since C++11;
 - evolutionary development rather than compulsory reinvention — keep what still carries, rethink what can now be expressed better;
 - architecture as stable meaning under change rather than as the fashion of the current deployment topology;
 - upstream-first third-party integration;
 - central, project-independent production of reusable native components;
 - portable managed tools instead of undocumented machine installation state;
+- flexible, schema-validatable XML contracts instead of library-specific orchestration code;
 - a small number of declarative contracts instead of CI knowledge spread across scripts and responsibilities;
 - one technical source of truth from which build, state, metadata, licenses, SBOM, and documentation can be derived;
 - maximum useful parallelism while preserving dependency correctness;
