@@ -141,9 +141,9 @@ $$
 
 For example, with `workers="4"`, the expected invariant is:
 
-\[
+$$
 0 \leq N_{active} \leq 4
-\]
+$$
 
 The queue length is a separate capacity. A simple conceptual upper bound for queued plus active work is:
 
