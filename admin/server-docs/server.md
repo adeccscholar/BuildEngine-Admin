@@ -44,6 +44,7 @@ Only HTTP `GET` requests are accepted by the current server implementation. The 
 | `/manual/build-tools.md` | `build-tools.xml` contract reference |
 | `/manual/build-libraries.md` | `build-libraries.xml` contract reference |
 | `/manual/tools.md` | Current BuildEngine tool overview |
+| `/manual/images/...` | Synchronized project-documentation images, including nested directories |
 | `/index.html` | Generated central library documentation index |
 
 Static generated documentation is served from the BuildEngine documentation root after the explicit application routes have been evaluated.
@@ -61,6 +62,7 @@ flowchart LR
    R -->|Project Markdown| M[cmark-gfm]
    M --> A[Feature analysis and TOC prereader]
    A --> P
+   R -->|Markdown image| I[admin/server-docs/images]
    R -->|Generated documentation| S[File response]
    R -->|Browser assets| W[Managed /js resource]
 ```
@@ -144,6 +146,9 @@ if(WriteMachineApi(theSocket, theRequest, vecSegments)) {
 else if(/* /js/... managed browser asset */) {
    // Serve managed JavaScript/CSS resource.
 }
+else if(/* /manual/images/... synchronized image */) {
+   // Serve an image from admin/server-docs/images.
+}
 else if(/* explicit browser route */) {
    // Render dashboard, libraries, packages or security page.
 }
@@ -183,6 +188,10 @@ sequenceDiagram
 
 The Markdown source is inspected for browser capabilities required by the page. Language-marked source blocks enable syntax highlighting, Mermaid diagrams enable Mermaid, and supported mathematical delimiters enable MathJax. Only the required browser resources are emitted for each rendered page.
 
+### Mermaid presentation
+
+Mermaid diagrams are rendered centrally by the server and are intentionally limited to approximately 82 percent of the Markdown content width. Individual documents therefore do not need size-specific Mermaid markup. Oversized diagrams remain scrollable, while ordinary diagrams no longer dominate the page width.
+
 ### Generated table of contents
 
 The Markdown prereader recognizes a BuildEngine-specific directive outside fenced code blocks:
@@ -196,6 +205,26 @@ The text after `TOC|` is the visible title, so `[TOC|Overview]` and `[TOC|Table 
 The prereader assigns deterministic document-unique anchors to headings following the directive, renders a nested list according to the heading hierarchy, creates an anchor before the table of contents itself, and adds `Back to <title>` before each heading on the shallowest section level. Project documents place the directive immediately after their `#` document title, making `##` sections the top-level TOC entries.
 
 The generated anchors are injected after cmark-gfm has rendered safe HTML. The feature therefore does not require enabling arbitrary raw HTML in Markdown source.
+
+## Images in project Markdown
+
+Project-documentation images are stored in the Admin repository below:
+
+```text
+admin/server-docs/images/
+```
+
+Subdirectories are supported. A Markdown file can reference an image with a normal relative Markdown path:
+
+```markdown
+![BuildEngine architecture](images/architecture/buildengine-overview.png)
+```
+
+When the page is served below `/manual/`, the browser resolves the reference to `/manual/images/architecture/buildengine-overview.png`. The server maps that route only to the synchronized `admin/server-docs/images` tree and rejects path traversal. Supported browser image formats are SVG, PNG, JPEG, GIF, and WebP.
+
+The normal Admin repository synchronization transfers the complete image tree recursively into the production Admin tree. Image files deliberately use a timestamp rule rather than the normal Admin SHA comparison: an existing production image is copied again only when the repository-side file is newer than the production copy. Other Admin contract files continue to use SHA-256 equality for synchronization.
+
+This keeps image deployment inexpensive without introducing a second documentation-copy pipeline.
 
 ## Links between Markdown documents
 
@@ -242,6 +271,7 @@ admin/server-docs/documentation.md
 admin/server-docs/build-tools.md
 admin/server-docs/build-libraries.md
 admin/server-docs/tools.md
+admin/server-docs/images/**
 ```
 
 They are read and rendered directly from that synchronized tree. All public-facing project Markdown in this live set is maintained in English; original-language titles may remain in parentheses when identifying referenced works.
@@ -260,7 +290,7 @@ Examples:
 - a new or changed tool also updates [tools.md](tools.md),
 - a new `build-libraries.xml` construct also updates [build-libraries.md](build-libraries.md),
 - documentation-pipeline changes also update [documentation.md](documentation.md),
-- HTTP, rendering, TOC preprocessing, or link behavior changes also update this document.
+- HTTP, rendering, TOC preprocessing, image handling, or link behavior changes also update this document.
 
 Documentation is therefore not a release-afterthought; it is maintained as part of the same change that modifies the corresponding behavior.
 
@@ -277,6 +307,7 @@ The current server is intentionally local-only.
 - Host validation accepts loopback hosts.
 - Documentation path traversal is rejected.
 - Managed browser asset paths are constrained.
+- Manual image paths are constrained to `admin/server-docs/images` and accepted image formats.
 - Machine endpoints validate library coordinates through the repository layer.
 - The server is read-only with respect to BuildEngine build state.
 - External transport is a separate concern and should not be inferred from the local HTTP listener.
