@@ -2,6 +2,18 @@
 
 BuildEngine combines a local XML parameter file with synchronized administration contracts. The local file selects the production tree, concurrency, repositories, feature switches, and contract locations; the Admin repository supplies the detailed tool, library, documentation, smoke-test, schema, and security definitions.
 
+> This page is also the MathJax-oriented renderer test. It intentionally combines XML, command-line examples, tables, GitHub-flavored Markdown, inline mathematics, display mathematics, and syntax-highlighted code without requiring Mermaid.
+
+## Renderer acceptance checklist
+
+- [x] XML syntax highlighting
+- [x] Text/command-line code blocks
+- [x] Tables and task lists
+- [x] Inline mathematics
+- [x] Display mathematics
+- [x] GitHub-flavored Markdown
+- [x] No Mermaid requirement on this page
+
 ## BuildEngine.xml
 
 The executable uses `BuildEngine.xml` next to the executable unless another configuration file is supplied as the final command-line argument.
@@ -83,23 +95,56 @@ The exact local worker counts and feature switches are deployment choices; the e
 | `repositoriesRoot` | Local administration repository checkouts |
 | `logsRoot` | BuildEngine log hierarchy |
 
-Concurrency is bounded by the configured worker count. A simple notation for the upper bound is:
+## Concurrency model
+
+The scheduler worker count defines an upper bound for simultaneously executing worker actions. In compact form:
 
 $$
 N_{active} \leq N_{workers}
 $$
 
-This formula is included intentionally so this page exercises MathJax selection without requiring Mermaid.
+For example, with `workers="4"`, the expected invariant is:
+
+\[
+0 \leq N_{active} \leq 4
+\]
+
+The queue length is a separate capacity. A simple conceptual upper bound for queued plus active work is:
+
+$$
+N_{resident} \leq N_{workers} + N_{queue}
+$$
+
+These formulas are intentionally included to exercise MathJax selection.
+
+Inline mathematics is also supported: for a four-worker scheduler, $N_{workers}=4$.
 
 ## Administration XML files
 
 ### `admin/build-tools.xml`
 
-Defines reproducible tools and browser assets. A tool may be discovered from an existing installation or managed by BuildEngine through a download, extraction/generation step, launcher, and probe. Examples include Git, CMake, Ninja, Doxygen, Graphviz, compiler tools, and the managed JavaScript resources used by the documentation server.
+Defines reproducible tools and browser assets. A tool may be discovered from an existing installation or managed by BuildEngine through download, extraction/generation, launcher, and probe steps. Examples include Git, CMake, Ninja, Doxygen, Graphviz, compiler tools, and the managed JavaScript resources used by the documentation server.
 
 ### `admin/build-libraries.xml`
 
 The primary library build contract. Each library entry can define metadata, source acquisition, extraction requirements, patches, build arguments, variants, install operations, publication, smoke consumers, security identity, and documentation metadata. Build knowledge belongs here rather than in library-specific C++ branches inside the engine.
+
+A reduced example illustrates the shared-contract/variant model:
+
+```xml
+<library id="example" version="1.2.3" category="test">
+   <build>
+      <argument value="-G"/>
+      <argument value="Ninja"/>
+      <variant name="Release">
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+      </variant>
+      <variant name="Debug">
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+      </variant>
+   </build>
+</library>
+```
 
 ### `admin/build-documentation.xml`
 
@@ -120,6 +165,23 @@ Generated machine/job state. It is not a replacement for the per-library technic
 ### `admin/schemas/*.xsd`
 
 XML schemas for the synchronized contracts. They make the accepted declarative vocabulary explicit and allow contract validation independently from C++ implementation details.
+
+## Local versus synchronized configuration
+
+The separation is intentional:
+
+| Concern | Local configuration | Synchronized Admin contract |
+| --- | --- | --- |
+| Production root | Yes | No |
+| Worker count | Yes | No |
+| Repository locations | Yes | Repository content itself is synchronized |
+| Tool definitions | No | Yes |
+| Library versions and build contracts | No | Yes |
+| Documentation profiles | No | Yes |
+| Smoke-test definitions | No | Yes |
+| Security metadata | No | Yes |
+
+This prevents local machine settings from becoming a hidden second source of library/build knowledge.
 
 ## Command line
 
@@ -205,13 +267,28 @@ Display CLI help or version information and exit.
 
 The CLI already parses `--lib` and `--libversion` for commands such as `--check` and `--monitor`. In the current build path, library selection is not yet wired into the `--make`/`--build` graph; attempting to use it there is rejected instead of silently building an unintended scope.
 
-## Examples
+## Example command matrix
 
-```text
-BuildEngine
-BuildEngine --make
-BuildEngine --build --config=Release,Debug
-BuildEngine --check --lib=ace-tao --libversion=8.0.6
-BuildEngine --show D:\config\BuildEngine.xml
-BuildEngine --monitor
-```
+| Goal | Command |
+| --- | --- |
+| Incremental default build | `BuildEngine --make` |
+| Clean Release + Debug build | `BuildEngine --build --config=Release,Debug` |
+| Inspect ACE/TAO state | `BuildEngine --check --lib=ace-tao --libversion=8.0.6` |
+| Show effective configuration | `BuildEngine --show D:\config\BuildEngine.xml` |
+| Security monitor | `BuildEngine --monitor` |
+| Display help | `BuildEngine --help` |
+
+## Configuration validation checklist
+
+- [ ] Production root points to the intended tree.
+- [ ] Admin synchronization is configured.
+- [ ] `build-tools.xml` and `build-libraries.xml` are available after synchronization.
+- [ ] Worker and queue settings match the target machine.
+- [ ] Required test/documentation switches are explicit.
+- [ ] `tools.xml` and technical state are treated as generated state rather than hand-authored library knowledge.
+
+## Related documentation
+
+- [BuildEngine architecture](/manual/buildengine.md)
+- [Server and REST API](/manual/server.md)
+- [Generated library documentation index](/index.html)
