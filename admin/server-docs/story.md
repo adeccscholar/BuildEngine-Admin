@@ -6,6 +6,8 @@ The original seminar title was **"C++Builder 13, Back in the Future"**. That tit
 
 But the underlying question was always larger than one product. C++ itself is still regularly described as old, legacy, or something that should gradually disappear behind newer languages. That is one reason our general C++ streams now run under the title **"C++ neu entdecken: Moderner als du denkst | Live Coding & Talk"** — rediscovering C++ as something more modern than many people assume.
 
+The same line of thought also appears in the books **"C++ neu denken"** and **"Architektur, die bleibt"**. They are not detached side projects. They formulate in a more systematic way a lesson that became increasingly visible during the experiments: learning new C++ features is useful, but the more interesting question is how those features allow us to formulate software differently — and how architecture can remain stable while technology continues to evolve.
+
 BuildEngine has grown far beyond the first compiler-evidence question. It now connects compiler integration, reproducible third-party builds, central component production, package creation, license evidence, SBOMs, vulnerability monitoring, risk assessment, documentation, native UI, REST services, package distribution, and a shared modern C++ architecture.
 
 The common idea behind all of those steps is what we now call **staying ahead of the wave**.
@@ -59,6 +61,97 @@ They showed where the real boundaries were:
 The project deliberately does not hide such evidence behind another compiler. If BCC64X fails, silently replacing that path with MSVC would answer a different question. The integration proof only remains meaningful if BCC64X itself stays visible.
 
 That proof has succeeded strongly enough to change the premise of the discussion: **C++Builder 13 can again be treated as a full member of the modern C++ family.** It can build and consume substantial contemporary open-source C and C++ software, including projects that exercise far more than a trivial compiler test.
+
+### The tests became more extreme — and the question changed
+
+Success did not end the experiment. It changed the experiment.
+
+Once ordinary third-party integration had become credible, the tests could become more demanding. The question was no longer only whether BCC64X could translate a large existing code base. We increasingly wanted to know whether the environment could support the way we ourselves wanted to write **modern C++**.
+
+That meant deliberately moving further into the language: Concepts and constraints, ranges, variadic templates, `constexpr`, stronger value types, RAII, policies, compile-time type relations, controlled conversions, modern standard-library facilities, and generic components whose contracts are expressed in the type system rather than only in comments or runtime checks.
+
+The tests therefore became more extreme in two directions at once.
+
+The external evidence became harder: larger libraries, stranger build systems, generated sources, deeper dependency graphs, more demanding integration cases.
+
+At the same time the internal evidence became harder: can we actually write libraries and applications that rely on modern C++ as an architectural language, not merely on a compiler that accepts newer syntax?
+
+That distinction became important. A compiler can support a feature syntactically without a development environment being ready for the way that feature changes design. Concepts are not interesting only because a template can be constrained. Ranges are not interesting only because iterator syntax becomes shorter. Policies are not interesting only because one implementation can be exchanged for another. Modern C++ becomes interesting when those mechanisms move meaning, constraints, ownership, lifetime, conversion rules, and valid combinations into forms that the compiler can help us verify.
+
+This changed our own learning as well.
+
+We had to learn new language facilities, of course. But learning a new feature and then continuing to design exactly as before misses part of the opportunity. The more important lesson was that some familiar problems can now be **thought about differently**.
+
+Not *must* be thought about differently.
+
+C++ is deliberately evolutionary. New language versions do not invalidate decades of experience, and modernity does not mean replacing every virtual function with a template, every loop with a range pipeline, or every runtime decision with compile-time machinery. Existing patterns can remain exactly right where they still express the responsibility well.
+
+But new facilities enlarge the design space. They give us additional places in which rules can live and additional ways to make structure explicit. The useful question therefore changes from:
+
+> **How does this new C++ feature work?**
+
+into:
+
+> **Which responsibility can this feature express more precisely, and what kind of architecture does that make possible?**
+
+That is the transition from learning modern C++ to **thinking C++ anew**.
+
+### "C++ neu denken"
+
+This development is the central idea of the book **"C++ neu denken — Wie C++23 aus Typen, Concepts und Ranges ein neues Architekturmodell formt"**.
+
+The book deliberately does not treat modern C++ as a catalogue of features. Its thesis is that modern C++ changes the place where architecture can be formulated. A business value can become a real type. A prerequisite can become a Concept. Repeated variation can become a Policy. Data movement can become a Range. A technical representation can be converted at a controlled boundary. Resource responsibility can be tied to lifetime through RAII.
+
+The compiler does not become the architect. Architecture remains a human responsibility. But the compiler can become a much stronger **partner in checking architecture** if we formulate assumptions in forms it can understand.
+
+That perspective also explains why our increasingly demanding tests mattered beyond C++Builder itself. Every successful test of Concepts, ranges, generic type structures, compile-time relationships, value semantics, or library composition did more than add another check mark to a feature matrix. It increased the confidence that we could use the modern language to structure real systems in a different way.
+
+The book also makes an important qualification that belongs in this story: C++ develops **evolutionarily**. Existing knowledge remains valuable. New facilities do not automatically replace old concepts; they expand the space of possible designs. Modern C++ architecture therefore does not mean using every new feature everywhere. It means choosing the expression that best matches a responsibility — sometimes a simple value, sometimes a Concept, sometimes a Range, sometimes a Policy, sometimes a virtual base class, and sometimes a deliberate runtime decision.
+
+That is also why experience is not the enemy of modernity. Experience becomes most useful when it is combined with a willingness to re-examine old habits and ask whether the language can now express the same intention more precisely.
+
+The path from streams and experiments to reusable library components is part of the book itself. Many building blocks did not begin as a finished architecture. They grew through practical work, live coding, failure, correction, generalization, and explanation. The stream shows the open process; the book condenses it into a coherent architectural line.
+
+### From "C++ neu denken" to "Architektur, die bleibt"
+
+But the C++ question leads naturally to a larger one.
+
+If types, Concepts, ranges, policies, explicit processes, controlled boundaries, and reusable core structures help us preserve meaning in code, then the underlying architectural question is no longer specific to C++:
+
+> **How can a system absorb change without losing its identity?**
+
+That is the subject of **"Architektur, die bleibt"**.
+
+The second book deliberately moves one level above individual language facilities. It is not a book about Microservices, containers, REST, cloud platforms, or one current framework. Those can all be useful implementation choices, but they are not architecture by themselves.
+
+Its central distinction is that **stability is not stillness**. A system is not stable because nobody changes it. Stability proves itself when technologies, requirements, processes, interfaces, and representations change and the system can absorb those changes without losing the structures that carry meaning.
+
+That leads to another principle that fits BuildEngine surprisingly well: technical packaging does not remove complexity. It only changes where that complexity appears. If the underlying structure is not understood, complexity migrates into conventions, scripts, metadata, naming rules, workarounds, manual procedures, or implicit knowledge.
+
+This is precisely the problem we encountered in third-party builds and CI environments. The complexity of acquiring, configuring, building, testing, documenting, licensing, and publishing a component does not disappear because a pipeline uses YAML or because one more script wraps the build command. The architectural task is to understand that complexity, separate its responsibilities, and give each part a stable place.
+
+In that sense, BuildEngine became a practical meeting point between the two books:
+
+```text
+C++Builder 13 evidence
+        |
+        v
+harder modern-C++ experiments
+        |
+        v
+C++ neu denken
+language facilities as architectural vocabulary
+        |
+        v
+Architektur, die bleibt
+stable meaning under technological change
+        |
+        v
+BuildEngine
+contracts + reusable core + replaceable tools/front ends
+```
+
+The books are therefore not a detour from the BuildEngine story. They describe the thinking that the experiments increasingly forced us to make explicit.
 
 ## 3. From evidence to centrally produced components
 
@@ -364,6 +457,8 @@ The presentation changes, but the interpretation does not.
 
 That is a small architectural decision with a large practical effect. It allows the project to demonstrate different C++Builder application styles without fragmenting the underlying engineering model.
 
+It is also a concrete example of the line developed in **"Architektur, die bleibt"**: the outer topology may change while the structure carrying meaning should remain coherent. Console, VCL manager, and HTTP server are different projections and technical forms. They should not become three independent domain models.
+
 ## 16. More than an SBOM: licenses and provenance
 
 A Software Bill of Materials is an important part of this model because it answers the inventory question in a machine-readable form. But an SBOM alone is not the complete architecture of component responsibility.
@@ -546,6 +641,10 @@ The second proof is about C++ itself:
 
 > **A modern C++ application can be the generalized orchestration layer for build, metadata, documentation, server, and native UI functionality rather than merely the code being compiled by CI.**
 
+The increasingly demanding tests added another lesson: modern C++ is not only a longer feature list. Concepts, ranges, templates, policies, RAII, value types, and controlled conversions give us a richer architectural vocabulary. That is the line condensed in **"C++ neu denken"**: we do not have to discard what we know, but we should be willing to reconsider where responsibilities can now be expressed more precisely.
+
+And that leads to the broader architectural proof expressed in **"Architektur, die bleibt"**: a system is not modern because its outer technology is new. It is sustainable when its underlying structure can absorb change without losing identity.
+
 The third proof is organisational:
 
 > **Knowing how to build a dependency is part of knowing how to own it.**
@@ -568,6 +667,9 @@ The goal is not a frozen showcase. The goal is a working system that continues t
 
 - modern C++Builder as part of the wider C++ ecosystem;
 - modern C++ as something more capable than the common "legacy" stereotype suggests;
+- learning new C++ features and then asking what they change in our way of designing software;
+- evolutionary development rather than compulsory reinvention — keep what still carries, rethink what can now be expressed better;
+- architecture as stable meaning under change rather than as the fashion of the current deployment topology;
 - upstream-first third-party integration;
 - central, project-independent production of reusable native components;
 - portable managed tools instead of undocumented machine installation state;
@@ -581,8 +683,14 @@ The goal is not a frozen showcase. The goal is a working system that continues t
 
 The original evidence test asked whether C++Builder 13 could come back into the modern C++ ecosystem.
 
-The project that grew from it now asks something broader:
+The harder tests then raised a second question: if the language and toolchain can do all of this, **should we continue to formulate our systems as if they could not?**
 
-> **What happens when we stop treating C++ as the legacy part of the system and instead use modern C++ to organize the system itself?**
+That is where "Back in the Future" meets **"C++ neu denken"**.
 
-**C++Builder 13 is back in the future. C++ may be more modern than you think. The next step is to stay ahead of the wave.**
+And once we ask how those new forms can remain coherent across years of technical change, the question becomes the one behind **"Architektur, die bleibt"**.
+
+The project that grew from those questions now asks something broader:
+
+> **What happens when we stop treating C++ as the legacy part of the system and instead use modern C++ to organize the system itself — while preserving the structures that should outlive the next tool, framework, or interface?**
+
+**C++Builder 13 is back in the future. C++ may be more modern than you think. We can learn new features without discarding our experience, rethink the structures they make possible, and build architecture that remains coherent when the next wave arrives.**
