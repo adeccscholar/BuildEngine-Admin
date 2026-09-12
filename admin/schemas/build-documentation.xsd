@@ -9,7 +9,17 @@
 
    <xs:complexType name="defineType">
       <xs:attribute name="name" type="xs:string" use="required"/>
-      <xs:attribute name="value" type="xs:string" use="optional" default="1"/>
+      <!--
+         Missing value means a normal predefined macro (Doxygen treats this as =1).
+         value="" means an explicit empty replacement. Non-empty values may contain
+         spaces and function-like macro replacements.
+      -->
+      <xs:attribute name="value" type="xs:string" use="optional"/>
+   </xs:complexType>
+
+   <xs:complexType name="optionType">
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="value" type="xs:string" use="required"/>
    </xs:complexType>
 
    <xs:complexType name="excludeType">
@@ -19,6 +29,7 @@
    <xs:complexType name="libraryType">
       <xs:sequence>
          <xs:element name="define" type="defineType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="option" type="optionType" minOccurs="0" maxOccurs="unbounded"/>
          <xs:element name="exclude" type="excludeType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="id" type="xs:string" use="required"/>
@@ -32,6 +43,7 @@
       <xs:complexType>
          <xs:sequence>
             <xs:element name="define" type="defineType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="option" type="optionType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="exclude" type="excludeType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="library" type="libraryType" minOccurs="0" maxOccurs="unbounded"/>
          </xs:sequence>
