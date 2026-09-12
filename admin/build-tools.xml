@@ -83,18 +83,21 @@
 
    <!--
       MiKTeX is provisioned only when the effective documentation contract asks
-      for LaTeX/PDF output. The official Basic Installer is executed unattended,
-      without registry state, with all user roots kept below tools/miktex/25.12.
+      for LaTeX/PDF output. Use the portable installer mode so the managed tool
+      does not inherit an existing per-user MiKTeX configuration from AppData.
+      The distinct managed root intentionally invalidates the earlier private
+      installation contract and forces one clean portable provisioning pass.
    -->
    <tool id="miktex" version="25.12" required="when-used">
-      <managed root="miktex\25.12" executable="texmfs\install\miktex\bin\x64\texify.exe">
+      <managed root="miktex\25.12-portable" executable="texmfs\install\miktex\bin\x64\texify.exe">
          <download url="https://miktex.org/download/ctan/systems/win32/miktex/setup/windows-x64/basic-miktex-25.12-x64.exe"
                    archive="basic-miktex-25.12-x64.exe"
                    sha256="14b42dd9f4b4a7813a8bfd69c8f99316c2888cc4ee26f631f397e163d85d6c62"/>
          <extract executable="{Archive}">
-            <argument value="--private"/>
+            <argument value="--portable"/>
             <argument value="--unattended"/>
             <argument value="--no-registry"/>
+            <argument value="--no-additional-roots"/>
             <argument value="--paper-size=A4"/>
             <argument value="--user-install={ManagedRoot}\texmfs\install"/>
             <argument value="--user-config={ManagedRoot}\texmfs\config"/>
