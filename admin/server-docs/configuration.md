@@ -2,7 +2,12 @@
 
 BuildEngine combines a local XML parameter file with synchronized administration contracts. The local file selects the production tree, concurrency, repositories, feature switches, and contract locations; the Admin repository supplies the detailed tool, library, documentation, smoke-test, schema, and security definitions.
 
-For the complete documentation profile, Doxygen, MathJax, LaTeX and MiKTeX contract, see [BuildEngine Documentation Contract](/manual/documentation.md).
+Related reference documents:
+
+- [Documentation contract](documentation.md)
+- [Tool contract `build-tools.xml`](build-tools.md)
+- [Library contract `build-libraries.xml`](build-libraries.md)
+- [Tool overview](tools.md)
 
 ## BuildEngine.xml
 
@@ -76,7 +81,7 @@ The exact local worker counts and feature switches are deployment choices; the e
 | `WithSmokeTests` | Enables BuildEngine consumer smoke tests |
 | `WithDoc` | Enables generated library information documentation |
 | `WithDoxygen` | Permits Doxygen API documentation |
-| `WithLatex` | Local default for the independent Doxygen LaTeX/MiKTeX PDF branch; default is `true` |
+| `WithLatex` | Local default for additional LaTeX output and the following MiKTeX PDF step; default is `true` |
 | `configurations` | Default build variants, for example `All` |
 | `buildTools` | Synchronized managed-tool contract |
 | `toolsState` | Generated effective tool state |
@@ -87,7 +92,9 @@ The exact local worker counts and feature switches are deployment choices; the e
 | `repositoriesRoot` | Local administration repository checkouts |
 | `logsRoot` | BuildEngine log hierarchy |
 
-`WithDoxygen=false` is a hard stop for the central Doxygen pipeline. `WithLatex`, however, is an inheritable local default. `admin/build-documentation.xml` may override it for the project, and a library may independently override it again with `latex="true"` or `latex="false"`. MiKTeX is requested only if at least one Doxygen-enabled library resolves to effective `latex=true`.
+`WithDoxygen=false` is a hard stop for the central Doxygen pipeline. `WithLatex`, however, is an inheritable local default. `admin/build-documentation.xml` may override it for the project, and a library may independently override it again with `latex="true"` or `latex="false"`.
+
+When LaTeX is effective, BuildEngine does **not** start Doxygen a second time. The normal Doxygen invocation produces HTML and LaTeX in one pass; MiKTeX is then requested only for the separate PDF compilation step.
 
 ## Concurrency model
 
@@ -119,6 +126,8 @@ Defines reproducible tools and browser assets. A tool may be discovered from an 
 
 MiKTeX is a `when-used` tool. It is provisioned only when the effective documentation configuration enables LaTeX/PDF for at least one library.
 
+The complete XML vocabulary is documented in [build-tools.md](build-tools.md); the currently configured tools are listed in [tools.md](tools.md).
+
 ### `admin/build-libraries.xml`
 
 The primary library build contract. Each library entry can define metadata, source acquisition, extraction requirements, patches, build arguments, variants, install operations, publication, smoke consumers, security identity, and documentation metadata. Build knowledge belongs here rather than in library-specific C++ branches inside the engine.
@@ -126,7 +135,7 @@ The primary library build contract. Each library entry can define metadata, sour
 A reduced example illustrates the shared-contract/variant model:
 
 ```xml
-<library id="example" version="1.2.3" category="test">
+<library id="example" version="1.2.3" timestamp="2026-09-12T18:00:00Z">
    <build>
       <argument value="-G"/>
       <argument value="Ninja"/>
@@ -140,11 +149,15 @@ A reduced example illustrates the shared-contract/variant model:
 </library>
 ```
 
+The contract and its actions are documented in [build-libraries.md](build-libraries.md).
+
 ### `admin/build-documentation.xml`
 
 Defines the shared documentation profile and library-specific overrides. It controls whether Doxygen and LaTeX/PDF are used, source visibility, public-only extraction, predefined macros, Doxygen options, and exclusion patterns.
 
-The root profile is inherited by every library. For `latex`, omission at the root means inheritance from local `WithLatex`; a root `latex` value overrides that local default for the synchronized project, and a library node may override it again. A library node is an override, not an allow-list. The complete parameter reference and examples are documented in [BuildEngine Documentation Contract](/manual/documentation.md).
+The root profile is inherited by every library. For `latex`, omission at the root means inheritance from local `WithLatex`; a root `latex` value overrides that local default for the synchronized project, and a library node may override it again. A library node is an override, not an allow-list.
+
+The complete parameter reference and the single-pass HTML/LaTeX pipeline are documented in [documentation.md](documentation.md).
 
 ### `admin/smoke-tests.xml`
 
@@ -284,7 +297,8 @@ The CLI already parses `--lib` and `--libversion` for commands such as `--check`
 - [ ] Required test/documentation switches are explicit.
 - [ ] `WithLatex` has the intended local default and any project/library overrides are deliberate.
 - [ ] `tools.xml` and technical state are treated as generated state rather than hand-authored library knowledge.
+- [ ] Contract changes and their Markdown reference pages are updated together.
 
 ## Related documentation
 
-The full documentation contract is available at `/manual/documentation.md`. Other project documents are available through the documentation buttons at the top of every server page. Generated library documentation starts at `/index.html`.
+Use the relative links at the top of this page to move between configuration, tool, library and documentation contracts. Generated library documentation starts at `/index.html`.
