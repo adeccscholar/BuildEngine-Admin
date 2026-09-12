@@ -29,14 +29,16 @@ flowchart TD
    D --> X[Doxygen - exactly one run]
    X --> H[HTML]
    X -->|when latex=true| L[LaTeX]
+   C --> R[One MiKTeX runtime preflight]
    L --> M[MiKTeX texify]
+   R --> M
    M --> P[PDF]
    H --> I[Central documentation index]
 ```
 
 **Essential rule:** when LaTeX is required, the same Doxygen run produces HTML and LaTeX. There is no second Doxygen run for PDF.
 
-MiKTeX is a separate downstream technical step so a MiKTeX version change reruns only PDF compilation and not Doxygen analysis.
+MiKTeX is a separate downstream technical step so a MiKTeX version change reruns only PDF compilation and not Doxygen analysis. A single shared MiKTeX runtime preflight runs before any per-library PDF compiler job; after that prerequisite succeeds, independent library PDF jobs may execute in parallel.
 
 ## Configuration layers
 
@@ -264,7 +266,19 @@ The currently managed tools are listed in [tools.md](tools.md).
 
 MiKTeX is defined in `build-tools.xml` as `required="when-used"`. It is required only if at least one library effectively has `latex=true`.
 
-At that point Doxygen has already generated the LaTeX tree. MiKTeX performs **no Doxygen invocation**; it only compiles `refman.tex`:
+MiKTeX has process-global/user-profile runtime state in addition to the managed executable tree. In particular, a first `pdflatex` use may need to create the shared `pdflatex.fmt` format file. Multiple first-use `texify` processes must not race while creating that common file.
+
+BuildEngine therefore schedules exactly one shared job named:
+
+```text
+documentation:miktex-runtime
+```
+
+The job writes a minimal `preflight.tex` below the BuildEngine documentation work area and compiles it once with `texify`. Every per-library PDF job depends on this runtime preflight as well as on its own Doxygen job. This deliberately serializes only MiKTeX runtime initialization; after the preflight succeeds, independent library PDF jobs remain parallel.
+
+The runtime preflight also makes a broken MiKTeX/pdflatex installation fail at one explicit prerequisite instead of producing a nondeterministic cascade across several library PDF jobs.
+
+At that point Doxygen has generated each library's LaTeX tree. MiKTeX performs **no Doxygen invocation**; it only compiles `refman.tex`:
 
 ```text
 texify --pdf --batch --max-iterations=5 --tex-option=--disable-installer refman.tex
@@ -287,9 +301,12 @@ flowchart LR
    S[Source / Publish / Metadata] --> D[Doxygen state]
    D --> H[HTML]
    D --> L[optional LaTeX]
-   L --> P[PDF state / MiKTeX]
+   R[MiKTeX runtime preflight] --> P[PDF state / MiKTeX]
+   L --> P
    H --> I[Central index]
 ```
+
+The MiKTeX runtime preflight is a shared DAG prerequisite, not a per-library technical-state marker. The per-library PDF state remains tied to the stable LaTeX inputs and MiKTeX version.
 
 ### Doxygen state
 
@@ -404,7 +421,7 @@ WithLatex="true"
 </buildDocumentation>
 ```
 
-Result: one Doxygen run generates HTML and LaTeX; MiKTeX then generates the PDF.
+Result: one Doxygen run generates HTML and LaTeX; the shared MiKTeX preflight initializes the PDF runtime once, then MiKTeX generates library PDFs.
 
 ### HTML only for Boost
 
