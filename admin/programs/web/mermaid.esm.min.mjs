@@ -1,0 +1,1 @@
+const mermaid=await new Promise((resolve,reject)=>{if(globalThis.mermaid){resolve(globalThis.mermaid);return;}const script=document.createElement('script');script.src='/assets/mermaid/mermaid.min.js';script.onload=()=>resolve(globalThis.mermaid);script.onerror=()=>reject(new Error('Mermaid runtime could not be loaded'));document.head.appendChild(script);});export default mermaid;
