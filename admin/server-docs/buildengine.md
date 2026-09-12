@@ -2,6 +2,15 @@
 
 BuildEngine is a declarative build orchestration system for reproducible C and C++ third-party library builds. Its current Windows integration is centered on Embarcadero C++Builder and the modern BCC64X toolchain. Library knowledge belongs in synchronized XML contracts, while the executable evaluates those contracts, prepares tools, creates a technical dependency graph, executes technical steps, and records the resulting state.
 
+Related reference documents:
+
+- [Configuration and command line](configuration.md)
+- [Tool contract `build-tools.xml`](build-tools.md)
+- [Library contract `build-libraries.xml`](build-libraries.md)
+- [Documentation contract](documentation.md)
+- [Tool overview](tools.md)
+- [BuildEngine Server](server.md)
+
 ## Main responsibilities
 
 BuildEngine separates configuration, orchestration, execution, evidence, and presentation:
@@ -13,8 +22,9 @@ BuildEngine separates configuration, orchestration, execution, evidence, and pre
 5. **The process scheduler** executes the technical dependency graph with a bounded worker count.
 6. **Technical step state** is the authoritative incremental state for library work.
 7. **Metadata generation** creates license information and CycloneDX SBOM data.
-8. **Documentation generation** publishes library information and, where enabled, Doxygen API documentation.
+8. **Documentation generation** publishes library information and, where enabled, one central Doxygen run that produces HTML and optionally LaTeX; MiKTeX compiles the already generated LaTeX tree to PDF as a separate downstream state.
 9. **The server** presents resulting packages, documentation, SBOMs, usage information, and security evidence without becoming a second build-state authority.
+10. **Project Markdown documentation** is maintained together with the code and XML contracts and is rendered live from the synchronized Admin repository.
 
 ## Execution flow
 
@@ -48,6 +58,8 @@ graph LR
    Install --> Metadata[SBOM and license metadata]
    Metadata --> Server[BuildEngine Server]
    Install --> Server
+   Admin --> Manual[Project Markdown]
+   Manual --> Server
 ```
 
 ## Core orchestration
@@ -100,6 +112,8 @@ BuildEngine distinguishes technical state from generated evidence. A library is 
 
 This distinction is especially important for large builds because a changed library timestamp, source input, build contract, tool version, or other fingerprint input should invalidate only the work that actually has to run again.
 
+The documentation pipeline follows the same rule. Enabling LaTeX changes the Doxygen output contract and therefore the Doxygen state. Changing only MiKTeX changes the PDF state but does not rerun Doxygen.
+
 ## Build variants
 
 Release and Debug are variants of the same library contract. Common arguments belong to the shared build node, while variant-specific arguments refine optimization level, binary names, installation directories, and other configuration-dependent values.
@@ -119,6 +133,30 @@ A typical conceptual shape is:
 </build>
 ```
 
+## Documentation pipeline
+
+Central API documentation has one Doxygen analysis/execution per library state:
+
+```mermaid
+flowchart LR
+   G[Generate documentation inputs + Doxyfile] --> D[Doxygen - one run]
+   D --> H[HTML]
+   D -->|effective latex=true| L[LaTeX]
+   L --> M[MiKTeX texify]
+   M --> P[PDF]
+```
+
+The key distinction is between **Doxygen output selection** and **PDF compilation**:
+
+- HTML is always requested for a Doxygen-enabled profile.
+- LaTeX is an additional output of the same Doxygen invocation when the effective `latex` setting is true.
+- MiKTeX does not rerun Doxygen; it consumes `latex/refman.tex` and related generated files.
+- The PDF state contains the MiKTeX version, while the Doxygen state does not.
+
+This avoids duplicate parsing of large source trees such as Boost or ACE/TAO and keeps invalidation aligned with the actual technical dependency.
+
+The complete contract is documented in [documentation.md](documentation.md).
+
 ## Important components
 
 | Component | Responsibility |
@@ -132,7 +170,7 @@ A typical conceptual shape is:
 | `ProcessScheduler` | Bounded concurrent DAG execution |
 | `LibraryStepState` | Authoritative technical incremental state |
 | `MetadataJob` | License and CycloneDX metadata |
-| `CentralDocumentationJob` | Library documentation and Doxygen integration |
+| `CentralDocumentationJob` / `DocumentationPipelineJob` | Shared documentation generation plus single-pass HTML/LaTeX Doxygen pipeline and downstream PDF job |
 | `SmokeJobBuilder` | Consumer/integration smoke tests |
 | `BuildEngine-Common` | Shared repository, HTTP, security, package, Markdown, and utility services |
 
@@ -156,6 +194,21 @@ graph TD
 
 This separation keeps presentation technology replaceable while the technical interpretation remains consistent.
 
+## Self-documenting project contract
+
+The Markdown files under `admin/server-docs` are part of the engineering contract, not an after-the-fact manual. They are synchronized with the Admin repository and rendered directly by the server.
+
+The maintenance rule is therefore:
+
+- changes to local configuration semantics update [configuration.md](configuration.md),
+- changes to `build-tools.xml` update [build-tools.md](build-tools.md) and, when tools or roles change, [tools.md](tools.md),
+- changes to `build-libraries.xml` update [build-libraries.md](build-libraries.md),
+- changes to documentation generation update [documentation.md](documentation.md),
+- changes to HTTP/Markdown behavior update [server.md](server.md),
+- architectural consequences are reflected in this document.
+
+Relative links between these Markdown files are used so the documentation remains navigable inside the server's `/manual/` namespace.
+
 ## Failure model
 
 A useful conceptual distinction is:
@@ -177,6 +230,8 @@ Nested example:
   - Install
   - Metadata
   - Documentation
+    - Doxygen HTML + optional LaTeX
+    - optional MiKTeX PDF
 
 ## Design principle
 
