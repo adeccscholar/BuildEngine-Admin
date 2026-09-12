@@ -1,11 +1,11 @@
 # BuildEngine-Admin TODO
 
-**Stand:** 8. September 2026  
-**Status:** eingefrorene Nachfolgearbeit bis zum abschließenden Clean-Room-Test
+**Status date:** September 8, 2026  
+**Status:** frozen follow-up work until the final clean-room test
 
-## Verifizierte Freeze-Basis
+## Verified freeze baseline
 
-Der aktuelle unveränderte Zielmaschinen-Folgelauf lieferte:
+The current unchanged follow-up run on the target machine produced:
 
 ```text
 [SUMMARY] jobs=471, current=451, passed=20, failed=0, blocked=0, incomplete=0
@@ -15,112 +15,112 @@ Machine state summary
 jobs=471, success=471, failed=0, blocked=0, incomplete=0
 ```
 
-Damit ist für den derzeitigen Admin-Vertrag bestätigt:
+For the current Admin contract this confirms:
 
-- 451/451 Library-Tasks werden korrekt als `CURRENT` erkannt,
-- kein Library-Task wird im unveränderten Folgelauf unnötig neu ausgeführt,
+- 451/451 library tasks are correctly recognized as `CURRENT`,
+- no library task is unnecessarily re-executed on an unchanged follow-up run,
 - 0 failed,
 - 0 blocked,
 - 0 incomplete.
 
-Funktionale Baselines vor den reinen Dokumentationsänderungen:
+Functional baselines before documentation-only changes:
 
 ```text
 BuildEngine       268504010b54245124005fde968400f57b6514b5
 BuildEngine-Admin f7c6183cf7dc4d2b56bbc7da8b5a963eb911e97f
 ```
 
-Der aktuelle Vertrag verwendet:
+The current contract uses:
 
 ```text
 schemaVersion = 14
-22 Bibliotheks-/Plattformverträge
+22 library/platform contracts
 ```
 
-Siehe `docs/FREEZE_CLEANROOM.md`.
+See `docs/FREEZE_CLEANROOM.md`.
 
-## Freeze-Regel
+## Freeze rule
 
-Bis zum Abschluss des vollständigen Clean-Room-Tests werden keine funktionalen Änderungen am Admin-Vertrag vorgenommen.
+No functional changes to the Admin contract are made until the complete clean-room test has finished.
 
-Vor dem Clean-Room-Test nicht zulässig:
+Not permitted before the clean-room test:
 
-- Änderungen an `admin/build-libraries.xml`,
-- Änderungen an `admin/build-tools.xml`,
-- XSD-/Schemaänderungen,
-- neue oder geänderte Patches,
-- neue oder geänderte CMake-/Toolchain-Adapter,
-- Änderungen an `admin/programs/`,
-- neue oder geänderte Package-Smokes,
-- neue Bibliotheken,
-- geänderte Library-Timestamps,
-- geänderte Source-Pins/Hashes,
-- geänderte Build-/Test-/Install-/Publishparameter.
+- changes to `admin/build-libraries.xml`,
+- changes to `admin/build-tools.xml`,
+- XSD/schema changes,
+- new or changed patches,
+- new or changed CMake/toolchain adapters,
+- changes to `admin/programs/`,
+- new or changed package smokes,
+- new libraries,
+- changed library timestamps,
+- changed source pins/hashes,
+- changed build/test/install/publish parameters.
 
-Erlaubt bleiben ausschließlich Dokumentations-, Evidence- und Handoff-Korrekturen.
+Only documentation, evidence, and handoff corrections remain permitted.
 
-Findet der Clean-Room-Test einen Fehler, wird nur die minimal notwendige funktionale Korrektur vorgenommen. Danach wird ein neuer Freeze-Basispunkt festgelegt und der vollständige Clean-Room-Test erneut durchgeführt.
+If the clean-room test finds an error, only the minimally required functional correction is made. A new freeze baseline is then established and the complete clean-room test is repeated.
 
-## Noch vor Aufhebung des Freeze
+## Before lifting the freeze
 
-- [x] 451/451-CURRENT-Folgelauf dokumentieren
-- [x] Schema-/Library-Stand dokumentieren
-- [x] Freeze-Regeln dokumentieren
-- [x] Nachfolge-TODOs einfrieren
-- [ ] vollständigen Clean-Room-Test auf frischer Zielumgebung durchführen
-- [ ] ersten vollständigen Lauf inklusive Commits, Toolversionen, Patches und Machine-State protokollieren
-- [ ] unmittelbar folgenden unveränderten zweiten `--make`-Lauf protokollieren
-- [ ] bestätigen, dass alle Library-Tasks im zweiten Lauf `CURRENT` sind
-- [ ] Clean-Room-Evidence anschließend in BuildEngine und BuildEngine-Admin aufnehmen
+- [x] Document the 451/451 CURRENT follow-up run
+- [x] Document schema/library state
+- [x] Document freeze rules
+- [x] Freeze follow-up TODO items
+- [ ] Run the complete clean-room test in a fresh target environment
+- [ ] Record the first complete run including commits, tool versions, patches, and machine state
+- [ ] Immediately record the following unchanged second `--make` run
+- [ ] Confirm that all library tasks are `CURRENT` on the second run
+- [ ] Add the clean-room evidence to BuildEngine and BuildEngine-Admin
 
-## Eingefrorene Bibliotheksarbeit nach dem Clean-Room-Test
+## Frozen library work after the clean-room test
 
 ### OpenCL
 
-- [ ] historische BCC64X-Evidence als Ausgangspunkt verwenden,
-- [ ] Header/Loader und Vendor-Runtime sauber trennen,
-- [ ] exakten Source-Pin und Lizenz deklarieren,
-- [ ] minimalen BCC64X Compile-/Link-Vertrag herstellen,
-- [ ] Runtime-Gate so gestalten, dass fehlende Vendor-Plattform nicht fälschlich den Buildvertrag widerlegt.
+- [ ] Use historical BCC64X evidence as the starting point
+- [ ] Separate headers/loader and vendor runtime cleanly
+- [ ] Declare exact source pin and license
+- [ ] Establish a minimal BCC64X compile/link contract
+- [ ] Design the runtime gate so a missing vendor platform does not falsely invalidate the build contract
 
 ### GoogleTest
 
-- [ ] exakten historisch bewiesenen Upstream-/Versionsstand rekonstruieren,
-- [ ] Shared-vs-Static bewusst neu bewerten,
-- [ ] Static ausdrücklich zulassen, wenn dies für Testinfrastruktur technisch sinnvoller ist,
-- [ ] kleinen Test-Consumer definieren.
+- [ ] Reconstruct the exact historically proven upstream/version state
+- [ ] Deliberately reassess Shared vs Static
+- [ ] Explicitly permit Static where technically more appropriate for test infrastructure
+- [ ] Define a small test consumer
 
-### Evidenzfeld danach bewerten
+### Reassess the evidence field afterwards
 
-Nach OpenCL und GoogleTest erfolgt keine automatische Aufnahme weiterer Bibliotheken. Zuerst wird bewertet, ob zusätzliche Pakete noch neuen Erkenntniswert zu BCC64X, ABI, RTL, Buildsystemintegration oder Toolchain-Kompatibilität liefern.
+After OpenCL and GoogleTest, no further libraries are added automatically. First evaluate whether additional packages provide new evidence about BCC64X, ABI, RTL, build-system integration, or toolchain compatibility.
 
-## Eingefrorene BuildEngine-/Admin-Gemeinschaftsthemen nach dem Clean-Room-Test
+## Frozen shared BuildEngine/Admin topics after the clean-room test
 
-### Publish-/Consumer-Ownership
+### Publish/consumer ownership
 
-- [ ] Ownership im gemeinsamen `Win64x`-Consumer-Baum modellieren,
-- [ ] Publish-Manifeste prüfen,
-- [ ] fremde Paketdateien niemals als eigene Altdateien löschen,
-- [ ] unnötige Publish-Wiederholungen vermeiden.
+- [ ] Model ownership in the shared `Win64x` consumer tree
+- [ ] Review publish manifests
+- [ ] Never delete foreign package files as if they were stale files owned by the current package
+- [ ] Avoid unnecessary publish repetitions
 
-### Scheduler-/DAG-Nutzung
+### Scheduler/DAG use
 
-- [ ] neue explizite Action-DAGs erst nach erfolgreichem Clean-Room-Test und nach Einführung sinnvoller Scheduler-Messbarkeit einsetzen,
-- [ ] keine Library-Verträge vorsorglich parallelisieren,
-- [ ] keine typabhängigen Worker-Pools einführen,
-- [ ] künftige Parallelität über generische Ressourcen (`cpuBudget`, `{JobSlots}`) steuern.
+- [ ] Use new explicit action DAGs only after a successful clean-room test and after meaningful scheduler measurability has been introduced
+- [ ] Do not pre-emptively parallelize library contracts
+- [ ] Do not introduce type-dependent worker pools
+- [ ] Control future parallelism through generic resources (`cpuBudget`, `{JobSlots}`)
 
 ### Security
 
-- [ ] Repository-Identitäten dort ergänzen, wo automatische Ableitung nicht belastbar genug ist,
-- [ ] vollständigen Schema-14-Security-Monitoring-Lauf nach dem Freeze dokumentieren.
+- [ ] Add repository identities where automatic derivation is not sufficiently reliable
+- [ ] Document a complete Schema-14 security-monitoring run after the freeze
 
-### Dokumentation
+### Documentation
 
-- [ ] Library-/Lizenz-/SBOM-Dokumentation nach dem Clean-Room-Lauf mit realer Evidence aktualisieren,
-- [ ] neue offene Punkte aus dem Clean-Room-Test nur als TODO aufnehmen, sofern sie nicht für den PASS zwingend korrigiert werden müssen.
+- [ ] Update library/license/SBOM documentation with real evidence after the clean-room run
+- [ ] Add new issues found by the clean-room test only as TODOs unless they must be corrected for PASS
 
-## Aktuell enthaltene Library-Verträge
+## Currently included library contracts
 
 ```text
 pugixml
@@ -147,37 +147,37 @@ vtk
 opencv
 ```
 
-Diese Liste ist für den Freeze funktional unverändert zu lassen.
+This list must remain functionally unchanged during the freeze.
 
-## Eingefrorene Projektregeln
+## Frozen project rules
 
-1. BCC64X bleibt tatsächliche Zieltoolchain.
-2. Kein stiller Ersatz durch MSVC, clang-cl oder MinGW.
-3. Upstream-Buildsysteme werden bevorzugt erhalten.
-4. `admin/build-libraries.xml` bleibt einziger normativer Bibliotheks-/Dependency-Vertrag.
-5. Generische Mechanik gehört in BuildEngine-C++; Bibliothekswissen in XML/Admin.
-6. Patches sind versionsgebunden und reproduzierbar.
-7. Tests werden nicht ohne Analyse deaktiviert.
-8. Release und Debug bleiben getrennte Varianten, soweit für die Bibliothek sinnvoll.
-9. Shared DLL + Import-Library ist Standard für normale Runtime-Bibliotheken, aber keine dogmatische Regel für Testinfrastruktur.
-10. Kleine Package-Smokes und komplexe `BuildEngine-Tests` bleiben getrennt.
-11. Primärdokumentation ist Deutsch.
-12. Source-Bäume sind regenerierbare Artefakte; halb extrahierte Quellen dürfen nicht als gültiger Source-Baum sichtbar werden.
-13. Alle technischen Actions werden schedulerseitig gleich behandelt; keine typabhängigen Scheduler-Kategorien.
-14. Schema 14 bleibt während des Freeze unverändert.
-15. Library-Timestamps bleiben während des Freeze unverändert.
+1. BCC64X remains the actual target toolchain.
+2. No silent replacement by MSVC, clang-cl, or MinGW.
+3. Upstream build systems are preserved where possible.
+4. `admin/build-libraries.xml` remains the single normative library/dependency contract.
+5. Generic mechanics belong in BuildEngine C++; library knowledge belongs in XML/Admin.
+6. Patches are version-bound and reproducible.
+7. Tests are not disabled without analysis.
+8. Release and Debug remain separate variants where meaningful for the library.
+9. Shared DLL + import library is the default for normal runtime libraries, but not a dogmatic rule for test infrastructure.
+10. Small package smokes and complex `BuildEngine-Tests` remain separate.
+11. Project documentation is maintained in English for the wider project audience.
+12. Source trees are regenerable artifacts; partially extracted sources must never be visible as a valid source tree.
+13. All technical actions are treated equally by the scheduler; no type-dependent scheduler categories.
+14. Schema 14 remains unchanged during the freeze.
+15. Library timestamps remain unchanged during the freeze.
 
-## Clean-Room-Abschlusskriterien
+## Clean-room completion criteria
 
-Der Freeze wird erst aufgehoben, wenn:
+The freeze is lifted only when:
 
 ```text
-vollständiger erster Clean-Room-Lauf: PASS
-unveränderter zweiter Lauf: PASS
-alle Library-Tasks im zweiten Lauf: CURRENT
+complete first clean-room run: PASS
+unchanged second run: PASS
+all library tasks on second run: CURRENT
 failed=0
 blocked=0
 incomplete=0
 ```
 
-Zusätzlich müssen die verwendeten Repository-Commits, Compiler-/Toolversionen, Source-Pins und angewendeten Patches nachvollziehbar protokolliert sein.
+The repository commits, compiler/tool versions, source pins, and applied patches used must also be recorded traceably.
