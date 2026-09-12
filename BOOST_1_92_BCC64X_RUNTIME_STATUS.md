@@ -1,57 +1,57 @@
-# Boost 1.92.0 / BCC64X – Runtime-Status und Handoff
+# Boost 1.92.0 / BCC64X – Runtime Status and Handoff
 
-Stand: 2026-08-31
+Status date: 2026-08-31
 
-Dieses Dokument ist der technische Wiedereinstiegspunkt für den Boost-1.92.0-Runtimebefund mit C++Builder 13 / BCC64X. Die Diagnose ist für den aktuellen Third-Party-Aufbau abgeschlossen: der verbleibende Textarchive-Fehler ist als bekannte BCC64X/libc++-DLL-Grenze dokumentiert und blockiert den weiteren Bibliotheksgraphen nicht mehr.
+This document is the technical re-entry point for the Boost 1.92.0 runtime findings with C++Builder 13 / BCC64X. Diagnosis is complete for the current third-party setup: the remaining text-archive failure is documented as a known BCC64X/libc++ DLL boundary and no longer blocks the wider library graph.
 
-## 1. Ziel und Toolchain
+## 1. Goal and toolchain
 
-Verifizierter Compiler-/Target-Vertrag:
+Verified compiler/target contract:
 
 - Compiler: BCC64X / Clang 20.1.7
-- Sprache: C++23
+- Language: C++23
 - Target: `x86_64-w64-windows-gnu`
-- C++-Standardbibliothek: LLVM libc++
-- Windows-GNU-Unterbau: MinGW-w64 / UCRT
-- Thread-Modell: posix
-- Boost.Config läuft über den nativen Clang-Zweig.
-- `BOOST_EMBTC` ist im verwalteten Consumer-Pfad nicht aktiv.
-- `BOOST_NO_CXX11_NOEXCEPT` ist nicht aktiv.
+- C++ standard library: LLVM libc++
+- Windows GNU foundation: MinGW-w64 / UCRT
+- Thread model: posix
+- Boost.Config uses the native Clang branch.
+- `BOOST_EMBTC` is not active in the managed consumer path.
+- `BOOST_NO_CXX11_NOEXCEPT` is not active.
 
-MSVC, clang-cl oder eine andere Ersatztoolchain sind nicht Bestandteil dieses Nachweises.
+MSVC, clang-cl, or any other replacement toolchain is not part of this proof.
 
-## 2. Historische Referenz
+## 2. Historical reference
 
-Der historische R193-Nachweis für Boost 1.92.0 war grün. Dort lief Serialization zusammen mit Boost.Iostreams, Boost.Locale, Boost.Nowide und Boost.URL und führte einen normalen `text_oarchive`/`text_iarchive`-Roundtrip aus.
+The historical R193 proof for Boost 1.92.0 was green. Serialization was linked together with Boost.Iostreams, Boost.Locale, Boost.Nowide, and Boost.URL and executed a normal `text_oarchive`/`text_iarchive` round trip.
 
-Die heutige Reproduktion dieser größeren Link-Komposition änderte das aktuelle Fehlerbild nicht. Die zusätzliche Link-Komposition ist daher als alleinige Ursache ausgeschlossen.
+Reproducing this larger link composition today did not change the current failure mode. The additional link composition is therefore excluded as the sole cause.
 
-## 3. Gesicherte positive Befunde
+## 3. Verified positive findings
 
-Folgende Pfade sind mit dem aktuellen BCC64X-/Boost-1.92.0-Paket verifiziert:
+The following paths are verified with the current BCC64X / Boost 1.92.0 package:
 
-- Boost.Charconv Runtime: PASS
-- Boost.URL Runtime: PASS
-- Standard-Locale/Codecvt für `char` und `wchar_t`: PASS
-- `std::stringstream::imbue` und `std::wstringstream::imbue`: PASS
-- `boost::archive::codecvt_null<char>` und `<wchar_t>`: PASS
-- `boost::archive::basic_ostream_locale_saver` lokal: PASS
-- Boost.Iostreams Plain Output + Flush: PASS
-- lokale Nachbildung der Text-Primitive-Lebensdauer auf Standardstream: PASS
-- lokale Nachbildung derselben Lebensdauer auf Boost.Iostreams: PASS
-- Boost.Serialization Binary Archive auf Standardstream: PASS
-- Boost.Serialization Binary Archive auf Boost.Iostreams: PASS
-- `std::uncaught_exceptions()` im EXE: PASS
-- `boost::core::uncaught_exceptions()` im EXE: PASS
-- beide Funktionen aus einer separaten BCC64X-DLL: PASS
+- Boost.Charconv runtime: PASS
+- Boost.URL runtime: PASS
+- standard locale/codecvt for `char` and `wchar_t`: PASS
+- `std::stringstream::imbue` and `std::wstringstream::imbue`: PASS
+- `boost::archive::codecvt_null<char>` and `<wchar_t>`: PASS
+- local `boost::archive::basic_ostream_locale_saver`: PASS
+- Boost.Iostreams plain output + flush: PASS
+- local reconstruction of the text-primitive lifetime on a standard stream: PASS
+- local reconstruction of the same lifetime on Boost.Iostreams: PASS
+- Boost.Serialization binary archive on a standard stream: PASS
+- Boost.Serialization binary archive on Boost.Iostreams: PASS
+- `std::uncaught_exceptions()` in the EXE: PASS
+- `boost::core::uncaught_exceptions()` in the EXE: PASS
+- both functions from a separate BCC64X DLL: PASS
 
-Damit sind Boost.Iostreams und Boost.Serialization insgesamt ausdrücklich **nicht** als defekt zu klassifizieren. Der verbleibende Befund betrifft eine engere C++-Stream-ABI-Grenze.
+Boost.Iostreams and Boost.Serialization as a whole are therefore explicitly **not** classified as defective. The remaining finding concerns a narrower C++ stream ABI boundary.
 
-## 4. Entscheidender Boundary-Befund
+## 4. Decisive boundary finding
 
-Ein minimales eigenes BCC64X-DLL-Reproducer erhält eine im EXE erzeugte `std::ostream&`.
+A minimal custom BCC64X DLL reproducer receives a `std::ostream&` created in the EXE.
 
-Reproduzierter Ablauf in Release und Debug:
+Reproduced sequence in Release and Debug:
 
 ```text
 local-ostream-endl      PASS
@@ -61,59 +61,59 @@ dll-ostream-insert-char BEGIN
 <0xC0000005>
 ```
 
-Damit ist der verbleibende Fehler nicht mehr nur ein Boost.Serialization-Indiz.
+The remaining failure is therefore no longer only an indication from Boost.Serialization.
 
-> Auf der untersuchten BCC64X/LLVM-libc++-Konfiguration kann eine BCC64X-DLL auf einer im EXE erzeugten `std::ostream&` die elementare Memberfunktion `put()` und `flush()` erfolgreich benutzen, während der freie/überladene C++-Stream-Insertion-Pfad `operator<<` reproduzierbar mit `0xC0000005` scheitert.
+> In the examined BCC64X/LLVM-libc++ configuration, a BCC64X DLL can successfully use the elementary member functions `put()` and `flush()` on a `std::ostream&` created in the EXE, while the free/overloaded C++ stream insertion path `operator<<` reproducibly fails with `0xC0000005`.
 
-`std::endl` enthält denselben Insertion-Pfad und ist damit ebenfalls betroffen.
+`std::endl` contains the same insertion path and is therefore affected as well.
 
-Dieser Befund erklärt den zuvor eingegrenzten Boost.Serialization-Textarchive-Absturz sehr plausibel: `basic_text_oprimitive<std::ostream>` ist in `boost_serialization.dll` explizit instanziiert und führt in seinem Destruktor `os << std::endl` auf einem vom Consumer bereitgestellten Stream aus.
+This finding very plausibly explains the previously isolated Boost.Serialization text-archive crash: `basic_text_oprimitive<std::ostream>` is explicitly instantiated in `boost_serialization.dll` and executes `os << std::endl` in its destructor on a stream supplied by the consumer.
 
-Die Kausalität zwischen genau diesem Aufruf und jedem möglichen Textarchive-Fall ist technisch sehr stark belegt, wird aber nicht über den reproduzierten Boundary-Befund hinaus verallgemeinert.
+The causal relationship between exactly this call and every possible text-archive case is technically very strongly supported, but is not generalized beyond the reproduced boundary finding.
 
-## 5. Boost.Iostreams ist abgeschlossen
+## 5. Boost.Iostreams is closed
 
-Boost.Iostreams bleibt aus Beschreibung und TODO als offene Ursache entfernt.
+Boost.Iostreams remains removed from the description and TODO list as an open cause.
 
-Verifiziert sind:
+Verified:
 
-1. normales Schreiben und Flush mit `boost::iostreams::stream`;
-2. lokale Stream-/Locale-Lebensdauer;
-3. vollständiger Binary-Archive-Roundtrip.
+1. normal writing and flush with `boost::iostreams::stream`;
+2. local stream/locale lifetime;
+3. complete binary-archive round trip.
 
-Der Fehler tritt erst auf, wenn Code aus einer DLL den problematischen `std::ostream`-Insertion-Pfad auf einem Consumer-Stream verwendet.
+The failure appears only when code from a DLL uses the problematic `std::ostream` insertion path on a consumer-owned stream.
 
-## 6. Acceptance-Entscheidung
+## 6. Acceptance decision
 
-Der bekannte Crashpfad bleibt als reproduzierbare Diagnosequelle im Repository erhalten, wird aber **nicht mehr als normaler Acceptance-Gate ausgeführt**.
+The known crash path remains in the repository as a reproducible diagnostic source, but is **no longer executed as a normal acceptance gate**.
 
-Der aktive `boost-evidence-runtime-serialization.exe` prüft weiterhin:
+The active `boost-evidence-runtime-serialization.exe` still checks:
 
-- lokalen `std::endl`-Pfad;
+- local `std::endl` path;
 - DLL `put()`;
 - DLL `flush()`;
-- lokale Text-Primitive-Lebensdauer;
-- Boost.Iostreams Plain Output;
-- lokale Text-Primitive-Lebensdauer auf Boost.Iostreams;
-- Binary Serialization über Boost.Iostreams.
+- local text-primitive lifetime;
+- Boost.Iostreams plain output;
+- local text-primitive lifetime on Boost.Iostreams;
+- binary serialization through Boost.Iostreams.
 
-Danach meldet er zwei stabile `KNOWN-LIMITATION`-Zeilen und beendet sich erfolgreich.
+It then reports two stable `KNOWN-LIMITATION` lines and exits successfully.
 
-Die folgenden Funktionen bleiben nur als Reproducer im Quelltext und werden im Acceptance-Lauf nicht aufgerufen:
+The following functions remain only as reproducers in the source and are not called during the acceptance run:
 
 - DLL `operator<<('\n')`;
 - DLL `std::endl`;
-- echte Boost.Serialization-Textarchive-Construct/Destroy-Probes.
+- real Boost.Serialization text-archive construct/destroy probes.
 
-Damit bedeutet ein grünes Boost-Gate künftig:
+A green Boost gate therefore means:
 
-> Das definierte BCC64X-Benutzungsprofil ist verifiziert; die bekannte libc++-C++-Stream-DLL-Grenze und davon betroffene Boost.Serialization-Textarchives sind dokumentiert und nicht Teil des akzeptierten Profils.
+> The defined BCC64X usage profile is verified; the known libc++ C++ stream DLL boundary and Boost.Serialization text archives affected by it are documented and are not part of the accepted profile.
 
-Es bedeutet ausdrücklich nicht, dass der bekannte Textarchive-Reproducer repariert wurde.
+It explicitly does not mean that the known text-archive reproducer has been fixed.
 
-## 7. Reproducer-Dateien
+## 7. Reproducer files
 
-Aktive bzw. erhaltene Diagnosequellen:
+Active or retained diagnostic sources:
 
 - `admin/smokes/boost/component-gate/runtime-serialization.cpp`
 - `admin/smokes/boost/component-gate/runtime-stream-boundary.cpp`
@@ -122,42 +122,42 @@ Aktive bzw. erhaltene Diagnosequellen:
 - `admin/smokes/boost/component-gate/runtime-uncaught-boundary.cpp`
 - `admin/smokes/boost/component-gate/runtime-uncaught-boundary.h`
 
-## 8. Nicht erneut verfolgen ohne neue Evidenz
+## 8. Do not revisit without new evidence
 
-- Boost.Iostreams als eigenständiger Defekt
-- größere R193-Link-Komposition
-- Boost.Locale-WinAPI-Backend
-- allgemeiner Locale-/Codecvt-Defekt
+- Boost.Iostreams as an independent defect
+- larger R193 link composition
+- Boost.Locale WinAPI backend
+- general locale/codecvt defect
 - `boost::core::uncaught_exceptions()`
-- Binary-Archive allgemein
-- Nutzdaten-/`std::string`-Roundtrip als primäre Ursache
+- binary archives in general
+- payload/`std::string` round trip as the primary cause
 
-## 9. Relevante Admin-Commits
+## 9. Relevant Admin commits
 
-- `c218b8ba3c838b5cd6a4d757b5197cf70a6a3d53` – R193 Serialization-Linkgraph reproduziert
-- `f00eafc55b8368529cb67ab0ed64fd9c43a9d4be` – Boost.Locale BCC64X WinAPI-Backend deaktiviert
-- `5fc3562e7d5658b27d4b3708e79f26ff99fd51c9` – Locale/Codecvt-/Archive-Diagnose erweitert
-- `2f9b810ff0dc69e874516151e96cc71d44d6df3d` – Konstruktor/Destruktor-Checkpoints
-- `fe4a05017829dbb2c358c066f85dc634da2a87b4` – Serialization-Boundary-Test
-- `2260fdc79885969a8e40bf92cc311119a6781d0d` – `uncaught_exceptions()` DLL-Reproducer
-- `8fc158cb48d25a1108f5ec50af62f1ce014acb9f` – `std::ostream&` DLL-Boundary integriert
-- `98328f3a60848910e8e0951954b2061ba55d837a` – bekannten Crashpfad aus Acceptance entfernt, Evidenz erhalten
+- `c218b8ba3c838b5cd6a4d757b5197cf70a6a3d53` – reproduced R193 Serialization link graph
+- `f00eafc55b8368529cb67ab0ed64fd9c43a9d4be` – disabled Boost.Locale BCC64X WinAPI backend
+- `5fc3562e7d5658b27d4b3708e79f26ff99fd51c9` – extended locale/codecvt/archive diagnostics
+- `2f9b810ff0dc69e874516151e96cc71d44d6df3d` – constructor/destructor checkpoints
+- `fe4a05017829dbb2c358c066f85dc634da2a87b4` – Serialization boundary test
+- `2260fdc79885969a8e40bf92cc311119a6781d0d` – `uncaught_exceptions()` DLL reproducer
+- `8fc158cb48d25a1108f5ec50af62f1ce014acb9f` – integrated `std::ostream&` DLL boundary
+- `98328f3a60848910e8e0951954b2061ba55d837a` – removed known crash path from acceptance while retaining evidence
 
-## 10. BuildEngine-Currentness
+## 10. BuildEngine currentness
 
-Während der Diagnose wurde zusätzlich festgestellt, dass Smoke-Currentness bislang nur den Source-Pfad, nicht den Source-Inhalt berücksichtigte. Deshalb konnten geänderte Smoke-Quellen fälschlich als `current` gelten.
+During diagnosis it was additionally discovered that smoke currentness previously considered only the source path, not source content. Changed smoke sources could therefore incorrectly remain `current`.
 
-BuildEngine-Commit:
+BuildEngine commit:
 
-- `9ae53c65f530bf57c889123380a263723523175b` – Smoke-Sourcebaum wird über relative Dateipfade + SHA-256 fingerprinted; Änderungen invalidieren den betroffenen Smoke.
+- `9ae53c65f530bf57c889123380a263723523175b` – smoke source tree is fingerprinted through relative file paths + SHA-256; changes invalidate the affected smoke.
 
-## 11. Nächster Third-Party-Arbeitsblock
+## 11. Next third-party work block
 
-Boost ist für den aktuellen Projektfortschritt abgeschlossen.
+Boost is closed for current project progress.
 
-Nächste Reihenfolge:
+Next sequence:
 
-1. Xerces-C als eigenständiges BCC64X-Paket integrieren und verifizieren.
-2. Danach ACE 8.0.6 / TAO 4.0.6 auf Basis des bereits erfolgreich verifizierten Evidenzpfades integrieren.
-3. Xerces-C als Abhängigkeit für die ACE/TAO-Komponenten aktivieren, die im früheren MPC-Lauf wegen `requires xerces` ausgelassen wurden, insbesondere `ACE_XML_Utils`.
-4. Bestehende ACE/TAO-Evidenz, Patches, MPC/BMake-Vertrag und Service-Gates übernehmen; keine Neuerfindung des erfolgreichen Ports.
+1. Integrate and verify Xerces-C as an independent BCC64X package.
+2. Then integrate ACE 8.0.6 / TAO 4.0.6 based on the already successfully verified evidence path.
+3. Enable Xerces-C as a dependency for the ACE/TAO components that were skipped in the earlier MPC run because they `require xerces`, especially `ACE_XML_Utils`.
+4. Reuse the existing ACE/TAO evidence, patches, MPC/BMake contract, and service gates; do not reinvent the successful port.
