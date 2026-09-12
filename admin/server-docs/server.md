@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-BuildEngine Server is the read-only HTTP presentation and machine-interface layer for a BuildEngine production tree. It exposes library/package metadata, generated documentation, SBOM data, dependency and usage information, security results, package export, project documentation, and a browser UI. It does not replace the BuildEngine scheduler or technical step-state model.
+BuildEngine Server is the read-only HTTP presentation and machine-interface layer for a BuildEngine production tree. It exposes library/package metadata, generated documentation, PDF documentation, SBOM data, dependency and usage information, security results, package export, project documentation, and a browser UI. It does not replace the BuildEngine scheduler or technical step-state model.
 
 Related project documentation:
 
@@ -13,23 +13,60 @@ Related project documentation:
 - [Library contract](build-libraries.md)
 - [Tool overview](tools.md)
 
+## One production tree, one repository view
+
+The server works directly on the central BuildEngine production tree. It does not maintain a server-specific copy of libraries, packages, generated documentation, SBOMs, security assessments, or administration metadata.
+
+`BuildEngineRepository` is the shared repository abstraction over that production tree. The console engine, server, manager, and other front ends can therefore consume the same centrally produced state instead of reconstructing it independently.
+
+```mermaid
+flowchart LR
+   Contracts["Synchronized Admin contracts"] --> Production["Central production tree"]
+   Engine["BuildEngine"] --> Production
+   Production --> Repository["BuildEngineRepository"]
+   Repository --> Server["Server"]
+   Repository --> Manager["Manager"]
+   Repository --> Other["Other front ends"]
+```
+
+This strengthens the BuildEngine principle of **one truth**: XML contracts describe intended state, BuildEngine produces and verifies the effective artifacts and evidence, and presentation layers read that same central state. The HTTP server is a projection of the repository, not an independent state authority.
+
 ## Transport and scope
 
 The server deliberately uses HTTP for its current presentation and machine interface. This is a design decision for the intended deployment model, not a limitation of the underlying networking stack.
 
-The default endpoint is deliberately local:
+The safe defaults remain local:
 
 ```text
-http://127.0.0.1:8765/
+serverAddress="127.0.0.1"
+serverName="localhost"
+serverPort="8765"
 ```
 
-The current version 1 implementation binds to the IPv4 loopback interface only. The broader deployment model is intentionally restricted as well: a BuildEngine server should either remain on localhost or be bound to an explicitly selected internal address/server identity whose network exposure is controlled by the operator. If an internal address is used, responsibility for keeping that endpoint behind the appropriate firewall and network boundary belongs to the deployment environment.
+The endpoint is configured centrally in `BuildEngine.xml`:
+
+```xml
+<parameters
+   ...
+   serverAddress="127.0.0.1"
+   serverName="localhost"
+   serverPort="8765"
+   .../>
+```
+
+`serverAddress` is the concrete local IP interface on which the listener binds. `serverName` is the logical DNS/server identity accepted in the HTTP `Host` header and used when presenting the endpoint. `serverPort` selects the TCP port.
+
+A protected-network deployment can bind to one explicitly selected internal interface and expose the corresponding internal server name. Wildcard listener addresses such as `0.0.0.0` or `::` are intentionally rejected: the deployment contract should identify the interface that is intended to be reachable.
+
+If a non-loopback interface is selected, responsibility for keeping that endpoint behind the appropriate firewall and network boundary belongs to the deployment environment.
 
 HTTP is appropriate for that deliberately constrained environment because introducing HTTPS would also introduce certificate provisioning, trust configuration, renewal/rotation, expiration handling, and operational ownership. Those concerns are intentionally kept outside this project's current scope.
 
-The server architecture is not coupled to plain HTTP. The Boost.Asio/Beast based transport can be extended to HTTPS without changing the repository, rendering, REST, package, or security service layers. Such an extension would primarily add TLS transport and certificate configuration. The absence of HTTPS in the current implementation should therefore be understood as a scope and operational-responsibility decision, not as an architectural restriction.
+The server architecture is not coupled to plain HTTP. The Boost.Asio/Beast based transport can be extended to HTTPS without changing the repository, rendering, REST, package, or security service layers. Such an extension would primarily add TLS transport and certificate configuration. The absence of HTTPS should therefore be understood as a scope and operational-responsibility decision, not as an architectural restriction.
 
 Only HTTP `GET` requests are accepted by the current server implementation. The browser UI and REST-style JSON endpoints share the same server.
+
+The standalone server reads these values from a central `BuildEngine.xml` when it is supplied with `--config` or when `BuildEngine.xml` is present in the working directory. Explicit `--root`, `--address`, `--name`, and `--port` arguments are runtime overrides rather than a second configuration authority.
 
 ## Browser routes
 
@@ -40,6 +77,7 @@ Only HTTP `GET` requests are accepted by the current server implementation. The 
 | `/libraries/` | Configured and installed library overview |
 | `/library/{library}/` | Versions of one library |
 | `/library/{library}/{version}/` | Library/version detail |
+| `/pdf/{library}/{version}` | Published PDF documentation for a library version |
 | `/packages/` | Installed package overview |
 | `/package/{library}/{version}/` | Package detail and export link |
 | `/security/` | Security overview |
@@ -55,14 +93,30 @@ Only HTTP `GET` requests are accepted by the current server implementation. The 
 | `/manual/images/...` | Synchronized project-documentation images, including nested directories |
 | `/index.html` | Generated central library documentation index |
 
-Static generated documentation is served from the BuildEngine documentation root after the explicit application routes have been evaluated.
+Static generated documentation is served from the central BuildEngine documentation root after the explicit application routes have been evaluated.
+
+## Published PDF documentation
+
+When the documentation pipeline has produced a PDF for a library/version, the server exposes it through:
+
+```text
+/pdf/{library}/{version}
+```
+
+The route resolves the published PDF from the same central documentation tree used by BuildEngine and sends it with MIME type:
+
+```text
+application/pdf
+```
+
+The server deliberately does not force a `Content-Disposition: attachment` header for this route. Modern browsers can therefore display the PDF directly and provide their normal download/save function. This also keeps PDF delivery consistent with the general principle that generated documentation is served directly from the central BuildEngine output rather than copied into a server-specific area.
 
 ## Request flow
 
 ```mermaid
 flowchart LR
-   B[Browser or local client] --> H[HTTP listener]
-   H --> V{Permitted interface and host?}
+   B[Browser or internal client] --> H[HTTP listener]
+   H --> V{Configured interface and host?}
    V -- no --> F[Rejected request]
    V -- yes --> R{Route type}
    R -->|Machine API| J[JSON response]
@@ -71,6 +125,7 @@ flowchart LR
    M --> A[Feature analysis and TOC prereader]
    A --> P
    R -->|Markdown image| I[admin/server-docs/images]
+   R -->|Published PDF| PDF[documentation/.../pdf]
    R -->|Generated documentation| S[File response]
    R -->|Browser assets| W[Managed /js resource]
 ```
@@ -87,7 +142,7 @@ Host: localhost:8765
 Accept: application/json
 ```
 
-Returns application/version information and the effective production/documentation roots.
+Returns application/version information, configured server identity, and the effective production/documentation roots.
 
 ### Libraries
 
@@ -134,10 +189,11 @@ A status response has the following conceptual shape:
   "apiBase": "/api",
   "versionedApiBase": "/api/v1",
   "bind": "127.0.0.1",
+  "serverName": "localhost",
   "port": 8765,
   "productionRoot": "D:/local/embarcadero/test_v3",
   "documentationRoot": "D:/local/embarcadero/test_v3/documentation",
-  "transport": "HTTP on a deliberately restricted interface"
+  "transport": "HTTP on explicitly configured interface"
 }
 ```
 
@@ -156,6 +212,9 @@ else if(/* /js/... managed browser asset */) {
 }
 else if(/* /manual/images/... synchronized image */) {
    // Serve an image from admin/server-docs/images.
+}
+else if(/* /pdf/{library}/{version} */) {
+   // Serve the published PDF from the central documentation tree.
 }
 else if(/* explicit browser route */) {
    // Render dashboard, libraries, packages or security page.
@@ -284,7 +343,7 @@ admin/server-docs/images/**
 
 They are read and rendered directly from that synchronized tree. All public-facing project Markdown in this live set is maintained in English; original-language titles may remain in parentheses when identifying referenced works.
 
-Generated per-library documentation remains below the normal BuildEngine documentation root and is served by the same HTTP server. This gives the running server one entry point for both evolving project documentation and generated third-party library documentation without mixing their source locations.
+Generated per-library HTML and PDF documentation remains below the normal BuildEngine documentation root and is served by the same HTTP server. This gives the running server one entry point for both evolving project documentation and generated third-party library documentation without mixing their source locations or creating another copy.
 
 The cmark-gfm runtime is validated when the server is initialized. A missing renderer runtime therefore fails visibly instead of leaving apparently available Markdown routes that cannot be rendered.
 
@@ -298,7 +357,7 @@ Examples:
 - a new or changed tool also updates [tools.md](tools.md),
 - a new `build-libraries.xml` construct also updates [build-libraries.md](build-libraries.md),
 - documentation-pipeline changes also update [documentation.md](documentation.md),
-- HTTP, rendering, TOC preprocessing, image handling, or link behavior changes also update this document.
+- HTTP, endpoint configuration, rendering, PDF delivery, TOC preprocessing, image handling, or link behavior changes also update this document.
 
 Documentation is therefore not a release-afterthought; it is maintained as part of the same change that modifies the corresponding behavior.
 
@@ -308,15 +367,19 @@ The server deliberately does not duplicate repository, security, package, or ren
 
 That separation makes the HTTP server a presentation surface rather than a second domain implementation. For example, the risk assessment exposed as HTML and JSON is the same assessment model available to the other BuildEngine front ends.
 
+Most importantly, the server creates its `BuildEngineRepository` directly from the configured central production root. Package metadata, SBOMs, generated documentation, PDFs, security assessments, tool state, and synchronized Admin content therefore remain shared evidence. The server does not reinterpret those artifacts into a second persistent store.
+
 ## Security boundary
 
 The intended security boundary is a deliberately restricted network endpoint rather than TLS termination inside BuildEngine itself.
 
-- The default and current version 1 implementation uses the loopback interface.
-- A broader deployment should use only an explicitly selected internal interface/server identity and remain behind the operator's firewall or equivalent network boundary.
+- The default uses the loopback interface and `localhost`.
+- A protected-network deployment may use one explicitly selected internal IP address and server name.
+- Wildcard bind addresses are rejected; the listener must identify a concrete interface.
+- The configured server name or interface address is validated against the HTTP `Host` header.
+- A non-loopback deployment remains the operator's responsibility and must stay behind the intended firewall or equivalent network boundary.
 - HTTP is an explicit design choice for this constrained deployment model, not a technical limitation.
 - HTTPS can be added at the transport layer if a deployment requires it, but certificate lifecycle and trust management are intentionally outside the present project scope.
-- Host and interface restrictions remain part of the transport boundary.
 - Documentation path traversal is rejected.
 - Managed browser asset paths are constrained.
 - Manual image paths are constrained to `admin/server-docs/images` and accepted image formats.
