@@ -1,5 +1,7 @@
 # BuildEngine Server
 
+[TOC|Content]
+
 BuildEngine Server is the read-only HTTP presentation and machine-interface layer for a BuildEngine production tree. It exposes library/package metadata, generated documentation, SBOM data, dependency and usage information, security results, package export, project documentation, and a browser UI. It does not replace the BuildEngine scheduler or technical step-state model.
 
 Related project documentation:
@@ -57,7 +59,7 @@ flowchart LR
    R -->|Machine API| J[JSON response]
    R -->|Dashboard/UI| P[Rendered HTML page]
    R -->|Project Markdown| M[cmark-gfm]
-   M --> A[Feature analysis]
+   M --> A[Feature analysis and TOC prereader]
    A --> P
    R -->|Generated documentation| S[File response]
    R -->|Browser assets| W[Managed /js resource]
@@ -168,9 +170,10 @@ sequenceDiagram
    Browser->>Server: GET /manual/server.md
    Server->>Admin: resolve current Markdown source
    Server->>Renderer: RenderFile(...)
-   Renderer->>Renderer: Analyze source features
+   Renderer->>Renderer: Analyze features and TOC directive
    Renderer->>CMark: Parse + render GFM
    CMark-->>Renderer: HTML body
+   Renderer->>Renderer: Inject generated anchors, TOC and back links
    Renderer-->>Server: HTML + feature mask
    Server-->>Browser: Complete page
    Browser->>Server: Request selected /js assets
@@ -179,6 +182,20 @@ sequenceDiagram
 ```
 
 The Markdown source is inspected for browser capabilities required by the page. Language-marked source blocks enable syntax highlighting, Mermaid diagrams enable Mermaid, and supported mathematical delimiters enable MathJax. Only the required browser resources are emitted for each rendered page.
+
+### Generated table of contents
+
+The Markdown prereader recognizes a BuildEngine-specific directive outside fenced code blocks:
+
+```markdown
+[TOC|Content]
+```
+
+The text after `TOC|` is the visible title, so `[TOC|Overview]` and `[TOC|Table of Contents]` are valid as well.
+
+The prereader assigns deterministic document-unique anchors to headings following the directive, renders a nested list according to the heading hierarchy, creates an anchor before the table of contents itself, and adds `Back to <title>` before each heading on the shallowest section level. Project documents place the directive immediately after their `#` document title, making `##` sections the top-level TOC entries.
+
+The generated anchors are injected after cmark-gfm has rendered safe HTML. The feature therefore does not require enabling arbitrary raw HTML in Markdown source.
 
 ## Links between Markdown documents
 
@@ -227,7 +244,7 @@ admin/server-docs/build-libraries.md
 admin/server-docs/tools.md
 ```
 
-They are read and rendered directly from that synchronized tree.
+They are read and rendered directly from that synchronized tree. All public-facing project Markdown in this live set is maintained in English; original-language titles may remain in parentheses when identifying referenced works.
 
 Generated per-library documentation remains below the normal BuildEngine documentation root and is served by the same HTTP server. This gives the running server one entry point for both evolving project documentation and generated third-party library documentation without mixing their source locations.
 
@@ -243,7 +260,7 @@ Examples:
 - a new or changed tool also updates [tools.md](tools.md),
 - a new `build-libraries.xml` construct also updates [build-libraries.md](build-libraries.md),
 - documentation-pipeline changes also update [documentation.md](documentation.md),
-- HTTP, rendering or link behavior changes also update this document.
+- HTTP, rendering, TOC preprocessing, or link behavior changes also update this document.
 
 Documentation is therefore not a release-afterthought; it is maintained as part of the same change that modifies the corresponding behavior.
 
