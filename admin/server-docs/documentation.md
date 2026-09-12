@@ -1,36 +1,36 @@
 # BuildEngine Documentation Contract
 
-BuildEngine treats documentation as a reproducible build product. The documentation model separates local machine policy from synchronized project policy and separates inexpensive presentation work from expensive API and PDF generation.
+BuildEngine treats documentation as a reproducible build product. The documentation model separates local machine defaults from synchronized project policy and separates inexpensive presentation work from expensive API and PDF generation.
 
-The central contract is stored in `admin/build-documentation.xml`. Its schema is `admin/schemas/build-documentation.xsd`. Local master switches are stored in `BuildEngine.xml`.
+The synchronized documentation contract is stored in `admin/build-documentation.xml`. Its schema is `admin/schemas/build-documentation.xsd`. Local defaults are stored in `BuildEngine.xml`.
 
 ## Configuration layers
 
-Documentation is controlled by two layers:
+Documentation is controlled by three levels:
 
-1. `BuildEngine.xml` decides which documentation capabilities the current machine is allowed to execute.
-2. `admin/build-documentation.xml` defines the synchronized defaults and per-library overrides.
+1. `BuildEngine.xml` supplies local defaults and hard capability switches.
+2. `admin/build-documentation.xml` can override documentation defaults for the synchronized project.
+3. A `<library>` element can override the synchronized default for one library.
 
-The effective setting is always the intersection of both layers. A synchronized library contract cannot enable a capability disabled by the local BuildEngine configuration.
+`WithDoxygen` is a hard capability switch: without central Doxygen there is no BuildEngine LaTeX source tree. `WithLatex`, in contrast, is deliberately an inheritable default. A root-level or library-level `latex` value can override it.
 
 ```mermaid
 flowchart TD
    A[BuildEngine.xml] -->|WithDoc| D[Overview / metadata documentation]
-   A -->|WithDoxygen| E[Doxygen API documentation]
-   A -->|WithLatex| F[LaTeX / PDF permission]
-   B[build-documentation.xml root defaults] --> E
-   B --> F
-   C[per-library overrides] --> E
-   C --> F
+   A -->|WithDoxygen| E[Doxygen capability]
+   A -->|WithLatex default| F[LaTeX default]
+   B[build-documentation.xml] -->|doxygen/profile| E
+   B -->|optional latex override| F
+   C[per-library profile] -->|optional latex override| F
    E --> H[HTML Doxygen]
    E --> L[LaTeX Doxygen]
    F --> L
    L --> P[MiKTeX PDF]
 ```
 
-## BuildEngine.xml master switches
+## BuildEngine.xml documentation settings
 
-The `<parameters>` element contains the machine-wide documentation switches.
+The `<parameters>` element contains the local documentation settings.
 
 ```xml
 <parameters
@@ -42,7 +42,7 @@ The `<parameters>` element contains the machine-wide documentation switches.
 
 ### `WithDoc`
 
-`WithDoc` enables BuildEngine-generated documentation such as library overview information, project documents, license information, SBOM material and related metadata pages.
+`WithDoc` enables BuildEngine-generated information documentation such as library overview information, project documents, license information, SBOM material and related metadata pages.
 
 Default: `false`.
 
@@ -52,31 +52,60 @@ Default: `false`.
 
 Default: `false`.
 
-A library can still suppress Doxygen with `doxygen="false"` in `build-documentation.xml`.
+This is a hard prerequisite for the BuildEngine Doxygen pipeline. If it is `false`, neither HTML Doxygen nor the derived LaTeX/PDF branch is created.
+
+A library can suppress Doxygen with `doxygen="false"` in `build-documentation.xml`, but `doxygen="true"` cannot bypass a local `WithDoxygen="false"`.
 
 ### `WithLatex`
 
-`WithLatex` is the machine-wide master switch for the LaTeX/PDF branch.
+`WithLatex` is the local default for the LaTeX/PDF branch.
 
 Default: `true`.
 
-LaTeX/PDF generation additionally requires:
+Unlike `WithDoxygen`, it is intentionally inheritable rather than a hard master switch. Resolution is:
 
-- `WithDoxygen="true"`,
-- the effective library setting `doxygen="true"`, and
-- the effective library setting `latex="true"`.
+```text
+BuildEngine.xml WithLatex
+        ↓ default
+build-documentation.xml latex (when present)
+        ↓ default
+library/@latex (when present)
+        ↓
+effective LaTeX/PDF decision
+```
 
-Setting `WithLatex="false"` does not disable HTML Doxygen. It suppresses only the LaTeX and PDF jobs and prevents MiKTeX from being provisioned solely for documentation.
+This makes both directions possible.
+
+Local default on, one library off:
+
+```xml
+<parameters WithDoxygen="true" WithLatex="true" ... />
+```
+
+```xml
+<library id="boost" latex="false" ...>
+```
+
+Local default off, one library explicitly on:
+
+```xml
+<parameters WithDoxygen="true" WithLatex="false" ... />
+```
+
+```xml
+<library id="pugixml" latex="true" ...>
+```
+
+MiKTeX is provisioned only if at least one library resolves to effective `latex=true`.
 
 ## Central build-documentation.xml contract
 
-The root element defines defaults inherited by every library.
+A representative root is:
 
 ```xml
 <buildDocumentation
    schemaVersion="1"
    doxygen="true"
-   latex="true"
    source="false"
    inlineSource="false"
    publicOnly="false">
@@ -90,36 +119,51 @@ The root element defines defaults inherited by every library.
 </buildDocumentation>
 ```
 
+Because `latex` is omitted here, the root inherits `BuildEngine.xml/WithLatex`.
+
+The synchronized contract can deliberately establish its own default:
+
+```xml
+<buildDocumentation
+   schemaVersion="1"
+   doxygen="true"
+   latex="false"
+   ...>
+```
+
 A library does not need its own `<library>` element. Library elements are overrides, not an allow-list.
 
 ## Root and library attributes
 
-The following attributes are supported on `<buildDocumentation>` and, except `schemaVersion`, on `<library>` overrides.
+The following profile attributes are supported.
 
-| Attribute | Default | Meaning |
-| --- | --- | --- |
-| `schemaVersion` | required | Contract schema version. Currently `1`. |
-| `doxygen` | `true` | Enables central Doxygen for the profile. |
-| `latex` | `true` | Enables the LaTeX/PDF branch when the local master switches permit it. |
-| `source` | `false` | Enables Doxygen source browser output. |
-| `inlineSource` | `false` | Includes source bodies inline. This also implies `source=true`. |
-| `publicOnly` | `false` | Restricts the generated API view and adds standard implementation-detail exclusions. |
+| Attribute | Root default | Library behavior | Meaning |
+| --- | --- | --- | --- |
+| `schemaVersion` | required | not applicable | Contract schema version. Currently `1`. |
+| `doxygen` | `true` | inherits root | Enables central Doxygen for the profile, subject to local `WithDoxygen`. |
+| `latex` | inherits `WithLatex` when omitted | inherits resolved root value | Enables the LaTeX/PDF branch for the library. |
+| `source` | `false` | inherits root | Enables Doxygen source browser output. |
+| `inlineSource` | `false` | inherits root | Includes source bodies inline and implies source browsing. |
+| `publicOnly` | `false` | inherits root | Restricts the generated API view and adds standard implementation-detail exclusions. |
 
-### Inheritance
-
-A library starts with the root profile and then applies its own attributes, definitions, Doxygen options and exclusions.
-
-Example:
+### Inheritance example
 
 ```xml
-<buildDocumentation doxygen="true" latex="true" publicOnly="false" ...>
-   <library id="boost" publicOnly="true" latex="false">
+<buildDocumentation
+   schemaVersion="1"
+   doxygen="true"
+   latex="true"
+   publicOnly="false">
+
+   <library id="boost"
+            publicOnly="true"
+            latex="false">
       ...
    </library>
 </buildDocumentation>
 ```
 
-Here all libraries inherit `latex=true`, while Boost keeps HTML Doxygen but suppresses LaTeX/PDF.
+All libraries inherit `latex=true`, while Boost keeps HTML Doxygen but suppresses LaTeX/PDF.
 
 ## `<define>`
 
@@ -131,7 +175,7 @@ Here all libraries inherit `latex=true`, while Boost keeps HTML Doxygen but supp
 <define name="BOOST_NOEXCEPT" value="noexcept"/>
 ```
 
-An omitted `value` means a normal predefined macro. Doxygen treats it like a defined macro with its normal truth value.
+An omitted `value` means a normal predefined macro:
 
 ```xml
 <define name="DOXYGEN_INVOKED"/>
@@ -149,7 +193,7 @@ Function-like macros are supported:
 <define name="BOOST_NOEXCEPT_IF(T)" value="noexcept(T)"/>
 ```
 
-If at least one function-like macro is configured, BuildEngine enables the Doxygen processing required for these definitions.
+If at least one function-like macro is configured, BuildEngine enables the corresponding Doxygen macro processing.
 
 ## `<option>`
 
@@ -163,7 +207,7 @@ If at least one function-like macro is configured, BuildEngine enables the Doxyg
 
 Use semantic BuildEngine attributes such as `doxygen`, `latex`, `source`, `inlineSource` and `publicOnly` when the setting controls BuildEngine behavior. Use `<option>` for genuine Doxygen configuration details.
 
-For example, do not use a raw `GENERATE_LATEX` option to control the BuildEngine PDF pipeline. Use `latex="true|false"` so tool provisioning, job creation and incremental state all see the same decision.
+Do not use a raw `GENERATE_LATEX` option to control the BuildEngine PDF pipeline. Use `latex="true|false"` so tool provisioning, job creation and incremental state all see the same decision.
 
 ## `<exclude>`
 
@@ -207,6 +251,21 @@ These generic exclusions can be supplemented by library-specific rules.
    <exclude pattern="*/examples/*"/>
 </library>
 ```
+
+## Effective decision examples
+
+Assume `WithDoxygen="true"`.
+
+| `WithLatex` | Root `latex` | Library `latex` | Effective PDF |
+| --- | --- | --- | --- |
+| `true` | omitted | omitted | yes |
+| `false` | omitted | omitted | no |
+| `false` | omitted | `true` | yes |
+| `true` | omitted | `false` | no |
+| `true` | `false` | omitted | no |
+| `true` | `false` | `true` | yes |
+| `false` | `true` | omitted | yes |
+| any | any | any, but effective `doxygen=false` | no |
 
 ## HTML and MathJax
 
@@ -255,7 +314,7 @@ refman.tex
 
 ## MiKTeX PDF generation
 
-BuildEngine uses managed MiKTeX 25.12 on Windows. MiKTeX is declared as `required="when-used"`; it is provisioned only when at least one library has an effective LaTeX profile.
+BuildEngine uses managed MiKTeX 25.12 on Windows. MiKTeX is declared as `required="when-used"`; it is provisioned only when at least one library resolves to effective `latex=true`.
 
 The managed installation uses the official MiKTeX Basic Installer in unattended private mode. Registry integration is disabled and the MiKTeX install, configuration and data roots are all placed explicitly below `tools/miktex/25.12`. The BuildEngine PDF pipeline therefore does not depend on a machine-wide MiKTeX installation or user-profile MiKTeX state.
 
@@ -272,13 +331,19 @@ basic-miktex-25.12-x64.exe
    --user-data=<ManagedRoot>\texmfs\data
 ```
 
+The expected managed entry point is:
+
+```text
+<ManagedRoot>\texmfs\install\miktex\bin\x64\texify.exe
+```
+
 PDF compilation uses the MiKTeX compiler driver `texify`:
 
 ```text
 texify --pdf --batch --max-iterations=5 --tex-option=--disable-installer refman.tex
 ```
 
-`texify` is used because it drives pdfLaTeX and the required index/reference passes until the document is resolved. Automatic package installation is explicitly disabled during the documentation build. A missing LaTeX package is therefore a reproducibility error to be fixed in the managed MiKTeX provisioning, not an invitation for a build job to change its tool installation silently.
+`texify` drives pdfLaTeX and the required index/reference passes until the document is resolved. Automatic package installation is explicitly disabled during the documentation build. A missing LaTeX package is therefore a reproducibility error to be fixed in managed MiKTeX provisioning, not an invitation for a build job to mutate its tool installation silently.
 
 The published PDF is written as:
 
@@ -302,13 +367,13 @@ flowchart LR
 
 The existing central Doxygen state is driven by the library identity and timestamp, effective Doxygen profile, Doxygen and Graphviz versions, publish manifest, license information and SBOM input.
 
-A change that does not affect those inputs must not rebuild API documentation.
+The `latex` decision is deliberately not part of the HTML Doxygen fingerprint. Turning PDF generation on or off must not rebuild otherwise unchanged HTML API documentation.
 
 ### LaTeX generation state
 
-The LaTeX state depends on the effective Doxygen configuration used as its source, the Doxygen version and the effective `latex` decision.
+The LaTeX state depends on the effective Doxygen configuration used as its source, the Doxygen version and the effective LaTeX decision.
 
-Changing `latex=false` to `latex=true` creates the LaTeX branch without making MiKTeX part of the HTML Doxygen fingerprint.
+Changing an effective LaTeX decision from false to true creates the LaTeX branch without making MiKTeX part of the HTML Doxygen fingerprint.
 
 ### PDF state
 
@@ -317,9 +382,9 @@ The PDF state depends on:
 - the stable Doxygen-generated LaTeX source files, and
 - the managed MiKTeX version.
 
-MiKTeX output files such as `refman.pdf`, auxiliary files and logs are not part of the PDF input fingerprint. The PDF job must therefore become `current` after a successful run instead of invalidating itself with its own output.
+MiKTeX output files such as `refman.pdf`, auxiliary files and logs are not part of the PDF input fingerprint. The PDF job therefore becomes `current` after a successful run instead of invalidating itself with its own output.
 
-A MiKTeX version change invalidates the PDF state but does not invalidate HTML Doxygen.
+A MiKTeX version change invalidates the PDF state but does not invalidate HTML Doxygen or the Doxygen-generated LaTeX source when those inputs are otherwise unchanged.
 
 ### Central documentation index
 
@@ -327,19 +392,7 @@ The central documentation index is an aggregate view. It is reconstructed cheapl
 
 ## Common configurations
 
-### HTML only on one machine
-
-```xml
-<parameters
-   WithDoc="true"
-   WithDoxygen="true"
-   WithLatex="false"
-   ... />
-```
-
-No MiKTeX tool is required for this run.
-
-### HTML and PDF by default
+### HTML and PDF by local default
 
 ```xml
 <parameters
@@ -349,19 +402,33 @@ No MiKTeX tool is required for this run.
    ... />
 ```
 
+If neither the root contract nor a library overrides `latex`, all Doxygen-enabled libraries receive PDF output.
+
+### HTML by default, PDF for selected libraries
+
 ```xml
-<buildDocumentation
-   schemaVersion="1"
-   doxygen="true"
-   latex="true"
-   source="false"
-   inlineSource="false"
-   publicOnly="false">
-   ...
-</buildDocumentation>
+<parameters
+   WithDoc="true"
+   WithDoxygen="true"
+   WithLatex="false"
+   ... />
 ```
 
-### Disable PDF only for a large library
+```xml
+<library id="pugixml" latex="true"/>
+<library id="curl" latex="true"/>
+```
+
+Only explicitly enabled libraries require MiKTeX and create PDFs.
+
+### PDF by default, disable one large library
+
+```xml
+<parameters
+   WithDoxygen="true"
+   WithLatex="true"
+   ... />
+```
 
 ```xml
 <library id="boost"
@@ -371,7 +438,25 @@ No MiKTeX tool is required for this run.
 </library>
 ```
 
-Boost still receives HTML Doxygen; other libraries inherit the root `latex=true` default.
+Boost still receives HTML Doxygen; other libraries inherit the PDF default.
+
+### Synchronized project default
+
+The Admin contract can override the local default for the whole project:
+
+```xml
+<buildDocumentation
+   schemaVersion="1"
+   doxygen="true"
+   latex="false"
+   ...>
+```
+
+A library can still opt in:
+
+```xml
+<library id="pugixml" latex="true"/>
+```
 
 ### Disable Doxygen entirely for one library
 
@@ -380,7 +465,7 @@ Boost still receives HTML Doxygen; other libraries inherit the root `latex=true`
          doxygen="false"/>
 ```
 
-No HTML Doxygen, LaTeX or PDF jobs are created for that library. BuildEngine overview/license/SBOM documentation can still be available when the central documentation pipeline is enabled.
+No HTML Doxygen, LaTeX or PDF jobs are created for that library. BuildEngine overview/license/SBOM documentation can still be available when the information documentation pipeline is enabled.
 
 ## Design rule
 
