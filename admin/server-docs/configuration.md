@@ -2,18 +2,6 @@
 
 BuildEngine combines a local XML parameter file with synchronized administration contracts. The local file selects the production tree, concurrency, repositories, feature switches, and contract locations; the Admin repository supplies the detailed tool, library, documentation, smoke-test, schema, and security definitions.
 
-> This page is also the MathJax-oriented renderer test. It intentionally combines XML, command-line examples, tables, GitHub-flavored Markdown, inline mathematics, display mathematics, and syntax-highlighted code without requiring Mermaid.
-
-## Renderer acceptance checklist
-
-- [x] XML syntax highlighting
-- [x] Text/command-line code blocks
-- [x] Tables and task lists
-- [x] Inline mathematics
-- [x] Display mathematics
-- [x] GitHub-flavored Markdown
-- [x] No Mermaid requirement on this page
-
 ## BuildEngine.xml
 
 The executable uses `BuildEngine.xml` next to the executable unless another configuration file is supplied as the final command-line argument.
@@ -115,9 +103,7 @@ $$
 N_{resident} \leq N_{workers} + N_{queue}
 $$
 
-These formulas are intentionally included to exercise MathJax selection.
-
-Inline mathematics is also supported: for a four-worker scheduler, $N_{workers}=4$.
+For a four-worker scheduler, $N_{workers}=4$.
 
 ## Administration XML files
 
@@ -231,7 +217,7 @@ BuildEngine --show D:\config\BuildEngine.xml
 
 ### `--monitor`
 
-Synchronizes administration repositories and checks configured libraries for known security vulnerabilities.
+Synchronizes administration repositories and checks configured libraries for known security vulnerabilities. The security model is intended to evolve from pure finding collection toward structured product relevance, remediation candidates, and shared risk assessment.
 
 ```text
 BuildEngine --monitor
@@ -289,6 +275,4 @@ The CLI already parses `--lib` and `--libversion` for commands such as `--check`
 
 ## Related documentation
 
-- [BuildEngine architecture](/manual/buildengine.md)
-- [Server and REST API](/manual/server.md)
-- [Generated library documentation index](/index.html)
+Project documents are available through the documentation buttons at the top of every server page. Generated library documentation starts at `/index.html`.
