@@ -99,15 +99,20 @@
             <argument value="--no-additional-roots"/>
             <argument value="--paper-size=A4"/>
          </extract>
-         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v2.txt">
+         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v3.txt">
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="update-package-database"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
             </command>
+            <!--
+               Basic MiKTeX can contain stale meta-package dependencies
+               (_miktex-latex-packages/_miktex-fonts-type1). Updating only the
+               package database is insufficient: synchronize the installed base
+               packages before requesting additional Doxygen packages.
+            -->
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
-               <argument value="packages"/><argument value="check-update"/>
+               <argument value="packages"/><argument value="update"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
-               <success code="0"/><success code="100"/>
             </command>
             <!--
                Install only the package IDs required by Doxygen 1.18.0 and its
