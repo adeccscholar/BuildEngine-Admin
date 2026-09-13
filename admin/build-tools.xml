@@ -99,27 +99,37 @@
             <argument value="--no-additional-roots"/>
             <argument value="--paper-size=A4"/>
          </extract>
-         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v3.txt">
+         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v4.txt">
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="update-package-database"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
             </command>
             <!--
-               Basic MiKTeX can contain stale meta-package dependencies
-               (_miktex-latex-packages/_miktex-fonts-type1). Updating only the
-               package database is insufficient: synchronize the installed base
-               packages before requesting additional Doxygen packages.
+               Synchronize the installed Basic MiKTeX packages with the current
+               repository before adding the Doxygen package surface.
             -->
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="update"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
             </command>
             <!--
+               basic-miktex-25.12 installs two pure container packages whose
+               dependency lists refer to package IDs no longer present in the
+               current MiKTeX repository (_miktex-latex-packages references
+               ms/showframe/thailatex; _miktex-fonts-type1 references luxi).
+               They are installer meta packages, not runtime files. Remove the
+               obsolete containers so the package resolver no longer traverses
+               those dead dependencies; their installed child packages remain.
+            -->
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
+               <argument value="packages"/><argument value="remove"/>
+               <argument value="_miktex-latex-packages"/><argument value="_miktex-fonts-type1"/>
+            </command>
+            <!--
                Install only the package IDs required by Doxygen 1.18.0 and its
-               generated PDFLaTeX input. Do not translate Basic MiKTeX's stale
-               meta-package dependency warnings into installation requests:
-               showframe is contained in eso-pic, thailatex is obsolete, and
-               ifpdf/ifxetex are both contained in the current iftex package.
+               generated PDFLaTeX input. Package IDs are matched against the
+               current MiKTeX package repository; automatic installation during
+               document generation remains disabled.
             -->
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="install"/>
