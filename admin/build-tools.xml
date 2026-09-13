@@ -52,7 +52,7 @@
 
    <tool id="meson" version="1.12.0" required="always">
       <managed root="meson\1.12.0" executable="meson.py">
-         <download url="https://files.pythonhosted.org/packages/source/m/meson/meson-1.12.0.tar.gz" archive="meson-1.12.0.tar.gz" sha256="88afe0c20e52030218924ac37d0c81c59b4b5f3ae3752c8c6d7470c7d365886c"/>
+         <download url="https://files.pythonhosted.org/packages/source/m/meson/meson-1.12.0.tar.gz" archive="meson-1.12.0.tar.gz" sha256="88afe0c20e52030218924ac37d0c81f59b4d5f3ae3752c8c6d7470c7d365886c"/>
          <nativeExtract format="libarchive" root="meson-1.12.0"><require path="meson.py"/><require path="mesonbuild\mesonmain.py"/><require path="COPYING"/></nativeExtract>
       </managed>
       <launcher tool="python"><argument value="{ToolEntry}"/></launcher>
@@ -99,14 +99,20 @@
             <argument value="--no-additional-roots"/>
             <argument value="--paper-size=A4"/>
          </extract>
-         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v6.txt">
+         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v7.txt">
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="update-package-database"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
             </command>
+            <!--
+               check-update records that the repository has been checked without
+               globally upgrading the pinned MiKTeX runtime. Exit 100 means that
+               updates are available and is not a preparation failure.
+            -->
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
-               <argument value="packages"/><argument value="update"/>
+               <argument value="packages"/><argument value="check-update"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
+               <success code="0"/><success code="100"/>
             </command>
             <!--
                MiKTeX returns exit code 1 when "packages install" is asked to
@@ -120,13 +126,13 @@
                <argument value="-Miktex"/><argument value="{ManagedRoot}\texmfs\install\miktex\bin\x64\miktex.exe"/>
                <argument value="-Repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
                <argument value="-Packages"/>
-               <argument value="ltxbase;latex-tools;graphics;amsfonts;psnfss;infwarerr;float;varwidth;xcolor;colortbl;xltabular;tabularray;fancyvrb;multirow;hanging;adjustbox;stackengine;enumitem;alphalph;ulem;iftex;wasysym;geometry;changepage;fancyhdr;natbib;tocloft;hyperref;caption;etoc"/>
+               <argument value="ltxbase;latex-tools;graphics;amsfonts;psnfss;infwarerr;float;varwidth;xcolor;colortbl;xltabular;ltablex;tabularray;fancyvrb;multirow;hanging;adjustbox;stackengine;enumitem;alphalph;ulem;iftex;wasysym;geometry;changepage;fancyhdr;natbib;tocloft;hyperref;caption;etoc"/>
             </command>
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="verify"/>
                <argument value="ltxbase"/><argument value="latex-tools"/><argument value="graphics"/><argument value="amsfonts"/><argument value="psnfss"/>
                <argument value="infwarerr"/><argument value="float"/><argument value="varwidth"/><argument value="xcolor"/><argument value="colortbl"/>
-               <argument value="xltabular"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/><argument value="hanging"/>
+               <argument value="xltabular"/><argument value="ltablex"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/><argument value="hanging"/>
                <argument value="adjustbox"/><argument value="stackengine"/><argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
                <argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/><argument value="fancyhdr"/><argument value="natbib"/><argument value="tocloft"/>
                <argument value="hyperref"/><argument value="caption"/><argument value="etoc"/>
