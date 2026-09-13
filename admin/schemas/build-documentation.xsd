@@ -26,11 +26,27 @@
       <xs:attribute name="pattern" type="xs:string" use="required"/>
    </xs:complexType>
 
+   <!--
+      Collection overrides are a negative list only. The collection members are
+      still discovered exclusively from the first directory level of the
+      published API tree. An override changes the effective Doxygen profile only
+      when a directory with the exact module name is actually discovered.
+   -->
+   <xs:complexType name="collectionOverrideType">
+      <xs:sequence>
+         <xs:element name="define" type="defineType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="option" type="optionType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="exclude" type="excludeType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="module" type="xs:string" use="required"/>
+   </xs:complexType>
+
    <xs:complexType name="libraryType">
       <xs:sequence>
          <xs:element name="define" type="defineType" minOccurs="0" maxOccurs="unbounded"/>
          <xs:element name="option" type="optionType" minOccurs="0" maxOccurs="unbounded"/>
          <xs:element name="exclude" type="excludeType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="override" type="collectionOverrideType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="id" type="xs:string" use="required"/>
       <xs:attribute name="doxygen" type="booleanText" use="optional"/>
