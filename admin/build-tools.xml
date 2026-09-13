@@ -99,7 +99,7 @@
             <argument value="--no-additional-roots"/>
             <argument value="--paper-size=A4"/>
          </extract>
-         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v1.txt">
+         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v2.txt">
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="update-package-database"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
@@ -109,22 +109,22 @@
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
                <success code="0"/><success code="100"/>
             </command>
-            <!-- Resolve the five missing dependencies reported by Basic MiKTeX 25.12 itself. -->
-            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
-               <argument value="packages"/><argument value="install"/>
-               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
-               <argument value="ms"/><argument value="showframe"/><argument value="sttools"/><argument value="thailatex"/><argument value="luxi"/>
-            </command>
-            <!-- Doxygen Release_1_18_0: header.tex + doxygen.sty + default PDFLaTeX fonts. -->
+            <!--
+               Install only the package IDs required by Doxygen 1.18.0 and its
+               generated PDFLaTeX input. Do not translate Basic MiKTeX's stale
+               meta-package dependency warnings into installation requests:
+               showframe is contained in eso-pic, thailatex is obsolete, and
+               ifpdf/ifxetex are both contained in the current iftex package.
+            -->
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="install"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
                <argument value="ltxbase"/><argument value="latex-tools"/><argument value="graphics"/><argument value="amsfonts"/><argument value="psnfss"/>
                <argument value="infwarerr"/><argument value="float"/><argument value="varwidth"/><argument value="xcolor"/><argument value="colortbl"/>
                <argument value="xltabular"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/>
-               <argument value="hanging"/><argument value="ifpdf"/><argument value="adjustbox"/><argument value="stackengine"/>
+               <argument value="hanging"/><argument value="adjustbox"/><argument value="stackengine"/>
                <argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
-               <argument value="ifxetex"/><argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/>
+               <argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/>
                <argument value="fancyhdr"/><argument value="natbib"/><argument value="tocloft"/><argument value="hyperref"/>
                <argument value="caption"/><argument value="etoc"/>
             </command>
@@ -133,9 +133,9 @@
                <argument value="ltxbase"/><argument value="latex-tools"/><argument value="graphics"/><argument value="amsfonts"/><argument value="psnfss"/>
                <argument value="infwarerr"/><argument value="float"/><argument value="varwidth"/><argument value="xcolor"/><argument value="colortbl"/>
                <argument value="xltabular"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/>
-               <argument value="hanging"/><argument value="ifpdf"/><argument value="adjustbox"/><argument value="stackengine"/>
+               <argument value="hanging"/><argument value="adjustbox"/><argument value="stackengine"/>
                <argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
-               <argument value="ifxetex"/><argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/>
+               <argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/>
                <argument value="fancyhdr"/><argument value="natbib"/><argument value="tocloft"/><argument value="hyperref"/>
                <argument value="caption"/><argument value="etoc"/>
             </command>
