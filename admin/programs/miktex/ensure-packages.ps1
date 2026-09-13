@@ -63,7 +63,7 @@ function Install-MiktexPackages
       return
    }
 
-   Write-Output "[MIKTEX] installing $($PackageIds.Count) package(s) in one transaction"
+   Write-Output "[MIKTEX] installing $($PackageIds.Count) missing package(s) in one transaction"
    $installArguments = @('packages', 'install', '--repository', $Repository) + $PackageIds
    & $Miktex $installArguments
    $exitCode = $LASTEXITCODE
@@ -71,22 +71,6 @@ function Install-MiktexPackages
    {
       throw "MiKTeX package installation failed (exit=$exitCode)."
    }
-}
-
-function Test-MiktexPackages
-{
-   param(
-      [Parameter(Mandatory = $true)]
-      [string[]]$PackageIds
-   )
-
-   if ($PackageIds.Count -eq 0)
-   {
-      return $true
-   }
-
-   & $Miktex packages verify $PackageIds | Out-Null
-   return ($LASTEXITCODE -eq 0)
 }
 
 function Test-DoxygenLatexStack
@@ -154,7 +138,7 @@ BuildEngine Doxygen 1.18.0 MiKTeX preflight.
          if (Test-Path -LiteralPath $log -PathType Leaf)
          {
             Write-Output '[MIKTEX] Doxygen LaTeX stack preflight log follows:'
-            Get-Content -LiteralPath $log | Select-Object -Last 80 | ForEach-Object { Write-Output $_ }
+            Get-Content -LiteralPath $log | Select-Object -Last 100 | ForEach-Object { Write-Output $_ }
          }
          throw "MiKTeX Doxygen LaTeX stack preflight failed (exit=$exitCode)."
       }
@@ -192,6 +176,14 @@ if ($missing.Count -gt 0)
 {
    Install-MiktexPackages -PackageIds $missing.ToArray()
 
+   # Refresh the file name database before validating the actual LaTeX stack.
+   & $Miktex fndb refresh
+   $exitCode = $LASTEXITCODE
+   if ($exitCode -ne 0)
+   {
+      throw "MiKTeX file name database refresh after package installation failed (exit=$exitCode)."
+   }
+
    $state = Get-MiktexPackageState
    foreach ($packageId in $missing)
    {
@@ -207,63 +199,10 @@ else
    Write-Output '[MIKTEX] all requested packages are already installed'
 }
 
-# A package can be marked as installed while its payload is incomplete. Verify
-# the complete declared package surface. Only if the bulk verification fails do
-# we pay the cost of checking packages individually and repairing the broken
-# subset.
-if (-not (Test-MiktexPackages -PackageIds $packageIds))
-{
-   Write-Output '[MIKTEX] package integrity check failed; isolating damaged package(s)'
-   $damaged = New-Object System.Collections.Generic.List[string]
-
-   foreach ($packageId in $packageIds)
-   {
-      if (-not (Test-MiktexPackages -PackageIds @($packageId)))
-      {
-         Write-Output "[MIKTEX] package:$packageId : DAMAGED"
-         $damaged.Add($packageId)
-      }
-   }
-
-   if ($damaged.Count -eq 0)
-   {
-      throw 'MiKTeX bulk package verification failed, but no individual damaged package could be identified.'
-   }
-
-   foreach ($packageId in $damaged)
-   {
-      Write-Output "[MIKTEX] package:$packageId : REINSTALL"
-      & $Miktex packages remove $packageId
-      $exitCode = $LASTEXITCODE
-      if ($exitCode -ne 0)
-      {
-         throw "MiKTeX package '$packageId' could not be removed for repair (exit=$exitCode)."
-      }
-
-      Install-MiktexPackages -PackageIds @($packageId)
-   }
-
-   & $Miktex fndb refresh
-   $exitCode = $LASTEXITCODE
-   if ($exitCode -ne 0)
-   {
-      throw "MiKTeX file name database refresh after package repair failed (exit=$exitCode)."
-   }
-
-   if (-not (Test-MiktexPackages -PackageIds $packageIds))
-   {
-      throw 'MiKTeX package integrity is still invalid after package repair.'
-   }
-
-   foreach ($packageId in $damaged)
-   {
-      Write-Output "[MIKTEX] package:$packageId : REPAIRED"
-   }
-}
-else
-{
-   Write-Output '[MIKTEX] package integrity verified'
-}
-
+# Do not attempt package-by-package repair here. The package database can be
+# newer than the bootstrap installer and a broad `packages verify` result is not
+# a safe signal for destructive remove/reinstall operations. The declarative XML
+# package set is ensured above; the real contract is then validated by compiling
+# the Doxygen-relevant LaTeX stack with automatic package installation disabled.
 Test-DoxygenLatexStack
 exit 0
