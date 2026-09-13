@@ -38,6 +38,13 @@
       <xs:attribute name="source" type="booleanText" use="optional"/>
       <xs:attribute name="inlineSource" type="booleanText" use="optional"/>
       <xs:attribute name="publicOnly" type="booleanText" use="optional"/>
+      <!--
+         A collection is documented with one non-recursive Doxygen run for the
+         common published API root and one recursive Doxygen run for every
+         first-level directory below that root. The directory structure is the
+         contract; no module/section list is configured here.
+      -->
+      <xs:attribute name="collection" type="booleanText" use="optional" default="false"/>
    </xs:complexType>
 
    <xs:element name="buildDocumentation">

@@ -35,7 +35,7 @@
    <option name="MATHJAX_FORMAT" value="SVG"/>
    <option name="MATHJAX_RELPATH" value="/js/mathjax/es5"/>
 
-   <library id="boost" publicOnly="true">
+   <library id="boost" publicOnly="true" collection="true">
       <!-- Proven BCC64X documentation model: Clang 20 / C++23. -->
       <define name="__clang__" value="1"/>
       <define name="__clang_major__" value="20"/>
