@@ -99,60 +99,60 @@
             <argument value="--no-additional-roots"/>
             <argument value="--paper-size=A4"/>
          </extract>
-         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v4.txt">
+         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v5.txt">
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="update-package-database"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
             </command>
-            <!--
-               Synchronize the installed Basic MiKTeX packages with the current
-               repository before adding the Doxygen package surface.
-            -->
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="update"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
             </command>
             <!--
-               basic-miktex-25.12 installs two pure container packages whose
-               dependency lists refer to package IDs no longer present in the
-               current MiKTeX repository (_miktex-latex-packages references
-               ms/showframe/thailatex; _miktex-fonts-type1 references luxi).
-               They are installer meta packages, not runtime files. Remove the
-               obsolete containers so the package resolver no longer traverses
-               those dead dependencies; their installed child packages remain.
+               Install the verified Doxygen 1.18.0 package surface one package
+               per command. MiKTeX otherwise reports only a generic
+               "requested package is unknown" for a multi-package request and
+               hides the offending package. This keeps the contract fully
+               declarative while making the failing package deterministic.
             -->
-            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
-               <argument value="packages"/><argument value="remove"/>
-               <argument value="_miktex-latex-packages"/><argument value="_miktex-fonts-type1"/>
-            </command>
-            <!--
-               Install only the package IDs required by Doxygen 1.18.0 and its
-               generated PDFLaTeX input. Package IDs are matched against the
-               current MiKTeX package repository; automatic installation during
-               document generation remains disabled.
-            -->
-            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
-               <argument value="packages"/><argument value="install"/>
-               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
-               <argument value="ltxbase"/><argument value="latex-tools"/><argument value="graphics"/><argument value="amsfonts"/><argument value="psnfss"/>
-               <argument value="infwarerr"/><argument value="float"/><argument value="varwidth"/><argument value="xcolor"/><argument value="colortbl"/>
-               <argument value="xltabular"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/>
-               <argument value="hanging"/><argument value="adjustbox"/><argument value="stackengine"/>
-               <argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
-               <argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/>
-               <argument value="fancyhdr"/><argument value="natbib"/><argument value="tocloft"/><argument value="hyperref"/>
-               <argument value="caption"/><argument value="etoc"/>
-            </command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="infwarerr"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="float"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="varwidth"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="xcolor"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="colortbl"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="xltabular"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="tabularray"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="fancyvrb"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="multirow"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="hanging"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="adjustbox"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="stackengine"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="enumitem"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="alphalph"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="ulem"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="iftex"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="wasysym"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="geometry"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="changepage"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="fancyhdr"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="natbib"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="tocloft"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="hyperref"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="caption"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="etoc"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="graphics"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="amsfonts"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="psnfss"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="latex-tools"/></command>
+            <command executable="texmfs\install\miktex\bin\x64\miktex.exe"><argument value="packages"/><argument value="install"/><argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/><argument value="ltxbase"/></command>
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="verify"/>
                <argument value="ltxbase"/><argument value="latex-tools"/><argument value="graphics"/><argument value="amsfonts"/><argument value="psnfss"/>
                <argument value="infwarerr"/><argument value="float"/><argument value="varwidth"/><argument value="xcolor"/><argument value="colortbl"/>
-               <argument value="xltabular"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/>
-               <argument value="hanging"/><argument value="adjustbox"/><argument value="stackengine"/>
-               <argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
-               <argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/>
-               <argument value="fancyhdr"/><argument value="natbib"/><argument value="tocloft"/><argument value="hyperref"/>
-               <argument value="caption"/><argument value="etoc"/>
+               <argument value="xltabular"/><argument value="tabularray"/><argument value="fancyvrb"/><argument value="multirow"/><argument value="hanging"/>
+               <argument value="adjustbox"/><argument value="stackengine"/><argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
+               <argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/><argument value="fancyhdr"/><argument value="natbib"/><argument value="tocloft"/>
+               <argument value="hyperref"/><argument value="caption"/><argument value="etoc"/>
             </command>
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="fndb"/><argument value="refresh"/>
