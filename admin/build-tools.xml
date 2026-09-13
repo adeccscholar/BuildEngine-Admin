@@ -99,7 +99,7 @@
             <argument value="--no-additional-roots"/>
             <argument value="--paper-size=A4"/>
          </extract>
-         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v8.txt">
+         <prepare marker=".buildengine\doxygen-1.18.0-latex-packages-v9.txt">
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="update-package-database"/>
                <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
@@ -126,14 +126,14 @@
                <argument value="-Miktex"/><argument value="{ManagedRoot}\texmfs\install\miktex\bin\x64\miktex.exe"/>
                <argument value="-Repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
                <argument value="-Packages"/>
-               <argument value="ltxbase;latex-tools;graphics;amsfonts;psnfss;infwarerr;float;varwidth;xcolor;colortbl;xltabular;ltablex;tabularray;ninecolors;fancyvrb;multirow;hanging;adjustbox;stackengine;enumitem;alphalph;ulem;iftex;wasysym;geometry;changepage;fancyhdr;natbib;tocloft;hyperref;caption;etoc"/>
+               <argument value="ltxbase;latex-tools;graphics;amsfonts;psnfss;infwarerr;float;varwidth;xcolor;colortbl;xltabular;ltablex;tabularray;ninecolors;fancyvrb;multirow;hanging;collectbox;adjustbox;stackengine;enumitem;alphalph;ulem;iftex;wasysym;geometry;changepage;fancyhdr;natbib;tocloft;hyperref;caption;etoc"/>
             </command>
             <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
                <argument value="packages"/><argument value="verify"/>
                <argument value="ltxbase"/><argument value="latex-tools"/><argument value="graphics"/><argument value="amsfonts"/><argument value="psnfss"/>
                <argument value="infwarerr"/><argument value="float"/><argument value="varwidth"/><argument value="xcolor"/><argument value="colortbl"/>
                <argument value="xltabular"/><argument value="ltablex"/><argument value="tabularray"/><argument value="ninecolors"/><argument value="fancyvrb"/><argument value="multirow"/><argument value="hanging"/>
-               <argument value="adjustbox"/><argument value="stackengine"/><argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
+               <argument value="collectbox"/><argument value="adjustbox"/><argument value="stackengine"/><argument value="enumitem"/><argument value="alphalph"/><argument value="ulem"/><argument value="iftex"/>
                <argument value="wasysym"/><argument value="geometry"/><argument value="changepage"/><argument value="fancyhdr"/><argument value="natbib"/><argument value="tocloft"/>
                <argument value="hyperref"/><argument value="caption"/><argument value="etoc"/>
             </command>
@@ -169,7 +169,7 @@
          <extract executable="{ENV:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe">
             <argument value="-NoProfile"/><argument value="-NonInteractive"/><argument value="-ExecutionPolicy"/><argument value="Bypass"/><argument value="-File"/>
             <argument value="{ProductionRoot}\admin\programs\web\install-web-asset.ps1"/>
-            <argument value="-Archive"/><argument value="{Archive}"/><argument value="-ManagedRoot"/><argument value="{ManagedRoot}"/>
+            <argument value="-Archive"/><argument value="{Archive}"/><argument value="-ManagedRoot"/>
             <argument value="-RelativePath"/><argument value="mermaid.min.js"/>
             <argument value="-AdditionalSource"/><argument value="{ProductionRoot}\admin\programs\web\mermaid.esm.min.mjs"/>
             <argument value="-AdditionalRelativePath"/><argument value="dist\mermaid.esm.min.mjs"/>
