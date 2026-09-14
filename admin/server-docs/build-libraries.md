@@ -39,7 +39,7 @@ The schema is located at `admin/schemas/build-libraries.xsd`. The current contra
 | --- | --- |
 | `id` | Unique library ID within BuildEngine. |
 | `version` | Exact version built by the contract. |
-| `timestamp` | Modification time of the library contract. It is part of technical state and must be changed only when the technical contract of that library actually changes. |
+| `timestamp` | Modification time of the library contract. It is the library-local change token used by logical scope state and must be changed only when the technical contract of that library actually changes. |
 
 Version numbers should not be duplicated unnecessarily in build/install path constants when the path is already formed from contract variables. The version remains contract data and is inserted into paths through variables.
 
@@ -52,7 +52,7 @@ Version numbers should not be duplicated unnecessarily in build/install path con
 
 A dependency describes an explicit BuildEngine dependency. BuildEngine can derive DAG relationships, installation prerequisites, metadata, SBOM relationships, and documentation from it.
 
-Dependencies must not be replaced by accidental file discovery: the contract remains authoritative.
+Dependencies must not be replaced by accidental file discovery: the contract remains authoritative. The execution DAG is also the basis for the persistent upstream state chain: downstream logical scopes remember the timestamp and completion identity of their direct upstream library scopes instead of maintaining an unrelated global dependency fingerprint.
 
 ## Metadata
 
@@ -101,7 +101,7 @@ The source phase consists of declarative technical actions. Supported actions in
 download | extract | copy | execute | target
 ```
 
-Actions can form a technical DAG through `id` and `dependsOn`. Without explicit graph metadata, the declared order applies.
+Actions can form a technical DAG through `id` and `dependsOn`. Without explicit graph metadata, the declared order applies. These Actions are execution units inside the logical `source` scope; they are not independent persistent-state authorities.
 
 ### `<download>`
 
@@ -218,11 +218,11 @@ Build parameters that are common to all variants belong on the shared level. Var
 </build>
 ```
 
-The model deliberately represents **one build contract with multiple variants**, not two independent build contracts.
+The model deliberately represents **one build contract with multiple variants**, not two independent build contracts. Persistent state preserves that distinction with logical scopes such as `build:Release`, `build:Debug`, `test:Release`, `install:Release`, and `install:common`.
 
 ### `testsAffectBuild`
 
-`testsAffectBuild="true"` means that the test setting already affects the build fingerprint. It should be set only when the build configuration itself changes as a result of tests being enabled or disabled.
+`testsAffectBuild="true"` means that enabling or disabling tests changes the build configuration itself rather than only adding a downstream test phase. It should be set only where the generated build really differs as a result of the test setting.
 
 ## Direct installation without a build
 
@@ -243,6 +243,8 @@ test="true" phase="validation"
 ```
 
 This assigns technical actions semantically to a test/validation phase. Tests should not be disabled casually; failures are investigated first.
+
+Test and validation work is represented as logical variant-aware scopes where applicable. The technical Actions inside those scopes remain visible for ordering and diagnostics but do not each create persistent state files.
 
 ## Installation
 
@@ -308,9 +310,9 @@ Supported entries:
 
 Historically, the library contract contains optional `doc` and `doxygen` phases. They are still supported independently until the affected upstream contracts have been cleaned up.
 
-The **central BuildEngine API documentation** is controlled by [build-documentation.xml](documentation.md). It defines the Doxygen profile, source visibility, exclusions, and PDF/LaTeX behavior.
+The **central BuildEngine API documentation** is controlled by [build-documentation.xml](documentation.md). It defines the Doxygen profile, source visibility, exclusions, collection behavior, and PDF/LaTeX behavior.
 
-In particular, when central PDF documentation is enabled, **the same Doxygen run produces HTML and LaTeX**. There is no second Doxygen run for PDF.
+In particular, when central PDF documentation is enabled, **the same Doxygen run produces HTML and LaTeX**. There is no second Doxygen run for PDF. Collection libraries can split the published API tree into root/module documentation scopes without changing this rule.
 
 ## BuildEngine variables
 
@@ -332,14 +334,40 @@ Contracts use resolved variables instead of hard-coded machine paths. Typical ex
 
 The concrete variables available depend on the action context. Paths and commands should be assembled declaratively from these values.
 
-## Technical state
+## Logical persistent state
 
-BuildEngine does not primarily decide whether a step is current by looking at output files. Technical step-state records with library timestamp and fingerprint are authoritative. The existence of required result files is additional evidence.
+BuildEngine does not decide that a phase is current merely because its output files exist. Persistent state belongs to the logical library scope represented by the scheduler DAG.
 
-Two rules follow:
+A completed state has this form:
 
-1. An existing artifact without the matching step state does not automatically make a step current.
-2. An independent contract change must not force all libraries to rebuild through a global aggregate fingerprint.
+```text
+timestamp=<library timestamp>
+upstream=<library>|<version>|<scope>|<upstream library timestamp>|<upstream completedAt>
+upstream=...
+completedAt=<completion timestamp of this scope>
+state=completed
+```
+
+The state is stored below:
+
+```text
+<ProductionRoot>/.buildengine/libraries/<library>/<version>/<safe-scope>.state
+```
+
+The important rules are:
+
+1. The library's own `timestamp` is the local contract-change token.
+2. Every direct upstream **library** scope contributes its library timestamp and `completedAt` value.
+3. If the own timestamp differs, a required upstream state is missing, or one upstream timestamp/`completedAt` differs, the logical scope is not current and executes again.
+4. Technical Actions inside the scope do not each create persistent state.
+5. Existing artifacts, hashes, or output fingerprints are not an alternative persistent state authority.
+6. Multiple direct dependencies produce multiple `upstream=` records.
+7. `source` has no upstream library scope.
+8. `--build` deliberately bypasses current-state reuse.
+
+This directly links incremental reuse to the DAG that expresses the real execution dependencies. A changed upstream completion invalidates its downstream chain without requiring a global aggregate fingerprint that would rebuild unrelated libraries.
+
+Legacy per-Action state files can still be recognized as migration evidence where their exact scope, timestamp, and expected Action count match. They are not the format written by new logical state commits.
 
 ## Change rules
 
