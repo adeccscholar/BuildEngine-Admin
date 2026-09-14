@@ -96,11 +96,7 @@
       <exclude pattern="*/libs/*/doc/example/*"/>
       <exclude pattern="*/tools/*"/>
 
-      <!-- Negative list: only libraries with additional Doxygen requirements appear below. -->
-      <override module="algorithm">
-         <define name="BOOST_ALGORITHM_DOXYGEN" value="1"/>
-      </override>
-
+      <override module="algorithm"><define name="BOOST_ALGORITHM_DOXYGEN" value="1"/></override>
       <override module="asio">
          <define name="GENERATING_DOCUMENTATION"/>
          <define name="BOOST_ASIO_INITFN_RESULT_TYPE(t,a)" value="auto"/>
@@ -109,7 +105,6 @@
          <define name="BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(ex)" value=""/>
          <define name="BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(ex)" value=" =__deduced__"/>
       </override>
-
       <override module="beast">
          <define name="BOOST_BEAST_DOXYGEN"/>
          <define name="BOOST_BEAST_USE_POSIX_FILE" value="1"/>
@@ -126,16 +121,11 @@
          <define name="BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(ex)" value=""/>
          <define name="BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(ex)" value=" =__deduced__"/>
       </override>
-
       <override module="bimap">
          <define name="BOOST_BIMAP_DOXYGEN_WILL_NOT_PROCESS_THE_FOLLOWING_LINES"/>
          <define name="BOOST_BIMAP_ONLY_DOXYGEN_WILL_PROCESS_THE_FOLLOWING_LINES"/>
       </override>
-
-      <override module="compute">
-         <define name="BOOST_COMPUTE_DOXYGEN_INVOKED"/>
-      </override>
-
+      <override module="compute"><define name="BOOST_COMPUTE_DOXYGEN_INVOKED"/></override>
       <override module="container">
          <define name="BOOST_CONTAINER_DOXYGEN_INVOKED"/>
          <define name="insert_const_ref_type" value=" const T&amp;"/>
@@ -159,7 +149,6 @@
          <define name="BOOST_CONTAINER_CONSTANT_VAR" value="static constexpr "/>
          <define name="BOOST_CONTAINER_FORCEINLINE" value="inline"/>
       </override>
-
       <override module="fusion">
          <define name="BOOST_FUSION_HAS_VARIADIC_DEQUE" value="1"/>
          <define name="BOOST_FUSION_HAS_VARIADIC_VECTOR" value="1"/>
@@ -168,7 +157,6 @@
          <define name="BOOST_FUSION_HAS_VARIADIC_SET" value="1"/>
          <define name="BOOST_FUSION_HAS_VARIADIC_TUPLE" value="1"/>
       </override>
-
       <override module="geometry">
          <define name="BOOST_CONCEPT_REQUIRES(x)" value=""/>
          <define name="BOOST_CONCEPT_ASSERT(x)" value=""/>
@@ -182,15 +170,8 @@
          <define name="DOXYGEN_NO_SPECIALIZATIONS"/>
          <define name="DOXYGEN_INVOKED"/>
       </override>
-
-      <override module="hana">
-         <define name="BOOST_HANA_DOXYGEN_INVOKED"/>
-      </override>
-
-      <override module="histogram">
-         <define name="BOOST_HISTOGRAM_DOXYGEN_INVOKED"/>
-      </override>
-
+      <override module="hana"><define name="BOOST_HANA_DOXYGEN_INVOKED"/></override>
+      <override module="histogram"><define name="BOOST_HISTOGRAM_DOXYGEN_INVOKED"/></override>
       <override module="interprocess">
          <define name="BOOST_INTERPROCESS_DOXYGEN_INVOKED"/>
          <define name="BOOST_INTERPROCESS_IMPDEF(T)" value="implementation_defined"/>
@@ -203,13 +184,11 @@
          <define name="BOOST_INTERPROCESS_FORCEINLINE" value="inline"/>
          <define name="op_nullptr_t" value="std::nullptr_t"/>
       </override>
-
       <override module="json">
          <define name="BOOST_JSON_DOCS"/>
          <define name="BOOST_JSON_DECL" value=""/>
          <define name="BOOST_JSON_INLINE_VARIABLE(v,t)" value="constexpr t v;"/>
       </override>
-
       <override module="log">
          <define name="BOOST_LOG_DOXYGEN_PASS"/>
          <define name="BOOST_LOG_NO_VTABLE" value=""/>
@@ -228,7 +207,6 @@
          <define name="BOOST_LOG_API" value=""/>
          <define name="BOOST_LOG_SETUP_API" value=""/>
       </override>
-
       <override module="mysql">
          <define name="BOOST_MYSQL_DOXYGEN"/>
          <define name="BOOST_PFR_ENABLED" value="1"/>
@@ -256,30 +234,25 @@
          <exclude pattern="mariadb_collations.hpp"/>
          <exclude pattern="src.hpp"/>
       </override>
-
       <override module="nowide">
          <define name="BOOST_NOWIDE_DOXYGEN"/>
          <define name="BOOST_NOWIDE_DECL" value=""/>
          <define name="__cpp_char8_t"/>
       </override>
-
       <override module="parser">
          <define name="BOOST_PARSER_DOXYGEN" value="1"/>
          <define name="BOOST_PARSER_USE_CONCEPTS" value="1"/>
       </override>
-
       <override module="pfr">
          <define name="BOOST_PFR_DOXYGEN_INVOKED" value="1"/>
          <define name="BOOST_PFR_ENABLED" value="1"/>
          <define name="BOOST_PFR_CORE_NAME_ENABLED" value="1"/>
       </override>
-
       <override module="stacktrace">
          <define name="BOOST_STACKTRACE_DOXYGEN_INVOKED"/>
          <define name="stl_type_info" value="std::type_info"/>
          <define name="BOOST_STACKTRACE_FUNCTION" value="inline"/>
       </override>
-
       <override module="test">
          <define name="BOOST_TEST_DOXYGEN_DOC__" value="1"/>
          <define name="BOOST_TEST_DECL" value=""/>
@@ -296,7 +269,19 @@
       <exclude pattern="*/third_party/*"/>
    </library>
 
-   <library id="ace-tao" publicOnly="true">
+   <!-- ACE and TAO are separate logical documentation products even though
+        both originate from the same DOCGroup source archive. -->
+   <library id="ace" publicOnly="true">
+      <exclude pattern="*/TAO/*"/>
+      <exclude pattern="*/tests/*"/>
+      <exclude pattern="*/examples/*"/>
+      <exclude pattern="*/performance-tests/*"/>
+      <exclude pattern="*/performance_tests/*"/>
+      <exclude pattern="*/bin/*"/>
+      <exclude pattern="*/MPC/*"/>
+   </library>
+
+   <library id="tao" publicOnly="true">
       <exclude pattern="*/tests/*"/>
       <exclude pattern="*/examples/*"/>
       <exclude pattern="*/performance-tests/*"/>
