@@ -1923,7 +1923,7 @@
             <line value="zlib=1"/>
          </temporaryFile>
          <temporaryFile id="ACEWorkspace" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\BuildEngine_ACE.mwc">
-            <line value="workspace {"/>
+            <line value="workspace {{"/>
             <line value="  $(ACE_ROOT)/ace"/>
             <line value="  $(ACE_ROOT)/apps/gperf/src"/>
             <line value="  $(ACE_ROOT)/ACEXML/common"/>
@@ -1931,7 +1931,7 @@
             <line value="  $(ACE_ROOT)/ACEXML/apps/svcconf"/>
             <line value="  $(ACE_ROOT)/Kokyu/Kokyu.mpc"/>
             <line value="  $(ACE_ROOT)/protocols"/>
-            <line value="}"/>
+            <line value="}}"/>
          </temporaryFile>
          <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\mwc.pl"/>
          <argument value="{TargetFile:ACEWorkspace}"/>
