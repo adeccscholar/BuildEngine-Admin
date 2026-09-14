@@ -127,7 +127,10 @@
          <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"/>
       </execute>
 
-      <!-- ACE.mwc is the upstream ACE-only workspace and explicitly excludes TAO. -->
+      <!--
+         Keep the ACE half of the previously proven TAO_ACE.mwc contract.
+         TAO is added later as an extension in this same variant producer tree.
+      -->
       <target name="generate-workspace" type="perl" executable="{Tool:perl}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers" showOutput="false">
          <temporaryFile id="config-h" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\ace\config.h">
             <line value="#include &quot;ace/config-win32.h&quot;"/>
@@ -138,8 +141,19 @@
             <line value="xerces3=1"/>
             <line value="zlib=1"/>
          </temporaryFile>
+         <temporaryFile id="ACEWorkspace" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\BuildEngine_ACE.mwc">
+            <line value="workspace {"/>
+            <line value="  $(ACE_ROOT)/ace"/>
+            <line value="  $(ACE_ROOT)/apps/gperf/src"/>
+            <line value="  $(ACE_ROOT)/ACEXML/common"/>
+            <line value="  $(ACE_ROOT)/ACEXML/parser/parser"/>
+            <line value="  $(ACE_ROOT)/ACEXML/apps/svcconf"/>
+            <line value="  $(ACE_ROOT)/Kokyu/Kokyu.mpc"/>
+            <line value="  $(ACE_ROOT)/protocols"/>
+            <line value="}"/>
+         </temporaryFile>
          <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\mwc.pl"/>
-         <argument value="ACE.mwc"/>
+         <argument value="{TargetFile:ACEWorkspace}"/>
          <argument value="-type"/>
          <argument value="bmake"/>
          <argument value="-value_template"/>
