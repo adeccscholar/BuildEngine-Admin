@@ -6,6 +6,8 @@ This page is the public engineering overview of the third-party libraries curren
 
 The corresponding internal engineering findings are maintained in `docs/bcc64x-library-integration-findings.md`. Both documents must be updated when a library is added, removed, upgraded, patched, or materially reconfigured.
 
+Each logical library also carries a concise one-line purpose description in its contract metadata. The description identifies what the upstream library is for; build-specific details remain in the integration notes so that product metadata and integration evidence do not become mixed.
+
 ## Integration rules
 
 The current integration follows a few project-wide rules:
@@ -18,6 +20,7 @@ The current integration follows a few project-wide rules:
 - Packaging repairs are preferred over source patches when the source itself is compatible but upstream install/export metadata is incomplete.
 - Consumer smoke tests validate the installed package rather than only the build tree.
 - BuildEngine dependencies remain visible in the DAG, package metadata, and SBOM. Bundled upstream components are tracked separately.
+- A logical library boundary does not require an artificial physical output boundary when the upstream build system deliberately shares a producer tree. ACE and TAO are the current explicit example.
 
 ## Dependency overview
 
@@ -42,9 +45,10 @@ flowchart LR
    openssl --> boost
    zlib --> boost
 
-   openssl --> ace[ACE/TAO]
+   openssl --> ace[ACE]
    xerces[Xerces-C] --> ace
    zlib --> ace
+   ace --> tao[TAO]
 
    opengl[OpenGL / Mesa] --> glew
    opengl --> raylib
@@ -73,42 +77,45 @@ flowchart LR
 
 HarfBuzz is deliberately built without FreeType. FreeType is then built with HarfBuzz, keeping that part of the graph acyclic.
 
+ACE and TAO are separate logical libraries in the dependency graph. This does **not** mean that their upstream output is physically separated. TAO is built on the already prepared ACE `ACE_wrappers` tree; `TAO_ROOT` is below `ACE_ROOT`, and ACE and TAO both write libraries and tools into the shared `ACE_wrappers\lib` and `ACE_wrappers\bin` directories. The logical `tao -> ace` edge therefore describes scheduling, state, metadata and SBOM ownership while preserving the upstream physical layout.
+
 ## Current inventory
 
-| Library | Version | Category | BuildEngine dependencies | Integration notes |
-| --- | --- | --- | --- | --- |
-| pugiXML | 1.16 | data | — | Shared package, Release/Debug, installed package smoke. |
-| zlib | 1.3.2 | compression | — | Core compression dependency used by several packages. |
-| Brotli | 1.2.0 | compression | — | Shared compression package; also consumed by OpenSSL, FreeType, and Skia. |
-| Zstandard | 1.5.7 | compression | — | Shared compression package used by libzip, libarchive, and OpenSSL. |
-| XZ / liblzma | 5.8.3 | compression | — | Shared compression package used by libzip and libarchive. |
-| libzip | 1.11.4 | archive | zlib, XZ, Zstandard | Shared library plus zip tools; AES/XZ/Zstd functional checks; upstream documentation build is not part of the package build because it writes shared source-tree outputs. |
-| libarchive | 3.8.9 | archive | zlib, XZ, Zstandard, OpenSSL | Shared libarchive plus tar/cpio/cat/unzip; BCC64X compatibility patch for legacy `__BORLANDC__` branches and Windows/Clang details. |
-| OpenSSL | 3.5.8 | security | zlib, Brotli, Zstandard | Native BCC64X Configure target, shared build, version-bound linker/Windows/PDB patches; no-asm baseline. |
-| curl | 8.21.0 | network | OpenSSL, zlib | Shared libcurl baseline with OpenSSL + zlib; Schannel, Brotli, Zstd and several optional protocol dependencies deliberately disabled in the current proof. |
-| Boost | 1.92.0 | foundation | OpenSSL, zlib | C++23 shared build from the official CMake tree; broad selected module set; MPI/Python excluded; BCC64X native-Clang preflight gates. |
-| nlohmann-json | 3.12.0 | data | — | Header-only package. |
-| ACE/TAO | 8.0.6 / TAO 4.0.6 | middleware | OpenSSL, Xerces-C, zlib | Native BCC64X MPC/BMake integration; installed libraries, `tao_idl`, `ace_gperf`, Naming, COS Event and RT Event services. |
-| bzip2 | 1.0.8 | compression | — | BuildEngine CMake wrapper creates the shared Win64 package and package metadata. |
-| GLEW | 2.3.1 | graphics | OpenGL | Shared package built against the managed OpenGL package. |
-| OpenGL / Mesa | 26.2.1 | graphics | — | Mesa/Meson softpipe WGL profile; OpenGL enabled, LLVM/Vulkan/GLES/EGL/GLX disabled; BCC64X-derived import libraries generated from built DLLs. |
-| raylib | 6.0 | graphics | OpenGL | BuildEngine CMake wrapper, shared Release/Debug package. |
-| SDL2 | 2.32.10 | graphics | — | Shared-only package; test targets and Direct3D renderer paths disabled in the current Windows proof. |
-| SQLite | 3.53.4 | database | — | Amalgamation-based shared package with BuildEngine CMake wrapper. |
-| Xerces-C | 3.3.0 | data | — | Shared Windows package using Winsock, Windows transcoder and in-memory message loader; upstream API-documentation target retained. |
-| SOIL2 | 1.3.0 | graphics | OpenGL | BuildEngine CMake wrapper and managed OpenGL package. |
-| VTK | 9.6.2 | graphics | — | Deliberately narrow shared profile: CommonCore, CommonDataModel and FiltersCore; large module groups and language wrappers disabled. |
-| OpenCV | 5.0.0 | graphics | zlib | Reduced package profile with a version-bound BCC64X patch making MLAS optional. |
-| cmark-gfm | 0.29.0.gfm.13 | documentation | — | GitHub-flavored CommonMark library used by BuildEngine documentation rendering. |
-| GoogleTest | 1.17.0 | testing | — | Managed test-framework package with CMake package consumption. |
-| Catch2 | 3.16.0 | testing | — | Deliberate static test-framework package; BCC64X-specific compile definitions/code-page setting, no source patch. |
-| BitmapPlusPlus | 1.1.1 | graphics | — | Header-only; no artificial binary build; BuildEngine supplies missing package-config metadata and Release/Debug consumer smokes. |
-| libjpeg-turbo | 3.2.0 | image | — | Shared library, TurboJPEG enabled, SIMD disabled for the current baseline. |
-| libpng | 1.6.58 | image | zlib | Shared package using managed zlib; static library and upstream tests disabled in the current contract. |
-| HarfBuzz | 14.4.0 | text | — | Shared core shaping + subset package; optional frameworks and FreeType disabled to keep the graph acyclic; package/export repairs applied at install time. |
-| FreeType | 2.14.3 | text | zlib, bzip2, Brotli, libpng, HarfBuzz | Shared package with all declared dependencies explicitly required; HarfBuzz integration is part of the consumer proof. |
-| libtiff | 4.7.2 | image | zlib, libjpeg-turbo | Shared package; tools/contrib/docs/tests disabled in the current contract. |
-| Skia | 153 | graphics | OpenGL, zlib, Brotli, libjpeg-turbo, libpng, HarfBuzz, FreeType | Broad Windows desktop component build at pinned source commit `2eed75b956045eb8603d3690a1e84bc582a2135d`; extensive BCC64X GN/system-library/component repairs and bundled-component SBOM evidence. |
+| Library | Version | Category | Description | BuildEngine dependencies | Integration notes |
+| --- | --- | --- | --- | --- | --- |
+| pugiXML | 1.16 | data | Lightweight C++ XML processing library with DOM-style parsing and XPath support. | — | Shared package, Release/Debug, installed package smoke. |
+| zlib | 1.3.2 | compression | General-purpose DEFLATE compression library used as a foundational compression dependency. | — | Core compression dependency used by several packages. |
+| Brotli | 1.2.0 | compression | Lossless compression library and codec optimized for web and general data compression. | — | Shared compression package; also consumed by OpenSSL, FreeType, and Skia. |
+| Zstandard | 1.5.7 | compression | Fast lossless compression library offering a wide compression-speed trade-off. | — | Shared compression package used by libzip, libarchive, and OpenSSL. |
+| XZ / liblzma | 5.8.3 | compression | LZMA/LZMA2 compression library and XZ container implementation. | — | Shared compression package used by libzip and libarchive. |
+| libzip | 1.11.4 | archive | C library for reading, creating, and modifying ZIP archives. | zlib, XZ, Zstandard | Shared library plus zip tools; AES/XZ/Zstd functional checks; upstream documentation build is not part of the package build because it writes shared source-tree outputs. |
+| libarchive | 3.8.9 | archive | Multi-format archive and compression library backing tar/cpio-style workflows. | zlib, XZ, Zstandard, OpenSSL | Shared libarchive plus tar/cpio/cat/unzip; BCC64X compatibility patch for legacy `__BORLANDC__` branches and Windows/Clang details. |
+| OpenSSL | 3.5.8 | security | TLS/SSL and general-purpose cryptography toolkit and provider library. | zlib, Brotli, Zstandard | Native BCC64X Configure target, shared build, version-bound linker/Windows/PDB patches; no-asm baseline. |
+| curl | 8.21.0 | network | Client-side URL transfer library with HTTP(S) and related protocol support. | OpenSSL, zlib | Shared libcurl baseline with OpenSSL + zlib; Schannel, Brotli, Zstd and several optional protocol dependencies deliberately disabled in the current proof. |
+| Boost | 1.92.0 | foundation | Large collection of portable C++ libraries extending the standard library ecosystem. | OpenSSL, zlib | C++23 shared build from the official CMake tree; broad selected module set; MPI/Python excluded; BCC64X native-Clang preflight gates. |
+| nlohmann-json | 3.12.0 | data | Header-only modern C++ JSON parser, serializer, and data model. | — | Header-only package. |
+| ACE | 8.0.6 | middleware | Adaptive Communication Environment providing portable networking, concurrency, IPC, and OS abstraction. | OpenSSL, Xerces-C, zlib | Native BCC64X MPC/BMake base; owns the shared `ACE_wrappers` producer tree used later by TAO. |
+| TAO | 4.0.6 | middleware | CORBA object request broker and middleware services built on top of ACE. | ACE | Logical TAO package continues inside ACE's physical `ACE_wrappers` tree; shared `bin`/`lib`, `tao_idl`, Naming, COS Event and RT Event services. |
+| bzip2 | 1.0.8 | compression | Lossless block-sorting compression library implementing the bzip2 format. | — | BuildEngine CMake wrapper creates the shared Win64 package and package metadata. |
+| GLEW | 2.3.1 | graphics | OpenGL extension loading library exposing modern OpenGL entry points. | OpenGL | Shared package built against the managed OpenGL package. |
+| OpenGL / Mesa | 26.2.1 | graphics | Mesa software OpenGL implementation providing the managed Windows desktop OpenGL runtime. | — | Mesa/Meson softpipe WGL profile; OpenGL enabled, LLVM/Vulkan/GLES/EGL/GLX disabled; BCC64X-derived import libraries generated from built DLLs. |
+| raylib | 6.0 | graphics | Small C game-programming library for graphics, input, audio, and windowing. | OpenGL | BuildEngine CMake wrapper, shared Release/Debug package. |
+| SDL2 | 2.32.10 | graphics | Cross-platform low-level multimedia library for windows, input, audio, and graphics integration. | — | Shared-only package; test targets and Direct3D renderer paths disabled in the current Windows proof. |
+| SQLite | 3.53.4 | database | Embedded transactional SQL database engine delivered as a self-contained library. | — | Amalgamation-based shared package with BuildEngine CMake wrapper. |
+| Xerces-C | 3.3.0 | data | C++ XML parser and validation library implementing DOM/SAX and XML Schema support. | — | Shared Windows package using Winsock, Windows transcoder and in-memory message loader; upstream API-documentation target retained. |
+| SOIL2 | 1.3.0 | graphics | Small OpenGL texture-loading library for common image formats. | OpenGL | BuildEngine CMake wrapper and managed OpenGL package. |
+| VTK | 9.6.2 | graphics | Visualization Toolkit for scientific data structures, processing, and visualization pipelines. | — | Deliberately narrow shared profile: CommonCore, CommonDataModel and FiltersCore; large module groups and language wrappers disabled. |
+| OpenCV | 5.0.0 | graphics | Computer vision and image-processing library with broad algorithm and matrix support. | zlib | Reduced package profile with a version-bound BCC64X patch making MLAS optional. |
+| cmark-gfm | 0.29.0.gfm.13 | documentation | GitHub-flavored CommonMark parser and renderer used for BuildEngine documentation. | — | GitHub-flavored CommonMark library used by BuildEngine documentation rendering. |
+| GoogleTest | 1.17.0 | testing | C++ unit-testing and mocking framework from the GoogleTest project. | — | Managed test-framework package with CMake package consumption. |
+| Catch2 | 3.16.0 | testing | Modern C++ unit-testing framework with self-contained test registration and assertions. | — | Deliberate static test-framework package; BCC64X-specific compile definitions/code-page setting, no source patch. |
+| BitmapPlusPlus | 1.1.1 | graphics | Header-only C++ bitmap utility for reading, writing, and manipulating BMP images. | — | Header-only; no artificial binary build; BuildEngine supplies missing package-config metadata and Release/Debug consumer smokes. |
+| libjpeg-turbo | 3.2.0 | image | High-performance JPEG codec using the libjpeg API and TurboJPEG interface. | — | Shared library, TurboJPEG enabled, SIMD disabled for the current baseline. |
+| libpng | 1.6.58 | image | Reference PNG image encoding and decoding library. | zlib | Shared package using managed zlib; static library and upstream tests disabled in the current contract. |
+| HarfBuzz | 14.4.0 | text | OpenType text shaping engine converting Unicode text into positioned glyphs. | — | Shared core shaping + subset package; optional frameworks and FreeType disabled to keep the graph acyclic; package/export repairs applied at install time. |
+| FreeType | 2.14.3 | text | Font rasterization engine for loading and rendering scalable and bitmap fonts. | zlib, bzip2, Brotli, libpng, HarfBuzz | Shared package with all declared dependencies explicitly required; HarfBuzz integration is part of the consumer proof. |
+| libtiff | 4.7.2 | image | TIFF image file reading, writing, and image metadata library. | zlib, libjpeg-turbo | Shared package; tools/contrib/docs/tests disabled in the current contract. |
+| Skia | 153 | graphics | 2D graphics engine for raster, vector, text, image, and GPU-backed rendering. | OpenGL, zlib, Brotli, libjpeg-turbo, libpng, HarfBuzz, FreeType | Broad Windows desktop component build at pinned source commit `2eed75b956045eb8603d3690a1e84bc582a2135d`; extensive BCC64X GN/system-library/component repairs and bundled-component SBOM evidence. |
 
 ## Archive and compression stack
 
@@ -159,11 +166,15 @@ Boost is built from the official CMake source distribution with C++23, shared li
 
 OpenSSL and zlib are exact managed dependencies. The build includes early native-BCC64X/Boost.Config preflight compilations so a compiler-model regression fails before the expensive Boost graph is started. The optional Boost.Random `random_device` binary is disabled because the verified contract treats Boost.Random as header/interface use.
 
-### ACE/TAO 8.0.6 / TAO 4.0.6
+### ACE 8.0.6 and TAO 4.0.6
 
-ACE/TAO uses its native MPC/BMake build path with BCC64X. BuildEngine packages headers, DLL/import-library artifacts, `tao_idl`, `ace_gperf`, and the Naming, COS Event and RT Event services. OpenSSL, Xerces-C and zlib are explicit BuildEngine dependencies.
+ACE and TAO are modeled as separate logical libraries because their dependency and product roles are different: ACE is the portable communication/concurrency foundation, while TAO is the CORBA implementation and service layer built on ACE. The direct BuildEngine edge is therefore `tao -> ace`; ACE itself depends on OpenSSL, Xerces-C and zlib. This also gives metadata and SBOM generation the correct direct/transitive relationship.
 
-The ACE/TAO integration intentionally remains a direct BCC64X ecosystem proof. Alternative compiler paths are not substituted for failed pieces.
+The logical split deliberately does **not** split the upstream producer tree. Both libraries come from the same ACE+TAO release and continue to use the same variant-specific `ACE_wrappers` tree. TAO builds with `ACE_ROOT` pointing at that existing ACE tree and `TAO_ROOT` at `ACE_ROOT\TAO`. In particular, TAO's generated libraries, DLLs and tools continue to appear in the same `ACE_wrappers\lib` and `ACE_wrappers\bin` directories used by ACE. BuildEngine must not invent a second physical TAO `bin` or `lib` tree merely because the scheduler has two logical library IDs.
+
+The package view can still assign ownership deliberately: ACE publishes its base headers/runtime artifacts; TAO publishes TAO/orbsvcs headers, `tao_idl`, Naming, COS Event and RT Event services and the TAO-specific artifacts produced in the shared tree. The physical producer overlap is therefore explicit and intentional rather than hidden by filesystem discovery.
+
+Both continue to use their native MPC/BMake path with BCC64X. The integration remains a direct BCC64X ecosystem proof; alternative compiler paths are not substituted for failed pieces.
 
 ## Graphics stack
 
@@ -286,9 +297,11 @@ This page and `docs/bcc64x-library-integration-findings.md` are documentation ou
 Whenever `admin/build-libraries.xml` changes materially, maintainers must update the applicable documentation in the same work unit:
 
 - add/remove/upgrade a library -> update the inventory and dependency information here;
+- add/change a library purpose description -> update `metadata/@description` and the inventory description together;
 - add/remove a patch -> update the relevant integration notes and identify whether it is source, packaging, compiler-policy, or generic-toolchain work;
 - change important feature/test/build settings -> update the library's note;
 - change dependency edges -> update both the inventory and dependency overview;
+- change an intentional shared producer layout such as ACE/TAO -> document both the logical ownership and the physical output relationship;
 - record deeper diagnostic evidence -> update the internal findings document under `docs/` as well.
 
 The XML contract remains authoritative when documentation and executable configuration ever disagree; such a disagreement is a documentation defect to be corrected, not a second source of truth.
