@@ -42,21 +42,15 @@
          <require path="TAO\orbsvcs\Event_Service\Event_Service.mpc"/>
       </extract>
 
-      <!-- Source-owner repairs that must be present before either logical build. -->
       <copy source="{BuildFileDir}\patches\ace-tao\8.0.6\bcc64x-win64-upstream-backports.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-win64-upstream-backports.patch"
             overwrite="true" preserveCurrentArtifact="true"/>
       <execute name="win64-backports-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--check"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
+         <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
          <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-win64-upstream-backports.patch"/>
       </execute>
       <execute name="win64-backports-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
+         <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
          <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-win64-upstream-backports.patch"/>
       </execute>
 
@@ -64,16 +58,11 @@
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch"
             overwrite="true" preserveCurrentArtifact="true"/>
       <execute name="xerces-modern-borland-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--check"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
+         <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
          <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch"/>
       </execute>
       <execute name="xerces-modern-borland-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
+         <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
          <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch"/>
       </execute>
 
@@ -81,16 +70,11 @@
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch"
             overwrite="true" preserveCurrentArtifact="true"/>
       <execute name="zlib-library-names-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--check"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
+         <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
          <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch"/>
       </execute>
       <execute name="zlib-library-names-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
+         <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
          <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch"/>
       </execute>
    </source>
@@ -106,119 +90,49 @@
       <environment name="ZLIB_ROOT" value="{InstallRoot}\packages\zlib\1.3.2"/>
       <environment name="ZLIB_INCDIR" value="{InstallRoot}\packages\zlib\1.3.2\include"/>
       <environment name="ZLIB_LIBDIR" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
-      <environment name="BCC32C" value=""/>
-      <environment name="BCC64" value=""/>
-      <environment name="BCC64X" value="1"/>
-      <environment name="CODEGUARD" value=""/>
-      <environment name="UNICODE" value=""/>
-      <environment name="DEBUG" value="{DebugFlag}"/>
-      <environment name="RELEASE" value="{ReleaseFlag}"/>
+      <environment name="BCC32C" value=""/><environment name="BCC64" value=""/><environment name="BCC64X" value="1"/>
+      <environment name="CODEGUARD" value=""/><environment name="UNICODE" value=""/>
+      <environment name="DEBUG" value="{DebugFlag}"/><environment name="RELEASE" value="{ReleaseFlag}"/>
       <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\lib;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin;{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
 
       <execute name="remove-build-tree" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
-         <argument value="-E"/>
-         <argument value="remove_directory"/>
-         <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-E"/><argument value="remove_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
       </execute>
       <execute name="copy-build-tree" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
-         <argument value="-E"/>
-         <argument value="copy_directory"/>
-         <argument value="{Workspace}\ACE_wrappers"/>
+         <argument value="-E"/><argument value="copy_directory"/><argument value="{Workspace}\ACE_wrappers"/>
          <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"/>
       </execute>
 
-      <!-- ACE.mwc is the upstream ACE-only workspace and explicitly excludes TAO. -->
-      <target name="generate-workspace" type="perl" executable="{Tool:perl}"
-              workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"
-              showOutput="false">
-         <temporaryFile id="config-h" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\ace\config.h">
-            <line value="#include &quot;ace/config-win32.h&quot;"/>
-         </temporaryFile>
+      <target name="generate-workspace" type="perl" executable="{Tool:perl}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers" showOutput="false">
+         <temporaryFile id="config-h" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\ace\config.h"><line value="#include &quot;ace/config-win32.h&quot;"/></temporaryFile>
          <temporaryFile id="default-features" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\MakeProjectCreator\config\default.features">
-            <line value="ssl=1"/>
-            <line value="openssl11=1"/>
-            <line value="xerces3=1"/>
-            <line value="zlib=1"/>
+            <line value="ssl=1"/><line value="openssl11=1"/><line value="xerces3=1"/><line value="zlib=1"/>
          </temporaryFile>
          <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\mwc.pl"/>
-         <argument value="ACE.mwc"/>
-         <argument value="-type"/>
-         <argument value="bmake"/>
-         <argument value="-value_template"/>
-         <argument value="xerceslib={XercesLibrary}"/>
-         <argument value="-value_template"/>
-         <argument value="zliblib={ZlibLibrary}"/>
+         <argument value="ACE.mwc"/><argument value="-type"/><argument value="bmake"/>
+         <argument value="-value_template"/><argument value="xerceslib={XercesLibrary}"/>
+         <argument value="-value_template"/><argument value="zliblib={ZlibLibrary}"/>
       </target>
-      <target name="build-workspace" type="bmake" executable="{Tool:embarcadero-make}"
-              workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"
-              showOutput="false">
-         <argument value="-m"/>
-         <argument value="-D{BMakeConfiguration}"/>
-         <argument value="-f"/>
-         <argument value="Makefile.bmak"/>
-         <argument value="MAKE={ToolShort:embarcadero-make}"/>
-         <argument value="all"/>
+      <target name="build-workspace" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers" showOutput="false">
+         <argument value="-m"/><argument value="-D{BMakeConfiguration}"/><argument value="-f"/><argument value="Makefile.bmak"/>
+         <argument value="MAKE={ToolShort:embarcadero-make}"/><argument value="all"/>
       </target>
 
-      <variant name="Release">
-         <variable name="BMakeConfiguration" value="RELEASE"/>
-         <variable name="DebugFlag" value=""/>
-         <variable name="ReleaseFlag" value="1"/>
-         <variable name="XercesLibrary" value="libxerces-c"/>
-         <variable name="ZlibLibrary" value="libz"/>
-      </variant>
-      <variant name="Debug">
-         <variable name="BMakeConfiguration" value="DEBUG"/>
-         <variable name="DebugFlag" value="1"/>
-         <variable name="ReleaseFlag" value=""/>
-         <variable name="XercesLibrary" value="libxerces-c"/>
-         <variable name="ZlibLibrary" value="libzd"/>
-      </variant>
+      <variant name="Release"><variable name="BMakeConfiguration" value="RELEASE"/><variable name="DebugFlag" value=""/><variable name="ReleaseFlag" value="1"/><variable name="XercesLibrary" value="libxerces-c"/><variable name="ZlibLibrary" value="libz"/></variant>
+      <variant name="Debug"><variable name="BMakeConfiguration" value="DEBUG"/><variable name="DebugFlag" value="1"/><variable name="ReleaseFlag" value=""/><variable name="XercesLibrary" value="libxerces-c"/><variable name="ZlibLibrary" value="libzd"/></variant>
 
       <install>
          <perVariant>
-            <!-- At this point TAO has not run: all generated bin/lib artifacts belong to the ACE baseline. -->
-            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
-                  recursive="true" overwrite="true" flatten="true" cleanTarget="true">
-               <include pattern="lib/**/*.lib"/>
-            </copy>
-            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
-                  recursive="true" overwrite="true" flatten="true" cleanTarget="true">
-               <include pattern="lib/**/*.dll"/>
-               <include pattern="lib/**/*.pdb"/>
-               <include pattern="bin/*.dll"/>
-               <include pattern="bin/*.pdb"/>
-            </copy>
-            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}"
-                  overwrite="true" cleanTarget="true">
-               <include pattern="ace_gperf.exe"/>
-            </copy>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true" flatten="true" cleanTarget="true"><include pattern="lib/**/*.lib"/></copy>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true" flatten="true" cleanTarget="true"><include pattern="lib/**/*.dll"/><include pattern="lib/**/*.pdb"/><include pattern="bin/*.dll"/><include pattern="bin/*.pdb"/></copy>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}" overwrite="true" cleanTarget="true"><include pattern="ace_gperf.exe"/></copy>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}\ace_gperf.exe"/>
          </perVariant>
          <common>
-            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\ace"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace"
-                  recursive="true" overwrite="true" cleanTarget="true">
-               <include pattern="**/*.h"/>
-               <include pattern="**/*.hpp"/>
-               <include pattern="**/*.inl"/>
-               <include pattern="**/*.ipp"/>
-               <include pattern="**/*.tpp"/>
-               <include pattern="**/*.idl"/>
-               <include pattern="**/*.pidl"/>
-               <include pattern="**/*.cpp"/>
-            </copy>
-            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\COPYING"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
-            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\VERSION.txt"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt" overwrite="true"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" kind="directory"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace\ACE.h"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt"/>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\ace" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" recursive="true" overwrite="true" cleanTarget="true"><include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/><include pattern="**/*.cpp"/></copy>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\VERSION.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt" overwrite="true"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" kind="directory"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace\ACE.h"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt"/>
          </common>
       </install>
    </build>
@@ -229,258 +143,76 @@
       <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="true"/>
       <tree source="tools\bin\win64\{Configuration}" target="tools\bin" optional="true"/>
    </publish>
-
    <documentation doxygen="true" source="false" inlineSource="false" publicOnly="true"/>
 </library>
 
 <library id="tao" version="4.0.6" category="middleware" timestamp="2026-09-14T14:38:00Z">
-   <extension library="ace" version="8.0.6" source="TAO" producer="ACE_wrappers" install=".">
-      <shared path="bin"/>
-      <shared path="lib"/>
-   </extension>
+   <extension library="ace" version="8.0.6" source="TAO" producer="ACE_wrappers" install="."><shared path="bin"/><shared path="lib"/></extension>
+   <metadata name="TAO" description="CORBA object request broker and middleware services built on top of ACE." supplier="DOC Group" homepage="https://www.dre.vanderbilt.edu/~schmidt/TAO.html"/>
+   <security><repository url="https://github.com/DOCGroup/ACE_TAO.git" ref="ACE+TAO-8_0_6"/></security>
 
-   <metadata name="TAO"
-             description="CORBA object request broker and middleware services built on top of ACE."
-             supplier="DOC Group"
-             homepage="https://www.dre.vanderbilt.edu/~schmidt/TAO.html"/>
-   <security>
-      <repository url="https://github.com/DOCGroup/ACE_TAO.git" ref="ACE+TAO-8_0_6"/>
-   </security>
-
-   <!-- Extension source preparation: the base ACE library owns download/extract. -->
    <source>
-      <copy source="{BuildFileDir}\patches\ace-tao\8.0.6\upstream-ssliop-params-dup-cpp.patch"
-            target="{ExtensionWorkspace}\.buildengine\patches\tao\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch"
-            overwrite="true" preserveCurrentArtifact="true"/>
-      <execute name="ssliop-backport-check" executable="{Tool:git}" workingDirectory="{ExtensionBaseSourceRoot}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--check"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
-         <argument value="{ExtensionWorkspace}\.buildengine\patches\tao\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch"/>
-      </execute>
-      <execute name="ssliop-backport-apply" executable="{Tool:git}" workingDirectory="{ExtensionBaseSourceRoot}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
-         <argument value="{ExtensionWorkspace}\.buildengine\patches\tao\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch"/>
-      </execute>
+      <copy source="{BuildFileDir}\patches\ace-tao\8.0.6\upstream-ssliop-params-dup-cpp.patch" target="{ExtensionWorkspace}\.buildengine\patches\tao\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch" overwrite="true" preserveCurrentArtifact="true"/>
+      <execute name="ssliop-backport-check" executable="{Tool:git}" workingDirectory="{ExtensionBaseSourceRoot}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{ExtensionWorkspace}\.buildengine\patches\tao\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch"/></execute>
+      <execute name="ssliop-backport-apply" executable="{Tool:git}" workingDirectory="{ExtensionBaseSourceRoot}" showOutput="false"><argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{ExtensionWorkspace}\.buildengine\patches\tao\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch"/></execute>
    </source>
 
    <build>
-      <environment name="ACE_ROOT" value="{ExtensionProducerRoot}"/>
-      <environment name="TAO_ROOT" value="{ExtensionProducerRoot}\TAO"/>
-      <environment name="SSL_ROOT" value="{InstallRoot}\packages\openssl\3.5.8"/>
-      <environment name="SSL_INCDIR" value="{InstallRoot}\packages\openssl\3.5.8\include"/>
-      <environment name="SSL_LIBDIR" value="{InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}"/>
-      <environment name="XERCESC_INCDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\include"/>
-      <environment name="XERCESC_LIBDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\lib\win64\{Configuration}"/>
-      <environment name="XERCESLIB" value="{XercesLibrary}"/>
-      <environment name="ZLIB_ROOT" value="{InstallRoot}\packages\zlib\1.3.2"/>
-      <environment name="ZLIB_INCDIR" value="{InstallRoot}\packages\zlib\1.3.2\include"/>
-      <environment name="ZLIB_LIBDIR" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
-      <environment name="BCC32C" value=""/>
-      <environment name="BCC64" value=""/>
-      <environment name="BCC64X" value="1"/>
-      <environment name="CODEGUARD" value=""/>
-      <environment name="UNICODE" value=""/>
-      <environment name="DEBUG" value="{DebugFlag}"/>
-      <environment name="RELEASE" value="{ReleaseFlag}"/>
+      <environment name="ACE_ROOT" value="{ExtensionProducerRoot}"/><environment name="TAO_ROOT" value="{ExtensionProducerRoot}\TAO"/>
+      <environment name="SSL_ROOT" value="{InstallRoot}\packages\openssl\3.5.8"/><environment name="SSL_INCDIR" value="{InstallRoot}\packages\openssl\3.5.8\include"/><environment name="SSL_LIBDIR" value="{InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}"/>
+      <environment name="XERCESC_INCDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\include"/><environment name="XERCESC_LIBDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\lib\win64\{Configuration}"/><environment name="XERCESLIB" value="{XercesLibrary}"/>
+      <environment name="ZLIB_ROOT" value="{InstallRoot}\packages\zlib\1.3.2"/><environment name="ZLIB_INCDIR" value="{InstallRoot}\packages\zlib\1.3.2\include"/><environment name="ZLIB_LIBDIR" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
+      <environment name="BCC32C" value=""/><environment name="BCC64" value=""/><environment name="BCC64X" value="1"/><environment name="CODEGUARD" value=""/><environment name="UNICODE" value=""/><environment name="DEBUG" value="{DebugFlag}"/><environment name="RELEASE" value="{ReleaseFlag}"/>
       <environment name="PATH" value="{ExtensionProducerRoot}\lib;{ExtensionProducerRoot}\bin;{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
 
-      <!-- The ACE producer already exists. TAO continues in that tree; it never copies or cleans it. -->
-      <target name="generate-workspace" type="perl" executable="{Tool:perl}"
-              workingDirectory="{ExtensionProducerRoot}\TAO" showOutput="false">
-         <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/>
-         <argument value="TAO.mwc"/>
-         <argument value="-type"/>
-         <argument value="bmake"/>
-         <argument value="-value_template"/>
-         <argument value="xerceslib={XercesLibrary}"/>
-         <argument value="-value_template"/>
-         <argument value="zliblib={ZlibLibrary}"/>
-      </target>
-      <target name="build-workspace" type="bmake" executable="{Tool:embarcadero-make}"
-              workingDirectory="{ExtensionProducerRoot}\TAO" showOutput="false">
-         <argument value="-m"/>
-         <argument value="-D{BMakeConfiguration}"/>
-         <argument value="-f"/>
-         <argument value="Makefile.bmak"/>
-         <argument value="MAKE={ToolShort:embarcadero-make}"/>
-         <argument value="all"/>
-      </target>
+      <target name="generate-workspace" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO" showOutput="false"><argument value="{ExtensionProducerRoot}\bin\mwc.pl"/><argument value="TAO.mwc"/><argument value="-type"/><argument value="bmake"/><argument value="-value_template"/><argument value="xerceslib={XercesLibrary}"/><argument value="-value_template"/><argument value="zliblib={ZlibLibrary}"/></target>
+      <target name="build-workspace" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{ExtensionProducerRoot}\TAO" showOutput="false"><argument value="-m"/><argument value="-D{BMakeConfiguration}"/><argument value="-f"/><argument value="Makefile.bmak"/><argument value="MAKE={ToolShort:embarcadero-make}"/><argument value="all"/></target>
 
-      <target name="generate-naming-service" type="perl" executable="{Tool:perl}"
-              workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Naming_Service" showOutput="false">
-         <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/>
-         <argument value="-type"/>
-         <argument value="bmake"/>
-         <argument value="-value_template"/>
-         <argument value="xerceslib={XercesLibrary}"/>
-         <argument value="-value_template"/>
-         <argument value="zliblib={ZlibLibrary}"/>
-      </target>
-      <target name="build-naming-service" type="bmake" executable="{Tool:embarcadero-make}"
-              workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Naming_Service" showOutput="false">
-         <argument value="-m"/>
-         <argument value="-D{BMakeConfiguration}"/>
-         <argument value="-f"/>
-         <argument value="Makefile.bmak"/>
-         <argument value="MAKE={ToolShort:embarcadero-make}"/>
-         <argument value="all"/>
-      </target>
+      <target name="generate-naming-service" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Naming_Service" showOutput="false"><argument value="{ExtensionProducerRoot}\bin\mwc.pl"/><argument value="-type"/><argument value="bmake"/><argument value="-value_template"/><argument value="xerceslib={XercesLibrary}"/><argument value="-value_template"/><argument value="zliblib={ZlibLibrary}"/></target>
+      <target name="build-naming-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Naming_Service" showOutput="false"><argument value="-m"/><argument value="-D{BMakeConfiguration}"/><argument value="-f"/><argument value="Makefile.bmak"/><argument value="MAKE={ToolShort:embarcadero-make}"/><argument value="all"/></target>
+      <target name="generate-cos-event-service" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\CosEvent_Service" showOutput="false"><argument value="{ExtensionProducerRoot}\bin\mwc.pl"/><argument value="-type"/><argument value="bmake"/><argument value="-value_template"/><argument value="xerceslib={XercesLibrary}"/><argument value="-value_template"/><argument value="zliblib={ZlibLibrary}"/></target>
+      <target name="build-cos-event-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\CosEvent_Service" showOutput="false"><argument value="-m"/><argument value="-D{BMakeConfiguration}"/><argument value="-f"/><argument value="Makefile.bmak"/><argument value="MAKE={ToolShort:embarcadero-make}"/><argument value="all"/></target>
+      <target name="generate-rt-event-service" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Event_Service" showOutput="false"><argument value="{ExtensionProducerRoot}\bin\mwc.pl"/><argument value="-type"/><argument value="bmake"/><argument value="-value_template"/><argument value="xerceslib={XercesLibrary}"/><argument value="-value_template"/><argument value="zliblib={ZlibLibrary}"/></target>
+      <target name="build-rt-event-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Event_Service" showOutput="false"><argument value="-m"/><argument value="-D{BMakeConfiguration}"/><argument value="-f"/><argument value="Makefile.bmak"/><argument value="MAKE={ToolShort:embarcadero-make}"/><argument value="all"/></target>
 
-      <target name="generate-cos-event-service" type="perl" executable="{Tool:perl}"
-              workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\CosEvent_Service" showOutput="false">
-         <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/>
-         <argument value="-type"/>
-         <argument value="bmake"/>
-         <argument value="-value_template"/>
-         <argument value="xerceslib={XercesLibrary}"/>
-         <argument value="-value_template"/>
-         <argument value="zliblib={ZlibLibrary}"/>
-      </target>
-      <target name="build-cos-event-service" type="bmake" executable="{Tool:embarcadero-make}"
-              workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\CosEvent_Service" showOutput="false">
-         <argument value="-m"/>
-         <argument value="-D{BMakeConfiguration}"/>
-         <argument value="-f"/>
-         <argument value="Makefile.bmak"/>
-         <argument value="MAKE={ToolShort:embarcadero-make}"/>
-         <argument value="all"/>
-      </target>
-
-      <target name="generate-rt-event-service" type="perl" executable="{Tool:perl}"
-              workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Event_Service" showOutput="false">
-         <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/>
-         <argument value="-type"/>
-         <argument value="bmake"/>
-         <argument value="-value_template"/>
-         <argument value="xerceslib={XercesLibrary}"/>
-         <argument value="-value_template"/>
-         <argument value="zliblib={ZlibLibrary}"/>
-      </target>
-      <target name="build-rt-event-service" type="bmake" executable="{Tool:embarcadero-make}"
-              workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Event_Service" showOutput="false">
-         <argument value="-m"/>
-         <argument value="-D{BMakeConfiguration}"/>
-         <argument value="-f"/>
-         <argument value="Makefile.bmak"/>
-         <argument value="MAKE={ToolShort:embarcadero-make}"/>
-         <argument value="all"/>
-      </target>
-
-      <variant name="Release">
-         <variable name="BMakeConfiguration" value="RELEASE"/>
-         <variable name="DebugFlag" value=""/>
-         <variable name="ReleaseFlag" value="1"/>
-         <variable name="XercesLibrary" value="libxerces-c"/>
-         <variable name="ZlibLibrary" value="libz"/>
-      </variant>
-      <variant name="Debug">
-         <variable name="BMakeConfiguration" value="DEBUG"/>
-         <variable name="DebugFlag" value="1"/>
-         <variable name="ReleaseFlag" value=""/>
-         <variable name="XercesLibrary" value="libxerces-c"/>
-         <variable name="ZlibLibrary" value="libzd"/>
-      </variant>
+      <variant name="Release"><variable name="BMakeConfiguration" value="RELEASE"/><variable name="DebugFlag" value=""/><variable name="ReleaseFlag" value="1"/><variable name="XercesLibrary" value="libxerces-c"/><variable name="ZlibLibrary" value="libz"/></variant>
+      <variant name="Debug"><variable name="BMakeConfiguration" value="DEBUG"/><variable name="DebugFlag" value="1"/><variable name="ReleaseFlag" value=""/><variable name="XercesLibrary" value="libxerces-c"/><variable name="ZlibLibrary" value="libzd"/></variant>
 
       <install>
          <perVariant>
-            <!-- Overlay the shared producer without cleaning the ACE-owned target.
-                 The generic artifact delta records which files TAO created or modified. -->
-            <copy source="{ExtensionProducerRoot}"
-                  target="{ExtensionInstallRoot}\lib\win64\{Configuration}"
-                  recursive="true" overwrite="true" flatten="true" cleanTarget="false">
-               <include pattern="lib/**/*.lib"/>
-            </copy>
-            <copy source="{ExtensionProducerRoot}"
-                  target="{ExtensionInstallRoot}\bin\win64\{Configuration}"
-                  recursive="true" overwrite="true" flatten="true" cleanTarget="false">
-               <include pattern="lib/**/*.dll"/>
-               <include pattern="lib/**/*.pdb"/>
-               <include pattern="bin/*.dll"/>
-               <include pattern="bin/*.pdb"/>
-            </copy>
-            <copy source="{ExtensionProducerRoot}\bin"
-                  target="{ExtensionInstallRoot}\tools\bin\win64\{Configuration}"
-                  overwrite="true" cleanTarget="false">
-               <include pattern="tao_idl.exe"/>
-            </copy>
-            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\Naming_Service"
-                  target="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosnaming.exe"
-                  recursive="true" overwrite="true" singleFile="true">
-               <include pattern="**/tao_cosnaming.exe"/>
-               <include pattern="**/tao_cosnamingd.exe"/>
-            </copy>
-            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\CosEvent_Service"
-                  target="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosevent.exe"
-                  recursive="true" overwrite="true" singleFile="true">
-               <include pattern="**/tao_cosevent.exe"/>
-               <include pattern="**/tao_coseventd.exe"/>
-            </copy>
-            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\Event_Service"
-                  target="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_rtevent.exe"
-                  recursive="true" overwrite="true" singleFile="true">
-               <include pattern="**/tao_rtevent.exe"/>
-               <include pattern="**/tao_rteventd.exe"/>
-            </copy>
-            <require path="{ExtensionInstallRoot}\tools\bin\win64\{Configuration}\tao_idl.exe"/>
-            <require path="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosnaming.exe"/>
-            <require path="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosevent.exe"/>
-            <require path="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_rtevent.exe"/>
+            <copy source="{ExtensionProducerRoot}" target="{ExtensionInstallRoot}\lib\win64\{Configuration}" recursive="true" overwrite="true" flatten="true" cleanTarget="false"><include pattern="lib/**/*.lib"/></copy>
+            <copy source="{ExtensionProducerRoot}" target="{ExtensionInstallRoot}\bin\win64\{Configuration}" recursive="true" overwrite="true" flatten="true" cleanTarget="false"><include pattern="lib/**/*.dll"/><include pattern="lib/**/*.pdb"/><include pattern="bin/*.dll"/><include pattern="bin/*.pdb"/></copy>
+            <copy source="{ExtensionProducerRoot}\bin" target="{ExtensionInstallRoot}\tools\bin\win64\{Configuration}" overwrite="true" cleanTarget="false"><include pattern="tao_idl.exe"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\Naming_Service" target="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosnaming.exe" recursive="true" overwrite="true" singleFile="true"><include pattern="**/tao_cosnaming.exe"/><include pattern="**/tao_cosnamingd.exe"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\CosEvent_Service" target="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosevent.exe" recursive="true" overwrite="true" singleFile="true"><include pattern="**/tao_cosevent.exe"/><include pattern="**/tao_coseventd.exe"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\Event_Service" target="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_rtevent.exe" recursive="true" overwrite="true" singleFile="true"><include pattern="**/tao_rtevent.exe"/><include pattern="**/tao_rteventd.exe"/></copy>
+            <require path="{ExtensionInstallRoot}\tools\bin\win64\{Configuration}\tao_idl.exe"/><require path="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosnaming.exe"/><require path="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosevent.exe"/><require path="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_rtevent.exe"/>
          </perVariant>
          <common>
-            <copy source="{ExtensionProducerRoot}\TAO\tao"
-                  target="{ExtensionInstallRoot}\include\tao"
-                  recursive="true" overwrite="true" cleanTarget="false">
-               <include pattern="**/*.h"/>
-               <include pattern="**/*.hpp"/>
-               <include pattern="**/*.inl"/>
-               <include pattern="**/*.ipp"/>
-               <include pattern="**/*.tpp"/>
-               <include pattern="**/*.idl"/>
-               <include pattern="**/*.pidl"/>
-               <include pattern="**/*.cpp"/>
-            </copy>
-            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\orbsvcs"
-                  target="{ExtensionInstallRoot}\include\orbsvcs"
-                  recursive="true" overwrite="true" cleanTarget="false">
-               <include pattern="**/*.h"/>
-               <include pattern="**/*.hpp"/>
-               <include pattern="**/*.inl"/>
-               <include pattern="**/*.ipp"/>
-               <include pattern="**/*.tpp"/>
-               <include pattern="**/*.idl"/>
-               <include pattern="**/*.pidl"/>
-               <include pattern="**/*.cpp"/>
-            </copy>
-            <copy source="{ExtensionProducerRoot}\TAO\VERSION.txt"
-                  target="{ExtensionInstallRoot}\TAO_VERSION.txt" overwrite="true"/>
-            <copy source="{ExtensionProducerRoot}\COPYING"
-                  target="{ExtensionInstallRoot}\.buildengine\extensions\{LibraryId}\{LibraryVersion}\COPYING"
-                  overwrite="true"/>
-            <require path="{ExtensionInstallRoot}\include\tao" kind="directory"/>
-            <require path="{ExtensionInstallRoot}\include\orbsvcs" kind="directory"/>
-            <require path="{ExtensionInstallRoot}\include\tao\corba.h"/>
-            <require path="{ExtensionInstallRoot}\include\orbsvcs\CosNamingC.h"/>
-            <require path="{ExtensionInstallRoot}\TAO_VERSION.txt"/>
-            <require path="{ExtensionInstallRoot}\.buildengine\extensions\{LibraryId}\{LibraryVersion}\COPYING"/>
+            <copy source="{ExtensionProducerRoot}\TAO\tao" target="{ExtensionInstallRoot}\include\tao" recursive="true" overwrite="true" cleanTarget="false"><include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/><include pattern="**/*.cpp"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\orbsvcs" target="{ExtensionInstallRoot}\include\orbsvcs" recursive="true" overwrite="true" cleanTarget="false"><include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/><include pattern="**/*.cpp"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\VERSION.txt" target="{ExtensionInstallRoot}\TAO_VERSION.txt" overwrite="true"/>
+            <copy source="{ExtensionProducerRoot}\COPYING" target="{ExtensionInstallRoot}\.buildengine\extensions\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+            <require path="{ExtensionInstallRoot}\include\tao" kind="directory"/><require path="{ExtensionInstallRoot}\include\orbsvcs" kind="directory"/><require path="{ExtensionInstallRoot}\include\tao\corba.h"/><require path="{ExtensionInstallRoot}\include\orbsvcs\CosNamingC.h"/><require path="{ExtensionInstallRoot}\TAO_VERSION.txt"/><require path="{ExtensionInstallRoot}\.buildengine\extensions\{LibraryId}\{LibraryVersion}\COPYING"/>
          </common>
       </install>
    </build>
 
-   <!-- TAO is validated against the shared installed ACE payload.  The package
-        smoke therefore intentionally uses the package scope rather than
-        pretending that TAO has an independent physical package root. -->
-   <smoke id="consumer" source="smokes\ace-tao\consumer" configuration="Release"
-          scope="package" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
-          toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
-          executable="ace-tao-consumer.exe">
-      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
-      <environment name="CB_BDS" value="{BDS}"/>
+   <!-- A published TAO SDK is a consumable closure: it contains TAO's API plus
+        the shared ACE/TAO runtime/import-library directories from the common payload. -->
+   <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+      <tree source="include\ace" target="include\ace" optional="true"/>
+      <tree source="include\tao" target="include\tao" optional="true"/>
+      <tree source="include\orbsvcs" target="include\orbsvcs" optional="true"/>
+      <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+      <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="true"/>
+      <tree source="services\bin\win64\{Configuration}" target="services\bin" optional="true"/>
+      <tree source="tools\bin\win64\{Configuration}" target="tools\bin" optional="true"/>
+   </publish>
+
+   <smoke id="consumer" source="smokes\ace-tao\consumer" configuration="Release" scope="package" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="ace-tao-consumer.exe">
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
       <environment name="PATH" value="{ExtensionInstallRoot}\tools\bin\win64\Release;{ExtensionInstallRoot}\services\bin\win64\Release;{ExtensionInstallRoot}\bin\win64\Release;{ENV:PATH}"/>
    </smoke>
-
    <documentation doxygen="true" source="false" inlineSource="false" publicOnly="true"/>
 </library>
