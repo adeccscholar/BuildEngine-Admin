@@ -271,7 +271,7 @@ We wanted the essential knowledge to be expressed in a small number of declarati
 - which files are installed and published;
 - which license evidence belongs to the component;
 - which documentation profile applies;
-- and which technical state makes a result current.
+- and which logical state makes a result current.
 
 The contracts therefore do more than drive execution. **They document the prerequisites and parameters of the build at the same time.**
 
@@ -334,6 +334,28 @@ flowchart LR
 ```
 
 The scheduler can exploit the graph, but it cannot violate it.
+
+### State follows the graph
+
+The same insight eventually changed the incremental state model itself.
+
+Early versions naturally tended to attach state to individual technical steps and to encode more and more knowledge in fingerprints. That works for a small sequence, but it begins to duplicate the dependency graph once the system has Release and Debug variants, tests, validation, common and variant installation, publication, metadata, documentation, PDF generation, and dynamically discovered collection work.
+
+The current direction is simpler: **persistent state belongs to the logical library scope, while technical Actions remain execution and diagnostic units inside that scope.** The state records the library's own contract timestamp and the timestamp plus completion identity of every direct upstream library scope.
+
+```text
+timestamp=<library timestamp>
+upstream=<library>|<version>|<scope>|<upstream library timestamp>|<upstream completedAt>
+upstream=...
+completedAt=<this scope completion>
+state=completed
+```
+
+If an upstream scope runs again, its new `completedAt` value invalidates the direct downstream scope. The invalidation then propagates naturally through the same DAG that controls execution. There is no need for an unrelated global fingerprint to explain the dependency a second time.
+
+This also preserves variants. `build:Release` and `build:Debug` are not two unrelated build contracts, but they are distinct logical scopes. The same applies to test, validation, installation, smoke, documentation, and other variant-specific work.
+
+The migration mattered in practice. In the first broad run with the new state model, **450 of 834 jobs were recognized as current**. That did not prove every migration edge case correct, but it did prove something important: changing the state model did not force the entire production tree to rebuild from zero.
 
 The goal is not "parallel at all costs". It is to use CPU, I/O, network, and waiting time efficiently without turning concurrency into another source of nondeterminism.
 
@@ -497,7 +519,57 @@ flowchart LR
    Server --> Download["Package download"]
 ```
 
-Documentation, evidence, software inventory, license information, and distributable artifacts are therefore presented from the same production state instead of living in unrelated places.
+### Documentation became a production pipeline
+
+The generated documentation itself went through the same evolution as the rest of BuildEngine.
+
+At first, HTML API documentation is the obvious target: generate a Doxyfile, run Doxygen, publish the result. But once documentation is treated as part of the component evidence rather than as a convenience page, PDF becomes interesting as well — for offline review, archiving, controlled distribution, and simply because it tests another complete tool chain around the same source state.
+
+The first naive model would be to run Doxygen once for HTML and a second time for LaTeX. That would be wasteful and, more importantly, it would allow two supposedly equivalent documentation forms to originate from two separate analyses.
+
+The current model is stricter:
+
+```mermaid
+flowchart TD
+   Profile["Documentation profile"] --> D[Doxygen - one run]
+   D --> H[HTML]
+   D --> L[LaTeX]
+   Tools["Managed portable MiKTeX<br/>prepared package contract"] --> R[Shared runtime preflight]
+   L --> T[Isolated texify job]
+   R --> T
+   T --> P[PDF]
+```
+
+When LaTeX is enabled, **the same Doxygen invocation produces HTML and LaTeX**. MiKTeX never asks Doxygen to analyse the sources again. It only compiles the already generated LaTeX tree.
+
+That sounds like a small optimisation, but it forced several architectural questions to become explicit.
+
+MiKTeX is not treated as an invisible workstation installation. BuildEngine provisions a portable managed MiKTeX below its own tool root. Its preparation is described declaratively in `build-tools.xml`, including the package surface required by the pinned Doxygen 1.18.0 LaTeX templates. Library PDF jobs run with automatic package installation disabled. A missing package is therefore evidence that the preparation contract is incomplete, not an invitation for one parallel build worker to modify the machine behind our back.
+
+MiKTeX also has mutable shared runtime state. The first `pdflatex` invocation may need to create its format files. Starting many first-use PDF jobs in parallel would therefore turn a deterministic documentation build into a race. BuildEngine now has one explicit shared MiKTeX runtime preflight; only after that succeeds may the independent PDF jobs run concurrently.
+
+The completed large diagnostic run was important because it separated the layers empirically. The shared MiKTeX runtime initialized successfully and a substantial group of library PDFs was produced. Other libraries still failed later in their individual `texify` jobs. That is useful evidence: **a per-document LaTeX failure is not the same thing as a broken MiKTeX runtime**. The remaining PDF cases can now be diagnosed from their own logs instead of repeatedly redesigning the entire MiKTeX installation path.
+
+Boost then made the documentation problem much larger again.
+
+A monolithic recursive Doxygen run over the complete Boost include tree is not an attractive unit. BuildEngine therefore treats Boost as a **collection**. The published API structure is the contract: the common root and every first-level directory become independent documentation scopes. In the diagnostic run this produced one root scope plus 145 discovered modules — 146 Doxygen scopes without maintaining a second hand-written list of Boost libraries.
+
+That scale immediately exposed another state-model issue. Every Boost module depended on a common `collection-prepare` step that generated the Doxygen inputs. The first implementation treated that preparation as a helper but not as persistent library state. The Doxygen work itself succeeded, but the downstream scopes could not commit their upstream state correctly. The lesson was architectural, not Boost-specific: **if a logical downstream scope depends on a preparation result, that preparation belongs in the logical state chain.**
+
+A second lesson came from the central documentation index. Rebuilding the global index at the end of every parallel library documentation job looked harmless because the operation itself was cheap. It was not harmless. While one job enumerated the global documentation tree, another job could be deleting and recreating its own output directory. The observed index size therefore varied with timing.
+
+The corrected model separates aggregation from production. Individual documentation jobs create only their own library output. The central index may be refreshed once from the existing tree before a long run, but its authoritative final refresh happens only after the parallel and deferred collection documentation work has settled.
+
+```mermaid
+flowchart LR
+   A[Library A docs] --> S[Stable documentation tree]
+   B[Library B docs] --> S
+   C[Boost collection scopes] --> S
+   P[PDF jobs] --> S
+   S --> I[One final central index]
+```
+
+This was a large step for the project because documentation stopped being a decorative tail of the build. It became another reproducible product pipeline with explicit tools, dependency boundaries, state, concurrency rules, diagnostics, and publication layout.
 
 And the documentation follows the same single-source principle as the build contracts: whenever a technical contract changes, the corresponding Markdown reference is changed with it.
 
@@ -722,7 +794,7 @@ The third proof is organisational:
 
 > **Knowing how to build a dependency is part of knowing how to own it.**
 
-BuildEngine turns component integration into a repeatable technical state: source, provenance, tools, build, tests, package, SBOM, licenses, documentation, security identity, risk view, and replacement path become connected rather than separate after-the-fact activities.
+BuildEngine turns component integration into a repeatable technical chain: source, provenance, tools, build, tests, package, SBOM, licenses, documentation, security identity, risk view, and replacement path become connected rather than separate after-the-fact activities.
 
 And the CI lesson is deliberately modest:
 
@@ -756,7 +828,12 @@ The goal is not a frozen showcase. The goal is a working system that continues t
 - transport and machine-to-machine protocols chosen independently for their own requirements;
 - a small number of declarative contracts instead of CI knowledge spread across scripts and responsibilities;
 - one technical source of truth from which build, state, metadata, licenses, SBOM, and documentation can be derived;
+- logical persistent state that follows the actual dependency graph instead of duplicating it in per-Action fingerprints;
 - maximum useful parallelism while preserving dependency correctness;
+- one Doxygen analysis per documentation scope producing HTML and optional LaTeX together;
+- portable, explicitly prepared MiKTeX and isolated downstream PDF compilation rather than hidden workstation state;
+- collection documentation discovered from published structure instead of maintained as a second module list;
+- aggregate documentation generated from a stable tree rather than from timing-dependent parallel snapshots;
 - shared C++ domain logic across console, native UI, and web interfaces;
 - live Markdown documentation with links and managed rendering capabilities;
 - SBOM and scanners as strong controls;
