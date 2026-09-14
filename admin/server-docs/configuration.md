@@ -96,7 +96,7 @@ The exact local worker counts, endpoint values, and feature switches are deploym
 | `configurations` | Default build variants, for example `All` |
 | `buildTools` | Synchronized managed-tool contract |
 | `toolsState` | Generated effective tool state |
-| `machineState` | Generated machine/job state |
+| `machineState` | Generated machine/job state summary; not the per-library persistent current-state authority |
 | `sourceRoot` | Downloaded/extracted source area |
 | `buildRoot` | Build and generated-work area |
 | `installRoot` | Installed package root |
@@ -129,7 +129,7 @@ If `BuildEngine.xml` exists in its working directory, it is used automatically. 
 
 `WithDoxygen=false` is a hard stop for the central Doxygen pipeline. `WithLatex`, however, is an inheritable local default. `admin/build-documentation.xml` may override it for the project, and a library may independently override it again with `latex="true"` or `latex="false"`.
 
-When LaTeX is effective, BuildEngine does **not** start Doxygen a second time. The normal Doxygen invocation produces HTML and LaTeX in one pass; MiKTeX is then requested only for the separate PDF compilation step.
+When LaTeX is effective, BuildEngine does **not** start Doxygen a second time. The normal Doxygen invocation for that documentation scope produces HTML and LaTeX in one pass; MiKTeX is then requested only for the separate PDF compilation step. Collection libraries can have many root/module documentation scopes, but the one-Doxygen-run-per-scope rule remains unchanged.
 
 ## Concurrency model
 
@@ -153,13 +153,15 @@ $$
 
 For a four-worker scheduler, $N_{workers}=4$.
 
+Parallelism is applied to independent technical Actions and logical jobs, but shared mutable prerequisites are kept explicit. The current documentation example is MiKTeX: one runtime preflight initializes shared `pdflatex` state before independent PDF jobs are allowed to run in parallel. The central documentation index is an aggregate and is rebuilt after parallel documentation work has settled instead of being regenerated concurrently by each library job.
+
 ## Administration XML files
 
 ### `admin/build-tools.xml`
 
-Defines reproducible tools and browser assets. A tool may be discovered from an existing installation or managed by BuildEngine through download, extraction/generation, launcher, and probe steps. Examples include Git, CMake, Ninja, Doxygen, Graphviz, MiKTeX, compiler tools, and the managed JavaScript resources used by the documentation server.
+Defines reproducible tools and browser assets. A tool may be discovered from an existing installation or managed by BuildEngine through download, extraction/generation, launcher, preparation, and probe steps. Examples include Git, CMake, Ninja, Doxygen, Graphviz, MiKTeX, compiler tools, and the managed JavaScript resources used by the documentation server.
 
-MiKTeX is a `when-used` tool. It is provisioned only when the effective documentation configuration enables LaTeX/PDF for at least one library.
+MiKTeX is a `when-used` tool. It is provisioned only when the effective documentation configuration enables LaTeX/PDF for at least one library. The current managed path is portable and isolated; its preparation contract installs and verifies the package surface required by the pinned Doxygen LaTeX templates before any library PDF job is allowed to run with automatic package installation disabled.
 
 The complete XML vocabulary is documented in [build-tools.md](build-tools.md); the currently configured tools are listed in [tools.md](tools.md).
 
@@ -184,13 +186,15 @@ A reduced example illustrates the shared-contract/variant model:
 </library>
 ```
 
-The contract and its actions are documented in [build-libraries.md](build-libraries.md).
+The library `timestamp` is the library-local contract-change token used by the logical persistent-state chain. The contract and its Actions are documented in [build-libraries.md](build-libraries.md).
 
 ### `admin/build-documentation.xml`
 
-Defines the shared documentation profile and library-specific overrides. It controls whether Doxygen and LaTeX/PDF are used, source visibility, public-only extraction, predefined macros, Doxygen options, and exclusion patterns.
+Defines the shared documentation profile and library-specific overrides. It controls whether Doxygen and LaTeX/PDF are used, source visibility, public-only extraction, predefined macros, Doxygen options, exclusion patterns, and collection behavior.
 
 The root profile is inherited by every library. For `latex`, omission at the root means inheritance from local `WithLatex`; a root `latex` value overrides that local default for the synchronized project, and a library node may override it again. A library node is an override, not an allow-list.
+
+`collection="true"` is library-specific. It tells BuildEngine to discover a collection from the first directory level of the published API tree. Module names are therefore derived from the actual published structure; `<override module="...">` changes the Doxygen profile only for a module that is really discovered.
 
 The complete parameter reference and the single-pass HTML/LaTeX pipeline are documented in [documentation.md](documentation.md).
 
@@ -204,7 +208,15 @@ Generated tool state. It records the effective resolved tool roots and versions 
 
 ### `admin/machine-state.xml`
 
-Generated machine/job state. It is not a replacement for the per-library technical step-state files; it provides the broader execution-state view used by BuildEngine.
+Generated machine/job state. It provides the broader execution-state view used by BuildEngine and its presentation surfaces. It is **not** the per-library persistent current-state authority.
+
+The persistent library scope states live below:
+
+```text
+<ProductionRoot>/.buildengine/libraries/<library>/<version>/<safe-scope>.state
+```
+
+Each completed state records the library timestamp plus the timestamp and `completedAt` of its direct upstream library scopes. See [build-libraries.md](build-libraries.md) for the state contract.
 
 ### `admin/schemas/*.xsd`
 
@@ -247,7 +259,7 @@ The configuration file, when supplied, must be the final command-line argument a
 
 ### `--make`
 
-Default command. Continues an incremental build from the first technical step that is not current for the configured library timestamp and fingerprint state.
+Default command. Evaluates the logical scope states against the current library timestamps and the stored timestamp/`completedAt` references of their direct upstream library scopes. A scope whose state is missing or no longer matches executes again; current scopes are reused.
 
 ```text
 BuildEngine --make
@@ -255,7 +267,7 @@ BuildEngine --make
 
 ### `--build`
 
-Performs a clean build for the selected scope and ignores incremental technical state.
+Forces execution for the selected build scope instead of reusing logical current state.
 
 ```text
 BuildEngine --build --config=Release,Debug
@@ -263,11 +275,13 @@ BuildEngine --build --config=Release,Debug
 
 ### `--check`
 
-Synchronizes administration repositories, inspects library/version state, and reports which phases would execute on the next `--make`. It does not perform library source/build/install work.
+Synchronizes administration repositories, inspects library/version logical scope state, and reports which phases are current or would require execution. It does not perform library source/build/install work.
 
 ```text
 BuildEngine --check --lib=ace-tao --libversion=8.0.6
 ```
+
+Historical per-Action state may be recognized as migration evidence where it exactly matches the expected logical scope. New persistent state is written at logical-scope granularity.
 
 ### `--show`
 
@@ -320,7 +334,7 @@ The CLI already parses `--lib` and `--libversion` for commands such as `--check`
 | Goal | Command |
 | --- | --- |
 | Incremental default build | `BuildEngine --make` |
-| Clean Release + Debug build | `BuildEngine --build --config=Release,Debug` |
+| Forced Release + Debug build | `BuildEngine --build --config=Release,Debug` |
 | Inspect ACE/TAO state | `BuildEngine --check --lib=ace-tao --libversion=8.0.6` |
 | Show effective configuration | `BuildEngine --show D:\config\BuildEngine.xml` |
 | Security monitor | `BuildEngine --monitor` |
@@ -336,7 +350,8 @@ The CLI already parses `--lib` and `--libversion` for commands such as `--check`
 - [ ] Worker and queue settings match the target machine.
 - [ ] Required test/documentation switches are explicit.
 - [ ] `WithLatex` has the intended local default and any project/library overrides are deliberate.
-- [ ] `tools.xml` and technical state are treated as generated state rather than hand-authored library knowledge.
+- [ ] Collection documentation settings and module overrides are deliberate where `collection="true"` is used.
+- [ ] `tools.xml`, `machine-state.xml`, and logical library scope state are treated as generated state rather than hand-authored library knowledge.
 - [ ] Contract changes and their Markdown reference pages are updated together.
 
 ## Related documentation
