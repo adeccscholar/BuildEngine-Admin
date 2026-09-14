@@ -2,13 +2,14 @@
 
 [TOC|Content]
 
-`admin/build-libraries.xml` is the central declarative build contract for the C and C++ libraries managed by BuildEngine. It describes versions, dependencies, sources, build actions, installation rules, publication, smoke tests, security metadata, and any remaining optional upstream documentation phases.
+`admin/build-libraries.xml` is the central declarative build contract for the C and C++ libraries managed by BuildEngine. It describes versions, dependencies, sources, build actions, installation rules, publication, smoke tests, security metadata, human-facing library metadata, and any remaining optional upstream documentation phases.
 
 Related documents:
 
 - [Tool contract `build-tools.xml`](build-tools.md)
 - [Tool overview](tools.md)
 - [Documentation contract](documentation.md)
+- [Integrated third-party libraries](libraries.md)
 - [BuildEngine configuration](configuration.md)
 
 The schema is located at `admin/schemas/build-libraries.xsd`. The current contract uses `schemaVersion="14"`.
@@ -19,9 +20,13 @@ The schema is located at `admin/schemas/build-libraries.xsd`. The current contra
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:noNamespaceSchemaLocation="schemas/build-libraries.xsd"
                 schemaVersion="14">
-   <library id="example" version="1.2.3" timestamp="2026-09-12T18:00:00Z">
+   <library id="example" version="1.2.3" category="network"
+            timestamp="2026-09-12T18:00:00Z">
       <dependency library="zlib" version="1.3.2"/>
-      <metadata .../>
+      <metadata name="Example Library"
+                description="One-line statement of the library's purpose."
+                supplier="Example Project"
+                homepage="https://example.invalid/"/>
       <security>...</security>
       <source>...</source>
       <build>...</build>
@@ -37,11 +42,16 @@ The schema is located at `admin/schemas/build-libraries.xsd`. The current contra
 
 | Attribute | Meaning |
 | --- | --- |
-| `id` | Unique library ID within BuildEngine. |
-| `version` | Exact version built by the contract. |
+| `id` | Unique logical library ID within BuildEngine. It is used by dependency references, scheduler job IDs, package paths and persistent state. |
+| `version` | Exact logical upstream version represented by this library entry. |
+| `category` | Optional stable inventory grouping such as `compression`, `graphics`, `middleware`, `testing`, or `data`. The public library overview uses the same grouping. |
 | `timestamp` | Modification time of the library contract. It is the library-local change token used by logical scope state and must be changed only when the technical contract of that library actually changes. |
 
 Version numbers should not be duplicated unnecessarily in build/install path constants when the path is already formed from contract variables. The version remains contract data and is inserted into paths through variables.
+
+A `library` is primarily a **logical BuildEngine unit**. Usually that logical boundary also has its own workspace, build tree and package directory. It is not, however, a requirement that an upstream project physically writes into an isolated directory. When an upstream build system deliberately shares one producer tree between logical products, the XML may describe that physical relationship explicitly instead of inventing a filesystem split that upstream does not have.
+
+ACE and TAO are the current important example: they are separate logical libraries for dependency/state/metadata/SBOM purposes, but TAO continues in the already prepared variant-specific ACE `ACE_wrappers` tree. `TAO_ROOT` is below `ACE_ROOT`, and the generated ACE and TAO artifacts share `ACE_wrappers\bin` and `ACE_wrappers\lib`.
 
 ## Dependencies
 
@@ -54,11 +64,13 @@ A dependency describes an explicit BuildEngine dependency. BuildEngine can deriv
 
 Dependencies must not be replaced by accidental file discovery: the contract remains authoritative. The execution DAG is also the basis for the persistent upstream state chain: downstream logical scopes remember the timestamp and completion identity of their direct upstream library scopes instead of maintaining an unrelated global dependency fingerprint.
 
+Dependencies describe **logical ownership and ordering**, not necessarily independent upstream output directories. For example, TAO declares ACE as a direct dependency even though TAO's native build writes into the same physical `ACE_wrappers` producer tree prepared by ACE. Metadata/SBOM generation therefore reports ACE as TAO's direct dependency and OpenSSL/Xerces-C/zlib as transitive dependencies while the producer layout remains faithful to upstream.
+
 ## Metadata
 
 ```xml
 <metadata name="Example Library"
-          category="network"
+          description="Client-side URL transfer library with HTTP(S) and related protocol support."
           supplier="Example Project"
           homepage="https://example.invalid/">
    <license name="MIT" spdx="MIT" file="LICENSE">
@@ -69,16 +81,59 @@ Dependencies must not be replaced by accidental file discovery: the contract rem
 
 | Field | Purpose |
 | --- | --- |
-| `name` | Display name. |
-| `category` | Grouping in UI and documentation. |
-| `supplier` | Upstream vendor/project. |
-| `homepage` | Upstream project page. |
+| `name` | Human-readable display name of the upstream library/project. |
+| `description` | Concise one-line statement of the library's purpose. It describes **what the library is**, not its BuildEngine integration status. The same wording is suitable for library inventories, generated package information, and a CycloneDX component description. |
+| `category` | Optional metadata-level grouping. The established contract-wide inventory grouping is `library/@category`; metadata category should not be used to create a conflicting second classification. |
+| `supplier` | Upstream vendor, organization, or project responsible for the component. |
+| `homepage` | Canonical upstream project/product page. |
 | `license/@name` | Human-readable license name. |
 | `license/@spdx` | SPDX identifier where unambiguous. |
 | `license/@licensor` | Optional licensor. |
 | `license/@file` | License file in source/package context. |
+| `license/summary` | Optional short license summary/evidence text. |
 
-This metadata flows into package information, SBOMs, and documentation.
+The purpose description and the integration notes are deliberately separate. A description should remain useful even when compiler flags, patches, tests, or package layout change. Build-specific facts belong in `libraries.md` and the technical contract.
+
+Contract metadata supplements automatically detected upstream evidence. Where BuildEngine has an explicit metadata override, the explicit value is authoritative for that field.
+
+### One-line descriptions
+
+Every managed logical library should have a concise `metadata/@description`. The current inventory is kept aligned with the descriptions in [libraries.md](libraries.md). Adding or splitting a logical library therefore requires updating the XML metadata and the documentation inventory together.
+
+## ACE/TAO: logical split with shared physical output
+
+The ACE/TAO integration demonstrates why logical and physical boundaries must not be confused. The intended contract shape is:
+
+```xml
+<library id="ace" version="8.0.6" category="middleware" timestamp="...">
+   <dependency library="openssl" version="3.5.8"/>
+   <dependency library="xerces-c" version="3.3.0"/>
+   <dependency library="zlib" version="1.3.2"/>
+   <metadata name="ACE"
+             description="Adaptive Communication Environment providing portable networking, concurrency, IPC, and OS abstraction."/>
+   ...
+</library>
+
+<library id="tao" version="4.0.6" category="middleware" timestamp="...">
+   <dependency library="ace" version="8.0.6"/>
+   <metadata name="TAO"
+             description="CORBA object request broker and middleware services built on top of ACE."/>
+   ...
+</library>
+```
+
+The two logical entries still originate from the ACE+TAO release family. The split means:
+
+- `ace` and `tao` have separate scheduler identities and persistent state;
+- TAO has the direct dependency `tao -> ace`;
+- TAO metadata/SBOM therefore includes ACE directly and ACE's dependencies transitively;
+- ACE owns preparation of the variant-specific `ACE_wrappers` producer tree;
+- TAO continues building **inside that existing tree** rather than copying it into an artificial TAO build tree;
+- `ACE_ROOT` denotes the shared `ACE_wrappers` root and `TAO_ROOT` remains `ACE_ROOT\TAO`;
+- `ACE_ROOT\bin` and `ACE_ROOT\lib` are shared upstream output directories for both ACE and TAO;
+- package installation may assign ACE-specific and TAO-specific artifacts to different logical packages, but that package ownership must not be mistaken for separate native producer directories.
+
+This is an explicit modeling of the upstream build layout, not a generic recommendation that unrelated libraries should share output directories.
 
 ## Security metadata
 
@@ -265,6 +320,8 @@ For normal build contracts, installation is split into two levels:
 
 Shared libraries with DLL plus import library are the project default. Static artifacts, when additionally produced, must have clearly distinguishable names.
 
+Installation describes the **package view**, not necessarily the exact shape of the native producer tree. In a shared producer layout such as ACE/TAO, install actions select the files that belong to each logical package from the common native output tree. They must not require the upstream producer to emit separate physical `bin`/`lib` directories when it does not do so.
+
 ## Publication with `<publish>`
 
 `publish` creates the consumable SDK/package view from the installed state.
@@ -334,6 +391,8 @@ Contracts use resolved variables instead of hard-coded machine paths. Typical ex
 
 The concrete variables available depend on the action context. Paths and commands should be assembled declaratively from these values.
 
+A variable should describe the current logical library unless the contract intentionally references another library's physical tree. ACE/TAO is such an explicit case: TAO can refer to ACE's known versioned producer path because the upstream products intentionally share `ACE_wrappers`; this must remain visible in the XML rather than being hidden behind an unrelated BuildEngine-wide abstraction.
+
 ## Logical persistent state
 
 BuildEngine does not decide that a phase is current merely because its output files exist. Persistent state belongs to the logical library scope represented by the scheduler DAG.
@@ -367,6 +426,8 @@ The important rules are:
 
 This directly links incremental reuse to the DAG that expresses the real execution dependencies. A changed upstream completion invalidates its downstream chain without requiring a global aggregate fingerprint that would rebuild unrelated libraries.
 
+A shared physical producer tree does not merge logical state. After the ACE/TAO split, ACE and TAO retain separate state identities even though TAO continues in ACE's native output tree. TAO's state chain references ACE as upstream; the filesystem layout is not used as a substitute for that dependency relationship.
+
 Legacy per-Action state files can still be recognized as migration evidence where their exact scope, timestamp, and expected Action count match. They are not the format written by new logical state commits.
 
 ## Change rules
@@ -375,12 +436,13 @@ When changing a library contract:
 
 1. Change only the library that is actually affected.
 2. Update that library's `timestamp` when its technical contract changes.
-3. Do not duplicate version numbers unnecessarily in path constants.
-4. Do not silently replace the BCC64X integration target with an alternative compiler/toolchain.
-5. Do not disable tests without analysis.
-6. Update source hashes, patch binding, and security evidence when the source version changes.
-7. Extend this Markdown documentation when semantics or XML vocabulary change.
+3. Keep `metadata/@description` as a concise purpose statement and update `libraries.md` with the same semantic description.
+4. Do not duplicate version numbers unnecessarily in path constants. Explicit cross-library producer references are allowed only where the upstream physical layout genuinely requires them and must be documented.
+5. Do not silently replace the BCC64X integration target with an alternative compiler/toolchain.
+6. Do not disable tests without analysis.
+7. Update source hashes, patch binding, and security evidence when the source version changes.
+8. Extend this Markdown documentation when semantics or XML vocabulary change.
 
 ## Maintenance rule
 
-`build-libraries.xml`, its XSD, and this document are maintained together. A new XML feature is considered fully integrated only when its semantics are documented here as well.
+`build-libraries.xml`, its XSD, [libraries.md](libraries.md), and this document are maintained together. A new XML feature is considered fully integrated only when its semantics are documented here as well.
