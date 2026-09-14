@@ -50,13 +50,27 @@
       <xs:attribute name="file" type="xs:string" use="optional"/>
    </xs:complexType>
    <xs:complexType name="libraryMetadataType">
+      <xs:annotation>
+         <xs:documentation>Human-facing and SBOM metadata for one logical BuildEngine library. Contract metadata overrides automatically detected upstream values where both are present.</xs:documentation>
+      </xs:annotation>
       <xs:sequence>
          <xs:element name="license" type="licenseMetadataType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
-      <xs:attribute name="name" type="xs:string" use="optional"/>
-      <xs:attribute name="category" type="xs:string" use="optional"/>
-      <xs:attribute name="supplier" type="xs:string" use="optional"/>
-      <xs:attribute name="homepage" type="xs:anyURI" use="optional"/>
+      <xs:attribute name="name" type="xs:string" use="optional">
+         <xs:annotation><xs:documentation>Human-readable display name of the upstream library or project.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="category" type="xs:string" use="optional">
+         <xs:annotation><xs:documentation>Optional metadata grouping. The established contract-wide inventory category is library/@category.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="description" type="xs:string" use="optional">
+         <xs:annotation><xs:documentation>Concise one-line description of the library's purpose. It is suitable for generated documentation, package metadata and the CycloneDX component description.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="supplier" type="xs:string" use="optional">
+         <xs:annotation><xs:documentation>Upstream vendor, organization or project responsible for the library.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="homepage" type="xs:anyURI" use="optional">
+         <xs:annotation><xs:documentation>Canonical upstream project or product page.</xs:documentation></xs:annotation>
+      </xs:attribute>
    </xs:complexType>
    <xs:complexType name="securityRepositoryType">
       <xs:attribute name="url" type="xs:anyURI" use="required"/>
@@ -304,8 +318,18 @@
                      <xs:element name="publish" type="publishType" minOccurs="0"/>
                      <xs:element name="smoke" type="librarySmokeType" minOccurs="0" maxOccurs="unbounded"/>
                   </xs:sequence>
-                  <xs:attribute name="id" type="xs:string" use="required"/><xs:attribute name="version" type="xs:string" use="required"/>
-                  <xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
+                  <xs:attribute name="id" type="xs:string" use="required">
+                     <xs:annotation><xs:documentation>Unique logical library ID within BuildEngine. It is used in job IDs, package paths, state paths and dependency references.</xs:documentation></xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="version" type="xs:string" use="required">
+                     <xs:annotation><xs:documentation>Logical upstream version represented by this library entry.</xs:documentation></xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="category" type="xs:string" use="optional">
+                     <xs:annotation><xs:documentation>Stable inventory grouping used by the public library overview and related documentation.</xs:documentation></xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="timestamp" type="xs:dateTime" use="required">
+                     <xs:annotation><xs:documentation>Library-local contract change token used by logical persistent state. Change it when the technical contract of this logical library changes.</xs:documentation></xs:annotation>
+                  </xs:attribute>
                </xs:complexType>
             </xs:element>
          </xs:sequence>
