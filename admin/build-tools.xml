@@ -69,7 +69,7 @@
 
    <tool id="pkg-config" version="0.28-1" runtimeVersion="0.28" required="always">
       <managed root="pkg-config-lite\0.28-1" executable="pkg-config-lite-0.28-1\bin\pkg-config.exe">
-         <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download" archive="pkg-config-lite-0.28-1.zip" sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
+         <download url="https://sourceforge.net/projects/pkgconfiglite/files/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip/download" archive="pkg-config-lite-0.28-1_bin-win32.zip" sha256="2038c49d23b5ca19e2218ca89f06df18fe6d870b4c6b54c0498548ef88771f6f"/>
       </managed>
       <probe contains="0.28"><argument value="--version"/></probe>
    </tool>
@@ -223,7 +223,7 @@
    <tool id="llvm-cov" version="20.1.7" required="always">
       <managed root="llvm\20.1.7" executable="bin\llvm-cov.exe">
          <download url="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/clang%2Bllvm-20.1.7-x86_64-pc-windows-msvc.tar.xz" archive="clang+llvm-20.1.7-x86_64-pc-windows-msvc.tar.xz" sha256="34a66bb4891584b32d32bbe5f129e345899b255593dab2c359b730b92e304b3e"/>
-         <nativeExtract format="libarchive" root="clang+llvm-20.1.7-x86_64-pc-windows-msvc"><include path="bin/llvm-cov.exe"/><include path="bin/*.dll"/><include path="LICENSE.TXT"/></nativeExtract>
+         <nativeExtract format="libarchive" root="clang+llvm-20.1.7-x86_64-pc-windows-msvc"><include path="bin/llvm-cov.exe"/><include path="bin/*.dll"/><include path="LICENSE.TXT"/><require path="bin/llvm-cov.exe"/></nativeExtract>
       </managed>
       <probe contains="LLVM version 20.1.7"><argument value="--version"/></probe>
    </tool>
