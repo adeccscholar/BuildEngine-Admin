@@ -2,84 +2,84 @@
 
 [TOC|Content]
 
-`admin/build-libraries.xml` is the executable declarative contract for the C and C++ libraries managed by BuildEngine. It describes logical library identity, exact versions, dependencies, source acquisition, source and producer preparation, build variants, tests, installation, publication, smoke tests, metadata, security evidence, documentation, and library extensions.
+**Status:** current declarative contract as of 15 September 2026. The active `admin/build-libraries.xml` uses **schemaVersion 15** and `schemas/build-libraries.xsd`.
+
+`admin/build-libraries.xml` is the executable declarative contract for C and C++ libraries managed by BuildEngine. It describes logical library identity, exact versions, dependencies, source acquisition/preparation, build variants, tests, installation, publication, smoke tests, metadata/security evidence, documentation and library extensions.
 
 Related documents:
 
 - [Library extensions](library-extensions.md)
-- [Integrated third-party libraries](libraries.md)
 - [Documentation pipeline](documentation.md)
+- [Integrated libraries](libraries.md)
 - [Tool contract](build-tools.md)
 - [BuildEngine architecture](buildengine.md)
 - [Server](server.md)
 
-The prepared ACE/TAO split uses **schema 15**. Until `admin/ace-tao.xml` has been copied into the production contract, the large active XML can still show schema 14 and the old combined `ace-tao` entry.
-
 ## Contract authority
 
-The XML is the source of build knowledge. Runtime code evaluates that contract; it must not contain hidden per-library alternatives.
+The XML is the source of library/build knowledge. Runtime code evaluates this contract; it must not contain hidden per-library alternatives.
 
 ```mermaid
 flowchart TD
-    XML[build-libraries.xml] --> XSD[build-libraries schema]
-    XML --> BE[BuildEngine scheduler]
-    XML --> C[BuildEngine-Common catalog]
-    C --> S[BuildEngine Server and applications]
-    BE --> STATE[Logical state]
-    BE --> ART[Artifact manifests]
-    BE --> PKG[Installed payload]
+    XML[build-libraries.xml schema 15] --> XSD[schemas/build-libraries.xsd]
+    XML --> BE[BuildEngine]
+    XML --> C[BuildEngine-Common LibraryCatalog]
+    BE --> STATE[Logical scope state]
+    BE --> ART[Artifact evidence]
+    BE --> PKG[Physical payload]
     BE --> META[Metadata / SBOM]
+    C --> S[Server / Manager / consumers]
 ```
 
-Common/DLL is the leading shared interpretation. Applications do not reconstruct a second repository model from physical directory scans.
+Common/DLL is the leading shared interpretation for logical library/extension repository semantics. Applications do not reconstruct a second catalog from physical package directories.
 
 ## Basic structure
 
 ```xml
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:noNamespaceSchemaLocation="schemas/build-libraries-v15.xsd"
+                xsi:noNamespaceSchemaLocation="schemas/build-libraries.xsd"
                 schemaVersion="15">
    <library id="example"
             version="1.2.3"
             category="network"
-            timestamp="2026-09-14T14:38:00Z">
+            timestamp="2026-09-15T00:00:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <metadata name="Example Library"
-                description="One-line statement of the library's purpose."
+                description="One-line statement of the library purpose."
                 supplier="Example Project"/>
       <source>...</source>
       <build>...</build>
-      <publish ...>...</publish>
-      <smoke .../>
+      <install>...</install>
+      <publish>...</publish>
    </library>
 </buildLibraries>
 ```
 
-## `<library>`
+## `<library>` identity
 
 | Attribute | Meaning |
 | --- | --- |
-| `id` | Unique logical library ID used by DAG, state, metadata, documentation and manifests. |
+| `id` | Unique logical library ID used by DAG, state, metadata, documentation and evidence. |
 | `version` | Exact logical upstream version. |
-| `category` | Stable inventory grouping such as `compression`, `graphics`, `middleware`, `testing`, or `data`. |
-| `timestamp` | Library-local contract change token. Change it when that logical library's technical contract changes. |
+| `category` | Stable inventory grouping. |
+| `timestamp` | Logical contract-change token for this library. |
 
-A logical library normally owns a separate physical package, but this is not mandatory. Upstream software may intentionally share source, producer, or installation areas.
+A logical library normally owns a separate physical package, but this is not mandatory. Extension libraries may share source, producer or installation areas.
 
-## Metadata and description
+A physical directory is never itself the logical identity.
 
-```xml
-<metadata name="curl"
-          description="Client-side URL transfer library with HTTP(S) and related protocol support."
-          supplier="curl project"
-          homepage="https://curl.se/">
-   <license name="curl License" file="COPYING"/>
-</metadata>
-```
+## Metadata
 
-`metadata/@description` is a concise one-line purpose description. It is not a build-status field. It is consumed by metadata/CycloneDX, the Common library catalog, and server presentation.
+`metadata/@description` is a concise one-line purpose description. It is not build status.
 
-License declarations remain evidence/override data. Source evidence is preferred where it can be discovered reliably.
+Metadata can feed:
+
+- Common library catalog,
+- CycloneDX component information,
+- Server/Manager presentation,
+- generated documentation.
+
+License declarations are evidence/override data; declared upstream license text is not rewritten by BuildEngine.
 
 ## Dependencies
 
@@ -88,19 +88,13 @@ License declarations remain evidence/override data. Source evidence is preferred
 <dependency library="zlib" version="1.3.2"/>
 ```
 
-Dependencies define logical graph relationships for ordering, state, package prerequisites, metadata, and SBOM.
+Dependencies define logical relationships used by the DAG, state, package prerequisites, metadata and SBOM.
 
-```mermaid
-flowchart LR
-    Z[zlib 1.3.2] --> C[curl 8.21.0]
-    O[OpenSSL 3.5.8] --> C
-```
-
-Filesystem proximity is not a dependency declaration.
+Filesystem proximity does not create a dependency.
 
 ## Library extensions
 
-Schema 15 adds `<extension>` for a logically independent component that deliberately reuses a base library's physical structures.
+Schema 15 supports a logically independent component that intentionally reuses a base library's physical structures.
 
 ```xml
 <library id="tao" version="4.0.6" category="middleware" timestamp="...">
@@ -116,117 +110,87 @@ Schema 15 adds `<extension>` for a logically independent component that delibera
 </library>
 ```
 
-The extension edge is the direct ACE relationship; TAO must not repeat ACE as a normal dependency.
+The extension edge is the direct base relationship and must not be duplicated as an ordinary dependency.
 
-| Extension field | Meaning |
+| Field | Meaning |
 | --- | --- |
-| `library` | Base logical library ID. |
-| `version` | Exact base version. |
-| `source` | Extension source subtree below the base source root. |
-| `producer` | Shared producer root below the base variant build directory. |
-| `install` | Overlay root below the base payload; `.` means the exact base payload. |
-| `shared/@path` | Producer subtrees intentionally shared by base and extension. |
+| `library` | exact base logical library ID |
+| `version` | exact base version |
+| `source` | extension source subtree below base source |
+| `producer` | shared producer root below the base variant workspace |
+| `install` | overlay root below base payload; `.` means same payload root |
+| `shared/@path` | deliberately shared producer areas |
 
-See [Library extensions](library-extensions.md) for the full semantics.
+See [Library extensions](library-extensions.md).
 
 ## Source contract
 
-Normal source actions can include:
+Source Actions may include download, extract, copy, execute, target and other generic Actions.
 
-- `download`;
-- `extract`;
-- `copy`;
-- `execute`;
-- `target`.
+Technical Actions remain execution/diagnostic units inside the logical `source` scope. They are not independent persistent Current-State files.
 
-Technical actions remain execution/diagnostic units inside the logical `source` scope. They are not independent persistent state files.
+For an extension, shared source acquisition belongs to the base. An extension must not download/extract a second copy of the same upstream archive.
 
-For an extension, source acquisition remains owned by the base. The runtime does not permit the extension to create a second base archive through its own `download`/`extract`.
-
-An extension source block may be used for preparation-only actions where timing is appropriate, but a shared producer introduces an important distinction: changing the base workspace **after** that producer has already been copied does not change the producer. Variant-specific repairs that must affect an existing producer therefore belong in the extension's variant build preparation.
-
-ACE/TAO uses exactly this rule:
-
-```mermaid
-flowchart TD
-    S[ACE source + common patches] --> CR[Copy Release ACE_wrappers]
-    S --> CD[Copy Debug ACE_wrappers]
-    CR --> AR[ACE.mwc Release]
-    CD --> AD[ACE.mwc Debug]
-    AR --> PR[TAO SSLIOP patch in Release producer]
-    AD --> PD[TAO SSLIOP patch in Debug producer]
-    PR --> TR[TAO.mwc Release]
-    PD --> TD[TAO.mwc Debug]
-```
-
-The TAO-only SSLIOP patch is therefore applied directly to `{ExtensionProducerRoot}` immediately before `TAO.mwc` for each variant.
+Variant-specific patches that must affect an already copied shared producer belong to the corresponding producer-preparation/build sequence, not to a late mutation of an unrelated source workspace.
 
 ## Build variants
 
-Release and Debug are variants of one logical contract. Common parameters live in the common `<build>` node; only differences belong in `<variant>`.
+Release, Debug and future configurations are variants of one logical build contract.
 
-```mermaid
-flowchart LR
-    B[Shared build contract] --> R[Release additions]
-    B --> D[Debug additions]
-    R --> BR[build:Release]
-    D --> BD[build:Debug]
+Common arguments/environment belong in the common build node. Variant nodes contain only differences.
+
+Separate variant directories permit Release/Debug parallelism without collisions.
+
+Dependency mapping stays variant-correct:
+
+```text
+Release -> Release
+Debug   -> Debug
 ```
-
-Separate variant directories allow useful parallelism without collisions.
 
 ## Tests and validation
 
-Test/validation actions remain enabled unless failures have been investigated and a deliberate contract decision says otherwise. Typical logical scopes are `test:Release`, `test:Debug`, `validation:Release`, and `validation:Debug`.
+Tests remain enabled unless a technical investigation justifies a deliberate exception.
+
+Typical logical scopes include:
+
+```text
+test:Release
+test:Debug
+validation:Release
+validation:Debug
+```
 
 ## Installation
 
-Compiled libraries normally use:
+Compiled libraries typically use variant-specific and common install actions.
 
-```xml
-<install>
-   <perVariant>...</perVariant>
-   <common>...</common>
-</install>
-```
+Shared DLL + import library is the preferred standard product shape where appropriate.
 
-`perVariant` handles DLLs/import libraries/tools. `common` handles headers, licenses and other variant-independent files.
+### Shared extension payloads
 
-Shared/DLL plus import library is the default product shape unless the upstream library is intrinsically header-only or the contract explicitly defines another product.
+Extensions may overlay a base payload. Physical operations need the dependencies/barriers required by the **actual shared resource**, not automatically the strongest global library barrier.
 
-### Shared physical payloads
+For ACE/TAO this means:
 
-A library extension may overlay the base payload. The base must finish consuming its base-only payload before extension installation is released.
+- TAO compilation may proceed once its required ACE producer/artifact prerequisites exist;
+- a later ACE global consumer-publish failure does not by itself invalidate the fact that TAO compilation started;
+- an extension install/overlay must still not race an operation that is actively reading the same base-only payload.
 
-```mermaid
-flowchart TD
-    AI[Base installation] --> AINV[Base install inventory]
-    AINV --> AP[Base publish / smoke / ready]
-    AI --> AM[Base metadata / SBOM]
-    AP --> H[Extension artifact handoff]
-    AM --> H
-    H --> EI[Extension install overlay]
-    EI --> EINV[Extension install delta]
-```
-
-The artifact handoff for an extension waits for both base `ready` and base `metadata`. This prevents a shared physical package from being overlaid while the base library still reads it for publication, smoke validation, or metadata generation.
-
-The barrier is generic and does not know the names ACE or TAO.
+Do not encode an unconditional `base ready + metadata` rule when only a narrower producer/install evidence dependency is physically required.
 
 ## Artifact inventory and ownership
 
-BuildEngine records binary evidence after build and installation. The shared manifest model is part of BuildEngine-Common.
+Artifact jobs are Evidence helpers and do not create a second persistent Current-State hierarchy.
 
-Typical tracked types include DLL, EXE, LIB, PDB, BPL, DCP, TDS, and relevant Unix-style library formats.
-
-Each entry stores:
+The **target contract** for a relevant artifact entry is:
 
 - relative path;
 - size;
 - SHA-256;
-- state/relationship in the generated manifest.
+- where needed, relationship/classification such as `present`, `created`, `modified`.
 
-For a normal library this is an inventory. For an extension, the shared producer/payload is compared with the base inventory.
+For an extension:
 
 ```mermaid
 flowchart LR
@@ -234,110 +198,122 @@ flowchart LR
     AFTER[After extension] --> CMP
     CMP --> CREATED[created]
     CMP --> MODIFIED[modified]
-    CREATED --> OWN[automatic extension ownership]
-    MODIFIED --> REVIEW[shared / not automatically owned]
+    CREATED --> OWN[extension ownership candidate]
+    MODIFIED --> SHARED[shared / explicit handling]
 ```
 
-This evidence is also the basis for future safe cleanup. A file from an obsolete version may only be removed automatically if the current file still matches the owned manifest entry. A diverged file is kept and reported.
+`modified` is not automatically exclusive extension ownership.
 
-Artifact jobs use `artifact:*` identities and remain helper/evidence jobs, not a second persistent state hierarchy.
+### Known current implementation gap
+
+`BuildEngine-Common/src/ArtifactManifest.h` currently stores path and size, but no SHA-256. Same-size content changes are therefore not yet detected correctly.
+
+This implementation gap must be fixed before hash-safe cleanup or authoritative shared-payload ownership can be claimed.
 
 ## Publication
 
-`<publish>` creates the consumable SDK view. Publication and ownership are different concepts.
+`<publish>` creates a consumer view. Publication and ownership are different concepts.
 
-For TAO, a published SDK must be usable and therefore contains the ACE + TAO closure required by consumers. That does **not** make all included ACE files TAO-owned. Artifact manifests remain the ownership evidence.
+A consumable extension SDK may need files from its base closure, but including a base file in that consumer view does not make the extension its owner.
+
+Publish must consume the central artifact/ownership model.
+
+### Known current implementation gap
+
+Current Publish code still interprets other publish manifests as collision ownership too strongly. Stale publication evidence can block a current producer, especially with shared extension payloads.
+
+Publish manifests are publication Evidence, not an independent ownership authority.
 
 ## Smoke tests
 
-`scope="published"` validates the published SDK. `scope="package"` validates the package/payload directly. TAO uses package scope because the real payload is physically shared with ACE.
+Smoke tests validate the intended consumer/package contract. Their scope (`published`, package/payload or another declared contract) must match what is actually being proven.
 
-The existing TAO consumer smoke continues to prove headers, ACE/TAO import libraries, `tao_idl`, and CORBA usage from the installed shared payload.
+A shared physical payload does not imply shared logical component identity.
 
 ## Security metadata
 
-Repository/tag/commit identity and downloaded archive hashes are distinct evidence layers. They should not be conflated.
-
-```xml
-<security>
-   <repository url="https://github.com/DOCGroup/ACE_TAO.git"
-               ref="ACE+TAO-8_0_6"/>
-</security>
-```
+Repository/tag/commit identity and downloaded archive hashes are distinct evidence layers and remain separate from logical Current-State.
 
 ## Documentation
 
-The central `build-documentation.xml` policy and per-library documentation flags form the documentation contract. ACE and TAO now have separate active profiles and separate documentation coordinates.
+The central `build-documentation.xml` policy controls generated documentation.
 
-```mermaid
-flowchart LR
-    A[ACE API input] --> AD[ACE Doxygen]
-    T[TAO API input] --> TD[TAO Doxygen]
-    AD --> AH[ACE HTML]
-    AD --> AP[ACE LaTeX / PDF]
-    TD --> TH[TAO HTML]
-    TD --> TP[TAO LaTeX / PDF]
+A logical Doxygen scope produces HTML and optional LaTeX in one Doxygen run. Consumer publish is not semantically required merely to document an already installed/public API.
+
+For collection libraries such as Boost, the current contract is `1 + N` logical Doxygen scopes:
+
+```text
+1 root scope, non-recursive
+N first-level module scopes, recursive
 ```
+
+There is no logical `collection-prepare` scope and no separate logical module-PDF scope.
+
+See [Documentation pipeline](documentation.md).
 
 ## Persistent logical state
 
-Persistent state belongs to logical scopes such as:
+Persistent state belongs to logical scopes, for example:
 
-- `source`;
-- `build:Release`, `build:Debug`;
-- `test:*`, `validation:*`;
-- `install:Release`, `install:Debug`, `install:common`, `install`;
-- `publish`;
-- `metadata`;
-- `doxygen` and collection scopes;
-- `ready:*`, `ready`.
-
-Each state stores the library timestamp plus direct upstream references containing upstream library/version/scope/timestamp/`completedAt`.
-
-```mermaid
-flowchart LR
-    S[source] --> B[build:Release]
-    B --> T[test:Release]
-    T --> I[install:Release]
-    I --> IA[install]
-    IA --> M[metadata]
-    IA --> P[publish]
-    P --> R[ready:Release]
+```text
+source
+build:Release
+install:Release
+install
+publish
+metadata
+doxygen
+doxygen:root
+doxygen:<module>
+ready:Release
+ready
 ```
 
-Technical actions remain observable execution and diagnostic units inside these scopes.
+Canonical state:
 
-## Prepared ACE/TAO replacement
+```text
+timestamp=<library timestamp>
+upstream=<library>|<version>|<scope>|<upstream library timestamp>|<upstream completedAt>
+...
+completedAt=<completion timestamp>
+state=completed
+```
 
-`admin/ace-tao.xml` is the temporary complete replacement fragment for the current combined `ace-tao` entry.
+Fingerprints, technical Action IDs, output hashes and output existence are not Current-State authority.
 
-Activation steps:
+The scheduler must invalidate an old success before actually rerunning a stale/forced scope and commit only after success.
 
-1. replace the old `ace-tao` library block with the `ace` and `tao` elements from `ace-tao.xml`;
-2. set root `schemaVersion="15"`;
-3. set `xsi:noNamespaceSchemaLocation="schemas/build-libraries-v15.xsd"`;
-4. add the requested `metadata/@description` values to the remaining libraries;
-5. validate the resulting XML;
-6. execute the intended BCC64X build/test;
-7. delete `ace-tao.xml` after acceptance.
+## Common repository semantics
 
-The fragment retains TAO Naming Service, COS Event Service, and RT Event Service.
+The XML catalog is consumed by BuildEngine-Common. Extensions can resolve to:
 
-## BuildEngine variables
+```text
+physical payload != logical metadata/SBOM root
+```
 
-Common variables include `{LibraryId}`, `{LibraryVersion}`, `{ProductionRoot}`, `{SourceRoot}`, `{BuildRoot}`, `{InstallRoot}`, `{WorkspaceRoot}`, `{BDS}`, `{Tool:<id>}`, `{ToolVersion:<id>}`, and `{ENV:<name>}`.
+Known current Common gaps before full extension verification:
 
-Extension contexts additionally provide `{ExtensionLibraryId}`, `{ExtensionLibraryVersion}`, `{ExtensionWorkspace}`, `{ExtensionBaseSourceRoot}`, `{ExtensionSourceRoot}`, `{ExtensionBuildRoot}`, `{ExtensionProducerRoot}`, and `{ExtensionInstallRoot}`.
+- `LibraryExists()` / `VersionExists()` still use physical package paths;
+- extension `installed` is inferred too strongly from base payload existence;
+- PackageExporter is not yet ownership-safe for shared payloads.
+
+These are Common corrections, not reasons for application-specific workarounds.
 
 ## Maintenance rules
 
 When changing a library contract:
 
-1. change only that logical library's `timestamp` when its technical contract changes;
+1. change only the affected logical library timestamp when its technical contract changes;
 2. keep XML, XSD, Runtime, Common, applications and documentation aligned;
 3. preserve exact dependency versions;
-4. bind local patches to the matching source version;
-5. validate XML before the production run;
+4. bind local patches to exact source versions;
+5. validate XML before production execution;
 6. do not substitute another compiler for BCC64X failures;
-7. use Mermaid for architecture/process diagrams; text blocks are reserved for literal paths, data formats and filesystem examples;
-8. mark implementation **not verified** until the intended BCC64X build/run proves it.
+7. technical Actions do not become persistent State merely because they have IDs;
+8. artifact evidence does not become Current-State;
+9. physical paths do not define logical identity;
+10. mark implementation **not verified** until the intended BCC64X/Common/Server run proves it.
+
+## Current execution gate
+
+The project is in a static repair phase. No new full Build/Make/Check/Clean-Room run is started until the current P0/P1 repair list is complete.
