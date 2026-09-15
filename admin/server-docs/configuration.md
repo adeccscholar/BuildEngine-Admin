@@ -2,21 +2,30 @@
 
 [TOC|Content]
 
-BuildEngine combines a local XML parameter file with synchronized administration contracts. The local file selects the production tree, concurrency, repositories, feature switches, server endpoint, and contract locations; the Admin repository supplies the detailed tool, library, documentation, smoke-test, schema, and security definitions.
+**Status:** current configuration contract as of 15 September 2026. Known implementation gaps are documented in the related architecture/library/documentation pages. No new full verification run has been performed.
 
-Related reference documents:
+BuildEngine combines one local machine/deployment configuration with synchronized administration contracts.
 
+- `BuildEngine.xml` selects production root, concurrency, repository synchronization, feature switches and server endpoint.
+- `admin/build-tools.xml` describes managed tools.
+- `admin/build-libraries.xml` describes logical libraries, versions, dependencies and build contracts.
+- `admin/build-documentation.xml` describes shared documentation policy and library/collection overrides.
+- generated `tools.xml` / `machine-state.xml` are runtime evidence, not library knowledge.
+
+Related documents:
+
+- [BuildEngine architecture](buildengine.md)
+- [Library contract](build-libraries.md)
+- [Library extensions](library-extensions.md)
 - [Documentation contract](documentation.md)
 - [Server and REST interface](server.md)
-- [Tool contract `build-tools.xml`](build-tools.md)
-- [Library contract `build-libraries.xml`](build-libraries.md)
-- [Tool overview](tools.md)
+- [Tool contract](build-tools.md)
 
-## BuildEngine.xml
+## Local `BuildEngine.xml`
 
-The executable uses `BuildEngine.xml` next to the executable unless another configuration file is supplied as the final command-line argument.
+Unless explicitly supplied, BuildEngine uses the configuration file next to the executable according to the current CLI contract.
 
-A representative structure is:
+Representative structure:
 
 ```xml
 <buildEngine schemaVersion="5">
@@ -39,73 +48,82 @@ A representative structure is:
       WithDoxygen="true"
       WithLatex="true"
       configurations="All"
-      bootstrapTools="build-tools.xml"
       buildTools="admin\build-tools.xml"
       toolsState="admin\tools.xml"
       machineState="admin\machine-state.xml"
       toolsRoot="tools"
-      downloadsRoot="tools\downloads"
       sourceRoot="src"
       buildRoot="build"
       installRoot="install"
-      workspaceRoot="build\thirdparty-test"
       repositoriesRoot="repositories"
-      smokeTests="admin\smoke-tests.xml"
-      smokeRoot="smoketests"
-      demoRoot="demos"
       logsRoot="logs\buildengine"/>
 
    <repository id="admin"
                url="https://github.com/adeccscholar/BuildEngine-Admin.git"
                branch="main"
                checkout="BuildEngine-Admin">
-      <sync source="admin" target="admin">
-         <preserve path="libraries.xml"/>
-         <preserve path="tools.xml"/>
-         <preserve path="machine-state.xml"/>
-      </sync>
+      <sync source="admin" target="admin"/>
    </repository>
 
    <build file="admin\build-libraries.xml"/>
 </buildEngine>
 ```
 
-The exact local worker counts, endpoint values, and feature switches are deployment choices; the example above explains the structure rather than prescribing one machine configuration.
+Exact worker counts, local paths and endpoint values are deployment choices and not synchronized library knowledge.
 
-## Important parameter groups
+## Important parameters
 
-| Parameter | Purpose |
+| Parameter | Meaning |
 | --- | --- |
-| `companyName` | Branding used by generated documentation |
-| `rsvars` | C++Builder environment initialization script |
-| `root` | BuildEngine production root and central repository view used by the server |
-| `heartbeatSeconds` | Heartbeat interval for long-running work |
-| `workers` | Maximum concurrent scheduler workers |
-| `queueLength` | Scheduler queue capacity |
-| `testJobs` | Parallelism made available to supported test runners |
-| `serverLanguage` | Default server presentation language |
-| `serverAddress` | Concrete local IP interface for the HTTP listener; default `127.0.0.1` |
-| `serverName` | Logical DNS/server identity accepted by the server and used in URLs; default `localhost` |
-| `serverPort` | HTTP TCP port, range `1..65535`; default `8765` |
-| `managerLanguage` | Initial manager UI language |
-| `WithTests` | Enables upstream/library tests |
-| `WithSmokeTests` | Enables BuildEngine consumer smoke tests |
-| `WithDoc` | Enables generated library information documentation |
-| `WithDoxygen` | Permits Doxygen API documentation |
-| `WithLatex` | Local default for additional LaTeX output and the following MiKTeX PDF step; default is `true` |
-| `configurations` | Default build variants, for example `All` |
-| `buildTools` | Synchronized managed-tool contract |
-| `toolsState` | Generated effective tool state |
-| `machineState` | Generated machine/job state summary; not the per-library persistent current-state authority |
-| `sourceRoot` | Downloaded/extracted source area |
-| `buildRoot` | Build and generated-work area |
-| `installRoot` | Installed package root |
-| `repositoriesRoot` | Local administration repository checkouts |
-| `logsRoot` | BuildEngine log hierarchy |
+| `root` | central BuildEngine production root |
+| `rsvars` | C++Builder environment initialization |
+| `workers` | global scheduler worker limit |
+| `queueLength` | scheduler queue capacity |
+| `testJobs` | parallelism supplied to supported test runners |
+| `heartbeatSeconds` | heartbeat interval |
+| `WithTests` | enable upstream/library tests |
+| `WithSmokeTests` | enable consumer/package smoke tests |
+| `WithDoc` | enable generated project/library information |
+| `WithDoxygen` | enable generic Doxygen API documentation |
+| `WithLatex` | local default for LaTeX/PDF; synchronized policy may override it |
+| `configurations` | selected build variants, for example `All` |
+| `serverAddress` | concrete bind interface, default `127.0.0.1` |
+| `serverName` | accepted server/Host identity, default `localhost` |
+| `serverPort` | TCP port, default `8765` |
+| `buildTools` | synchronized managed-tool contract |
+| `toolsState` | generated effective tool evidence |
+| `machineState` | generated execution summary; not library Current-State authority |
+| `sourceRoot` | source workspace |
+| `buildRoot` | build/generated workspace |
+| `installRoot` | package/payload root |
+| `repositoriesRoot` | repository checkouts |
+| `logsRoot` | BuildEngine logs |
 
-### Server endpoint contract
+## Local versus synchronized authority
 
-The server endpoint belongs to the central `BuildEngine.xml` configuration instead of a server-specific configuration file:
+```mermaid
+flowchart TD
+    L[BuildEngine.xml local machine/deployment] --> E[Effective run]
+    A[Admin XML/XSD synchronized contracts] --> E
+```
+
+| Concern | Local | Admin contract |
+| --- | ---: | ---: |
+| Production root | yes | no |
+| Server endpoint | yes | no |
+| Worker/queue count | yes | no |
+| Repository checkout locations | yes | repository content is synchronized |
+| Tool definitions/versions | no | yes |
+| Library identities/versions/build contracts | no | yes |
+| Dependency graph | no | yes |
+| Documentation defaults/capability | local feature switch | project/library/module policy |
+| Security identity | no | yes |
+
+A local setting must not become hidden alternative library/build knowledge.
+
+## Server endpoint
+
+Example:
 
 ```xml
 serverAddress="10.20.30.15"
@@ -113,139 +131,128 @@ serverName="buildengine.intern.example"
 serverPort="8765"
 ```
 
-`serverAddress` is intentionally an explicit interface address. Wildcard bindings such as `0.0.0.0` or `::` are rejected by the current server because they make the actual exposure less explicit. `serverName` is validated against the HTTP `Host` header together with the configured address.
+`serverAddress` is intentionally one concrete interface. `common::HttpServer` rejects unspecified/multicast addresses such as `0.0.0.0` or `::`.
 
-The safe default remains `127.0.0.1` / `localhost`. A non-loopback value is intended for a protected internal network whose firewall and routing boundary are controlled by the operator.
+`serverName` is used for Host validation. Loopback remains the safe default. Non-loopback operation requires the intended protected network/firewall boundary.
 
-HTTP itself is a deliberate deployment decision. HTTPS could be added to the Boost.Asio/Beast transport without changing the central repository model, but that would add certificate provisioning, trust, renewal, rotation, and operational responsibility. Those concerns are intentionally outside the current BuildEngine server contract.
+The standalone Server reads the same `BuildEngine.xml`; invocation options such as `--root`, `--address`, `--name` and `--port` are one-run overrides, not a second persistent configuration store.
 
-The standalone `BuildEngineDocServer` can load the central values with:
+## Concurrency
 
-```text
-BuildEngineDocServer.exe --config D:\path\BuildEngine.xml
-```
-
-If `BuildEngine.xml` exists in its working directory, it is used automatically. Runtime options `--root`, `--address`, `--name`, and `--port` are explicit overrides for one invocation, not a second persistent source of truth.
-
-`WithDoxygen=false` is a hard stop for the central Doxygen pipeline. `WithLatex`, however, is an inheritable local default. `admin/build-documentation.xml` may override it for the project, and a library may independently override it again with `latex="true"` or `latex="false"`.
-
-When LaTeX is effective, BuildEngine does **not** start Doxygen a second time. The normal Doxygen invocation for that documentation scope produces HTML and LaTeX in one pass; MiKTeX is then requested only for the separate PDF compilation step. Collection libraries can have many root/module documentation scopes, but the one-Doxygen-run-per-scope rule remains unchanged.
-
-## Concurrency model
-
-The scheduler worker count defines an upper bound for simultaneously executing worker actions. In compact form:
+The global invariant is:
 
 $$
 N_{active} \leq N_{workers}
 $$
 
-For example, with `workers="4"`, the expected invariant is:
+Technical Actions from independent logical jobs/scopes can execute concurrently when their dependencies and physical resources allow it.
 
-$$
-0 \leq N_{active} \leq 4
-$$
+There are no separate architectural worker pools for Build, Test or Documentation. A future resource-slot contract must remain generic.
 
-The queue length is a separate capacity. A simple conceptual upper bound for queued plus active work is:
+Shared mutable prerequisites are explicit. Example: one managed MiKTeX runtime preflight can initialize shared runtime state before independent document `texify` actions run.
 
-$$
-N_{resident} \leq N_{workers} + N_{queue}
-$$
+## `admin/build-tools.xml`
 
-For a four-worker scheduler, $N_{workers}=4$.
+Defines reproducible tools and browser assets. Tools can be discovered or provisioned through managed download/extract/generate/prepare/probe workflows.
 
-Parallelism is applied to independent technical Actions and logical jobs, but shared mutable prerequisites are kept explicit. The current documentation example is MiKTeX: one runtime preflight initializes shared `pdflatex` state before independent PDF jobs are allowed to run in parallel. The central documentation index is an aggregate and is rebuilt after parallel documentation work has settled instead of being regenerated concurrently by each library job.
+MiKTeX is provisioned when effective documentation configuration requires LaTeX/PDF. Runtime package installation during individual `texify` calls remains disabled.
 
-## Administration XML files
+See [build-tools.md](build-tools.md).
 
-### `admin/build-tools.xml`
+## `admin/build-libraries.xml`
 
-Defines reproducible tools and browser assets. A tool may be discovered from an existing installation or managed by BuildEngine through download, extraction/generation, launcher, preparation, and probe steps. Examples include Git, CMake, Ninja, Doxygen, Graphviz, MiKTeX, compiler tools, and the managed JavaScript resources used by the documentation server.
+This is the primary declarative library contract.
 
-MiKTeX is a `when-used` tool. It is provisioned only when the effective documentation configuration enables LaTeX/PDF for at least one library. The current managed path is portable and isolated; its preparation contract installs and verifies the package surface required by the pinned Doxygen LaTeX templates before any library PDF job is allowed to run with automatic package installation disabled.
+A library can describe:
 
-The complete XML vocabulary is documented in [build-tools.md](build-tools.md); the currently configured tools are listed in [tools.md](tools.md).
+- metadata/licenses/security identity,
+- source acquisition and validation,
+- build arguments and variants,
+- tests/validation,
+- installation,
+- publish/consumer view,
+- smoke tests,
+- extension relationships.
 
-### `admin/build-libraries.xml`
+The library `timestamp` is the logical contract-change token used by persistent logical scope state.
 
-The primary library build contract. Each library entry can define metadata, source acquisition, extraction requirements, patches, build arguments, variants, install operations, publication, smoke consumers, security identity, and documentation metadata. Build knowledge belongs here rather than in library-specific C++ branches inside the engine.
+Technical Actions inside these phases do not become independent persistent Current-State entries.
 
-A reduced example illustrates the shared-contract/variant model:
+See [build-libraries.md](build-libraries.md).
 
-```xml
-<library id="example" version="1.2.3" timestamp="2026-09-12T18:00:00Z">
-   <build>
-      <argument value="-G"/>
-      <argument value="Ninja"/>
-      <variant name="Release">
-         <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
-      </variant>
-      <variant name="Debug">
-         <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
-      </variant>
-   </build>
-</library>
+## `admin/build-documentation.xml`
+
+Defines shared documentation policy and overrides.
+
+Effective settings can be inherited in this order:
+
+```text
+BuildEngine.xml feature/default
+-> build-documentation.xml root/default
+-> library override
+-> collection module override
 ```
 
-The library `timestamp` is the library-local contract-change token used by the logical persistent-state chain. The contract and its Actions are documented in [build-libraries.md](build-libraries.md).
+`WithDoxygen=false` is a hard local stop for Doxygen generation. `WithLatex` is a local default that synchronized policy may refine.
 
-### `admin/build-documentation.xml`
+### One Doxygen run per logical scope
 
-Defines the shared documentation profile and library-specific overrides. It controls whether Doxygen and LaTeX/PDF are used, source visibility, public-only extraction, predefined macros, Doxygen options, exclusion patterns, and collection behavior.
+When LaTeX is effective, BuildEngine does not start a second Doxygen analysis. The same Doxygen invocation emits HTML and LaTeX; MiKTeX compiles `refman.tex` afterward.
 
-The root profile is inherited by every library. For `latex`, omission at the root means inheritance from local `WithLatex`; a root `latex` value overrides that local default for the synchronized project, and a library node may override it again. A library node is an override, not an allow-list.
+### Collection libraries
 
-`collection="true"` is library-specific. It tells BuildEngine to discover a collection from the first directory level of the published API tree. Module names are therefore derived from the actual published structure; `<override module="...">` changes the Doxygen profile only for a module that is really discovered.
+`collection="true"` means the library is documented as one root scope plus one recursive scope per discovered first-level module.
 
-The complete parameter reference and the single-pass HTML/LaTeX pipeline are documented in [documentation.md](documentation.md).
+The discovery source is the library's **logical public/install API view**, not a requirement that global consumer publish already succeeded.
 
-### `admin/smoke-tests.xml`
+Current logical topology:
 
-Defines smoke/integration tests that are not expressed directly as a library-local consumer smoke entry.
+```text
+doxygen:root
+doxygen:<module-1>
+doxygen:<module-2>
+...
+```
+
+There is no current logical `collection-prepare` scope and no separate logical module-PDF scope.
+
+`--check` must use the same discovery/scope source as execution. This is a known current implementation repair item.
+
+See [documentation.md](documentation.md).
+
+## Generated state/evidence files
 
 ### `admin/tools.xml`
 
-Generated tool state. It records the effective resolved tool roots and versions used by the running production tree. The server uses this information to map stable `/js/...` URLs to managed browser assets.
+Generated effective managed-tool state.
 
 ### `admin/machine-state.xml`
 
-Generated machine/job state. It provides the broader execution-state view used by BuildEngine and its presentation surfaces. It is **not** the per-library persistent current-state authority.
+Generated broader execution/machine summary. It is **not** the persistent per-library Current-State authority.
 
-The persistent library scope states live below:
+### logical library state
+
+Persistent logical scope state lives below:
 
 ```text
 <ProductionRoot>/.buildengine/libraries/<library>/<version>/<safe-scope>.state
 ```
 
-Each completed state records the library timestamp plus the timestamp and `completedAt` of its direct upstream library scopes. See [build-libraries.md](build-libraries.md) for the state contract.
+Canonical content:
 
-### `admin/schemas/*.xsd`
+```text
+timestamp=<library timestamp>
+upstream=<library>|<version>|<scope>|<upstream library timestamp>|<upstream completedAt>
+...
+completedAt=<completion timestamp>
+state=completed
+```
 
-XML schemas for the synchronized contracts. They make the accepted declarative vocabulary explicit and allow contract validation independently from C++ implementation details.
+Fingerprints, command hashes, output files and technical Step markers are not Current-State authority.
 
-## Local versus synchronized configuration
+## Commands
 
-The separation is intentional:
-
-| Concern | Local configuration | Synchronized Admin contract |
-| --- | --- | --- |
-| Production root | Yes | No |
-| Server interface/name/port | Yes | No |
-| Worker count | Yes | No |
-| Repository locations | Yes | Repository content itself is synchronized |
-| Tool definitions | No | Yes |
-| Library versions and build contracts | No | Yes |
-| Documentation capability/default settings | Yes | Project and library overrides |
-| Documentation profiles | No | Yes |
-| Smoke-test definitions | No | Yes |
-| Security metadata | No | Yes |
-
-This prevents local machine settings from becoming a hidden second source of library/build knowledge while still allowing the local machine to supply deployment defaults.
-
-The server reinforces the same principle. It does not create a server-specific database or copy of packages/documentation. It opens the central production tree through the shared `BuildEngineRepository`, so browser pages and REST responses are views of the same package metadata, SBOMs, generated documentation, PDFs, security evidence, and synchronized Admin content used elsewhere in BuildEngine.
-
-## Command line
-
-General syntax:
+General form:
 
 ```text
 BuildEngine [command] [options] [configuration-file]
@@ -253,107 +260,67 @@ BuildEngine --help
 BuildEngine --version
 ```
 
-The configuration file, when supplied, must be the final command-line argument and must not start with `--`.
-
-## Commands
-
 ### `--make`
 
-Default command. Evaluates the logical scope states against the current library timestamps and the stored timestamp/`completedAt` references of their direct upstream library scopes. A scope whose state is missing or no longer matches executes again; current scopes are reused.
-
-```text
-BuildEngine --make
-```
+Default incremental command. Reuses current logical scopes and executes stale scopes only.
 
 ### `--build`
 
-Forces execution for the selected build scope instead of reusing logical current state.
-
-```text
-BuildEngine --build --config=Release,Debug
-```
+Forces execution of the selected graph. The failure-safe contract still requires previous success state to be invalidated before actual execution so a failed forced build cannot leave old success behind.
 
 ### `--check`
 
-Synchronizes administration repositories, inspects library/version logical scope state, and reports which phases are current or would require execution. It does not perform library source/build/install work.
+Read-only evaluation of logical scopes. It must report the same logical scope model used by execution, including dynamic collection documentation scopes.
+
+Examples after the active library IDs are confirmed from the current synchronized catalog:
 
 ```text
-BuildEngine --check --lib=ace-tao --libversion=8.0.6
+BuildEngine --check --lib=<library> --libversion=<version>
 ```
 
-Historical per-Action state may be recognized as migration evidence where it exactly matches the expected logical scope. New persistent state is written at logical-scope granularity.
+Do not hard-code historical combined IDs such as `ace-tao` into documentation when the active catalog uses separated logical components.
 
 ### `--show`
 
-Displays the effective settings read from the BuildEngine configuration file.
-
-```text
-BuildEngine --show D:\config\BuildEngine.xml
-```
+Displays effective configuration.
 
 ### `--monitor`
 
-Synchronizes administration repositories and checks configured libraries for known security vulnerabilities. The security model is intended to evolve from pure finding collection toward structured product relevance, remediation candidates, and shared risk assessment.
-
-```text
-BuildEngine --monitor
-```
+Synchronizes administration data and performs the configured security-monitoring workflow.
 
 ### `--parse`
 
-The command is recognized by the current CLI, but the current implementation reports that it is not implemented and performs no build action. It is reserved for checking configured upstream sources for newer versions.
+Reserved/recognized according to the current CLI implementation; if not implemented by the current source, it must report that explicitly rather than silently performing another action.
 
-## Options
+## Selection
 
-### `--lib=<library>`
+`--lib` / `--libversion` identify logical library coordinates and are case-sensitive according to the current contract.
 
-Selects one configured library. Library identifiers are case-sensitive.
+Any command that does not yet support library selection must reject it rather than silently operating on an unintended graph.
 
-### `--libversion=<version>`
+## Current no-run gate
 
-Selects an exact version and requires `--lib`. Versions are case-sensitive.
+The project is currently in a structural repair phase.
 
-### `--config=<variant>[,<variant>...]`
+Until the P0/P1 issues in logical state lifecycle, ownership/Publish, Common extension semantics, PackageExporter and documentation migration/check are statically corrected:
 
-Selects configuration variants exactly as named in the library XML. `All` selects every declared variant.
+- no full `--make`,
+- no full `--build`,
+- no full `--check`,
+- no Clean-Room run.
 
-### `--tests=on|off`
+A later run verifies a previously reasoned correction; it is not used to discover already visible architecture errors after hours of execution.
 
-Overrides the configured test setting for the current invocation.
+## Validation checklist
 
-### `--help` and `--version`
-
-Display CLI help or version information and exit.
-
-## Current selection limitation
-
-The CLI already parses `--lib` and `--libversion` for commands such as `--check` and `--monitor`. In the current build path, library selection is not yet wired into the `--make`/`--build` graph; attempting to use it there is rejected instead of silently building an unintended scope.
-
-## Example command matrix
-
-| Goal | Command |
-| --- | --- |
-| Incremental default build | `BuildEngine --make` |
-| Forced Release + Debug build | `BuildEngine --build --config=Release,Debug` |
-| Inspect ACE/TAO state | `BuildEngine --check --lib=ace-tao --libversion=8.0.6` |
-| Show effective configuration | `BuildEngine --show D:\config\BuildEngine.xml` |
-| Security monitor | `BuildEngine --monitor` |
-| Display help | `BuildEngine --help` |
-
-## Configuration validation checklist
-
-- [ ] Production root points to the intended central tree.
-- [ ] Server address, server name, and port describe the intended deployment boundary.
-- [ ] Any non-loopback server address is protected by the intended firewall/network policy.
+- [ ] Production root is the intended central tree.
+- [ ] Server endpoint matches the intended network boundary.
 - [ ] Admin synchronization is configured.
-- [ ] `build-tools.xml` and `build-libraries.xml` are available after synchronization.
-- [ ] Worker and queue settings match the target machine.
-- [ ] Required test/documentation switches are explicit.
-- [ ] `WithLatex` has the intended local default and any project/library overrides are deliberate.
-- [ ] Collection documentation settings and module overrides are deliberate where `collection="true"` is used.
-- [ ] `tools.xml`, `machine-state.xml`, and logical library scope state are treated as generated state rather than hand-authored library knowledge.
-- [ ] Contract changes and their Markdown reference pages are updated together.
-
-## Related documentation
-
-Use the relative links at the top of this page to move between configuration, server, tool, library and documentation contracts. Generated library documentation starts at `/index.html`.
+- [ ] active `build-libraries.xml` validates against its current XSD/schema version.
+- [ ] worker/queue/test parallelism is intentional.
+- [ ] tests/documentation feature switches are explicit.
+- [ ] documentation inheritance/collection settings are intentional.
+- [ ] generated `tools.xml`/`machine-state.xml` are not hand-authored library knowledge.
+- [ ] logical scope state is not replaced by Step/fingerprint/output state.
+- [ ] physical package paths are not used as logical library identity.
+- [ ] contract and maintained Markdown pages are updated together.
