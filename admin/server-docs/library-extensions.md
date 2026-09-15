@@ -2,59 +2,53 @@
 
 [TOC|Content]
 
-This document defines the BuildEngine **library extension** model. A library extension is a logically independent library that deliberately continues inside the physical source, producer, and installation layout of another logical BuildEngine library.
+**Status:** current extension contract as of 15 September 2026. Several Common/ownership implementation gaps are explicitly identified below and remain **not verified**.
 
-The reference case is **ACE 8.0.6** and **TAO 4.0.6**. ACE can be consumed without TAO. TAO is independently versioned middleware built on ACE. The DOCGroup release nevertheless places TAO below `ACE_wrappers\TAO` and both components deliberately use the same `ACE_wrappers\bin` and `ACE_wrappers\lib` producer directories. BuildEngine preserves both truths: separate logical components and a shared physical producer.
+A library extension is a logically independent library that deliberately continues inside the physical source, producer or installation layout of another logical BuildEngine library.
 
-## Design principles
+The reference case is ACE 8.0.6 and TAO 4.0.6.
 
-- logical component identity is independent of physical directory layout;
-- the base library is an explicit graph dependency of the extension;
-- one upstream archive is acquired and extracted only once when the base is the source owner;
-- an extension must not download or extract a second copy of that base archive;
-- Release extends Release and Debug extends Debug;
-- a declared shared producer path authorizes physical overlap but does not merge logical ownership;
-- base and extension keep separate state, metadata, SBOM, documentation, and artifact manifests;
-- Common/DLL is the authoritative shared interpretation used by Server and later applications;
-- artifact ownership is derived from inventory/delta evidence instead of file-name heuristics.
+## Core rule
+
+Logical identity is independent of physical placement.
 
 ```mermaid
 flowchart LR
-    C[Logical contract] --> A[ACE 8.0.6]
-    C --> T[TAO 4.0.6]
-    T -->|extends| A
-    A --> P[Shared ACE_wrappers producer]
-    T --> P
-    P --> B[bin]
-    P --> L[lib]
+    A[ACE 8.0.6 logical] --> P[Shared ACE_wrappers producer/payload]
+    T[TAO 4.0.6 logical] -->|extends ACE| P
 ```
+
+ACE and TAO may share source/producer/payload structures while retaining separate:
+
+- logical state,
+- metadata,
+- SBOM,
+- documentation,
+- artifact/ownership evidence.
+
+A physical directory is never itself the logical component identity.
 
 ## Normal dependency versus extension
 
-| Property | Normal dependency | Library extension |
+| Property | Normal dependency | Extension |
 | --- | --- | --- |
 | Logical identity | independent | independent |
 | Version | independent | independent |
-| Persistent scopes | independent | independent |
+| Persistent logical scopes | independent | independent |
 | Metadata / SBOM | independent | independent |
-| Source acquisition | normally independent | can be owned by the base |
-| Variant producer | independent | may continue in base producer |
-| `bin` / `lib` producer directories | independent | explicitly shareable |
-| Installation | own package root | may overlay base payload |
-| Graph relation | dependency | extension/base dependency |
-| Transitive SBOM relation | yes | yes, through the base |
+| Source acquisition | normally independent | may be owned by base |
+| Native producer | independent | may be shared with base |
+| Physical payload | normally independent | may overlay base |
+| Ownership | own inventory | base inventory + extension delta |
 
-The extension edge already carries the direct base relationship. The same base must not be declared again as a normal `<dependency>`.
+The extension edge already carries the direct base relationship and must not be duplicated as an ordinary dependency.
 
 ## XML contract
 
-Schema 15 adds an optional `<extension>` element:
+Conceptually:
 
 ```xml
-<library id="extension-id"
-         version="extension-version"
-         category="..."
-         timestamp="...">
+<library id="extension-id" version="extension-version" ...>
    <extension library="base-id"
               version="base-version"
               source="relative/source/subtree"
@@ -63,326 +57,209 @@ Schema 15 adds an optional `<extension>` element:
       <shared path="bin"/>
       <shared path="lib"/>
    </extension>
-
-   <metadata name="..."
-             description="One-line purpose description"
-             supplier="..."/>
-
-   <build>
-      ...
-   </build>
+   ...
 </library>
 ```
 
-### `extension/@library`
+Important rules:
 
-Logical ID of the base library. It must resolve to exactly one library in the same contract and must not refer to the extension itself.
+- exact base ID/version;
+- no extension cycle;
+- relative/safe source/producer/install/shared paths;
+- base owns acquisition when the archive is shared;
+- extension does not download/extract a second copy;
+- Release extends Release and Debug extends Debug;
+- shared paths authorize physical overlap, not shared logical identity.
 
-### `extension/@version`
+## ACE / TAO producer model
 
-Exact base version required by the extension. BuildEngine does not substitute another version.
-
-### `extension/@source`
-
-Relative extension source subtree below the extracted base source root:
-
-```text
-ExtensionSourceRoot = BaseSourceRoot / extension/@source
-```
-
-The path must be relative and safe. For TAO this is `TAO` below the ACE-owned `ACE_wrappers` source tree.
-
-### `extension/@producer`
-
-Relative producer root below the variant-specific base build directory:
+The DOCGroup archive is acquired and extracted once by ACE.
 
 ```text
-ExtensionBuildRoot    = BuildRoot/packages/<base>/<base-version>/<Configuration>
-ExtensionProducerRoot = ExtensionBuildRoot / extension/@producer
+ACE_ROOT = .../ACE_wrappers
+TAO_ROOT = ACE_ROOT/TAO
 ```
 
-For ACE/TAO this is the already existing variant-specific `ACE_wrappers` tree. BuildEngine does not fabricate a second native TAO producer.
-
-### `extension/@install`
-
-Relative overlay root below the base payload. `.` means the exact base package root:
-
-```text
-BaseInstallRoot      = InstallRoot/packages/<base>/<base-version>
-ExtensionInstallRoot = BaseInstallRoot / extension/@install
-```
-
-TAO therefore has a logical package identity without requiring a fake `install\packages\tao\4.0.6` payload tree.
-
-### `extension/shared/@path`
-
-Declares producer subtrees that are intentionally shared. ACE/TAO declares:
-
-```xml
-<shared path="bin"/>
-<shared path="lib"/>
-```
-
-This authorizes physical coexistence only. It does not say that every file belongs to both components.
-
-## Runtime variables
-
-| Variable | Meaning |
-| --- | --- |
-| `{ExtensionLibraryId}` | base library ID |
-| `{ExtensionLibraryVersion}` | base library version |
-| `{ExtensionWorkspace}` | base workspace |
-| `{ExtensionBaseSourceRoot}` | extracted base source root |
-| `{ExtensionSourceRoot}` | base source root plus `extension/@source` |
-| `{ExtensionBuildRoot}` | variant-specific base build directory |
-| `{ExtensionProducerRoot}` | base build directory plus `extension/@producer` |
-| `{ExtensionInstallRoot}` | physical payload root plus `extension/@install` |
-
-The variables exist only in an extension context.
-
-## Source ownership and producer preparation
-
-The base owns source acquisition. Schema/runtime can support preparation-only extension source actions, but such actions modify the **base workspace**, not a producer that may already have been copied from it. They must therefore only be used where that timing is semantically correct.
-
-For ACE/TAO the TAO-specific SSLIOP repair is intentionally **not** performed as workspace source preparation. ACE first creates each Release/Debug `ACE_wrappers` producer from the ACE-owned source tree. TAO then applies its SSLIOP patch directly to that concrete variant producer immediately before generating `TAO.mwc`.
-
-```mermaid
-flowchart TD
-    U[ACE+TAO upstream archive] --> S[ACE source owner]
-    S --> P[ACE/common source patches]
-    P --> CR[Copy Release producer]
-    P --> CD[Copy Debug producer]
-    CR --> ABR[ACE.mwc Release]
-    CD --> ABD[ACE.mwc Debug]
-    ABR --> TPR[Apply TAO SSLIOP patch to Release producer]
-    ABD --> TPD[Apply TAO SSLIOP patch to Debug producer]
-    TPR --> TBR[TAO.mwc Release]
-    TPD --> TBD[TAO.mwc Debug]
-```
-
-This guarantees that both producers receive the TAO-only repair and avoids a race between workspace preparation and the ACE producer copy.
-
-An extension may not use `download` or `extract` to create a second copy of the base source tree.
-
-## ACE / TAO producer sequence
-
-Upstream defines the split directly: `ACE.mwc` explicitly excludes TAO, while `TAO.mwc` builds TAO. BuildEngine follows those upstream workspaces instead of inferring ownership from binary names.
+ACE builds via `ACE.mwc`, which excludes TAO. TAO later builds via `TAO.mwc` in the already prepared shared producer.
 
 ```mermaid
 flowchart TD
     U[Combined DOCGroup archive] --> AS[ACE source owner]
-    AS --> AB[ACE build with ACE.mwc]
-    AB --> ABI[ACE build inventory]
-    ABI --> AI[ACE installation]
-    AI --> AII[ACE install inventory]
-    AII --> AR[ACE publish / smoke / ready]
-    AI --> AM[ACE metadata / SBOM]
-    AR --> H[Extension handoff barrier]
-    AM --> H
-    H --> TD[TAO build artifact delta]
-    TD --> TI[TAO overlay installation]
-    TI --> TID[TAO install artifact delta]
+    AS --> ABR[ACE Release producer/build]
+    AS --> ABD[ACE Debug producer/build]
+    ABR --> TPR[TAO Release producer preparation/build]
+    ABD --> TPD[TAO Debug producer preparation/build]
 ```
 
-TAO compilation can already occur in the shared producer, but the **artifact handoff** that releases TAO tests and installation waits for both `library:ace:ready` and `library:ace:metadata`. This is deliberate. ACE publication, smoke/ready processing, and metadata generation must finish reading the base-only physical payload before TAO overlays that payload.
+TAO-specific source fixes that must affect copied variant producers are applied to the concrete TAO producer at the correct time; they are not raced against an already copied ACE workspace.
 
-The barrier is generic extension behavior. It contains no ACE-name special case.
+## Dependency/barrier semantics
 
-## Variant preservation
+Do not infer barriers from logical names such as `ready` when the physical operation only requires a narrower prerequisite.
 
-Each extension variant uses the corresponding base variant.
+In the current intended ACE/TAO graph, TAO compilation can proceed after the required ACE producer/install artifact evidence is available. A later ACE global consumer-publish failure does **not** by itself make TAO compilation invalid.
 
-```mermaid
-flowchart LR
-    AR[ACE Release producer] --> TR[TAO Release producer]
-    AD[ACE Debug producer] --> TD[TAO Debug producer]
-```
+A stronger barrier is required only for operations that would mutate a shared physical payload while the base still needs to read that exact payload for another step.
 
-No Release-to-Debug or Debug-to-Release edge is permitted.
+This distinction prevents the extension graph from becoming unnecessarily serialized.
 
-## Artifact manifests
+## Physical payload and logical metadata
 
-BuildEngine records relevant binary artifacts for normal libraries and extensions. The shared model lives in BuildEngine-Common.
-
-Typical tracked files include:
-
-- `.dll`;
-- `.exe`;
-- `.lib`;
-- `.a`;
-- `.so`;
-- `.dylib`;
-- `.pdb`;
-- `.tds`;
-- `.bpl`;
-- `.dcp`.
-
-Each entry records at least relative path, size, and SHA-256.
-
-For a normal library the manifest is an inventory. For an extension the declared shared producer paths are compared with the base inventory.
-
-```mermaid
-flowchart LR
-    BI[Base inventory] --> D{Compare}
-    EI[Inventory after extension] --> D
-    D --> C[created]
-    D --> M[modified]
-    C --> O[automatic extension ownership]
-    M --> R[shared / review required]
-```
-
-`created` means the extension introduced the file. `modified` means a base artifact already existed and changed during extension work. A modified base file is not automatically extension-owned.
-
-Artifact jobs use `artifact:*` IDs and remain helper/evidence jobs. Persistent current-state authority stays on logical `library:*` scopes.
-
-## Installation overlay
-
-ACE is installed first. TAO then overlays its additions into the same physical payload. Shared targets are never wholesale cleaned by the extension.
-
-Representative filesystem layout:
+Representative layout:
 
 ```text
 install/packages/ace/8.0.6/
   include/
-    ace/
-    tao/
-    orbsvcs/
-  bin/win64/Release/
-  bin/win64/Debug/
-  lib/win64/Release/
-  lib/win64/Debug/
-  tools/bin/win64/Release/
-  tools/bin/win64/Debug/
-  services/bin/win64/Release/
-  services/bin/win64/Debug/
+  bin/
+  lib/
   .buildengine/extensions/tao/4.0.6/
 ```
 
-The tree is a filesystem example, not an execution diagram.
-
-TAO's logical metadata is stored below:
+TAO may therefore resolve to:
 
 ```text
-install/packages/ace/8.0.6/.buildengine/extensions/tao/4.0.6/
+Payload:
+  install/packages/ace/8.0.6/
+
+Metadata:
+  install/packages/ace/8.0.6/.buildengine/extensions/tao/4.0.6/
 ```
 
-The runtime/development payload can therefore be physically shared while the TAO SBOM and license evidence remain logically separate.
+The runtime/development payload can be shared while TAO retains its own SBOM/license/documentation identity.
 
-## Safe future cleanup
+## Artifact inventory and ownership
 
-The artifact inventory is also the basis for later version cleanup in shared areas.
+The target artifact contract records at least:
+
+- relative path,
+- size,
+- SHA-256.
+
+For an extension, compare the base inventory with the post-extension inventory:
+
+```mermaid
+flowchart LR
+    B[Base inventory] --> D{Compare}
+    A[After extension] --> D
+    D --> C[created]
+    D --> M[modified]
+    C --> O[extension ownership candidate]
+    M --> S[shared / explicit handling]
+```
+
+Semantics:
+
+- `created`: the extension introduced the file;
+- `modified`: a previously existing base file changed;
+- `modified` is not automatically exclusive extension ownership.
+
+### Known current implementation gap
+
+`BuildEngine-Common/src/ArtifactManifest.h` currently stores path and size but no SHA-256. A same-size binary content change is therefore not detected as `modified`.
+
+Documentation that previously stated SHA-256 was already present described the intended contract, not the actual implementation.
+
+## Publish
+
+Publish must consume the same central artifact/ownership model.
+
+It must not infer ownership merely because a file exists below the shared payload root.
+
+Publish manifests are publication evidence, not an independent ownership authority.
+
+### Known current implementation gap
+
+Current Publish collision handling can treat entries from other publish manifests as ownership even when that evidence is stale. With a shared ACE/TAO payload this can allow an old downstream manifest to block a newly rebuilt upstream file.
+
+This is a P0 repair item.
+
+## Package export
+
+Package export must also consume the same logical ownership/closure model.
+
+### Known current implementation gap
+
+`PackageExporter` currently recursively copies each component's physical `PackageRoot`. ACE and TAO can resolve to the same payload root, so this can duplicate or mislabel files inside an exported ZIP.
+
+This must be corrected in Common rather than hidden by server-specific rules.
+
+## Common repository interpretation
+
+`LibraryCatalog` correctly models the logical extension relation and resolves payload/metadata separately.
+
+However, the repository audit found remaining physical-directory assumptions:
+
+- `LibraryExists()` still checks `install/packages/<library>`;
+- `VersionExists()` still checks `install/packages/<library>/<version>`;
+- extension `installed` currently follows physical payload existence too closely.
+
+These functions must be aligned with the logical catalog before the Server API is fully extension-safe.
+
+## Safe cleanup
+
+The desired cleanup rule is:
 
 ```mermaid
 flowchart TD
-    O[Old owned-manifest entry] --> E{File still exists?}
+    O[Owned artifact evidence] --> E{File exists?}
     E -- no --> N[Nothing to remove]
-    E -- yes --> H{Current hash matches stored hash?}
+    E -- yes --> H{Current SHA-256 matches owned evidence?}
     H -- yes --> R[Safe automatic removal]
     H -- no --> K[Keep and report divergence]
 ```
 
-A new version must never blindly delete a file that another component or a user changed after the manifest was created.
+This is a target capability. Because current ArtifactManifest does not yet store SHA-256, this cleanup rule is not yet fully implementable.
 
 ## State model
 
-Logical state remains separate even when physical paths overlap. ACE owns ACE scopes; TAO owns TAO scopes. The shared directory itself is never state authority.
+Logical state remains separate even when paths overlap.
 
-```mermaid
-flowchart LR
-    AS[ACE source] --> AB[ACE build]
-    AB --> AI[ACE install]
-    AI --> AR[ACE ready]
-    AI --> AM[ACE metadata]
-    AR --> TH[TAO handoff]
-    AM --> TH
-    TH --> TI[TAO install]
-    TI --> TM[TAO metadata]
-    TM --> TD[TAO documentation]
+```text
+ace:source
+ace:build:Release
+ace:install
+...
+
+tao:build:Release
+tao:install
+...
 ```
 
-The logical extension relationship supplies the base dependency for state/SBOM semantics; TAO must not duplicate ACE as a normal dependency.
+The shared directory is not state authority. Artifact evidence is not state authority either.
 
-## Metadata and SBOM
+## Documentation identity
 
-```mermaid
-flowchart TD
-    TAO[TAO 4.0.6] --> ACE[ACE 8.0.6]
-    ACE --> SSL[OpenSSL 3.5.8]
-    ACE --> X[Xerces-C 3.3.0]
-    ACE --> Z[zlib 1.3.2]
-```
-
-ACE's SBOM contains its actual direct dependencies. TAO's graph contains ACE as the direct base and reaches those dependencies transitively.
-
-`metadata/@description` is the human-facing one-line purpose description. It feeds the common catalog and can feed CycloneDX `component.description` and server presentation.
-
-## Common/DLL and server interpretation
-
-The physical package tree is not the library catalog. Common is the authoritative repository interpretation.
-
-```mermaid
-flowchart TD
-    XML[build-libraries.xml] --> C[BuildEngine-Common LibraryCatalog]
-    C --> R[BuildEngineRepository]
-    R --> API[Server REST]
-    R --> UI[Server HTML]
-    R --> SEC[Package / security / usage views]
-```
-
-Server package and security lists therefore enumerate logical catalog entries and resolve each logical SBOM path. TAO remains visible even though its payload is below ACE.
-
-## Documentation split
-
-ACE and TAO produce separate documentation coordinates:
+ACE and TAO have separate documentation coordinates:
 
 ```text
 documentation/ace/8.0.6/...
 documentation/tao/4.0.6/...
 ```
 
-The active `build-documentation.xml` now has separate `ace` and `tao` profiles. ACE excludes the TAO subtree; TAO starts from its extension API/source area.
-
-```mermaid
-flowchart LR
-    AS[ACE API input] --> AD[ACE Doxygen]
-    TS[TAO API input] --> TD[TAO Doxygen]
-    AD --> AH[ACE HTML]
-    AD --> AP[ACE LaTeX / PDF]
-    TD --> TH[TAO HTML]
-    TD --> TP[TAO LaTeX / PDF]
-```
-
-## Prepared ACE/TAO fragment
-
-`admin/ace-tao.xml` contains the complete prepared replacement for the old combined `ace-tao` block.
-
-To activate it:
-
-1. replace the old `ace-tao` block with the `ace` and `tao` elements from `ace-tao.xml`;
-2. set root `schemaVersion="15"`;
-3. set `xsi:noNamespaceSchemaLocation="schemas/build-libraries-v15.xsd"`;
-4. validate the resulting XML;
-5. run the intended BCC64X build/test;
-6. delete the temporary fragment after acceptance.
-
-The fragment retains Naming Service, COS Event Service, and RT Event Service. TAO publication intentionally represents a **consumable closure** containing the ACE+TAO headers/runtime/import libraries required by a consumer; artifact manifests, not publication contents, are the ownership evidence.
+Documentation follows logical API identity rather than assuming TAO owns a separate physical package directory.
 
 ## Validation rules
 
-1. At most one `<extension>` per library.
+1. One optional extension declaration per library.
 2. Exact base ID/version.
-3. Relative and safe source/producer/install/shared paths.
+3. Safe relative paths.
 4. No extension cycle.
-5. No duplicate normal dependency on the base.
-6. Base owns source acquisition.
-7. Extension `download`/`extract` is forbidden.
+5. No duplicate ordinary dependency on the base.
+6. Shared source acquisition belongs to the base.
+7. Extension download/extract of the same archive is forbidden.
 8. Variants preserve identity.
-9. Shared paths authorize physical overlap but not logical ownership.
-10. Shared install targets are not wholesale cleaned by the extension.
-11. Base and extension keep separate logical state and metadata.
-12. Artifact deltas distinguish `created` from `modified`.
-13. Extension downstream work is not released until base `ready` and base `metadata` have completed.
+9. Shared paths permit overlap but do not define ownership.
+10. Shared targets are not wholesale cleaned by an extension.
+11. Logical state/metadata/documentation remain independent.
+12. Ownership distinguishes `created` and `modified`.
+13. Publish, PackageExporter and future cleanup must consume one central ownership interpretation.
 
 ## Maintenance rule
 
-When another library needs the same physical-sharing model, use this generic contract. Do not introduce a library-name special case. If a concept is shared by multiple applications, extend BuildEngine-Common first and let applications follow the Common/DLL contract.
+When another library needs this model, extend the generic XML/Common contract. Do not add a library-name special case.
+
+When semantics are shared by multiple applications, correct BuildEngine-Common first and let Server/Manager follow it.
+
+## Verification status
+
+The extension-aware Common/Server work and the corrections described above remain **not verified** until a later explicitly approved BCC64X/Common/Server test.
