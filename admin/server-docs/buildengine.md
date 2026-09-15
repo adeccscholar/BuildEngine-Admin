@@ -2,84 +2,45 @@
 
 [TOC|Content]
 
-BuildEngine is a declarative build orchestration system for reproducible C and C++ third-party library builds. Its current Windows integration is centered on Embarcadero C++Builder and the modern BCC64X toolchain. Library knowledge belongs in synchronized XML contracts; the executable evaluates those contracts, prepares tools, creates a dependency graph, executes technical Actions, records persistent state at logical library-scope granularity, and records artifact evidence for later ownership and lifecycle operations.
+**Status:** current architecture contract as of 15 September 2026. Known implementation deviations are explicitly noted; no new full verification run has been performed.
 
-Related reference documents:
+BuildEngine is a declarative C++23 build orchestration system whose current Windows integration is centered on Embarcadero C++Builder 13 / BCC64X. The system separates logical library contracts, technical execution, persistent logical state, artifact evidence, Common repository semantics and read-only presentation.
 
-- [Configuration and command line](configuration.md)
-- [Tool contract `build-tools.xml`](build-tools.md)
-- [Library contract `build-libraries.xml`](build-libraries.md)
-- [Library extensions](library-extensions.md)
-- [Documentation contract](documentation.md)
-- [Tool overview](tools.md)
-- [BuildEngine Server](server.md)
+## Main principles
 
-## Main responsibilities
+1. `admin/build-libraries.xml` and the related schemas are the declarative library/dependency contract.
+2. BCC64X is the intended toolchain; compiler substitutions are not silently introduced.
+3. Technical Actions are execution/ordering/diagnostic units, not persistent state authorities.
+4. Persistent Current-State belongs to logical library scopes.
+5. Artifact inventories are evidence/ownership, not Current-State.
+6. BuildEngine-Common/DLL is the leading shared interpretation for logical libraries, extensions, repository paths, security and package semantics.
+7. A physical directory is never automatically a logical library identity.
+8. Server and Manager consume Common rather than implementing parallel interpretations.
 
-BuildEngine separates configuration, orchestration, execution, evidence, and presentation:
-
-1. **Configuration** resolves production roots, tools, repositories, build contracts, concurrency, tests, and documentation settings.
-2. **Repository synchronization** updates the administration content before build evaluation.
-3. **Tool preparation** discovers or installs tools described by the administration contract.
-4. **Library contracts** define logical identity, dependencies, source acquisition, build variants, installation, publication, smoke tests, metadata, documentation, and extensions.
-5. **The process scheduler** executes the dependency graph with a bounded worker count.
-6. **Logical library-scope state** is the authoritative persistent incremental state; technical Actions remain execution and diagnostic units inside a scope.
-7. **Artifact inventories** record build/install binary evidence and extension deltas without becoming a second state model.
-8. **Metadata generation** creates license information and CycloneDX SBOM data.
-9. **Documentation generation** publishes one Doxygen invocation per documentation scope producing HTML and optionally LaTeX; MiKTeX compiles generated LaTeX downstream.
-10. **Aggregate documentation navigation** is rebuilt after parallel documentation jobs have settled.
-11. **BuildEngine-Common/DLL** is the leading shared repository/domain contract consumed by BuildEngine, Server, Manager, and future applications.
-12. **The server** presents resulting packages, documentation, SBOMs, usage information, and security evidence without becoming a second build-state authority.
-
-## Contract and application architecture
-
-A shared concept is implemented in Common first. Applications follow that contract rather than reconstructing their own interpretation of XML or physical package directories.
+## Application architecture
 
 ```mermaid
 flowchart TD
-    XML[Admin XML contracts] --> C[BuildEngine-Common / DLL]
-    XML --> BE[BuildEngine]
-    C --> BE
-    C --> S[BuildEngine Server]
-    C --> M[VCL Manager / later applications]
+    XML[Admin XML contracts] --> BE[BuildEngine]
+    XML --> C[BuildEngine-Common]
     BE --> PROD[Production tree]
     PROD --> C
-    C --> API[Logical repository / security / package APIs]
+    C --> S[BuildEngine Server]
+    C --> M[BuildEngine Manager]
+    C --> O[other consumers]
 ```
 
-This rule became essential once logical library identity stopped being identical to physical package layout. TAO can be a complete logical component while its payload deliberately overlays ACE.
+BuildEngine is the writer/orchestrator. Common is the shared reader/domain layer. Server is read-only presentation. Manager owns review workflows but uses Common Security/Repository services.
 
-## Execution flow
+## Logical scopes and technical Actions
 
-```mermaid
-flowchart TD
-   A[Read BuildEngine configuration] --> B[Prepare bootstrap tool]
-   B --> C[Synchronize administration repositories]
-   C --> D[Load managed tool contract]
-   D --> E[Prepare required tools]
-   E --> F[Load library build contracts]
-   F --> G[Create library DAG]
-   G --> H[Evaluate logical scope state]
-   H --> I{Current?}
-   I -- yes --> J[Reuse completed scope]
-   I -- no --> K[Execute required technical Actions]
-   K --> L[Commit logical scope state]
-   L --> M[Build/install artifact inventory]
-   J --> N[Downstream scopes]
-   M --> N[Publish / metadata / documentation / smoke]
-   N --> O[Ready and machine-state summary]
-```
-
-## Logical state
-
-Persistent state belongs to a **logical library scope**, not to each technical Action. Typical scopes include:
+Typical logical scopes include:
 
 ```text
 source
 build:Release
 build:Debug
 test:Release
-test:Debug
 validation:Release
 install:Release
 install:Debug
@@ -88,221 +49,200 @@ install
 publish
 metadata
 doxygen
-doxygen:collection-prepare
+doxygen:root
 doxygen:<module>
-pdf
 ready:Release
 ready:Debug
 ready
 ```
 
-A completed state stores the library contract timestamp and every direct upstream library scope:
+Collection module scopes are dynamic and must be discovered consistently by execution and `--check`.
+
+Technical Actions underneath a scope may have IDs and dependencies and may run in parallel where safe. They do not receive independent persistent Current-State.
+
+## Logical Current-State
+
+Canonical state:
 
 ```text
 timestamp=<library timestamp>
 upstream=<library>|<version>|<scope>|<upstream library timestamp>|<upstream completedAt>
-upstream=...
+...
 completedAt=<completion timestamp>
 state=completed
 ```
 
-A scope is current only if its own timestamp still matches and every stored direct upstream reference still has the same timestamp and `completedAt`.
+A scope is current only when its own library timestamp and its direct logical upstream completion chain still match.
+
+Fingerprints, output files, command hashes, tree hashes and technical step markers are not Current-State authorities.
+
+The required failure-safe lifecycle is:
 
 ```mermaid
 flowchart LR
-    S[source] --> B[build:Release]
-    B --> T[test:Release]
-    T --> I[install:Release]
-    I --> IA[install]
-    IA --> P[publish]
-    IA --> M[metadata]
-    P --> R[ready:Release]
+    E[Evaluate] --> C{Current?}
+    C -- yes --> R[Reuse scope]
+    C -- no --> I[Invalidate old success]
+    I --> X[Execute technical Actions]
+    X -->|success| W[Commit new logical state]
+    X -->|failure| F[No success state]
 ```
 
-Technical Actions remain important for execution order, worker activity, logging, and failure diagnosis. They are not persistent-state authorities.
+**Known current gap:** scheduler invalidation/commit ownership is not yet fully wired for every stale/forced/failure path. This is a P0 repair item before another large run.
 
-## Artifact evidence is separate from state
+## Artifact evidence and ownership
 
-Artifact manifests answer a different question from logical state: **what binary files did this component create or change?**
+Artifact evidence answers: which files did a logical component create or change?
 
-For normal libraries BuildEngine inventories relevant build/install artifacts. For an extension it compares the shared producer/payload with the base inventory.
+The target manifest contract requires at least:
+
+```text
+relative path
+size
+SHA-256
+```
+
+Extensions additionally distinguish `created` and `modified`.
 
 ```mermaid
 flowchart LR
-    BI[Base inventory] --> CMP{Compare}
-    EI[Inventory after extension] --> CMP
-    CMP --> C[created]
-    CMP --> M[modified]
-    C --> O[automatic extension ownership]
-    M --> R[shared / review required]
+    B[Base inventory] --> D{Compare}
+    A[After extension] --> D
+    D --> C[created]
+    D --> M[modified]
+    C --> O[extension ownership candidate]
+    M --> S[shared / explicit handling]
 ```
 
-Manifest records contain at least relative path, size, and SHA-256. Typical relevant file types include DLL, EXE, LIB, PDB, BPL, DCP, TDS and platform library equivalents.
+**Known current gap:** Common `ArtifactManifest` currently stores only path and size, so same-size content changes are not detected. Documentation that previously described SHA-256 as already implemented overstated the current code.
 
-`artifact:*` jobs are helper/evidence jobs. They deliberately do not create a parallel persistent state hierarchy.
+## Publish and ownership
 
-The manifests are also the basis for future safe cleanup of obsolete versions. An owned file may only be removed automatically when the current file still matches the stored ownership evidence.
+Publish projects selected package files into the shared consumer tree. It must consume the same ownership model as artifact inventory/extension delta.
 
-## Library extensions and shared producers
+Publish manifests are publish evidence. They must not become a second independent ownership authority and stale publish evidence must not block a current producer.
 
-The extension model separates **logical ownership** from **physical placement**.
+**Known current gap:** current Publish code still treats other publish manifests as collision ownership without first establishing that this ownership is logically current. Shared extension payloads make this especially problematic.
 
-ACE/TAO is the reference implementation:
+## Library extensions
 
-- ACE 8.0.6 and TAO 4.0.6 are separate logical libraries;
-- ACE owns the combined DOCGroup archive;
-- `ACE.mwc` builds ACE and explicitly excludes TAO;
-- `TAO.mwc` builds TAO afterward;
-- both variants use the same `ACE_wrappers\bin` and `ACE_wrappers\lib` producer directories;
-- TAO overlays the ACE physical package rather than inventing a second native package layout;
-- ACE and TAO retain separate state, metadata, SBOM, documentation, and artifact evidence.
+ACE 8.0.6 / TAO 4.0.6 is the reference case.
 
 ```mermaid
 flowchart TD
-    U[Combined ACE+TAO archive] --> AS[ACE source owner]
-    AS --> AB[ACE.mwc build]
-    AB --> ABI[ACE build inventory]
-    ABI --> AI[ACE install]
-    AI --> AII[ACE install inventory]
-    AII --> AR[ACE publish / smoke / ready]
-    AI --> AM[ACE metadata]
-    AR --> H[Extension artifact handoff]
-    AM --> H
-    H --> TB[TAO build delta available]
-    TB --> TI[TAO overlay install]
-    TI --> TII[TAO install delta]
+    U[Combined ACE + TAO archive] --> AS[ACE source owner]
+    AS --> AB[ACE build]
+    AB --> AI[ACE artifact/install evidence]
+    AI --> TB[TAO build in shared producer]
+    TB --> TD[TAO delta]
+    TD --> TI[TAO overlay install]
 ```
 
-TAO's SSLIOP-specific patch is applied to each concrete Release/Debug producer directly before `TAO.mwc`. It is not applied asynchronously to the common workspace after ACE may already have copied that workspace.
+Important distinctions:
 
-The extension artifact handoff waits for both base `ready` and base `metadata` before releasing downstream extension test/install work. This prevents an overlay from mutating the base physical payload while the base is still publishing, smoke-testing, or reading metadata from it.
+- ACE and TAO are separate logical libraries.
+- TAO extends ACE.
+- Source archive is acquired once by ACE.
+- Native producer directories can be shared.
+- Payload can be shared.
+- logical state, metadata, SBOM, documentation and ownership remain separate.
 
-The mechanism is generic. There is no ACE/TAO name test in the engine.
+TAO compilation may start once its actual ACE producer/install-artifact prerequisites are satisfied. A later ACE consumer-publish failure does not by itself prove that starting TAO compilation was wrong.
 
-## Build variants
+Do not add an artificial requirement that every extension build wait for base global publish/ready unless the affected physical operation truly needs that barrier.
 
-Release and Debug are variants of one library contract. Common arguments belong to the shared build node; variant nodes contain only differences.
+## Common repository model
 
-```mermaid
-flowchart LR
-    B[Shared build contract] --> R[Release additions]
-    B --> D[Debug additions]
-    R --> BR[build:Release]
-    D --> BD[build:Debug]
-```
+`LibraryCatalog` and `BuildEngineRepository` separate logical identity from physical payload/metadata placement.
 
-Independent variant directories preserve useful parallelism.
-
-## Heartbeat semantics
-
-The heartbeat separates **active technical worker activity** from **logical job state**. A logical job can remain scheduler-running while its technical Actions transition; therefore logical running/open counts are not worker counts.
-
-Example data format:
+For a normal library:
 
 ```text
-[HEARTBEAT] running=4/4, open=32, ready=0, pending=12, current=406, passed=22, failed=0, blocked=0
+Payload:  install/packages/zlib/1.3.2/
+Metadata: install/packages/zlib/1.3.2/
 ```
 
-Here all four workers are occupied while 32 logical jobs remain non-terminal.
+For TAO:
+
+```text
+Payload:  install/packages/ace/8.0.6/
+Metadata: install/packages/ace/8.0.6/.buildengine/extensions/tao/4.0.6/
+```
+
+**Known Common gaps discovered by audit:**
+
+- `LibraryExists()` / `VersionExists()` still use physical package directories and may incorrectly reject an extension coordinate.
+- extension `installed` can be inferred too early merely because the base payload directory exists.
+- `PackageExporter` still copies complete physical package roots per logical component and is not ownership-safe for shared payloads.
+
+These issues belong in Common; Server must not work around them locally.
 
 ## Documentation pipeline
 
-Central API documentation is a dependency graph rather than an uncontrolled post-build side effect.
+Documentation is a reproducible build product.
 
-```mermaid
-flowchart TD
-   U[Publish / install + metadata] --> G[Prepare documentation input + Doxyfile]
-   G --> D[Doxygen - one run per scope]
-   D --> H[HTML]
-   D -->|effective latex=true| L[LaTeX]
-   R[Shared MiKTeX runtime preflight] --> M[MiKTeX texify]
-   L --> M
-   M --> P[PDF]
-   H --> S[Documentation jobs settled]
-   P --> S
-   S --> I[One final central index]
+A logical Doxygen scope performs exactly one Doxygen analysis producing HTML and optionally LaTeX. MiKTeX then compiles generated `refman.tex` when enabled.
+
+The semantic API source is the library's logical installed/public API. Successful global consumer publish is not inherently required to document an already installed API.
+
+**Known current gap:** implementation paths still use publish manifests for Doxygen input/dependencies when publish is configured. This is being removed.
+
+### Collection libraries
+
+Boost uses a simple `1 + N` scope model:
+
+```text
+1 root scope, non-recursive
+N first-level module scopes, recursive
 ```
 
-Important rules:
+There is no logical `collection-prepare` scope in the current contract and no separate logical PDF scope per Boost module. `texify`/PDF publication are technical Actions within that module's logical Doxygen scope.
 
-- HTML and LaTeX come from the **same** Doxygen run for a scope.
-- MiKTeX consumes generated `refman.tex`; it does not rerun Doxygen.
-- portable MiKTeX packages are prepared declaratively;
-- runtime package installation during `texify` is disabled;
-- one shared preflight initializes mutable MiKTeX runtime state before parallel PDFs;
-- a successful preflight does not imply every individual LaTeX document is valid;
-- collection libraries such as Boost use root/member documentation scopes discovered from published API structure;
-- parallel library jobs do not regenerate the global index; the final index is produced after the documentation tree is stable.
+Module output is nested under the module root:
 
-ACE and TAO now have separate documentation profiles and output coordinates even though their native producer is shared.
-
-## Important components
-
-| Component | Responsibility |
-| --- | --- |
-| `BuildEngine` | Top-level orchestration and build-file processing |
-| `BuildEngineConfiguration` | Effective local configuration and paths |
-| `RepositorySync` | Synchronization of administration repositories |
-| `ToolConfiguration` / `ToolJobs` | Managed tool contracts and preparation |
-| `LibraryConfiguration` | Declarative library and extension contracts |
-| `LibraryExtensionPaths` | Resolution of base workspace, source, producer, payload and logical metadata roots |
-| `LibraryJobBuilder` | Translation of library contracts into executable DAG jobs |
-| `LibraryArtifactJob` | Build/install inventories, extension deltas and safe extension handoff |
-| `ProcessScheduler` | Bounded concurrent DAG execution |
-| `LibraryStepState` | Logical state and direct-upstream timestamp/completion chain |
-| `MetadataJob` | License and CycloneDX metadata, including descriptions and extension identities |
-| `CentralDocumentationJob` / `DocumentationPipelineJob` / `CollectionDocumentationJob` | Doxygen/LaTeX/PDF and aggregate navigation |
-| `SmokeJobBuilder` | Consumer/integration smoke tests |
-| `BuildEngine-Common` | Leading shared DLL: library catalog, repository mapping, artifact manifest format, HTTP, security, package, Markdown, and utility services |
-
-## Common/DLL as leading contract
-
-BuildEngine is no longer a single console executable. The console engine, VCL manager, and local HTTP/REST server must not develop separate interpretations of libraries, packages, extensions, SBOMs, security findings, or physical payloads.
-
-```mermaid
-flowchart TD
-   Common[BuildEngine-Common DLL]
-   Common --> Repo[Logical repository model]
-   Common --> Catalog[Library catalog]
-   Common --> Artifacts[Artifact manifest model]
-   Common --> Risk[Risk/security services]
-   Common --> Export[Package export]
-   Common --> Markdown[Markdown rendering]
-   Common --> Console[BuildEngine]
-   Common --> Manager[VCL Manager]
-   Common --> Server[HTTP / REST Server]
+```text
+documentation/boost/<version>/<module>/html/
+documentation/boost/<version>/<module>/latex/
+documentation/boost/<version>/<module>/refman.pdf
 ```
 
-Applications follow Common. A change that is genuinely shared is not solved independently in each application.
+## Ready and consumer semantics
 
-This is why package/security overview pages now enumerate the logical catalog and resolve logical SBOM paths rather than treating `install/packages/<id>/<version>` as the complete truth. TAO's payload can live below ACE while TAO remains visible to REST, HTML, SBOM, and security consumers.
+Variant install readiness, global publish, package smoke and aggregate library readiness are related but not identical concepts.
 
-## Self-documenting project contract
+**Known current gap:** `ready:Debug` and `ready:Release` can currently represent different effective prerequisites while sharing the same wording. Ready/consumer semantics must be made symmetric and messages corrected before the next large run.
 
-Markdown under `admin/server-docs` is part of the engineering contract. Process and architecture diagrams are maintained as Mermaid. Literal state formats, XML fragments, paths and filesystem trees may remain code/text blocks because they represent data rather than diagrams.
+## Heartbeat and telemetry
 
-The maintenance rule is:
+Telemetry is evidence, not state.
 
-- configuration changes update [configuration.md](configuration.md);
-- tool changes update [build-tools.md](build-tools.md) and [tools.md](tools.md);
-- library/XML changes update [build-libraries.md](build-libraries.md) and, where applicable, [library-extensions.md](library-extensions.md);
-- documentation changes update [documentation.md](documentation.md);
-- HTTP/Common repository behavior updates [server.md](server.md);
-- architectural milestones are reflected here and, where they materially change the project narrative, in [story.md](story.md).
+**Known current gap:** the current `current=` heartbeat count mixes logical Current scopes with artifact-evidence no-op results. These counters must be separated.
 
-## Failure model
+## No-run gate
 
-Distinguish:
+The current project phase explicitly avoids another long full build/make/check/clean-room run until the static P0/P1 repair list is complete.
 
-- **technical Action failure**: one concrete execution step failed;
-- **dependency failure**: a logical job could not run because a prerequisite failed;
-- **current-state miss**: a logical scope cannot be reused because its timestamp/upstream chain changed;
-- **state commit failure**: technical work succeeded but state persistence failed;
-- **artifact evidence failure**: inventory/delta evidence could not be generated;
-- **generated-output failure**: a downstream product such as a PDF is missing although earlier prerequisites may have succeeded.
+The repair order is:
 
-Concrete exceptions should remain visible rather than being unnecessarily collapsed into generic messages.
+1. scheduler state lifecycle;
+2. artifact/ownership model;
+3. Common extension repository semantics;
+4. Publish;
+5. PackageExporter;
+6. documentation input and collection migration/check;
+7. ready/heartbeat semantics;
+8. only then targeted verification.
 
-## Design principle
+## Documentation maintenance rule
 
-The system is deliberately contract-driven. Compiler-specific integration stays explicit and verifiable, while reusable orchestration remains generic. Alternative compiler paths are not silently substituted for BCC64X: compatibility failures remain visible because proving that integration boundary is part of the project itself.
+The maintained project documentation is part of the architecture contract.
+
+- BuildEngine core rules: `BuildEngine/CONTRACT-RULE.md`, `CONTRACTS.md`
+- selfassessment/audit: BuildEngine `docs/SELFASSESSMENT_2026-09-15.md` and `docs/REPOSITORY_AUDIT_2026-09-15.md`
+- public documentation: this `admin/server-docs` tree
+
+Historical descriptions may be kept as provenance only when clearly marked historical. They must not look like active architecture instructions.
+
+## Verification status
+
+The repository cleanup and the identified implementation corrections are **not verified** until later explicitly approved BCC64X/Common/Server/Manager tests are performed.
