@@ -7,6 +7,13 @@
       </xs:restriction>
    </xs:simpleType>
 
+   <xs:simpleType name="documentationInputType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="published"/>
+         <xs:enumeration value="source"/>
+      </xs:restriction>
+   </xs:simpleType>
+
    <xs:complexType name="defineType">
       <xs:attribute name="name" type="xs:string" use="required"/>
       <!--
@@ -66,6 +73,7 @@
       <xs:attribute name="source" type="booleanText" use="optional"/>
       <xs:attribute name="inlineSource" type="booleanText" use="optional"/>
       <xs:attribute name="publicOnly" type="booleanText" use="optional"/>
+      <xs:attribute name="input" type="documentationInputType" use="optional" default="published"/>
       <!--
          A collection is documented with one non-recursive Doxygen run for the
          common published API root and one recursive Doxygen run for every
