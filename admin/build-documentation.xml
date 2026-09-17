@@ -272,7 +272,6 @@
    <!-- ACE and TAO are separate logical documentation products even though
         both originate from the same DOCGroup source archive. -->
    <library id="ace" publicOnly="true">
-      <exportTag file="ace.tag"/>
       <exclude pattern="*/TAO/*"/>
       <exclude pattern="*/tests/*"/>
       <exclude pattern="*/examples/*"/>
@@ -280,16 +279,18 @@
       <exclude pattern="*/performance_tests/*"/>
       <exclude pattern="*/bin/*"/>
       <exclude pattern="*/MPC/*"/>
+      <exportTag file="ace.tag"/>
    </library>
 
    <library id="tao" publicOnly="true">
-      <importTag library="ace" version="8.0.6" file="ace.tag"/>
+      <exclude pattern="*/ace/*"/>
       <exclude pattern="*/tests/*"/>
       <exclude pattern="*/examples/*"/>
       <exclude pattern="*/performance-tests/*"/>
       <exclude pattern="*/performance_tests/*"/>
       <exclude pattern="*/bin/*"/>
       <exclude pattern="*/MPC/*"/>
+      <importTag library="ace" version="8.0.6" file="ace.tag"/>
    </library>
 
    <library id="opencv" publicOnly="true">
