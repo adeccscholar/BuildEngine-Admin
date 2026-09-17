@@ -26,6 +26,16 @@
       <xs:attribute name="pattern" type="xs:string" use="required"/>
    </xs:complexType>
 
+   <xs:complexType name="exportTagType">
+      <xs:attribute name="file" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:complexType name="importTagType">
+      <xs:attribute name="library" type="xs:string" use="required"/>
+      <xs:attribute name="version" type="xs:string" use="required"/>
+      <xs:attribute name="file" type="xs:string" use="required"/>
+   </xs:complexType>
+
    <!--
       Collection overrides are a negative list only. The collection members are
       still discovered exclusively from the first directory level of the
@@ -46,6 +56,8 @@
          <xs:element name="define" type="defineType" minOccurs="0" maxOccurs="unbounded"/>
          <xs:element name="option" type="optionType" minOccurs="0" maxOccurs="unbounded"/>
          <xs:element name="exclude" type="excludeType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="exportTag" type="exportTagType" minOccurs="0" maxOccurs="1"/>
+         <xs:element name="importTag" type="importTagType" minOccurs="0" maxOccurs="unbounded"/>
          <xs:element name="override" type="collectionOverrideType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="id" type="xs:string" use="required"/>
