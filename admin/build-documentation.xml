@@ -282,8 +282,7 @@
       <exportTag file="ace.tag"/>
    </library>
 
-   <library id="tao" publicOnly="true">
-      <exclude pattern="*/ace/*"/>
+   <library id="tao" publicOnly="true" input="source">
       <exclude pattern="*/tests/*"/>
       <exclude pattern="*/examples/*"/>
       <exclude pattern="*/performance-tests/*"/>
