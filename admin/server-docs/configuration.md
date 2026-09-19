@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current configuration contract as of 15 September 2026. Known implementation gaps are documented in the related architecture/library/documentation pages. No new full verification run has been performed.
+**Status:** current configuration contract as of 19 September 2026. The Library-FSM architecture is active. The current `build-libraries.xml` declares schemaVersion 15, while `schemas/build-libraries.xsd` still declares fixed version 14; this mismatch is a known contract defect and must be resolved before schema validation can be considered current.
 
 BuildEngine combines one local machine/deployment configuration with synchronized administration contracts.
 
@@ -77,8 +77,8 @@ Exact worker counts, local paths and endpoint values are deployment choices and 
 | --- | --- |
 | `root` | central BuildEngine production root |
 | `rsvars` | C++Builder environment initialization |
-| `workers` | global scheduler worker limit |
-| `queueLength` | scheduler queue capacity |
+| `workers` | technical ProcessScheduler/worker limit for released jobs |
+| `queueLength` | technical execution queue capacity |
 | `testJobs` | parallelism supplied to supported test runners |
 | `heartbeatSeconds` | heartbeat interval |
 | `WithTests` | enable upstream/library tests |
@@ -115,7 +115,7 @@ flowchart TD
 | Repository checkout locations | yes | repository content is synchronized |
 | Tool definitions/versions | no | yes |
 | Library identities/versions/build contracts | no | yes |
-| Dependency graph | no | yes |
+| Direct library dependencies / FSM requirements | no | yes |
 | Documentation defaults/capability | local feature switch | project/library/module policy |
 | Security identity | no | yes |
 
@@ -145,7 +145,7 @@ $$
 N_{active} \leq N_{workers}
 $$
 
-Technical Actions from independent logical jobs/scopes can execute concurrently when their dependencies and physical resources allow it.
+Technical WorkItems released by independent Library-FSMs can execute concurrently when their local dependencies and physical resources allow it. The worker limit bounds technical execution; it does not define the fachlich library lifecycle.
 
 There are no separate architectural worker pools for Build, Test or Documentation. A future resource-slot contract must remain generic.
 
@@ -216,7 +216,7 @@ doxygen:<module-2>
 
 There is no current logical `collection-prepare` scope and no separate logical module-PDF scope.
 
-`--check` must use the same discovery/scope source as execution. This is a known current implementation repair item.
+`--check` uses the same discovery/scope source and the same Library-FSM/orchestrator semantics as execution, but remains read-only and submits no technical library jobs.
 
 See [documentation.md](documentation.md).
 
@@ -262,15 +262,15 @@ BuildEngine --version
 
 ### `--make`
 
-Default incremental command. Reuses current logical scopes and executes stale scopes only.
+Default incremental command. The declarative contract is compiled into Library-FSM definitions; current scopes transition without technical work and stale scopes release WorkItems for execution.
 
 ### `--build`
 
-Forces execution of the selected graph. The failure-safe contract still requires previous success state to be invalidated before actual execution so a failed forced build cannot leave old success behind.
+Forces selected logical work while keeping the same Library-FSM architecture. A scope is invalidated before its technical execution so a failed forced build cannot leave old success behind.
 
 ### `--check`
 
-Read-only evaluation of logical scopes. It must report the same logical scope model used by execution, including dynamic collection documentation scopes.
+Read-only evaluation through the same declarative definitions and Library-FSM/orchestrator semantics used by execution. It submits no technical library jobs and changes no persistent state. Dynamic collection documentation scopes use the same discovery as execution.
 
 Examples after the active library IDs are confirmed from the current synchronized catalog:
 
@@ -298,29 +298,28 @@ Reserved/recognized according to the current CLI implementation; if not implemen
 
 Any command that does not yet support library selection must reject it rather than silently operating on an unintended graph.
 
-## Current no-run gate
+## Current verification boundary
 
-The project is currently in a structural repair phase.
+The historical static no-run gate from the 15 September repair phase has been superseded by the active Library-FSM implementation.
 
-Until the P0/P1 issues in logical state lifecycle, ownership/Publish, Common extension semantics, PackageExporter and documentation migration/check are statically corrected:
+Verification remains staged: architecture changes are checked statically and with targeted BCC64X runs first; a complete Clean-Room run remains a separate evidence milestone.
 
-- no full `--make`,
-- no full `--build`,
-- no full `--check`,
-- no Clean-Room run.
+The current BZip2/libarchive capability has its own explicit gate: the BuildEngine-private libarchive runtime must be rebuilt and must report `filter bzip2 : in-proc` before the hidden Bash `.tar.bz2` tool contract is restored.
 
-A later run verifies a previously reasoned correction; it is not used to discover already visible architecture errors after hours of execution.
+There is also a current schema-version mismatch: `build-libraries.xml` declares version 15, while `schemas/build-libraries.xsd` still fixes version 14. Until this is corrected, schema validation must not be described as current.
 
 ## Validation checklist
 
 - [ ] Production root is the intended central tree.
 - [ ] Server endpoint matches the intended network boundary.
 - [ ] Admin synchronization is configured.
-- [ ] active `build-libraries.xml` validates against its current XSD/schema version.
+- [ ] `build-libraries.xml` and `schemas/build-libraries.xsd` agree on the schema version.
 - [ ] worker/queue/test parallelism is intentional.
+- [ ] Library-FSM state and persistent logical scope state remain separate.
+- [ ] technical ProcessJobs/Actions are not treated as library-state authority.
 - [ ] tests/documentation feature switches are explicit.
 - [ ] documentation inheritance/collection settings are intentional.
 - [ ] generated `tools.xml`/`machine-state.xml` are not hand-authored library knowledge.
-- [ ] logical scope state is not replaced by Step/fingerprint/output state.
 - [ ] physical package paths are not used as logical library identity.
+- [ ] private libarchive capability banner matches the archive formats used by active tool contracts.
 - [ ] contract and maintained Markdown pages are updated together.
