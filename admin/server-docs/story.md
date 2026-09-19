@@ -447,7 +447,7 @@ For production use we need stronger questions answered:
 
 BuildEngine grew out of that need.
 
-Instead of turning every library into a new hard-coded C++ workflow, the project increasingly moved library-specific knowledge into declarative XML contracts. The engine provides generic execution: repository synchronization, tool provisioning, source acquisition, dependency graphs, scheduler execution, state handling, package installation, smoke tests, documentation, metadata, and later security analysis.
+Instead of turning every library into a new hard-coded C++ workflow, the project increasingly moved library-specific knowledge into declarative XML contracts. The engine provides generic infrastructure: repository synchronization, tool provisioning, source acquisition, Library-FSM orchestration, local technical execution, logical state handling, package installation, smoke tests, documentation, metadata, and later security analysis.
 
 The third-party library becomes data wherever possible. The engine remains infrastructure.
 
