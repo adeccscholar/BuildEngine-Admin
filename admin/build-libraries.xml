@@ -5854,7 +5854,7 @@
          <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
          <environment name="CPPFLAGS" value="-I{InstallRoot}\packages\zlib\1.3.2\include"/>
          <environment name="LDFLAGS" value="-L{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
-         <environment name="PATH" value="{ToolDir:bash}\usr\bin;{ToolDir:perl}\..\..\c\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PATH" value="{ToolDir:bash}\bin;{ToolDir:perl}\..\..\c\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
          <execute name="create-build-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
@@ -5934,7 +5934,7 @@
          <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
          <environment name="MAKE" value="{ToolDir:perl}\..\..\c\bin\gmake.exe"/>
          <environment name="U_MAKE" value="{ToolDir:perl}\..\..\c\bin\gmake.exe"/>
-         <environment name="PATH" value="{ToolDir:bash}\usr\bin;{ToolDir:perl}\..\..\c\bin;{ENV:PATH}"/>
+         <environment name="PATH" value="{ToolDir:bash}\bin;{ToolDir:perl}\..\..\c\bin;{ENV:PATH}"/>
          <execute name="create-build-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
