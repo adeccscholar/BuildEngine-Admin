@@ -59,7 +59,7 @@ Common/DLL is the leading shared interpretation for logical library/extension re
 
 | Attribute | Meaning |
 | --- | --- |
-| `id` | Unique logical library ID used by DAG, state, metadata, documentation and evidence. |
+| `id` | Unique logical library ID used by the Library-FSM, state, metadata, documentation and evidence. |
 | `version` | Exact logical upstream version. |
 | `category` | Stable inventory grouping. |
 | `timestamp` | Logical contract-change token for this library. |
@@ -88,7 +88,7 @@ License declarations are evidence/override data; declared upstream license text 
 <dependency library="zlib" version="1.3.2"/>
 ```
 
-Dependencies define logical relationships used by the DAG, state, package prerequisites, metadata and SBOM.
+Dependencies define logical relationships used by the Library-FSM, persistent scope state, package prerequisites, metadata and SBOM. From `Build` onward the generic runtime rule requires every direct dependency to have completed the same fachlich state before the downstream library can work there.
 
 Filesystem proximity does not create a dependency.
 
@@ -281,7 +281,7 @@ state=completed
 
 Fingerprints, technical Action IDs, output hashes and output existence are not Current-State authority.
 
-The scheduler must invalidate an old success before actually rerunning a stale/forced scope and commit only after success.
+The active FSM/execution path invalidates a stale scope before its technical job is submitted and commits a new success only after the work, required evidence and expected upstream state are successful.
 
 ## Common repository semantics
 
@@ -314,6 +314,17 @@ When changing a library contract:
 9. physical paths do not define logical identity;
 10. mark implementation **not verified** until the intended BCC64X/Common/Server run proves it.
 
-## Current execution gate
+## Current integration gate
 
-The project is in a static repair phase. No new full Build/Make/Check/Clean-Room run is started until the current P0/P1 repair list is complete.
+The FSM architecture is active. The historical 15 September static no-run gate is no longer the architectural status of this contract.
+
+Verification remains staged: targeted BCC64X runs first, complete Clean-Room evidence as a separate milestone.
+
+For the current BZip2/libarchive transition:
+
+1. build managed `bzip2 1.0.8`;
+2. rebuild managed `libarchive 3.8.9` with `ENABLE_BZip2=ON`;
+3. refresh the private BuildEngine libarchive runtime;
+4. rebuild/relink BuildEngine;
+5. verify `[LIBARCHIVE] filter bzip2 : in-proc`;
+6. only then restore the pinned Bash `.tar.bz2` tool contract.
