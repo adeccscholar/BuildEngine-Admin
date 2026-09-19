@@ -184,9 +184,11 @@ A credible clean-room proof should identify at least:
 - machine-state summary,
 - an unchanged second run proving full CURRENT state.
 
-## Next freeze
+## Next verification milestone
 
-Before the complete clean-room test, the new core state is compiled locally with BCC64X and verified with `WithDoxygen=true`. A new common freeze baseline is then documented. Until then, Admin library contracts remain functionally unchanged.
+The next cross-cutting infrastructure gate is the private-libarchive refresh with BZip2 support. After managed bzip2/libarchive are rebuilt, BuildEngine is relinked and the runtime must report `filter bzip2 : in-proc` before the pinned Bash `.tar.bz2` tool contract is restored.
+
+A complete Clean-Room run remains a later, separately recorded evidence milestone. Admin contracts are no longer frozen; each material contract change must update its logical timestamp and the maintained documentation together.
 
 ## Important documents
 
