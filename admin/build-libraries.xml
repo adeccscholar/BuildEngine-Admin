@@ -5908,7 +5908,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" category="text" timestamp="2026-09-20T00:15:00Z">
+   <library id="icu" version="78.3" category="text" timestamp="2026-09-20T01:15:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services."/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -5942,12 +5942,13 @@
          </execute>
          <execute name="configure" executable="{Tool:bash}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
             <argument value="-c"/>
-            <argument value="exec &quot;$(cygpath -u &quot;$1&quot;)&quot; &quot;$2&quot; &quot;$3&quot; &quot;--prefix=$(cygpath -u &quot;$4&quot;)&quot; --enable-shared --disable-static"/>
+            <argument value="export PYTHON=&quot;$(cygpath -u &quot;$5&quot;)&quot;; exec &quot;$(cygpath -u &quot;$1&quot;)&quot; &quot;$2&quot; &quot;$3&quot; &quot;--prefix=$(cygpath -u &quot;$4&quot;)&quot; --enable-shared --disable-static"/>
             <argument value="icu-configure"/>
             <argument value="{Workspace}\icu\source\runConfigureICU"/>
             <argument value="MinGW"/>
             <argument value="{ConfigureMode}"/>
             <argument value="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="{Tool:python}"/>
          </execute>
          <execute name="build" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"/>
          <variant name="Release">
