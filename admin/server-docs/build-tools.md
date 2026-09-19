@@ -170,7 +170,7 @@ The native extractor does not mean "whatever libarchive can somehow open on this
 
 A filter is accepted only when the linked libarchive reports it as in-process. External decompressor fallback is deliberately rejected.
 
-The pinned Bash/Git-for-Windows contract uses `.tar.bz2` and is active again as a managed `required="when-used"` tool. Its extraction deliberately exercises the BuildEngine-private libarchive BZip2 path; no external decompressor fallback is part of the contract.
+Git bootstrap and Bash now use the same pinned full Git-for-Windows `.tar.bz2` payload and the same managed root. The bootstrap `git` entry verifies `cmd\\git.exe` plus the required shell helpers during extraction. The later logical `bash` entry therefore reuses the existing payload and only probes `usr\\bin\\bash.exe`; it does not trigger a second download or extraction.
 
 ### `<generated>`
 
