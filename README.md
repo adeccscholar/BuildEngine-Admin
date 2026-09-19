@@ -22,7 +22,7 @@ That BZip2/private-libarchive transition is **not verified** until the rebuilt B
 [LIBARCHIVE] filter bzip2      : in-proc ...
 ```
 
-Git and Bash now share one pinned full Git-for-Windows payload. The bootstrap resolves `cmd\\git.exe` from that managed root, while the logical `bash` tool resolves `usr\\bin\\bash.exe` from the same root. This removes the separate MinGit payload while preserving distinct logical tool IDs.
+Git and Bash now share one pinned official PortableGit payload. The bootstrap resolves `cmd\\git.exe` from that managed root, while the logical `bash` tool resolves `usr\\bin\\bash.exe` from the same root. This removes the separate MinGit payload and avoids reconstructing MSYS virtual links from the raw TAR archive while preserving distinct logical tool IDs.
 
 
 ## Role in the overall project
