@@ -105,7 +105,7 @@ Most foundation tools are `required="always"`.
 
 `miktex` is deliberately `required="when-used"`: it is provisioned and prepared only when the effective documentation configuration of at least one library requires PDF output.
 
-The logical `git` and `bash` tools share one pinned official `PortableGit-2.55.0.3-64-bit.7z.exe` managed payload. Bootstrap Git resolves `cmd\\git.exe`; `bash` remains `required="when-used"` and resolves `usr\\bin\\bash.exe` from the same managed root. The self-extracting Windows package is provisioned once, while the two logical IDs keep their independent roles visible.
+The logical `git` and `bash` tools share one pinned official `PortableGit-2.55.0.3-64-bit.7z.exe` managed payload. Bootstrap Git resolves `cmd\\git.exe`; `bash` remains `required="when-used"` and resolves the Git-for-Windows wrapper `bin\\bash.exe` from the same managed root. The wrapper establishes the MSYS runtime environment for child shell processes. The self-extracting Windows package is provisioned once, while the two logical IDs keep their independent roles visible.
 
 This avoids unnecessary tool installation and package preparation on machines that build HTML documentation only.
 
