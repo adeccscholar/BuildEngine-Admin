@@ -22,7 +22,7 @@ That BZip2/private-libarchive transition is **not verified** until the rebuilt B
 [LIBARCHIVE] filter bzip2      : in-proc ...
 ```
 
-The pinned Bash `.tar.bz2` tool contract is active again. Its managed archive is extracted only through the BuildEngine private libarchive runtime, so BZip2 remains an explicit in-process capability rather than an accidental host dependency.
+Git and Bash now share one pinned full Git-for-Windows payload. The bootstrap resolves `cmd\\git.exe` from that managed root, while the logical `bash` tool resolves `usr\\bin\\bash.exe` from the same root. This removes the separate MinGit payload while preserving distinct logical tool IDs.
 
 
 ## Role in the overall project
