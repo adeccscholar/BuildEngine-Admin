@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current declarative contract as of 19 September 2026. The active `admin/build-libraries.xml` declares **schemaVersion 15**. `schemas/build-libraries.xsd` still fixes version **14**; this is a known contract mismatch and schema validation must not be described as current until it is resolved.
+**Status:** current declarative contract as of 19 September 2026. The active `admin/build-libraries.xml` and `schemas/build-libraries.xsd` use **schemaVersion 15**.
 
 `admin/build-libraries.xml` is the executable declarative contract for C and C++ libraries managed by BuildEngine. It describes logical library identity, exact versions, dependencies, source acquisition/preparation, build variants, tests, installation, publication, smoke tests, metadata/security evidence, documentation and library extensions.
 
