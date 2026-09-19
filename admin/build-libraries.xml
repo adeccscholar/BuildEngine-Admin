@@ -5908,7 +5908,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" category="text" timestamp="2026-09-19T22:30:00Z">
+   <library id="icu" version="78.3" category="text" timestamp="2026-09-20T00:15:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services."/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -5928,10 +5928,10 @@
          </extract>
       </source>
       <build testsAffectBuild="true">
-         <environment name="CC" value="{Tool:bcc64x}"/>
-         <environment name="CXX" value="{Tool:bcc64x}"/>
-         <environment name="AR" value="{Tool:llvm-ar}"/>
-         <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
+         <environment name="CC" value="{ToolShort:bcc64x}"/>
+         <environment name="CXX" value="{ToolShort:bcc64x}"/>
+         <environment name="AR" value="{ToolShort:llvm-ar}"/>
+         <environment name="RANLIB" value="{ToolShort:llvm-ranlib}"/>
          <environment name="MAKE" value="{ToolDir:perl}\..\..\c\bin\gmake.exe"/>
          <environment name="U_MAKE" value="{ToolDir:perl}\..\..\c\bin\gmake.exe"/>
          <environment name="PATH" value="{ToolDir:bash}\bin;{ToolDir:perl}\..\..\c\bin;{ENV:PATH}"/>
@@ -5941,12 +5941,13 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
          <execute name="configure" executable="{Tool:bash}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+            <argument value="-c"/>
+            <argument value="exec &quot;$(cygpath -u &quot;$1&quot;)&quot; &quot;$2&quot; &quot;$3&quot; &quot;--prefix=$(cygpath -u &quot;$4&quot;)&quot; --enable-shared --disable-static"/>
+            <argument value="icu-configure"/>
             <argument value="{Workspace}\icu\source\runConfigureICU"/>
             <argument value="MinGW"/>
             <argument value="{ConfigureMode}"/>
-            <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <argument value="--enable-shared"/>
-            <argument value="--disable-static"/>
+            <argument value="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
          <execute name="build" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"/>
          <variant name="Release">
