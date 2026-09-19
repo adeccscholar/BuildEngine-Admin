@@ -167,11 +167,13 @@ It must not infer ownership merely because a file exists below the shared payloa
 
 Publish manifests are publication evidence, not an independent ownership authority.
 
-### Known current implementation gap
+### Current migration handling
 
-Current Publish collision handling can treat entries from other publish manifests as ownership even when that evidence is stale. With a shared ACE/TAO payload this can allow an old downstream manifest to block a newly rebuilt upstream file.
+Publish distinguishes active publisher manifests from retired logical publisher identities for the same publish root. A manifest whose library ID is no longer present in the current publish contract is treated as migration evidence rather than active collision authority. Its files can therefore be adopted by a current publisher without weakening the protection against genuinely unowned files.
 
-This is a P0 repair item.
+After a current publish has taken over all still existing files recorded by a retired manifest, or those files no longer exist, the retired manifest is removed automatically. This specifically covers migrations such as the former combined `ace-tao.manifest` to the separate `ace.manifest` and `tao.manifest`.
+
+The implementation is committed but remains **not verified** until the next BCC64X run has exercised the migration on an existing publish tree.
 
 ## Package export
 
