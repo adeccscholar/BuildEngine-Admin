@@ -5705,4 +5705,358 @@
       </smoke>
    </library>
    
+   <!--
+      XeTeX preparation stack. These are normal BuildEngine library participants.
+      No XeTeX/XeLaTeX tool promotion is defined here yet.
+   -->
+   <library id="graphite2" version="1.3.15" category="text" timestamp="2026-09-19T13:30:00Z">
+      <metadata name="Graphite2" supplier="SIL Global" homepage="https://graphite.sil.org/" description="Smart-font rendering engine for Graphite fonts and complex text shaping."/>
+      <security>
+         <repository url="https://github.com/silnrsi/graphite.git" ref="{LibraryVersion}"/>
+      </security>
+      <source>
+         <download url="https://github.com/silnrsi/graphite/releases/download/{LibraryVersion}/graphite2-{LibraryVersion}.tgz"
+                   archive="graphite2-{LibraryVersion}.tgz"
+                   sha256="c6bc8b4252724665297f7cad0c55897285c673f9b8e6db3522ace833593fe0b1"/>
+         <extract format="libarchive" root="graphite2-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE"/>
+            <require path="COPYING"/>
+            <require path="include\graphite2\Font.h"/>
+            <require path="src\CMakeLists.txt"/>
+            <require path="tests\CMakeLists.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DLIB_SUFFIX:STRING=/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TESTING:BOOL={TestsEnabled}"/>
+         <argument value="-DGRAPHITE2_VM_TYPE:STRING=auto"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\graphite2-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\graphite2-{LibraryVersion}\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\graphite2\Font.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
+      </publish>
+   </library>
+
+   <library id="teckit" version="2.5.13" category="text" timestamp="2026-09-19T13:30:00Z">
+      <dependency library="zlib" version="1.3.2"/>
+      <metadata name="TECkit" supplier="SIL Global" homepage="https://software.sil.org/teckit/" description="Text encoding conversion toolkit with runtime engine, mapping compiler, and Unicode conversion utilities."/>
+      <security>
+         <repository url="https://github.com/silnrsi/teckit.git" ref="v{LibraryVersion}"/>
+      </security>
+      <source>
+         <download url="https://github.com/silnrsi/teckit/releases/download/v{LibraryVersion}/teckit-{LibraryVersion}.tar.xz"
+                   archive="teckit-{LibraryVersion}.tar.xz"
+                   sha256="3f55cd3670f1ff1a439d5a40071870b9e4ca2be8877a0eb80e24783cb532b380"/>
+         <extract format="libarchive" root="teckit-{LibraryVersion}">
+            <require path="configure"/>
+            <require path="configure.ac"/>
+            <require path="COPYING"/>
+            <require path="README.md"/>
+            <require path="source\Public-headers\TECkit_Common.h"/>
+            <require path="source\Public-headers\TECkit_Engine.h"/>
+            <require path="source\Public-headers\TECkit_Compiler.h"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CC" value="{Tool:bcc64x}"/>
+         <environment name="CXX" value="{Tool:bcc64x}"/>
+         <environment name="AR" value="{Tool:llvm-ar}"/>
+         <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
+         <environment name="CPPFLAGS" value="-I{InstallRoot}\packages\zlib\1.3.2\include"/>
+         <environment name="LDFLAGS" value="-L{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
+         <environment name="PATH" value="{ToolDir:git}\..\usr\bin;{ToolDir:perl}\..\..\c\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <execute name="create-build-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <execute name="configure" executable="{ToolDir:git}\..\usr\bin\sh.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+            <argument value="{Workspace}\teckit-{LibraryVersion}\configure"/>
+            <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="--with-system-zlib"/>
+            <argument value="--disable-dependency-tracking"/>
+            <argument value="{ConfigureMode}"/>
+         </execute>
+         <execute name="build" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"/>
+         <variant name="Release">
+            <variable name="ConfigureMode" value="--enable-final"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="ConfigureMode" value="--enable-debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="test" test="true" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="check"/>
+               </execute>
+               <execute name="install" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="install"/>
+               </execute>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\teckit-{LibraryVersion}\COPYING"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\TECkit\TECkit_Common.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib;.a" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe" optional="true"/>
+      </publish>
+   </library>
+
+   <library id="icu" version="78.3" category="text" timestamp="2026-09-19T13:30:00Z">
+      <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services."/>
+      <security>
+         <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
+      </security>
+      <source>
+         <download url="https://github.com/unicode-org/icu/releases/download/release-{LibraryVersion}/icu4c-{LibraryVersion}-sources.tgz"
+                   archive="icu4c-{LibraryVersion}-sources.tgz"
+                   sha256="3a2e7a47604ba702f345878308e6fefeca612ee895cf4a5f222e7955fabfe0c0"/>
+         <extract format="libarchive" root="icu">
+            <require path="LICENSE"/>
+            <require path="source\configure"/>
+            <require path="source\runConfigureICU"/>
+            <require path="source\common\unicode\utypes.h"/>
+            <require path="source\common\unicode\unicode.h"/>
+            <require path="source\test\intltest\intltest.h"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CC" value="{Tool:bcc64x}"/>
+         <environment name="CXX" value="{Tool:bcc64x}"/>
+         <environment name="AR" value="{Tool:llvm-ar}"/>
+         <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
+         <environment name="MAKE" value="{ToolDir:perl}\..\..\c\bin\gmake.exe"/>
+         <environment name="U_MAKE" value="{ToolDir:perl}\..\..\c\bin\gmake.exe"/>
+         <environment name="PATH" value="{ToolDir:git}\..\usr\bin;{ToolDir:perl}\..\..\c\bin;{ENV:PATH}"/>
+         <execute name="create-build-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <execute name="configure" executable="{ToolDir:git}\..\usr\bin\sh.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+            <argument value="{Workspace}\icu\source\runConfigureICU"/>
+            <argument value="MinGW"/>
+            <argument value="{ConfigureMode}"/>
+            <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="--enable-shared"/>
+            <argument value="--disable-static"/>
+         </execute>
+         <execute name="build" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"/>
+         <variant name="Release">
+            <variable name="ConfigureMode" value="--disable-debug"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="ConfigureMode" value="--enable-debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="test" test="true" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="check"/>
+               </execute>
+               <execute name="install" executable="{ToolDir:perl}\..\..\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="install"/>
+               </execute>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\share"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\icu\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode\utypes.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib;.a" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.dat" optional="true"/>
+         <tree source="share" target="share" optional="true"/>
+      </publish>
+   </library>
+
+   <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-09-19T13:30:00Z">
+      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="freetype" version="2.14.3"/>
+      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libpng" version="1.6.58"/>
+      <dependency library="libtiff" version="4.7.2"/>
+      <metadata name="Poppler" supplier="Poppler project" homepage="https://poppler.freedesktop.org/" description="PDF rendering and parsing library derived from Xpdf and used by document-processing toolchains."/>
+      <security>
+         <repository url="https://gitlab.freedesktop.org/poppler/poppler.git" ref="poppler-{LibraryVersion}"/>
+      </security>
+      <source>
+         <download url="https://poppler.freedesktop.org/poppler-{LibraryVersion}.tar.xz"
+                   archive="poppler-{LibraryVersion}.tar.xz"
+                   sha256="8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e"/>
+         <extract format="libarchive" root="poppler-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="COPYING3"/>
+            <require path="poppler\PDFDoc.h"/>
+            <require path="poppler\GlobalParams.h"/>
+            <require path="splash\Splash.h"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DFONT_CONFIGURATION:STRING=win32"/>
+         <argument value="-DENABLE_CPP:BOOL=OFF"/>
+         <argument value="-DENABLE_UTILS:BOOL=OFF"/>
+         <argument value="-DENABLE_GLIB:BOOL=OFF"/>
+         <argument value="-DENABLE_QT5:BOOL=OFF"/>
+         <argument value="-DENABLE_QT6:BOOL=OFF"/>
+         <argument value="-DENABLE_BOOST:BOOL=OFF"/>
+         <argument value="-DENABLE_BROTLI:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBOPENJPEG:BOOL=OFF"/>
+         <argument value="-DENABLE_LCMS:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBCURL:BOOL=OFF"/>
+         <argument value="-DENABLE_NSS3:BOOL=OFF"/>
+         <argument value="-DENABLE_GPGME:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBJPEG:BOOL=ON"/>
+         <argument value="-DENABLE_LIBTIFF:BOOL=ON"/>
+         <argument value="-DBUILD_GTK_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_QT5_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_QT6_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_CPP_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_MANUAL_TESTS:BOOL=OFF"/>
+         <argument value="-DRUN_GPERF_IF_PRESENT:BOOL=OFF"/>
+         <argument value="-DENABLE_RELOCATABLE:BOOL=ON"/>
+         <!--
+            Upstream release tarballs do not contain poppler/test-data.
+            Test integration stays explicit and will be added when that separate
+            upstream data repository becomes a pinned BuildEngine participant.
+         -->
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\poppler-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\poppler-{LibraryVersion}\COPYING"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
+      </publish>
+   </library>
+
 </buildLibraries>
