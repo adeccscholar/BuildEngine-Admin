@@ -105,7 +105,7 @@ Most foundation tools are `required="always"`.
 
 `miktex` is deliberately `required="when-used"`: it is provisioned and prepared only when the effective documentation configuration of at least one library requires PDF output.
 
-The pinned `bash` tool based on the Git-for-Windows `.tar.bz2` distribution is active in the tool contract. It is `required="when-used"` and is consumed explicitly by Autoconf-style library paths such as TECkit and ICU. Its archive is extracted by the BuildEngine-private libarchive runtime, whose BZip2 capability must be `in-proc`; no host decompressor fallback is accepted.
+The logical `git` and `bash` tools share one pinned full Git-for-Windows managed payload. Bootstrap Git resolves `cmd\\git.exe`; `bash` remains `required="when-used"` and resolves `usr\\bin\\bash.exe` from the same managed root. The archive is downloaded and extracted once, while the two logical IDs keep their independent roles visible.
 
 This avoids unnecessary tool installation and package preparation on machines that build HTML documentation only.
 
