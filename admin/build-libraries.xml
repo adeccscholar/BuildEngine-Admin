@@ -784,7 +784,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="libarchive" version="3.8.9" category="archive" timestamp="2026-09-19T19:05:00Z">
+   <library id="libarchive" version="3.8.9" category="archive" timestamp="2026-09-19T19:12:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="xz" version="5.8.3"/>
       <dependency library="zstd" version="1.5.7"/>
