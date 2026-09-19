@@ -40,6 +40,19 @@
       <xs:attribute name="library" type="xs:string" use="required"/>
       <xs:attribute name="version" type="xs:string" use="required"/>
    </xs:complexType>
+   <xs:complexType name="extensionSharedPathType">
+      <xs:attribute name="path" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="libraryExtensionType">
+      <xs:sequence>
+         <xs:element name="shared" type="extensionSharedPathType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="library" type="xs:string" use="required"/>
+      <xs:attribute name="version" type="xs:string" use="required"/>
+      <xs:attribute name="source" type="xs:string" use="required"/>
+      <xs:attribute name="producer" type="xs:string" use="required"/>
+      <xs:attribute name="install" type="xs:string" use="optional" default="."/>
+   </xs:complexType>
    <xs:complexType name="licenseMetadataType">
       <xs:sequence>
          <xs:element name="summary" type="xs:string" minOccurs="0"/>
@@ -310,9 +323,13 @@
                <xs:complexType>
                   <xs:sequence>
                      <xs:element name="dependency" type="dependencyType" minOccurs="0" maxOccurs="unbounded"/>
+                     <xs:element name="extension" type="libraryExtensionType" minOccurs="0"/>
                      <xs:element name="metadata" type="libraryMetadataType" minOccurs="0"/>
                      <xs:element name="security" type="librarySecurityType" minOccurs="0"/>
-                     <xs:element name="source" type="sourceType"/>
+                     <!-- Source is mandatory for source-owning libraries and optional for
+                          schema-15 extensions. LibraryConfiguration enforces that semantic
+                          distinction and forbids download/extract in extension source prep. -->
+                     <xs:element name="source" type="sourceType" minOccurs="0"/>
                      <xs:choice><xs:element name="build" type="buildType"/><xs:element name="install" type="directInstallType"/></xs:choice>
                      <xs:element name="documentation" type="documentationType" minOccurs="0"/>
                      <xs:element name="publish" type="publishType" minOccurs="0"/>
