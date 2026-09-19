@@ -784,7 +784,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="libarchive" version="3.8.9" category="archive" timestamp="2026-09-19T18:50:00Z">
+   <library id="libarchive" version="3.8.9" category="archive" timestamp="2026-09-19T19:05:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="xz" version="5.8.3"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -803,6 +803,7 @@
             <require path="tar\bsdtar.c"/>
          </extract>
          <copy source="{BuildFileDir}\patches\libarchive\3.8.9\bcc64x-modern-borland-compat.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\libarchive\3.8.9\managed-bzip2-contract.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <!--
             BCC64X compatibility backpatch for legacy __BORLANDC__ compiler
             branches. BCC64X also defines __clang__ and must therefore use the
@@ -842,6 +843,30 @@
             <argument value="--unidiff-zero"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch"/>
+         </execute>
+         <execute name="bzip2-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch"/>
+         </execute>
+         <execute name="bzip2-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch"/>
+         </execute>
+         <execute name="bzip2-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="true">
@@ -896,6 +921,7 @@
          <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
          <argument value="-DENABLE_BZip2:BOOL=ON"/>
          <argument value="-DBZIP2_INCLUDE_DIR:PATH={InstallRoot}\packages\bzip2\1.0.8\include"/>
+         <argument value="-DBZIP2_LIBRARIES:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\{Configuration}\{Bzip2LibraryName}.lib"/>
          <argument value="-DENABLE_LIBXML2:BOOL=OFF"/>
          <argument value="-DENABLE_EXPAT:BOOL=OFF"/>
          <!--
@@ -914,7 +940,6 @@
             <variable name="ArchiveName" value="libarchive"/>
             <variable name="ZlibLibraryName" value="libz"/>
             <variable name="Bzip2LibraryName" value="bzip2"/>
-            <argument value="-DBZIP2_LIBRARY_RELEASE:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\Release\bzip2.lib"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
          </variant>
@@ -922,7 +947,6 @@
             <variable name="ArchiveName" value="libarchived"/>
             <variable name="ZlibLibraryName" value="libzd"/>
             <variable name="Bzip2LibraryName" value="bzip2d"/>
-            <argument value="-DBZIP2_LIBRARY_DEBUG:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\Debug\bzip2d.lib"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
