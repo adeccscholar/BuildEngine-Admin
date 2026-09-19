@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current configuration contract as of 19 September 2026. The Library-FSM architecture is active. The current `build-libraries.xml` declares schemaVersion 15, while `schemas/build-libraries.xsd` still declares fixed version 14; this mismatch is a known contract defect and must be resolved before schema validation can be considered current.
+**Status:** current configuration contract as of 19 September 2026. The Library-FSM architecture is active. `build-libraries.xml` and `schemas/build-libraries.xsd` use schema version 15.
 
 BuildEngine combines one local machine/deployment configuration with synchronized administration contracts.
 
@@ -305,8 +305,6 @@ The historical static no-run gate from the 15 September repair phase has been su
 Verification remains staged: architecture changes are checked statically and with targeted BCC64X runs first; a complete Clean-Room run remains a separate evidence milestone.
 
 The current BZip2/libarchive capability has its own explicit gate: the BuildEngine-private libarchive runtime must be rebuilt and must report `filter bzip2 : in-proc` before the hidden Bash `.tar.bz2` tool contract is restored.
-
-There is also a current schema-version mismatch: `build-libraries.xml` declares version 15, while `schemas/build-libraries.xsd` still fixes version 14. Until this is corrected, schema validation must not be described as current.
 
 ## Validation checklist
 
