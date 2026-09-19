@@ -105,7 +105,7 @@ Most foundation tools are `required="always"`.
 
 `miktex` is deliberately `required="when-used"`: it is provisioned and prepared only when the effective documentation configuration of at least one library requires PDF output.
 
-A pinned `bash` tool based on the Git-for-Windows `.tar.bz2` distribution has been prepared but is currently intentionally hidden from the active tool contract. It will be restored only after the BuildEngine-private libarchive runtime has been rebuilt with BZip2 support and reports that filter as `in-proc`. Until then TECkit and ICU use the established Git-for-Windows `usr/bin` shell path.
+The pinned `bash` tool based on the Git-for-Windows `.tar.bz2` distribution is active in the tool contract. It is `required="when-used"` and is consumed explicitly by Autoconf-style library paths such as TECkit and ICU. Its archive is extracted by the BuildEngine-private libarchive runtime, whose BZip2 capability must be `in-proc`; no host decompressor fallback is accepted.
 
 This avoids unnecessary tool installation and package preparation on machines that build HTML documentation only.
 
