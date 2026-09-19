@@ -24,7 +24,6 @@ That BZip2/private-libarchive transition is **not verified** until the rebuilt B
 
 The pinned Bash `.tar.bz2` tool contract therefore remains intentionally hidden until this gate is met.
 
-A separate contract defect is currently visible: `admin/build-libraries.xml` declares `schemaVersion="15"`, while `admin/schemas/build-libraries.xsd` still declares `fixed="14"`. Documentation must not present schema validation as current until that mismatch is resolved.
 
 ## Role in the overall project
 
@@ -52,7 +51,7 @@ This separation is binding.
 Current state:
 
 ```text
-schemaVersion = 15 (XML; XSD still fixed at 14 — current mismatch)
+schemaVersion = 15
 current synchronized logical library catalog
 ```
 
