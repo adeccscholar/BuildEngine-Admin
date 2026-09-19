@@ -158,7 +158,7 @@ Archives can be extracted through the integrated libarchive path:
 </nativeExtract>
 ```
 
-Optional `<include>` patterns restrict the extracted content. `<require>` defines files that must exist after extraction.
+Optional `<include>` patterns restrict the extracted content. `<require>` defines files that must exist after extraction. `root="."` denotes the archive root itself and therefore strips no leading directory component; a non-dot root denotes a literal leading archive directory that must be present.
 
 The native extractor does not mean "whatever libarchive can somehow open on this machine". Compressed TAR suffixes select an explicit in-process filter. The current BuildEngine source recognizes:
 
