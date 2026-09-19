@@ -1,7 +1,7 @@
 # BuildEngine-Admin – Technical Administration Data
 
-**Status date:** September 8, 2026  
-**Status:** frozen contract state before the final clean-room test
+**Status date:** September 19, 2026  
+**Status:** active declarative contract for the Library-FSM architecture; BZip2/private-libarchive promotion pending verification
 
 This directory contains the administration contracts that BuildEngine synchronizes and uses at runtime for tool provisioning, library builds, packaging, publishing, and small consumer smokes.
 
@@ -16,8 +16,8 @@ Active libraries are not distributed across XML fragments.
 ## Current contract state
 
 ```text
-build-libraries.xml : Schema 14
-Library contracts   : 22
+build-libraries.xml : XML schemaVersion 15; XSD marker still fixed at 14
+Library contracts   : current synchronized logical catalog
 ```
 
 Included:
@@ -34,7 +34,8 @@ openssl
 curl
 boost
 nlohmann-json
-ace-tao
+ace
+tao
 bzip2
 glew
 opengl
@@ -59,30 +60,11 @@ programs/          technically justified special bridges
 smokes/            small package-related consumer smokes
 ```
 
-## Verified freeze state
+## Historical freeze evidence
 
-The last unchanged follow-up run on the target machine with this functional Admin contract produced:
+The earlier 451/451 CURRENT run remains historical evidence for the pre-FSM architecture. It is not the current verification baseline and does not prove later FSM, documentation, extension, Publish or BZip2/libarchive changes.
 
-```text
-[SUMMARY] jobs=471, current=451, passed=20, failed=0, blocked=0, incomplete=0
-Machine state: jobs=471, success=471, failed=0, blocked=0, incomplete=0
-```
-
-This confirmed 451/451 library tasks as `CURRENT`.
-
-Functional baselines before documentation-only changes:
-
-```text
-BuildEngine       268504010b54245124005fde968400f57b6514b5
-BuildEngine-Admin f7c6183cf7dc4d2b56bbc7da8b5a963eb911e97f
-```
-
-Detailed freeze rules are documented in:
-
-```text
-../docs/FREEZE_CLEANROOM.md
-../TODO.md
-```
+The current XML/XSD pair also contains a known schema-version mismatch: `build-libraries.xml` declares version 15 while `schemas/build-libraries.xsd` still fixes version 14. This must be corrected before schema validation is described as current.
 
 ## Core principle
 
@@ -132,7 +114,7 @@ Semantics:
 - explicitly empty `dependsOn` means no local predecessor dependency,
 - explicit dependencies currently reference previously defined technical actions through stable IDs.
 
-No new parallelization structures are introduced into library contracts until after the clean-room test.
+Technical `id`/`dependsOn` graphs remain local to WorkItems. Fachliche progression and dependency barriers are owned by the Library-FSM, not by a global Action DAG.
 
 ## Extended copy semantics
 
@@ -185,7 +167,7 @@ Source trees are regenerable artifacts. A temporary extraction tree must never b
 
 ## Native archive processing
 
-The historical custom generic Python extraction path for `.tar.xz` is no longer part of the active architecture. BuildEngine uses its internally available libarchive/xz functionality.
+The historical custom generic Python extraction path is no longer part of the active architecture. BuildEngine uses a private libarchive runtime with explicit in-process gzip, XZ and BZip2 filters. `.tar.bz2`, `.tbz2` and `.tbz` are accepted only when the BZip2 filter is in-process. The managed libarchive contract now consumes bzip2 1.0.8; the private runtime rebuild is still pending verification.
 
 ## Technically necessary special programs
 
@@ -237,33 +219,17 @@ The library `timestamp` describes the revision of the effective contract. Librar
 
 Ongoing incremental-state authority resides in the BuildEngine core through technical step markers. The verified follow-up run with 451/451 `CURRENT` confirms the current contract.
 
-## Freeze rule
+## Current verification boundary
 
-No functional changes are permitted in this `admin/` tree until the complete clean-room test has finished.
+The old freeze rule has been superseded by the active Library-FSM implementation.
 
-In particular, do not change:
+Verification remains staged. For the BZip2/libarchive transition the required sequence is:
 
-- `build-libraries.xml`,
-- `build-tools.xml`,
-- XSDs,
-- patches,
-- CMake/toolchain adapters,
-- programs,
-- smokes,
-- source pins,
-- hashes,
-- library timestamps,
-- build/test/install/publish parameters.
+1. build managed bzip2 1.0.8;
+2. rebuild managed libarchive 3.8.9 with BZip2 enabled;
+3. refresh the BuildEngine-private libarchive runtime;
+4. rebuild/relink BuildEngine;
+5. verify `[LIBARCHIVE] filter bzip2 : in-proc`;
+6. restore the pinned Bash `.tar.bz2` tool contract.
 
-If the clean-room test finds a functional error, only the minimally necessary correction is made; the complete clean-room test must then be repeated against a newly documented freeze baseline.
-
-## After the clean-room test
-
-Only then resume:
-
-- OpenCL,
-- GoogleTest and the Static-vs-Shared decision,
-- further security identities,
-- publish ownership,
-- new explicit DAG parallelization,
-- further libraries only where they add new evidence.
+A complete Clean-Room run remains a separate final evidence milestone.
