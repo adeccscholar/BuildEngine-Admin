@@ -172,7 +172,7 @@ The native extractor does not mean "whatever libarchive can somehow open on this
 
 A filter is accepted only when the linked libarchive reports it as in-process. External decompressor fallback is deliberately rejected.
 
-Git bootstrap and Bash now use the same pinned full Git-for-Windows `.tar.bz2` payload and the same managed root. The bootstrap `git` entry verifies `cmd\\git.exe` plus the required shell helpers during extraction. The later logical `bash` entry therefore reuses the existing payload and only probes `usr\\bin\\bash.exe`; it does not trigger a second download or extraction.
+Git bootstrap and Bash now use the same pinned official `PortableGit-2.55.0.3-64-bit.7z.exe` payload and the same managed root. The PortableGit self-extractor is used because the raw Git-for-Windows TAR contains MSYS virtual and dangling link entries such as `/dev/fd -> /proc/self/fd`, which are not faithfully representable as ordinary NTFS extraction results. The later logical `bash` entry reuses the existing managed root and only probes `usr\\bin\\bash.exe`; it does not trigger a second download or installation.
 
 ### `<generated>`
 
