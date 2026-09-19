@@ -33,6 +33,7 @@ flowchart LR
    zlib --> libarchive
    xz --> libarchive
    zstd --> libarchive
+   bzip2 --> libarchive
    openssl --> libarchive
 
    zlib --> openssl
@@ -89,7 +90,7 @@ ACE and TAO are separate logical libraries in the dependency graph. This does **
 | Zstandard | 1.5.7 | compression | Fast lossless compression library offering a wide compression-speed trade-off. | — | Shared compression package used by libzip, libarchive, and OpenSSL. |
 | XZ / liblzma | 5.8.3 | compression | LZMA/LZMA2 compression library and XZ container implementation. | — | Shared compression package used by libzip and libarchive. |
 | libzip | 1.11.4 | archive | C library for reading, creating, and modifying ZIP archives. | zlib, XZ, Zstandard | Shared library plus zip tools; AES/XZ/Zstd functional checks; upstream documentation build is not part of the package build because it writes shared source-tree outputs. |
-| libarchive | 3.8.9 | archive | Multi-format archive and compression library backing tar/cpio-style workflows. | zlib, XZ, Zstandard, OpenSSL | Shared libarchive plus tar/cpio/cat/unzip; BCC64X compatibility patch for legacy `__BORLANDC__` branches and Windows/Clang details. |
+| libarchive | 3.8.9 | archive | Multi-format archive and compression library backing tar/cpio-style workflows. | zlib, XZ, Zstandard, bzip2, OpenSSL | Shared libarchive plus tar/cpio/cat/unzip; BZip2 enabled explicitly for in-process `.tar.bz2` extraction; BCC64X compatibility patch for legacy `__BORLANDC__` branches and Windows/Clang details. |
 | OpenSSL | 3.5.8 | security | TLS/SSL and general-purpose cryptography toolkit and provider library. | zlib, Brotli, Zstandard | Native BCC64X Configure target, shared build, version-bound linker/Windows/PDB patches; no-asm baseline. |
 | curl | 8.21.0 | network | Client-side URL transfer library with HTTP(S) and related protocol support. | OpenSSL, zlib | Shared libcurl baseline with OpenSSL + zlib; Schannel, Brotli, Zstd and several optional protocol dependencies deliberately disabled in the current proof. |
 | Boost | 1.92.0 | foundation | Large collection of portable C++ libraries extending the standard library ecosystem. | OpenSSL, zlib | C++23 shared build from the official CMake tree; broad selected module set; MPI/Python excluded; BCC64X native-Clang preflight gates. |
@@ -119,9 +120,11 @@ ACE and TAO are separate logical libraries in the dependency graph. This does **
 
 ## Archive and compression stack
 
-### zlib, Brotli, Zstandard and XZ
+### zlib, Brotli, Zstandard, XZ and bzip2
 
 These libraries form the reusable compression foundation. Their versions are explicit dependencies of downstream packages rather than libraries discovered from an arbitrary machine installation. This matters especially for OpenSSL, libzip, libarchive, FreeType and Skia, because package metadata and SBOM relationships must describe the exact producer that was used.
+
+BZip2 1.0.8 is now also an explicit libarchive dependency. Release uses `bzip2.lib`, Debug uses `bzip2d.lib`. This is also the source for rebuilding BuildEngine's private libarchive runtime so `.tar.bz2`, `.tbz2` and `.tbz` can be handled in-process.
 
 ### libzip 1.11.4
 
@@ -133,7 +136,7 @@ The upstream documentation target is deliberately not part of the current build 
 
 ### libarchive 3.8.9
 
-libarchive consumes zlib, XZ, Zstandard and OpenSSL and enables the native tar, cpio, cat and unzip tools. CNG and Windows XMLLite are enabled; optional backends not represented by explicit BuildEngine dependencies are disabled.
+libarchive consumes zlib, XZ, Zstandard, bzip2 and OpenSSL and enables the native tar, cpio, cat and unzip tools. BZip2 is enabled explicitly and bound to the managed `bzip2 1.0.8` package rather than to an accidental host installation. CNG and Windows XMLLite are enabled; optional backends not represented by explicit BuildEngine dependencies are disabled.
 
 The version-bound `bcc64x-modern-borland-compat.patch` separates modern Clang-based BCC64X behavior from legacy compiler branches guarded only by `__BORLANDC__`. It covers inline/integer/literal handling, Windows `lseek` and `mbstate_t` handling, open-mode signatures and related tests. It also incorporates the relevant upstream Windows/Clang `filter_fork_windows.c` correction and resolves a BCC64X `ftruncate` macro collision without weakening Debug `-Werror`.
 
