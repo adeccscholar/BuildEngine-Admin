@@ -215,9 +215,11 @@ Static is permitted as a documented exception. GoogleTest will be deliberately r
 
 ## Incremental state
 
-The library `timestamp` describes the revision of the effective contract. Library timestamps remain unchanged during the freeze.
+The library `timestamp` describes the revision of the effective logical contract and changes when that contract changes.
 
-Ongoing incremental-state authority resides in the BuildEngine core through technical step markers. The verified follow-up run with 451/451 `CURRENT` confirms the current contract.
+Persistent Current-State belongs to logical library scopes. Each successful scope records its own library timestamp plus the exact direct upstream completion identities required by that scope. Technical step markers, job IDs, fingerprints and runtime FSM states are not Current-State authority.
+
+The historical 451/451 CURRENT run belongs to the pre-FSM baseline and must not be used as proof for the current contract.
 
 ## Current verification boundary
 
