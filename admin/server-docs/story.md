@@ -213,6 +213,8 @@ That also meant that the build prerequisites themselves had to become part of th
 
 BuildEngine therefore provisions required tools centrally. Where possible, those tools are **not installed system-wide and not registered globally**. They are downloaded or discovered, verified, kept inside the BuildEngine production tree, and referenced through internal tool variables such as `{Tool:cmake}`, `{Tool:ninja}`, or `{Tool:perl}`.
 
+The same principle increasingly applies to infrastructure that would normally be delegated to external helper programs. Archive extraction is a good example. BuildEngine links a private libarchive runtime and now treats gzip, XZ and BZip2 as explicit in-process capabilities. A `.tar.bz2` file is therefore not accepted merely because some `bzip2.exe` happens to exist on the machine; the runtime must report the BZip2 filter as available in-process. That turns an accidental host prerequisite into a visible, testable part of the BuildEngine capability contract.
+
 That approach has several advantages:
 
 - the build does not depend on a developer remembering which global tools were installed;
@@ -290,76 +292,119 @@ flowchart LR
 
 Within the vocabulary understood by the engine, changing a library version, adding a dependency, selecting another build variant, adjusting an upstream option, or defining another tool path becomes a data change rather than a new orchestration implementation.
 
-```mermaid
-flowchart LR
-   XML["XML contracts<br/>tools · libraries · variants · dependencies"] --> Model["Generic C++ model"]
-   Model --> DAG["Dependency graph"]
-   DAG --> Jobs["Build · test · install · document · publish"]
-   Jobs --> Evidence["State · packages · SBOM · licenses · documentation"]
+The first implementation of that idea was naturally task-oriented. We generated technical jobs, connected them through a dependency DAG, and let a scheduler find runnable work. That was the right starting point: it gave us parallelism, explicit dependencies, and a concrete way to turn the XML contract into execution.
+
+But as the project grew, the DAG started to carry too much meaning. Build, Test, Validation, Install, Metadata, Publish, Documentation, Ready, Release/Debug variants, extensions, dynamic documentation scopes and incremental state all had to be represented through combinations of jobs and edges. The technical graph was beginning to become a second model of the library itself.
+
+The architecture therefore changed at its center.
+
+## 6. The library became the state machine
+
+Today the primary runtime object is no longer a global graph node. It is the **library**.
+
+Every active `Library/Version` is represented by its own state machine:
+
+```text
+Source -> Build -> Test -> Validation -> Install -> Metadata -> Publish -> Documentation -> Ready
 ```
 
-That is the flexibility we were looking for: **the stable execution model remains in C++, while changing technical knowledge is represented declaratively in XML in a form that people can still understand directly.**
+The XML contract is compiled into state and scope definitions. The state machine asks, at each state:
 
-A generalized C++ application interprets those contracts and turns them into technical jobs and dependency graphs.
+- are my direct library requirements satisfied?
+- which of my logical scopes are already current?
+- is this state a no-op for this library?
+- which WorkItems must now be executed?
 
-That was an important design choice. We did not want two truths in the CI process: one truth in documentation and another in scripts, or one in YAML and another in a release handbook. Wherever possible, the data that controls the process should also be the data from which its documentation, state, metadata, and evidence are derived.
-
-There was also a pragmatic reason for implementing the orchestrator in C++:
-
-> **C++ is the language we know best.**
-
-Using it allowed us to reuse existing components, model ownership and concurrency explicitly, share functionality with native and server applications, and keep the orchestration engine itself within the modern C++ story we were trying to demonstrate.
-
-## 6. Efficiency is part of reproducibility
-
-Reproducibility must not mean deliberately wasting machine resources.
-
-A second design target was therefore **maximum useful parallelism while respecting real dependencies**.
-
-Release and Debug variants of one library should be able to run concurrently when they do not depend on each other. Independent libraries should be able to progress at the same time. A downstream library, however, must wait for the upstream package it actually requires. Tests can use their own bounded parallelism. Expensive documentation should not rerun because an unrelated aggregate index changed.
-
-That naturally leads to a dependency graph rather than a serial script:
+Only after those questions have been answered does technical work enter the worker infrastructure.
 
 ```mermaid
 flowchart LR
-   S[Source] --> BR[Build Release]
-   S --> BD[Build Debug]
-   BR --> IR[Install Release]
-   BD --> ID[Install Debug]
-   IR --> P[Publish / package]
-   ID --> P
-   P --> M[Metadata]
-   P --> D[Documentation]
-   M --> D
+   XML["XML contracts"] --> Def["LibraryDefinition"]
+   State["persistent scope state"] --> FSM["one FSM per Library/Version"]
+   Def --> FSM
+   FSM --> Work["released WorkItems"]
+   Work --> Exec["technical execution"]
+   Exec --> State
 ```
 
-The scheduler can exploit the graph, but it cannot violate it.
+This is not an add-on around the old scheduler. It is the organizing model of the current BuildEngine.
 
-### State follows the graph
+### Dependencies become state relationships
 
-The same insight eventually changed the incremental state model itself.
+A direct library dependency is no longer expanded into a second global web of phase-specific job edges.
 
-Early versions naturally tended to attach state to individual technical steps and to encode more and more knowledge in fingerprints. That works for a small sequence, but it begins to duplicate the dependency graph once the system has Release and Debug variants, tests, validation, common and variant installation, publication, metadata, documentation, PDF generation, and dynamically discovered collection work.
+Instead, for every state from Build onward, the general rule is:
 
-The current direction is simpler: **persistent state belongs to the logical library scope, while technical Actions remain execution and diagnostic units inside that scope.** The state records the library's own contract timestamp and the timestamp plus completion identity of every direct upstream library scope.
+> **A library may work on state S only after every direct dependency has successfully completed S.**
+
+So:
+
+```text
+ACE Build requires OpenSSL > Build
+TAO Build requires ACE > Build
+```
+
+Transitivity follows from the individual machines themselves. TAO does not need a hard-coded transitive OpenSSL rule; ACE already carries that responsibility.
+
+This was an important simplification. The same generic relation works for ordinary dependencies and for the logical side of extensions. The physical details of an extension — shared source, producer and payload paths — remain explicit in the XML contract, while the state progression stays uniform.
+
+### Parallelism moves inside the right boundary
+
+Release and Debug are variants of one library state, not separate libraries.
+
+When Build is reached, the state can release multiple independent WorkItems. The technical execution layer may run them concurrently, bounded by the worker count and by real local dependencies.
+
+Local Action graphs still exist where they are useful. A generated file can precede a compile, two tests can follow it, and an install step can wait for both. But that graph is now deliberately **local to already approved work**.
+
+```text
+Library FSM:
+   decides whether work is allowed
+
+WorkItem / local Action graph:
+   decides how that work is executed
+
+ProcessScheduler / workers:
+   execute the released jobs
+```
+
+That separation is one of the most important architectural results of the project.
+
+### Persistent state is not the runtime state machine
+
+The FSM is runtime control. It is not persisted.
+
+Persistent state belongs to logical scopes:
 
 ```text
 timestamp=<library timestamp>
 upstream=<library>|<version>|<scope>|<upstream library timestamp>|<upstream completedAt>
-upstream=...
 completedAt=<this scope completion>
 state=completed
 ```
 
-If an upstream scope runs again, its new `completedAt` value invalidates the direct downstream scope. The invalidation then propagates naturally through the same DAG that controls execution. There is no need for an unrelated global fingerprint to explain the dependency a second time.
+Before stale work is actually submitted, the previous successful scope state is invalidated. A new state is committed only after the technical work and its required evidence succeed and the expected upstream scopes are still current.
 
-This also preserves variants. `build:Release` and `build:Debug` are not two unrelated build contracts, but they are distinct logical scopes. The same applies to test, validation, installation, smoke, documentation, and other variant-specific work.
+That means a failed rebuild cannot leave an old success behind.
 
-The migration mattered in practice. In the first broad run with the new state model, **450 of 834 jobs were recognized as current**. That did not prove every migration edge case correct, but it did prove something important: changing the state model did not force the entire production tree to rebuild from zero.
+It also means fingerprints, output files, job IDs and technical step markers do not become a second definition of "current".
 
-The goal is not "parallel at all costs". It is to use CPU, I/O, network, and waiting time efficiently without turning concurrency into another source of nondeterminism.
+### The same model drives observation
 
-This is another place where modern C++ fits the problem well. Move-aware data structures, RAII, standard concurrency primitives, generic algorithms, ranges, and explicit ownership make it possible to build a scheduler and its surrounding infrastructure with relatively high-level abstractions while retaining direct control over lifetime and cost.
+The heartbeat now speaks primarily in terms of libraries and their reached FSM states rather than pretending that hundreds of technical jobs are the domain model.
+
+The read-only `--check` path also uses the same LibraryDefinition, state requirements and state-machine/orchestrator semantics. It does not submit technical build jobs and does not mutate persistence, but it answers the same question as execution: **where can this library actually progress under the current contract and state?**
+
+Documentation became a particularly useful stress test. Its `Documentation` state has hierarchical runtime substates for standard, collection and linked documentation. Dynamic Boost module scopes and ACE/TAO Doxygen tagfile relationships can therefore be expressed without inventing another global scheduler hierarchy.
+
+### Why this matters to the C++ story
+
+This redesign is also part of the modern-C++ experiment.
+
+Boost.Statechart provides the state-machine mechanism. Strong types carry library coordinates and states. Ranges and standard algorithms express requirement checks and fixpoint scans. RAII governs processes and resources. Move semantics make WorkItems and completion data practical without unnecessary copying.
+
+The value is not that C++ has an FSM library. The value is that the language and its ecosystem let us move from a technically convenient task graph to an architecture that more closely matches the domain we are trying to control.
+
+The goal is still not "parallel at all costs". It is useful parallelism under a model whose meaning remains understandable.
 
 ## 7. Thirty days later: a different application
 
