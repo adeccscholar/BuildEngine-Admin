@@ -16,7 +16,7 @@
    </tool>
 
    <tool id="bash" version="5.2" required="when-used">
-      <managed root="git-for-windows\2.55.0.3" executable="usr\bin\bash.exe">
+      <managed root="git-for-windows\2.55.0.3" executable="bin\bash.exe">
          <download url="https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.3/PortableGit-2.55.0.3-64-bit.7z.exe"
                    archive="PortableGit-2.55.0.3-64-bit.7z.exe"
                    sha256="ab00566336b5472120f9a52d34f2e79c5406535792acb0548001ffd0bd090e5d"/>
