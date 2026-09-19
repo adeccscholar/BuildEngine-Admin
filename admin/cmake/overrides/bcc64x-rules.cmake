@@ -88,6 +88,38 @@ foreach(_bcc64x_lang C CXX)
 endforeach()
 unset(_bcc64x_lang)
 
+# BCC64X is invoked by CMake outside the RAD Studio project generator.
+# Therefore reproduce the generic Win64 Modern compiler system include set
+# explicitly. CMAKE_INCLUDE_PATH is a CMake find_* search path and does not
+# establish the compiler's C/C++ standard-header search environment.
+#
+# Keep this generic: VCL/FMX headers are deliberately not part of the
+# third-party C/C++ toolchain profile.
+set(_BCC64X_C_STANDARD_INCLUDE_DIRECTORIES
+   "$ENV{CB_BDS}/include"
+   "$ENV{CB_BDS}/lib/clang/20/include"
+   "$ENV{CB_BDS}/include/x86_64-w64-mingw32"
+   "$ENV{CB_BDS}/include/windows/sdk"
+   "$ENV{CB_BDS}/include/windows/rtl")
+
+set(_BCC64X_CXX_STANDARD_INCLUDE_DIRECTORIES
+   "$ENV{CB_BDS}/include"
+   "$ENV{CB_BDS}/include/x86_64-w64-mingw32/c++/v1"
+   "$ENV{CB_BDS}/lib/clang/20/include"
+   "$ENV{CB_BDS}/include/x86_64-w64-mingw32"
+   "$ENV{CB_BDS}/include/windows/sdk"
+   "$ENV{CB_BDS}/include/windows/rtl")
+
+set(CMAKE_C_STANDARD_INCLUDE_DIRECTORIES
+   "${_BCC64X_C_STANDARD_INCLUDE_DIRECTORIES}"
+   CACHE STRING "BCC64X Win64 Modern C system include directories" FORCE)
+set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES
+   "${_BCC64X_CXX_STANDARD_INCLUDE_DIRECTORIES}"
+   CACHE STRING "BCC64X Win64 Modern C++ system include directories" FORCE)
+
+unset(_BCC64X_C_STANDARD_INCLUDE_DIRECTORIES)
+unset(_BCC64X_CXX_STANDARD_INCLUDE_DIRECTORIES)
+
 # Configuration-specific compiler flags belong to the BuildEngine variant
 # contract. Clear legacy Embarcadero initializers here without replacing them
 # with hidden Release/Debug policy.
