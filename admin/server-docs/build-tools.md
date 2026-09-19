@@ -160,6 +160,8 @@ Archives can be extracted through the integrated libarchive path:
 
 Optional `<include>` patterns restrict the extracted content. `<require>` defines files that must exist after extraction. `root="."` denotes the archive root itself and therefore strips no leading directory component; a non-dot root denotes a literal leading archive directory that must be present.
 
+The native extractor also materializes archive links safely after the normal files are present. Symbolic links are resolved within the extraction root and materialized as copied files/directories. TAR hard-link entries without their own payload are deferred and created as Windows hard links to their extracted archive target; missing targets, escaping paths, unsupported target types, and link cycles remain hard failures.
+
 The native extractor does not mean "whatever libarchive can somehow open on this machine". Compressed TAR suffixes select an explicit in-process filter. The current BuildEngine source recognizes:
 
 ```text
