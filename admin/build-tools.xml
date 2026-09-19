@@ -11,6 +11,21 @@
       <probe contains="git version 2.55.0.windows.3"><argument value="--version"/></probe>
    </tool>
 
+   <tool id="bash" version="5.2" required="when-used">
+      <managed root="bash\git-for-windows-2.55.0.3" executable="usr\bin\bash.exe">
+         <download url="https://github.com/git-for-windows/git/releases/download/v2.55.0.windows.3/Git-2.55.0.3-64-bit.tar.bz2"
+                   archive="Git-2.55.0.3-64-bit.tar.bz2"
+                   sha256="4ee071816e424f928f493c4b42e5486d05344a371665c82f1802ebcecaa1d19a"/>
+         <nativeExtract format="libarchive" root=".">
+            <require path="usr\bin\bash.exe"/>
+            <require path="usr\bin\sh.exe"/>
+            <require path="usr\bin\sed.exe"/>
+            <require path="usr\bin\awk.exe"/>
+         </nativeExtract>
+      </managed>
+      <probe contains="GNU bash"><argument value="--version"/></probe>
+   </tool>
+
    <tool id="cmake" version="4.1.1" required="always">
       <discover executable="cmake.exe" path="false">
          <candidate path="{USERPROFILE}\Documents\Embarcadero\Studio\37.0\CatalogRepository\CMake-cb\4.1.1\bin\cmake.exe"/>
