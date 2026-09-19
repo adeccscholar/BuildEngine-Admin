@@ -99,6 +99,7 @@ set(_BCC64X_C_STANDARD_INCLUDE_DIRECTORIES
    "$ENV{CB_BDS}/include"
    "$ENV{CB_BDS}/lib/clang/20/include"
    "$ENV{CB_BDS}/include/x86_64-w64-mingw32"
+   "$ENV{CB_BDS}/include/windows/crtl"
    "$ENV{CB_BDS}/include/windows/sdk"
    "$ENV{CB_BDS}/include/windows/rtl")
 
@@ -107,6 +108,7 @@ set(_BCC64X_CXX_STANDARD_INCLUDE_DIRECTORIES
    "$ENV{CB_BDS}/include/x86_64-w64-mingw32/c++/v1"
    "$ENV{CB_BDS}/lib/clang/20/include"
    "$ENV{CB_BDS}/include/x86_64-w64-mingw32"
+   "$ENV{CB_BDS}/include/windows/crtl"
    "$ENV{CB_BDS}/include/windows/sdk"
    "$ENV{CB_BDS}/include/windows/rtl")
 
