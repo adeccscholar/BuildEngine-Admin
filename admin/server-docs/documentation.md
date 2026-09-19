@@ -2,9 +2,9 @@
 
 [TOC|Content]
 
-**Status:** current contract as of 15 September 2026. The implementation is still being repaired against this contract; no new full verification run has been performed.
+**Status:** current contract as of 19 September 2026. Documentation is integrated into the active Library-FSM architecture. Individual end-to-end documentation paths remain subject to targeted BCC64X/runtime verification.
 
-BuildEngine treats documentation as a reproducible build product. The documentation pipeline separates configuration, logical documentation scopes, technical Doxygen/MiKTeX actions, aggregate navigation, and read-only server presentation.
+BuildEngine treats documentation as a reproducible build product. `Documentation` is a first-class Library-FSM state; below it, hierarchical runtime substates select standard, collection or linked documentation and the applicable Doxygen/PDF stages. Persistent Current-State remains attached to logical documentation scopes, not to those runtime substates.
 
 Central files:
 
@@ -53,17 +53,15 @@ Fingerprints, output existence, command hashes and technical step markers are no
 
 ## Documentation input
 
-The documented API is the library's **logical installed/public API** plus generated project, metadata, license and upstream documentation pages.
+The documented API is selected by the effective documentation contract. Standard/collection documentation normally uses the logical public/install API view; extension documentation can explicitly use `input="source"` when the logical API is defined by an extension source subtree.
 
-A successful global consumer publish is not a semantic prerequisite for API documentation.
-
-This distinction is important:
+A successful global consumer publish is not a semantic prerequisite for documentation.
 
 ```text
-logical public API  !=  successful projection into the global consumer tree
+logical documentation input != ownership of the global consumer tree
 ```
 
-The current BuildEngine source still contains code paths that use a publish manifest when a publish contract exists. That coupling is a known P0 repair item and must not be interpreted as the target contract.
+For TAO, `input="source"` resolves from the extension SourceRoot (`ACE_wrappers/TAO`), while references to ACE are connected through the explicit Doxygen tagfile relationship.
 
 ## Configuration layers
 
@@ -160,22 +158,23 @@ Historical layouts such as `html/<module>`, `latex/<module>` or a central `pdf/<
 
 ## Collection discovery and `--check`
 
-The same collection discovery must define:
+Execution and `--check` use the same collection discovery. The declarative compiler initially marks a collection as dynamically scoped; when the Documentation state is reached, the discovery materializes:
 
-- scheduled jobs,
-- logical scope IDs,
-- `--check` scopes,
-- allowed state migration.
+```text
+doxygen:root
+doxygen:<module>
+...
+```
 
-A `--check` implementation that only knows `doxygen` while execution creates `doxygen:root` and `doxygen:<module>` is incorrect and is a known repair item.
+The read-only check uses the same Library-FSM/orchestrator semantics and materializes these scopes only when the reached Documentation state requires them. It submits no technical documentation jobs and does not mutate persistent state.
 
 ## State migration
 
 State migration must preserve completed work whenever semantic equivalence can be proven.
 
-A migration may retain an existing `completedAt` only when library timestamp and direct logical upstream chain remain equivalent.
+A migration may retain an existing `completedAt` only when library timestamp and the exact direct logical upstream chain remain equivalent.
 
-A migration must not delete all previous collection states merely because job topology was simplified. The current destructive `MigrateSplitCollectionTopology()` behavior is known to violate this rule and must be corrected before a new large run.
+The earlier destructive collection-state migration path has been removed. Dynamic collection scopes are materialized from current discovery instead of deleting prior state merely because the technical topology changed.
 
 ## Extensions
 
@@ -237,4 +236,6 @@ Do not reintroduce:
 
 ## Verification status
 
-This document describes the current target contract. The current source tree still contains known deviations described in the BuildEngine Selfassessment/Repository Audit. The corrected implementation remains **not verified** until a later explicitly approved BCC64X/documentation run.
+The hierarchical Documentation FSM, standard/collection/linked modes, dynamic collection-scope materialization and explicit Doxygen tagfile relationships are implemented in the active source.
+
+Targeted BCC64X compilation has been performed for major parts of this path. A complete fresh documentation/clean-room run across all library profiles remains **[nicht verifiziert]** until separately executed and recorded.
