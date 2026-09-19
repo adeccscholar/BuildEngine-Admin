@@ -6,29 +6,33 @@ The project documentation is maintained in English so the project is accessible 
 
 ## Current status
 
-The earlier freeze before the clean-room test was deliberately reopened in the BuildEngine core on September 8, 2026 for two final functions:
-
-1. central Doxygen documentation based on the files actually published,
-2. task-based performance evidence (`buildlog_*.log`).
-
-The **Admin contract itself remains functionally unchanged** for that work. No library timestamps, source pins, patches, build parameters, smoke tests, or schemas were changed for those two functions.
-
-Last verified runtime evidence before this core-function block:
+BuildEngine has moved from its original task/global-DAG orchestration to a **Library-FSM architecture**. Each active Library/Version follows the fachlich lifecycle:
 
 ```text
-[SUMMARY] jobs=471, current=451, passed=20, failed=0, blocked=0, incomplete=0
-Machine state: jobs=471, success=471, failed=0, blocked=0, incomplete=0
+Source -> Build -> Test -> Validation -> Install -> Metadata -> Publish -> Documentation -> Ready
 ```
 
-This evidence is the baseline of the preceding functional state and must be reconfirmed after the Doxygen/performance extension.
+Technical jobs and local Action graphs execute only work released by that state machine. `ProcessScheduler` remains technical queue/worker infrastructure; it is no longer the fachlich model of a library.
+
+The Admin contract has continued to evolve beyond the old September freeze baseline. In particular, managed `libarchive 3.8.9` now depends explicitly on `bzip2 1.0.8` so BuildEngine's private libarchive runtime can gain native in-process `.tar.bz2` support.
+
+That BZip2/private-libarchive transition is **not verified** until the rebuilt BuildEngine runtime reports:
+
+```text
+[LIBARCHIVE] filter bzip2      : in-proc ...
+```
+
+The pinned Bash `.tar.bz2` tool contract therefore remains intentionally hidden until this gate is met.
+
+A separate contract defect is currently visible: `admin/build-libraries.xml` declares `schemaVersion="15"`, while `admin/schemas/build-libraries.xsd` still declares `fixed="14"`. Documentation must not present schema validation as current until that mismatch is resolved.
 
 ## Role in the overall project
 
 ```text
 adeccscholar/BuildEngine
    private C++23 application
-   Scheduler, generic technical actions, repository synchronization,
-   incremental state, publish, documentation, and smoke orchestration
+   Library-FSM + Orchestrator, logical scope state, generic technical execution,
+   repository synchronization, publish, documentation, and smoke orchestration
 
 adeccscholar/BuildEngine-Admin        <-- this repository
    declarative tool and library contracts
@@ -48,8 +52,8 @@ This separation is binding.
 Current state:
 
 ```text
-schemaVersion = 14
-22 library/platform contracts
+schemaVersion = 15 (XML; XSD still fixed at 14 — current mismatch)
+current synchronized logical library catalog
 ```
 
 Included:
@@ -66,7 +70,8 @@ openssl
 curl
 boost
 nlohmann-json
-ace-tao
+ace
+tao
 bzip2
 glew
 opengl
@@ -114,7 +119,7 @@ require
 target
 ```
 
-Schema 14 permits optional technical graph metadata (`id`, `dependsOn`). Without `dependsOn`, the historical serial predecessor relationship remains in effect.
+Schema 15 XML uses optional technical graph metadata (`id`, `dependsOn`). These dependencies order Actions inside technical work; they do not replace the Library-FSM or create persistent state. The XSD version marker is currently inconsistent and must be corrected separately.
 
 ## Publish manifest and Doxygen
 
