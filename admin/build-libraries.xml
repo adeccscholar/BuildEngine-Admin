@@ -5709,7 +5709,7 @@
       XeTeX preparation stack. These are normal BuildEngine library participants.
       No XeTeX/XeLaTeX tool promotion is defined here yet.
    -->
-   <library id="graphite2" version="1.3.15" category="text" timestamp="2026-09-19T13:30:00Z">
+   <library id="graphite2" version="1.3.15" category="text" timestamp="2026-09-19T15:25:00Z">
       <metadata name="Graphite2" supplier="SIL Global" homepage="https://graphite.sil.org/" description="Smart-font rendering engine for Graphite fonts and complex text shaping."/>
       <security>
          <repository url="https://github.com/silnrsi/graphite.git" ref="{LibraryVersion}"/>
@@ -5742,6 +5742,7 @@
          <argument value="-DLIB_SUFFIX:STRING=/win64/{Configuration}"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DBUILD_TESTING:BOOL={TestsEnabled}"/>
+         <argument value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
          <argument value="-DGRAPHITE2_VM_TYPE:STRING=auto"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\graphite2-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -5869,7 +5870,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" category="text" timestamp="2026-09-19T13:30:00Z">
+   <library id="icu" version="78.3" category="text" timestamp="2026-09-19T15:25:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services."/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -5883,7 +5884,8 @@
             <require path="source\configure"/>
             <require path="source\runConfigureICU"/>
             <require path="source\common\unicode\utypes.h"/>
-            <require path="source\common\unicode\unicode.h"/>
+            <require path="source\common\unicode\uchar.h"/>
+            <require path="source\common\unicode\ustring.h"/>
             <require path="source\test\intltest\intltest.h"/>
          </extract>
       </source>
