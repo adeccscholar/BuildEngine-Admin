@@ -85,7 +85,7 @@ Markdown itself is rendered server-side by the installed `cmark-gfm` library. `c
 In addition to explicit tool IDs, BuildEngine uses existing system components in selected places:
 
 - **Windows PowerShell**: for declaratively configured installation/extraction scripts of some managed tools.
-- **libarchive**: linked into BuildEngine for archive extraction; it is not a separate external command-line tool.
+- **libarchive**: linked into BuildEngine for archive extraction; it is not a separate external command-line tool. The private runtime exposes gzip, XZ and BZip2 as explicit in-process filters. `.tar.bz2`/`.tbz2`/`.tbz` require the BZip2 filter to report `in-proc`; no external decompressor fallback is accepted.
 - **Windows SDK**: source of `rc.exe`, discovered declaratively through `windows-rc`.
 
 Dependencies that matter for reproducibility should remain visible through the contracts or through BuildEngine binary dependencies.
@@ -104,6 +104,8 @@ Dependencies that matter for reproducibility should remain visible through the c
 Most foundation tools are `required="always"`.
 
 `miktex` is deliberately `required="when-used"`: it is provisioned and prepared only when the effective documentation configuration of at least one library requires PDF output.
+
+A pinned `bash` tool based on the Git-for-Windows `.tar.bz2` distribution has been prepared but is currently intentionally hidden from the active tool contract. It will be restored only after the BuildEngine-private libarchive runtime has been rebuilt with BZip2 support and reports that filter as `in-proc`. Until then TECkit and ICU use the established Git-for-Windows `usr/bin` shell path.
 
 This avoids unnecessary tool installation and package preparation on machines that build HTML documentation only.
 
