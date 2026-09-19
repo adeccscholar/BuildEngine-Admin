@@ -170,7 +170,7 @@ The native extractor does not mean "whatever libarchive can somehow open on this
 
 A filter is accepted only when the linked libarchive reports it as in-process. External decompressor fallback is deliberately rejected.
 
-The pinned Bash/Git-for-Windows contract uses `.tar.bz2`. It is temporarily absent from the active XML until the BuildEngine-private libarchive runtime has been rebuilt with the new BZip2 dependency and verified by the startup capability banner.
+The pinned Bash/Git-for-Windows contract uses `.tar.bz2` and is active again as a managed `required="when-used"` tool. Its extraction deliberately exercises the BuildEngine-private libarchive BZip2 path; no external decompressor fallback is part of the contract.
 
 ### `<generated>`
 
