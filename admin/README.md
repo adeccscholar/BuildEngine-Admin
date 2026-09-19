@@ -16,7 +16,7 @@ Active libraries are not distributed across XML fragments.
 ## Current contract state
 
 ```text
-build-libraries.xml : XML schemaVersion 15; XSD marker still fixed at 14
+build-libraries.xml : Schema 15
 Library contracts   : current synchronized logical catalog
 ```
 
@@ -63,8 +63,6 @@ smokes/            small package-related consumer smokes
 ## Historical freeze evidence
 
 The earlier 451/451 CURRENT run remains historical evidence for the pre-FSM architecture. It is not the current verification baseline and does not prove later FSM, documentation, extension, Publish or BZip2/libarchive changes.
-
-The current XML/XSD pair also contains a known schema-version mismatch: `build-libraries.xml` declares version 15 while `schemas/build-libraries.xsd` still fixes version 14. This must be corrected before schema validation is described as current.
 
 ## Core principle
 
