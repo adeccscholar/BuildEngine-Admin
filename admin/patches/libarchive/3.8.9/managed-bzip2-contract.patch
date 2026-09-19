@@ -1,0 +1,26 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -531,7 +531,19 @@
+ # Find BZip2
+ #
+ IF(ENABLE_BZip2)
+-  FIND_PACKAGE(BZip2)
++  # BuildEngine supplies the exact managed BZip2 producer.  Do not silently
++  # downgrade the feature when CMake's generic Windows library discovery
++  # does not recognise the BCC64X import-library layout.
++  IF(BZIP2_INCLUDE_DIR AND BZIP2_LIBRARIES)
++    IF(NOT EXISTS "${BZIP2_INCLUDE_DIR}/bzlib.h")
++      MESSAGE(FATAL_ERROR "Managed BZip2 header does not exist: ${BZIP2_INCLUDE_DIR}/bzlib.h")
++    ENDIF()
++    IF(NOT EXISTS "${BZIP2_LIBRARIES}")
++      MESSAGE(FATAL_ERROR "Managed BZip2 library does not exist: ${BZIP2_LIBRARIES}")
++    ENDIF()
++    SET(BZIP2_FOUND TRUE)
++    SET(BZip2_FOUND TRUE)
++  ELSE()
++    FIND_PACKAGE(BZip2 REQUIRED)
++  ENDIF()
+ ELSE()
+   SET(BZIP2_FOUND FALSE) # Override cached value
+ ENDIF()
