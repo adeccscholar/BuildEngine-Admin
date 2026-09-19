@@ -160,6 +160,18 @@ Archives can be extracted through the integrated libarchive path:
 
 Optional `<include>` patterns restrict the extracted content. `<require>` defines files that must exist after extraction.
 
+The native extractor does not mean "whatever libarchive can somehow open on this machine". Compressed TAR suffixes select an explicit in-process filter. The current BuildEngine source recognizes:
+
+```text
+.tar.gz / .tgz        -> gzip / zlib
+.tar.xz / .txz        -> xz / liblzma
+.tar.bz2 / .tbz2/.tbz -> bzip2 / libbz2
+```
+
+A filter is accepted only when the linked libarchive reports it as in-process. External decompressor fallback is deliberately rejected.
+
+The pinned Bash/Git-for-Windows contract uses `.tar.bz2`. It is temporarily absent from the active XML until the BuildEngine-private libarchive runtime has been rebuilt with the new BZip2 dependency and verified by the startup capability banner.
+
 ### `<generated>`
 
 BuildEngine can generate a tool artifact from already available files. The current use case is the BCC64X UCRT compatibility library.
