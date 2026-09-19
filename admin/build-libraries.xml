@@ -188,7 +188,6 @@
                </execute>
                <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
-                  <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
                   <environment name="PATH" value="{ToolDir:ninja};{ENV:PATH}"/>
                   <environment name="CMAKE_PREFIX_PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\test_install\lib\win64\{Configuration}\cmake\zlib"/>
                   <argument value="--output-on-failure"/>
@@ -932,6 +931,7 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <execute name="test" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
                   <argument value="--build"/>
                   <argument value="."/>
                   <argument value="--target"/>
