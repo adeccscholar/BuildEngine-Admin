@@ -5827,7 +5827,7 @@
       </publish>
    </library>
 
-   <library id="teckit" version="2.5.13" category="text" timestamp="2026-09-19T13:30:00Z">
+   <library id="teckit" version="2.5.13" category="text" timestamp="2026-09-19T21:05:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <metadata name="TECkit" supplier="SIL Global" homepage="https://software.sil.org/teckit/" description="Text encoding conversion toolkit with runtime engine, mapping compiler, and Unicode conversion utilities."/>
       <security>
@@ -5854,13 +5854,13 @@
          <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
          <environment name="CPPFLAGS" value="-I{InstallRoot}\packages\zlib\1.3.2\include"/>
          <environment name="LDFLAGS" value="-L{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
-         <environment name="PATH" value="{ToolDir:git}\..\usr\bin;{ToolDir:perl}\..\..\c\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PATH" value="{ToolDir:bash};{ToolDir:perl}\..\..\c\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
          <execute name="create-build-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
-         <execute name="configure" executable="{ToolDir:git}\..\usr\bin\sh.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+         <execute name="configure" executable="{ToolDir:bash}\sh.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
             <argument value="{Workspace}\teckit-{LibraryVersion}\configure"/>
             <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--with-system-zlib"/>
@@ -5908,7 +5908,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" category="text" timestamp="2026-09-19T15:55:00Z">
+   <library id="icu" version="78.3" category="text" timestamp="2026-09-19T21:05:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services."/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -5934,13 +5934,13 @@
          <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
          <environment name="MAKE" value="{ToolDir:perl}\..\..\c\bin\gmake.exe"/>
          <environment name="U_MAKE" value="{ToolDir:perl}\..\..\c\bin\gmake.exe"/>
-         <environment name="PATH" value="{ToolDir:git}\..\usr\bin;{ToolDir:perl}\..\..\c\bin;{ENV:PATH}"/>
+         <environment name="PATH" value="{ToolDir:bash};{ToolDir:perl}\..\..\c\bin;{ENV:PATH}"/>
          <execute name="create-build-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
-         <execute name="configure" executable="{ToolDir:git}\..\usr\bin\sh.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+         <execute name="configure" executable="{ToolDir:bash}\sh.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
             <argument value="{Workspace}\icu\source\runConfigureICU"/>
             <argument value="MinGW"/>
             <argument value="{ConfigureMode}"/>
