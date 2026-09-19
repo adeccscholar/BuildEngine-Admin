@@ -22,7 +22,7 @@ That BZip2/private-libarchive transition is **not verified** until the rebuilt B
 [LIBARCHIVE] filter bzip2      : in-proc ...
 ```
 
-The pinned Bash `.tar.bz2` tool contract therefore remains intentionally hidden until this gate is met.
+The pinned Bash `.tar.bz2` tool contract is active again. Its managed archive is extracted only through the BuildEngine private libarchive runtime, so BZip2 remains an explicit in-process capability rather than an accidental host dependency.
 
 
 ## Role in the overall project
@@ -185,7 +185,7 @@ A credible clean-room proof should identify at least:
 
 ## Next verification milestone
 
-The next cross-cutting infrastructure gate is the private-libarchive refresh with BZip2 support. After managed bzip2/libarchive are rebuilt, BuildEngine is relinked and the runtime must report `filter bzip2 : in-proc` before the pinned Bash `.tar.bz2` tool contract is restored.
+The private-libarchive/BZip2 gate has been crossed in the active contract: Bash is restored as a pinned managed tool and TECkit/ICU consume it explicitly instead of reaching through Git's private `usr/bin` tree. A complete Clean-Room run remains the verification milestone for this combined path.
 
 A complete Clean-Room run remains a later, separately recorded evidence milestone. Admin contracts are no longer frozen; each material contract change must update its logical timestamp and the maintained documentation together.
 
