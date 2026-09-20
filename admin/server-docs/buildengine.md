@@ -213,3 +213,34 @@ Heartbeat output is library/FSM-oriented. Technical job activity remains availab
 The FSM architecture, WorkItem integration and library-oriented runtime reporting are active source. Individual parts have already been compiled and exercised with BCC64X.
 
 The newly added private-libarchive BZip2 path is **not verified** until the private runtime is rebuilt, linked and reports `filter bzip2 : in-proc` during a real run.
+
+
+## Projectimport im CMake-Configure-Schritt
+
+Mit Bibliotheksvertrag Schema 16 kann eine CMake-Configure-Action Projektmetadaten aus vorhandenen Projektdateien importieren und daraus vor dem eigentlichen Configure-Lauf eine `CMakeLists.txt` erzeugen.
+
+Unterstützt werden zunächst:
+
+- `vcxproj` mit `ClCompile` und `ResourceCompile`;
+- `cbproj` mit `CppCompile`, `ResourceCompile` und `RcCompile`.
+
+Die Projektdatei wird ausschließlich gelesen. BuildEngine verändert weder `.vcxproj` noch `.cbproj`.
+
+Der Ablauf ist:
+
+```text
+cmake configure
+   -> optionale project imports
+   -> neutrales Targetmodell
+   -> generiertes CMakeLists.txt
+   -> reguläres CMake configure
+   -> Ninja / BCC64X
+```
+
+Der Importer ist bewusst kein MSBuild- oder C++Builder-Projekt-Interpreter. Toolchain, Plattform, Varianten, Installationspfade, Dependencies und allgemeine Buildargumente bleiben im bestehenden BuildEngine-Vertrag. Der Import liefert Projektinventar und wenige targetbezogene Angaben.
+
+Bedingte Source-Semantik wird nicht geraten. Ein Source-Eintrag mit nicht aufgelöster Condition bzw. `ExcludedFromBuild` führt zum Abbruch des Imports. Dadurch kann der Generator nicht stillschweigend ein anderes Target erzeugen als das Projekt beschreibt.
+
+Mehrere Imports dürfen in derselben Configure-Action zusammengeführt werden. Damit können beispielsweise mehrere Upstream-Windows-Projekte ein gemeinsames generiertes CMake-Projekt bilden.
+
+**Verifikationsstatus:** Implementierung und Schema sind vorhanden; der reale BCC64X-Proof für VCXPROJ und CBPROJ steht noch aus.
