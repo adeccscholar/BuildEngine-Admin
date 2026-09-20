@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+   <xs:simpleType name="archiveFormatType">
+      <xs:restriction base="xs:string"><xs:enumeration value="zip"/><xs:enumeration value="gzip"/><xs:enumeration value="gz"/><xs:enumeration value="libarchive"/></xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="booleanTextType">
+      <xs:restriction base="xs:string"><xs:enumeration value="true"/><xs:enumeration value="false"/></xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="pathProbeKindType">
+      <xs:restriction base="xs:string"><xs:enumeration value="file"/><xs:enumeration value="directory"/><xs:enumeration value="any"/></xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="cmakeModeType">
+      <xs:restriction base="xs:string"><xs:enumeration value="configure"/><xs:enumeration value="build"/><xs:enumeration value="install"/></xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="testPhaseType">
+      <xs:restriction base="xs:string"><xs:enumeration value="test"/><xs:enumeration value="validation"/></xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="targetDriverType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="generic"/>
+         <xs:enumeration value="cmake"/><xs:enumeration value="meson"/><xs:enumeration value="perl"/><xs:enumeration value="gmake"/>
+         <xs:enumeration value="python"/><xs:enumeration value="bmake"/>
+      </xs:restriction>
+   </xs:simpleType>
+
+   <!-- Optional graph metadata remains available in schema 15. -->
+   <xs:attributeGroup name="technicalActionGraphAttributes">
+      <xs:attribute name="id" type="xs:string" use="optional"/>
+      <xs:attribute name="dependsOn" type="xs:string" use="optional"/>
+   </xs:attributeGroup>
+
+   <xs:complexType name="environmentType">
+      <xs:attribute name="name" type="xs:string" use="required"/><xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="argumentType"><xs:attribute name="value" type="xs:string" use="required"/></xs:complexType>
+   <xs:complexType name="variableType">
+      <xs:attribute name="name" type="xs:string" use="required"/><xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="dependencyType">
+      <xs:attribute name="library" type="xs:string" use="required"/>
+      <xs:attribute name="version" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="extensionSharedType">
+      <xs:annotation>
+         <xs:documentation>Producer subtree intentionally shared by a base library and its extension. Sharing the physical path does not transfer logical artifact ownership.</xs:documentation>
+      </xs:annotation>
+      <xs:attribute name="path" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="libraryExtensionType">
+      <xs:annotation>
+         <xs:documentation>Special dependency for a logically independent library that reuses the base library source, variant producer and optionally installation tree.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="shared" type="extensionSharedType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="library" type="xs:string" use="required">
+         <xs:annotation><xs:documentation>Logical ID of the base library.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="version" type="xs:string" use="required">
+         <xs:annotation><xs:documentation>Exact base-library version required by the extension.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="source" type="xs:string" use="required">
+         <xs:annotation><xs:documentation>Relative extension source subtree below the base library source root.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="producer" type="xs:string" use="required">
+         <xs:annotation><xs:documentation>Relative producer root below the variant-specific base build directory.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="install" type="xs:string" use="optional" default=".">
+         <xs:annotation><xs:documentation>Relative overlay root below the base package root. A value of '.' overlays the base package root itself.</xs:documentation></xs:annotation>
+      </xs:attribute>
+   </xs:complexType>
+   <xs:complexType name="licenseMetadataType">
+      <xs:sequence>
+         <xs:element name="summary" type="xs:string" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="optional"/>
+      <xs:attribute name="spdx" type="xs:string" use="optional"/>
+      <xs:attribute name="licensor" type="xs:string" use="optional"/>
+      <xs:attribute name="file" type="xs:string" use="optional"/>
+   </xs:complexType>
+   <xs:complexType name="libraryMetadataType">
+      <xs:annotation>
+         <xs:documentation>Human-facing and SBOM metadata for one logical BuildEngine library. Contract metadata overrides automatically detected upstream values where both are present.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="license" type="licenseMetadataType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="optional">
+         <xs:annotation><xs:documentation>Human-readable display name of the upstream library or project.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="category" type="xs:string" use="optional">
+         <xs:annotation><xs:documentation>Optional metadata grouping. The established contract-wide inventory category is library/@category.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="description" type="xs:string" use="optional">
+         <xs:annotation><xs:documentation>Concise one-line description of the library's purpose. It is consumed by generated documentation, package metadata and the CycloneDX component description.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="supplier" type="xs:string" use="optional">
+         <xs:annotation><xs:documentation>Upstream vendor, organization or project responsible for the library.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="homepage" type="xs:anyURI" use="optional">
+         <xs:annotation><xs:documentation>Canonical upstream project or product page.</xs:documentation></xs:annotation>
+      </xs:attribute>
+   </xs:complexType>
+   <xs:complexType name="securityRepositoryType">
+      <xs:attribute name="url" type="xs:anyURI" use="required"/>
+      <xs:attribute name="ref" type="xs:string" use="optional"/>
+      <xs:attribute name="commit" type="xs:string" use="optional"/>
+   </xs:complexType>
+   <xs:complexType name="librarySecurityType">
+      <xs:sequence>
+         <xs:element name="repository" type="securityRepositoryType"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="downloadActionType">
+      <xs:attribute name="url" type="xs:string" use="required"/><xs:attribute name="archive" type="xs:string" use="required"/>
+      <xs:attribute name="sha256" type="xs:string" use="optional"/>
+      <xs:attributeGroup ref="technicalActionGraphAttributes"/>
+   </xs:complexType>
+   <xs:complexType name="extractActionType">
+      <xs:sequence>
+         <xs:element name="require" minOccurs="1" maxOccurs="unbounded">
+            <xs:complexType><xs:attribute name="path" type="xs:string" use="required"/></xs:complexType>
+         </xs:element>
+      </xs:sequence>
+      <xs:attribute name="format" type="archiveFormatType" use="required"/><xs:attribute name="root" type="xs:string" use="required"/>
+      <xs:attribute name="merge" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="preserveCurrentArtifact" type="booleanTextType" use="optional" default="false"/>
+      <xs:attributeGroup ref="technicalActionGraphAttributes"/>
+   </xs:complexType>
+   <xs:complexType name="copyPatternType">
+      <xs:attribute name="pattern" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="copyActionType">
+      <xs:sequence>
+         <xs:element name="include" type="copyPatternType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="exclude" type="copyPatternType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="source" type="xs:string" use="required"/><xs:attribute name="target" type="xs:string" use="required"/>
+      <xs:attribute name="recursive" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="overwrite" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="flatten" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="cleanTarget" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="singleFile" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="preserveCurrentArtifact" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
+      <xs:attributeGroup ref="technicalActionGraphAttributes"/>
+   </xs:complexType>
+   <xs:complexType name="requireActionType">
+      <xs:attribute name="path" type="xs:string" use="required"/>
+      <xs:attribute name="kind" type="pathProbeKindType" use="optional" default="file"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
+      <xs:attributeGroup ref="technicalActionGraphAttributes"/>
+   </xs:complexType>
+   <xs:simpleType name="projectImportFormatType">
+      <xs:restriction base="xs:string"><xs:enumeration value="vcxproj"/><xs:enumeration value="cbproj"/></xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="projectImportTargetType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="auto"/><xs:enumeration value="shared"/><xs:enumeration value="static"/><xs:enumeration value="executable"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:complexType name="projectImportIncludeType">
+      <xs:attribute name="path" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="projectImportValueType">
+      <xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="projectImportType">
+      <xs:sequence>
+         <xs:element name="include" type="projectImportIncludeType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="define" type="projectImportValueType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="link" type="projectImportValueType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="format" type="projectImportFormatType" use="required"/>
+      <xs:attribute name="source" type="xs:string" use="required"/>
+      <xs:attribute name="target" type="xs:string" use="required"/>
+      <xs:attribute name="type" type="projectImportTargetType" use="optional" default="auto"/>
+      <xs:attribute name="runtimeOutput" type="xs:string" use="optional"/>
+      <xs:attribute name="archiveOutput" type="xs:string" use="optional"/>
+      <xs:attribute name="debugPostfix" type="xs:string" use="optional"/>
+      <xs:attribute name="install" type="booleanTextType" use="optional" default="true"/>
+   </xs:complexType>
+   <xs:complexType name="cmakeActionType">
+      <xs:sequence>
+         <xs:element name="import" type="projectImportType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="mode" type="cmakeModeType" use="required"/><xs:attribute name="executable" type="xs:string" use="required"/>
+      <xs:attribute name="source" type="xs:string" use="optional"/><xs:attribute name="build" type="xs:string" use="required"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
+      <xs:attributeGroup ref="technicalActionGraphAttributes"/>
+   </xs:complexType>
+   <xs:complexType name="executeActionType">
+      <xs:sequence>
+         <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+      <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
+      <xs:attribute name="successExitCode" type="xs:unsignedInt" use="optional" default="0"/>
+      <xs:attribute name="showOutput" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
+      <xs:attributeGroup ref="technicalActionGraphAttributes"/>
+   </xs:complexType>
+   <xs:complexType name="targetParameterType">
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="targetLineType">
+      <xs:annotation>
+         <xs:documentation>Target text expands BuildEngine variables; doubled braces {{ and }} emit literal braces.</xs:documentation>
+      </xs:annotation>
+      <xs:attribute name="value" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="targetTemporaryFileType">
+      <xs:sequence>
+         <xs:element name="line" type="targetLineType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+      <xs:attribute name="path" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="targetActionType">
+      <xs:sequence>
+         <xs:element name="parameter" type="targetParameterType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="temporaryFile" type="targetTemporaryFileType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="type" type="targetDriverType" use="required"/>
+      <xs:attribute name="executable" type="xs:string" use="optional"/>
+      <xs:attribute name="tool" type="xs:string" use="optional"/>
+      <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
+      <xs:attribute name="successExitCode" type="xs:unsignedInt" use="optional" default="0"/>
+      <xs:attribute name="showOutput" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
+      <xs:attributeGroup ref="technicalActionGraphAttributes"/>
+   </xs:complexType>
+   <xs:complexType name="sourceType">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+         <xs:element name="download" type="downloadActionType"/><xs:element name="extract" type="extractActionType"/>
+         <xs:element name="copy" type="copyActionType"/><xs:element name="execute" type="executeActionType"/>
+         <xs:element name="target" type="targetActionType"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="buildVariantType">
+      <xs:sequence>
+         <xs:element name="variable" type="variableType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="perVariantInstallType">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+         <xs:element name="cmake" type="cmakeActionType"/><xs:element name="execute" type="executeActionType"/>
+         <xs:element name="target" type="targetActionType"/><xs:element name="copy" type="copyActionType"/><xs:element name="require" type="requireActionType"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="commonInstallType">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+         <xs:element name="execute" type="executeActionType"/><xs:element name="target" type="targetActionType"/>
+         <xs:element name="copy" type="copyActionType"/><xs:element name="require" type="requireActionType"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="installType">
+      <xs:sequence><xs:element name="perVariant" type="perVariantInstallType"/><xs:element name="common" type="commonInstallType" minOccurs="0"/></xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="directInstallType">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+         <xs:element name="execute" type="executeActionType"/><xs:element name="target" type="targetActionType"/>
+         <xs:element name="copy" type="copyActionType"/><xs:element name="require" type="requireActionType"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="buildType">
+      <xs:sequence>
+         <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:choice minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="cmake" type="cmakeActionType"/><xs:element name="execute" type="executeActionType"/>
+            <xs:element name="target" type="targetActionType"/>
+         </xs:choice>
+         <xs:element name="variant" type="buildVariantType" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element name="install" type="installType"/>
+      </xs:sequence>
+      <xs:attribute name="testsAffectBuild" type="booleanTextType" use="optional" default="false"/>
+   </xs:complexType>
+
+   <xs:complexType name="documentationPhaseType">
+      <xs:sequence>
+         <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:choice minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="cmake" type="cmakeActionType"/>
+            <xs:element name="execute" type="executeActionType"/>
+            <xs:element name="copy" type="copyActionType"/>
+            <xs:element name="require" type="requireActionType"/>
+         </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="tool" type="xs:string" use="required"/>
+      <xs:attribute name="output" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="documentationType">
+      <xs:sequence>
+         <xs:element name="doc" type="documentationPhaseType" minOccurs="0"/>
+         <xs:element name="doxygen" type="documentationPhaseType" minOccurs="0"/>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="publishTreeType">
+      <xs:attribute name="source" type="xs:string" use="required"/>
+      <xs:attribute name="target" type="xs:string" use="required"/>
+      <xs:attribute name="optional" type="booleanTextType" use="optional" default="false"/>
+   </xs:complexType>
+   <xs:complexType name="publishFilesType">
+      <xs:attribute name="source" type="xs:string" use="required"/>
+      <xs:attribute name="target" type="xs:string" use="required"/>
+      <xs:attribute name="extensions" type="xs:string" use="required"/>
+      <xs:attribute name="optional" type="booleanTextType" use="optional" default="false"/>
+   </xs:complexType>
+   <xs:complexType name="publishCMakeType">
+      <xs:attribute name="source" type="xs:string" use="required"/>
+      <xs:attribute name="target" type="xs:string" use="required"/>
+      <xs:attribute name="optional" type="booleanTextType" use="optional" default="false"/>
+   </xs:complexType>
+   <xs:complexType name="publishType">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+         <xs:element name="tree" type="publishTreeType"/>
+         <xs:element name="files" type="publishFilesType"/>
+         <xs:element name="cmake" type="publishCMakeType"/>
+      </xs:choice>
+      <xs:attribute name="root" type="xs:string" use="required"/>
+      <xs:attribute name="configuration" type="xs:string" use="required"/>
+      <xs:attribute name="consumer" type="xs:string" use="required"/>
+      <xs:attribute name="requiresAllVariants" type="booleanTextType" use="optional" default="false"/>
+   </xs:complexType>
+
+   <xs:simpleType name="smokeScopeType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="published"/>
+         <xs:enumeration value="package"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:complexType name="smokeRunType">
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+   </xs:complexType>
+   <xs:complexType name="librarySmokeType">
+      <xs:sequence>
+         <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
+         <xs:element name="run" type="smokeRunType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+      <xs:attribute name="scope" type="smokeScopeType" use="optional" default="published"/>
+      <xs:attribute name="source" type="xs:string" use="required"/>
+      <xs:attribute name="configuration" type="xs:string" use="required"/>
+      <xs:attribute name="cmake" type="xs:string" use="required"/>
+      <xs:attribute name="ninja" type="xs:string" use="required"/>
+      <xs:attribute name="toolchain" type="xs:string" use="required"/>
+      <xs:attribute name="executable" type="xs:string" use="required"/>
+   </xs:complexType>
+
+   <xs:element name="buildLibraries">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="library" minOccurs="1" maxOccurs="unbounded">
+               <xs:complexType>
+                  <xs:sequence>
+                     <xs:element name="extension" type="libraryExtensionType" minOccurs="0"/>
+                     <xs:element name="dependency" type="dependencyType" minOccurs="0" maxOccurs="unbounded"/>
+                     <xs:element name="metadata" type="libraryMetadataType" minOccurs="0"/>
+                     <xs:element name="security" type="librarySecurityType" minOccurs="0"/>
+                     <xs:element name="source" type="sourceType" minOccurs="0"/>
+                     <xs:choice><xs:element name="build" type="buildType"/><xs:element name="install" type="directInstallType"/></xs:choice>
+                     <xs:element name="documentation" type="documentationType" minOccurs="0"/>
+                     <xs:element name="publish" type="publishType" minOccurs="0"/>
+                     <xs:element name="smoke" type="librarySmokeType" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                  <xs:attribute name="id" type="xs:string" use="required">
+                     <xs:annotation><xs:documentation>Unique logical library ID within BuildEngine. It is used in job IDs, package paths, state paths and dependency references.</xs:documentation></xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="version" type="xs:string" use="required">
+                     <xs:annotation><xs:documentation>Logical upstream version represented by this library entry.</xs:documentation></xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="category" type="xs:string" use="optional">
+                     <xs:annotation><xs:documentation>Stable inventory grouping used by the public library overview and related documentation.</xs:documentation></xs:annotation>
+                  </xs:attribute>
+                  <xs:attribute name="timestamp" type="xs:dateTime" use="required">
+                     <xs:annotation><xs:documentation>Library-local contract change token used by logical persistent state. Change it when the technical contract of this logical library changes.</xs:documentation></xs:annotation>
+                  </xs:attribute>
+               </xs:complexType>
+            </xs:element>
+         </xs:sequence>
+         <xs:attribute name="schemaVersion" use="required" fixed="16"/>
+      </xs:complexType>
+      <xs:unique name="uniqueLibraryId"><xs:selector xpath="library"/><xs:field xpath="@id"/></xs:unique>
+   </xs:element>
+</xs:schema>
