@@ -5747,7 +5747,7 @@
       XeTeX preparation stack. These are normal BuildEngine library participants.
       No XeTeX/XeLaTeX tool promotion is defined here yet.
    -->
-   <library id="graphite2" version="1.3.15" category="text" timestamp="2026-09-20T17:15:00Z">
+   <library id="graphite2" version="1.3.15" category="text" timestamp="2026-09-20T17:45:00Z">
       <metadata name="Graphite2" supplier="SIL Global" homepage="https://graphite.sil.org/" description="Smart-font rendering engine for Graphite fonts and complex text shaping."/>
       <security>
          <repository url="https://github.com/silnrsi/graphite.git" ref="{LibraryVersion}"/>
@@ -5880,6 +5880,36 @@
          <execute name="fonttools-path-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\add-managed-fonttools-path.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\graphite2\1.3.15\fix-jsontest-log-line-endings.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-jsontest-log-line-endings.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="jsontest-log-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-jsontest-log-line-endings.patch"/>
+         </execute>
+         <execute name="jsontest-log-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-jsontest-log-line-endings.patch"/>
+         </execute>
+         <execute name="jsontest-log-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-jsontest-log-line-endings.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\graphite2\1.3.15\fix-bcc64x-padauk3-reference.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-bcc64x-padauk3-reference.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="padauk3-reference-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-bcc64x-padauk3-reference.patch"/>
+         </execute>
+         <execute name="padauk3-reference-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-bcc64x-padauk3-reference.patch"/>
+         </execute>
+         <execute name="padauk3-reference-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-bcc64x-padauk3-reference.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="true">
