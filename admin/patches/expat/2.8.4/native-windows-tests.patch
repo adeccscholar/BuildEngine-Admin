@@ -1,0 +1,21 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -712,15 +712,15 @@ if(EXPAT_BUILD_TESTS)
+     ## these are unittests that can be run on any platform
+     enable_testing()
+ 
+-    if(NOT MSVC)
++    if(NOT WIN32)
+         if(MINGW)
+             set(host whatever-mingw32)  # for nothing but run.sh
+         endif()
+         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/run.sh.in run.sh @ONLY)
+     endif()
+ 
+     function(expat_add_test _name _file)
+-        if(MSVC)
++        if(WIN32)
+             add_test(NAME ${_name} COMMAND ${_file})
+         else()
+             add_test(NAME ${_name} COMMAND bash run.sh ${_file})
