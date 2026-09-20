@@ -1,0 +1,12 @@
+diff --git a/tests/json/jsontest.cpp b/tests/json/jsontest.cpp
+--- a/tests/json/jsontest.cpp
++++ b/tests/json/jsontest.cpp
+@@ -8,7 +8,7 @@ using namespace graphite2;
+ 
+ int main(int argc, char * argv[])
+ {
+-	json	jo(argc == 1 ? stdout : fopen(argv[1], "w"));
++	json	jo(argc == 1 ? stdout : fopen(argv[1], "wb"));
+ 	jo << json::array << "a string"
+ 		<< 0.54
+ 		<< 123
