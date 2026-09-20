@@ -1,0 +1,25 @@
+diff --git a/tests/nametabletest/nametabletest.cpp b/tests/nametabletest/nametabletest.cpp
+--- a/tests/nametabletest/nametabletest.cpp
++++ b/tests/nametabletest/nametabletest.cpp
+@@ -162,7 +162,7 @@ int main(int, char **)
+ 
+     testName(testAData, sizeof(NameTestA), 0x409, 0x409, 7, "ABC");
+     testName(testAData, sizeof(NameTestA), 0x809, 0x809, 7, "abcd");
+-    testName(testAData, sizeof(NameTestA), 0x455, 0x455, 7, "ကခ");
++    testName(testAData, sizeof(NameTestA), 0x455, 0x455, 7, "\xE1\x80\x80\xE1\x80\x81");
+ 
+     testLangId(testAData, sizeof(NameTestA), "en-US", 0x409);
+     testLangId(testAData, sizeof(NameTestA), "en", 0x409);
+@@ -181,9 +181,9 @@ int main(int, char **)
+     testLangId(testBData, sizeof(NameTestB), "ksw-MM", 0x8000);
+     testLangId(testBData, sizeof(NameTestB), "mnw-MM", 0x8001);
+     testName(testBData, sizeof(NameTestB), 0x809, 0x809, 7, "abcd");
+-    testName(testBData, sizeof(NameTestB), 0x455, 0x455, 7, "ကခ");
+-    testName(testBData, sizeof(NameTestB), 0x8000, 0x8000, 7, "ကၢၤ");
+-    testName(testBData, sizeof(NameTestB), 0x8001, 0x8001, 7, "ၜ");
++    testName(testBData, sizeof(NameTestB), 0x455, 0x455, 7, "\xE1\x80\x80\xE1\x80\x81");
++    testName(testBData, sizeof(NameTestB), 0x8000, 0x8000, 7, "\xE1\x80\x80\xE1\x81\xA2\xE1\x81\xA4");
++    testName(testBData, sizeof(NameTestB), 0x8001, 0x8001, 7, "\xE1\x81\x9C");
+     testName(testBData, sizeof(NameTestB), 0x8002, 0x409, 1, "Aa");
+     free(testBData);
+ 
