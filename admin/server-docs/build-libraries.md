@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current declarative contract as of 19 September 2026. The active `admin/build-libraries.xml` and `schemas/build-libraries.xsd` use **schemaVersion 15**.
+**Status:** current declarative contract as of 20 September 2026. The active `admin/build-libraries.xml` and `schemas/build-libraries.xsd` use **schemaVersion 16**.
 
 `admin/build-libraries.xml` is the executable declarative contract for C and C++ libraries managed by BuildEngine. It describes logical library identity, exact versions, dependencies, source acquisition/preparation, build variants, tests, installation, publication, smoke tests, metadata/security evidence, documentation and library extensions.
 
@@ -21,7 +21,7 @@ The XML is the source of library/build knowledge. Runtime code evaluates this co
 
 ```mermaid
 flowchart TD
-    XML[build-libraries.xml schema 15] --> XSD[schemas/build-libraries.xsd]
+    XML[build-libraries.xml schema 16] --> XSD[schemas/build-libraries.xsd]
     XML --> BE[BuildEngine]
     XML --> C[BuildEngine-Common LibraryCatalog]
     BE --> STATE[Logical scope state]
@@ -38,7 +38,7 @@ Common/DLL is the leading shared interpretation for logical library/extension re
 ```xml
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 xsi:noNamespaceSchemaLocation="schemas/build-libraries.xsd"
-                schemaVersion="15">
+                schemaVersion="16">
    <library id="example"
             version="1.2.3"
             category="network"
@@ -94,7 +94,7 @@ Filesystem proximity does not create a dependency.
 
 ## Library extensions
 
-Schema 15 supports a logically independent component that intentionally reuses a base library's physical structures.
+Schema 16 supports a logically independent component that intentionally reuses a base library's physical structures.
 
 ```xml
 <library id="tao" version="4.0.6" category="middleware" timestamp="...">
@@ -133,6 +133,48 @@ For an extension, shared source acquisition belongs to the base. An extension mu
 
 Variant-specific patches that must affect an already copied shared producer belong to the corresponding producer-preparation/build sequence, not to a late mutation of an unrelated source workspace.
 
+## CMake project import
+
+Schema 16 allows a CMake configure action to generate its source tree from existing project metadata before CMake itself is executed.
+
+Example:
+
+```xml
+<cmake mode="configure"
+       executable="{Tool:cmake}"
+       source="{BuildRoot}\generated\cmake\example"
+       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}">
+   <import format="vcxproj"
+           source="{Workspace}\example\example.vcxproj"
+           target="example"
+           type="shared">
+      <include path="{Workspace}\example\include"/>
+      <define value="EXAMPLE_BUILD"/>
+      <link value="dependency_target"/>
+   </import>
+</cmake>
+```
+
+Supported formats:
+
+| `format` | Imported inventory |
+| --- | --- |
+| `vcxproj` | `ClCompile`, `ResourceCompile` |
+| `cbproj` | `CppCompile`, `ResourceCompile`, `RcCompile` |
+
+Supported target types are `auto`, `shared`, `static` and `executable`. `auto` uses project metadata where that metadata is unambiguous.
+
+Optional output attributes are `runtimeOutput`, `archiveOutput`, `debugPostfix` and `install`. Child elements can add target-local `include`, `define` and `link` information.
+
+The import is intentionally narrower than MSBuild or the C++Builder project evaluator. BuildEngine does **not** import the compiler/toolchain contract from the project file. Platform, BCC64X, Release/Debug, install roots, dependency versions and common CMake arguments remain in `build-libraries.xml`.
+
+Project files are read-only inputs. In particular, a `.cbproj` is never rewritten by this mechanism.
+
+Source items with conditional inclusion or `ExcludedFromBuild` semantics are rejected instead of guessed. If such semantics are needed, they must be represented explicitly in the BuildEngine contract.
+
+Generated CMake source trees belong below the build root and are build artifacts, not Admin source.
+
+**Verification status:** the schema and both import adapters are implemented. The real BCC64X execution path is still **not verified** until BuildEngine is rebuilt with the new `ProjectImport.cpp` and representative VCXPROJ/CBPROJ cases pass.
 ## Build variants
 
 Release, Debug and future configurations are variants of one logical build contract.
