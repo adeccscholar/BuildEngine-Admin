@@ -1,0 +1,13 @@
+diff --git a/tests/fnttxtrender b/tests/fnttxtrender
+--- a/tests/fnttxtrender
++++ b/tests/fnttxtrender
+@@ -279,8 +279,8 @@ for label, words in reader:
+         t = makelabel(label, count, wcount)
+         gls = [list(map(partial(name, tt, rounding=rounding),
+                         font.glyphs(s, includewidth=True)))]
+         if gls[-1][-1][0] is None:
+-            gls[-1] = ('_adv_', gls[-1][-1][1], gls[-1][-1][2])
++            gls[-1][-1] = ('_adv_', gls[-1][-1][1], gls[-1][-1][2])
+         if cjson is not None and cmpgls(gls[0], cjson[t][0], opts.epsilon):
+             errors += 1
+             print(t + " Failed")
