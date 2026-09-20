@@ -5747,7 +5747,7 @@
       XeTeX preparation stack. These are normal BuildEngine library participants.
       No XeTeX/XeLaTeX tool promotion is defined here yet.
    -->
-   <library id="graphite2" version="1.3.15" category="text" timestamp="2026-09-20T16:30:00Z">
+   <library id="graphite2" version="1.3.15" category="text" timestamp="2026-09-20T17:15:00Z">
       <metadata name="Graphite2" supplier="SIL Global" homepage="https://graphite.sil.org/" description="Smart-font rendering engine for Graphite fonts and complex text shaping."/>
       <security>
          <repository url="https://github.com/silnrsi/graphite.git" ref="{LibraryVersion}"/>
@@ -5836,12 +5836,58 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\diagnose-fnttxtrender-mismatch.patch"/>
          </execute>
+         <copy source="{BuildFileDir}\patches\graphite2\1.3.15\fix-gr2fonttest-log-line-endings.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-gr2fonttest-log-line-endings.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="gr2fonttest-log-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-gr2fonttest-log-line-endings.patch"/>
+         </execute>
+         <execute name="gr2fonttest-log-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-gr2fonttest-log-line-endings.patch"/>
+         </execute>
+         <execute name="gr2fonttest-log-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-gr2fonttest-log-line-endings.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\graphite2\1.3.15\fix-nametabletest-utf8-literals.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-nametabletest-utf8-literals.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="nametabletest-utf8-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-nametabletest-utf8-literals.patch"/>
+         </execute>
+         <execute name="nametabletest-utf8-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-nametabletest-utf8-literals.patch"/>
+         </execute>
+         <execute name="nametabletest-utf8-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-nametabletest-utf8-literals.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\graphite2\1.3.15\add-managed-fonttools-path.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\add-managed-fonttools-path.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="fonttools-path-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\add-managed-fonttools-path.patch"/>
+         </execute>
+         <execute name="fonttools-path-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\add-managed-fonttools-path.patch"/>
+         </execute>
+         <execute name="fonttools-path-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\add-managed-fonttools-path.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <environment name="GRAPHITE2_FONTTOOLS_PATH" value="{ToolDir:fonttools}"/>
          <argument value="-G"/>
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
