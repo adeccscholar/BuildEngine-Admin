@@ -1,0 +1,24 @@
+diff --git a/tests/fnttxtrender b/tests/fnttxtrender
+--- a/tests/fnttxtrender
++++ b/tests/fnttxtrender
+@@ -130,14 +130,27 @@ def scalecmp(a, b, e):
+ 
+ 
+ def cmpgls(tests, bases, epsilon):
+     if len(tests) != len(bases):
++        print("glyph-count mismatch: actual={} expected={}"
++              .format(len(tests), len(bases)), file=sys.stderr)
+         return True
+     for i in range(len(tests)):
+         if tests[i][0] != bases[i][0]:
++            print("glyph[{}] name mismatch: actual={!r} expected={!r}"
++                  .format(i, tests[i][0], bases[i][0]), file=sys.stderr)
+             return True
+         for j in range(1, 3):
+             if scalecmp(tests[i][j], bases[i][j], epsilon):
++                axis = "x" if j == 1 else "y"
++                print("glyph[{}] {} mismatch: actual={!r} expected={!r} epsilon={!r}"
++                      .format(i, axis, tests[i][j], bases[i][j], epsilon),
++                      file=sys.stderr)
+                 return True
+     return False
