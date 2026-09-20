@@ -2,7 +2,7 @@ diff --git a/tests/nametabletest/nametabletest.cpp b/tests/nametabletest/nametab
 index 9c5a5e2..d35f0aa 100644
 --- a/tests/nametabletest/nametabletest.cpp
 +++ b/tests/nametabletest/nametabletest.cpp
-@@ -145,10 +145,13 @@ template <class T> T * toBigEndian1(T & table)
+@@ -145,9 +145,12 @@ template <class T> T * toBigEndian1(T & table)
      bigEndian->m_langTagCount = be::swap<uint16>(table.m_langTagCount);
      for (size_t i = 0; i < table.m_langTagCount; i++)
      {
