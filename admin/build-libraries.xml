@@ -6034,6 +6034,7 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <argument value="-DFONT_CONFIGURATION:STRING=win32"/>
          <argument value="-DENABLE_CPP:BOOL=OFF"/>
          <argument value="-DENABLE_UTILS:BOOL=OFF"/>
