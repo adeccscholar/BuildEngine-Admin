@@ -1,0 +1,12 @@
+diff --git a/gr2fonttest/gr2FontTest.cpp b/gr2fonttest/gr2FontTest.cpp
+--- a/gr2fonttest/gr2FontTest.cpp
++++ b/gr2fonttest/gr2FontTest.cpp
+@@ -267,7 +267,7 @@ bool Parameters::loadFromArgs(int argc, char *argv[])
+                 break;
+         case LOG:
+             closeLog();
+-            log = fopen(argv[a], "w");
++            log = fopen(argv[a], "wb");
+             if (log == NULL)
+             {
+                 fprintf(stderr,"Failed to open %s\n", argv[a]);
