@@ -501,7 +501,7 @@ That is a direct example of the principle behind *Architecture That Lasts*: stab
 
 The implementation is present in BuildEngine and Schema 16. The two initial adapters are `vcxproj` and `cbproj`. The generated CMake source tree is a build artifact; the original project remains untouched.
 
-The feature remains **[not yet fully verified]** until the new `ProjectImport.cpp` path has been compiled with BCC64X and exercised by real VCXPROJ and CBPROJ proof builds. ICU `stubdata/common` is the first intended real-world VCXPROJ proof. The story will distinguish that evidence status from the architectural implementation rather than claiming success before the run exists.
+The feature remains **[not yet fully verified]** until the new `ProjectImport.cpp` path has been compiled with BCC64X and exercised by real VCXPROJ and CBPROJ proof builds. ICU is the first real-world VCXPROJ proof: the active contract now imports `stubdata.vcxproj`, `common.vcxproj` and `i18n.vcxproj` and maps them to the native BCC64X bootstrap chain `icudt -> icuuc -> icuin`. The real ICU data-generator stage follows after this core chain is proven. The story will distinguish that evidence status from the architectural implementation rather than claiming success before the run exists.
 
 But even before that proof, the architectural direction is clear: BuildEngine is moving from supporting a list of build systems toward supporting **translations between representations while preserving one controlled build contract**.
 
