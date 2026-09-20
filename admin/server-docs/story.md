@@ -406,6 +406,46 @@ The value is not that C++ has an FSM library. The value is that the language and
 
 The goal is still not "parallel at all costs". It is useful parallelism under a model whose meaning remains understandable.
 
+### Project files stopped being build-system walls
+
+The ICU work created another useful pressure point.
+
+Some upstream projects contain a perfectly good description of their Windows sources and targets, but that description lives in a project format tied to a build environment we do not want to import as a second toolchain. ICU is a good example: its Windows project files contain valuable source inventory and target information, while its traditional native Windows data build assumes NMAKE and its Unix-oriented configuration path pulls us toward MSYS-style semantics.
+
+The first temptation is to choose one of those foreign build worlds. But that would again answer the wrong question.
+
+Instead, BuildEngine now has the beginnings of a more general capability: a CMake configure action can **import project metadata**, normalize the useful parts into an internal target model, generate a small CMake project, and then continue through the same CMake, Ninja and BCC64X path that already serves the rest of the ecosystem evidence.
+
+The first two input formats are deliberately interesting:
+
+```text
+VCXPROJ  -> source/resource inventory -> neutral target model
+CBPROJ   -> source/resource inventory -> neutral target model
+                                      -> generated CMakeLists.txt
+                                      -> CMake / Ninja / BCC64X
+```
+
+The imported project file remains read-only. It does not choose the compiler. It does not silently pull MSBuild, Visual Studio or another compiler into the proof. BuildEngine already owns the platform, variant, compiler, installation and dependency contract; the project file contributes only the information that is useful to that contract.
+
+That is a small implementation step with a potentially much larger consequence.
+
+If the mechanism proves stable on real libraries and applications, a Visual Studio project or even an existing C++Builder project no longer has to be treated as a closed build-system island. Its project metadata can become another **source of evidence** that feeds a reproducible CMake/Ninja/BCC64X build without modifying the original project.
+
+For the C++Builder story that is a particularly interesting reversal. The experiment began by asking whether C++Builder could consume the wider C++ ecosystem. The same architecture may now allow BuildEngine to take information from C++Builder's own project format and project it back into a standard CMake build path.
+
+```mermaid
+flowchart LR
+   Upstream["existing project metadata<br/>VCXPROJ · CBPROJ"] --> Import["BuildEngine import<br/>read-only · normalized"]
+   Contract["BuildEngine XML contract<br/>toolchain · variants · dependencies"] --> Import
+   Import --> CMake["generated CMake project"]
+   CMake --> Ninja["Ninja"]
+   Ninja --> BCC["BCC64X"]
+```
+
+This capability is intentionally described as **emerging evidence**, not as a finished compatibility claim. Schema 16 and both import adapters are implemented; the next proof is the real BCC64X build path, beginning with ICU and followed by representative CBPROJ cases. How far the idea belongs in the final story will be determined by those runs.
+
+But the architectural direction already fits the larger theme: staying ahead of the wave does not mean predicting which project format will dominate. It means building a boundary at which project formats can change while the production model behind them remains stable.
+
 ## 7. Thirty days later: a different application
 
 The evidence test took roughly ten days and covered twenty libraries.
