@@ -5975,7 +5975,7 @@
       </publish>
    </library>
 
-   <library id="expat" version="2.8.4" category="text" timestamp="2026-09-20T18:30:00Z">
+   <library id="expat" version="2.8.4" category="data" timestamp="2026-09-20T18:30:00Z">
       <metadata name="Expat" supplier="Expat Project" homepage="https://libexpat.github.io/" description="Streaming XML parser used as a native dependency by TECkit SFconv and other XML-consuming components.">
          <license name="MIT" spdx="MIT" file="COPYING"/>
       </metadata>

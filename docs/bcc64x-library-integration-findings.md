@@ -439,6 +439,8 @@ Nach der aktuellen Korrekturrunde liefen Release und Debug jeweils mit 91/91 Tes
 
 ## Expat 2.8.4
 
+Expat ist fachlich der Kategorie **data** zugeordnet: Es ist ein Streaming-XML-Parser. Die Verwendung durch TECkit/SFconv ist eine Abhängigkeitsbeziehung und keine Kategorienzuordnung.
+
 Expat wird mit Upstream-CMake als Shared Package gebaut und installiert inklusive `xmlwf`, Headern und CMake-Paketmetadaten.
 
 Der Patch `native-windows-tests.patch` korrigiert eine Buildsystemannahme: Upstream unterscheidet bei den Tests im Wesentlichen MSVC gegen Nicht-MSVC und leitet Nicht-MSVC über `bash run.sh`. Für BCC64X ist diese Klassifikation falsch, weil BCC64X ein nativer Windows-Clang-Compiler ist.
