@@ -4,14 +4,14 @@
 **Schema:** 13  
 **Documentation language:** English
 
-This document describes the semantics of `admin/build-libraries.xml` at the documented Schema-13 state. The XSD file `admin/schemas/build-libraries.xsd` is the formal structural definition; this document explains the technical meaning. For the current Schema-14 contract, also see `server-docs/build-libraries.md`.
+This document describes the semantics of `admin/build-libraries.xml` at the documented Schema-13 state. The XSD file `admin/schemas/build-libraries.xsd` is the formal structural definition; this document explains the technical meaning. For the current Schema-16 contract, also see `server-docs/build-libraries.md`.
 
 ## 1. Core idea
 
 `build-libraries.xml` is the project's single normative library and dependency contract.
 
 ```xml
-<buildLibraries schemaVersion="13">
+<buildLibraries schemaVersion="16">
    <library ...>
       ...
    </library>
@@ -48,9 +48,25 @@ Example:
 <dependency library="zlib" version="1.3.2"/>
 ```
 
-Dependencies are modeled only where a real technical dependency exists. They are not used to force artificial scheduler ordering.
+Dependencies are modeled only where a real technical package dependency exists. They are not used to force artificial scheduler ordering.
 
-BuildEngine supplies managed package paths to dependent producer builds through environment/CMake search paths.
+From the downstream `Build` state onward, the Library-FSM requires every direct dependency to have completed the full `Install` state:
+
+```text
+dependency.state > Install
+```
+
+BuildEngine then supplies the installed, versioned package paths to dependent producer builds through environment/CMake search paths. This keeps scheduling and package consumption separate:
+
+```text
+XML dependency
+ -> FSM package barrier
+ -> dependency install evidence
+ -> installed package search paths
+ -> consumer build
+```
+
+The dependency's aggregate `install` scope is the persistent upstream evidence. Build-tree artifacts are not a substitute for package completion.
 
 ## 4. Metadata and licensing
 

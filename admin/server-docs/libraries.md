@@ -74,6 +74,15 @@ flowchart LR
    freetype --> skia
 
    zlib --> opencv[OpenCV]
+
+   zlib --> teckit[TECkit]
+   expat[Expat] --> teckit
+
+   zlib --> poppler[Poppler]
+   freetype --> poppler
+   jpeg --> poppler
+   libpng --> poppler
+   libtiff --> poppler
 ```
 
 HarfBuzz is deliberately built without FreeType. FreeType is then built with HarfBuzz, keeping that part of the graph acyclic.
@@ -117,6 +126,11 @@ ACE and TAO are separate logical libraries in the dependency graph. This does **
 | FreeType | 2.14.3 | text | Font rasterization engine for loading and rendering scalable and bitmap fonts. | zlib, bzip2, Brotli, libpng, HarfBuzz | Shared package with all declared dependencies explicitly required; HarfBuzz integration is part of the consumer proof. |
 | libtiff | 4.7.2 | image | TIFF image file reading, writing, and image metadata library. | zlib, libjpeg-turbo | Shared package; tools/contrib/docs/tests disabled in the current contract. |
 | Skia | 153 | graphics | 2D graphics engine for raster, vector, text, image, and GPU-backed rendering. | OpenGL, zlib, Brotli, libjpeg-turbo, libpng, HarfBuzz, FreeType | Broad Windows desktop component build at pinned source commit `2eed75b956045eb8603d3690a1e84bc582a2135d`; extensive BCC64X GN/system-library/component repairs and bundled-component SBOM evidence. |
+| Graphite2 | 1.3.15 | text | Smart-font rendering engine for Graphite fonts and complex text shaping. | — | Upstream CMake with full Release/Debug tests; several exact-version test portability/reference/encoding patches, currently 91/91 tests in both variants. |
+| Expat | 2.8.4 | text | Streaming XML parser used by TECkit/SFconv and other XML consumers. | — | Upstream CMake; exact-version patch corrects the upstream assumption that every non-MSVC test build requires Bash. |
+| TECkit | 2.5.13 | text | Text encoding conversion toolkit, mapping compiler and conversion utilities. | zlib, Expat | Deliberate native CMake/Ninja/BCC64X adapter derived from upstream Makefile.am inventories; original Perl regression suite retained; no Autotools/MinGW-crossbuild runtime. |
+| ICU4C | 78.3 | text | Unicode and globalization library for locale, normalization, collation and conversion. | — | VCXPROJ files are read only as source/resource inventory; BuildEngine owns CMake/Ninja/BCC64X. Current bootstrap builds stubdata, common and i18n without MSBuild/MSVC/NMAKE/MSYS. |
+| Poppler | 26.09.0 | documentation | PDF parser and rendering foundation used in document-processing toolchains. | zlib, FreeType, libjpeg-turbo, libpng, libtiff | Upstream CMake with reduced Windows profile; local _AMD64_/NOMINMAX bridge; upstream test-data repository is a separate future pinned participant. |
 
 ## Archive and compression stack
 
@@ -282,6 +296,62 @@ The version-bound BCC64X integration includes, among other repairs:
 
 A generic BCC64X UCRT runtime defect discovered while testing Skia is not hidden in a Skia source patch. BuildEngine creates the `bcc64x-ucrt-compat` archive from the installed Embarcadero runtime objects and places it before the normal runtime during linking. No Embarcadero object files are distributed in the repository.
 
+## Text, Unicode and document-processing stack
+
+### Graphite2 1.3.15
+
+Graphite2 remains an upstream-CMake build. The important integration work is concentrated in the upstream test path rather than in a replacement build system. The current exact-version patch set covers language-tag/reference expectations, text-render advance diagnostics, Windows line endings, UTF-8 literals, managed FontTools discovery and the BCC64X Padauk3 reference case.
+
+These patches are intentionally version-bound under `admin/patches/graphite2/1.3.15`. They are not described as generic Graphite2 fixes.
+
+The resulting current evidence is strong: both Release and Debug completed the complete configured suite with 91/91 tests. This is a useful example where preserving the tests was more valuable than disabling inconvenient cases.
+
+### Expat 2.8.4
+
+Expat uses its upstream CMake build, builds a shared parser package plus `xmlwf`, runs upstream CTest tests and installs its own CMake package metadata.
+
+One upstream test-system assumption required correction: Expat treated every non-MSVC compiler as a POSIX-shell case and routed tests through `bash run.sh`. BCC64X is a native Windows Clang toolchain. The version-bound `native-windows-tests.patch` changes this decision to Windows-vs-non-Windows, so native Windows test executables run directly.
+
+This is a build/test-system patch, not an Expat parser-source compatibility patch.
+
+### TECkit 2.5.13
+
+TECkit is a deliberate exception to the default preference for using the upstream build system directly.
+
+The maintained upstream build contract is Autotools and the upstream Windows release script cross-builds with MinGW. Neither path is the evidence target of this project. The TECkit source itself has a small, explicit target inventory in its `Makefile.am` files, so BuildEngine-Admin provides a native CMake adapter that expresses the same core products for CMake/Ninja/BCC64X:
+
+- `TECkit`;
+- `TECkit_Compiler`;
+- `teckit_compile`;
+- `txtconv`;
+- `sfconv`.
+
+The adapter is therefore a **downstream build description**, not a claim that TECkit upstream provides CMake support.
+
+zlib 1.3.2 and Expat 2.8.4 are normal BuildEngine package dependencies. The FSM releases TECkit Build only after both dependency Install states have completed; TECkit then consumes their installed package metadata from `InstallRoot`.
+
+The unchanged upstream `test/dotests.pl` regression suite is retained and executed with managed Strawberry Perl. This preserves upstream behavioral evidence despite the different native build description.
+
+### ICU4C 78.3
+
+ICU demonstrates a different integration class. The Windows VCXPROJ files are not executed with MSBuild and do not select MSVC. They are used read-only as source/resource inventories by BuildEngine's ProjectImport layer.
+
+The generated neutral CMake project is then built by Ninja/BCC64X. The current bootstrap deliberately covers:
+
+```text
+stubdata -> common -> i18n
+```
+
+This was chosen over introducing NMAKE, MSYS, `runConfigureICU`, `cygpath` or Visual Studio Build Tools into the BCC64X proof. The first bootstrap stage does not yet claim full ICU data-generator/test coverage; that boundary remains explicit.
+
+### Poppler 26.09.0
+
+Poppler returns to the ordinary upstream-CMake path but uses an intentionally constrained package profile. Managed zlib, FreeType, libjpeg-turbo, libpng and libtiff are exact package dependencies.
+
+The Win32 backend uses Microsoft-style Windows SDK headers. BCC64X identifies the x64 target differently from the assumptions in those headers, so the current contract supplies a local `_AMD64_` bridge and `NOMINMAX` through Poppler-specific flags instead of changing the generic BCC64X toolchain.
+
+Several optional frontends/backends and utilities are disabled in this proof. Upstream release tarballs also do not contain the separate `poppler/test-data` repository, so the upstream test-data integration is explicitly deferred until that repository is pinned as its own reproducible participant. Tests are not claimed as passed merely because the core package builds.
+
 ## Package repairs versus source patches
 
 The distinction is intentional:
@@ -296,6 +366,8 @@ The distinction is intentional:
 ## Maintenance contract
 
 This page and `docs/bcc64x-library-integration-findings.md` are documentation outputs of the library integration work, not optional historical notes.
+
+Every non-default integration decision must remain visible here or in the matching detailed findings section. The documentation classifies it as one of: upstream build unchanged, downstream build adapter, exact-version source/build-system patch, packaging/export repair, library-local compiler policy, or generic toolchain/runtime correction.
 
 Whenever `admin/build-libraries.xml` changes materially, maintainers must update the applicable documentation in the same work unit:
 

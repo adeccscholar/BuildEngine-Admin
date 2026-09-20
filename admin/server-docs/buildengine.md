@@ -44,20 +44,27 @@ The FSM decides **whether** a state may progress and which logical scopes need w
 
 ## Dependency hierarchy
 
-For every direct dependency and every state `S >= Build`:
+Normal XML dependencies are package dependencies. For every consumer state `S >= Build`:
 
 ```text
-downstream may work on S only when dependency Completed(S)
+downstream S may run only when dependency Completed(Install)
+
+Completed(Install) <=> dependency.state > Install
 ```
+
+The same installed-package barrier is used for Build, Test, Validation, Install, Metadata, Publish, Documentation and Ready. This is deliberate: a consumer must use an assigned, versioned package rather than an arbitrary producer build directory.
+
+The aggregate `dependency:install` scope is recorded as persistent upstream evidence. Variant installation and `install:common` therefore remain part of the Current-State chain.
 
 Examples:
 
 ```text
-ACE Build requires OpenSSL > Build
-TAO Build requires ACE > Build
+TECkit Build requires Expat > Install
+ACE Build requires OpenSSL > Install
+TAO Build requires ACE > Install
 ```
 
-The transitive ordering emerges from the direct XML edges and the individual FSMs. There is no second global transitive runtime closure.
+After a dependency completed Install, its later Metadata/Publish/Documentation work may proceed in parallel with consumers. The transitive ordering comes from direct XML edges and persisted install evidence; there is no second global runtime dependency DAG.
 
 ## Orchestrator and technical workers
 

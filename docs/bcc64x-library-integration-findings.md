@@ -1,6 +1,6 @@
 # BCC64X-Integrationsbefunde aktueller Third-Party-Bibliotheken
 
-Stand: 8. September 2026  
+Stand: 20. September 2026  
 Zielplattform: RAD Studio 13 Florence / C++Builder 13 / BCC64X 20.1.7 / Embarcadero C++ 7.80 / Win64 Modern
 
 ## Zweck
@@ -413,6 +413,93 @@ BuildEngine erfindet deshalb keinen künstlichen Build. Der Vertrag verwendet ei
 - Release- und Debug-Consumer-Smokes mit BCC64X/C++23.
 
 Der Consumer-Smoke schreibt ein BMP, lädt es erneut und prüft Geometrie und Pixelwerte. Damit wird echte Header-/Compile-/Runtime-Nutzbarkeit geprüft und nicht nur `#include`.
+
+---
+
+## Graphite2 1.3.15
+
+Graphite2 wurde mit dem Upstream-CMake-Projekt gebaut; ein eigener Buildadapter war nicht notwendig. Die wesentliche Arbeit lag in der Testevidence.
+
+Der aktuelle Patchsatz unter `admin/patches/graphite2/1.3.15` enthält:
+
+- `fix-nametabletest-langtags.patch`;
+- `fix-fnttxtrender-advance.patch`;
+- `diagnose-fnttxtrender-mismatch.patch`;
+- `fix-gr2fonttest-log-line-endings.patch`;
+- `fix-nametabletest-utf8-literals.patch`;
+- `add-managed-fonttools-path.patch`;
+- `fix-jsontest-log-line-endings.patch`;
+- `fix-bcc64x-padauk3-reference.patch`.
+
+Die Korrekturen betreffen Testportabilität, Referenz-/Diagnoseverhalten, Encoding/Zeilenenden und managed Tool-Auflösung. Sie sind versionsgebunden und werden nicht als allgemeingültige Graphite2-Patches dargestellt.
+
+Nach der aktuellen Korrekturrunde liefen Release und Debug jeweils mit 91/91 Tests erfolgreich.
+
+---
+
+## Expat 2.8.4
+
+Expat wird mit Upstream-CMake als Shared Package gebaut und installiert inklusive `xmlwf`, Headern und CMake-Paketmetadaten.
+
+Der Patch `native-windows-tests.patch` korrigiert eine Buildsystemannahme: Upstream unterscheidet bei den Tests im Wesentlichen MSVC gegen Nicht-MSVC und leitet Nicht-MSVC über `bash run.sh`. Für BCC64X ist diese Klassifikation falsch, weil BCC64X ein nativer Windows-Clang-Compiler ist.
+
+Der Patch entscheidet daher Windows gegen Nicht-Windows. Auf Windows wird das Testbinary direkt gestartet. Parserquellcode wird dabei nicht angepasst.
+
+---
+
+## TECkit 2.5.13
+
+TECkit hat keinen geeigneten upstream-nativen Windows-Buildvertrag für den BCC64X-Nachweis. Upstream verwendet Autotools; die aktuelle Windows-Binary-Strecke ist ein MinGW-Crossbuild. Beides beantwortet nicht die Projektfrage nach einem nativen BCC64X-Windows-Pfad.
+
+Der Admin-CMake-Adapter übernimmt deshalb ausschließlich das explizite Targetinventar aus den Upstream-`Makefile.am`-Dateien:
+
+- `source/Engine.cpp` -> TECkit Engine;
+- `source/Compiler.cpp` + `source/UnicodeNames.cpp` -> Compiler-Library;
+- Sample-Tools `teckit_compile` und `txtconv`;
+- `SFconv` mit Expat.
+
+Das ist eine bewusste Downstream-Buildbeschreibung. Die Upstream-Sourcen selbst bleiben unverändert.
+
+zlib und Expat sind echte Package-Dependencies. Nach der korrigierten FSM-Regel beginnt TECkit Build erst nach vollständig abgeschlossenem `Install` beider Dependencies und konsumiert deren installierte Package-Sicht.
+
+Der Upstream-Testtreiber `test/dotests.pl` ist Windows-aware und bleibt unverändert. Er prüft alle drei Tools; dadurch bleibt die behavioral Evidence trotz geändertem Buildsystem erhalten.
+
+---
+
+## ICU4C 78.3
+
+ICU nutzt BuildEngine ProjectImport als read-only Windows-Projektinventar. Importiert werden aktuell:
+
+- `stubdata/stubdata.vcxproj`;
+- `common/common.vcxproj`;
+- `i18n/i18n.vcxproj`.
+
+Wichtig ist die Trennung:
+
+- VCXPROJ liefert Source-/Resource-Inventar und Targetstruktur;
+- BuildEngine liefert Toolchain, Defines, Links, Varianten und Installlayout;
+- CMake/Ninja/BCC64X führt den Build aus;
+- MSBuild/MSVC/NMAKE/MSYS/`runConfigureICU` gehören nicht zum Pfad.
+
+Der aktuelle Bootstrap erzeugt `icudt -> icuuc -> icuin`. Volle Daten-Generator- und Upstream-Testabdeckung wird für diesen Bootstrap nicht behauptet.
+
+---
+
+## Poppler 26.09.0
+
+Poppler wird mit Upstream-CMake gebaut und hängt explizit von zlib, FreeType, libjpeg-turbo, libpng und libtiff ab.
+
+Die Windows-SDK-Header erwarten auf x64 teilweise den Microsoft-Architekturselector `_AMD64_`. BCC64X beschreibt den Zielcompiler nicht identisch. Der aktuelle Vertrag setzt daher Poppler-lokal:
+
+```text
+-D_AMD64_ -DNOMINMAX
+```
+
+Diese Bridge wird bewusst **nicht** global in die BCC64X-Toolchain verschoben, solange sie nur für diesen Upstream-Pfad nachgewiesen ist.
+
+Der aktuelle Poppler-Proof schaltet mehrere optionale Consumer-/Backend-Welten aus, darunter Qt/GLib, Boost, OpenJPEG, LCMS, libcurl, NSS/GPGME und Utilities. Das ist ein bewusst begrenztes Profil.
+
+Die Release-Tarballs enthalten nicht das separate `poppler/test-data`-Repository. Upstream-Testintegration bleibt daher ein eigener reproduzierbarer Schritt; fehlende Testdaten werden nicht durch Deaktivieren und anschließendes Behaupten vollständiger Tests verdeckt.
 
 ---
 

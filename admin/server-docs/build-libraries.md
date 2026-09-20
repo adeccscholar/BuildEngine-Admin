@@ -88,9 +88,21 @@ License declarations are evidence/override data; declared upstream license text 
 <dependency library="zlib" version="1.3.2"/>
 ```
 
-Dependencies define logical relationships used by the Library-FSM, persistent scope state, package prerequisites, metadata and SBOM. From `Build` onward the generic runtime rule requires every direct dependency to have completed the same fachlich state before the downstream library can work there.
+A normal library dependency is a **package dependency**. It is used by the Library-FSM, persistent scope state, package prerequisites, metadata and SBOM.
 
-Filesystem proximity does not create a dependency.
+From the consumer's `Build` state onward, every downstream state requires each direct dependency to have completed its full `Install` state:
+
+```text
+dependency.state > Install
+```
+
+The consumer therefore never relies on a merely completed producer build tree. It consumes the versioned installed package where headers, import libraries, runtime files and package metadata have already been assigned to a stable package root.
+
+The `ScopeDependencyResolver` records the aggregate `dependency:install` scope as upstream evidence. Variant installs and `install:common` are thereby retained transitively in the Current-State chain.
+
+BuildEngine may expose the already-installed package through `InstallRoot`, `PATH`, `CMAKE_PREFIX_PATH`, `CMAKE_INCLUDE_PATH` and `CMAKE_LIBRARY_PATH`. These paths are package consumption, not scheduler control.
+
+Filesystem proximity alone never creates a dependency. Technical `ProcessJob::DependsOn` edges must not form a second global library DAG beside the FSM.
 
 ## Library extensions
 
