@@ -1,0 +1,12 @@
+diff --git a/Graphite.cmake b/Graphite.cmake
+--- a/Graphite.cmake
++++ b/Graphite.cmake
+@@ -74,7 +74,8 @@ endfunction(nolib_test)
+ 
+ function(fonttest TESTNAME FONTFILE)
+-    if (EXISTS ${PROJECT_SOURCE_DIR}/standards/${TESTNAME}${CMAKE_SYSTEM_NAME}.log)
++    if (NOT CMAKE_CXX_COMPILER MATCHES "bcc64x" AND
++        EXISTS ${PROJECT_SOURCE_DIR}/standards/${TESTNAME}${CMAKE_SYSTEM_NAME}.log)
+         set(PLATFORM_TEST_SUFFIX ${CMAKE_SYSTEM_NAME})
+     endif (EXISTS ${PROJECT_SOURCE_DIR}/standards/${TESTNAME}${CMAKE_SYSTEM_NAME}.log)
+     if (NOT GRAPHITE2_NFILEFACE)
