@@ -370,3 +370,73 @@ For the current BZip2/libarchive transition:
 4. rebuild/relink BuildEngine;
 5. verify `[LIBARCHIVE] filter bzip2 : in-proc`;
 6. only then restore the pinned Bash `.tar.bz2` tool contract.
+
+
+## CMake-Projektimport ab Schema 16
+
+Schema 16 erweitert den bestehenden `cmake`-Knoten um optionale `import`-Elemente. Der Import läuft ausschließlich vor `mode="configure"` und erzeugt das CMake-Source-Verzeichnis, das anschließend vom normalen Configure-Schritt verwendet wird.
+
+Beispiel:
+
+```xml
+<cmake mode="configure"
+       executable="{Tool:cmake}"
+       source="{BuildRoot}\generated\cmake\{LibraryId}"
+       build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}">
+   <import format="vcxproj"
+           source="{Workspace}\project\project.vcxproj"
+           target="project"
+           type="shared">
+      <include path="{Workspace}\project\include"/>
+      <define value="PROJECT_BUILD"/>
+      <link value="dependency_target"/>
+   </import>
+</cmake>
+```
+
+Unterstützte Importformate:
+
+- `vcxproj`
+- `cbproj`
+
+Unterstützte Zielarten:
+
+- `auto`
+- `shared`
+- `static`
+- `executable`
+
+Optionale Zielattribute:
+
+- `runtimeOutput`
+- `archiveOutput`
+- `debugPostfix`
+- `install`
+
+Optionale Ergänzungen innerhalb eines Imports:
+
+- `include/@path`
+- `define/@value`
+- `link/@value`
+
+Die importierte Projektdatei ist **keine zweite Buildautorität**. Compiler, Toolchain, Konfiguration, CMake-Argumente, Installationspfade und Library-Dependencies bleiben Teil des umgebenden BuildEngine-Vertrags.
+
+Der Importer übernimmt derzeit:
+
+`vcxproj`:
+
+- `ClCompile`
+- `ResourceCompile`
+- `ConfigurationType` für die optionale automatische Zielarterkennung
+
+`cbproj`:
+
+- `CppCompile`
+- `ResourceCompile`
+- `RcCompile`
+- `ProjectType` bzw. `Borland.ProjectType` für die optionale automatische Zielarterkennung
+
+Nicht automatisch ausgewertet werden insbesondere komplexe MSBuild-/C++Builder-Conditions, importierte Property-Dateien und projektspezifische Tool-Tasks. Wenn einzelne Source-Einträge bedingte Buildsemantik besitzen, bricht der Import absichtlich ab. Solche Unterschiede müssen explizit im BuildEngine-Vertrag modelliert werden.
+
+Das generierte `CMakeLists.txt` ist ein Buildartefakt. Die ursprüngliche `.vcxproj`- oder `.cbproj`-Datei wird nicht verändert.
+
