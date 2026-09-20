@@ -454,6 +454,49 @@ Diese Trennung ist wichtig, damit spätere Upstream-Updates gezielt neu bewertet
 
 ---
 
+
+## Projektdateien als Importquelle statt Buildsystemgrenze
+
+Die ICU-Analyse führte zu einem zusätzlichen generischen Integrationsbefund.
+
+Eine vorhandene Windows-Projektdatei kann wertvolle Upstream-Information enthalten, ohne dass das zugehörige Buildsystem zur BuildEngine-Toolchain werden muss. Für ICU enthalten die Visual-Studio-Projekte beispielsweise Source- und Targetinventar, während die eigentliche BCC64X-Produktion weiterhin über CMake/Ninja erfolgen kann.
+
+BuildEngine Schema 16 führt deshalb einen Projektimport innerhalb von `cmake mode="configure"` ein.
+
+Der Mechanismus trennt:
+
+```text
+Projektmetadaten
+   -> Importadapter
+   -> neutrales Targetmodell
+   -> generiertes CMakeLists.txt
+
+BuildEngine-Vertrag
+   -> Toolchain
+   -> Varianten
+   -> Dependencies
+   -> Installation
+
+beides zusammen
+   -> CMake
+   -> Ninja
+   -> BCC64X
+```
+
+Die ersten Importadapter sind:
+
+- `vcxproj`
+- `cbproj`
+
+Damit entsteht kein MSVC- oder MSBuild-Fallback. Auch beim Import eines `.vcxproj` bleibt BCC64X die Zieltoolchain. Ebenso wird ein `.cbproj` nicht durch BuildEngine verändert oder als alternative Buildautorität verwendet.
+
+Die Architektur ist bewusst konservativ: komplexe bedingte Source-Selektion wird nicht geschätzt. Der Import scheitert, wenn Source-Items Bedingungen tragen, deren Semantik nicht sicher in das neutrale Modell überführt werden kann.
+
+Der technische Nutzen geht über ICU hinaus. Dasselbe Modell kann vorhandene C++Builder-Projektmetadaten in einen CMake/Ninja/BCC64X-Pfad projizieren. Damit wird ein Projektformat zu einer austauschbaren Eingangsrepräsentation und nicht zu einer dauerhaften Grenze des Buildsystems.
+
+**Status:** Implementierung und Schema vorhanden; reale BCC64X-Proof-Runs mit VCXPROJ und CBPROJ sind noch offen.
+
+
 ## Offene Punkte
 
 - vollständiger erneuter Catch2-BuildEngine-Lauf für Release und Debug einschließlich aller 82 CTest-Einträge, Install, Publish und beider Package-Smokes nach der finalen Execution-Codepage-Einstellung;
