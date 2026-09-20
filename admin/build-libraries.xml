@@ -5933,15 +5933,11 @@
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\graphite2-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
-            <variable name="ZlibName" value="libz"/>
-            <variable name="ExpatName" value="libexpat"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
          </variant>
          <variant name="Debug">
-            <variable name="ZlibName" value="libzd"/>
-            <variable name="ExpatName" value="libexpatd"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
@@ -6175,12 +6171,16 @@
                 executable="{Tool:cmake}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
+            <variable name="ZlibName" value="libz"/>
+            <variable name="ExpatName" value="libexpat"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
          </variant>
          <variant name="Debug">
+            <variable name="ZlibName" value="libzd"/>
+            <variable name="ExpatName" value="libexpatd"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
