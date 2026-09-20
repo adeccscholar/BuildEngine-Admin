@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current architecture contract as of 19 September 2026. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
+**Status:** current architecture contract as of 20 September 2026. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
 
 BuildEngine is a declarative C++23 orchestration system centered on Embarcadero C++Builder 13 / BCC64X. The current architecture separates the declarative library contract, the runtime Library-FSM, persistent logical scope state, technical WorkItems/Actions, artifact evidence, Common repository semantics and read-only presentation.
 
@@ -67,6 +67,31 @@ The existing ProcessScheduler remains useful as technical queue/worker infrastru
 
 Local `id`/`dependsOn` graphs are allowed inside WorkItems where technical ordering needs them.
 
+## Project import before CMake configure
+
+Schema 16 adds a project-import layer directly to the existing CMake configure action. This is not a new FSM state and not a second build system. It is a technical preparation step inside already released Build work.
+
+Supported input formats are currently:
+
+- `vcxproj`: `ClCompile` and `ResourceCompile`;
+- `cbproj`: `CppCompile`, `ResourceCompile` and `RcCompile`.
+
+The imported file is read-only. BuildEngine does not modify `.vcxproj` or `.cbproj` files and does not invoke MSBuild or the C++Builder project system as part of the import.
+
+```text
+VCXPROJ / CBPROJ
+      -> project inventory import
+      -> neutral target model
+      -> generated CMakeLists.txt
+      -> existing CMake configure
+      -> Ninja / BCC64X
+```
+
+Toolchain, variant selection, installation paths, dependencies and common CMake arguments remain owned by the surrounding BuildEngine contract. The imported project contributes source/resource inventory and target identity. Explicit `include`, `define` and `link` additions can be declared on the import where BuildEngine must supply target-specific information.
+
+Conditional source inventory is deliberately not guessed. If an imported compile item contains a condition or `ExcludedFromBuild` semantics, the importer fails until that decision is represented explicitly. This keeps the generated build deterministic instead of silently emulating only part of MSBuild or the C++Builder project evaluator.
+
+The implementation exists for both formats, but the capability remains **not verified** until the new BuildEngine source is rebuilt with BCC64X and real VCXPROJ/CBPROJ imports complete successfully. ICU is the first intended VCXPROJ proof.
 ## Logical scopes and Current-State
 
 Typical scopes include:
