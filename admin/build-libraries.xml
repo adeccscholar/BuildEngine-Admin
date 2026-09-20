@@ -6032,12 +6032,12 @@
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
          <variant name="Release">
-            <variable name="IcuDataRuntime" value="icudt78"/>
-            <variable name="IcuDataImport" value="icudt"/>
-            <variable name="IcuCommonRuntime" value="icuuc78"/>
-            <variable name="IcuCommonImport" value="icuuc"/>
-            <variable name="IcuI18nRuntime" value="icuin78"/>
-            <variable name="IcuI18nImport" value="icuin"/>
+            <variable name="IcuDataRuntime" value="libicudt78"/>
+            <variable name="IcuDataImport" value="libicudt"/>
+            <variable name="IcuCommonRuntime" value="libicuuc78"/>
+            <variable name="IcuCommonImport" value="libicuuc"/>
+            <variable name="IcuI18nRuntime" value="libicuin78"/>
+            <variable name="IcuI18nImport" value="libicuin"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -6047,10 +6047,10 @@
             <!-- Upstream stubdata deliberately has no Debug postfix. -->
             <variable name="IcuDataRuntime" value="icudt78"/>
             <variable name="IcuDataImport" value="icudt"/>
-            <variable name="IcuCommonRuntime" value="icuuc78d"/>
-            <variable name="IcuCommonImport" value="icuucd"/>
-            <variable name="IcuI18nRuntime" value="icuin78d"/>
-            <variable name="IcuI18nImport" value="icuind"/>
+            <variable name="IcuCommonRuntime" value="libicuuc78d"/>
+            <variable name="IcuCommonImport" value="libicuucd"/>
+            <variable name="IcuI18nRuntime" value="libicuin78d"/>
+            <variable name="IcuI18nImport" value="libicuind"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0 -D_DEBUG"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0 -D_DEBUG"/>
