@@ -494,7 +494,7 @@ Die Architektur ist bewusst konservativ: komplexe bedingte Source-Selektion wird
 
 Der technische Nutzen geht über ICU hinaus. Dasselbe Modell kann vorhandene C++Builder-Projektmetadaten in einen CMake/Ninja/BCC64X-Pfad projizieren. Damit wird ein Projektformat zu einer austauschbaren Eingangsrepräsentation und nicht zu einer dauerhaften Grenze des Buildsystems.
 
-**Status:** Implementierung und Schema vorhanden; reale BCC64X-Proof-Runs mit VCXPROJ und CBPROJ sind noch offen.
+**Status:** Implementierung und Schema sind vorhanden. ICU 78.3 ist als erster realer VCXPROJ-Proof in den aktiven Vertrag eingebaut (`stubdata`, `common`, `i18n` -> `icudt`, `icuuc`, `icuin`). Der abschließende BCC64X-Lauf dieses neuen Pfads sowie ein realer CBPROJ-Proof stehen noch aus.
 
 
 ## Offene Punkte
