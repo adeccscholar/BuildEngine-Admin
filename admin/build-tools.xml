@@ -67,6 +67,19 @@
       <probe contains="Python 3.14.7"><argument value="--version"/></probe>
    </tool>
 
+   <tool id="fonttools" version="4.65.0" required="when-used">
+      <managed root="python-packages\fonttools\4.65.0"
+               executable="fontTools\__init__.py">
+         <download url="https://files.pythonhosted.org/packages/a1/2d/ee69affecd4bc81cb932a213438d4199fb48bf8ca6d664438ccc7f623c2a/fonttools-4.65.0-cp314-cp314-win_amd64.whl"
+                   archive="fonttools-4.65.0-cp314-cp314-win_amd64.whl"
+                   sha256="0aa8901db22875c831d6a91796549590d7e747da37438f38b69d771b668be445"/>
+         <nativeExtract format="libarchive" root=".">
+            <require path="fontTools\__init__.py"/>
+            <require path="fontTools\ttLib\__init__.py"/>
+         </nativeExtract>
+      </managed>
+   </tool>
+
    <tool id="meson" version="1.12.0" required="always">
       <managed root="meson\1.12.0" executable="meson.py">
          <download url="https://files.pythonhosted.org/packages/source/m/meson/meson-1.12.0.tar.gz" archive="meson-1.12.0.tar.gz" sha256="88afe0c20e52030218924ac37d0c81c59b4d5f3ae3752c8c6d7470c7d365886c"/>
