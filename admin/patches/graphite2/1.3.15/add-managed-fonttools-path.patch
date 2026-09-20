@@ -1,0 +1,14 @@
+diff --git a/tests/fnttxtrender b/tests/fnttxtrender
+--- a/tests/fnttxtrender
++++ b/tests/fnttxtrender
+@@ -10,6 +10,10 @@ import os
+ import pathlib
+ import re
+ import sys
++
++fonttools_path = os.environ.get("GRAPHITE2_FONTTOOLS_PATH")
++if fonttools_path:
++    sys.path.insert(0, fonttools_path)
+ from fontTools.ttLib import TTFont
+ from functools import partial
+ from xml.etree.ElementTree import parse
