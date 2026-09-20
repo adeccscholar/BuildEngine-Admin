@@ -1,0 +1,28 @@
+diff --git a/tests/nametabletest/nametabletest.cpp b/tests/nametabletest/nametabletest.cpp
+index 9c5a5e2..d35f0aa 100644
+--- a/tests/nametabletest/nametabletest.cpp
++++ b/tests/nametabletest/nametabletest.cpp
+@@ -145,10 +145,13 @@ template <class T> T * toBigEndian1(T & table)
+     bigEndian->m_langTagCount = be::swap<uint16>(table.m_langTagCount);
+     for (size_t i = 0; i < table.m_langTagCount; i++)
+     {
+-        bigEndian->m_languages[i] = be::swap<uint16>(table.m_languages[i]);
+-        bigEndian->m_languages[i] = be::swap<uint16>(table.m_languages[i]);
++        bigEndian->m_languages[i].length =
++            be::swap<uint16>(table.m_languages[i].length);
++        bigEndian->m_languages[i].offset =
++            be::swap<uint16>(table.m_languages[i].offset);
+     }
++    return bigEndian;
+ }
+ 
+ int main(int, char **)
+@@ -172,7 +175,7 @@ int main(int, char **)
+     testLangId(testAData, sizeof(NameTestA), "en-GB-Cockney", 0x809);
+     free(testAData);
+ 
+-    struct NameTestB* testBData = toBigEndian<struct NameTestB>(testB);
++    struct NameTestB* testBData = toBigEndian1<struct NameTestB>(testB);
+     testLangId(testBData, sizeof(NameTestB), "en-US", 0x409);
+     testLangId(testBData, sizeof(NameTestB), "en-GB", 0x809);
+     testLangId(testBData, sizeof(NameTestB), "ksw-MM", 0x8000);
