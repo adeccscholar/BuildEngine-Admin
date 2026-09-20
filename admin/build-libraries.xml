@@ -5868,7 +5868,7 @@
          </variant>
          <install>
             <perVariant>
-               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="true">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <argument value="--output-on-failure"/>
                </execute>
