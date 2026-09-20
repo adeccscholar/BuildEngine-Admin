@@ -5908,7 +5908,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" category="text" timestamp="2026-09-20T03:00:00Z">
+   <library id="icu" version="78.3" category="text" timestamp="2026-09-20T16:15:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services."/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -5919,84 +5919,188 @@
                    sha256="3a2e7a47604ba702f345878308e6fefeca612ee895cf4a5f222e7955fabfe0c0"/>
          <extract format="libarchive" root="icu">
             <require path="LICENSE"/>
-            <require path="source\configure"/>
-            <require path="source\runConfigureICU"/>
+            <require path="source\stubdata\stubdata.vcxproj"/>
+            <require path="source\common\common.vcxproj"/>
+            <require path="source\i18n\i18n.vcxproj"/>
             <require path="source\common\unicode\utypes.h"/>
             <require path="source\common\unicode\uchar.h"/>
             <require path="source\common\unicode\ustring.h"/>
-            <require path="source\test\intltest\intltest.h"/>
+            <require path="source\i18n\unicode\calendar.h"/>
          </extract>
       </source>
-      <build testsAffectBuild="true">
-         <environment name="CC" value="{ToolShort:bcc64x}"/>
-         <environment name="CXX" value="{ToolShort:bcc64x}"/>
-         <environment name="AR" value="{ToolShort:llvm-ar}"/>
-         <environment name="RANLIB" value="{ToolShort:llvm-ranlib}"/>
-         <environment name="MAKE" value="{ToolDir:perl}\c\bin\gmake.exe"/>
-         <environment name="U_MAKE" value="{ToolDir:perl}\c\bin\gmake.exe"/>
-         <environment name="PATH" value="{ToolDir:bash}\bin;{ToolDir:perl}\c\bin;{ENV:PATH}"/>
-         <execute name="create-build-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-         </execute>
-         <execute name="configure" executable="{Tool:bash}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
-            <argument value="-c"/>
-            <argument value="export PYTHON=&quot;$(cygpath -u &quot;$5&quot;)&quot;; exec &quot;$(cygpath -u &quot;$1&quot;)&quot; &quot;$2&quot; &quot;$3&quot; &quot;--prefix=$(cygpath -u &quot;$4&quot;)&quot; --enable-shared --disable-static"/>
-            <argument value="icu-configure"/>
-            <argument value="{Workspace}\icu\source\runConfigureICU"/>
-            <argument value="MinGW"/>
-            <argument value="{ConfigureMode}"/>
-            <argument value="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <argument value="{Tool:python}"/>
-         </execute>
-         <execute name="normalize-generated-paths" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false">
-            <argument value="{BuildFileDir}\programs\autoconf\normalize-msys-root.py"/>
-            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <argument value="{BuildRoot}"/>
-         </execute>
-         <execute name="build" executable="{ToolDir:perl}\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"/>
+      <!--
+         Native Windows/BCC64X bootstrap path.
+
+         ICU's VCXPROJ files are used only as read-only source/resource inventory.
+         BuildEngine owns compiler, platform, variants, output layout and dependencies.
+         No MSBuild, Visual Studio, NMAKE, MSYS, cygpath or runConfigureICU is involved.
+
+         This first native stage builds the bootstrap data DLL plus common and i18n:
+            icudt -> icuuc -> icuin
+
+         The real ICU data generators and upstream test suites are added after this
+         bootstrap graph is proven. Full ICU tests require replacing stubdata with
+         the generated data package and are therefore not meaningful in this stage.
+      -->
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin"/>
+         <argument value="-DCMAKE_C_STANDARD:STRING=11"/>
+         <argument value="-DCMAKE_C_STANDARD_REQUIRED:BOOL=ON"/>
+         <argument value="-DCMAKE_C_EXTENSIONS:BOOL=OFF"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=17"/>
+         <argument value="-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"/>
+         <argument value="-DCMAKE_CXX_EXTENSIONS:BOOL=OFF"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+
+         <cmake mode="configure"
+                executable="{Tool:cmake}"
+                source="{BuildRoot}\generated\cmake\{LibraryId}\{Configuration}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}">
+            <import format="vcxproj"
+                    source="{Workspace}\icu\source\stubdata\stubdata.vcxproj"
+                    target="icudt"
+                    type="shared"
+                    runtimeOutput="icudt78"
+                    archiveOutput="icudt">
+               <include path="{Workspace}\icu\source\common"/>
+               <define value="WIN32"/>
+               <define value="WIN64"/>
+               <define value="WINVER=0x0601"/>
+               <define value="_WIN32_WINNT=0x0601"/>
+               <define value="_CRT_SECURE_NO_DEPRECATE"/>
+               <define value="_HAS_EXCEPTIONS=0"/>
+               <define value="STUBDATA_BUILD"/>
+            </import>
+
+            <import format="vcxproj"
+                    source="{Workspace}\icu\source\common\common.vcxproj"
+                    target="icuuc"
+                    type="shared"
+                    runtimeOutput="icuuc78"
+                    archiveOutput="icuuc"
+                    debugPostfix="d">
+               <include path="{Workspace}\icu\source\common"/>
+               <define value="WIN32"/>
+               <define value="WIN64"/>
+               <define value="WINVER=0x0601"/>
+               <define value="_WIN32_WINNT=0x0601"/>
+               <define value="_CRT_SECURE_NO_DEPRECATE"/>
+               <define value="_HAS_EXCEPTIONS=0"/>
+               <define value="U_ATTRIBUTE_DEPRECATED="/>
+               <define value="U_COMMON_IMPLEMENTATION"/>
+               <define value="U_PLATFORM_USES_ONLY_WIN32_API=1"/>
+               <link value="icudt"/>
+            </import>
+
+            <import format="vcxproj"
+                    source="{Workspace}\icu\source\i18n\i18n.vcxproj"
+                    target="icuin"
+                    type="shared"
+                    runtimeOutput="icuin78"
+                    archiveOutput="icuin"
+                    debugPostfix="d">
+               <include path="{Workspace}\icu\source\common"/>
+               <include path="{Workspace}\icu\source\i18n"/>
+               <define value="WIN32"/>
+               <define value="WIN64"/>
+               <define value="WINVER=0x0601"/>
+               <define value="_WIN32_WINNT=0x0601"/>
+               <define value="_CRT_SECURE_NO_DEPRECATE"/>
+               <define value="_HAS_EXCEPTIONS=0"/>
+               <define value="U_ATTRIBUTE_DEPRECATED="/>
+               <define value="U_I18N_IMPLEMENTATION"/>
+               <link value="icuuc"/>
+            </import>
+         </cmake>
+
+         <cmake mode="build"
+                executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
          <variant name="Release">
-            <variable name="ConfigureMode" value="--disable-debug"/>
+            <variable name="IcuDataRuntime" value="icudt78"/>
+            <variable name="IcuDataImport" value="icudt"/>
+            <variable name="IcuCommonRuntime" value="icuuc78"/>
+            <variable name="IcuCommonImport" value="icuuc"/>
+            <variable name="IcuI18nRuntime" value="icuin78"/>
+            <variable name="IcuI18nImport" value="icuin"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
          </variant>
+
          <variant name="Debug">
-            <variable name="ConfigureMode" value="--enable-debug"/>
+            <!-- Upstream stubdata deliberately has no Debug postfix. -->
+            <variable name="IcuDataRuntime" value="icudt78"/>
+            <variable name="IcuDataImport" value="icudt"/>
+            <variable name="IcuCommonRuntime" value="icuuc78d"/>
+            <variable name="IcuCommonImport" value="icuucd"/>
+            <variable name="IcuI18nRuntime" value="icuin78d"/>
+            <variable name="IcuI18nImport" value="icuind"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0 -D_DEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0 -D_DEBUG"/>
          </variant>
+
          <install>
             <perVariant>
-               <execute name="test" test="true" executable="{ToolDir:perl}\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
-                  <argument value="check"/>
-               </execute>
-               <execute name="install" executable="{ToolDir:perl}\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
-                  <argument value="install"/>
-               </execute>
+               <cmake mode="install"
+                      executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
                      recursive="true" overwrite="true"/>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
                      recursive="true" overwrite="true"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{IcuDataRuntime}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{IcuDataImport}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{IcuCommonRuntime}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{IcuCommonImport}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{IcuI18nRuntime}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{IcuI18nImport}.lib"/>
             </perVariant>
+
             <common>
-               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
-                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
+               <!-- ICU public headers are split between common/unicode and i18n/unicode. -->
+               <copy source="{Workspace}\icu\source\common\unicode"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode"
                      recursive="true" overwrite="true"/>
-               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\share"
-                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share"
+               <copy source="{Workspace}\icu\source\i18n\unicode"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode"
                      recursive="true" overwrite="true"/>
                <copy source="{Workspace}\icu\LICENSE"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
                      overwrite="true"/>
+
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode\utypes.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode\ustring.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode\calendar.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
             </common>
          </install>
       </build>
+
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
          <tree source="include" target="include" optional="false"/>
-         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib;.a" optional="true"/>
-         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.dat" optional="true"/>
-         <tree source="share" target="share" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
       </publish>
    </library>
 
