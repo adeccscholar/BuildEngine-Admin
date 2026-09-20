@@ -6104,7 +6104,7 @@
       </smoke>
    </library>
 
-   <library id="teckit" version="2.5.13" category="text" timestamp="2026-09-20T14:20:00Z">
+   <library id="teckit" version="2.5.13" category="text" timestamp="2026-09-20T15:45:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="expat" version="2.8.4"/>
       <metadata name="TECkit" supplier="SIL Global" homepage="https://software.sil.org/teckit/" description="Text encoding conversion toolkit with runtime engine, mapping compiler, and Unicode conversion utilities."/>
@@ -6137,7 +6137,11 @@
          Windows.  The upstream Autotools files remain the source of truth for
          target membership, but no Bash/Autoconf/Automake/Libtool path is used.
          The adapter builds the same two libraries and three command-line tools
-         directly with CMake/Ninja/BCC64X and links our managed ZLib and Expat.
+         directly with CMake/Ninja/BCC64X.
+
+         Library dependencies are package dependencies. The FSM releases this
+         Build state only after ZLib and Expat completed Install, so the adapter
+         consumes their versioned packages from InstallRoot.
       -->
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -6151,18 +6155,8 @@
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DTECKIT_SOURCE_DIR:PATH={Workspace}\teckit-{LibraryVersion}"/>
-         <!--
-            FSM dependency contract: Build may start only after every dependency
-            is strictly beyond Build.  Therefore consume the producer artifacts
-            of that completed Build state, never the later InstallRoot package.
-         -->
-         <argument value="-DTECKIT_ZLIB_INCLUDE_DIR:PATH={WorkspaceRoot}\zlib\zlib-1.3.2"/>
-         <argument value="-DTECKIT_ZLIB_GENERATED_INCLUDE_DIR:PATH={BuildRoot}\packages\zlib\1.3.2\{Configuration}"/>
-         <argument value="-DTECKIT_ZLIB_LIBRARY:FILEPATH={BuildRoot}\packages\zlib\1.3.2\{Configuration}\{ZlibName}.lib"/>
-         <argument value="-DTECKIT_ZLIB_RUNTIME:FILEPATH={BuildRoot}\packages\zlib\1.3.2\{Configuration}\{ZlibName}.dll"/>
-         <argument value="-DTECKIT_EXPAT_INCLUDE_DIR:PATH={WorkspaceRoot}\expat\expat-2.8.4\lib"/>
-         <argument value="-DTECKIT_EXPAT_LIBRARY:FILEPATH={BuildRoot}\packages\expat\2.8.4\{Configuration}\{ExpatName}.lib"/>
-         <argument value="-DTECKIT_EXPAT_RUNTIME:FILEPATH={BuildRoot}\packages\expat\2.8.4\{Configuration}\{ExpatName}.dll"/>
+         <argument value="-DZLIB_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\cmake\zlib"/>
+         <argument value="-Dexpat_DIR:PATH={InstallRoot}\packages\expat\2.8.4\lib\win64\{Configuration}\cmake\expat-2.8.4"/>
          <cmake mode="configure"
                 executable="{Tool:cmake}"
                 source="{BuildFileDir}\cmake\teckit"
@@ -6171,16 +6165,12 @@
                 executable="{Tool:cmake}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
-            <variable name="ZlibName" value="libz"/>
-            <variable name="ExpatName" value="libexpat"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
          </variant>
          <variant name="Debug">
-            <variable name="ZlibName" value="libzd"/>
-            <variable name="ExpatName" value="libexpatd"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
@@ -6193,7 +6183,7 @@
                         showOutput="false">
                   <environment name="BINDIR" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"/>
                   <environment name="SRCDIR" value="{Workspace}\teckit-{LibraryVersion}\test"/>
-                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin;{BuildRoot}\packages\zlib\1.3.2\{Configuration};{BuildRoot}\packages\expat\2.8.4\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\expat\2.8.4\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="{Workspace}\teckit-{LibraryVersion}\test\dotests.pl"/>
                </execute>
                <cmake mode="install"
