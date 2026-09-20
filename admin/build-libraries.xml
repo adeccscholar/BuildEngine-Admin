@@ -6045,8 +6045,8 @@
 
          <variant name="Debug">
             <!-- Upstream stubdata deliberately has no Debug postfix. -->
-            <variable name="IcuDataRuntime" value="icudt78"/>
-            <variable name="IcuDataImport" value="icudt"/>
+            <variable name="IcuDataRuntime" value="libicudt78"/>
+            <variable name="IcuDataImport" value="libicudt"/>
             <variable name="IcuCommonRuntime" value="libicuuc78d"/>
             <variable name="IcuCommonImport" value="libicuucd"/>
             <variable name="IcuI18nRuntime" value="libicuin78d"/>
