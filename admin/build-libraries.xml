@@ -6104,7 +6104,7 @@
       </publish>
    </library>
 
-   <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-09-19T13:30:00Z">
+   <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-09-20T13:00:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="freetype" version="2.14.3"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
@@ -6154,6 +6154,7 @@
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <argument value="-DFONT_CONFIGURATION:STRING=win32"/>
          <argument value="-DENABLE_CPP:BOOL=OFF"/>
+         <argument value="-DENABLE_UNSTABLE_API_ABI_HEADERS:BOOL=ON"/>
          <argument value="-DENABLE_UTILS:BOOL=OFF"/>
          <argument value="-DENABLE_GLIB:BOOL=OFF"/>
          <argument value="-DENABLE_QT5:BOOL=OFF"/>
