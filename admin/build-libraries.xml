@@ -5908,7 +5908,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" category="text" timestamp="2026-09-20T02:15:00Z">
+   <library id="icu" version="78.3" category="text" timestamp="2026-09-20T03:00:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services."/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -5942,13 +5942,18 @@
          </execute>
          <execute name="configure" executable="{Tool:bash}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
             <argument value="-c"/>
-            <argument value="export PYTHON=&quot;$(cygpath -m &quot;$5&quot;)&quot;; exec &quot;$(cygpath -m &quot;$1&quot;)&quot; &quot;$2&quot; &quot;$3&quot; &quot;--prefix=$(cygpath -m &quot;$4&quot;)&quot; --enable-shared --disable-static"/>
+            <argument value="export PYTHON=&quot;$(cygpath -u &quot;$5&quot;)&quot;; exec &quot;$(cygpath -u &quot;$1&quot;)&quot; &quot;$2&quot; &quot;$3&quot; &quot;--prefix=$(cygpath -u &quot;$4&quot;)&quot; --enable-shared --disable-static"/>
             <argument value="icu-configure"/>
             <argument value="{Workspace}\icu\source\runConfigureICU"/>
             <argument value="MinGW"/>
             <argument value="{ConfigureMode}"/>
             <argument value="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="{Tool:python}"/>
+         </execute>
+         <execute name="normalize-generated-paths" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="{BuildFileDir}\programs\autoconf\normalize-msys-root.py"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="{BuildRoot}"/>
          </execute>
          <execute name="build" executable="{ToolDir:perl}\c\bin\gmake.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"/>
          <variant name="Release">
@@ -6030,7 +6035,7 @@
             Keep this bridge local to Poppler; the proven generic BCC64X toolchain
             remains unchanged.
          -->
-         <environment name="CXXFLAGS" value="-D_AMD64_"/>
+         <environment name="CXXFLAGS" value="-D_AMD64_ -DNOMINMAX"/>
          <argument value="-G"/>
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
