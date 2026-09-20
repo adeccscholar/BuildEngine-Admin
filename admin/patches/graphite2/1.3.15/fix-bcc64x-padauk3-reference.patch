@@ -8,5 +8,5 @@ diff --git a/Graphite.cmake b/Graphite.cmake
 +    if (NOT CMAKE_CXX_COMPILER MATCHES "bcc64x" AND
 +        EXISTS ${PROJECT_SOURCE_DIR}/standards/${TESTNAME}${CMAKE_SYSTEM_NAME}.log)
          set(PLATFORM_TEST_SUFFIX ${CMAKE_SYSTEM_NAME})
-     endif (EXISTS ${PROJECT_SOURCE_DIR}/standards/${TESTNAME}${CMAKE_SYSTEM_NAME}.log)
+     endif ()
      if (NOT GRAPHITE2_NFILEFACE)
