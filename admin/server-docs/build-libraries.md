@@ -440,3 +440,24 @@ Nicht automatisch ausgewertet werden insbesondere komplexe MSBuild-/C++Builder-C
 
 Das generierte `CMakeLists.txt` ist ein Buildartefakt. Die ursprüngliche `.vcxproj`- oder `.cbproj`-Datei wird nicht verändert.
 
+
+
+### Aktueller ICU-Anwendungsfall
+
+ICU 78.3 ist der erste produktive Einsatz des Schema-16-Imports. Der aktive Vertrag verwendet drei Upstream-VCXPROJ-Dateien ausschließlich als Inventarquelle:
+
+```text
+stubdata.vcxproj -> icudt78
+common.vcxproj   -> icuuc78 / icuuc78d
+i18n.vcxproj     -> icuin78 / icuin78d
+```
+
+Die logische Buildreihenfolge wird über die generierten CMake-Targets hergestellt:
+
+```text
+icudt -> icuuc -> icuin
+```
+
+Die Toolchain bleibt BCC64X/CMake/Ninja. Der frühere ICU-Pfad über `runConfigureICU MinGW`, Bash, `cygpath`, GNU Make und den nachträglichen MSYS-Pfadnormalisierer ist aus dem aktiven Vertrag entfernt.
+
+Dieser erste Schritt ist bewusst ein Bootstrap-Build mit ICU-`stubdata`. Die echten ICU-Datengeneratoren und die vollständige Upstream-Teststrecke folgen erst nach erfolgreichem Nachweis dieses Core-Graphs.
