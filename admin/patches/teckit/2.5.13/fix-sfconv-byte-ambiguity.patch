@@ -1,0 +1,20 @@
+diff --git a/SFconv/SFconv.cpp b/SFconv/SFconv.cpp
+--- a/SFconv/SFconv.cpp
++++ b/SFconv/SFconv.cpp
+@@ -6,8 +6,6 @@
+ #include <map>
+ #include <vector>
+ 
+-using namespace std;
+-
+ #include "TECkit_Engine.h"
+ #include "UtfCodec.h"
+ #include "sfReader.h"
+@@ -43,6 +41,8 @@
+ #include "expat/xmlparse/xmlparse.h"
+ #endif
+ 
++using namespace std;
++
+ 
+ char*					gMappingDirectory;
