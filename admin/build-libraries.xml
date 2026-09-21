@@ -5946,7 +5946,7 @@
          </variant>
          <install>
             <perVariant>
-               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="true">
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <argument value="--output-on-failure"/>
                </execute>
@@ -6131,6 +6131,23 @@
             <require path="SFconv\SFconv.cpp"/>
             <require path="test\dotests.pl"/>
          </extract>
+
+         <copy source="{BuildFileDir}\patches\teckit\2.5.13\fix-sfconv-byte-ambiguity.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-sfconv-byte-ambiguity.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="sfconv-byte-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-sfconv-byte-ambiguity.patch"/>
+         </execute>
+         <execute name="sfconv-byte-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\fix-sfconv-byte-ambiguity.patch"/>
+         </execute>
       </source>
       <!--
          Native Windows/BCC64X build adapter.
