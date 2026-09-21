@@ -1858,7 +1858,7 @@
    deleted after the block has been copied into build-libraries.xml.
 -->
 
-<library id="ace" version="8.0.6" category="middleware" timestamp="2026-09-14T14:38:00Z">
+<library id="ace" version="8.0.6" category="middleware" timestamp="2026-09-21T15:59:12Z">
    <dependency library="openssl" version="3.5.8"/>
    <dependency library="xerces-c" version="3.3.0"/>
    <dependency library="zlib" version="1.3.2"/>
@@ -6106,7 +6106,7 @@
       </smoke>
    </library>
 
-   <library id="teckit" version="2.5.13" category="text" timestamp="2026-09-20T15:45:00Z">
+   <library id="teckit" version="2.5.13" category="text" timestamp="2026-09-21T15:59:12Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="expat" version="2.8.4"/>
       <metadata name="TECkit" supplier="SIL Global" homepage="https://software.sil.org/teckit/" description="Text encoding conversion toolkit with runtime engine, mapping compiler, and Unicode conversion utilities."/>
