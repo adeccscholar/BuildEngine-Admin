@@ -1941,6 +1941,24 @@
          <argument value="--whitespace=nowarn"/>
          <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch"/>
       </execute>
+
+
+      <copy source="{BuildFileDir}\patches\ace-tao\8.0.6\upstream-ssliop-params-dup-cpp.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+      <execute name="ssliop-backport-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <argument value="apply"/>
+         <argument value="--check"/>
+         <argument value="--no-index"/>
+         <argument value="--whitespace=nowarn"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch"/>
+      </execute>
+      <execute name="ssliop-backport-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <argument value="apply"/>
+         <argument value="--no-index"/>
+         <argument value="--whitespace=nowarn"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\upstream-ssliop-params-dup-cpp.patch"/>
+      </execute>
    </source>
 
    <build>
@@ -2094,8 +2112,8 @@
       <repository url="https://github.com/DOCGroup/ACE_TAO.git" ref="ACE+TAO-8_0_6"/>
    </security>
 
-   <!-- No TAO download/extract and no workspace patch: ACE owns source acquisition.
-        The TAO-only patch is applied to each already-built variant producer below. -->
+   <!-- No TAO download/extract or patching here: ACE owns and prepares the complete
+        ACE_wrappers source tree, including TAO source repairs, in Source. -->
    <build>
       <environment name="ACE_ROOT" value="{ExtensionProducerRoot}"/>
       <environment name="TAO_ROOT" value="{ExtensionProducerRoot}\TAO"/>
@@ -2116,22 +2134,6 @@
       <environment name="DEBUG" value="{DebugFlag}"/>
       <environment name="RELEASE" value="{ReleaseFlag}"/>
       <environment name="PATH" value="{ExtensionProducerRoot}\lib;{ExtensionProducerRoot}\bin;{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
-
-      <!-- Variant-local TAO preparation: both Release and Debug producers get the
-           TAO-only SSLIOP repair immediately before TAO.mwc is generated. -->
-      <execute name="ssliop-backport-check" executable="{Tool:git}" workingDirectory="{ExtensionProducerRoot}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--check"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
-         <argument value="{BuildFileDir}\patches\ace-tao\8.0.6\upstream-ssliop-params-dup-cpp.patch"/>
-      </execute>
-      <execute name="ssliop-backport-apply" executable="{Tool:git}" workingDirectory="{ExtensionProducerRoot}" showOutput="false">
-         <argument value="apply"/>
-         <argument value="--no-index"/>
-         <argument value="--whitespace=nowarn"/>
-         <argument value="{BuildFileDir}\patches\ace-tao\8.0.6\upstream-ssliop-params-dup-cpp.patch"/>
-      </execute>
 
       <target name="generate-workspace" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO" showOutput="false">
          <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/>
