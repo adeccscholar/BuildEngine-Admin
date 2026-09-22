@@ -1,9 +1,7 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -113,7 +113,12 @@ if(ENABLE_QTC)
- endif()
- 
+@@ -140,3 +140,7 @@
  enable_testing()
 -set(RUN_QTEST perl ${qpdf_SOURCE_DIR}/run-qtest ${ENABLE_QTC_ARG})
 +if(DEFINED ENV{QPDF_PERL})
@@ -11,13 +9,14 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 +else()
 +  set(RUN_QTEST perl ${qpdf_SOURCE_DIR}/run-qtest ${ENABLE_QTC_ARG})
 +endif()
-@@ -244,7 +249,11 @@ endif()
  
+@@ -371,4 +375,5 @@
  add_test(
    NAME check-assert
 -  COMMAND perl ${qpdf_SOURCE_DIR}/check_assert)
 +  COMMAND "$<IF:$<BOOL:$ENV{QPDF_PERL}>,$ENV{QPDF_PERL},perl>"
 +          ${qpdf_SOURCE_DIR}/check_assert)
+ 
 diff --git a/run-qtest b/run-qtest
 --- a/run-qtest
 +++ b/run-qtest
@@ -53,7 +52,7 @@ diff --git a/run-qtest b/run-qtest
 diff --git a/qtest/bin/qtest-driver b/qtest/bin/qtest-driver
 --- a/qtest/bin/qtest-driver
 +++ b/qtest/bin/qtest-driver
-@@ -45,14 +45,16 @@ if ((@ARGV == 1) && ($ARGV[0] eq '--print-path'))
+@@ -45,14 +45,17 @@ if ((@ARGV == 1) && ($ARGV[0] eq '--print-path'))
  my @bindirs = ();
  my $datadir = undef;
  my $covdir = '.';
@@ -72,3 +71,11 @@ diff --git a/qtest/bin/qtest-driver b/qtest/bin/qtest-driver
 -	push(@bindirs, split(':', shift(@ARGV)));
 +	push(@bindirs, split(/\Q$bindir_sep\E/, shift(@ARGV)));
      }
+@@ -430,7 +433,7 @@
+ 	$ENV{'TESTS'} = "";
+ 
+-	exec +('perl', '-I', $module_dir, '-I', $qtc_dir,
++	exec +($perl, '-I', $module_dir, '-I', $qtc_dir,
+ 	       basename($prog),
+ 	       @comm_args,
+ 	       '-origdir', $cwd,
