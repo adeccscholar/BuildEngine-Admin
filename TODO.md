@@ -102,6 +102,17 @@ Correction:
 - [x] Add a PE runtime-closure verification step using the managed `tdump` tool.
 - [ ] Verify that `qpdf.exe`, `json_parse.exe` and `qpdf30[d].dll` no longer import OpenSSL/Brotli/Zstd after the rebuild.
 
+## Seventh PDF/XML integration run: 23 September 2026
+
+Observed target-machine evidence:
+
+- [ ] QPDF Release/Debug were stopped only by the newly added PE import verification step. The underlying QPDF build had already completed before the verifier ran.
+- [ ] The verifier invoked `tdump -em.` through PowerShell's native-command path while `$ErrorActionPreference = "Stop"` was active. Native stderr was therefore surfaced as a terminating `NativeCommandError`. The verifier now uses `System.Diagnostics.ProcessStartInfo` and evaluates stdout, stderr and exit code explicitly.
+- [x] Embarcadero documents `-em.` as the option that lists imported modules from PE executables/DLLs; the option itself remains unchanged.
+- [ ] libxml2 tests still executed the previously patched source tree. The run activated only `test:Release` / `test:Debug`, not `source`, proving that the helper-file change had not invalidated Source evidence. The libxml2 library timestamp is now advanced after the actual helper correction.
+- [ ] PoDoFo remains blocked by libxml2 test/install evidence.
+- [x] BuildEngine runtime dependency propagation was corrected generically before this run: normal build/test/validation/install jobs now use the transitive dependency runtime closure, matching package-smoke semantics.
+
 ## Active PDF / XML stack
 
 The following participants are now declared in the active Schema-16 BuildEngine stack:
