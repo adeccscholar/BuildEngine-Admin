@@ -8,16 +8,17 @@ This page is intentionally **license-centered**. It explains the license types t
 
 It is an engineering aid, not legal advice. The authoritative terms are always the exact license, copyright and notice files of the distributed upstream version. Mixed projects and bundled components can contain file-level terms that are more specific than the project-level license.
 
-## Reading the risk classification
+## License traffic light
 
-The risk classification below is about **integration and distribution effort**, not about whether a license is good or bad.
+The traffic light is about **proprietary product integration and distribution**, not about whether a license is good or bad.
 
-| Risk | Meaning |
+| Signal | Meaning |
 | --- | --- |
-| Low | Usually compatible with proprietary and open-source products when notices are preserved. |
-| Low to medium | Permissive, but attribution, NOTICE, patent, advertising or mixed-component obligations need explicit packaging work. |
-| Medium | Weak copyleft, dual licensing or file-level copyleft requires a deliberate integration and redistribution model. |
-| High | Strong copyleft can affect the licensing of a distributed combined work and therefore requires an explicit product architecture decision. |
+| 🟢 **Green** | Normally suitable for proprietary software. Preserve required notices, attribution, NOTICE files, patent terms and similar ordinary obligations. |
+| 🟡 **Yellow** | Requires an explicit product-specific review. Typical reasons are weak copyleft, dual/multi licensing, mixed-license distributions, bundled components or special redistribution obligations. |
+| 🔴 **Red** | Do not plan as an in-process dependency of proprietary software. Strong copyleft requires another product/distribution architecture or another licensing path. |
+
+A library can be open source and still be yellow or red. The signal is an integration marker, not a quality judgment.
 
 ## Public domain / permissive dedication
 
@@ -33,7 +34,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with other open-source licenses:** generally straightforward.
 
-**Integration risk:** **Low**.
+**Traffic light:** 🟢 **Green**.
 
 **Main risk:** assuming that every file in a project follows the public-domain status of the core. Always inspect bundled and generated components separately.
 
@@ -49,7 +50,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with GPL and other OSS:** generally straightforward.
 
-**Integration risk:** **Low**.
+**Traffic light:** 🟢 **Green**.
 
 **Main risk:** mixed projects can contain files under additional licenses even when the principal project uses 0BSD.
 
@@ -69,7 +70,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with other OSS:** broadly compatible, including GPL-family projects.
 
-**Integration risk:** **Low**.
+**Traffic light:** 🟢 **Green**.
 
 **Main risk:** losing copyright/license notices when source fragments are copied or vendored.
 
@@ -85,7 +86,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination:** broadly compatible with proprietary and open-source software.
 
-**Integration risk:** **Low**.
+**Traffic light:** 🟢 **Green**.
 
 ---
 
@@ -115,7 +116,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with other OSS:** broadly compatible.
 
-**Integration risk:** **Low**.
+**Traffic light:** 🟢 **Green**.
 
 ---
 
@@ -131,7 +132,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with other OSS:** broadly compatible.
 
-**Integration risk:** **Low**.
+**Traffic light:** 🟢 **Green**.
 
 **Main risk:** binary redistributions must not silently drop the required notices.
 
@@ -149,7 +150,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with other OSS:** broadly compatible.
 
-**Integration risk:** **Low**.
+**Traffic light:** 🟢 **Green**.
 
 ---
 
@@ -163,7 +164,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination:** broadly compatible with proprietary and open-source software.
 
-**Integration risk:** **Low**.
+**Traffic light:** 🟢 **Green**.
 
 ---
 
@@ -177,7 +178,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination:** generally straightforward.
 
-**Integration risk:** **Low**.
+**Traffic light:** 🟢 **Green**.
 
 ---
 
@@ -207,7 +208,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with other OSS:** usually possible, but the acknowledgement requirement remains.
 
-**Integration risk:** **Low to medium**.
+**Traffic light:** 🟢 **Green**.
 
 **Main risk:** treating the license as ordinary BSD and omitting the required product documentation acknowledgement.
 
@@ -225,7 +226,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with other OSS:** generally possible subject to bundled-component terms.
 
-**Integration risk:** **Low to medium**.
+**Traffic light:** 🟢 **Green**.
 
 ---
 
@@ -239,7 +240,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination:** broadly compatible with proprietary and OSS products.
 
-**Integration risk:** **Low to medium**.
+**Traffic light:** 🟢 **Green**.
 
 **Main risk:** Unicode distributions often carry third-party data/software notices that must remain with the package.
 
@@ -267,7 +268,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with GPLv2-only:** not generally considered compatible without an additional permission or another licensing path.
 
-**Integration risk:** **Low to medium**.
+**Traffic light:** 🟢 **Green**.
 
 **Main risks:** ignoring NOTICE obligations, modifying source without marking changes, or overlooking the patent-termination provision.
 
@@ -291,7 +292,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with GPL:** normally possible according to the applicable LGPL/GPL version rules.
 
-**Integration risk:** **Medium**.
+**Traffic light:** 🟡 **Yellow**.
 
 **Main risks:** static linking without relinking provisions, embedding the library so it is no longer replaceable, or modifying LGPL code without offering the required corresponding source.
 
@@ -309,7 +310,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with other OSS:** generally good; MPL 2.0 also contains defined GPL/LGPL/AGPL compatibility mechanisms unless a project marks itself incompatible with secondary licenses.
 
-**Integration risk:** **Medium**.
+**Traffic light:** 🟡 **Yellow**.
 
 **Main risk:** copying MPL code into proprietary source files instead of keeping the boundary clear.
 
@@ -327,7 +328,7 @@ The risk classification below is about **integration and distribution effort**, 
 
 **Combination with GPL-family software:** compatibility is not as straightforward as with modern permissive licenses and requires explicit review.
 
-**Integration risk:** **Medium**.
+**Traffic light:** 🟡 **Yellow**.
 
 **Main risk:** selecting the CPL path in a multi-licensed project without considering a simpler LGPL/MPL alternative.
 
@@ -350,7 +351,7 @@ Typical examples of choices are:
 
 **Combination with proprietary software:** often possible when one offered path permits it.
 
-**Integration risk:** **Medium**.
+**Traffic light:** 🟡 **Yellow**.
 
 **Main risks:**
 
@@ -380,7 +381,7 @@ Typical examples of choices are:
 
 **Combination with OSS:** requires GPL-compatible licensing for the combined distributed work.
 
-**Integration risk:** **High**.
+**Traffic light:** 🔴 **Red**.
 
 **Main risks:** assuming that DLL linkage avoids copyleft, shipping a proprietary in-process integration without a licensing strategy, or overlooking GPL-covered tools that are separate from a more permissively licensed library.
 
@@ -408,7 +409,7 @@ For such a package BuildEngine should retain:
 4. the exact source version;
 5. the selected build profile, because disabled components can materially change the effective license set.
 
-**Integration risk:** **Low to high**, depending on the most restrictive enabled component.
+**Traffic light:** 🟡 **Yellow** by default; the effective signal can become 🔴 **Red** if an enabled bundled component is strong copyleft.
 
 ## Integration risk rules for the BuildEngine stack
 
