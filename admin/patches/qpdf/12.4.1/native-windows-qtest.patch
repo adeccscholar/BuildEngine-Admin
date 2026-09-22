@@ -71,7 +71,7 @@ diff --git a/qtest/bin/qtest-driver b/qtest/bin/qtest-driver
 -	push(@bindirs, split(':', shift(@ARGV)));
 +	push(@bindirs, split(/\Q$bindir_sep\E/, shift(@ARGV)));
      }
-@@ -430,7 +433,7 @@
+@@ -430,6 +433,6 @@
  	$ENV{'TESTS'} = "";
  
 -	exec +('perl', '-I', $module_dir, '-I', $qtc_dir,
