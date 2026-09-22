@@ -6551,7 +6551,7 @@
          <argument value="-DLibXml2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libxml2"/>
       </smoke>
    </library>
-   <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-09-22T23:49:00Z">
+   <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-09-22T23:55:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="openssl" version="3.5.8"/>
