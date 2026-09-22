@@ -242,11 +242,8 @@
       </generated>
    </tool>
 
-   <tool id="tdump" version="RADStudio-13-64" required="always">
-      <discover executable="tdump64.exe" path="false">
-         <candidate path="{BDS}\bin64\tdump64.exe"/>
-         <candidate path="{BDS}\bin\tdump64.exe"/>
-      </discover>
+   <tool id="tdump" version="RADStudio-13" required="always">
+      <discover executable="tdump.exe" path="false"><candidate path="{BDS}\bin64\tdump.exe"/><candidate path="{BDS}\bin\tdump.exe"/></discover>
    </tool>
 
    <tool id="llvm-cov" version="20.1.7" required="always">
