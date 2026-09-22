@@ -28,6 +28,26 @@ Observed target-machine evidence:
 - [ ] Poppler and PoDoFo remained blocked transitively; no new compiler failure was observed.
 - [x] License traffic-light metadata added to all BuildEngine libraries and mirrored on the relevant server documentation pages.
 
+## Third PDF/XML integration run: 22 September 2026
+
+Observed target-machine evidence at the supplied run cutoff:
+
+- [x] win-iconv 0.0.8 source: PASS
+- [x] win-iconv 0.0.8 Release build: PASS
+- [x] win-iconv 0.0.8 Debug build: PASS
+- [x] win-iconv 0.0.8 Release upstream test: PASS
+- [x] win-iconv 0.0.8 Debug upstream test: PASS
+- [ ] win-iconv install: failed only because the contract expected `iconv.lib`. Under the active BCC64X CMake model, the MinGW-style `lib` import-library prefix combines with BuildEngine's `.lib` import suffix, yielding `libiconv.lib`. Contract, smoke and Poppler dependency paths are corrected.
+- [x] libxml2 2.15.3 source including the release-test-helper patch: PASS
+- [x] libxml2 2.15.3 Release build: PASS
+- [x] libxml2 2.15.3 Debug build: PASS
+- [ ] libxml2 tests were still running at the supplied log cutoff; no result is inferred.
+- [x] QPDF 12.4.1 patched source: PASS
+- [ ] QPDF Release/Debug build: dependency path still used a MinGW `.dll.a` suffix. Under the active BCC64X CMake model the shared import libraries are `libjpeg.lib` and `libjpegd.lib`; the contract is corrected.
+- [ ] Poppler remains transitively behind win-iconv install evidence; its Iconv path is updated to `libiconv.lib`.
+- [ ] PoDoFo remains behind successful libxml2 test/install evidence; no PoDoFo compiler result is inferred.
+- [x] License traffic lights are propagated through BuildEngine-Common into the dynamic HTML server pages and REST library metadata.
+
 ## Active PDF / XML stack
 
 The following participants are now declared in the active Schema-16 BuildEngine stack:
