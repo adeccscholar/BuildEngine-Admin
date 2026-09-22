@@ -29,8 +29,8 @@ index 0000000..81a113e
 +
 +file(READ "${STDOUT}" actual_stdout)
 +file(READ "${EXPECTED_STDOUT}" expected_stdout)
-+string(REPLACE "\\r\\n" "\\n" actual_stdout "${actual_stdout}")
-+string(REPLACE "\\r\\n" "\\n" expected_stdout "${expected_stdout}")
++string(REPLACE "\r\n" "\n" actual_stdout "${actual_stdout}")
++string(REPLACE "\r\n" "\n" expected_stdout "${expected_stdout}")
 +
 +if(NOT actual_stdout STREQUAL expected_stdout)
 +    message(STATUS "Actual stdout: [${actual_stdout}]")
@@ -42,8 +42,8 @@ index 0000000..81a113e
 +if(EXISTS "${EXPECTED_STDERR}")
 +    file(READ "${STDERR}" actual_stderr)
 +    file(READ "${EXPECTED_STDERR}" expected_stderr)
-+    string(REPLACE "\\r\\n" "\\n" actual_stderr "${actual_stderr}")
-+    string(REPLACE "\\r\\n" "\\n" expected_stderr "${expected_stderr}")
++    string(REPLACE "\r\n" "\n" actual_stderr "${actual_stderr}")
++    string(REPLACE "\r\n" "\n" expected_stderr "${expected_stderr}")
 +    if(NOT actual_stderr STREQUAL expected_stderr)
 +        message(STATUS "Actual stderr: [${actual_stderr}]")
 +        message(STATUS "Expected stderr: [${expected_stderr}]")
