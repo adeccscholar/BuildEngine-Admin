@@ -2,7 +2,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index c8a1aa7..bc1458a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1,5 +1,5 @@
+@@ -1,4 +1,4 @@
 -project(win_iconv)
 +cmake_minimum_required(VERSION 3.10)
  
