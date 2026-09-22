@@ -1,7 +1,7 @@
 diff --git a/run-qtest b/run-qtest
 --- a/run-qtest
 +++ b/run-qtest
-@@ -15,11 +15,13 @@ my $show_on_failure = 0;
+@@ -15,10 +15,12 @@ my $show_on_failure = 0;
  my $disable_tc = 0;
  my @tc = ();
  
