@@ -6679,7 +6679,7 @@
          <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\libjpeg-turbo\3.2.0"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\qpdf-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-         <pe-imports executable="{Tool:tdump}">
+         <pe-imports>
             <file path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\qpdf\qpdf.exe"/>
             <file path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libtests\json_parse.exe"/>
             <file path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf\qpdf3*.dll"/>

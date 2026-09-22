@@ -3,7 +3,7 @@ new file mode 100644
 index 0000000..81a113e
 --- /dev/null
 +++ b/run_and_diff.cmake
-@@ -0,0 +1,52 @@
+@@ -0,0 +1,51 @@
 +# Ensure output directory exists
 +get_filename_component(_outdir "${STDOUT}" DIRECTORY)
 +file(MAKE_DIRECTORY "${_outdir}")
