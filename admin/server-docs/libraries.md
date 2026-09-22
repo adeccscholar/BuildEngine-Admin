@@ -93,7 +93,6 @@ flowchart LR
 
    zlib --> qpdf[QPDF]
    jpeg --> qpdf
-   openssl --> qpdf
 
    zlib --> podofo[PoDoFo]
    openssl --> podofo
@@ -157,7 +156,7 @@ ACE and TAO are separate logical libraries in the dependency graph. This does **
 | ICU4C | 78.3 | 🟡 Yellow | text | Unicode and globalization library for locale, normalization, collation and conversion. | — | VCXPROJ files are read only as source/resource inventory; BuildEngine owns CMake/Ninja/BCC64X. Current bootstrap builds stubdata, common and i18n without MSBuild/MSVC/NMAKE/MSYS. |
 | win-iconv | 0.0.8 | 🟢 Green | text | Small Windows iconv implementation backed by Win32 character conversion APIs. | — | Added as the explicit Iconv dependency required by Poppler's C++ API. Public-domain upstream; modern-CMake compatibility patch for the tagged 0.0.8 source. **[nicht verifiziert]** |
 | libxml2 | 2.15.3 | 🟢 Green | data | C XML toolkit with XPath, XML Schema, Relax NG, XInclude and serialization support. | zlib | New shared upstream CMake profile with tests/programs, schema/Relax NG/XPath/XInclude and zlib enabled; Python, ICU, modules and external iconv disabled for the first BCC64X proof. **[nicht verifiziert]** |
-| QPDF | 12.4.1 | 🟢 Green | documentation | PDF structural inspection and transformation library for rewriting, encryption and validation workflows. | zlib, libjpeg-turbo, OpenSSL | New shared upstream CMake profile, static library disabled, OpenSSL required as the crypto provider, upstream tests and package consumer smoke retained. **[nicht verifiziert]** |
+| QPDF | 12.4.1 | 🟢 Green | documentation | PDF structural inspection and transformation library for rewriting, encryption and validation workflows. | zlib, libjpeg-turbo | New shared upstream CMake profile, static library disabled, QPDF native crypto required to keep the runtime closure independent of OpenSSL/Brotli/Zstd, upstream tests and package consumer smoke retained. **[nicht verifiziert]** |
 | PoDoFo | 1.1.1 | 🟡 Yellow | documentation | C++ PDF parsing, creation and modification library with form, annotation, signing and incremental-update APIs. | zlib, OpenSSL, FreeType, libxml2, libjpeg-turbo, libpng, libtiff | New shared upstream CMake profile; Win32 GDI font search enabled, AFDKO/examples/GPL tools disabled, upstream tests and package smoke retained. **[nicht verifiziert]** |
 | Poppler | 26.09.0 | 🔴 Red | documentation | PDF parser and rendering foundation used in document-processing toolchains. | zlib, FreeType, libjpeg-turbo, libpng, libtiff | Upstream CMake with reduced Windows profile; local _AMD64_/NOMINMAX bridge; C++ API enabled with ENABLE_CPP=ON; upstream test-data repository is a separate future pinned participant. **[nicht verifiziert]** |
 
