@@ -1,7 +1,8 @@
 diff --git a/libqpdf/CMakeLists.txt b/libqpdf/CMakeLists.txt
 --- a/libqpdf/CMakeLists.txt
 +++ b/libqpdf/CMakeLists.txt
-@@ -150,19 +150,22 @@ if(NOT EXTERNAL_LIBS)
+@@ -150,19 +150,24 @@
+ if(NOT EXTERNAL_LIBS)
 -  pkg_check_modules(pc_zlib zlib)
 -  if(pc_zlib_FOUND)
 +  if(ZLIB_H_PATH AND ZLIB_LIB_PATH)
@@ -25,7 +26,10 @@ diff --git a/libqpdf/CMakeLists.txt b/libqpdf/CMakeLists.txt
      else()
        message(SEND_ERROR "zlib not found")
        set(ANYTHING_MISSING 1)
-@@ -170,20 +173,24 @@ endif()
+     endif()
+   endif()
+ endif()
+@@ -170,20 +175,26 @@
  if(NOT EXTERNAL_LIBS)
 -  pkg_check_modules(pc_libjpeg libjpeg)
 -  if(pc_libjpeg_FOUND)
@@ -52,7 +56,11 @@ diff --git a/libqpdf/CMakeLists.txt b/libqpdf/CMakeLists.txt
      else()
        message(SEND_ERROR "libjpeg not found")
        set(ANYTHING_MISSING 1)
-@@ -217,11 +224,16 @@ if(USE_IMPLICIT_CRYPTO OR REQUIRE_CRYPTO_OPENSSL)
+     endif()
+   endif()
+ endif()
+@@ -217,11 +228,16 @@
+ if(USE_IMPLICIT_CRYPTO OR REQUIRE_CRYPTO_OPENSSL)
    if(EXTERNAL_LIBS)
      set(USE_CRYPTO_OPENSSL ON)
      set(FOUND_CRYPTO ON)
@@ -68,4 +76,3 @@ diff --git a/libqpdf/CMakeLists.txt b/libqpdf/CMakeLists.txt
        set(FOUND_CRYPTO ON)
        set(CRYPTO_PKG "${CRYPTO_PKG}, openssl >= 1.1.0")
      else()
-       find_path(OPENSSL_H_PATH openssl/evp.h)
