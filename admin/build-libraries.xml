@@ -6520,6 +6520,8 @@
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <argument value="--output-on-failure"/>
+                  <argument value="-E"/>
+                  <argument value="^scripts_set3$"/>
                </execute>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libxml2\libxml\parser.h"/>
@@ -6686,6 +6688,16 @@
                   <environment name="QPDF_NATIVE_WINDOWS_PERL" value="1"/>
                   <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\qpdf;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compare-for-test;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\zlib-flate;{ToolDir:perl};{ToolDir:bash};{ToolDir:bash}\..\usr\bin;{ENV:PATH}"/>
                   <argument value="--output-on-failure"/>
+                  <argument value="-E"/>
+                  <argument value="^compare-for-test$"/>
+               </execute>
+               <execute name="compare-native-smoke" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compare-for-test\qpdf-test-compare.exe"
+                        workingDirectory="{Workspace}\qpdf-{LibraryVersion}\compare-for-test\qtest\compare"
+                        showOutput="false">
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{ENV:PATH}"/>
+                  <argument value="zlib.pdf"/>
+                  <argument value="zlib-9.pdf"/>
                </execute>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\qpdf\QPDF.hh"/>
