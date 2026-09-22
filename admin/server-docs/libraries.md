@@ -78,6 +78,7 @@ flowchart LR
    zlib --> teckit[TECkit]
    expat[Expat] --> teckit
 
+   winiconv[win-iconv] --> poppler
    zlib --> libxml2[libxml2]
 
    zlib --> qpdf[QPDF]
@@ -144,6 +145,7 @@ ACE and TAO are separate logical libraries in the dependency graph. This does **
 | Expat | 2.8.4 | data | Streaming XML parser used by TECkit/SFconv and other XML consumers. | — | Upstream CMake; exact-version patch corrects the upstream assumption that every non-MSVC test build requires Bash. |
 | TECkit | 2.5.13 | text | Text encoding conversion toolkit, mapping compiler and conversion utilities. | zlib, Expat | Deliberate native CMake/Ninja/BCC64X adapter derived from upstream Makefile.am inventories; original Perl regression suite retained; no Autotools/MinGW-crossbuild runtime. |
 | ICU4C | 78.3 | text | Unicode and globalization library for locale, normalization, collation and conversion. | — | VCXPROJ files are read only as source/resource inventory; BuildEngine owns CMake/Ninja/BCC64X. Current bootstrap builds stubdata, common and i18n without MSBuild/MSVC/NMAKE/MSYS. |
+| win-iconv | 0.0.8 | text | Small Windows iconv implementation backed by Win32 character conversion APIs. | — | Added as the explicit Iconv dependency required by Poppler's C++ API. Public-domain upstream; modern-CMake compatibility patch for the tagged 0.0.8 source. **[nicht verifiziert]** |
 | libxml2 | 2.15.3 | data | C XML toolkit with XPath, XML Schema, Relax NG, XInclude and serialization support. | zlib | New shared upstream CMake profile with tests/programs, schema/Relax NG/XPath/XInclude and zlib enabled; Python, ICU, modules and external iconv disabled for the first BCC64X proof. **[nicht verifiziert]** |
 | QPDF | 12.4.1 | documentation | PDF structural inspection and transformation library for rewriting, encryption and validation workflows. | zlib, libjpeg-turbo, OpenSSL | New shared upstream CMake profile, static library disabled, OpenSSL required as the crypto provider, upstream tests and package consumer smoke retained. **[nicht verifiziert]** |
 | PoDoFo | 1.1.1 | documentation | C++ PDF parsing, creation and modification library with form, annotation, signing and incremental-update APIs. | zlib, OpenSSL, FreeType, libxml2, libjpeg-turbo, libpng, libtiff | New shared upstream CMake profile; Win32 GDI font search enabled, AFDKO/examples/GPL tools disabled, upstream tests and package smoke retained. **[nicht verifiziert]** |
