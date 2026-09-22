@@ -6428,7 +6428,7 @@
       </publish>
    </library>
 
-   <library id="libxml2" version="2.15.3" category="data" timestamp="2026-09-22T22:58:00Z">
+   <library id="libxml2" version="2.15.3" category="data" timestamp="2026-09-22T23:14:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <metadata name="libxml2" supplier="GNOME / libxml2 contributors" homepage="https://gitlab.gnome.org/GNOME/libxml2" description="C XML toolkit providing parsing, XPath, XML Schema, Relax NG, XInclude and serialization support." licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="Copyright"/>
@@ -6551,7 +6551,7 @@
          <argument value="-DLibXml2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libxml2"/>
       </smoke>
    </library>
-   <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-09-22T23:01:00Z">
+   <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-09-22T23:14:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="openssl" version="3.5.8"/>
@@ -6626,6 +6626,7 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
          <environment name="QPDF_BCC64X" value="1"/>
+         <environment name="QPDF_PERL" value="{Tool:perl}"/>
          <argument value="-G"/>
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
