@@ -15,12 +15,34 @@ function Get-ImportedModules {
       throw "PE import probe input does not exist: $File"
    }
 
-   $output = & $TDump -em. $File 2>&1
-   if ($LASTEXITCODE -ne 0) {
-      throw "tdump failed for '$File' with exit code $LASTEXITCODE"
+   $startInfo = New-Object System.Diagnostics.ProcessStartInfo
+   $startInfo.FileName = $TDump
+   $startInfo.Arguments = ('-em. "{0}"' -f $File)
+   $startInfo.UseShellExecute = $false
+   $startInfo.RedirectStandardOutput = $true
+   $startInfo.RedirectStandardError = $true
+   $startInfo.CreateNoWindow = $true
+
+   $process = New-Object System.Diagnostics.Process
+   $process.StartInfo = $startInfo
+
+   if (-not $process.Start()) {
+      throw "tdump could not be started for '$File'"
    }
 
-   $text = ($output | Out-String)
+   $stdout = $process.StandardOutput.ReadToEnd()
+   $stderr = $process.StandardError.ReadToEnd()
+   $process.WaitForExit()
+
+   if ($process.ExitCode -ne 0) {
+      throw "tdump failed for '$File' with exit code $($process.ExitCode): $stderr"
+   }
+
+   if (-not [string]::IsNullOrWhiteSpace($stderr)) {
+      Write-Host ("[PE][tdump] {0}" -f $stderr.Trim())
+   }
+
+   $text = $stdout
    $matches = [regex]::Matches($text, '(?i)\b[A-Za-z0-9_.+\-]+\.dll\b')
    $modules = @()
    foreach ($match in $matches) {
