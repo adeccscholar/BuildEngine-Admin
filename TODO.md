@@ -65,6 +65,18 @@ Observed target-machine evidence:
 - [ ] libxml2 tests now reach the real upstream output comparison. Failure occurs at the stderr comparison in `run_and_diff.cmake`; the helper now normalizes CRLF/LF before textual comparison. Result remains **[nicht verifiziert]** until the next run.
 - [ ] PoDoFo remains blocked solely by libxml2 test/install evidence; no PoDoFo compiler result is inferred.
 
+## Fifth PDF/XML integration run: 22 September 2026
+
+Observed target-machine evidence:
+
+- [x] win-iconv 0.0.8 complete including package consumer smoke: PASS.
+- [x] QPDF 12.4.1 Release build: PASS.
+- [x] QPDF 12.4.1 Debug build: PASS.
+- [ ] QPDF upstream tests still report 0/7. Because `check-assert` is one of the seven and does not load QPDF binaries, the common failure is before the actual library tests. The QPDF 12.4.1 test adapter now pins every Perl invocation to BuildEngine's managed Strawberry Perl and keeps native Windows paths/semicolon-separated bindirs.
+- [x] libxml2 2.15.3 source and Release/Debug builds remain PASS.
+- [ ] libxml2 tests still fail at `run_and_diff.cmake:45`. Inspection of the Admin patch revealed that the previously intended CRLF/LF normalization had not actually been written to the patch file. The version-bound helper now really normalizes line endings and prints actual/expected text on mismatch.
+- [ ] PoDoFo remains blocked only by libxml2 test/install evidence.
+
 ## Active PDF / XML stack
 
 The following participants are now declared in the active Schema-16 BuildEngine stack:
