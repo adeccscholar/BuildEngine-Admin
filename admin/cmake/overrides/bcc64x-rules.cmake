@@ -16,6 +16,18 @@ endif()
 unset(_BCC64X_RULES_SUMMARY_EMITTED)
 
 
+# CMake 4.1.x identifies BCC64X as Clang with the GNU frontend and EMBT
+# simulation, but the compiler also exposes MinGW compatibility macros.
+# CMake therefore assigns PLATFORM_ID=MinGW and Windows-Clang.cmake includes
+# Windows-GNU.cmake, which sets MINGW=1. That describes a real MinGW/GCC
+# toolchain and is false for BCC64X. Keep the MinGW-compatible header/library
+# conventions handled explicitly below, but do not expose MINGW to projects.
+if((CMAKE_C_COMPILER_ID STREQUAL "Clang" AND CMAKE_C_SIMULATE_ID STREQUAL "EMBT") OR
+   (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "EMBT"))
+   unset(MINGW)
+endif()
+
+
 # Stock CMake's Windows-Embarcadero platform module still initializes linker
 # flags for the legacy ILINK32/BCC32 toolchain:
 #   -lS:<stack reserve> -lSc:<stack commit>
