@@ -1,7 +1,24 @@
 # BuildEngine-Admin TODO
 
-**Status date:** September 8, 2026  
-**Status:** frozen follow-up work until the final clean-room test
+**Status date:** September 22, 2026  
+**Status:** active BuildEngine/Admin integration work; the September 8 freeze section below is retained as historical provenance
+
+## Active PDF / XML stack
+
+The following participants are now declared in the active Schema-16 BuildEngine stack:
+
+- [x] Poppler 26.09.0: enable `ENABLE_CPP=ON`. **[nicht verifiziert]**
+- [x] libxml2 2.15.3: add shared CMake/Ninja/BCC64X contract with zlib, XML Schema, Relax NG, XPath, XInclude, tests, package publish and consumer smoke. **[nicht verifiziert]**
+- [x] QPDF 12.4.1: add shared CMake/Ninja/BCC64X contract using managed zlib, libjpeg-turbo and OpenSSL, upstream tests, package publish and consumer smoke. **[nicht verifiziert]**
+- [x] PoDoFo 1.1.1: add shared CMake/Ninja/BCC64X contract using managed zlib, OpenSSL, FreeType, libxml2, JPEG, PNG and TIFF; use Win32 GDI font search and keep AFDKO/tools disabled in the first library profile. **[nicht verifiziert]**
+- [ ] Run the new source/configure/build paths and correct only evidence-backed BCC64X incompatibilities.
+- [ ] Run upstream tests for libxml2, QPDF and PoDoFo.
+- [ ] Run Release package consumer smokes for all three libraries.
+- [ ] After the first PASS, add Debug consumer smokes where they provide additional ABI/runtime evidence.
+- [ ] Add BuildEngine-Tests scenarios for E-invoice embedded XML extraction, XML validation, PDF form discovery, field filling, save/reopen verification and printing adapters.
+- [ ] Add exact source archive SHA-256 values where the upstream distribution publishes a stable digest and record them in the contract.
+- [ ] Decide the concrete product/distribution architecture before Poppler becomes a mandatory proprietary in-process runtime dependency because Poppler is GPL licensed.
+- [ ] Record the selected PoDoFo licensing path (MPL-2.0 or LGPL-2.0-or-later) for each distributable product rather than leaving the alternative implicit.
 
 ## Verified freeze baseline
 
