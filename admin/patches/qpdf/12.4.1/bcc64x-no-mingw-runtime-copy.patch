@@ -1,0 +1,13 @@
+diff --git a/qpdf/CMakeLists.txt b/qpdf/CMakeLists.txt
+index 877d8af..3f8c6b1 100644
+--- a/qpdf/CMakeLists.txt
++++ b/qpdf/CMakeLists.txt
+@@ -73,7 +73,7 @@ install(TARGETS qpdf fix-qdf
+   TYPE RUNTIME
+   COMPONENT ${COMPONENT_CLI})
+ 
+-if(MINGW)
++if(MINGW AND NOT DEFINED ENV{QPDF_BCC64X})
+   # For MSVC, including InstallRequiredSystemLibraries in the
+   # top-level CMakeLists.txt is sufficient. For mingw, we have to copy
+   # mingw libraries in ourselves.
