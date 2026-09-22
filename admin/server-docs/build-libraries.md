@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current declarative contract as of 20 September 2026. The active `admin/build-libraries.xml` and `schemas/build-libraries.xsd` use **schemaVersion 16**.
+**Status:** current declarative contract as of 22 September 2026. The active `admin/build-libraries.xml` and `schemas/build-libraries.xsd` use **schemaVersion 16**.
 
 `admin/build-libraries.xml` is the executable declarative contract for C and C++ libraries managed by BuildEngine. It describes logical library identity, exact versions, dependencies, source acquisition/preparation, build variants, tests, installation, publication, smoke tests, metadata/security evidence, documentation and library extensions.
 
@@ -88,17 +88,17 @@ License declarations are evidence/override data; declared upstream license text 
 <dependency library="zlib" version="1.3.2"/>
 ```
 
-A normal library dependency is a **package dependency**. It is used by the Library-FSM, persistent scope state, package prerequisites, metadata and SBOM.
+A normal library dependency is a **package dependency**. It is used by the Library-FSM, package prerequisites, metadata and SBOM.
 
-From the consumer's `Build` state onward, every downstream state requires each direct dependency to have completed its full `Install` state:
+From the consumer's `Build` state onward, every downstream consumer state requires each direct dependency to have completed its full `Install` state:
 
 ```text
 dependency.state > Install
 ```
 
-The consumer therefore never relies on a merely completed producer build tree. It consumes the versioned installed package where headers, import libraries, runtime files and package metadata have already been assigned to a stable package root.
+The shared Library registry evaluates each requirement as `satisfied`, `waiting` or `impossible`. `waiting` means the producer can still reach the required state. `impossible` means it has failed/stopped before that point, so the consumer becomes BLOCKED instead of waiting forever.
 
-The `ScopeDependencyResolver` records the aggregate `dependency:install` scope as upstream evidence. Variant installs and `install:common` are thereby retained transitively in the Current-State chain.
+Dependency requirements are runtime gates only. A newer dependency `completedAt` is **not** persisted as a stale minimum for the consumer and does not by itself rebuild an otherwise current consumer.
 
 BuildEngine may expose the already-installed package through `InstallRoot`, `PATH`, `CMAKE_PREFIX_PATH`, `CMAKE_INCLUDE_PATH` and `CMAKE_LIBRARY_PATH`. These paths are package consumption, not scheduler control.
 
@@ -189,11 +189,22 @@ Generated CMake source trees belong below the build root and are build artifacts
 **Verification status:** the schema and both import adapters are implemented. The real BCC64X execution path is still **not verified** until BuildEngine is rebuilt with the new `ProjectImport.cpp` and representative VCXPROJ/CBPROJ cases pass.
 ## Build variants
 
-Release, Debug and future configurations are variants of one logical build contract.
+Release, Debug and future configurations are variants of one logical build contract. Their number is not fixed.
 
 Common arguments/environment belong in the common build node. Variant nodes contain only differences.
 
-Separate variant directories permit Release/Debug parallelism without collisions.
+Build, Test, Validation and Install are logical upper states. The selected variant scopes form parallel branches below the upper state and share one exit barrier:
+
+```text
+Build
+  +-- build:Debug -----------+
+  +-- build:Release ---------+
+  +-- build:<variant> -------+
+                             |
+                             +--> Test only when all are current
+```
+
+Separate variant directories permit parallelism without collisions.
 
 Dependency mapping stays variant-correct:
 
@@ -218,6 +229,23 @@ validation:Debug
 ## Installation
 
 Compiled libraries typically use variant-specific and common install actions.
+
+Install uses an explicit barrier:
+
+```text
+install:<variant>*  in parallel
+        |
+        v
+install:common
+        |
+        v
+install
+        |
+        v
+Metadata
+```
+
+`install:common` must not run while any selected variant installation is still open. The aggregate `install` scope is the single shared exit of the Install upper state.
 
 Shared DLL + import library is the preferred standard product shape where appropriate.
 
@@ -323,19 +351,19 @@ ready:Release
 ready
 ```
 
-Canonical state:
+Current canonical state:
 
 ```text
 timestamp=<library timestamp>
-upstream=<library>|<version>|<scope>|<upstream library timestamp>|<upstream completedAt>
-...
 completedAt=<completion timestamp>
 state=completed
 ```
 
+Historical `upstream=` and `fingerprint=` lines are migration-compatible input only.
+
 Fingerprints, technical Action IDs, output hashes and output existence are not Current-State authority.
 
-The active FSM/execution path invalidates a stale scope before its technical job is submitted and commits a new success only after the work, required evidence and expected upstream state are successful.
+Old Evidence is never deleted before new work. On success BuildEngine atomically replaces only the completed Scope record. On failure it leaves the previous record untouched. Later pipeline states become stale through the normal temporal predecessor comparison; no downstream state deletion is required.
 
 ## Common repository semantics
 
