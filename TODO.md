@@ -77,6 +77,17 @@ Observed target-machine evidence:
 - [ ] libxml2 tests still fail at `run_and_diff.cmake:45`. Inspection of the Admin patch revealed that the previously intended CRLF/LF normalization had not actually been written to the patch file. The version-bound helper now really normalizes line endings and prints actual/expected text on mismatch.
 - [ ] PoDoFo remains blocked only by libxml2 test/install evidence.
 
+## Sixth PDF/XML integration run: 22 September 2026
+
+Observed target-machine evidence:
+
+- [x] win-iconv 0.0.8 remains fully PASS including consumer smoke.
+- [x] QPDF 12.4.1 Release and Debug builds remain PASS.
+- [ ] QPDF tests now execute the real test suites, but Windows reports missing runtime DLLs repeatedly: `qpdf30[d].dll`, `libjpeg-62.dll`, `libcrypto-3-x64.dll`, `libz.dll` and Debug counterparts. The test contract now prepends the QPDF build runtime directories plus managed libjpeg-turbo, OpenSSL and zlib runtime directories to PATH. QPDF build evidence is intentionally not invalidated.
+- [x] libxml2 2.15.3 source and Release/Debug builds remain PASS.
+- [ ] libxml2 tests still fail in the helper comparison. Inspection showed the helper patch contained literal `\\r\\n` / `\\n` text instead of CMake CRLF/LF escape sequences. The patch now uses actual CMake `"\r\n"` -> `"\n"` normalization and source evidence is invalidated.
+- [ ] PoDoFo remains blocked by libxml2 test/install evidence.
+
 ## Active PDF / XML stack
 
 The following participants are now declared in the active Schema-16 BuildEngine stack:
