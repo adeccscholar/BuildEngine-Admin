@@ -149,6 +149,28 @@ flowchart LR
     A --> Z[zlib]
 ```
 
+## License traffic lights in the browser UI
+
+The library catalog carries the `metadata/@licenseSignal` value through BuildEngine-Common into the live server presentation.
+
+The same signal is rendered on the dynamic HTML views for:
+
+- the library overview in tile and list mode;
+- library/version pages;
+- library detail pages;
+- package overview and package detail pages;
+- the security overview.
+
+The browser uses the same semantic values as the admin contract:
+
+- **Green** — normal proprietary integration with ordinary license/notice obligations;
+- **Yellow** — explicit product-specific licensing/integration review required;
+- **Red** — do not plan as an in-process proprietary dependency.
+
+The license signal is independent of the security assessment traffic light. A library can be license-green while still having security findings, or license-red while having no known vulnerability.
+
+The REST library representations also expose `licenseSignal` so Server, Manager and other clients consume the same Common interpretation.
+
 ## Security
 
 Security views combine:
