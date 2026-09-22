@@ -6797,12 +6797,125 @@
          <argument value="-DPoDoFo_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo"/>
       </smoke>
    </library>
+   <library id="win-iconv" version="0.0.8" category="text" timestamp="2026-09-22T21:10:00Z">
+      <metadata name="win-iconv" supplier="Yukihiro Nakadaira / win-iconv contributors" homepage="https://github.com/win-iconv/win-iconv" description="Small Windows iconv implementation using the Win32 character conversion APIs.">
+         <license name="Public Domain" file="readme.txt"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/win-iconv/win-iconv.git" ref="v{LibraryVersion}" commit="c9df88a284d448da5434c6ad2737b54a907f888c"/>
+      </security>
+      <source>
+         <download url="https://github.com/win-iconv/win-iconv/archive/refs/tags/v{LibraryVersion}.zip"
+                   archive="win-iconv-{LibraryVersion}.zip"/>
+         <extract format="zip" root="win-iconv-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="readme.txt"/>
+            <require path="iconv.h"/>
+            <require path="iconv.def"/>
+            <require path="win_iconv.c"/>
+            <require path="win_iconv_test.c"/>
+         </extract>
+         <copy source="{BuildFileDir}\patches\win-iconv\0.0.8\cmake-modern-minimum.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\cmake-modern-minimum.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\cmake-modern-minimum.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\cmake-modern-minimum.patch"/>
+         </execute>
+         <execute name="patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\cmake-modern-minimum.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DBUILD_SHARED:BOOL=ON"/>
+         <argument value="-DBUILD_STATIC:BOOL=OFF"/>
+         <argument value="-DBUILD_EXECUTABLE:BOOL=OFF"/>
+         <argument value="-DBUILD_TEST:BOOL={TestsEnabled}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\win-iconv-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\iconv.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\iconv.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\win-iconv-{LibraryVersion}\readme.txt"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\readme.txt"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\iconv.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\readme.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\win-iconv\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="win-iconv-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DIconv_INCLUDE_DIR:PATH={ConsumerRoot}\include"/>
+         <argument value="-DIconv_LIBRARY:FILEPATH={ConsumerRoot}\lib\iconv.lib"/>
+      </smoke>
+   </library>
    <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-09-22T19:31:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="freetype" version="2.14.3"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
       <dependency library="libtiff" version="4.7.2"/>
+      <dependency library="win-iconv" version="0.0.8"/>
       <metadata name="Poppler" supplier="Poppler project" homepage="https://poppler.freedesktop.org/" description="PDF rendering and parsing library derived from Xpdf and used by document-processing toolchains."/>
       <security>
          <repository url="https://gitlab.freedesktop.org/poppler/poppler.git" ref="poppler-{LibraryVersion}"/>
@@ -6877,11 +6990,15 @@
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DIconv_INCLUDE_DIR:PATH={InstallRoot}\packages\win-iconv\0.0.8\include"/>
+            <argument value="-DIconv_LIBRARY:FILEPATH={InstallRoot}\packages\win-iconv\0.0.8\lib\win64\Release\iconv.lib"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
          </variant>
          <variant name="Debug">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DIconv_INCLUDE_DIR:PATH={InstallRoot}\packages\win-iconv\0.0.8\include"/>
+            <argument value="-DIconv_LIBRARY:FILEPATH={InstallRoot}\packages\win-iconv\0.0.8\lib\win64\Debug\iconv.lib"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
          </variant>
