@@ -1,3 +1,23 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -113,7 +113,12 @@ if(ENABLE_QTC)
+ endif()
+ 
+ enable_testing()
+-set(RUN_QTEST perl ${qpdf_SOURCE_DIR}/run-qtest ${ENABLE_QTC_ARG})
++if(DEFINED ENV{QPDF_PERL})
++  set(RUN_QTEST "$ENV{QPDF_PERL}" ${qpdf_SOURCE_DIR}/run-qtest ${ENABLE_QTC_ARG})
++else()
++  set(RUN_QTEST perl ${qpdf_SOURCE_DIR}/run-qtest ${ENABLE_QTC_ARG})
++endif()
+@@ -244,7 +249,11 @@ endif()
+ 
+ add_test(
+   NAME check-assert
+-  COMMAND perl ${qpdf_SOURCE_DIR}/check_assert)
++  COMMAND "$<IF:$<BOOL:$ENV{QPDF_PERL}>,$ENV{QPDF_PERL},perl>"
++          ${qpdf_SOURCE_DIR}/check_assert)
 diff --git a/run-qtest b/run-qtest
 --- a/run-qtest
 +++ b/run-qtest
@@ -41,6 +61,7 @@ diff --git a/qtest/bin/qtest-driver b/qtest/bin/qtest-driver
  my $junit_suffix = "";
 +my $native_windows_perl = (($^O eq 'MSWin32') && ($ENV{'QPDF_NATIVE_WINDOWS_PERL'} || 0));
 +my $bindir_sep = $native_windows_perl ? ';' : ':';
++my $perl = $ENV{'QPDF_PERL'} || 'perl';
  
  while (@ARGV)
  {
