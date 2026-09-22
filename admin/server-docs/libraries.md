@@ -78,6 +78,20 @@ flowchart LR
    zlib --> teckit[TECkit]
    expat[Expat] --> teckit
 
+   zlib --> libxml2[libxml2]
+
+   zlib --> qpdf[QPDF]
+   jpeg --> qpdf
+   openssl --> qpdf
+
+   zlib --> podofo[PoDoFo]
+   openssl --> podofo
+   freetype --> podofo
+   libxml2 --> podofo
+   jpeg --> podofo
+   libpng --> podofo
+   libtiff --> podofo
+
    zlib --> poppler[Poppler]
    freetype --> poppler
    jpeg --> poppler
@@ -130,7 +144,25 @@ ACE and TAO are separate logical libraries in the dependency graph. This does **
 | Expat | 2.8.4 | data | Streaming XML parser used by TECkit/SFconv and other XML consumers. | — | Upstream CMake; exact-version patch corrects the upstream assumption that every non-MSVC test build requires Bash. |
 | TECkit | 2.5.13 | text | Text encoding conversion toolkit, mapping compiler and conversion utilities. | zlib, Expat | Deliberate native CMake/Ninja/BCC64X adapter derived from upstream Makefile.am inventories; original Perl regression suite retained; no Autotools/MinGW-crossbuild runtime. |
 | ICU4C | 78.3 | text | Unicode and globalization library for locale, normalization, collation and conversion. | — | VCXPROJ files are read only as source/resource inventory; BuildEngine owns CMake/Ninja/BCC64X. Current bootstrap builds stubdata, common and i18n without MSBuild/MSVC/NMAKE/MSYS. |
-| Poppler | 26.09.0 | documentation | PDF parser and rendering foundation used in document-processing toolchains. | zlib, FreeType, libjpeg-turbo, libpng, libtiff | Upstream CMake with reduced Windows profile; local _AMD64_/NOMINMAX bridge; upstream test-data repository is a separate future pinned participant. |
+| libxml2 | 2.15.3 | data | C XML toolkit with XPath, XML Schema, Relax NG, XInclude and serialization support. | zlib | New shared upstream CMake profile with tests/programs, schema/Relax NG/XPath/XInclude and zlib enabled; Python, ICU, modules and external iconv disabled for the first BCC64X proof. **[nicht verifiziert]** |
+| QPDF | 12.4.1 | documentation | PDF structural inspection and transformation library for rewriting, encryption and validation workflows. | zlib, libjpeg-turbo, OpenSSL | New shared upstream CMake profile, static library disabled, OpenSSL required as the crypto provider, upstream tests and package consumer smoke retained. **[nicht verifiziert]** |
+| PoDoFo | 1.1.1 | documentation | C++ PDF parsing, creation and modification library with form, annotation, signing and incremental-update APIs. | zlib, OpenSSL, FreeType, libxml2, libjpeg-turbo, libpng, libtiff | New shared upstream CMake profile; Win32 GDI font search enabled, AFDKO/examples/GPL tools disabled, upstream tests and package smoke retained. **[nicht verifiziert]** |
+| Poppler | 26.09.0 | documentation | PDF parser and rendering foundation used in document-processing toolchains. | zlib, FreeType, libjpeg-turbo, libpng, libtiff | Upstream CMake with reduced Windows profile; local _AMD64_/NOMINMAX bridge; C++ API enabled with ENABLE_CPP=ON; upstream test-data repository is a separate future pinned participant. **[nicht verifiziert]** |
+
+## PDF and XML processing stack
+
+The document-processing branch now has four complementary layers:
+
+- **libxml2 2.15.3** provides the XML parser, XPath, XML Schema and Relax NG foundation for extracted E-invoice payloads.
+- **QPDF 12.4.1** provides low-level PDF object/structure inspection and deterministic rewrite capabilities.
+- **PoDoFo 1.1.1** provides the higher-level C++ PDF modification layer, including forms, annotations, signing and incremental updates.
+- **Poppler 26.09.0** provides PDF reading/rendering and its C++ API is enabled.
+
+The current contracts are intentionally separate. No single PDF library is treated as a universal abstraction. The first BuildEngine goal is to prove each installed package independently with BCC64X, then use BuildEngine-Tests to determine the practical responsibility boundary through real E-invoice, form-discovery and fill/save/reopen scenarios.
+
+The new libxml2, QPDF and PoDoFo paths are **[nicht verifiziert]** until a target-machine run passes. Poppler's newly enabled C++ API is likewise **[nicht verifiziert]**.
+
+Licensing is also part of the architecture. QPDF is Apache-2.0. PoDoFo's library offers MPL-2.0 or LGPL-2.0-or-later, while its command-line tools are GPL and are therefore disabled in the first library-focused profile. Poppler is GPL and must not become an accidental mandatory proprietary in-process dependency without a deliberate distribution decision. See [Open-Source License Overview](licenses.md) and [PDF and E-Invoice Processing Roadmap](pdf-processing.md).
 
 ## Archive and compression stack
 
