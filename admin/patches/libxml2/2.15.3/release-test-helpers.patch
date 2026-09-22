@@ -3,7 +3,7 @@ new file mode 100644
 index 0000000..81a113e
 --- /dev/null
 +++ b/run_and_diff.cmake
-@@ -0,0 +1,47 @@
+@@ -0,0 +1,52 @@
 +# Ensure output directory exists
 +get_filename_component(_outdir "${STDOUT}" DIRECTORY)
 +file(MAKE_DIRECTORY "${_outdir}")
@@ -44,10 +44,14 @@ index 0000000..81a113e
 +    file(READ "${EXPECTED_STDERR}" expected_stderr)
 +    string(REPLACE "\r\n" "\n" actual_stderr "${actual_stderr}")
 +    string(REPLACE "\r\n" "\n" expected_stderr "${expected_stderr}")
++    string(REPLACE "\r" "\n" actual_stderr "${actual_stderr}")
++    string(REPLACE "\r" "\n" expected_stderr "${expected_stderr}")
++    string(REPLACE "\\" "/" actual_stderr "${actual_stderr}")
++    string(REPLACE "\\" "/" expected_stderr "${expected_stderr}")
 +    if(NOT actual_stderr STREQUAL expected_stderr)
-+        message(STATUS "Actual stderr: [${actual_stderr}]")
-+        message(STATUS "Expected stderr: [${expected_stderr}]")
-+        message(FATAL_ERROR "stderr does not match expected")
++        string(REPLACE "\n" "\\n" actual_stderr_one_line "${actual_stderr}")
++        string(REPLACE "\n" "\\n" expected_stderr_one_line "${expected_stderr}")
++        message(FATAL_ERROR "stderr does not match expected: actual=[${actual_stderr_one_line}] expected=[${expected_stderr_one_line}]")
 +    endif()
 +endif()
 +diff --git a/test_xmlcatalog_add_del.cmake b/test_xmlcatalog_add_del.cmake
