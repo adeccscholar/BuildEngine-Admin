@@ -3,6 +3,21 @@
 **Status date:** September 22, 2026  
 **Status:** active BuildEngine/Admin integration work; the September 8 freeze section below is retained as historical provenance
 
+## First PDF/XML integration run: 22 September 2026
+
+Observed target-machine evidence:
+
+- [x] libxml2 2.15.3 source: PASS
+- [x] libxml2 2.15.3 Release build: PASS
+- [x] libxml2 2.15.3 Debug build: PASS
+- [ ] libxml2 tests: failed because the official 2.15.3 release archive omits two CMake test helper files that are present in the tagged Git source. A version-bound patch now restores both helpers.
+- [ ] QPDF Debug configure: failed because upstream searches for `jpeg` while the managed Debug package is `jpegd.lib`. The contract now supplies exact variant-specific dependency paths.
+- [ ] QPDF Release build: reached compilation/linking, then failed in the upstream MinGW runtime-copy target for `libstdc++-6.dll`. BCC64X is now excluded from that MinGW-only post-build path by a version-bound patch.
+- [ ] Poppler configure with `ENABLE_CPP=ON`: exposed the upstream mandatory Iconv dependency. win-iconv 0.0.8 is now a separate BuildEngine participant and Poppler consumes its exact variant package.
+- [ ] PoDoFo remained blocked only because its new libxml2 dependency had not reached successful test/install evidence.
+
+The next run must verify the fixes rather than introduce replacement compiler/toolchain paths.
+
 ## Active PDF / XML stack
 
 The following participants are now declared in the active Schema-16 BuildEngine stack:
