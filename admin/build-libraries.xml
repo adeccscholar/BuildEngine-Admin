@@ -6446,6 +6446,30 @@
             <require path="include\libxml\xmlschemas.h"/>
             <require path="include\libxml\relaxng.h"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\libxml2\2.15.3\release-test-helpers.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\release-test-helpers.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\release-test-helpers.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\release-test-helpers.patch"/>
+         </execute>
+         <execute name="patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\release-test-helpers.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -6553,6 +6577,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <environment name="QPDF_BCC64X" value="1"/>
          <argument value="-G"/>
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
