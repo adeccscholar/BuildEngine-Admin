@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** architectural direction as of 22 September 2026. Poppler 26.09.0 is already present in the BuildEngine contract and its C++ API is enabled. LibXML2, PoDoFo and QPDF are planned additions and are not yet integrated BuildEngine libraries.
+**Status:** active architectural and BuildEngine integration direction as of 22 September 2026. Poppler 26.09.0, libxml2 2.15.3, QPDF 12.4.1 and PoDoFo 1.1.1 are declared in the Schema-16 BuildEngine stack. The three newly added build/test/package paths are **[nicht verifiziert]** until the next BCC64X run.
 
 ## Objective
 
@@ -42,19 +42,19 @@ Role: PDF reading, page/document inspection, text/rendering-related capabilities
 
 **Licensing note:** Poppler is GPL-licensed. A shipped proprietary in-process integration requires a deliberate product/legal architecture decision before deployment.
 
-### QPDF
+### QPDF 12.4.1
 
-Planned role: low-level PDF structure, object inspection, transformations, validation/repair-oriented workflows and deterministic rewriting.
+Role: low-level PDF structure, object inspection, transformations, validation/repair-oriented workflows and deterministic rewriting. The current BuildEngine contract builds the shared library against managed zlib, libjpeg-turbo and OpenSSL and retains the upstream test suite. **[nicht verifiziert]**
 
-### PoDoFo
+### PoDoFo 1.1.1
 
-Planned role: higher-level PDF modification, AcroForm inspection/update, annotations and attachments where appropriate, and writing modified documents.
+Role: higher-level PDF modification, AcroForm inspection/update, annotations and attachments where appropriate, and writing modified documents. The first BuildEngine profile uses managed zlib, OpenSSL, FreeType, libxml2, JPEG, PNG and TIFF, uses the Win32 GDI font search path, and deliberately disables AFDKO plus the GPL command-line tools. **[nicht verifiziert]**
 
 The exact PoDoFo/QPDF responsibility boundary must be proven with small real programs before both become mandatory runtime dependencies.
 
-### LibXML2
+### libxml2 2.15.3
 
-Planned role: low-level XML parsing and schema-related mechanics for extracted invoice XML. Business meaning, invoice rules and profile validation remain a separate typed application layer.
+Role: low-level XML parsing and schema-related mechanics for extracted invoice XML. The BuildEngine profile keeps XML Schema, Relax NG, XPath, XInclude, serialization and zlib support enabled while Python, ICU, dynamic modules and external iconv are disabled in the first BCC64X profile. Business meaning, invoice rules and profile validation remain a separate typed application layer. **[nicht verifiziert]**
 
 ## E-invoice processing
 
@@ -104,11 +104,14 @@ Printer selection and Windows spooler policy do not belong inside the PDF librar
 
 ## BuildEngine work items
 
-1. Keep Poppler `ENABLE_CPP=ON` and verify the C++ headers/library consumer with BCC64X.
-2. Add LibXML2 as a versioned library contract with tests, package, publish and smoke evidence.
-3. Add QPDF with its exact dependency closure and a structural read/rewrite smoke.
-4. Add PoDoFo with its exact dependency closure and a form-inspection/form-write smoke.
+1. Verify Poppler `ENABLE_CPP=ON` with a real BCC64X C++ consumer.
+2. Run libxml2 2.15.3 through source, Release/Debug build, upstream tests, install, publish and package smoke.
+3. Run QPDF 12.4.1 through source, Release/Debug build, upstream tests, install, publish and package smoke.
+4. Run PoDoFo 1.1.1 through source, Release/Debug build, upstream tests, install, publish and package smoke.
 5. Add small comparison programs that establish the real responsibility boundary between Poppler, QPDF and PoDoFo.
 6. Add representative E-invoice and form samples to `BuildEngine-Tests`, not to generic package smokes.
-7. Add exact license evidence and normalized metadata for every new dependency.
-8. Decide the product/distribution boundary for GPL Poppler before a proprietary deliverable relies on in-process linkage.
+7. Extend the first PoDoFo smoke from construction to AcroForm discovery and a save/reopen round trip after the package itself passes.
+8. Extend the QPDF smoke from object construction to structural read/rewrite validation after the package itself passes.
+9. Record exact source archive SHA-256 values where upstream publishes stable digests.
+10. Decide the product/distribution boundary for GPL Poppler before a proprietary deliverable relies on in-process linkage.
+11. Record which PoDoFo license path, MPL-2.0 or LGPL-2.0-or-later, is selected for each distributable product.
