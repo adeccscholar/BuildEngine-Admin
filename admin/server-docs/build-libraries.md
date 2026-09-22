@@ -14,6 +14,8 @@ Related documents:
 - [Tool contract](build-tools.md)
 - [BuildEngine architecture](buildengine.md)
 - [Server](server.md)
+- [Third-party licenses](licenses.md)
+- [PDF and E-invoice processing roadmap](pdf-processing.md)
 
 ## Contract authority
 
