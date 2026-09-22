@@ -88,6 +88,20 @@ Observed target-machine evidence:
 - [ ] libxml2 tests still fail in the helper comparison. Inspection showed the helper patch contained literal `\\r\\n` / `\\n` text instead of CMake CRLF/LF escape sequences. The patch now uses actual CMake `"\r\n"` -> `"\n"` normalization and source evidence is invalidated.
 - [ ] PoDoFo remains blocked by libxml2 test/install evidence.
 
+## QPDF runtime-closure correction: 23 September 2026
+
+Target-machine evidence showed that `qpdf.exe` and `json_parse.exe` both attempted to load Brotli/Zstd runtime DLLs. Inspection of the BuildEngine OpenSSL contract identified the concrete source: OpenSSL 3.5.8 is intentionally built with `zlib`, `enable-brotli` and `enable-zstd`. QPDF was linked against that OpenSSL build as its crypto provider.
+
+Correction:
+
+- [x] Remove OpenSSL from QPDF's declared dependencies.
+- [x] Set `REQUIRE_CRYPTO_OPENSSL=OFF`.
+- [x] Set `REQUIRE_CRYPTO_NATIVE=ON`.
+- [x] Remove OpenSSL from QPDF configure/runtime paths.
+- [x] Keep managed zlib and libjpeg-turbo as the only external QPDF libraries.
+- [x] Add a PE runtime-closure verification step using the managed `tdump` tool.
+- [ ] Verify that `qpdf.exe`, `json_parse.exe` and `qpdf30[d].dll` no longer import OpenSSL/Brotli/Zstd after the rebuild.
+
 ## Active PDF / XML stack
 
 The following participants are now declared in the active Schema-16 BuildEngine stack:
