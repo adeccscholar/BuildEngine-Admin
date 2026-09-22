@@ -4,6 +4,16 @@
 
 **Status:** active architectural and BuildEngine integration direction as of 22 September 2026. Poppler 26.09.0, libxml2 2.15.3, QPDF 12.4.1 and PoDoFo 1.1.1 are declared in the Schema-16 BuildEngine stack. The three newly added build/test/package paths are **[nicht verifiziert]** until the next BCC64X run.
 
+## License traffic light for this stack
+
+- **🟢 Green — libxml2 2.15.3:** MIT; normal notice-preservation obligations.
+- **🟢 Green — QPDF 12.4.1:** Apache-2.0; preserve license/NOTICE obligations and patent terms.
+- **🟡 Yellow — PoDoFo 1.1.1:** MPL-2.0 or LGPL-2.0-or-later for the library; the concrete product must record the selected licensing path. GPL command-line tools remain outside the first library-focused package.
+- **🟢 Green — win-iconv 0.0.8:** upstream places this implementation in the public domain. This is not GNU libiconv.
+- **🔴 Red — Poppler 26.09.0:** GPL; do not plan as an in-process dependency of proprietary software without a different product/distribution architecture or another licensing path.
+
+The traffic light is an engineering integration marker. The exact upstream license texts remain authoritative.
+
 ## Objective
 
 The PDF track should grow from a rendering/parsing capability into a reusable document-processing stack that can:
