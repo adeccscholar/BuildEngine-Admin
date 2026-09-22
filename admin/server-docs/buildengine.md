@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current architecture contract as of 20 September 2026. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
+**Status:** current architecture contract as of 22 September 2026. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
 
 BuildEngine is a declarative C++23 orchestration system centered on Embarcadero C++Builder 13 / BCC64X. The current architecture separates the declarative library contract, the runtime Library-FSM, persistent logical scope state, technical WorkItems/Actions, artifact evidence, Common repository semantics and read-only presentation.
 
@@ -52,9 +52,19 @@ downstream S may run only when dependency Completed(Install)
 Completed(Install) <=> dependency.state > Install
 ```
 
-The same installed-package barrier is used for Build, Test, Validation, Install, Metadata, Publish, Documentation and Ready. This is deliberate: a consumer must use an assigned, versioned package rather than an arbitrary producer build directory.
+The shared runtime registry stores, per Library/Version, the current FSM state and whether that machine is still running, finished, stopped or failed.
 
-The aggregate `dependency:install` scope is recorded as persistent upstream evidence. Variant installation and `install:common` therefore remain part of the Current-State chain.
+A requirement evaluates to:
+
+```text
+satisfied
+waiting
+impossible
+```
+
+`waiting` means the producer can still reach the required state. `impossible` means it cannot, so the consumer becomes BLOCKED instead of waiting forever.
+
+Normal dependency completion timestamps are **not** part of local consumer Current-State. A dependency re-install therefore does not by itself age a valid consumer build. The explicit temporal cross-library exception is Extension Source inheritance when the extension shares the prepared base Source.
 
 Examples:
 
@@ -73,6 +83,30 @@ After a dependency completed Install, its later Metadata/Publish/Documentation w
 The existing ProcessScheduler remains useful as technical queue/worker infrastructure for already released jobs and for tool provisioning. It is not the persistent state authority and no longer defines the library lifecycle.
 
 Local `id`/`dependsOn` graphs are allowed inside WorkItems where technical ordering needs them.
+
+
+### Variant upper states
+
+Build, Test, Validation and Install are logical upper states. Their selected variant scopes run in parallel and share one exit barrier.
+
+```text
+Build
+  +-- build:Debug -----------+
+  +-- build:Release ---------+
+  +-- build:<variant> -------+
+                             |
+                             +--> Test
+```
+
+The FSM leaves Build only when every selected build variant is current. Test and Validation use the same rule.
+
+Install adds two ordered stages after the parallel variant barrier:
+
+```text
+install:<variant>* -> install:common -> install -> Metadata
+```
+
+The number of variants is not fixed.
 
 ## Project import before CMake configure
 
@@ -122,17 +156,17 @@ ready:Debug
 ready
 ```
 
-Canonical state:
+Canonical state written by the current store:
 
 ```text
 timestamp=<library timestamp>
-upstream=<library>|<version>|<scope>|<upstream library timestamp>|<upstream completedAt>
-...
 completedAt=<completion timestamp>
 state=completed
 ```
 
-A scope is current only when its own contract timestamp and the exact expected set of direct upstream completion identities still match.
+Historical `upstream=` and `fingerprint=` records are accepted only for migration compatibility and are not written again.
+
+A scope is current when its own contract timestamp matches and its own temporal predecessor is not newer. Normal package dependencies remain runtime gates in the shared registry and do not become local Evidence timestamps.
 
 Fingerprints, output files, command hashes, tree hashes, technical step markers and runtime FSM state are not Current-State authorities.
 
@@ -141,13 +175,12 @@ Fingerprints, output files, command hashes, tree hashes, technical step markers 
 For work that is actually submitted:
 
 ```text
-invalidate old scope success
--> execute technical work
--> verify evidence/upstreams
--> commit new logical scope state on success
+evaluate current
+-> execute required technical work
+-> commit this logical scope atomically on success
 ```
 
-A failure leaves the scope stale. Old success is not retained as if the rebuild had never failed.
+Old Evidence is never deleted before execution. A failure leaves the previous Evidence record untouched, while the current machine still ends FAILED. Downstream records are not deleted; newer predecessor timestamps make them stale naturally.
 
 ## Read-only check
 
@@ -213,7 +246,15 @@ BuildEngine-Common resolves logical identity separately from physical payload an
 
 ## Heartbeat and telemetry
 
-Heartbeat output is library/FSM-oriented. Technical job activity remains available for diagnosis, but job counts are not treated as the domain model.
+Interactive output is grouped deliberately:
+
+- `[FSM] activated ...` lists newly released logical scopes as one batch;
+- `[HEARTBEAT]` reports FSM totals plus scheduler `running/ready/pending` and active technical actions;
+- `[COMPLETED since last heartbeat]` preserves short successful FSM scopes that would otherwise disappear between heartbeats, including their duration;
+- failures are printed immediately;
+- successful technical substeps stay in detailed logs instead of flooding the console.
+
+Technical queue state remains diagnostic information, not the domain model.
 
 ## Verification status
 
