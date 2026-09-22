@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current configuration contract as of 19 September 2026. The Library-FSM architecture is active. `build-libraries.xml` and `schemas/build-libraries.xsd` use schema version 15.
+**Status:** current configuration contract as of 22 September 2026. The Library-FSM architecture is active. `build-libraries.xml` and `schemas/build-libraries.xsd` use schema version 16.
 
 BuildEngine combines one local machine/deployment configuration with synchronized administration contracts.
 
@@ -141,13 +141,15 @@ The standalone Server reads the same `BuildEngine.xml`; invocation options such 
 
 The global invariant is:
 
-$$
+$
 N_{active} \leq N_{workers}
-$$
+$
 
-Technical WorkItems released by independent Library-FSMs can execute concurrently when their local dependencies and physical resources allow it. The worker limit bounds technical execution; it does not define the fachlich library lifecycle.
+Technical WorkItems released by independent Library-FSMs can execute concurrently when their local dependencies and physical resources allow it. One outer BuildEngine worker may itself start internally parallel tools such as Ninja, CTest or Doxygen; the worker count is therefore not a CPU-count model.
 
-There are no separate architectural worker pools for Build, Test or Documentation. A future resource-slot contract must remain generic.
+Build, Test, Validation and Install are logical upper states. Selected variant scopes run in parallel below that upper state and share one exit barrier. The number of variants is not fixed.
+
+There are no separate architectural worker pools for Build, Test or Documentation.
 
 Shared mutable prerequisites are explicit. Example: one managed MiKTeX runtime preflight can initialize shared runtime state before independent document `texify` actions run.
 
@@ -238,15 +240,17 @@ Persistent logical scope state lives below:
 <ProductionRoot>/.buildengine/libraries/<library>/<version>/<safe-scope>.state
 ```
 
-Canonical content:
+Current canonical content:
 
 ```text
 timestamp=<library timestamp>
-upstream=<library>|<version>|<scope>|<upstream library timestamp>|<upstream completedAt>
-...
 completedAt=<completion timestamp>
 state=completed
 ```
+
+Historical `upstream=` and `fingerprint=` lines can still be read for migration compatibility, but they are not current authority and are not written by new commits.
+
+Normal library dependencies are runtime `satisfied / waiting / impossible` gates in the shared Library registry. Their completion timestamps do not age local consumer Evidence. The explicit exception is extension Source inheritance, where an extension shares the prepared base Source.
 
 Fingerprints, command hashes, output files and technical Step markers are not Current-State authority.
 
@@ -266,7 +270,9 @@ Default incremental command. The declarative contract is compiled into Library-F
 
 ### `--build`
 
-Forces selected logical work while keeping the same Library-FSM architecture. A scope is invalidated before its technical execution so a failed forced build cannot leave old success behind.
+Forces selected logical work while keeping the same Library-FSM architecture. Old Evidence is not deleted before execution. A successful Scope atomically replaces its own Evidence; a failed forced build leaves the previous Evidence untouched, while the current run still ends failed.
+
+With `--lib`, only the explicitly selected library is forced. Its Requirement closure remains governed by normal Evidence and runs only when its own state requires work.
 
 ### `--check`
 
@@ -294,9 +300,11 @@ Reserved/recognized according to the current CLI implementation; if not implemen
 
 ## Selection
 
-`--lib` / `--libversion` identify logical library coordinates and are case-sensitive according to the current contract.
+`--lib` / `--libversion` identify logical library coordinates and are case-sensitive.
 
-Any command that does not yet support library selection must reject it rather than silently operating on an unintended graph.
+For `--make` and `--build`, BuildEngine reduces the Library-FSM definition set to the selected library plus its transitive Requirement closure. The selected consumer therefore does not bypass dependencies and no second execution path is created.
+
+`--config` selects variants before FSM compilation. `--tests` changes the same declarative contract; neither option creates a special scheduler path.
 
 ## Current verification boundary
 
@@ -321,3 +329,19 @@ The current BZip2/libarchive capability has its own explicit gate: the BuildEngi
 - [ ] physical package paths are not used as logical library identity.
 - [ ] private libarchive capability banner matches the archive formats used by active tool contracts.
 - [ ] contract and maintained Markdown pages are updated together.
+
+
+## Console and heartbeat
+
+Interactive output is intentionally grouped by semantic level:
+
+```text
+[FSM] activated ...
+[HEARTBEAT] ... scheduler: running=... ready=... pending=...
+[COMPLETED since last heartbeat]
+...
+```
+
+The heartbeat shows current FSM totals, scheduler queue state and active technical actions. Short successful FSM scopes that start and finish between heartbeats are collected under `COMPLETED since last heartbeat` with their duration. Failures are printed immediately instead of waiting for the next heartbeat.
+
+Successful technical substeps remain available in detailed logs without flooding the interactive console.
