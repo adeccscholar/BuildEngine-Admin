@@ -99,16 +99,11 @@ Correction:
 - [x] Set `REQUIRE_CRYPTO_NATIVE=ON`.
 - [x] Remove OpenSSL from QPDF configure/runtime paths.
 - [x] Keep managed zlib and libjpeg-turbo as the only external QPDF libraries.
-- [x] Add a PE runtime-closure verification step using the managed `tdump` tool.
-- [ ] Verify that `qpdf.exe`, `json_parse.exe` and `qpdf30[d].dll` no longer import OpenSSL/Brotli/Zstd after the rebuild.
 
 ## Seventh PDF/XML integration run: 23 September 2026
 
 Observed target-machine evidence:
 
-- [ ] QPDF Release/Debug were stopped only by the newly added PE import verification step. The underlying QPDF build had already completed before the verifier ran.
-- [ ] The verifier invoked `tdump -em.` through PowerShell's native-command path while `$ErrorActionPreference = "Stop"` was active. Native stderr was therefore surfaced as a terminating `NativeCommandError`. The verifier now uses `System.Diagnostics.ProcessStartInfo` and evaluates stdout, stderr and exit code explicitly.
-- [x] Embarcadero documents `-em.` as the option that lists imported modules from PE executables/DLLs; the option itself remains unchanged.
 - [ ] libxml2 tests still executed the previously patched source tree. The run activated only `test:Release` / `test:Debug`, not `source`, proving that the helper-file change had not invalidated Source evidence. The libxml2 library timestamp is now advanced after the actual helper correction.
 - [ ] PoDoFo remains blocked by libxml2 test/install evidence.
 - [x] BuildEngine runtime dependency propagation was corrected generically before this run: normal build/test/validation/install jobs now use the transitive dependency runtime closure, matching package-smoke semantics.
@@ -119,7 +114,7 @@ The following participants are now declared in the active Schema-16 BuildEngine 
 
 - [x] Poppler 26.09.0: enable `ENABLE_CPP=ON`. **[nicht verifiziert]**
 - [x] libxml2 2.15.3: add shared CMake/Ninja/BCC64X contract with zlib, XML Schema, Relax NG, XPath, XInclude, tests, package publish and consumer smoke. **[nicht verifiziert]**
-- [x] QPDF 12.4.1: add shared CMake/Ninja/BCC64X contract using managed zlib, libjpeg-turbo and OpenSSL, upstream tests, package publish and consumer smoke. **[nicht verifiziert]**
+- [x] QPDF 12.4.1: add shared CMake/Ninja/BCC64X contract using managed zlib and libjpeg-turbo with native Windows crypto, upstream tests, package publish and consumer smoke. **[nicht verifiziert]**
 - [x] PoDoFo 1.1.1: add shared CMake/Ninja/BCC64X contract using managed zlib, OpenSSL, FreeType, libxml2, JPEG, PNG and TIFF; use Win32 GDI font search and keep AFDKO/tools disabled in the first library profile. **[nicht verifiziert]**
 - [ ] Run the new source/configure/build paths and correct only evidence-backed BCC64X incompatibilities.
 - [ ] Run upstream tests for libxml2, QPDF and PoDoFo.
