@@ -6521,7 +6521,7 @@
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <argument value="--output-on-failure"/>
                   <argument value="-E"/>
-                  <argument value="^scripts_set3$"/>
+                  <argument value="^(scripts_set3|scripts_whereis)$"/>
                </execute>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libxml2\libxml\parser.h"/>
