@@ -53,7 +53,7 @@ new file mode 100644
 index 0000000..c124e59
 --- /dev/null
 +++ b/test_xmlcatalog_add_del.cmake
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,35 @@
 +# test_xmlcatalog_add_del.cmake
 +cmake_minimum_required(VERSION 3.16)
 +
