@@ -6689,7 +6689,7 @@
                   <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\qpdf;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compare-for-test;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\zlib-flate;{ToolDir:perl};{ToolDir:bash};{ToolDir:bash}\..\usr\bin;{ENV:PATH}"/>
                   <argument value="--output-on-failure"/>
                   <argument value="-E"/>
-                  <argument value="^compare-for-test$"/>
+                  <argument value="^(compare-for-test|libtests|qpdf|zlib-flate|examples|fuzz)$"/>
                </execute>
                <execute name="compare-native-smoke" test="true"
                         executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compare-for-test\qpdf-test-compare.exe"
@@ -6698,6 +6698,20 @@
                   <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{ENV:PATH}"/>
                   <argument value="zlib.pdf"/>
                   <argument value="zlib-9.pdf"/>
+               </execute>
+               <execute name="qpdf-native-smoke" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\qpdf\qpdf.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\qpdf"
+                        showOutput="false">
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{ENV:PATH}"/>
+                  <argument value="--version"/>
+               </execute>
+               <execute name="zlib-flate-native-smoke" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\zlib-flate\zlib-flate.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\zlib-flate"
+                        showOutput="false">
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{ENV:PATH}"/>
+                  <argument value="--_zopfli"/>
                </execute>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\qpdf\QPDF.hh"/>
