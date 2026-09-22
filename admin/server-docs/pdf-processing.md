@@ -54,7 +54,7 @@ Role: PDF reading, page/document inspection, text/rendering-related capabilities
 
 ### QPDF 12.4.1
 
-Role: low-level PDF structure, object inspection, transformations, validation/repair-oriented workflows and deterministic rewriting. The current BuildEngine contract builds the shared library against managed zlib, libjpeg-turbo and OpenSSL and retains the upstream test suite. **[nicht verifiziert]**
+Role: low-level PDF structure, object inspection, transformations, validation/repair-oriented workflows and deterministic rewriting. The current BuildEngine contract builds the shared library against managed zlib and libjpeg-turbo and requires QPDF's native crypto provider. OpenSSL is deliberately excluded from the QPDF runtime so the OpenSSL Brotli/Zstd feature closure cannot leak into qpdf.exe or the libtests. **[nicht verifiziert]**
 
 ### PoDoFo 1.1.1
 
