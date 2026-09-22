@@ -78,6 +78,13 @@
       <xs:attribute name="licensor" type="xs:string" use="optional"/>
       <xs:attribute name="file" type="xs:string" use="optional"/>
    </xs:complexType>
+   <xs:simpleType name="licenseSignalType">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="green"/>
+         <xs:enumeration value="yellow"/>
+         <xs:enumeration value="red"/>
+      </xs:restriction>
+   </xs:simpleType>
    <xs:complexType name="libraryMetadataType">
       <xs:annotation>
          <xs:documentation>Human-facing and SBOM metadata for one logical BuildEngine library. Contract metadata overrides automatically detected upstream values where both are present.</xs:documentation>
@@ -99,6 +106,9 @@
       </xs:attribute>
       <xs:attribute name="homepage" type="xs:anyURI" use="optional">
          <xs:annotation><xs:documentation>Canonical upstream project or product page.</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="licenseSignal" type="licenseSignalType" use="optional">
+         <xs:annotation><xs:documentation>Traffic-light integration marker for proprietary product use: green = normal notice/attribution obligations, yellow = product-specific legal/integration review required, red = do not plan as an in-process proprietary dependency.</xs:documentation></xs:annotation>
       </xs:attribute>
    </xs:complexType>
    <xs:complexType name="securityRepositoryType">
