@@ -48,6 +48,23 @@ Observed target-machine evidence at the supplied run cutoff:
 - [ ] PoDoFo remains behind successful libxml2 test/install evidence; no PoDoFo compiler result is inferred.
 - [x] License traffic lights are propagated through BuildEngine-Common into the dynamic HTML server pages and REST library metadata.
 
+## Fourth PDF/XML integration run: 22 September 2026
+
+Observed target-machine evidence:
+
+- [x] win-iconv 0.0.8 source/build/test/install/metadata/publish/doxygen: PASS.
+- [x] win-iconv 0.0.8 Release and Debug upstream tests: PASS.
+- [ ] win-iconv consumer smoke failed because the smoke used a flattened `{ConsumerRoot}\lib\libiconv.lib` path while package-scope smokes consume the installed package layout. The smoke now uses `{ConsumerRoot}\lib\win64\{Configuration}\libiconv.lib`.
+- [x] Poppler 26.09.0 Release build: PASS.
+- [x] Poppler 26.09.0 Debug build: PASS.
+- [x] Poppler 26.09.0 install/common/metadata/publish/doxygen/ready: PASS. This is the first complete BCC64X build evidence for Poppler with `ENABLE_CPP=ON`.
+- [x] QPDF 12.4.1 Release build: PASS.
+- [x] QPDF 12.4.1 Debug build: PASS.
+- [ ] QPDF upstream tests: 0/7 passed. Upstream qtest's Windows path handling assumes MinGW/MSYS Perl, while BuildEngine deliberately provides Strawberry Perl. A version-bound native-Windows qtest adapter is added; result remains **[nicht verifiziert]** until the next run.
+- [x] libxml2 2.15.3 source/build remains PASS in both variants.
+- [ ] libxml2 tests now reach the real upstream output comparison. Failure occurs at the stderr comparison in `run_and_diff.cmake`; the helper now normalizes CRLF/LF before textual comparison. Result remains **[nicht verifiziert]** until the next run.
+- [ ] PoDoFo remains blocked solely by libxml2 test/install evidence; no PoDoFo compiler result is inferred.
+
 ## Active PDF / XML stack
 
 The following participants are now declared in the active Schema-16 BuildEngine stack:
