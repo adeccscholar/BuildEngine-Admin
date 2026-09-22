@@ -6428,7 +6428,7 @@
       </publish>
    </library>
 
-   <library id="libxml2" version="2.15.3" category="data" timestamp="2026-09-22T22:34:00Z">
+   <library id="libxml2" version="2.15.3" category="data" timestamp="2026-09-22T22:58:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <metadata name="libxml2" supplier="GNOME / libxml2 contributors" homepage="https://gitlab.gnome.org/GNOME/libxml2" description="C XML toolkit providing parsing, XPath, XML Schema, Relax NG, XInclude and serialization support." licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="Copyright"/>
@@ -6551,7 +6551,7 @@
          <argument value="-DLibXml2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libxml2"/>
       </smoke>
    </library>
-   <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-09-22T22:48:00Z">
+   <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-09-22T22:58:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="openssl" version="3.5.8"/>
@@ -6594,6 +6594,30 @@
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-no-mingw-runtime-copy.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\qpdf\12.4.1\native-windows-qtest.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-qtest.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="qtest-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-qtest.patch"/>
+         </execute>
+         <execute name="qtest-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-qtest.patch"/>
+         </execute>
+         <execute name="qtest-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-qtest.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="true">
@@ -6663,6 +6687,7 @@
                <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="QPDF_NATIVE_WINDOWS_PERL" value="1"/>
                   <environment name="PATH" value="{ToolDir:perl};{ToolDir:bash};{ENV:PATH}"/>
                   <argument value="--output-on-failure"/>
                </execute>
@@ -6797,7 +6822,7 @@
          <argument value="-DPoDoFo_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo"/>
       </smoke>
    </library>
-   <library id="win-iconv" version="0.0.8" category="text" timestamp="2026-09-22T22:48:00Z">
+   <library id="win-iconv" version="0.0.8" category="text" timestamp="2026-09-22T22:58:00Z">
       <metadata name="win-iconv" supplier="Yukihiro Nakadaira / win-iconv contributors" homepage="https://github.com/win-iconv/win-iconv" description="Small Windows iconv implementation using the Win32 character conversion APIs." licenseSignal="green">
          <license name="Public Domain" file="readme.txt"/>
       </metadata>
@@ -6906,7 +6931,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DIconv_INCLUDE_DIR:PATH={ConsumerRoot}\include"/>
-         <argument value="-DIconv_LIBRARY:FILEPATH={ConsumerRoot}\lib\libiconv.lib"/>
+         <argument value="-DIconv_LIBRARY:FILEPATH={ConsumerRoot}\lib\win64\{Configuration}\libiconv.lib"/>
       </smoke>
    </library>
    <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-09-22T22:48:00Z">
