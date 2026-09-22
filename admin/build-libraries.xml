@@ -6797,7 +6797,7 @@
          <argument value="-DPoDoFo_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo"/>
       </smoke>
    </library>
-   <library id="win-iconv" version="0.0.8" category="text" timestamp="2026-09-22T22:34:00Z">
+   <library id="win-iconv" version="0.0.8" category="text" timestamp="2026-09-22T22:35:00Z">
       <metadata name="win-iconv" supplier="Yukihiro Nakadaira / win-iconv contributors" homepage="https://github.com/win-iconv/win-iconv" description="Small Windows iconv implementation using the Win32 character conversion APIs." licenseSignal="green">
          <license name="Public Domain" file="readme.txt"/>
       </metadata>
