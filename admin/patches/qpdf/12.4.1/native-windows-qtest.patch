@@ -1,0 +1,53 @@
+diff --git a/run-qtest b/run-qtest
+--- a/run-qtest
++++ b/run-qtest
+@@ -15,11 +15,13 @@ my $show_on_failure = 0;
+ my $disable_tc = 0;
+ my @tc = ();
+ 
+-if ($^O =~ m/^MSWin32|msys$/)
++my $native_windows_perl = (($^O eq 'MSWin32') && ($ENV{'QPDF_NATIVE_WINDOWS_PERL'} || 0));
++
++if (($^O =~ m/^MSWin32|msys$/) && (! $native_windows_perl))
+ {
+     for (@ARGV)
+     {
+         s,^([A-Z]):/,/\L$1\E/,;
+     }
+ }
+@@ -90,11 +92,13 @@ while (@ARGV)
+ usage() unless (defined $top && defined $code && scalar(@bin));
+ 
+ my @cmd = ("$top/qtest/bin/qtest-driver");
++unshift(@cmd, $^X) if $native_windows_perl;
++my $bindir_sep = $native_windows_perl ? ';' : ':';
+ if (defined $color)
+ {
+     push(@cmd, "-stdout-tty=$color");
+ }
+ push(@cmd,
+-     "-bindirs", join(':', @bin),
++     "-bindirs", join($bindir_sep, @bin),
+      "-datadir", "$code/qtest",
+      "-junit-suffix", basename($code));
+diff --git a/qtest/bin/qtest-driver b/qtest/bin/qtest-driver
+--- a/qtest/bin/qtest-driver
++++ b/qtest/bin/qtest-driver
+@@ -45,14 +45,16 @@ if ((@ARGV == 1) && ($ARGV[0] eq '--print-path'))
+ my @bindirs = ();
+ my $datadir = undef;
+ my $covdir = '.';
+ my $stdout_tty = (-t STDOUT) ? "1" : "0";
+ my $junit_suffix = "";
++my $native_windows_perl = (($^O eq 'MSWin32') && ($ENV{'QPDF_NATIVE_WINDOWS_PERL'} || 0));
++my $bindir_sep = $native_windows_perl ? ';' : ':';
+ 
+ while (@ARGV)
+ {
+     my $arg = shift(@ARGV);
+     if ($arg eq '-bindirs')
+     {
+ 	usage() unless @ARGV;
+-	push(@bindirs, split(':', shift(@ARGV)));
++	push(@bindirs, split(/\Q$bindir_sep\E/, shift(@ARGV)));
+     }
