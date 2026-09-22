@@ -18,6 +18,16 @@ Observed target-machine evidence:
 
 The next run must verify the fixes rather than introduce replacement compiler/toolchain paths.
 
+## Second PDF/XML integration run: 22 September 2026
+
+Observed target-machine evidence:
+
+- [ ] libxml2 tests still executed against the previous source evidence and therefore still missed `run_and_diff.cmake`. The libxml2 library timestamp is now advanced so the source patch stage must be reconsidered on the next run; no state deletion is required.
+- [ ] QPDF Release and Debug both reached the build stage. The hard-coded JPEG import-library paths were wrong: libjpeg-turbo's MinGW-style shared import artifacts are `libjpeg.dll.a` and `libjpegd.dll.a`, not `jpeg.lib` / `jpegd.lib`. The QPDF contract now uses those exact installed artifacts.
+- [ ] win-iconv stopped in `patch-check` because the generated patch hunk length was malformed. The patch header is corrected and the win-iconv timestamp is advanced so source/patch evidence is invalidated naturally.
+- [ ] Poppler and PoDoFo remained blocked transitively; no new compiler failure was observed.
+- [x] License traffic-light metadata added to all BuildEngine libraries and mirrored on the relevant server documentation pages.
+
 ## Active PDF / XML stack
 
 The following participants are now declared in the active Schema-16 BuildEngine stack:
