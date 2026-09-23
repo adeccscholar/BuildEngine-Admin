@@ -6843,12 +6843,14 @@
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DLIBXML2_LIBRARY:FILEPATH={InstallRoot}\packages\libxml2\2.15.3\lib\win64\Release\libxml2.lib"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
          </variant>
          <variant name="Debug">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DLIBXML2_LIBRARY:FILEPATH={InstallRoot}\packages\libxml2\2.15.3\lib\win64\Debug\libxml2d.lib"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
