@@ -1,0 +1,12 @@
+diff --git a/test/common/catch.hpp b/test/common/catch.hpp
+--- a/test/common/catch.hpp
++++ b/test/common/catch.hpp
+@@ -281,7 +281,7 @@
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+ // Embarcadero C++Build
+-#if defined(__BORLANDC__)
++#if defined(__BORLANDC__) && !defined(__clang__)
+     #define CATCH_INTERNAL_CONFIG_POLYFILL_ISNAN
+ #endif
+ 
