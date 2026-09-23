@@ -6746,7 +6746,7 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-23T02:20:00Z">
+   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-23T02:35:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="freetype" version="2.14.3"/>
@@ -6817,6 +6817,23 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-catch-isnan-route.patch"/>
          </execute>
+         <!-- PoDoFo 1.1.1 gitlink extern/resources -> podofo-resources@1e0740f2183e01d6f8516399031f6dbccbe8cd0f -->
+         <execute name="resources-clone" executable="{Tool:git}"
+                  workingDirectory="{Workspace}\podofo-{LibraryVersion}" showOutput="false">
+            <argument value="clone"/>
+            <argument value="--no-checkout"/>
+            <argument value="--no-tags"/>
+            <argument value="https://github.com/podofo/podofo-resources.git"/>
+            <argument value="extern/resources"/>
+         </execute>
+         <execute name="resources-checkout" executable="{Tool:git}"
+                  workingDirectory="{Workspace}\podofo-{LibraryVersion}\extern\resources" showOutput="false">
+            <argument value="checkout"/>
+            <argument value="--detach"/>
+            <argument value="1e0740f2183e01d6f8516399031f6dbccbe8cd0f"/>
+         </execute>
+         <require path="{Workspace}\podofo-{LibraryVersion}\extern\resources\Fonts\LiberationSans-Regular.ttf"/>
+         <require path="{Workspace}\podofo-{LibraryVersion}\extern\resources\README.md"/>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
