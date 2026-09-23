@@ -6746,7 +6746,7 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-23T02:35:00Z">
+   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-23T02:50:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="freetype" version="2.14.3"/>
@@ -6847,6 +6847,14 @@
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <!--
+            PoDoFo sources and upstream tests contain UTF-8 characters in
+            ordinary narrow string literals. BCC64X 20.1.7 requires the
+            Embarcadero execution-code-page switch for UTF-8 literal bytes.
+            This was machine-verified previously for Catch2; generic Clang
+            -finput-charset/-fexec-charset did not change BCC64X behaviour.
+         -->
+         <argument value="-DCMAKE_CXX_FLAGS:STRING=-fborland-exec-code-page=65001"/>
          <argument value="-DPODOFO_BUILD_STATIC:BOOL=OFF"/>
          <argument value="-DPODOFO_BUILD_TEST:BOOL={TestsEnabled}"/>
          <argument value="-DPODOFO_BUILD_EXAMPLES:BOOL=OFF"/>
