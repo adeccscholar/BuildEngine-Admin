@@ -24,7 +24,15 @@ typedef struct Bcc64xSockaddrIn6 {
 
 const IN_ADDR in4addr_any = { 0 };
 
-BOOLEAN
+#if defined(__clang__)
+#define BCC64X_WINSOCK_BRIDGE __attribute__((optnone, noinline))
+#else
+#define BCC64X_WINSOCK_BRIDGE
+#undef BCC64X_WINSOCK_BRIDGE
+
+#endif
+
+BCC64X_WINSOCK_BRIDGE BOOLEAN
 IN6_IS_ADDR_V4TRANSLATED(CONST IN6_ADDR *a)
 {
    return (BOOLEAN) ((a->u.Word[0] == 0) &&
@@ -35,7 +43,7 @@ IN6_IS_ADDR_V4TRANSLATED(CONST IN6_ADDR *a)
                      (a->u.Word[5] == 0));
 }
 
-BOOLEAN
+BCC64X_WINSOCK_BRIDGE BOOLEAN
 IN6ADDR_ISEQUAL(CONST Bcc64xSockaddrIn6 *a, CONST Bcc64xSockaddrIn6 *b)
 {
    return (BOOLEAN) ((a->sin6_scope_id == b->sin6_scope_id) &&
@@ -49,7 +57,7 @@ IN6ADDR_ISEQUAL(CONST Bcc64xSockaddrIn6 *a, CONST Bcc64xSockaddrIn6 *b)
                      (a->sin6_addr.u.Word[7] == b->sin6_addr.u.Word[7]));
 }
 
-BOOLEAN
+BCC64X_WINSOCK_BRIDGE BOOLEAN
 IN6ADDR_ISUNSPECIFIED(CONST Bcc64xSockaddrIn6 *a)
 {
    return (BOOLEAN) ((a->sin6_scope_id == 0) &&
