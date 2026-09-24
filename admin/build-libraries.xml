@@ -2521,6 +2521,17 @@
             <require path="src\interfaces\libpq\meson.build"/>
             <require path="src\include\postgres_ext.h"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\libpq\18.6\bcc64x-ntsecapi-conflict.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ntsecapi-conflict.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="ntsecapi-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ntsecapi-conflict.patch"/>
+         </execute>
+         <execute name="ntsecapi-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ntsecapi-conflict.patch"/>
+         </execute>
          <!-- Reuse the proven generic Meson bootstrap already used by the native BCC64X Mesa build. -->
          <copy source="{BuildFileDir}\programs\meson\bcc64x_bootstrap.py"
                target="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"
@@ -7031,6 +7042,17 @@
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-catch-isnan-route.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\podofo\1.1.1\bcc64x-cid-order.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cid-order.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="cid-order-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cid-order.patch"/>
+         </execute>
+         <execute name="cid-order-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cid-order.patch"/>
          </execute>
          <copy source="{BuildFileDir}\patches\podofo\1.1.1\bcc64x-test-output-isolation.patch"
                target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-output-isolation.patch"
