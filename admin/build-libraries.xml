@@ -7063,6 +7063,7 @@
             <argument value="{Workspace}\.buildengine\podofo-resources.tar"/>
          </execute>
          <require path="{Workspace}\podofo-{LibraryVersion}\extern\resources\Fonts\LiberationSans-Regular.ttf"/>
+         <require path="{Workspace}\podofo-{LibraryVersion}\extern\resources\TextExtractionPredefinedCmap.pdf"/>
          <require path="{Workspace}\podofo-{LibraryVersion}\extern\resources\README.md"/>
       </source>
       <build testsAffectBuild="true">
