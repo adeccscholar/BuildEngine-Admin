@@ -2499,6 +2499,220 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\sqlite\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="sqlite-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
+
+<library id="libpq" version="18.6" category="database" timestamp="2026-09-24T21:55:00Z">
+      <dependency library="openssl" version="3.5.8"/>
+      <dependency library="zlib" version="1.3.2"/>
+      <metadata name="PostgreSQL libpq" supplier="PostgreSQL Global Development Group" homepage="https://www.postgresql.org/" description="Official PostgreSQL C client library and wire-protocol access API." licenseSignal="green">
+         <license name="PostgreSQL License" file="COPYRIGHT"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/postgres/postgres.git" ref="REL_18_6"/>
+      </security>
+      <source>
+         <download url="https://ftp.postgresql.org/pub/source/v{LibraryVersion}/postgresql-{LibraryVersion}.tar.xz"
+                   archive="postgresql-{LibraryVersion}.tar.xz"/>
+         <extract format="libarchive" root="postgresql-{LibraryVersion}">
+            <require path="COPYRIGHT"/>
+            <require path="meson.build"/>
+            <require path="meson_options.txt"/>
+            <require path="src\interfaces\libpq\libpq-fe.h"/>
+            <require path="src\interfaces\libpq\libpq-events.h"/>
+            <require path="src\interfaces\libpq\meson.build"/>
+            <require path="src\include\postgres_ext.h"/>
+         </extract>
+         <!-- Reuse the proven generic Meson bootstrap already used by the native BCC64X Mesa build. -->
+         <copy source="{BuildFileDir}\programs\opengl\meson_bootstrap.py"
+               target="{Workspace}\.buildengine\meson_bootstrap.py"
+               overwrite="true" preserveCurrentArtifact="true"/>
+      </source>
+      <build testsAffectBuild="false">
+         <!-- Native BCC64X PostgreSQL client build. No MSVC, clang-cl or MinGW fallback. -->
+         <environment name="CC" value="{Tool:bcc64x}"/>
+         <environment name="CXX" value="{Tool:bcc64x}"/>
+         <environment name="AR" value="{Tool:llvm-ar}"/>
+         <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
+         <environment name="WINDRES" value="{Tool:bcc64x-windres}"/>
+         <environment name="PKG_CONFIG" value="{Tool:pkg-config}"/>
+         <environment name="PKG_CONFIG_PATH" value="{InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\pkgconfig;{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\pkgconfig"/>
+         <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ToolDir:pkg-config};{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/><argument value="remove_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <target name="meson-setup" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="{Workspace}\.buildengine\meson_bootstrap.py"/>
+            <argument value="{ToolDir:meson}"/>
+            <argument value="setup"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="{Workspace}\postgresql-{LibraryVersion}"/>
+            <argument value="--backend=ninja"/>
+            <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="--bindir=bin"/>
+            <argument value="--libdir=lib"/>
+            <argument value="--includedir=include"/>
+            <argument value="--buildtype={MesonBuildType}"/>
+            <argument value="-Dssl=openssl"/>
+            <argument value="-Dzlib=enabled"/>
+            <argument value="-Dreadline=disabled"/>
+            <argument value="-Dicu=disabled"/>
+            <argument value="-Dldap=disabled"/>
+            <argument value="-Dgssapi=disabled"/>
+            <argument value="-Dlibcurl=disabled"/>
+            <argument value="-Dnls=disabled"/>
+            <argument value="-Ddocs=disabled"/>
+            <argument value="-Ddocs_pdf=disabled"/>
+            <argument value="-Dtap_tests=disabled"/>
+            <argument value="-Dextra_include_dirs={InstallRoot}\packages\openssl\3.5.8\include,{InstallRoot}\packages\zlib\1.3.2\include"/>
+            <argument value="-Dextra_lib_dirs={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration},{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
+         </target>
+         <target name="meson-compile-libpq" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="{Workspace}\.buildengine\meson_bootstrap.py"/>
+            <argument value="{ToolDir:meson}"/>
+            <argument value="compile"/>
+            <argument value="-C"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="libpq"/>
+         </target>
+         <variant name="Release"><variable name="MesonBuildType" value="release"/></variant>
+         <variant name="Debug"><variable name="MesonBuildType" value="debug"/></variant>
+         <install>
+            <perVariant>
+               <execute name="create-bin-dir" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="make_directory"/><argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="create-lib-dir" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="make_directory"/><argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\interfaces\libpq\libpq.dll"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libpq.dll"
+                     overwrite="true"/>
+               <execute name="libpq-def" executable="{Tool:tdump}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-def"/><argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libpq.dll"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libpq.def"/>
+               </execute>
+               <execute name="libpq-import" executable="{Tool:ld-lld}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-m"/><argument value="i386pep"/><argument value="--out-implib"/><argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libpq.lib"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libpq.def"/>
+               </execute>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libpq.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libpq.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\postgresql-{LibraryVersion}\src\interfaces\libpq\libpq-fe.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libpq-fe.h" overwrite="true"/>
+               <copy source="{Workspace}\postgresql-{LibraryVersion}\src\interfaces\libpq\libpq-events.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libpq-events.h" overwrite="true"/>
+               <copy source="{Workspace}\postgresql-{LibraryVersion}\src\include\postgres_ext.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\postgres_ext.h" overwrite="true"/>
+               <copy source="{Workspace}\postgresql-{LibraryVersion}\COPYRIGHT" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYRIGHT" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libpq-fe.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\postgres_ext.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYRIGHT"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+      </publish>
+      <smoke id="consumer" source="smokes\libpq\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="libpq-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\openssl\3.5.8\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={ConsumerRoot}\include"/>
+         <argument value="-DPostgreSQL_LIBRARY:FILEPATH={ConsumerRoot}\lib\win64\{Configuration}\libpq.lib"/>
+      </smoke>
+   </library>
+
+   <library id="libpqxx" version="8.0.2" category="database" timestamp="2026-09-24T21:55:00Z">
+      <dependency library="libpq" version="18.6"/>
+      <metadata name="libpqxx" supplier="libpqxx project" homepage="https://pqxx.org/development/libpqxx/" description="Modern C++ client API for PostgreSQL built on the official libpq C client library." licenseSignal="green">
+         <license name="BSD-3-Clause" file="COPYING"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/jtv/libpqxx.git" ref="{LibraryVersion}"/>
+      </security>
+      <source>
+         <download url="https://github.com/jtv/libpqxx/archive/refs/tags/{LibraryVersion}.tar.gz"
+                   archive="libpqxx-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="libpqxx-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="VERSION"/>
+            <require path="include\pqxx\pqxx"/>
+            <require path="src\CMakeLists.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\libpq\18.6\bin\win64\{Configuration};{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TEST:BOOL=OFF"/>
+         <argument value="-DBUILD_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DBUILD_TOOLS:BOOL=OFF"/>
+         <argument value="-DBUILD_DOC:BOOL=OFF"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={InstallRoot}\packages\libpq\18.6\include"/>
+         <argument value="-DPostgreSQL_LIBRARY:FILEPATH={InstallRoot}\packages\libpq\18.6\lib\win64\{Configuration}\libpq.lib"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\libpqxx-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="PqxxName" value="pqxx"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="PqxxName" value="pqxxd"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{PqxxName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{PqxxName}.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\libpqxx-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\pqxx\pqxx"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/>
+      </publish>
+      <smoke id="consumer" source="smokes\libpqxx\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="libpqxx-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\libpq\18.6\bin\win64\Release;{InstallRoot}\packages\openssl\3.5.8\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-Dlibpqxx_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libpqxx"/>
+         <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={InstallRoot}\packages\libpq\18.6\include"/>
+         <argument value="-DPostgreSQL_LIBRARY:FILEPATH={InstallRoot}\packages\libpq\18.6\lib\win64\Release\libpq.lib"/>
+      </smoke>
+   </library>
 <library id="xerces-c" version="3.3.0" category="data" timestamp="2026-08-31T01:00:00Z">
       <metadata description="Apache C++ XML parser supporting DOM, SAX, validation, and XML Schema." licenseSignal="green"/>
       <security>
