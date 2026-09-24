@@ -13,7 +13,7 @@ diff --git a/src/interfaces/libpq/bcc64x-winsock-compat.c b/src/interfaces/libpq
 new file mode 100644
 --- /dev/null
 +++ b/src/interfaces/libpq/bcc64x-winsock-compat.c
-@@ -0,0 +1,28 @@
+@@ -0,0 +1,24 @@
 +/*
 + * BCC64X compatibility for Windows socket symbols that are declared by the
 + * selected headers but not emitted/provided with the linkage expected here.
