@@ -2500,7 +2500,7 @@
       <smoke id="consumer" source="smokes\sqlite\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="sqlite-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-<library id="libpq" version="18.6" category="database" timestamp="2026-09-24T22:50:00Z">
+<library id="libpq" version="18.6" category="database" timestamp="2026-09-24T23:10:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="zlib" version="1.3.2"/>
       <metadata name="PostgreSQL libpq" supplier="PostgreSQL Global Development Group" homepage="https://www.postgresql.org/" description="Official PostgreSQL C client library and wire-protocol access API." licenseSignal="green">
@@ -2543,6 +2543,9 @@
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-winsock-link.patch"/>
          </execute>
+         <copy source="{BuildFileDir}\programs\libpq\bcc64x-winsock-compat.c"
+               target="{CurrentArtifact}\src\interfaces\libpq\bcc64x-winsock-compat.c"
+               overwrite="true"/>
          <!-- Reuse the proven generic Meson bootstrap already used by the native BCC64X Mesa build. -->
          <copy source="{BuildFileDir}\programs\meson\bcc64x_bootstrap.py"
                target="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"
