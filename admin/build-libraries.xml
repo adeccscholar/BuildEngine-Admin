@@ -2535,7 +2535,7 @@
          <environment name="WINDRES" value="{Tool:bcc64x-windres}"/>
          <environment name="PKG_CONFIG" value="{Tool:pkg-config}"/>
          <environment name="PKG_CONFIG_PATH" value="{InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration}\pkgconfig;{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\pkgconfig"/>
-         <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ToolDir:pkg-config};{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ToolDir:perl};{ToolDir:pkg-config};{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
          <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/><argument value="remove_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
