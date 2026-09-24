@@ -2572,7 +2572,7 @@
             <argument value="compile"/>
             <argument value="-C"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <argument value="libpq"/>
+            <argument value="src/interfaces/libpq/libpq:shared_library"/>
          </target>
          <variant name="Release"><variable name="MesonBuildType" value="release"/></variant>
          <variant name="Debug"><variable name="MesonBuildType" value="debug"/></variant>
