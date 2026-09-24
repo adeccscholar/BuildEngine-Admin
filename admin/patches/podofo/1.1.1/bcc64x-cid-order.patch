@@ -1,28 +1,45 @@
 diff --git a/src/podofo/main/PdfFont.cpp b/src/podofo/main/PdfFont.cpp
 --- a/src/podofo/main/PdfFont.cpp
 +++ b/src/podofo/main/PdfFont.cpp
-@@ -6,4 +6,5 @@
- #include "PdfFont.h"
+@@ -1033,19 +1033,28 @@
+     {
+         PODOFO_ASSERT(!m_SubsettingEnabled);
  
- #include <utf8cpp/utf8.h>
-+#include <algorithm>
+-        if (m_DynamicCIDMap != nullptr)
+-        {
+-            // Create a cid/gid map from the dynamic mapping
+-            ret.resize(m_DynamicCIDMap->GetMappings().size());
+-            unsigned i = 0;
+-            for (auto& pair : m_DynamicCIDMap->GetMappings())
+-            {
+-                auto s = pair.first;
+-                ret[i] = { *pair.second, *pair.second, PdfGID(*pair.second)};
+-                i++;
+-            }
+-            return ret;
+-        }
++        if (m_DynamicCIDMap != nullptr)
++        {
++            // Create a cid/gid map from the dynamic mapping. The backing
++            // container is unordered, so sort by character code to keep
++            // exported PDF structures deterministic across STL implementations.
++            vector<pair<PdfCharCode, unsigned>> mappings;
++            mappings.reserve(m_DynamicCIDMap->GetMappings().size());
++            for (auto& pair : m_DynamicCIDMap->GetMappings())
++                mappings.push_back({ pair.first, *pair.second });
++
++            std::sort(mappings.begin(), mappings.end(),
++                [](auto const& lhs, auto const& rhs) { return lhs.first.Code < rhs.first.Code; });
++
++            ret.resize(mappings.size());
++            unsigned i = 0;
++            for (auto& pair : mappings)
++            {
++                ret[i] = { pair.second, pair.second, PdfGID(pair.second) };
++                i++;
++            }
++            return ret;
++        }
  
-@@ -1112,6 +1113,9 @@ vector<PdfCharGIDInfo> PdfFont::GetCharGIDInfos() const
-                 ret[i] = { *pair.second, *pair.second, PdfGID(*pair.second)};
-                 i++;
-             }
-+            std::sort(ret.begin(), ret.end(), [](const PdfCharGIDInfo& lhs, const PdfCharGIDInfo& rhs) {
-+                return lhs.Cid < rhs.Cid;
-+            });
-             return ret;
-         }
- 
-@@ -1147,5 +1152,8 @@ vector<PdfCharGIDInfo> PdfFont::GetCharGIDInfos() const
-         }
-     }
- 
-+    std::sort(ret.begin(), ret.end(), [](const PdfCharGIDInfo& lhs, const PdfCharGIDInfo& rhs) {
-+        return lhs.Cid < rhs.Cid;
-+    });
-     return ret;
- }
+         // Create an identity cid/gid map
+         unsigned gidCount = GetMetrics().GetGlyphCount();
