@@ -2500,7 +2500,7 @@
       <smoke id="consumer" source="smokes\sqlite\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="sqlite-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-<library id="libpq" version="18.6" category="database" timestamp="2026-09-24T22:05:00Z">
+<library id="libpq" version="18.6" category="database" timestamp="2026-09-24T22:20:00Z">
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="zlib" version="1.3.2"/>
       <metadata name="PostgreSQL libpq" supplier="PostgreSQL Global Development Group" homepage="https://www.postgresql.org/" description="Official PostgreSQL C client library and wire-protocol access API." licenseSignal="green">
@@ -2540,6 +2540,7 @@
       <build testsAffectBuild="false">
          <!-- Native BCC64X PostgreSQL client build. No MSVC, clang-cl or MinGW fallback. -->
          <environment name="CC" value="{Tool:bcc64x}"/>
+         <environment name="CFLAGS" value="-DWIN32"/>
          <environment name="CXX" value="{Tool:bcc64x}"/>
          <environment name="AR" value="{Tool:llvm-ar}"/>
          <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
@@ -2549,6 +2550,14 @@
          <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ToolDir:perl};{ToolDir:pkg-config};{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
          <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/><argument value="remove_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <execute name="create-zlib-compat-dir" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/><argument value="make_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib"/>
+         </execute>
+         <execute name="stage-zlib-import-name" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/><argument value="copy_if_different"/>
+            <argument value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportName}"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib\libz.lib"/>
          </execute>
          <target name="meson-setup" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"/>
@@ -2575,7 +2584,7 @@
             <argument value="-Dtap_tests=disabled"/>
             <argument value="-DPERL={Tool:perl}"/>
             <argument value="-Dextra_include_dirs={InstallRoot}\packages\openssl\3.5.8\include,{InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="-Dextra_lib_dirs={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration},{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
+            <argument value="-Dextra_lib_dirs={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib,{InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration},{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
          </target>
          <target name="meson-compile-libpq" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="true">
             <argument value="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"/>
@@ -2585,8 +2594,8 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="src/interfaces/libpq/libpq:shared_library"/>
          </target>
-         <variant name="Release"><variable name="MesonBuildType" value="release"/></variant>
-         <variant name="Debug"><variable name="MesonBuildType" value="debug"/></variant>
+         <variant name="Release"><variable name="MesonBuildType" value="release"/><variable name="ZlibImportName" value="libz.lib"/></variant>
+         <variant name="Debug"><variable name="MesonBuildType" value="debug"/><variable name="ZlibImportName" value="libzd.lib"/></variant>
          <install>
             <perVariant>
                <execute name="create-bin-dir" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
@@ -6972,7 +6981,7 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-24T22:05:00Z">
+   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-24T22:20:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="freetype" version="2.14.3"/>
@@ -7148,9 +7157,13 @@
          </variant>
          <install>
             <perVariant>
+               <execute name="test-output-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="make_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out"/>
+               </execute>
                <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="true">
                   <environment name="CTEST_PARALLEL_LEVEL" value="1"/>
+                  <environment name="PODOFO_TEST_OUTPUT_PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out"/>
                   <!-- Keep the tested runtime closure deterministic. In particular, Release libz.dll must come from our zlib 1.3.2 package. -->
                   <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{InstallRoot}\packages\libxml2\2.15.3\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.58\bin\win64\{Configuration};{InstallRoot}\packages\libtiff\4.7.2\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--output-on-failure"/>
