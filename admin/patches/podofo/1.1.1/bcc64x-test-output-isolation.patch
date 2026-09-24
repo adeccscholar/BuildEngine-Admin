@@ -1,12 +1,47 @@
-diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
---- a/test/CMakeLists.txt
-+++ b/test/CMakeLists.txt
-@@ -5,7 +5,7 @@ if(NOT EXISTS "${PDF_TEST_RESOURCE_PATH}")
-     return()
- endif()
+diff --git a/test/common/PdfTest.cpp b/test/common/PdfTest.cpp
+--- a/test/common/PdfTest.cpp
++++ b/test/common/PdfTest.cpp
+@@ -6,9 +6,10 @@
+  * Some rights reserved. See COPYING, AUTHORS.
+  */
  
--set(PDF_TEST_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/out")
-+set(PDF_TEST_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/out")
- make_directory(${PDF_TEST_OUTPUT_PATH})
+-#include "PdfTest.h"
+-
+-#include <utf8cpp/utf8.h>
++#include "PdfTest.h"
++
++#include <cstdlib>
++#include <utf8cpp/utf8.h>
  
- file(TO_NATIVE_PATH "${PDF_TEST_RESOURCE_PATH}" PDF_TEST_RESOURCE_PATH)
+ using namespace std;
+ using namespace PoDoFo;
+@@ -16,13 +16,22 @@
+ static void readTestInputFile(const string_view& filepath, string& str);
+ static void writeTestOutputFile(const string_view& filepath, const string_view& view);
+ 
+-static struct TestPaths
+-{
+-    TestPaths() :
+-        Input(PDF_TEST_RESOURCE_PATH), Output(PDF_TEST_OUTPUT_PATH) { }
+-    fs::path Input;
+-    fs::path Output;
+-} s_paths;
++static fs::path getTestOutputPath()
++{
++    auto pszPath = std::getenv("PODOFO_TEST_OUTPUT_PATH");
++    if (pszPath != nullptr && *pszPath != '\0')
++        return fs::u8path(pszPath);
++
++    return fs::u8path(PDF_TEST_OUTPUT_PATH);
++}
++
++static struct TestPaths
++{
++    TestPaths() :
++        Input(PDF_TEST_RESOURCE_PATH), Output(getTestOutputPath()) { }
++    fs::path Input;
++    fs::path Output;
++} s_paths;
+ 
+ 
+ void utls::CombinePaths(std::filesystem::path& path, std::initializer_list<std::string_view> paths)
