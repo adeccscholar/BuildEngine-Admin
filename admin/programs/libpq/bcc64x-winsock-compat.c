@@ -15,7 +15,7 @@
 #include <in6addr.h>
 
 typedef struct Bcc64xSockaddrIn6 {
-   USHORT   sin6_family;
+   ADDRESS_FAMILY sin6_family;
    USHORT   sin6_port;
    ULONG    sin6_flowinfo;
    IN6_ADDR sin6_addr;
@@ -27,40 +27,40 @@ const IN_ADDR in4addr_any = { 0 };
 BOOLEAN
 IN6_IS_ADDR_V4TRANSLATED(CONST IN6_ADDR *a)
 {
-   return (BOOLEAN) ((a->s6_words[0] == 0) &&
-                     (a->s6_words[1] == 0) &&
-                     (a->s6_words[2] == 0) &&
-                     (a->s6_words[3] == 0) &&
-                     (a->s6_words[4] == 0xffff) &&
-                     (a->s6_words[5] == 0));
+   return (BOOLEAN) ((a->u.Word[0] == 0) &&
+                     (a->u.Word[1] == 0) &&
+                     (a->u.Word[2] == 0) &&
+                     (a->u.Word[3] == 0) &&
+                     (a->u.Word[4] == 0xffff) &&
+                     (a->u.Word[5] == 0));
 }
 
 BOOLEAN
 IN6ADDR_ISEQUAL(CONST Bcc64xSockaddrIn6 *a, CONST Bcc64xSockaddrIn6 *b)
 {
    return (BOOLEAN) ((a->sin6_scope_id == b->sin6_scope_id) &&
-                     (a->sin6_addr.s6_words[0] == b->sin6_addr.s6_words[0]) &&
-                     (a->sin6_addr.s6_words[1] == b->sin6_addr.s6_words[1]) &&
-                     (a->sin6_addr.s6_words[2] == b->sin6_addr.s6_words[2]) &&
-                     (a->sin6_addr.s6_words[3] == b->sin6_addr.s6_words[3]) &&
-                     (a->sin6_addr.s6_words[4] == b->sin6_addr.s6_words[4]) &&
-                     (a->sin6_addr.s6_words[5] == b->sin6_addr.s6_words[5]) &&
-                     (a->sin6_addr.s6_words[6] == b->sin6_addr.s6_words[6]) &&
-                     (a->sin6_addr.s6_words[7] == b->sin6_addr.s6_words[7]));
+                     (a->sin6_addr.u.Word[0] == b->sin6_addr.u.Word[0]) &&
+                     (a->sin6_addr.u.Word[1] == b->sin6_addr.u.Word[1]) &&
+                     (a->sin6_addr.u.Word[2] == b->sin6_addr.u.Word[2]) &&
+                     (a->sin6_addr.u.Word[3] == b->sin6_addr.u.Word[3]) &&
+                     (a->sin6_addr.u.Word[4] == b->sin6_addr.u.Word[4]) &&
+                     (a->sin6_addr.u.Word[5] == b->sin6_addr.u.Word[5]) &&
+                     (a->sin6_addr.u.Word[6] == b->sin6_addr.u.Word[6]) &&
+                     (a->sin6_addr.u.Word[7] == b->sin6_addr.u.Word[7]));
 }
 
 BOOLEAN
 IN6ADDR_ISUNSPECIFIED(CONST Bcc64xSockaddrIn6 *a)
 {
    return (BOOLEAN) ((a->sin6_scope_id == 0) &&
-                     (a->sin6_addr.s6_words[0] == 0) &&
-                     (a->sin6_addr.s6_words[1] == 0) &&
-                     (a->sin6_addr.s6_words[2] == 0) &&
-                     (a->sin6_addr.s6_words[3] == 0) &&
-                     (a->sin6_addr.s6_words[4] == 0) &&
-                     (a->sin6_addr.s6_words[5] == 0) &&
-                     (a->sin6_addr.s6_words[6] == 0) &&
-                     (a->sin6_addr.s6_words[7] == 0));
+                     (a->sin6_addr.u.Word[0] == 0) &&
+                     (a->sin6_addr.u.Word[1] == 0) &&
+                     (a->sin6_addr.u.Word[2] == 0) &&
+                     (a->sin6_addr.u.Word[3] == 0) &&
+                     (a->sin6_addr.u.Word[4] == 0) &&
+                     (a->sin6_addr.u.Word[5] == 0) &&
+                     (a->sin6_addr.u.Word[6] == 0) &&
+                     (a->sin6_addr.u.Word[7] == 0));
 }
 
 #endif
