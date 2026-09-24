@@ -2510,8 +2510,8 @@
          <repository url="https://github.com/postgres/postgres.git" ref="REL_18_6"/>
       </security>
       <source>
-         <download url="https://ftp.postgresql.org/pub/source/v{LibraryVersion}/postgresql-{LibraryVersion}.tar.xz"
-                   archive="postgresql-{LibraryVersion}.tar.xz"/>
+         <download url="https://ftp.postgresql.org/pub/source/v{LibraryVersion}/postgresql-{LibraryVersion}.tar.bz2"
+                   archive="postgresql-{LibraryVersion}.tar.bz2"/>
          <extract format="libarchive" root="postgresql-{LibraryVersion}">
             <require path="COPYRIGHT"/>
             <require path="meson.build"/>
