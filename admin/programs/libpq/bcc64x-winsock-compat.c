@@ -8,17 +8,17 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-const struct in_addr in4addr_any = { 0 };
+const IN_ADDR in4addr_any = { 0 };
 
-int
-IN6_IS_ADDR_V4TRANSLATED(const struct in6_addr *a)
+BOOLEAN
+IN6_IS_ADDR_V4TRANSLATED(CONST IN6_ADDR *a)
 {
-    return (a->s6_words[0] == 0) &&
-           (a->s6_words[1] == 0) &&
-           (a->s6_words[2] == 0) &&
-           (a->s6_words[3] == 0) &&
-           (a->s6_words[4] == 0xffff) &&
-           (a->s6_words[5] == 0);
+    return (BOOLEAN) ((a->s6_words[0] == 0) &&
+                      (a->s6_words[1] == 0) &&
+                      (a->s6_words[2] == 0) &&
+                      (a->s6_words[3] == 0) &&
+                      (a->s6_words[4] == 0xffff) &&
+                      (a->s6_words[5] == 0));
 }
 
 #endif
