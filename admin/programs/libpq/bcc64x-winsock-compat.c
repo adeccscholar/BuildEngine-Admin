@@ -1,15 +1,26 @@
 /*
- * BCC64X compatibility for Windows socket symbols that are declared as
- * extern inline by the Windows SDK for non-MSVC compilers, but for which
- * BCC64X does not emit the external definitions required by PostgreSQL.
+ * BCC64X compatibility for Windows socket symbols that the Windows SDK
+ * declares as extern inline for non-MSVC compilers.  BCC64X does not emit
+ * the external definitions required by PostgreSQL.
  *
- * Do not include ws2tcpip.h here. Its extern-inline definitions would
- * collide with the explicit external definitions below.
+ * Deliberately do not include ws2ipdef.h or ws2tcpip.h here: those headers
+ * contain the colliding extern-inline definitions.  in6addr.h provides the
+ * IPv6 address type only.  The local socket-address view below matches the
+ * Windows SOCKADDR_IN6 ABI layout used by the callers.
  */
 
 #if defined(__clang__) && defined(__BORLANDC__)
 
 #include <winsock2.h>
+#include <in6addr.h>
+
+typedef struct Bcc64xSockaddrIn6 {
+   USHORT   sin6_family;
+   USHORT   sin6_port;
+   ULONG    sin6_flowinfo;
+   IN6_ADDR sin6_addr;
+   ULONG    sin6_scope_id;
+} Bcc64xSockaddrIn6;
 
 const IN_ADDR in4addr_any = { 0 };
 
@@ -25,7 +36,7 @@ IN6_IS_ADDR_V4TRANSLATED(CONST IN6_ADDR *a)
 }
 
 BOOLEAN
-IN6ADDR_ISEQUAL(CONST SOCKADDR_IN6 *a, CONST SOCKADDR_IN6 *b)
+IN6ADDR_ISEQUAL(CONST Bcc64xSockaddrIn6 *a, CONST Bcc64xSockaddrIn6 *b)
 {
    return (BOOLEAN) ((a->sin6_scope_id == b->sin6_scope_id) &&
                      (a->sin6_addr.s6_words[0] == b->sin6_addr.s6_words[0]) &&
@@ -39,7 +50,7 @@ IN6ADDR_ISEQUAL(CONST SOCKADDR_IN6 *a, CONST SOCKADDR_IN6 *b)
 }
 
 BOOLEAN
-IN6ADDR_ISUNSPECIFIED(CONST SOCKADDR_IN6 *a)
+IN6ADDR_ISUNSPECIFIED(CONST Bcc64xSockaddrIn6 *a)
 {
    return (BOOLEAN) ((a->sin6_scope_id == 0) &&
                      (a->sin6_addr.s6_words[0] == 0) &&
