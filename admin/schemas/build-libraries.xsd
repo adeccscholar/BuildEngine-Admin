@@ -6,6 +6,9 @@
    <xs:simpleType name="booleanTextType">
       <xs:restriction base="xs:string"><xs:enumeration value="true"/><xs:enumeration value="false"/></xs:restriction>
    </xs:simpleType>
+   <xs:simpleType name="outputModeType">
+      <xs:restriction base="xs:string"><xs:enumeration value="none"/><xs:enumeration value="errors"/><xs:enumeration value="all"/></xs:restriction>
+   </xs:simpleType>
    <xs:simpleType name="pathProbeKindType">
       <xs:restriction base="xs:string"><xs:enumeration value="file"/><xs:enumeration value="directory"/><xs:enumeration value="any"/></xs:restriction>
    </xs:simpleType>
@@ -212,6 +215,7 @@
       <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
       <xs:attribute name="successExitCode" type="xs:unsignedInt" use="optional" default="0"/>
       <xs:attribute name="showOutput" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="outputMode" type="outputModeType" use="optional"/>
       <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
       <xs:attributeGroup ref="technicalActionGraphAttributes"/>
@@ -247,6 +251,7 @@
       <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
       <xs:attribute name="successExitCode" type="xs:unsignedInt" use="optional" default="0"/>
       <xs:attribute name="showOutput" type="booleanTextType" use="optional" default="false"/>
+      <xs:attribute name="outputMode" type="outputModeType" use="optional"/>
       <xs:attribute name="test" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="phase" type="testPhaseType" use="optional" default="test"/>
       <xs:attributeGroup ref="technicalActionGraphAttributes"/>
