@@ -2,11 +2,14 @@
 
 [TOC|Content]
 
-**Status:** current extension contract as of 15 September 2026. Several Common/ownership implementation gaps are explicitly identified below and remain **not verified**.
+**Status:** current extension contract as of 25 September 2026. Several Common/ownership implementation gaps are explicitly identified below and remain **not verified**.
 
 A library extension is a logically independent library that deliberately continues inside the physical source, producer or installation layout of another logical BuildEngine library.
 
-The reference case is ACE 8.0.6 and TAO 4.0.6.
+There are two extension kinds.
+
+- `shared-source`: the extension reuses source, producer and optionally payload structures of its base. ACE 8.0.6 and TAO 4.0.6 are the reference case.
+- `package`: the extension has its own source, producer and install package but is still semantically layered on a base library. libpq 18.6 and libpqxx 8.0.2 are the reference case.
 
 ## Core rule
 
@@ -49,7 +52,8 @@ Conceptually:
 
 ```xml
 <library id="extension-id" version="extension-version" ...>
-   <extension library="base-id"
+   <extension type="shared-source"
+              library="base-id"
               version="base-version"
               source="relative/source/subtree"
               producer="relative/producer/root"
@@ -63,13 +67,36 @@ Conceptually:
 
 Important rules:
 
+The `type` attribute defaults to `shared-source` for backward compatibility with the ACE/TAO contract.
+
+For `shared-source`:
+
 - exact base ID/version;
 - no extension cycle;
 - relative/safe source/producer/install/shared paths;
 - base owns acquisition when the archive is shared;
 - extension does not download/extract a second copy;
+
+For `package`:
+
+- exact base ID/version;
+- no extension cycle;
+- own non-empty `source` contract including normal download/extract;
+- own workspace, variant producer and package root;
+- no inherited Source completion timestamp;
+- the extension edge itself supplies the direct base dependency and must not be duplicated as an ordinary dependency.
 - Release extends Release and Debug extends Debug;
 - shared paths authorize physical overlap, not shared logical identity.
+
+## libpq / libpqxx package-extension model
+
+libpqxx is declared as:
+
+```xml
+<extension type="package" library="libpq" version="18.6"/>
+```
+
+Its source remains the independent libpqxx upstream archive, its build directories remain under `packages/libpqxx/8.0.2`, and its installation remains under `install/packages/libpqxx/8.0.2`. The extension relation contributes the direct dependency on libpq and its contract timestamp to libpqxx evidence, but does not redirect any physical path to libpq.
 
 ## ACE / TAO producer model
 
