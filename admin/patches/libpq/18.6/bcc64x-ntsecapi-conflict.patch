@@ -1,0 +1,17 @@
+diff --git a/src/interfaces/libpq/libpq-int.h b/src/interfaces/libpq/libpq-int.h
+--- a/src/interfaces/libpq/libpq-int.h
++++ b/src/interfaces/libpq/libpq-int.h
+@@ -46,7 +46,11 @@
+ #ifdef ENABLE_SSPI
+ #define SECURITY_WIN32
+-#if defined(WIN32) && !defined(_MSC_VER)
++#if defined(WIN32) && !defined(_MSC_VER) && \
++    !(defined(__clang__) && defined(__BORLANDC__))
++/*
++ * BCC64X uses the Windows SDK headers directly. security.h already provides
++ * the SSPI declarations and including ntsecapi.h additionally conflicts with
++ * winternl.h typedefs for UNICODE_STRING and STRING.
++ */
+ #include <ntsecapi.h>
+ #endif
+ #include <security.h>
