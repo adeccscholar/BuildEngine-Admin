@@ -2579,7 +2579,7 @@
             <argument value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportName}"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib\libz.a"/>
          </execute>
-         <target name="meson-setup" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="true">
+         <target name="meson-setup" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"/>
             <argument value="{ToolDir:meson}"/>
             <argument value="setup"/>
