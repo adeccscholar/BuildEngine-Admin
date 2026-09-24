@@ -7,7 +7,7 @@ diff --git a/src/podofo/main/PdfFont.cpp b/src/podofo/main/PdfFont.cpp
  #include <utf8cpp/utf8.h>
 +#include <algorithm>
  
-@@ -1112,6 +1113,10 @@ vector<PdfCharGIDInfo> PdfFont::GetCharGIDInfos() const
+@@ -1112,6 +1113,9 @@ vector<PdfCharGIDInfo> PdfFont::GetCharGIDInfos() const
                  ret[i] = { *pair.second, *pair.second, PdfGID(*pair.second)};
                  i++;
              }
