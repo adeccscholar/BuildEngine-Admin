@@ -2522,8 +2522,8 @@
             <require path="src\include\postgres_ext.h"/>
          </extract>
          <!-- Reuse the proven generic Meson bootstrap already used by the native BCC64X Mesa build. -->
-         <copy source="{BuildFileDir}\programs\opengl\meson_bootstrap.py"
-               target="{Workspace}\.buildengine\meson_bootstrap.py"
+         <copy source="{BuildFileDir}\programs\meson\bcc64x_bootstrap.py"
+               target="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"
                overwrite="true" preserveCurrentArtifact="true"/>
       </source>
       <build testsAffectBuild="false">
@@ -2540,7 +2540,7 @@
             <argument value="-E"/><argument value="remove_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
          <target name="meson-setup" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false">
-            <argument value="{Workspace}\.buildengine\meson_bootstrap.py"/>
+            <argument value="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"/>
             <argument value="{ToolDir:meson}"/>
             <argument value="setup"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -2566,7 +2566,7 @@
             <argument value="-Dextra_lib_dirs={InstallRoot}\packages\openssl\3.5.8\lib\win64\{Configuration},{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
          </target>
          <target name="meson-compile-libpq" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false">
-            <argument value="{Workspace}\.buildengine\meson_bootstrap.py"/>
+            <argument value="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"/>
             <argument value="{ToolDir:meson}"/>
             <argument value="compile"/>
             <argument value="-C"/>
