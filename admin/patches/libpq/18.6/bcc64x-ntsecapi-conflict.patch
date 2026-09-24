@@ -1,7 +1,7 @@
 diff --git a/src/interfaces/libpq/libpq-int.h b/src/interfaces/libpq/libpq-int.h
 --- a/src/interfaces/libpq/libpq-int.h
 +++ b/src/interfaces/libpq/libpq-int.h
-@@ -46,7 +46,11 @@
+@@ -46,6 +46,12 @@
  #ifdef ENABLE_SSPI
  #define SECURITY_WIN32
 -#if defined(WIN32) && !defined(_MSC_VER)
