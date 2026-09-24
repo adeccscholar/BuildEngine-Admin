@@ -1,0 +1,22 @@
+diff --git a/src/podofo/main/PdfFont.cpp b/src/podofo/main/PdfFont.cpp
+--- a/src/podofo/main/PdfFont.cpp
++++ b/src/podofo/main/PdfFont.cpp
+@@ -1112,6 +1112,10 @@ vector<PdfCharGIDInfo> PdfFont::GetCharGIDInfos() const
+                 ret[i] = { *pair.second, *pair.second, PdfGID(*pair.second)};
+                 i++;
+             }
++            std::sort(ret.begin(), ret.end(), [](const PdfCharGIDInfo& lhs, const PdfCharGIDInfo& rhs) {
++                return lhs.Cid < rhs.Cid;
++            });
+             return ret;
+         }
+ 
+@@ -1147,6 +1151,9 @@ vector<PdfCharGIDInfo> PdfFont::GetCharGIDInfos() const
+         }
+     }
+ 
++    std::sort(ret.begin(), ret.end(), [](const PdfCharGIDInfo& lhs, const PdfCharGIDInfo& rhs) {
++        return lhs.Cid < rhs.Cid;
++    });
+     return ret;
+ }
