@@ -168,7 +168,7 @@ Source-Bäume sind regenerierbare Artefakte. Bei ungültigem Source-State wird d
 
 ## 8. Produktform
 
-Für normale Runtime-Bibliotheken bleibt Shared DLL + Import-Library der bevorzugte Standard, soweit Upstream und Bibliothekszweck dies sinnvoll unterstützen.
+Für normale Runtime-Bibliotheken bleibt Shared DLL + Import-Library der bevorzugte Produktstandard, soweit Upstream und Bibliothekszweck dies sinnvoll unterstützen. Davon getrennt gilt als harte Toolchain-Regel: Jeder BCC64X-Windows-EXE/DLL/MODULE-Link verwendet die dynamische Laufzeit (`-tR`); statische BCC64X-Laufzeit ist verboten.
 
 Static ist eine zulässige, zu dokumentierende Ausnahme. Für GoogleTest wird diese Entscheidung erst nach Aufhebung des Freeze getroffen.
 
@@ -272,3 +272,11 @@ Der Contract Freeze wird erst aufgehoben, wenn:
 3. 0 `failed`, 0 `blocked`, 0 `incomplete` vorliegen,
 4. ein unmittelbar folgender unveränderter Lauf die Library-Tasks als `CURRENT` bestätigt,
 5. die vollständige Evidence in BuildEngine und BuildEngine-Admin dokumentiert wurde.
+
+## Ergänzte harte Regeln aus der späteren Integration
+
+Auch für spätere Clean-Room-Wiederholungen gelten zusätzlich:
+
+- BCC64X ist Clang/LLVM; MinGW-Kompatibilitätsmakros oder der `x86_64-w64-mingw32`-Targetkontext dürfen nicht als Beweis für eine MinGW/GCC-Toolchain interpretiert werden.
+- Die BCC64X-Laufzeit wird ausschließlich dynamisch (`-tR`) gelinkt.
+- Patch-Erzeugung erfolgt immer aus dem vollständigen effektiven Dateistand an der konkreten Position in der Patchkette; Zielzustand vollständig erzeugen, Diff mechanisch erzeugen, erneut anwenden und byteidentisch prüfen.
