@@ -120,6 +120,9 @@ ACE and TAO are separate logical libraries in the dependency graph. This does **
 
 ## Current inventory
 
+The active Schema-16 contract currently contains **44 logical libraries**.
+
+
 | Library | Version | License | Category | Description | BuildEngine dependencies | Integration notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | pugiXML | 1.16 | 🟢 Green | data | Lightweight C++ XML processing library with DOM-style parsing and XPath support. | — | Shared package, Release/Debug, installed package smoke. |
