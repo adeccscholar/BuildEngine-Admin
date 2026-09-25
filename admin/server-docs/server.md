@@ -137,6 +137,12 @@ GET /api/v1/package/{library}/{version}/download
 
 The individual route-validation bug described above is an implementation gap, not a change in the logical API contract.
 
+## Current catalog breadth
+
+The synchronized Common catalog currently exposes 44 logical third-party libraries across compression, archives, security, networking, embedded/client-server databases, middleware, graphics, image codecs, testing, text/Unicode, XML and PDF/document processing.
+
+Recent additions include the PostgreSQL client pair libpq/libpqxx and the document-processing branch win-iconv/libxml2/QPDF/PoDoFo/Poppler. The Server presents these from the same Common catalog and license/security metadata as every earlier library; it does not maintain a separate hard-coded roster.
+
 ## Dependency and usage data
 
 Direct dependencies, closure and reverse usage are derived from logical CycloneDX/component relationships. Physical directory proximity does not create a dependency.
