@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current contract as of 19 September 2026. Documentation is integrated into the active Library-FSM architecture. Individual end-to-end documentation paths remain subject to targeted BCC64X/runtime verification.
+**Status:** current contract as of 25 September 2026. Documentation is integrated into the active Library-FSM architecture. Individual end-to-end documentation paths remain subject to targeted BCC64X/runtime verification.
 
 BuildEngine treats documentation as a reproducible build product. `Documentation` is a first-class Library-FSM state; below it, hierarchical runtime substates select standard, collection or linked documentation and the applicable Doxygen/PDF stages. Persistent Current-State remains attached to logical documentation scopes, not to those runtime substates.
 
@@ -233,6 +233,12 @@ Do not reintroduce:
 - old `html/<module>` / `latex/<module>` output nesting;
 - consumer publish manifests as mandatory documentation-input authority;
 - physical payload paths as logical library identity.
+
+## Library-catalog scale
+
+The active library contract currently contains 44 logical libraries. Documentation generation therefore spans not only the original compression/network/graphics/middleware set but also PostgreSQL clients, test frameworks, Unicode/text engines, XML processing and the PDF/document stack.
+
+Documentation status follows the logical library identity. New package extensions such as libpqxx/libpq and shared-producer extensions such as TAO/ACE therefore remain separate documentation identities even when their physical integration models differ.
 
 ## Verification status
 
