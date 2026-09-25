@@ -37,7 +37,7 @@
  #else
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -48,9 +48,16 @@
+@@ -48,9 +48,17 @@
  endif()
  # cmake-lint: disable=C0301
 +if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "EMBT")
@@ -49,6 +49,7 @@
      pqxx PROPERTIES
 -    OUTPUT_NAME $<IF:$<PLATFORM_ID:Windows>,pqxx,pqxx-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}>
 +    PREFIX ""
++    IMPORT_PREFIX ""
 +    OUTPUT_NAME ${PQXX_OUTPUT_NAME}
  )
 +unset(PQXX_OUTPUT_NAME)
