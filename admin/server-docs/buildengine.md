@@ -2,20 +2,27 @@
 
 [TOC|Content]
 
-**Status:** current architecture contract as of 22 September 2026. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
+**Status:** current architecture contract as of 25 September 2026. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
 
 BuildEngine is a declarative C++23 orchestration system centered on Embarcadero C++Builder 13 / BCC64X. The current architecture separates the declarative library contract, the runtime Library-FSM, persistent logical scope state, technical WorkItems/Actions, artifact evidence, Common repository semantics and read-only presentation.
 
 ## Main principles
 
 1. `admin/build-libraries.xml` and its schemas are the declarative library/dependency contract.
-2. BCC64X is the intended toolchain; compiler substitutions are not silently introduced.
-3. Every active `Library/Version` is controlled by a runtime state machine.
-4. Persistent Current-State belongs to logical library scopes, not to the runtime FSM and not to technical Actions.
-5. Technical Actions are execution/ordering/diagnostic units inside already released work.
-6. Artifact inventories are evidence/ownership, not Current-State.
-7. BuildEngine-Common is the leading shared interpretation for logical libraries, extensions, repository paths, security and package semantics.
-8. A physical directory is never automatically a logical library identity.
+2. BCC64X is the intended Clang/LLVM toolchain; MinGW-compatible target/header behavior is not treated as MinGW compiler identity, and compiler substitutions are not silently introduced.
+3. Every BCC64X Windows executable, DLL and module uses the dynamic BCC64X runtime (`-tR`); static BCC64X runtime linkage is forbidden.
+4. Every active `Library/Version` is controlled by a runtime state machine.
+5. Persistent Current-State belongs to logical library scopes, not to the runtime FSM and not to technical Actions.
+6. Technical Actions are execution/ordering/diagnostic units inside already released work.
+7. Artifact inventories are evidence/ownership, not Current-State.
+8. BuildEngine-Common is the leading shared interpretation for logical libraries, extensions, repository paths, security and package semantics.
+9. A physical directory is never automatically a logical library identity.
+
+## Runtime ABI policy
+
+The PoDoFo integration exposed why runtime linkage belongs to the generic toolchain layer. Public C++ APIs can return owning pointers, strings, containers and exceptions across DLL boundaries. If an EXE and DLL each carry an independent static BCC64X C++ runtime, allocation/deallocation and STL ownership can cross incompatible runtime domains.
+
+BuildEngine therefore treats dynamic BCC64X runtime linkage as a non-optional invariant. CMake rules for EXE, DLL and MODULE targets contain `-tR` and are checked at configure time.
 
 ## From the first DAG to the current FSM
 
