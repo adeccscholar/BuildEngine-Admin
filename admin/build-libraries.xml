@@ -6816,6 +6816,14 @@
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DLibXml2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libxml2"/>
       </smoke>
+      <smoke id="relaxng-recovery" scope="package" source="smokes\libxml2\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="libxml2-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DLibXml2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libxml2"/>
+      </smoke>
    </library>
    <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-09-23T02:30:00Z">
       <dependency library="zlib" version="1.3.2"/>
