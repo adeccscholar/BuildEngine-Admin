@@ -327,3 +327,10 @@ A missing package during a library PDF job therefore means the explicit provisio
 ## Maintenance rule
 
 Changes to the tool contract and changes to its meaning are documented together. `build-tools.xml`, this document, [tools.md](tools.md), and the relevant pipeline documentation are maintained as one coherent technical unit.
+
+
+## Compiler runtime policy
+
+The BCC64X CMake adapter has a project-wide dynamic-runtime invariant. Console executables, GUI executables, shared libraries and modules all carry `-tR`; static BCC64X runtime linkage is forbidden.
+
+This is intentionally enforced outside individual library contracts because it is a toolchain ABI/ownership property. It complements, but is independent from, the generated `bcc64x-ucrt-compat` archive used for the verified UCRT math-import defect.
