@@ -37,7 +37,7 @@
  #else
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -48,9 +48,15 @@
+@@ -48,9 +48,16 @@
  endif()
  # cmake-lint: disable=C0301
 +if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "EMBT")
