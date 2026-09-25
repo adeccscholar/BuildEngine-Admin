@@ -1,15 +1,7 @@
 diff --git a/src/podofo/private/XMPUtils.cpp b/src/podofo/private/XMPUtils.cpp
 --- a/src/podofo/private/XMPUtils.cpp
 +++ b/src/podofo/private/XMPUtils.cpp
-@@ -3,6 +3,7 @@
- 
- #include "PdfDeclarationsPrivate.h"
- #include "XMPUtils.h"
-+#include <cstdio>
- 
- #include <libxml/relaxng.h>
- #include <libxml/xpath.h>
-@@ -1240,7 +1241,15 @@
+@@ -1273,7 +1273,15 @@
          }
          ~Init()
          {
@@ -25,7 +17,7 @@ diff --git a/src/podofo/private/XMPUtils.cpp b/src/podofo/private/XMPUtils.cpp
          }
          xmlRelaxNGPtr m_schema;
      } s_init;
-@@ -1266,7 +1275,15 @@
+@@ -1299,7 +1307,15 @@
          }
          ~Init()
          {
@@ -41,7 +33,7 @@ diff --git a/src/podofo/private/XMPUtils.cpp b/src/podofo/private/XMPUtils.cpp
          }
          xmlRelaxNGPtr m_schema;
      } s_init;
-@@ -1294,7 +1311,15 @@
+@@ -1327,7 +1343,15 @@
          }
          ~Init()
          {
