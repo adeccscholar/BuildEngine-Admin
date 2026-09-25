@@ -449,6 +449,20 @@ License compliance is only one part of integration risk. XML and PDF parsers pro
 - isolation for especially risky transformations;
 - deterministic failure instead of silent recovery when integrity matters.
 
+### 8. Runtime linkage does not change license identity
+
+BuildEngine's dynamic-only BCC64X runtime policy is an ABI/ownership rule, not a license classification rule. The project distinguishes:
+
+- whether a third-party component is distributed as a shared or static library;
+- whether the BCC64X compiler runtime is linked dynamically;
+- which upstream license obligations apply to the component itself.
+
+A static test-framework archive does not imply static BCC64X runtime linkage, and a shared third-party DLL does not by itself determine the component's license traffic light.
+
+### 9. PostgreSQL client libraries
+
+The managed PostgreSQL client stack consists of libpq 18.6 under the PostgreSQL License and libpqxx 8.0.2 under BSD-3-Clause. Both are permissive/green integration candidates when normal notice obligations are preserved.
+
 ## BuildEngine documentation rule
 
 The license overview remains general and license-centered.
