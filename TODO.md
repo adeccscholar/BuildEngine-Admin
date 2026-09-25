@@ -1,3 +1,14 @@
+## Current toolchain policy: 25 September 2026
+
+- [x] BCC64X is treated as Clang/LLVM with Embarcadero simulation; MinGW-compatible headers/macros are not compiler identity.
+- [x] **Dynamic BCC64X runtime is mandatory for every Windows EXE, DLL and MODULE (`-tR`). Static BCC64X runtime linkage is forbidden.**
+- [x] Generic CMake rules enforce the dynamic-runtime policy and fail configuration if `-tR` disappears.
+- [x] Third-party patches are generated from the complete effective file state at their exact position in the ordered patch chain, mechanically reapplied, and byte-verified.
+- [x] libpq 18.6 and libpqxx 8.0.2 installed consumer smokes are PASS.
+- [x] win-iconv 0.0.8 complete consumer path is PASS.
+- [x] Poppler 26.09.0 Release/Debug build and install/common/metadata/publish/doxygen/ready are PASS with `ENABLE_CPP=ON`.
+- [ ] PoDoFo 1.1.1: re-run all 220 upstream tests and the installed XMP DLL consumer after the dynamic-runtime toolchain correction.
+
 # BuildEngine-Admin TODO
 
 **Status date:** September 22, 2026  
@@ -281,7 +292,7 @@ This list must remain functionally unchanged during the freeze.
 6. Patches are version-bound and reproducible.
 7. Tests are not disabled without analysis.
 8. Release and Debug remain separate variants where meaningful for the library.
-9. Shared DLL + import library is the default for normal runtime libraries, but not a dogmatic rule for test infrastructure.
+9. Shared DLL + import library is the default product form for normal runtime libraries, but not a dogmatic rule for test infrastructure. This does not weaken the separate hard rule that the BCC64X compiler runtime is always dynamic (`-tR`).
 10. Small package smokes and complex `BuildEngine-Tests` remain separate.
 11. Project documentation is maintained in English for the wider project audience.
 12. Source trees are regenerable artifacts; partially extracted sources must never be visible as a valid source tree.
