@@ -96,7 +96,7 @@ libpqxx is declared as:
 <extension type="package" library="libpq" version="18.6"/>
 ```
 
-Its source remains the independent libpqxx upstream archive, its build directories remain under `packages/libpqxx/8.0.2`, and its installation remains under `install/packages/libpqxx/8.0.2`. The extension relation contributes the direct dependency on libpq and its contract timestamp to libpqxx evidence, but does not redirect any physical path to libpq.
+Its source remains the independent libpqxx upstream archive, its build directories remain under `packages/libpqxx/8.0.2`, and its installation remains under `install/packages/libpqxx/8.0.2`. The extension relation contributes the direct dependency on libpq and its contract timestamp to libpqxx evidence, but does not redirect any physical path to libpq. The active target-machine run has completed the installed consumer smokes for both libpq 18.6 and libpqxx 8.0.2.
 
 ## ACE / TAO producer model
 
@@ -291,4 +291,4 @@ When semantics are shared by multiple applications, correct BuildEngine-Common f
 
 ## Verification status
 
-The extension-aware Common/Server work and the corrections described above remain **not verified** until a later explicitly approved BCC64X/Common/Server test.
+The package-extension model is exercised by the libpq/libpqxx build and consumer-smoke path. Separate Common/Server ownership and shared-payload corrections described above retain their own verification status and must not be inferred from the package-extension PASS alone.
