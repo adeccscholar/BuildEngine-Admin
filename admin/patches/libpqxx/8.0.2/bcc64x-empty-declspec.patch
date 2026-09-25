@@ -1,0 +1,11 @@
+--- a/src/pqxx-source.hxx
++++ b/src/pqxx-source.hxx
+@@ -27,7 +27,7 @@
+ // We're building libpqxx as a shared library.
+ #    undef PQXX_LIBEXPORT
+ #    define PQXX_LIBEXPORT __declspec(dllexport)
+-#    define PQXX_PRIVATE __declspec()
++#    define PQXX_PRIVATE
+ #  endif // PQXX_SHARED
+ 
+ #endif // _WIN32
