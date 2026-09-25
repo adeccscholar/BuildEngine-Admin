@@ -2664,7 +2664,7 @@
       </smoke>
    </library>
 
-   <library id="libpqxx" version="8.0.2" category="database" timestamp="2026-09-25T02:21:00Z">
+   <library id="libpqxx" version="8.0.2" category="database" timestamp="2026-09-25T02:30:00Z">
       <extension type="package" library="libpq" version="18.6"/>
       <metadata name="libpqxx" supplier="libpqxx project" homepage="https://pqxx.org/development/libpqxx/" description="Modern C++ client API for PostgreSQL built on the official libpq C client library." licenseSignal="green">
          <license name="BSD-3-Clause" file="COPYING"/>
@@ -2682,16 +2682,16 @@
             <require path="include\pqxx\pqxx"/>
             <require path="src\CMakeLists.txt"/>
          </extract>
-         <copy source="{BuildFileDir}\patches\libpqxx\8.0.2\bcc64x-cold-attribute.patch"
-               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cold-attribute.patch"
+         <copy source="{BuildFileDir}\patches\libpqxx\8.0.2\bcc64x-gnu-attributes.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gnu-attributes.patch"
                overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="cold-attribute-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <execute name="gnu-attributes-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cold-attribute.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gnu-attributes.patch"/>
          </execute>
-         <execute name="cold-attribute-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <execute name="gnu-attributes-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cold-attribute.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gnu-attributes.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="false">
