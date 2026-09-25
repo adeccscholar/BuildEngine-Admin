@@ -7030,7 +7030,7 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-25T07:30:00Z">
+   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-25T07:45:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="freetype" version="2.14.3"/>
@@ -7134,17 +7134,6 @@
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export.patch"/>
          </execute>
-         <copy source="{BuildFileDir}\patches\podofo\1.1.1\bcc64x-signature-stream-read.patch"
-               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-signature-stream-read.patch"
-               overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="signature-stream-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-signature-stream-read.patch"/>
-         </execute>
-         <execute name="signature-stream-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-signature-stream-read.patch"/>
-         </execute>
          <!-- PoDoFo 1.1.1 gitlink extern/resources -> podofo-resources@1e0740f2183e01d6f8516399031f6dbccbe8cd0f.
               Keep Git metadata outside the materialized PoDoFo source tree. -->
          <execute name="resources-clone" executable="{Tool:git}"
@@ -7238,8 +7227,6 @@
                   <!-- Keep the tested runtime closure deterministic. In particular, Release libz.dll must come from our zlib 1.3.2 package. -->
                   <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\openssl\3.5.8\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{InstallRoot}\packages\libxml2\2.15.3\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.58\bin\win64\{Configuration};{InstallRoot}\packages\libtiff\4.7.2\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--output-on-failure"/>
-                  <argument value="-E"/>
-                  <argument value="^(TestPruneInvalid|TestPruneInvalidDataset)$"/>
                </execute>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\podofo\podofo.h"/>
