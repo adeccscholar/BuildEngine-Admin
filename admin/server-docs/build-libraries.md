@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current declarative contract as of 22 September 2026. The active `admin/build-libraries.xml` and `schemas/build-libraries.xsd` use **schemaVersion 16**.
+**Status:** current declarative contract as of 25 September 2026. The active `admin/build-libraries.xml` and `schemas/build-libraries.xsd` use **schemaVersion 16**.
 
 `admin/build-libraries.xml` is the executable declarative contract for C and C++ libraries managed by BuildEngine. It describes logical library identity, exact versions, dependencies, source acquisition/preparation, build variants, tests, installation, publication, smoke tests, metadata/security evidence, documentation and library extensions.
 
@@ -392,11 +392,23 @@ When changing a library contract:
 3. preserve exact dependency versions;
 4. bind local patches to exact source versions;
 5. validate XML before production execution;
-6. do not substitute another compiler for BCC64X failures;
+6. do not substitute another compiler for BCC64X failures; BCC64X is Clang/LLVM, not MinGW/GCC;
 7. technical Actions do not become persistent State merely because they have IDs;
 8. artifact evidence does not become Current-State;
 9. physical paths do not define logical identity;
-10. mark implementation **not verified** until the intended BCC64X/Common/Server run proves it.
+10. mark implementation **not verified** until the intended BCC64X/Common/Server run proves it;
+11. all BCC64X Windows EXE/DLL/MODULE link paths must use the dynamic runtime (`-tR`); static BCC64X runtime linkage is forbidden;
+12. every third-party patch must be generated from the complete effective file state at its exact place in the ordered patch chain and mechanically reapplied/byte-verified before commit.
+
+## BCC64X compiler/runtime invariants
+
+BCC64X is the Win64 Modern Clang/LLVM compiler path. GNU-compatible headers, target triples and MinGW compatibility macros are part of the environment but are not compiler identity.
+
+The runtime policy is dynamic-only. The generic CMake rules encode `-tR` for console executables, GUI executables, shared libraries and modules and fail configuration if one of those rules loses the flag.
+
+This prevents separate static C++ allocator/STL/runtime domains across DLL boundaries.
+
+For source patches, the patch input is not automatically pristine upstream. It is the complete file state after every earlier patch in contract order. The target file is constructed completely, the diff is generated mechanically, and reapplication must reproduce the target byte-for-byte.
 
 ## Current integration gate
 
