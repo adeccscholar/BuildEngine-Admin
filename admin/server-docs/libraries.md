@@ -12,9 +12,10 @@ Each logical library also carries a concise one-line purpose description in its 
 
 The current integration follows a few project-wide rules:
 
-- BCC64X is the compiler path under investigation. A library is not silently moved to MSVC, clang-cl, MinGW, or another compiler to make it pass.
+- BCC64X is the compiler path under investigation. It is Clang/LLVM with Embarcadero simulation and GNU-compatible target/header conventions; MinGW compatibility macros do not make it a MinGW/GCC compiler. A library is not silently moved to MSVC, clang-cl, MinGW, or another compiler to make it pass.
 - Versions and dependencies are explicit BuildEngine contract data rather than accidental host discovery.
 - Shared libraries are the normal product shape unless a library is intrinsically header-only or there is a deliberate, documented reason for a static package.
+- Library product form is separate from compiler-runtime linkage: every BCC64X Windows EXE, DLL and MODULE uses the dynamic BCC64X runtime (`-tR`). Static BCC64X runtime linkage is forbidden.
 - Release and Debug use separate variant directories and are tested independently where the package contract requires both.
 - Source repairs are version-bound and checked with `git apply --check` before application.
 - Packaging repairs are preferred over source patches when the source itself is compatible but upstream install/export metadata is incomplete.
@@ -52,6 +53,10 @@ flowchart LR
 
    openssl --> curl
    zlib --> curl
+
+   openssl --> libpq[libpq]
+   zlib --> libpq
+   libpq --> libpqxx[libpqxx]
 
    openssl --> boost
    zlib --> boost
