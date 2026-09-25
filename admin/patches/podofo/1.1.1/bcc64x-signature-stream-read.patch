@@ -1,0 +1,49 @@
+diff --git a/test/unit/SignatureTest.cpp b/test/unit/SignatureTest.cpp
+--- a/test/unit/SignatureTest.cpp
++++ b/test/unit/SignatureTest.cpp
+@@ -9,6 +9,20 @@
+ 
+ constexpr string_view TestSignatureRefHash = "1CC60CEA1A7A8D3ECDD18B20FAAAEFE7"sv;
+ 
++static void readDevice(charbuff& buffer, StreamDevice& device)
++{
++    device.Flush();
++    auto const position = device.GetPosition();
++    auto const length = device.GetLength();
++
++    buffer.resize(length);
++    device.Seek(0);
++    if (length != 0)
++        device.Read(buffer.data(), length);
++
++    device.Seek(position);
++}
++
+ TEST_CASE("TestLoadCertificate")
+ {
+     // Load a PEM certificate now works
+@@ -71,7 +85,7 @@
+         fs::copy_file(fs::u8path(inputPath), fs::u8path(outputPath), fs::copy_options::overwrite_existing);
+         auto stream = std::make_shared<FileStreamDevice>(outputPath, FileMode::Open);
+         testSignature(stream, pkey8);
+-        utls::ReadTo(buff, outputPath);
++        readDevice(buff, *stream);
+         REQUIRE(ssl::ComputeMD5Str(buff) == TestSignatureRefHash);
+     }
+ }
+@@ -109,13 +123,13 @@
+     auto signer = PdfSignerCms(cert, params);
+     PoDoFo::SignDocument(doc, *stream, signer, signature, PdfSaveOptions::NoMetadataUpdate);
+ 
+-    utls::ReadTo(buff, outputPath);
++    readDevice(buff, *stream);
+     REQUIRE(ssl::ComputeMD5Str(buff) == TestSignatureRefHash);
+ 
+     // Resign should work
+     signature.SetCreatingApplication(PdfName("Sample Application"));
+     PoDoFo::SignDocument(doc, *stream, signer, signature, PdfSaveOptions::NoMetadataUpdate);
+-    utls::ReadTo(buff, outputPath);
++    readDevice(buff, *stream);
+     REQUIRE(ssl::ComputeMD5Str(buff) == "2AA706A0A84C662CEE3886C908C06557");
+ }
+ 
