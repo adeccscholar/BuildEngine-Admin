@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current configuration contract as of 22 September 2026. The Library-FSM architecture is active. `build-libraries.xml` and `schemas/build-libraries.xsd` use schema version 16.
+**Status:** current configuration contract as of 25 September 2026. The Library-FSM architecture is active. `build-libraries.xml` and `schemas/build-libraries.xsd` use schema version 16.
 
 BuildEngine combines one local machine/deployment configuration with synchronized administration contracts.
 
@@ -305,6 +305,12 @@ Reserved/recognized according to the current CLI implementation; if not implemen
 For `--make` and `--build`, BuildEngine reduces the Library-FSM definition set to the selected library plus its transitive Requirement closure. The selected consumer therefore does not bypass dependencies and no second execution path is created.
 
 `--config` selects variants before FSM compilation. `--tests` changes the same declarative contract; neither option creates a special scheduler path.
+
+## BCC64X runtime configuration invariant
+
+The synchronized CMake/BCC64X rules enforce dynamic compiler-runtime linkage for every Windows executable, shared library and module. `-tR` is mandatory; static BCC64X runtime linkage is rejected at configure time.
+
+This is a project-wide invariant, not a per-library option. It prevents accidental ABI/allocator separation when C++ ownership crosses DLL boundaries.
 
 ## Current verification boundary
 
