@@ -48,6 +48,7 @@
  set_target_properties(
      pqxx PROPERTIES
 -    OUTPUT_NAME $<IF:$<PLATFORM_ID:Windows>,pqxx,pqxx-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}>
++    PREFIX ""
 +    OUTPUT_NAME ${PQXX_OUTPUT_NAME}
  )
 +unset(PQXX_OUTPUT_NAME)
