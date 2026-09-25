@@ -51,39 +51,22 @@ This separation is binding.
 Current state:
 
 ```text
-schemaVersion = 15
+schemaVersion = 16
 current synchronized logical library catalog
 ```
 
-Included:
+Included (44 logical libraries):
 
 ```text
-pugixml
-zlib
-brotli
-zstd
-xz
-libzip
-libarchive
-openssl
-curl
-boost
-nlohmann-json
-ace
-tao
-bzip2
-glew
-opengl
-raylib
-sdl2
-sqlite
-xerces-c
-soil2
-vtk
-opencv
+pugixml, zlib, brotli, zstd, xz, libzip, libarchive, openssl, curl,
+boost, nlohmann-json, ace, tao, bzip2, glew, opengl, raylib, sdl2,
+sqlite, libpq, libpqxx, xerces-c, soil2, vtk, opencv, cmark-gfm,
+googletest, catch2, bitmapplusplus, libjpeg-turbo, libpng, harfbuzz,
+freetype, libtiff, skia, graphite2, expat, teckit, icu, libxml2,
+qpdf, podofo, win-iconv, poppler
 ```
 
-OpenCL and GoogleTest remain follow-up work after clean-room completion.
+The catalog now covers database clients (SQLite and PostgreSQL), XML, PDF/document processing, text shaping/Unicode, test frameworks, graphics, compression, networking and middleware.
 
 ## Core principle
 
@@ -104,6 +87,10 @@ official upstream
 
 An alternative compiler must never silently replace BCC64X.
 
+BCC64X is treated as **Clang/LLVM with Embarcadero simulation and GNU-compatible target/header conventions**, not as a MinGW/GCC compiler. MinGW compatibility macros or paths must never be used as proof that the active compiler is MinGW.
+
+**Runtime policy:** every BCC64X Windows executable, DLL and module must use the **dynamic runtime** (`-tR`). Static BCC64X runtime linkage is forbidden. This is a hard CMake/toolchain invariant because C++ ownership, STL objects and allocator activity cross DLL boundaries in real packages such as PoDoFo.
+
 ## Generic technical actions
 
 The current XML contract uses actions including:
@@ -118,7 +105,7 @@ require
 target
 ```
 
-Schema 15 XML uses optional technical graph metadata (`id`, `dependsOn`). These dependencies order Actions inside technical work; they do not replace the Library-FSM or create persistent state. The XSD version marker is currently inconsistent and must be corrected separately.
+Schema 16 XML uses optional technical graph metadata (`id`, `dependsOn`). These dependencies order Actions inside technical work; they do not replace the Library-FSM or create persistent state. The XML and active XSD contract are aligned on Schema 16.
 
 ## Publish manifest and Doxygen
 
