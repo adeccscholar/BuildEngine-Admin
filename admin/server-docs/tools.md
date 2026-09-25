@@ -120,3 +120,12 @@ Every change to `admin/build-tools.xml` is reflected on this page:
 - new tool category → extend this page accordingly.
 
 The XML semantics are maintained in parallel in [build-tools.md](build-tools.md).
+
+
+## BCC64X runtime-link policy
+
+BCC64X is the managed compiler path and is treated as Clang/LLVM with Embarcadero simulation. Its GNU-compatible Win64 target/header environment must not be confused with a MinGW/GCC compiler.
+
+All Windows executables, DLLs and modules produced through the generic BCC64X CMake rules use the dynamic BCC64X runtime (`-tR`). Static BCC64X runtime linkage is forbidden and configuration-time checks guard the link-rule templates against regression.
+
+This policy is separate from the generated `bcc64x-ucrt-compat` tool. The compatibility archive fixes the verified UCRT math-symbol selection problem; `-tR` establishes a shared C++ runtime/allocator domain across module boundaries.
