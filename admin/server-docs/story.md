@@ -947,6 +947,26 @@ And the CI lesson is deliberately modest:
 
 XML is a decisive part of that concentration. It keeps the changing knowledge flexible, inspectable and **human-readable** while the generalized engine remains stable. Instead of hard-coding every library, BuildEngine turns much of the ecosystem-specific variation into validated data. That choice is about maintainable engineering contracts, not about prescribing XML for machine-to-machine communication.
 
+### The runtime boundary became part of the experiment
+
+The expansion into PostgreSQL and PDF processing added another lesson that was easy to overlook while individual libraries were still the focus.
+
+The active catalog has grown to **44 logical libraries**, including libpq/libpqxx for PostgreSQL and a document stack built around libxml2, QPDF, PoDoFo, win-iconv and Poppler. This breadth exposed not only library-specific compatibility issues but also assumptions in the toolchain layer itself.
+
+PoDoFo was particularly useful because its public C++ API transfers ownership across a DLL boundary. A factory such as `PdfXMPPacket::Create()` can allocate an object inside the DLL and return an owning C++ pointer to the caller. That makes the runtime model observable: if the executable and DLL carry separate static C++ runtimes, allocation and destruction may occur in different allocator/runtime domains.
+
+The resulting project rule is deliberately stronger than a local PoDoFo workaround:
+
+> **BCC64X on Windows always uses the dynamic runtime. Static BCC64X runtime linkage is forbidden.**
+
+The generic CMake rules now encode `-tR` for executables, DLLs and modules and fail configuration if the rule disappears.
+
+The same investigation reinforced another distinction. BCC64X is **Clang/LLVM**, even though its target, headers and compatibility macros intentionally resemble parts of the MinGW ecosystem. A third-party branch that sees `__MINGW64__` and assumes GCC/MinGW semantics can therefore choose the wrong code path. Toolchain identity must be derived from the actual compiler, not from one compatibility macro.
+
+Finally, repeated patch work hardened the source-repair discipline. A patch is no longer thought of as a diff against a pristine release in isolation. Its input is the complete file state at its exact place in the ordered patch chain. The intended full target file is constructed first, the diff is generated mechanically, and reapplication must reproduce the target byte-for-byte.
+
+These rules are important because they move knowledge upward: from a single failing library into the reusable integration architecture.
+
 ## 24. The project is still evolving
 
 None of this makes the project finished.
