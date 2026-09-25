@@ -1,0 +1,98 @@
+--- a/include/pqxx/internal/header-pre.hxx
++++ b/include/pqxx/internal/header-pre.hxx
+@@ -53,4 +53,6 @@
+-#if __has_cpp_attribute(gnu::pure)
++#if defined(__clang__) && defined(__BORLANDC__)
++#  define PQXX_PURE __attribute__((pure))
++#elif __has_cpp_attribute(gnu::pure)
+ /// Declare function "pure": no side effects, only reads globals and its args.
+ /** Be careful with exceptions.  The compiler may elide calls, which may stop
+  * an exception from happening; or reorder them, moving a call outside of a
+@@ -62,7 +64,9 @@
+ #endif
+ 
+ 
+-#if __has_cpp_attribute(gnu::hot)
++#if defined(__clang__) && defined(__BORLANDC__)
++#  define PQXX_HOT __attribute__((hot))
++#elif __has_cpp_attribute(gnu::hot)
+ /// Tell the compiler that this function can get called a lot.
+ #  define PQXX_HOT [[gnu::hot]]
+ #else
+@@ -70,7 +74,9 @@
+ #endif
+ 
+ 
+-#if __has_cpp_attribute(gnu::cold)
++#if defined(__clang__) && defined(__BORLANDC__)
++#  define PQXX_COLD __attribute__((cold))
++#elif __has_cpp_attribute(gnu::cold)
+ /// Tell the compiler to optimise a function for size, not speed.
+ #  define PQXX_COLD [[gnu::cold]]
+ #else
+@@ -78,7 +84,9 @@
+ #endif
+ 
+ 
+-#if __has_cpp_attribute(gnu::always_inline)
++#if defined(__clang__) && defined(__BORLANDC__)
++#  define PQXX_INLINE_ONLY __attribute__((always_inline))
++#elif __has_cpp_attribute(gnu::always_inline)
+ /// Never generate an out-of-line version of this inline function.
+ #  define PQXX_INLINE_ONLY [[gnu::always_inline]]
+ #elif __has_cpp_attribute(msvc::forceinline)
+@@ -97,7 +105,9 @@
+  * We're only defining this for gcc, since that's the compiler we use for test
+  * coverage analysis.
+  */
+-#if defined(PQXX_COVERAGE) && __has_cpp_attribute(gnu::always_inline)
++#if defined(PQXX_COVERAGE) && defined(__clang__) && defined(__BORLANDC__)
++#  define PQXX_INLINE_COV __attribute__((always_inline))
++#elif defined(PQXX_COVERAGE) && __has_cpp_attribute(gnu::always_inline)
+ #  define PQXX_INLINE_COV [[gnu::always_inline]]
+ #else
+ #  define PQXX_INLINE_COV /* inline-only on coverage runs */
+@@ -108,7 +118,9 @@
+ /** Bear in mind that this only works for the specific compilers for which we
+  * know non-standard attributes that achieve this.
+  */
+-#if __has_cpp_attribute(gnu::noinline)
++#if defined(__clang__) && defined(__BORLANDC__)
++#  define PQXX_NOINLINE __attribute__((noinline))
++#elif __has_cpp_attribute(gnu::noinline)
+ #  define PQXX_NOINLINE [[gnu::noinline]]
+ #elif __has_cpp_attribute(msvc::noinline)
+ #  define PQXX_NOINLINE [[msvc::noinline]]
+@@ -117,7 +129,9 @@
+ #endif
+ 
+ 
+-#if __has_cpp_attribute(gnu::returns_nonnull)
++#if defined(__clang__) && defined(__BORLANDC__)
++#  define PQXX_RETURNS_NONNULL __attribute__((returns_nonnull))
++#elif __has_cpp_attribute(gnu::returns_nonnull)
+ /// For functions returning a pointer: the pointer is never null.
+ #  define PQXX_RETURNS_NONNULL [[gnu::returns_nonnull]]
+ #else
+@@ -125,7 +139,9 @@
+ #endif
+ 
+ 
+-#if __has_cpp_attribute(gnu::null_terminated_string_arg)
++#if defined(__clang__) && defined(__BORLANDC__)
++#  define PQXX_ZARG(n) __attribute__((null_terminated_string_arg((n))))
++#elif __has_cpp_attribute(gnu::null_terminated_string_arg)
+ /// Function argument n (counted starting from 1) is a zero-terminated string.
+ #  define PQXX_ZARG(n) [[gnu::null_terminated_string_arg((n))]]
+ #else
+@@ -134,7 +150,9 @@
+ 
+ 
+ // Not all gcc versions we're seeing support the argument-less version.
+-#if defined(PQXX_HAVE_ZARGS)
++#if defined(__clang__) && defined(__BORLANDC__) && defined(PQXX_HAVE_ZARGS)
++#  define PQXX_ZARGS __attribute__((null_terminated_string_arg))
++#elif defined(PQXX_HAVE_ZARGS)
+ /// This function's C-style string arguments are zero-terminated.
+ #  define PQXX_ZARGS [[gnu::null_terminated_string_arg]]
+ #else
