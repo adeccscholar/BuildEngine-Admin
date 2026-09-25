@@ -1,7 +1,7 @@
 # BuildEngine-Admin – Technical Administration Data
 
-**Status date:** September 19, 2026  
-**Status:** active declarative contract for the Library-FSM architecture; BZip2/private-libarchive promotion pending verification
+**Status date:** September 25, 2026  
+**Status:** active Schema-16 declarative contract for the Library-FSM architecture and 44-library integration catalog
 
 This directory contains the administration contracts that BuildEngine synchronizes and uses at runtime for tool provisioning, library builds, packaging, publishing, and small consumer smokes.
 
@@ -16,36 +16,19 @@ Active libraries are not distributed across XML fragments.
 ## Current contract state
 
 ```text
-build-libraries.xml : Schema 15
+build-libraries.xml : Schema 16
 Library contracts   : current synchronized logical catalog
 ```
 
-Included:
+Included (44 logical libraries):
 
 ```text
-pugixml
-zlib
-brotli
-zstd
-xz
-libzip
-libarchive
-openssl
-curl
-boost
-nlohmann-json
-ace
-tao
-bzip2
-glew
-opengl
-raylib
-sdl2
-sqlite
-xerces-c
-soil2
-vtk
-opencv
+pugixml, zlib, brotli, zstd, xz, libzip, libarchive, openssl, curl,
+boost, nlohmann-json, ace, tao, bzip2, glew, opengl, raylib, sdl2,
+sqlite, libpq, libpqxx, xerces-c, soil2, vtk, opencv, cmark-gfm,
+googletest, catch2, bitmapplusplus, libjpeg-turbo, libpng, harfbuzz,
+freetype, libtiff, skia, graphite2, expat, teckit, icu, libxml2,
+qpdf, podofo, win-iconv, poppler
 ```
 
 Other central content:
@@ -99,7 +82,7 @@ require
 target
 ```
 
-Schema 14 additionally permits optional graph metadata:
+Schema 16 permits optional graph metadata:
 
 ```text
 id
@@ -156,8 +139,10 @@ The flow remains:
 download upstream
 -> verify identity
 -> extract completely
--> check patch against exactly that state
--> apply patch
+-> reconstruct the complete effective file state after all earlier patches
+-> create the complete desired target file
+-> generate the unified diff mechanically
+-> reapply and verify byte-identical target output
 -> execute original build system
 ```
 
@@ -207,9 +192,9 @@ The ACE/TAO smoke is already implemented as a small IDL/ORB/Naming path.
 
 ## Product form
 
-For normal runtime libraries, Shared DLL + import library is the preferred default where technically meaningful.
+For normal runtime libraries, Shared DLL + import library is the preferred product form where technically meaningful.
 
-Static is permitted as a documented exception. GoogleTest will be deliberately reassessed for Static vs Shared only after the freeze.
+This product-form rule is independent of the compiler runtime rule: **all BCC64X Windows executables, DLLs and modules use the dynamic runtime (`-tR`) without exception. Static BCC64X runtime linkage is forbidden.** A library may still deliberately be a static archive (for example test infrastructure) while the final BCC64X executable consuming it remains dynamically linked to the BCC64X runtime.
 
 ## Incremental state
 
