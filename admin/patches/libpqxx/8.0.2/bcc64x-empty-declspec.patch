@@ -9,3 +9,16 @@
  #  endif // PQXX_SHARED
  
  #endif // _WIN32
+--- a/include/pqxx/internal/header-pre.hxx
++++ b/include/pqxx/internal/header-pre.hxx
+@@ -73,7 +73,9 @@
+ #endif
+ 
+ 
+-#if __has_cpp_attribute(gnu::cold)
++#if defined(__clang__) && defined(__BORLANDC__)
++#  define PQXX_COLD __attribute__((cold))
++#elif __has_cpp_attribute(gnu::cold)
+ /// Tell the compiler to optimise a function for size, not speed.
+ #  define PQXX_COLD [[gnu::cold]]
+ #else
