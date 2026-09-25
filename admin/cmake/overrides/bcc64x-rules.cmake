@@ -95,8 +95,12 @@ endif()
 # Keep this explicit because the stock Windows-Embarcadero platform module is
 # otherwise targeted at several generations of Embarcadero toolchains.
 foreach(_bcc64x_lang C CXX)
-   set(CMAKE_${_bcc64x_lang}_CREATE_WIN32_EXE "-tW")
-   set(CMAKE_${_bcc64x_lang}_CREATE_CONSOLE_EXE "-tC")
+   # Borland-style targets (-tC/-tW/-tD) default to the static BCC64X RTL.
+   # Third-party DLLs expose C++ ownership and STL types across module
+   # boundaries, so EXEs and DLLs must share the dynamic BCC64X RTL.
+   # Embarcadero documents -tR as the switch enabling dynamic RTL linking.
+   set(CMAKE_${_bcc64x_lang}_CREATE_WIN32_EXE "-tW -tR")
+   set(CMAKE_${_bcc64x_lang}_CREATE_CONSOLE_EXE "-tC -tR")
 endforeach()
 unset(_bcc64x_lang)
 
@@ -157,15 +161,15 @@ set(CMAKE_CXX_LINK_EXECUTABLE
 # DLLs: let LLD create the COFF import library in the same link invocation.
 # Embarcadero documents -Wl,--out-implib,<file.lib> for BCC64X.
 set(CMAKE_C_CREATE_SHARED_LIBRARY
-   "<CMAKE_C_COMPILER> --rsp-quoting=windows -tD -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES> -Wl,--out-implib,<TARGET_IMPLIB>")
+   "<CMAKE_C_COMPILER> --rsp-quoting=windows -tD -tR -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES> -Wl,--out-implib,<TARGET_IMPLIB>")
 set(CMAKE_CXX_CREATE_SHARED_LIBRARY
-   "<CMAKE_CXX_COMPILER> --rsp-quoting=windows -tD -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES> -Wl,--out-implib,<TARGET_IMPLIB>")
+   "<CMAKE_CXX_COMPILER> --rsp-quoting=windows -tD -tR -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES> -Wl,--out-implib,<TARGET_IMPLIB>")
 
 # MODULE libraries do not require an import library.
 set(CMAKE_C_CREATE_SHARED_MODULE
-   "<CMAKE_C_COMPILER> --rsp-quoting=windows -tD -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES>")
+   "<CMAKE_C_COMPILER> --rsp-quoting=windows -tD -tR -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES>")
 set(CMAKE_CXX_CREATE_SHARED_MODULE
-   "<CMAKE_CXX_COMPILER> --rsp-quoting=windows -tD -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES>")
+   "<CMAKE_CXX_COMPILER> --rsp-quoting=windows -tD -tR -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES>")
 
 # Windows resource compiler.
 #
