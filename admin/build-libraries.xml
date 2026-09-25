@@ -2664,7 +2664,7 @@
       </smoke>
    </library>
 
-   <library id="libpqxx" version="8.0.2" category="database" timestamp="2026-09-25T03:00:00Z">
+   <library id="libpqxx" version="8.0.2" category="database" timestamp="2026-09-25T03:15:00Z">
       <extension type="package" library="libpq" version="18.6"/>
       <metadata name="libpqxx" supplier="libpqxx project" homepage="https://pqxx.org/development/libpqxx/" description="Modern C++ client API for PostgreSQL built on the official libpq C client library." licenseSignal="green">
          <license name="BSD-3-Clause" file="COPYING"/>
