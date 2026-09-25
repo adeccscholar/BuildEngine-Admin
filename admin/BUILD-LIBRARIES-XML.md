@@ -1,10 +1,10 @@
 # `build-libraries.xml` – Current Contract Guide
 
-**Status date:** September 3, 2026  
-**Schema:** 13  
+**Status date:** September 25, 2026  
+**Schema:** 16  
 **Documentation language:** English
 
-This document describes the semantics of `admin/build-libraries.xml` at the documented Schema-13 state. The XSD file `admin/schemas/build-libraries.xsd` is the formal structural definition; this document explains the technical meaning. For the current Schema-16 contract, also see `server-docs/build-libraries.md`.
+This document describes the current Schema-16 semantics of `admin/build-libraries.xml`. The XSD file `admin/schemas/build-libraries.xsd` is the formal structural definition; this document explains the technical meaning.
 
 ## 1. Core idea
 
@@ -105,6 +105,16 @@ A source contract consists of generic actions, typically:
 Supported formats include ZIP and libarchive-based archives.
 
 Important: the **nested** `<extract><require>` is deliberately file evidence inside the extracted upstream artifact. It is not identical to the general later `<require>` action.
+
+### BCC64X runtime invariant
+
+For Win64 Modern/BCC64X, BuildEngine enforces a dynamic-only compiler runtime policy. CMake link rules for console executables, GUI executables, shared libraries and modules all carry `-tR`, and the toolchain fails configuration if the flag disappears from any of those paths. This prevents independent static C++ runtime/allocator domains across DLL boundaries.
+
+BCC64X remains Clang/LLVM. GNU-compatible target triples, headers or compatibility macros do not make the compiler MinGW/GCC.
+
+### Third-party patch construction invariant
+
+A version-bound source patch is generated from the **complete effective source file at its exact point in the ordered patch chain**. The complete intended target file is constructed first; the unified diff is generated mechanically; the generated patch is then reapplied to the complete input and the result must be byte-identical to the intended target. Fragment-based reconstruction or hand-authored hunk offsets are not accepted.
 
 ## 6. Build
 
@@ -339,7 +349,7 @@ The former custom Python installer is therefore no longer technically required.
 
 For normal runtime libraries, Shared DLL + import library is the preferred product form where upstream supports it meaningfully.
 
-Static is permitted where technically justified. GoogleTest is deliberately assessed separately as test infrastructure and may receive a documented static exception.
+Library linkage form and compiler-runtime linkage are separate decisions. A package may deliberately be a static archive, but every BCC64X Windows EXE/DLL/MODULE must still use the dynamic BCC64X runtime (`-tR`). Static BCC64X runtime linkage is forbidden.
 
 ## 18. Change discipline
 
