@@ -1,15 +1,13 @@
 diff --git a/src/podofo/private/XMPUtils.cpp b/src/podofo/private/XMPUtils.cpp
 --- a/src/podofo/private/XMPUtils.cpp
 +++ b/src/podofo/private/XMPUtils.cpp
-@@ -3,6 +3,7 @@
+@@ -3,4 +3,5 @@
  
  #include "PdfDeclarationsPrivate.h"
  #include "XMPUtils.h"
 +#include <cstdio>
  
- #include <libxml/relaxng.h>
- #include <libxml/xpath.h>
-@@ -516,6 +517,9 @@
+@@ -516,5 +517,8 @@
  void PoDoFo::PruneAndValidate(xmlDocPtr doc, xmlNodePtr description, PdfALevel level,
      bool skipSetPdfAId, const function<void(string_view name, string_view ns,
          string_view prefix, XMPPropError error, xmlNodePtr node)>& reportWarnings)
@@ -28,31 +26,32 @@ diff --git a/src/podofo/private/XMPUtils.cpp b/src/podofo/private/XMPUtils.cpp
      unique_ptr<xmlRelaxNGValidCtxt, decltype(&xmlRelaxNGFreeValidCtxt)> validCtx(xmlRelaxNGNewValidCtxt(schema), xmlRelaxNGFreeValidCtxt);
      if (validCtx == nullptr)
          PODOFO_RAISE_ERROR_INFO(PdfErrorCode::OutOfMemory, "Out of memory while validating XMP packet");
-@@ -552,14 +559,26 @@
+@@ -552,3 +559,6 @@
      // Set a null error handler
      xmlRelaxNGSetValidStructuredErrors(validCtx.get(), (xmlStructuredErrorFunc)nullValidationErrorHandler, nullptr);
  
 +#if defined(__clang__) && defined(__BORLANDC__)
 +    std::fprintf(stderr, "PODOFO_XMP_TRACE validctx=%p\n", (void*)validCtx.get());
 +#endif
-     // Push enclosing/preable elements
+@@ -556,2 +566,5 @@
      rc = xmlRelaxNGValidatePushElement(validCtx.get(), doc, xmlDocGetRootElement(doc)); // <x:xmpmeta>
 +#if defined(__clang__) && defined(__BORLANDC__)
 +    std::fprintf(stderr, "PODOFO_XMP_TRACE push-xmpmeta rc=%d\n", rc);
 +#endif
      ASSERT_STREAMING_RNG(rc == 1);
+@@ -558,2 +571,5 @@
      rc = xmlRelaxNGValidatePushElement(validCtx.get(), doc, description->parent);       // <rdf:RDF>
 +#if defined(__clang__) && defined(__BORLANDC__)
 +    std::fprintf(stderr, "PODOFO_XMP_TRACE push-rdf rc=%d\n", rc);
 +#endif
      ASSERT_STREAMING_RNG(rc == 1);
+@@ -560,2 +576,5 @@
      rc = xmlRelaxNGValidatePushElement(validCtx.get(), doc, description);               // <rdf:Description>
 +#if defined(__clang__) && defined(__BORLANDC__)
 +    std::fprintf(stderr, "PODOFO_XMP_TRACE push-description rc=%d\n", rc);
 +#endif
      ASSERT_STREAMING_RNG(rc == 1);
-@@ -570,6 +589,10 @@
-     vector<XMPNamespaceKind> extensionsToAdd;
+@@ -571,3 +590,8 @@
      for (auto child = xmlFirstElementChild(description); child != nullptr; child = xmlNextElementSibling(child))
      {
 +#if defined(__clang__) && defined(__BORLANDC__)
@@ -61,51 +60,36 @@ diff --git a/src/podofo/private/XMPUtils.cpp b/src/podofo/private/XMPUtils.cpp
 +            child->ns != nullptr && child->ns->href != nullptr ? (const char*)child->ns->href : "<none>");
 +#endif
          ns = XMPNamespaceKind::Unknown;
-@@ -604,7 +627,14 @@
-         auto inserted = duplicated.emplace(utls::GetNodePrefixedName(child));
-         if (inserted.second)
-         {
+@@ -606,1 +630,8 @@
 -            if (tryValidateElement(validCtx.get(), doc, child))
 +#if defined(__clang__) && defined(__BORLANDC__)
-+            std::fprintf(stderr, "PODOFO_XMP_TRACE validate-begin child=%s\n",
-+                child->name != nullptr ? (const char*)child->name : "<null>");
++            std::fprintf(stderr, "PODOFO_XMP_TRACE validate-begin child=%s\n", child->name != nullptr ? (const char*)child->name : "<null>");
 +#endif
 +            bool const valid = tryValidateElement(validCtx.get(), doc, child);
 +#if defined(__clang__) && defined(__BORLANDC__)
-+            std::fprintf(stderr, "PODOFO_XMP_TRACE validate-end child=%s valid=%d\n",
-+                child->name != nullptr ? (const char*)child->name : "<null>", valid ? 1 : 0);
++            std::fprintf(stderr, "PODOFO_XMP_TRACE validate-end child=%s valid=%d\n", child->name != nullptr ? (const char*)child->name : "<null>", valid ? 1 : 0);
 +#endif
 +            if (valid)
-             {
-                 // Non duplicate property verified
-@@ -1023,6 +1053,10 @@
- bool tryValidateElement(xmlRelaxNGValidCtxtPtr ctx, xmlDocPtr doc, xmlNodePtr elem)
+@@ -1025,2 +1056,5 @@
  {
      int rc = xmlRelaxNGValidatePushElement(ctx, doc, elem);
 +#if defined(__clang__) && defined(__BORLANDC__)
-+    std::fprintf(stderr, "PODOFO_XMP_TRACE try-push elem=%s rc=%d\n",
-+        elem->name != nullptr ? (const char*)elem->name : "<null>", rc);
++    std::fprintf(stderr, "PODOFO_XMP_TRACE try-push elem=%s rc=%d\n", elem->name != nullptr ? (const char*)elem->name : "<null>", rc);
 +#endif
-     if (rc == 0)
+@@ -1029,3 +1063,6 @@
      {
          /* Streaming is not possible, validate full element instead */
          rc = xmlRelaxNGValidateFullElement(ctx, doc, elem);
 +#if defined(__clang__) && defined(__BORLANDC__)
-+        std::fprintf(stderr, "PODOFO_XMP_TRACE full elem=%s rc=%d\n",
-+            elem->name != nullptr ? (const char*)elem->name : "<null>", rc);
++        std::fprintf(stderr, "PODOFO_XMP_TRACE full elem=%s rc=%d\n", elem->name != nullptr ? (const char*)elem->name : "<null>", rc);
 +#endif
-         if (rc == 1)
-             return true;
- 
+@@ -1035,3 +1072,11 @@
      Fail:
 +#if defined(__clang__) && defined(__BORLANDC__)
-+        std::fprintf(stderr, "PODOFO_XMP_TRACE clear-errors elem=%s\n",
-+            elem->name != nullptr ? (const char*)elem->name : "<null>");
++        std::fprintf(stderr, "PODOFO_XMP_TRACE clear-errors elem=%s\n", elem->name != nullptr ? (const char*)elem->name : "<null>");
 +#endif
          xmlRelaxNGValidCtxtClearErrors(ctx);
 +#if defined(__clang__) && defined(__BORLANDC__)
-+        std::fprintf(stderr, "PODOFO_XMP_TRACE clear-errors-done elem=%s\n",
-+            elem->name != nullptr ? (const char*)elem->name : "<null>");
++        std::fprintf(stderr, "PODOFO_XMP_TRACE clear-errors-done elem=%s\n", elem->name != nullptr ? (const char*)elem->name : "<null>");
 +#endif
          xmlResetLastError();
-         return false;
