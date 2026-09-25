@@ -7020,7 +7020,7 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-25T06:00:00Z">
+   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-25T06:15:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="freetype" version="2.14.3"/>
@@ -7134,6 +7134,17 @@
          <execute name="xmp-trace-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-trace.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\podofo\1.1.1\bcc64x-xmp-lifetime-trace.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-lifetime-trace.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="xmp-lifetime-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-lifetime-trace.patch"/>
+         </execute>
+         <execute name="xmp-lifetime-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-lifetime-trace.patch"/>
          </execute>
          <!-- PoDoFo 1.1.1 gitlink extern/resources -> podofo-resources@1e0740f2183e01d6f8516399031f6dbccbe8cd0f.
               Keep Git metadata outside the materialized PoDoFo source tree. -->
