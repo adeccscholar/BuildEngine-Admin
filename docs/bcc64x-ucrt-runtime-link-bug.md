@@ -123,3 +123,26 @@ This reproduces independently of Skia or any third-party library.
 **Expected:** the normal BCC64X runtime link selects the supplied x64 `libucrt_extra` implementations where required, producing a loadable Win64 binary.
 
 **Actual:** LLD selects/emits the API-set imports and the resulting DLL fails at runtime with `ERROR_PROC_NOT_FOUND`.
+
+
+## Separate dynamic-runtime invariant
+
+The UCRT compatibility archive above solves a specific BCC64X/LLD symbol-selection defect. It does **not** replace the general BCC64X runtime-linkage rule discovered later while validating PoDoFo.
+
+BCC64X's Borland-style target modes default to static runtime linkage unless `-tR` is present. Separate static C++ runtimes in an executable and a DLL are unsafe when C++ ownership, STL objects, exceptions, or allocator activity cross the module boundary.
+
+BuildEngine therefore enforces:
+
+```text
+console EXE : -tC -tR
+GUI EXE     : -tW -tR
+DLL         : -tD -tR
+MODULE      : -tD -tR
+```
+
+Static BCC64X runtime linkage is forbidden project-wide. CMake configuration fails if `-tR` disappears from one of these link rules.
+
+These two runtime controls address different issues:
+
+- `libbcc64x-ucrt-compat.a` selects working implementations for the verified UCRT math-symbol defect;
+- `-tR` ensures one shared BCC64X C++ runtime/allocator domain across Windows module boundaries.
