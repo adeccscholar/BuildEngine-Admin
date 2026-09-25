@@ -167,6 +167,16 @@ ACE and TAO are separate logical libraries in the dependency graph. This does **
 | PoDoFo | 1.1.1 | 🟡 Yellow | documentation | C++ PDF parsing, creation and modification library with form, annotation, signing and incremental-update APIs. | zlib, OpenSSL, FreeType, libxml2, libjpeg-turbo, libpng, libtiff | Shared upstream CMake profile with Win32 GDI font search; build/test/install/metadata/publish/doxygen reached PASS before the final runtime-policy correction. PoDoFo exposed the project-wide requirement for dynamic BCC64X runtime linkage (-tR) across EXE/DLL boundaries; the full 220-test plus installed XMP-DLL smoke rerun is the remaining final evidence gate. |
 | Poppler | 26.09.0 | 🔴 Red | documentation | PDF parser and rendering foundation used in document-processing toolchains. | zlib, FreeType, libjpeg-turbo, libpng, libtiff, win-iconv | Release/Debug builds and install/common/metadata/publish/doxygen/ready have passed with ENABLE_CPP=ON; upstream test-data remains a separate pinned future participant. GPL licensing remains a deliberate product-architecture constraint. |
 
+## PostgreSQL client stack
+
+The database branch now includes both embedded and client/server access:
+
+- **SQLite 3.53.4** remains the embedded self-contained SQL engine.
+- **libpq 18.6** is the official PostgreSQL C client package and consumes managed OpenSSL and zlib.
+- **libpqxx 8.0.2** is the modern C++ layer and is modeled as a package extension of libpq rather than as a physical source/install extension.
+
+The PostgreSQL work produced reusable BCC64X findings: Windows shared-library import/export logic must not assume `_MSC_VER`; `__MINGW64__` must not be treated as proof of a MinGW compiler; GNU hot/cold attributes may need BCC64X-specific declaration spelling; and installed consumer smokes are the authoritative package-acceptance evidence.
+
 ## PDF and XML processing stack
 
 The document-processing branch now has four complementary layers:
@@ -178,7 +188,7 @@ The document-processing branch now has four complementary layers:
 
 The current contracts are intentionally separate. No single PDF library is treated as a universal abstraction. The first BuildEngine goal is to prove each installed package independently with BCC64X, then use BuildEngine-Tests to determine the practical responsibility boundary through real E-invoice, form-discovery and fill/save/reopen scenarios.
 
-The new libxml2, QPDF and PoDoFo paths are **[nicht verifiziert]** until a target-machine run passes. Poppler's newly enabled C++ API is likewise **[nicht verifiziert]**.
+win-iconv and Poppler now have target-machine build/package evidence, including Poppler with ENABLE_CPP=ON. libxml2 and QPDF have progressed through their active integration/debugging paths; their exact final test status remains tied to current contract evidence. PoDoFo reached build/test/install/metadata/publish/doxygen PASS before the final runtime-policy correction; its authoritative final gate is the clean rerun with dynamic-only BCC64X runtime plus the installed XMP DLL consumer.
 
 Licensing is also part of the architecture. QPDF is Apache-2.0. PoDoFo's library offers MPL-2.0 or LGPL-2.0-or-later, while its command-line tools are GPL and are therefore disabled in the first library-focused profile. Poppler is GPL and must not become an accidental mandatory proprietary in-process dependency without a deliberate distribution decision. See [Open-Source License Overview](licenses.md) and [PDF and E-Invoice Processing Roadmap](pdf-processing.md).
 
@@ -432,3 +442,11 @@ Whenever `admin/build-libraries.xml` changes materially, maintainers must update
 - record deeper diagnostic evidence -> update the internal findings document under `docs/` as well.
 
 The XML contract remains authoritative when documentation and executable configuration ever disagree; such a disagreement is a documentation defect to be corrected, not a second source of truth.
+
+### BCC64X dynamic-runtime rule
+
+The PoDoFo investigation established a project-wide invariant: **all BCC64X Windows executables, DLLs and modules use the dynamic runtime (`-tR`)**. Static BCC64X runtime linkage is forbidden.
+
+This is separate from whether a third-party library is packaged as a static or shared library. Public C++ APIs may move strings, exceptions, STL containers or owning pointers across a DLL boundary. Separate static C++ runtime/allocator domains can then corrupt ownership or fail during destruction.
+
+The generic CMake rules now encode and assert the dynamic-only policy so it cannot silently regress.
