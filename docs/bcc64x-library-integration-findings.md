@@ -600,3 +600,86 @@ Der technische Nutzen geht über ICU hinaus. Dasselbe Modell kann vorhandene C++
 - `docs/library-license-sbom.md` – kumulierte Lizenzinformationen und CycloneDX-SBOM;
 - `admin/build-libraries.xml` – autoritativer Bibliotheks- und Dependency-Vertrag;
 - `admin/build-tools.xml` – Tool- und Generated-Tool-Vertrag, einschließlich `bcc64x-ucrt-compat`.
+
+
+## PostgreSQL client stack: libpq 18.6 and libpqxx 8.0.2
+
+The PostgreSQL client stack is now part of the active database catalog.
+
+### libpq 18.6
+
+The official PostgreSQL C client library is built as a managed package against BuildEngine OpenSSL 3.5.8 and zlib 1.3.2. BCC64X-specific source repairs cover the Windows `ntsecapi` conflict and Winsock linkage without redirecting the build to another compiler.
+
+Release/Debug build, install, metadata, publish and the installed consumer smoke have passed. The smoke validates the installed libpq API rather than only build-tree linkage.
+
+### libpqxx 8.0.2
+
+libpqxx is modeled as a package extension of libpq: it owns its own upstream source, build and package roots while the extension relation supplies the exact libpq dependency/evidence.
+
+Important BCC64X findings were:
+
+- Windows shared builds must not emit an empty `__declspec()`; the version-bound patch normalizes that path.
+- `[[gnu::cold]]` / `[[gnu::hot]]` in upstream declaration positions are not accepted by BCC64X in the same way as generic Clang/GCC; BCC64X uses `__attribute__((cold))` / `__attribute__((hot))` for this path.
+- CMake's MinGW-like platform inference must not rename the produced library as though BCC64X were MinGW/GCC.
+- The v8 installed consumer header is `<pqxx/util>`, not the older `<pqxx/util.hxx>`.
+
+The installed package consumer smoke is PASS.
+
+## PDF/XML stack update: libxml2, QPDF, PoDoFo, win-iconv and Poppler
+
+### libxml2 2.15.3
+
+libxml2 is the managed XML foundation for XPath, XML Schema, Relax NG, XInclude and serialization. Its BCC64X integration exposed release-archive test-helper and Windows line-ending assumptions. A dedicated Relax NG recovery consumer smoke also proved that libxml2 2.15.3 can perform streaming validation recovery under BCC64X; this ruled out a generic libxml2 Relax NG failure while diagnosing PoDoFo.
+
+### QPDF 12.4.1
+
+QPDF is built as a shared package against managed zlib and libjpeg-turbo. The initial OpenSSL crypto path was deliberately removed because the managed OpenSSL build brings Brotli/Zstd runtime dependencies that are unnecessary for QPDF's native crypto path. The resulting contract keeps QPDF's runtime closure smaller and easier to audit.
+
+### win-iconv 0.0.8
+
+win-iconv is the explicit Windows iconv implementation required by Poppler's C++ API path. Its source/build/test/install/publish/doxygen and installed consumer smoke have been exercised successfully.
+
+### Poppler 26.09.0
+
+Poppler now builds in Release and Debug with `ENABLE_CPP=ON`; install/common/metadata/publish/doxygen/ready have passed in the active target-machine run. Its GPL licensing remains a product-architecture constraint even though the technical package build succeeds.
+
+### PoDoFo 1.1.1
+
+PoDoFo exposed two separate BCC64X lessons.
+
+First, its Windows DLL export/import selection used `_MSC_VER` as the Windows branch selector. BCC64X is Clang and does not define `_MSC_VER`, so the upstream code incorrectly selected GNU visibility attributes. A version-bound BCC64X Windows branch now uses `__declspec(dllexport/dllimport)`.
+
+Second, the investigation exposed a more fundamental toolchain problem: BCC64X EXEs and DLLs were previously linked without `-tR`, which means separate static C++ runtime/allocator domains. PoDoFo's public API returns ownership across the DLL boundary (for example `std::unique_ptr<PdfXMPPacket>` from `PdfXMPPacket::Create()`). That makes static runtime separation unsafe and explains access violations during destruction/shutdown.
+
+The BuildEngine BCC64X rule is now explicit and global:
+
+```text
+ALWAYS dynamic BCC64X runtime (-tR)
+NEVER static BCC64X runtime
+```
+
+The rule applies to console EXEs, GUI EXEs, DLLs and MODULE targets and is enforced by configure-time assertions. After this toolchain correction, the complete original PoDoFo upstream test set and the installed DLL XMP consumer are the required evidence; symptom-only test exclusions are not part of the intended final state.
+
+## Generic BCC64X findings added in September 2026
+
+### BCC64X is Clang, not MinGW
+
+BCC64X may expose MinGW-compatible target/header conventions and macros because its Win64 environment uses the `x86_64-w64-mingw32` ecosystem. That compatibility surface must not be interpreted as compiler identity. The active compiler is Clang/LLVM with Embarcadero simulation. Third-party branches that equate `__MINGW64__` with a real MinGW/GCC toolchain must be reviewed and corrected where they select incompatible behavior.
+
+### Dynamic runtime is a hard invariant
+
+Static vs shared *library product form* is separate from compiler-runtime linkage. A test framework may legitimately be delivered as a static archive, but every BCC64X Windows executable/DLL/module still links the BCC64X runtime dynamically. This avoids independent allocator/STL/runtime domains across DLL boundaries.
+
+### Patch construction is stateful
+
+A third-party patch is not generated against a pristine upstream file by default. Its input is the complete file state that exists at its exact position in the ordered patch chain. The required workflow is:
+
+1. materialize the complete original upstream file;
+2. apply all earlier patches in contract order;
+3. create the complete desired target file;
+4. generate the unified diff mechanically;
+5. reapply the generated diff to the complete input;
+6. verify byte identity with the intended target;
+7. only then commit the patch and advance evidence.
+
+Hand-written hunk positions and fragment-derived patches are not accepted.
