@@ -1,0 +1,59 @@
+diff --git a/src/podofo/private/XMPUtils.cpp b/src/podofo/private/XMPUtils.cpp
+--- a/src/podofo/private/XMPUtils.cpp
++++ b/src/podofo/private/XMPUtils.cpp
+@@ -3,6 +3,7 @@
+ 
+ #include "PdfDeclarationsPrivate.h"
+ #include "XMPUtils.h"
++#include <cstdio>
+ 
+ #include <libxml/relaxng.h>
+ #include <libxml/xpath.h>
+@@ -1240,7 +1241,15 @@
+         }
+         ~Init()
+         {
++#if defined(__clang__) && defined(__BORLANDC__)
++            std::fprintf(stderr, "PODOFO_XMP_SCHEMA destroy-begin PDFA1 schema=%p\n", (void*)m_schema);
++            std::fflush(stderr);
++#endif
+             xmlRelaxNGFree(m_schema);
++#if defined(__clang__) && defined(__BORLANDC__)
++            std::fprintf(stderr, "PODOFO_XMP_SCHEMA destroy-end PDFA1 schema=%p\n", (void*)m_schema);
++            std::fflush(stderr);
++#endif
+         }
+         xmlRelaxNGPtr m_schema;
+     } s_init;
+@@ -1266,7 +1275,15 @@
+         }
+         ~Init()
+         {
++#if defined(__clang__) && defined(__BORLANDC__)
++            std::fprintf(stderr, "PODOFO_XMP_SCHEMA destroy-begin PDFA2_3 schema=%p\n", (void*)m_schema);
++            std::fflush(stderr);
++#endif
+             xmlRelaxNGFree(m_schema);
++#if defined(__clang__) && defined(__BORLANDC__)
++            std::fprintf(stderr, "PODOFO_XMP_SCHEMA destroy-end PDFA2_3 schema=%p\n", (void*)m_schema);
++            std::fflush(stderr);
++#endif
+         }
+         xmlRelaxNGPtr m_schema;
+     } s_init;
+@@ -1294,7 +1311,15 @@
+         }
+         ~Init()
+         {
++#if defined(__clang__) && defined(__BORLANDC__)
++            std::fprintf(stderr, "PODOFO_XMP_SCHEMA destroy-begin PDFA4 schema=%p\n", (void*)m_schema);
++            std::fflush(stderr);
++#endif
+             xmlRelaxNGFree(m_schema);
++#if defined(__clang__) && defined(__BORLANDC__)
++            std::fprintf(stderr, "PODOFO_XMP_SCHEMA destroy-end PDFA4 schema=%p\n", (void*)m_schema);
++            std::fflush(stderr);
++#endif
+         }
+         xmlRelaxNGPtr m_schema;
+     } s_init;
