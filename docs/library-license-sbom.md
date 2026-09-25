@@ -48,7 +48,7 @@ erhalten. Die von BuildEngine erzeugte kumulierte Datei `sbom.cdx.json` bleibt d
 
 ## Optionale Metadaten im Bibliotheksvertrag
 
-Schema 13 kennt weiterhin einen optionalen `metadata`-Knoten:
+Schema 16 kennt weiterhin einen optionalen `metadata`-Knoten:
 
 ```xml
 <metadata name="Xerces-C++"
