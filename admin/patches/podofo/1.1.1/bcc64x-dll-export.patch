@@ -1,0 +1,16 @@
+diff --git a/src/podofo/auxiliary/basedefs.h b/src/podofo/auxiliary/basedefs.h
+--- a/src/podofo/auxiliary/basedefs.h
++++ b/src/podofo/auxiliary/basedefs.h
+@@ -42,7 +42,11 @@
+ #define PODOFO_IMPORT
+ 
+ #else // PODOFO_SHARED
+-#if defined(_MSC_VER)
++#if defined(__clang__) && defined(__BORLANDC__) && defined(_WIN32)
++    #define PODOFO_EXPORT __declspec(dllexport)
++    #define PODOFO_IMPORT __declspec(dllimport)
++    #define PODOFO_DEPRECATED __attribute__((__deprecated__))
++#elif defined(_MSC_VER)
+     #define PODOFO_EXPORT __declspec(dllexport)
+     #define PODOFO_IMPORT __declspec(dllimport)
+     #define PODOFO_DEPRECATED
