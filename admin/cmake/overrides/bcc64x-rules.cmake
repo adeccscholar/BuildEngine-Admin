@@ -8,6 +8,15 @@
 # after its builtin compiler/platform modules, but before compiler checks are
 # used. Therefore these settings also apply to try_compile().
 
+# HARD TOOLCHAIN POLICY
+# ---------------------
+# BCC64X builds must ALWAYS use the dynamic runtime library. Static runtime
+# linkage is forbidden for executables, shared libraries, and modules.
+# The policy is required for a single C++ runtime/allocator domain across DLL
+# boundaries and is enforced below through -tR plus configure-time assertions.
+set(BUILDENGINE_BCC64X_RUNTIME_POLICY "dynamic-only"
+   CACHE INTERNAL "BuildEngine BCC64X runtime policy" FORCE)
+
 get_property(_BCC64X_RULES_SUMMARY_EMITTED GLOBAL PROPERTY ADECC_BCC64X_RULES_SUMMARY_EMITTED)
 if(NOT _BCC64X_RULES_SUMMARY_EMITTED)
    message(STATUS "Applying BCC64X make-rules override: ${CMAKE_CURRENT_LIST_FILE}")
@@ -170,6 +179,25 @@ set(CMAKE_C_CREATE_SHARED_MODULE
    "<CMAKE_C_COMPILER> --rsp-quoting=windows -tD -tR -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES>")
 set(CMAKE_CXX_CREATE_SHARED_MODULE
    "<CMAKE_CXX_COMPILER> --rsp-quoting=windows -tD -tR -o<TARGET> <LINK_FLAGS> <FLAGS> <OBJECTS> \"${BCC64X_UCRT_COMPAT_LIBRARY}\" <LINK_LIBRARIES>")
+
+# Enforce the dynamic-runtime policy as a configuration invariant. Do not
+# silently fall back to the BCC64X default static RTL if a rule is edited later.
+foreach(_bcc64x_dynamic_rtl_var
+   CMAKE_C_CREATE_WIN32_EXE
+   CMAKE_CXX_CREATE_WIN32_EXE
+   CMAKE_C_CREATE_CONSOLE_EXE
+   CMAKE_CXX_CREATE_CONSOLE_EXE
+   CMAKE_C_CREATE_SHARED_LIBRARY
+   CMAKE_CXX_CREATE_SHARED_LIBRARY
+   CMAKE_C_CREATE_SHARED_MODULE
+   CMAKE_CXX_CREATE_SHARED_MODULE)
+   if(NOT DEFINED ${_bcc64x_dynamic_rtl_var} OR
+      NOT "${${_bcc64x_dynamic_rtl_var}}" MATCHES "(^|[ ;])-tR([ ;]|$)")
+      message(FATAL_ERROR
+         "BuildEngine BCC64X policy violation: ${_bcc64x_dynamic_rtl_var} must use the dynamic RTL (-tR). Static RTL linkage is forbidden.")
+   endif()
+endforeach()
+unset(_bcc64x_dynamic_rtl_var)
 
 # Windows resource compiler.
 #
