@@ -1,0 +1,453 @@
+diff --git a/test/unit/CMakeLists.txt b/test/unit/CMakeLists.txt
+--- a/test/unit/CMakeLists.txt
++++ b/test/unit/CMakeLists.txt
+@@ -1,23 +1,38 @@
+-file(GLOB SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "[^.]*.h" "[^.]*.cpp")
+-source_group("" FILES ${SOURCE_FILES})
+-
+-include_directories(
+-    ${Fontconfig_INCLUDE_DIRS}
+-    ${FREETYPE_INCLUDE_DIRS}
+-    ${CMAKE_CURRENT_BINARY_DIR}
+-)
+-
+-# repeat for each test
+-add_executable(podofo-unit ${SOURCE_FILES})
+-target_link_libraries(podofo-unit
+-    podofo_test
+-    OpenSSL::Crypto
+-    ${PODOFO_LIBRARIES}
+-    podofo_private
+-    podofo_3rdparty
+-)
+-add_compile_options(${PODOFO_CFLAGS})
+-
+-include(CTest)
+-include(Catch)
+-catch_discover_tests(podofo-unit)
++file(GLOB SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "[^.]*.h" "[^.]*.cpp")
++source_group("" FILES ${SOURCE_FILES})
++
++# White-box tests need the internal archives. Keep XMP tests isolated when
++# building a shared PoDoFo library, so they use DLL public exports only.
++if(PODOFO_BUILD_SHARED)
++    list(REMOVE_ITEM SOURCE_FILES XMPTest.cpp)
++endif()
++
++include_directories(
++    ${Fontconfig_INCLUDE_DIRS}
++    ${FREETYPE_INCLUDE_DIRS}
++    ${CMAKE_CURRENT_BINARY_DIR}
++)
++
++# repeat for each test
++add_executable(podofo-unit ${SOURCE_FILES})
++target_link_libraries(podofo-unit
++    podofo_test
++    OpenSSL::Crypto
++    ${PODOFO_LIBRARIES}
++    podofo_private
++    podofo_3rdparty
++)
++add_compile_options(${PODOFO_CFLAGS})
++
++include(CTest)
++include(Catch)
++catch_discover_tests(podofo-unit)
++
++if(PODOFO_BUILD_SHARED)
++    add_executable(podofo-xmp-dll-tests main.cpp XMPTest.cpp)
++    target_link_libraries(podofo-xmp-dll-tests PRIVATE
++        podofo_test
++        podofo_shared
++    )
++    catch_discover_tests(podofo-xmp-dll-tests)
++endif()
+diff --git a/test/unit/XMPTest.cpp b/test/unit/XMPTest.cpp
+--- a/test/unit/XMPTest.cpp
++++ b/test/unit/XMPTest.cpp
+@@ -1,180 +1,204 @@
+-// SPDX-FileCopyrightText: 2022 Francesco Pretto <ceztko@gmail.com>
+-// SPDX-License-Identifier: MIT-0
+-
+-#include <PdfTest.h>
+-
+-#include <podofo/private/XMPUtils.h>
+-
+-using namespace std;
+-using namespace PoDoFo;
+-
+-static void TestNormalizeXMP(string_view filename)
+-{
+-    string sourceXmp;
+-    TestUtils::ReadTestInputFile(string(filename) + ".xml", sourceXmp);
+-
+-    auto packet = PdfXMPPacket::Create(sourceXmp);
+-    auto metadata = packet->GetMetadata();
+-    auto normalizedXmp = packet->ToString();
+-
+-    string expectedXmp;
+-    TestUtils::ReadTestInputFile(string(filename) + "-Expected.xml", expectedXmp);
+-
+-    REQUIRE(normalizedXmp == expectedXmp);
+-}
+-
+-TEST_CASE("TestAdditionalXMPMetatadata")
+-{
+-    string sourceXmp;
+-    TestUtils::ReadTestInputFile("TestXMP5.xml", sourceXmp);
+-
+-    auto packet = PdfXMPPacket::Create(sourceXmp);
+-    auto metadata = packet->GetMetadata();
+-
+-    REQUIRE(metadata.PdfaLevel == PdfALevel::L1B);
+-    REQUIRE(metadata.PdfuaLevel == PdfUALevel::L1);
+-    REQUIRE(*metadata.GetMetadata(PdfAdditionalMetadata::PdfAIdCorr) == "2:2011");
+-}
+-
+-TEST_CASE("TestNormalizeXMP")
+-{
+-    TestNormalizeXMP("TestXMP1");
+-    TestNormalizeXMP("TestXMP5");
+-    TestNormalizeXMP("TestXMP7");
+-}
+-
+-TEST_CASE("TestPDFA1_PDFUA1")
+-{
+-    PdfMemDocument doc;
+-    doc.Load(TestUtils::GetTestInputFilePath("blank-pdfa.pdf"));
+-    doc.GetMetadata().SetPdfUALevel(PdfUALevel::L1);
+-    doc.Save(TestUtils::GetTestOutputFilePath("TestPDFA1_PDFUA1.pdf"));
+-}
+-
+-#ifdef PODOFO_HAVE_RNG_VALIDATION_RECOVERY
+-
+-TEST_CASE("TestPruneInvalid")
+-{
+-    struct FailedProp
+-    {
+-        string Name;
+-        bool IsDuplicated;
+-        bool HasInvalidPrefix;
+-    };
+-
+-    vector<FailedProp> warnings;
+-    auto reportWarnings = [&warnings](const PdfXMPProperty& prop) {
+-        warnings.push_back(FailedProp{ prop.GetPrefixedName(),
+-            prop.IsDuplicated(), prop.HasInvalidPrefix() });
+-    };
+-
+-    string xmp;
+-    TestUtils::ReadTestInputFile("TestXMP1.xml", xmp);
+-
+-    auto packet = PdfXMPPacket::Create(xmp);
+-    packet->PruneAndValidate(PdfALevel::L1B, reportWarnings);
+-    REQUIRE(warnings.size() == 0);
+-    warnings.clear();
+-    packet = PdfXMPPacket::Create(xmp);
+-    packet->PruneAndValidate(PdfALevel::L2B, reportWarnings);
+-    REQUIRE(warnings.size() == 0);
+-    warnings.clear();
+-    packet = PdfXMPPacket::Create(xmp);
+-    packet->PruneAndValidate(PdfALevel::L4, reportWarnings);
+-    REQUIRE(warnings.size() == 0);
+-
+-    xmp.clear();
+-    TestUtils::ReadTestInputFile("TestXMP1_PDFA4.xml", xmp);
+-
+-    warnings.clear();
+-    packet = PdfXMPPacket::Create(xmp);
+-    packet->PruneAndValidate(PdfALevel::L1B, reportWarnings);
+-    REQUIRE(warnings.size() == 1);
+-    warnings.clear();
+-    packet = PdfXMPPacket::Create(xmp);
+-    packet->PruneAndValidate(PdfALevel::L2B, reportWarnings);
+-    REQUIRE(warnings.size() == 1);
+-    warnings.clear();
+-    packet = PdfXMPPacket::Create(xmp);
+-    packet->PruneAndValidate(PdfALevel::L4, reportWarnings);
+-    REQUIRE(warnings.size() == 0);
+-
+-    xmp.clear();
+-    TestUtils::ReadTestInputFile("TestXMP1_PDFA4_Invalid1.xml", xmp);
+-    packet = PdfXMPPacket::Create(xmp);
+-    packet->PruneAndValidate(PdfALevel::L4, reportWarnings);
+-    REQUIRE(warnings.size() == 1);
+-    REQUIRE(warnings[0].Name == "pdf:Trapped");
+-    REQUIRE(warnings[0].IsDuplicated);
+-
+-    xmp.clear();
+-    TestUtils::ReadTestInputFile("TestXMP1_PDFA4_Invalid2.xml", xmp);
+-    warnings.clear();
+-    packet = PdfXMPPacket::Create(xmp);
+-    packet->PruneAndValidate(PdfALevel::L4, reportWarnings);
+-    REQUIRE(warnings.size() == 2);
+-    REQUIRE(warnings[0].Name == "mypdfaid:part");
+-    REQUIRE(warnings[0].HasInvalidPrefix);
+-
+-    xmp.clear();
+-    TestUtils::ReadTestInputFile("TestXMP8.xml", xmp);
+-    warnings.clear();
+-    packet = PdfXMPPacket::Create(xmp);
+-    packet->PruneAndValidate(PdfALevel::L2B, reportWarnings);
+-    REQUIRE(warnings.size() == 0);
+-
+-    string expectedXmp;
+-    TestUtils::ReadTestInputFile("TestXMP8-Expected.xml", expectedXmp);
+-    packet->ToString(xmp);
+-    REQUIRE(xmp == expectedXmp);
+-}
+-
+-static void testPruneInvalid(const fs::path& path, PdfALevel level, const fs::path& refFolder, charbuff& buff1, charbuff& buff2);
+-
+-TEST_CASE("TestPruneInvalidDataset")
+-{
+-    charbuff buff1;
+-    charbuff buff2;
+-    auto srcPath = TestUtils::GetTestInputPath() / "XMP";
+-    auto refPath = TestUtils::GetTestOutputPath() / "XMP" / "Ref";
+-    fs::create_directories(refPath);
+-    for (const auto& entry : fs::directory_iterator(TestUtils::GetTestInputFilePath("XMP")))
+-    {
+-        testPruneInvalid(entry.path(), PdfALevel::L1B, refPath, buff1, buff2);
+-        testPruneInvalid(entry.path(), PdfALevel::L2B, refPath, buff1, buff2);
+-    }
+-}
+-
+-void testPruneInvalid(const fs::path& path, PdfALevel level, const fs::path& refFolder, charbuff& buff1, charbuff& buff2)
+-{
+-    if (path.filename() == "Ref")
+-        return;
+-
+-    utls::ReadTo(buff1, path.u8string());
+-    auto packet = PdfXMPPacket::Create(buff1);
+-    constexpr bool WriteNormalized = false;
+-    if (WriteNormalized)
+-    {
+-        auto normalizedPath = refFolder / path.stem().u8string().append("_Normalized").append(".xmp");
+-        buff1.clear();
+-        packet->ToString(buff1);
+-        utls::WriteTo(normalizedPath.u8string(), buff1);
+-    }
+-
+-    packet->PruneAndValidate(level);
+-    buff1.clear();
+-    packet->ToString(buff1);
+-
+-    auto refPath = refFolder / path.stem().u8string().append("_").append(PoDoFo::ToString(level)).append(".xmp");
+-    if (fs::exists(refPath))
+-    {
+-        utls::ReadTo(buff2, refPath.u8string());
+-        REQUIRE(buff1 == buff2);
+-    }
+-    else
+-    {
+-        utls::WriteTo(refPath.u8string(), buff1);
+-    }
+-}
+-
+-#endif // PODOFO_HAVE_RNG_VALIDATION_RECOVERY
++// SPDX-FileCopyrightText: 2022 Francesco Pretto <ceztko@gmail.com>
++// SPDX-License-Identifier: MIT-0
++
++#include <PdfTest.h>
++
++#include <fstream>
++#include <iterator>
++#include <stdexcept>
++
++using namespace std;
++using namespace PoDoFo;
++
++static void ReadXMPFile(charbuff& buffer, const fs::path& path)
++{
++    ifstream stream(path, ios::binary);
++    if (!stream)
++        throw runtime_error("Cannot read XMP test file");
++
++    buffer.assign(istreambuf_iterator<char>(stream), istreambuf_iterator<char>());
++    if (stream.bad())
++        throw runtime_error("Error reading XMP test file");
++}
++
++static void WriteXMPFile(const fs::path& path, const charbuff& buffer)
++{
++    ofstream stream(path, ios::binary);
++    if (!stream)
++        throw runtime_error("Cannot create XMP test reference file");
++
++    stream.write(buffer.data(), static_cast<streamsize>(buffer.size()));
++    if (!stream)
++        throw runtime_error("Error writing XMP test reference file");
++}
++
++static void TestNormalizeXMP(string_view filename)
++{
++    string sourceXmp;
++    TestUtils::ReadTestInputFile(string(filename) + ".xml", sourceXmp);
++
++    auto packet = PdfXMPPacket::Create(sourceXmp);
++    auto metadata = packet->GetMetadata();
++    auto normalizedXmp = packet->ToString();
++
++    string expectedXmp;
++    TestUtils::ReadTestInputFile(string(filename) + "-Expected.xml", expectedXmp);
++
++    REQUIRE(normalizedXmp == expectedXmp);
++}
++
++TEST_CASE("TestAdditionalXMPMetatadata")
++{
++    string sourceXmp;
++    TestUtils::ReadTestInputFile("TestXMP5.xml", sourceXmp);
++
++    auto packet = PdfXMPPacket::Create(sourceXmp);
++    auto metadata = packet->GetMetadata();
++
++    REQUIRE(metadata.PdfaLevel == PdfALevel::L1B);
++    REQUIRE(metadata.PdfuaLevel == PdfUALevel::L1);
++    REQUIRE(*metadata.GetMetadata(PdfAdditionalMetadata::PdfAIdCorr) == "2:2011");
++}
++
++TEST_CASE("TestNormalizeXMP")
++{
++    TestNormalizeXMP("TestXMP1");
++    TestNormalizeXMP("TestXMP5");
++    TestNormalizeXMP("TestXMP7");
++}
++
++TEST_CASE("TestPDFA1_PDFUA1")
++{
++    PdfMemDocument doc;
++    doc.Load(TestUtils::GetTestInputFilePath("blank-pdfa.pdf"));
++    doc.GetMetadata().SetPdfUALevel(PdfUALevel::L1);
++    doc.Save(TestUtils::GetTestOutputFilePath("TestPDFA1_PDFUA1.pdf"));
++}
++
++#ifdef PODOFO_HAVE_RNG_VALIDATION_RECOVERY
++
++TEST_CASE("TestPruneInvalid")
++{
++    struct FailedProp
++    {
++        string Name;
++        bool IsDuplicated;
++        bool HasInvalidPrefix;
++    };
++
++    vector<FailedProp> warnings;
++    auto reportWarnings = [&warnings](const PdfXMPProperty& prop) {
++        warnings.push_back(FailedProp{ prop.GetPrefixedName(),
++            prop.IsDuplicated(), prop.HasInvalidPrefix() });
++    };
++
++    string xmp;
++    TestUtils::ReadTestInputFile("TestXMP1.xml", xmp);
++
++    auto packet = PdfXMPPacket::Create(xmp);
++    packet->PruneAndValidate(PdfALevel::L1B, reportWarnings);
++    REQUIRE(warnings.size() == 0);
++    warnings.clear();
++    packet = PdfXMPPacket::Create(xmp);
++    packet->PruneAndValidate(PdfALevel::L2B, reportWarnings);
++    REQUIRE(warnings.size() == 0);
++    warnings.clear();
++    packet = PdfXMPPacket::Create(xmp);
++    packet->PruneAndValidate(PdfALevel::L4, reportWarnings);
++    REQUIRE(warnings.size() == 0);
++
++    xmp.clear();
++    TestUtils::ReadTestInputFile("TestXMP1_PDFA4.xml", xmp);
++
++    warnings.clear();
++    packet = PdfXMPPacket::Create(xmp);
++    packet->PruneAndValidate(PdfALevel::L1B, reportWarnings);
++    REQUIRE(warnings.size() == 1);
++    warnings.clear();
++    packet = PdfXMPPacket::Create(xmp);
++    packet->PruneAndValidate(PdfALevel::L2B, reportWarnings);
++    REQUIRE(warnings.size() == 1);
++    warnings.clear();
++    packet = PdfXMPPacket::Create(xmp);
++    packet->PruneAndValidate(PdfALevel::L4, reportWarnings);
++    REQUIRE(warnings.size() == 0);
++
++    xmp.clear();
++    TestUtils::ReadTestInputFile("TestXMP1_PDFA4_Invalid1.xml", xmp);
++    packet = PdfXMPPacket::Create(xmp);
++    packet->PruneAndValidate(PdfALevel::L4, reportWarnings);
++    REQUIRE(warnings.size() == 1);
++    REQUIRE(warnings[0].Name == "pdf:Trapped");
++    REQUIRE(warnings[0].IsDuplicated);
++
++    xmp.clear();
++    TestUtils::ReadTestInputFile("TestXMP1_PDFA4_Invalid2.xml", xmp);
++    warnings.clear();
++    packet = PdfXMPPacket::Create(xmp);
++    packet->PruneAndValidate(PdfALevel::L4, reportWarnings);
++    REQUIRE(warnings.size() == 2);
++    REQUIRE(warnings[0].Name == "mypdfaid:part");
++    REQUIRE(warnings[0].HasInvalidPrefix);
++
++    xmp.clear();
++    TestUtils::ReadTestInputFile("TestXMP8.xml", xmp);
++    warnings.clear();
++    packet = PdfXMPPacket::Create(xmp);
++    packet->PruneAndValidate(PdfALevel::L2B, reportWarnings);
++    REQUIRE(warnings.size() == 0);
++
++    string expectedXmp;
++    TestUtils::ReadTestInputFile("TestXMP8-Expected.xml", expectedXmp);
++    packet->ToString(xmp);
++    REQUIRE(xmp == expectedXmp);
++}
++
++static void testPruneInvalid(const fs::path& path, PdfALevel level, const fs::path& refFolder, charbuff& buff1, charbuff& buff2);
++
++TEST_CASE("TestPruneInvalidDataset")
++{
++    charbuff buff1;
++    charbuff buff2;
++    auto srcPath = TestUtils::GetTestInputPath() / "XMP";
++    auto refPath = TestUtils::GetTestOutputPath() / "XMP" / "Ref";
++    fs::create_directories(refPath);
++    for (const auto& entry : fs::directory_iterator(TestUtils::GetTestInputFilePath("XMP")))
++    {
++        testPruneInvalid(entry.path(), PdfALevel::L1B, refPath, buff1, buff2);
++        testPruneInvalid(entry.path(), PdfALevel::L2B, refPath, buff1, buff2);
++    }
++}
++
++void testPruneInvalid(const fs::path& path, PdfALevel level, const fs::path& refFolder, charbuff& buff1, charbuff& buff2)
++{
++    if (path.filename() == "Ref")
++        return;
++
++    ReadXMPFile(buff1, path);
++    auto packet = PdfXMPPacket::Create(buff1);
++    constexpr bool WriteNormalized = false;
++    if (WriteNormalized)
++    {
++        auto normalizedPath = refFolder / path.stem().u8string().append("_Normalized").append(".xmp");
++        buff1.clear();
++        packet->ToString(buff1);
++        WriteXMPFile(normalizedPath, buff1);
++    }
++
++    packet->PruneAndValidate(level);
++    buff1.clear();
++    packet->ToString(buff1);
++
++    auto refPath = refFolder / path.stem().u8string().append("_").append(PoDoFo::ToString(level)).append(".xmp");
++    if (fs::exists(refPath))
++    {
++        ReadXMPFile(buff2, refPath);
++        REQUIRE(buff1 == buff2);
++    }
++    else
++    {
++        WriteXMPFile(refPath, buff1);
++    }
++}
++
++#endif // PODOFO_HAVE_RNG_VALIDATION_RECOVERY
