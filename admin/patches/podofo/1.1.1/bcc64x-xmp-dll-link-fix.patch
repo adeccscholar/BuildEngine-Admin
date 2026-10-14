@@ -1,0 +1,116 @@
+diff --git a/test/unit/CMakeLists.txt b/test/unit/CMakeLists.txt
+--- a/test/unit/CMakeLists.txt
++++ b/test/unit/CMakeLists.txt
+@@ -29,10 +29,8 @@
+ catch_discover_tests(podofo-unit)
+ 
+ if(PODOFO_BUILD_SHARED)
+-    add_executable(podofo-xmp-dll-tests main.cpp XMPTest.cpp)
+-    target_link_libraries(podofo-xmp-dll-tests PRIVATE
+-        podofo_test
+-        podofo_shared
+-    )
++    add_executable(podofo-xmp-dll-tests
++        main.cpp XMPTest.cpp dll-test-support/XMPDllTestSupport.cpp)
++    target_link_libraries(podofo-xmp-dll-tests PRIVATE podofo_shared)
+     catch_discover_tests(podofo-xmp-dll-tests)
+ endif()
+diff --git a/test/unit/dll-test-support/XMPDllTestSupport.cpp b/test/unit/dll-test-support/XMPDllTestSupport.cpp
+new file mode 100644
+--- /dev/null
++++ b/test/unit/dll-test-support/XMPDllTestSupport.cpp
+@@ -0,0 +1,94 @@
++// SPDX-FileCopyrightText: 2026 adecc Systemhaus GmbH
++// SPDX-License-Identifier: MIT-0
++// Minimal test helpers; no linkage against podofo_test or private archives.
++
++#include <PdfTest.h>
++
++#include <cstdlib>
++#include <fstream>
++#include <iterator>
++#include <stdexcept>
++
++using namespace std;
++using namespace PoDoFo;
++
++namespace
++{
++    struct TestPaths
++    {
++        TestPaths()
++            : Input(PDF_TEST_RESOURCE_PATH), Output(PDF_TEST_OUTPUT_PATH)
++        {
++            const char* configured = std::getenv("PODOFO_TEST_OUTPUT_PATH");
++            if (configured != nullptr && *configured != '\0')
++                Output = fs::u8path(configured);
++        }
++
++        fs::path Input;
++        fs::path Output;
++    };
++
++    const TestPaths& getPaths()
++    {
++        static const TestPaths paths;
++        return paths;
++    }
++
++    void readFile(const fs::path& path, string& content)
++    {
++        ifstream stream(path, ios::binary);
++        if (!stream)
++            throw runtime_error("Cannot open XMP input file");
++
++        content.assign(istreambuf_iterator<char>(stream), istreambuf_iterator<char>());
++        if (stream.bad())
++            throw runtime_error("Cannot read XMP input file");
++    }
++
++    void writeFile(const fs::path& path, string_view content)
++    {
++        ofstream stream(path, ios::binary);
++        if (!stream)
++            throw runtime_error("Cannot open XMP output file");
++
++        stream.write(content.data(), static_cast<streamsize>(content.size()));
++        if (!stream)
++            throw runtime_error("Cannot write XMP output file");
++    }
++}
++
++void utls::CombinePaths(fs::path& path, initializer_list<string_view> paths)
++{
++    for (auto part : paths)
++        path /= fs::u8path(part);
++}
++
++string TestUtils::GetTestInputFilePath(const string_view& name)
++{
++    return (getPaths().Input / fs::u8path(name)).u8string();
++}
++
++string TestUtils::GetTestOutputFilePath(const string_view& name)
++{
++    return (getPaths().Output / fs::u8path(name)).u8string();
++}
++
++const fs::path& TestUtils::GetTestInputPath()
++{
++    return getPaths().Input;
++}
++
++const fs::path& TestUtils::GetTestOutputPath()
++{
++    return getPaths().Output;
++}
++
++void TestUtils::ReadTestInputFile(const string_view& name, string& content)
++{
++    readFile(getPaths().Input / fs::u8path(name), content);
++}
++
++void TestUtils::WriteTestOutputFile(const string_view& name, const string_view& content)
++{
++    writeFile(getPaths().Output / fs::u8path(name), content);
++}
