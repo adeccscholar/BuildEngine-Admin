@@ -7492,7 +7492,7 @@
    </library>
 
 
-   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-10-14T03:35:00Z">
+   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-10-14T03:50:00Z">
       <dependency library="pugixml" version="1.16"/>
       <dependency library="libzip" version="1.11.4"/>
       <dependency library="boost" version="1.92.0"/>
@@ -7551,6 +7551,8 @@
          <argument value="-DCMAKE_PREFIX_PATH:STRING={InstallRoot}\packages\boost\1.92.0\lib\win64\{Configuration}\cmake\boost_nowide-1.92.0-shared;{InstallRoot}\packages\boost\1.92.0\lib\win64\{Configuration}\cmake;{InstallRoot}\packages\pugixml\1.16\lib\win64\{Configuration}\cmake;{InstallRoot}\packages\libzip\1.11.4\lib\win64\{Configuration}\cmake"/>
          <argument value="-Dboost_nowide_DIR:PATH={InstallRoot}\packages\boost\1.92.0\lib\win64\{Configuration}\cmake\boost_nowide-1.92.0-shared"/>
          <argument value="-DBoost_DIR:PATH={InstallRoot}\packages\boost\1.92.0\lib\win64\{Configuration}\cmake\Boost-1.92.0"/>
+         <argument value="-DLibZip_DIR:PATH={InstallRoot}\packages\libzip\1.11.4\lib\win64\{Configuration}\cmake\libzip"/>
+         <argument value="-Dpugixml_DIR:PATH={InstallRoot}\packages\pugixml\1.16\lib\win64\{Configuration}\cmake\pugixml"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\OpenXLSX-{LibraryVersion}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}"
