@@ -7492,7 +7492,7 @@
    </library>
 
 
-   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-10-14T03:50:00Z">
+   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-10-14T04:00:00Z">
       <dependency library="pugixml" version="1.16"/>
       <dependency library="libzip" version="1.11.4"/>
       <dependency library="boost" version="1.92.0"/>
@@ -7593,6 +7593,16 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
-   </library>
-
-</buildLibraries>
+         <smoke id="consumer" source="smokes\openxlsx\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="openxlsx-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\openxlsx\0.5.1\bin\win64\Release;{InstallRoot}\packages\boost\1.92.0\bin\win64\Release;{InstallRoot}\packages\libzip\1.11.4\bin\win64\Release;{InstallRoot}\packages\pugixml\1.16\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-DOpenXLSX_DIR:PATH={InstallRoot}\packages\openxlsx\0.5.1\lib\win64\Release\cmake\OpenXLSX"/>
+         <argument value="-DBoost_DIR:PATH={InstallRoot}\packages\boost\1.92.0\lib\win64\Release\cmake\Boost-1.92.0"/>
+         <argument value="-DLibZip_DIR:PATH={InstallRoot}\packages\libzip\1.11.4\lib\win64\Release\cmake\libzip"/>
+         <argument value="-Dpugixml_DIR:PATH={InstallRoot}\packages\pugixml\1.16\lib\win64\Release\cmake\pugixml"/>
+      </smoke>
+   </library>/buildLibraries>
