@@ -7030,7 +7030,7 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-09-25T07:45:00Z">
+   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-10-14T18:30:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="freetype" version="2.14.3"/>
@@ -7122,6 +7122,23 @@
          <execute name="test-output-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-output-isolation.patch"/>
+         </execute>
+         <!-- In shared builds, XMP tests use the DLL without re-linking internal archives.
+              The existing upstream tests retain their original private-library access. -->
+         <copy source="{BuildFileDir}\patches\podofo\1.1.1\bcc64x-xmp-dll-boundary.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-boundary.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="xmp-dll-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-boundary.patch"/>
+         </execute>
+         <execute name="xmp-dll-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-boundary.patch"/>
+         </execute>
+         <execute name="xmp-dll-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-boundary.patch"/>
          </execute>
          <copy source="{BuildFileDir}\patches\podofo\1.1.1\bcc64x-dll-export.patch"
                target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export.patch"
