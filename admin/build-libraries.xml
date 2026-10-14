@@ -7511,7 +7511,7 @@
                    archive="openxlsx-{LibraryVersion}.tar.gz"/>
          <extract format="libarchive" root="OpenXLSX-{LibraryVersion}">
             <require path="CMakeLists.txt"/>
-            <require path="LICENSE"/>
+            <require path="LICENSE.md"/>
             <require path="OpenXLSX\\CMakeLists.txt"/>
          </extract>
       </source>
@@ -7562,10 +7562,10 @@
                <copy source="{BuildRoot}\\stage\\packages\\{LibraryId}\\{LibraryVersion}\\Release\\include"
                      target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\include"
                      recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\\OpenXLSX-{LibraryVersion}\\LICENSE"
-                     target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\LICENSE"
+               <copy source="{Workspace}\\OpenXLSX-{LibraryVersion}\\LICENSE.md"
+                     target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\LICENSE.md"
                      overwrite="true"/>
-               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\LICENSE"/>
+               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\LICENSE.md"/>
             </common>
          </install>
       </build>
