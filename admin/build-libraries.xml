@@ -7605,4 +7605,5 @@
          <argument value="-DLibZip_DIR:PATH={InstallRoot}\packages\libzip\1.11.4\lib\win64\Release\cmake\libzip"/>
          <argument value="-Dpugixml_DIR:PATH={InstallRoot}\packages\pugixml\1.16\lib\win64\Release\cmake\pugixml"/>
       </smoke>
-   </library>/buildLibraries>
+   </library>
+</buildLibraries>
