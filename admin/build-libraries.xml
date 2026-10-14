@@ -7491,4 +7491,90 @@
       </publish>
    </library>
 
+
+   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-10-14T00:00:00Z">
+      <dependency library="pugixml" version="1.16"/>
+      <dependency library="libzip" version="1.11.4"/>
+      <dependency library="boost" version="1.92.0"/>
+      <metadata name="OpenXLSX" supplier="OpenXLSX project"
+                homepage="https://codeberg.org/lars_uffmann/OpenXLSX"
+                description="C++ library for reading and writing Office Open XML XLSX workbooks."
+                licenseSignal="green">
+         <license name="BSD-3-Clause" file="LICENSE"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/troldal/OpenXLSX.git" ref="v{LibraryVersion}"/>
+      </security>
+      <source>
+         <!-- Immutable upstream release tag; never fetch dependencies from CMake. -->
+         <download url="https://github.com/troldal/OpenXLSX/archive/refs/tags/v{LibraryVersion}.tar.gz"
+                   archive="openxlsx-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="OpenXLSX-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE"/>
+            <require path="OpenXLSX\\CMakeLists.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\\cmake\\toolchains\\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\\stage\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DOPENXLSX_CREATE_DOCS:BOOL=OFF"/>
+         <argument value="-DOPENXLSX_BUILD_SAMPLES:BOOL=OFF"/>
+         <argument value="-DOPENXLSX_BUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DOPENXLSX_BUILD_BENCHMARKS:BOOL=OFF"/>
+         <argument value="-DOPENXLSX_ENABLE_LIBZIP:BOOL=ON"/>
+         <argument value="-DOPENXLSX_NOWIDE_STANDALONE:BOOL=OFF"/>
+         <argument value="-DOPENXLSX_LOCAL_PACKAGES_ONLY:BOOL=ON"/>
+         <argument value="-DUSE_SYSTEM_LIBS:BOOL=ON"/>
+         <argument value="-DFETCH_DEPS_AUTO:BOOL=OFF"/>
+         <argument value="-DFORCE_FETCH_ALL:BOOL=OFF"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\\packages\\pugixml\\1.16;{InstallRoot}\\packages\\libzip\\1.11.4;{InstallRoot}\\packages\\boost\\1.92.0"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\\OpenXLSX-{LibraryVersion}"
+                build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+                build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}"
+                      build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
+               <copy source="{BuildRoot}\\stage\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}\\lib"
+                     target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\lib\\win64\\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\\stage\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}\\bin"
+                     target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\{Configuration}"
+                     recursive="true" overwrite="true" optional="true"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\\stage\\packages\\{LibraryId}\\{LibraryVersion}\\Release\\include"
+                     target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\include"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\\OpenXLSX-{LibraryVersion}\\LICENSE"
+                     target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\LICENSE"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\\cmake\\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\\win64\\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\\win64\\{Configuration}" target="bin" extensions=".dll" optional="true"/>
+         <cmake source="lib\\win64\\{Configuration}\\cmake" target="lib\\cmake" optional="true"/>
+      </publish>
+   </library>
+
 </buildLibraries>
