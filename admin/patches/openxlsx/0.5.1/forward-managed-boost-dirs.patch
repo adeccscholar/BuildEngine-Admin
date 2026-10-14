@@ -1,13 +1,15 @@
 diff --git a/cmake/manage_dependency.cmake b/cmake/manage_dependency.cmake
 --- a/cmake/manage_dependency.cmake
 +++ b/cmake/manage_dependency.cmake
-@@ -431,7 +431,9 @@
+@@ -431,7 +431,11 @@
                  -D TEST_TARGET_NAME_SYSTEM=${ARG_TARGET_NAME_SYSTEM}
                  -D TEST_REQUIRED_TYPE=${REQUIRED_LIBRARY_TYPE}
                  -D TEST_FIND_LIBRARY_SUFFIXES="${FIND_LIBRARY_SUFFIXES}"
                  -D CMAKE_PREFIX_PATH=${PREFIX_ESCAPED}
 +                -D Boost_DIR=${Boost_DIR}
 +                -D boost_nowide_DIR=${boost_nowide_DIR}
++                -D LibZip_DIR=${LibZip_DIR}
++                -D pugixml_DIR=${pugixml_DIR}
                  ${PARAM_FIND_PACKAGE_VARIABLES}
                  --log-level ${TestPackage_LOG_LEVEL}
          RESULT_VARIABLE test_package_success
