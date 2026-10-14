@@ -12,7 +12,7 @@ namespace {
 void Check(bool condition, char const* name) {
    if (!condition)
       throw std::runtime_error(name);
-   std::cout << "SMOKE|CHECK|" << name << "|PASS\n";
+   std::cout << "SMOKE|CHECK|" << name << "|PASS|workbook roundtrip value verified\n";
 }
 }
 
