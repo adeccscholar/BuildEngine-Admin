@@ -26,7 +26,7 @@ int main() {
          auto sheet = document.workbook().worksheet("Sheet1");
          sheet.cell("A1").value() = "Caption";
          sheet.cell("B1").value() = "Amount";
-         sheet.cell("A2").value() = "Gr\xC3\xBC\xC3\x9Fe";
+         sheet.cell("A2").value() = "Gr\xC3\xBC\xC3\x9F" "e";
          sheet.cell("B2").value() = 42.125;
          sheet.cell("C2").value() = 123456;
          sheet.cell("D2").value() = true;
@@ -39,7 +39,7 @@ int main() {
          auto sheet = document.workbook().worksheet("Sheet1");
          Check(static_cast<std::string>(sheet.cell("A1").value()) == "Caption", "caption");
          Check(static_cast<std::string>(sheet.cell("B1").value()) == "Amount", "caption-2");
-         Check(static_cast<std::string>(sheet.cell("A2").value()) == "Gr\xC3\xBC\xC3\x9Fe", "unicode");
+         Check(static_cast<std::string>(sheet.cell("A2").value()) == "Gr\xC3\xBC\xC3\x9F" "e", "unicode");
          Check(std::abs(static_cast<double>(sheet.cell("B2").value()) - 42.125) < 1e-10, "decimal");
          Check(static_cast<int>(sheet.cell("C2").value()) == 123456, "integer");
          Check(static_cast<bool>(sheet.cell("D2").value()), "boolean");
