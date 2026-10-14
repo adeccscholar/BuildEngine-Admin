@@ -7556,7 +7556,7 @@
                      recursive="true" overwrite="true"/>
                <copy source="{BuildRoot}\\stage\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}\\bin"
                      target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\{Configuration}"
-                     recursive="true" overwrite="true" optional="true"/>
+                     recursive="true" overwrite="true"/>
             </perVariant>
             <common>
                <copy source="{BuildRoot}\\stage\\packages\\{LibraryId}\\{LibraryVersion}\\Release\\include"
