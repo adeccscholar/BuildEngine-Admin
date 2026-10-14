@@ -7492,7 +7492,7 @@
    </library>
 
 
-   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-10-14T03:20:00Z">
+   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-10-14T03:35:00Z">
       <dependency library="pugixml" version="1.16"/>
       <dependency library="libzip" version="1.11.4"/>
       <dependency library="boost" version="1.92.0"/>
@@ -7514,6 +7514,17 @@
             <require path="LICENSE.md"/>
             <require path="OpenXLSX\CMakeLists.txt"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\openxlsx\0.5.1\forward-managed-boost-dirs.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\forward-managed-boost-dirs.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="boost-dirs-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\forward-managed-boost-dirs.patch"/>
+         </execute>
+         <execute name="boost-dirs-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\forward-managed-boost-dirs.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
