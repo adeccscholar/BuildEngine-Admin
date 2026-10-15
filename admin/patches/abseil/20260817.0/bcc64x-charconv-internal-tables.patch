@@ -17,14 +17,14 @@ diff --git a/absl/strings/internal/charconv_bigint.h b/absl/strings/internal/cha
 +  return value;
 +}
 @@ -176,1 +184,1 @@
--kFiveToNth[kMaxSmallPowerOfFive]
-+SmallPowerOfFive(kMaxSmallPowerOfFive)
+-      MultiplyBy(kFiveToNth[kMaxSmallPowerOfFive]);
++      MultiplyBy(SmallPowerOfFive(kMaxSmallPowerOfFive));
 @@ -180,1 +188,1 @@
--kFiveToNth[n]
-+SmallPowerOfFive(n)
+-      MultiplyBy(kFiveToNth[n]);
++      MultiplyBy(SmallPowerOfFive(n));
 @@ -194,1 +202,1 @@
--kTenToNth[n]
-+SmallPowerOfTen(n)
+-      MultiplyBy(kTenToNth[n]);
++      MultiplyBy(SmallPowerOfTen(n));
 diff --git a/absl/strings/internal/charconv_bigint.cc b/absl/strings/internal/charconv_bigint.cc
 --- a/absl/strings/internal/charconv_bigint.cc
 +++ b/absl/strings/internal/charconv_bigint.cc
@@ -39,8 +39,8 @@ diff --git a/absl/strings/internal/charconv_bigint.cc b/absl/strings/internal/ch
 -};
 -
 @@ -261,1 +252,1 @@
--kTenToNth[kMaxSmallPowerOfTen]
-+SmallPowerOfTen(kMaxSmallPowerOfTen)
+-      MultiplyBy(kTenToNth[kMaxSmallPowerOfTen]);
++      MultiplyBy(SmallPowerOfTen(kMaxSmallPowerOfTen));
 @@ -268,1 +259,1 @@
--kTenToNth[digits_queued]
-+SmallPowerOfTen(digits_queued)
+-    MultiplyBy(kTenToNth[digits_queued]);
++    MultiplyBy(SmallPowerOfTen(digits_queued));
