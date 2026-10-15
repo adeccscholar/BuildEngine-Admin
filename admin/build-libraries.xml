@@ -7653,7 +7653,7 @@
       </smoke>
    </library>
    <library id="fast_float" version="8.2.3" category="data" timestamp="2026-10-15T12:53:00Z">
-      <metadata name="fast_float" supplier="fast_float authors" homepage="https://github.com/fastfloat/fast_float" description="High-performance C++ floating-point parser" licenseSignal="green">
+      <metadata name="fast_float" supplier="fast_float authors" homepage="https://github.com/fastfloat/fast_float" description="High-performance C++ floating-point parser" licenseSignal="yellow">
          <license name="MIT" spdx="MIT" file="licenses\fast_float\LICENSE-MIT"/>
       </metadata>
       <security><repository url="https://github.com/fastfloat/fast_float.git" ref="v8.2.3"/></security>
@@ -7720,7 +7720,7 @@
    </library>
 
    <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T12:53:00Z">
-      <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="green">
+      <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="yellow">
          <license name="Apache-2.0" spdx="Apache-2.0" file="licenses\abseil\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/abseil/abseil-cpp.git" ref="20260817.0"/></security>
@@ -7793,7 +7793,7 @@
    </library>
 
    <library id="lcms2" version="2.19.1" category="graphics" timestamp="2026-10-15T12:53:00Z">
-      <metadata name="lcms2" supplier="LittleCMS" homepage="https://github.com/mm2/Little-CMS" description="LittleCMS 2 ICC color-management engine (GPL plugins excluded)" licenseSignal="green">
+      <metadata name="lcms2" supplier="LittleCMS" homepage="https://github.com/mm2/Little-CMS" description="LittleCMS 2 ICC color-management engine (GPL plugins excluded)" licenseSignal="yellow">
          <license name="MIT" spdx="MIT" file="licenses\lcms2\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/mm2/Little-CMS.git" ref="lcms2.19.1"/></security>
@@ -7866,7 +7866,7 @@
    </library>
 
    <library id="openjpeg" version="2.5.4" category="graphics" timestamp="2026-10-15T12:53:00Z">
-      <metadata name="openjpeg" supplier="OpenJPEG developers" homepage="https://github.com/uclouvain/openjpeg" description="OpenJPEG JPEG 2000 encoder and decoder library" licenseSignal="green">
+      <metadata name="openjpeg" supplier="OpenJPEG developers" homepage="https://github.com/uclouvain/openjpeg" description="OpenJPEG JPEG 2000 encoder and decoder library" licenseSignal="yellow">
          <license name="BSD-2-Clause" spdx="BSD-2-Clause" file="licenses\openjpeg\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/uclouvain/openjpeg.git" ref="v2.5.4"/></security>
@@ -7936,7 +7936,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ENV:PATH}"/>
-         <argument value="-Dopenjpeg-2.5_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\openjpeg-2.5"/>
+         <argument value="-DOpenJPEG_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\openjpeg-2.5"/>
       </smoke>
    </library>
 </buildLibraries>
