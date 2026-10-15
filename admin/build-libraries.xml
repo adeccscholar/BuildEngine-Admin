@@ -1884,7 +1884,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-15T16:15:00Z">
+   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-15T16:56:00Z">
       <!-- First re-establish the historically verified curl baseline: TLS via
            OpenSSL plus zlib.  Brotli/Zstd remain built and published packages,
            but are re-enabled for curl only after this baseline is green. -->
@@ -1906,6 +1906,17 @@
             <require path="CMake\FindBrotli.cmake"/>
             <require path="CMake\FindZstd.cmake"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\curl\8.23.0\bcc64x-winsock-inline.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-winsock-inline.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="win-inline-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-winsock-inline.patch"/>
+         </execute>
+         <execute name="win-inline-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-winsock-inline.patch"/>
+         </execute>
       </source>
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -1922,6 +1933,7 @@
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILDENGINE_BCC64X_WINSDK_INLINE:BOOL=ON"/>
          <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
          <argument value="-DBUILD_CURL_EXE:BOOL=OFF"/>
          <argument value="-DBUILD_EXAMPLES:BOOL=OFF"/>
@@ -8214,7 +8226,7 @@
       </smoke>
    </library>
 
-   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T16:00:00Z">
+   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T16:56:00Z">
       <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="yellow">
          <license name="Apache-2.0" spdx="Apache-2.0" file="licenses\abseil\LICENSE"/>
       </metadata>
@@ -8259,6 +8271,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
