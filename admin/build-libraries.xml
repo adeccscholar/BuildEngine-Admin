@@ -7719,7 +7719,7 @@
       </smoke>
    </library>
 
-   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T12:53:00Z">
+   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T15:20:00Z">
       <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="yellow">
          <license name="Apache-2.0" spdx="Apache-2.0" file="licenses\abseil\LICENSE"/>
       </metadata>
@@ -7731,6 +7731,22 @@
             <require path="absl\strings\str_cat.h"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-win32-cctz.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-win32-cctz.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-win32-cctz.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-win32-cctz.patch"/>
+         </execute>
+         <execute name="patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-win32-cctz.patch"/>
+         </execute>
       </source>
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -7792,7 +7808,7 @@
       </smoke>
    </library>
 
-   <library id="lcms2" version="2.19.1" category="graphics" timestamp="2026-10-15T12:53:00Z">
+   <library id="lcms2" version="2.19.1" category="graphics" timestamp="2026-10-15T15:20:00Z">
       <metadata name="lcms2" supplier="LittleCMS" homepage="https://github.com/mm2/Little-CMS" description="LittleCMS 2 ICC color-management engine (GPL plugins excluded)" licenseSignal="yellow">
          <license name="MIT" spdx="MIT" file="licenses\lcms2\LICENSE"/>
       </metadata>
