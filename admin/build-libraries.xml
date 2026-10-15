@@ -470,7 +470,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="xz" version="5.8.3" category="compression" timestamp="2026-08-29T17:38:02Z">
+   <library id="xz" version="5.8.3" category="compression" timestamp="2026-10-16T00:56:00Z">
       <metadata description="Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma." licenseSignal="yellow"/>
       <source>
          <download url="https://github.com/tukaani-project/xz/releases/download/v{LibraryVersion}/xz-{LibraryVersion}.tar.gz" archive="xz-{LibraryVersion}.tar.gz" sha256="3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0"/>
@@ -484,6 +484,37 @@
             <require path="src\xz\main.c"/>
             <require path="tests\tests.cmake"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\xz\5.8.3\bcc64x-windres-package-name.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="windres-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch"/>
+         </execute>
+         <execute name="windres-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch"/>
+         </execute>
+         <execute name="windres-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch"/>
+         </execute>
+         <!-- BCC64X must emit liblzma.dll, not libliblzma.dll. -->
+         <copy source="{BuildFileDir}\patches\xz\5.8.3\bcc64x-liblzma-dll-name.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-liblzma-dll-name.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="dll-name-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-liblzma-dll-name.patch"/>
+         </execute>
+         <execute name="dll-name-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-liblzma-dll-name.patch"/>
+         </execute>
+         <execute name="dll-name-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-liblzma-dll-name.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -579,7 +610,7 @@
       </smoke>
    </library>
 
-<library id="xz" version="5.8.4" category="compression" timestamp="2026-10-15T21:30:00Z">
+<library id="xz" version="5.8.4" category="compression" timestamp="2026-10-16T00:56:00Z">
       <metadata description="Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma." licenseSignal="yellow"/>
       <source>
          <download url="https://github.com/tukaani-project/xz/releases/download/v{LibraryVersion}/xz-{LibraryVersion}.tar.gz" archive="xz-{LibraryVersion}.tar.gz" sha256="0014c7886930454fe8bd4228665b51af55eeae560ea135c9c4cd33f55b2591d9"/>
@@ -607,6 +638,22 @@
          <execute name="windres-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch"/>
+         </execute>
+         <!-- BCC64X must emit liblzma.dll, not libliblzma.dll. -->
+         <copy source="{BuildFileDir}\patches\xz\5.8.4\bcc64x-liblzma-dll-name.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-liblzma-dll-name.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="dll-name-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-liblzma-dll-name.patch"/>
+         </execute>
+         <execute name="dll-name-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-liblzma-dll-name.patch"/>
+         </execute>
+         <execute name="dll-name-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-liblzma-dll-name.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="true">
