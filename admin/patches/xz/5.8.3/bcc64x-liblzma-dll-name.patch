@@ -1,0 +1,14 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1627,3 +1627,10 @@
+     set_target_properties(liblzma PROPERTIES RUNTIME_OUTPUT_NAME "liblzma")
+ endif()
+ 
++# CMake's Windows-GNU platform may still add "lib" for BCC64X even though
++# the compiler is not MinGW. Avoid libliblzma.dll; retain the import prefix
++# and the upstream OUTPUT_NAME so the import library stays liblzma.lib.
++if(WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "Clang"
++   AND CMAKE_C_SIMULATE_ID STREQUAL "EMBT")
++    set_target_properties(liblzma PROPERTIES PREFIX "")
++endif()
