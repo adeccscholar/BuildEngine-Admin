@@ -8231,7 +8231,7 @@
       </smoke>
    </library>
 
-   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T19:10:00Z">
+   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T19:30:00Z">
       <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="yellow">
          <license name="Apache-2.0" spdx="Apache-2.0" file="licenses\abseil\LICENSE"/>
       </metadata>
@@ -8265,20 +8265,20 @@
             <argument value="apply"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-digits10.patch"/>
          </execute>
-         <copy source="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-charconv-internal-tables.patch"
-               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-internal-tables.patch"
+         <copy source="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-dll-import-export.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-import-export.patch"
                overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="tables-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--unidiff-zero"/><argument value="--check"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-internal-tables.patch"/>
+         <execute name="dll-import-export-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-import-export.patch"/>
          </execute>
-         <execute name="tables-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--unidiff-zero"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-internal-tables.patch"/>
+         <execute name="dll-import-export-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-import-export.patch"/>
          </execute>
-         <execute name="tables-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--unidiff-zero"/><argument value="--reverse"/><argument value="--check"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-internal-tables.patch"/>
+         <execute name="dll-import-export-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-import-export.patch"/>
          </execute>
          <execute name="digits10-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
@@ -8300,13 +8300,13 @@
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
-         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <argument value="-DABSL_BUILD_TESTING:BOOL=OFF"/>
          <argument value="-DABSL_BUILD_TEST_HELPERS:BOOL=OFF"/>
          <argument value="-DABSL_ENABLE_INSTALL:BOOL=ON"/>
          <argument value="-DABSL_PROPAGATE_CXX_STD:BOOL=ON"/>
-         <argument value="-DABSL_BUILD_MONOLITHIC_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DABSL_BUILD_MONOLITHIC_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DABSL_USE_GOOGLETEST_HEAD:BOOL=OFF"/>
          <argument value="-DCMAKE_CXX_STANDARD:STRING=20"/>
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
@@ -8328,6 +8328,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\absl\strings\str_cat.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\absl\abslConfig.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
                <copy source="{Workspace}\abseil-cpp-20260817.0\LICENSE"
@@ -8339,6 +8340,7 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
          <tree source="include" target="include" optional="false"/>
          <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="false"/>
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
       </publish>
       <smoke id="consumer" scope="package" source="smokes\abseil\consumer"
