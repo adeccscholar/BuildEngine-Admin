@@ -108,64 +108,6 @@
    </tool>
 
    <!--
-      MiKTeX is provisioned only when the effective documentation contract asks
-      for LaTeX/PDF output. A complete package set is installed deliberately:
-      Doxygen versions, Doxygen templates and user-authored LaTeX commands may
-      require packages which cannot be predicted reliably by BuildEngine.
-      Library PDF jobs keep automatic package installation disabled so that the
-      build itself never mutates the prepared toolchain.
-   -->
-   <tool id="miktex" version="25.12" required="when-used">
-      <managed root="miktex\25.12-portable" executable="texmfs\install\miktex\bin\x64\texify.exe">
-         <download url="https://mirrors.ibiblio.org/CTAN/systems/win32/miktex/setup/windows-x64/basic-miktex-25.12-x64.exe"
-                   archive="basic-miktex-25.12-x64.exe"
-                   sha256="14b42dd9f4b4a7813a8bfd69c8f99316c2888cc4ee26f631f397e163d85d6c62"/>
-         <extract executable="{Archive}">
-            <argument value="--portable={ManagedRoot}"/>
-            <argument value="--unattended"/>
-            <argument value="--no-registry"/>
-            <argument value="--no-additional-roots"/>
-            <argument value="--paper-size=A4"/>
-            <argument value="--package-set=complete"/>
-            <argument value="--remote-package-repository=https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
-         </extract>
-         <prepare marker=".buildengine\complete-package-set-v1.txt">
-            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
-               <argument value="packages"/><argument value="update-package-database"/>
-               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
-            </command>
-            <!--
-               Fresh installations already request package-set=complete above.
-               This command also promotes an existing managed Basic installation
-               to the complete package level when the preparation contract changes.
-            -->
-            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
-               <argument value="packages"/><argument value="upgrade"/>
-               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
-               <argument value="complete"/>
-            </command>
-            <!--
-               MiKTeX tracks an update check separately from package-database refresh
-               and package-level upgrade. Without this explicit check, every TeX
-               invocation reports the installation as never checked for updates.
-               Exit code 100 means that package updates are available and is a
-               successful result for this check operation.
-            -->
-            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
-               <argument value="packages"/><argument value="check-update"/>
-               <argument value="--repository"/><argument value="https://mirrors.ibiblio.org/pub/mirrors/CTAN/systems/win32/miktex/tm/packages/"/>
-               <success code="0"/>
-               <success code="100"/>
-            </command>
-            <command executable="texmfs\install\miktex\bin\x64\miktex.exe">
-               <argument value="fndb"/><argument value="refresh"/>
-            </command>
-         </prepare>
-      </managed>
-      <probe contains="MiKTeX"><argument value="--version"/></probe>
-   </tool>
-
-   <!--
       Graphviz is part of the reproducible documentation toolchain, not a BCC64X target artifact.
       The official Windows ZIP contains the complete tools/libraries/plugins/runtime tree below its
       package directory Graphviz-15.1.1-win64. BuildEngine's built-in ZIP extraction preserves that
