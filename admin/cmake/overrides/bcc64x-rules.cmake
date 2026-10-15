@@ -213,11 +213,17 @@ if(DEFINED ENV{CB_LLVM_RANLIB} AND NOT "$ENV{CB_LLVM_RANLIB}" STREQUAL "")
    set(CMAKE_RANLIB "$ENV{CB_LLVM_RANLIB}" CACHE FILEPATH "BCC64X llvm-ranlib" FORCE)
 endif()
 
+# llvm-ar 'q' appends members even when a member with the same name already
+# exists. With incremental Ninja builds, an existing archive would accumulate
+# repeated .o members and make LLD report duplicate symbols from the same
+# archive/object name. Remove the old archive before recreating it.
 if(CMAKE_AR)
    set(CMAKE_C_CREATE_STATIC_LIBRARY
+      "<CMAKE_COMMAND> -E rm -f <TARGET>"
       "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>"
       "<CMAKE_AR> s <TARGET>")
    set(CMAKE_CXX_CREATE_STATIC_LIBRARY
+      "<CMAKE_COMMAND> -E rm -f <TARGET>"
       "<CMAKE_AR> qc <TARGET> <LINK_FLAGS> <OBJECTS>"
       "<CMAKE_AR> s <TARGET>")
 endif()
