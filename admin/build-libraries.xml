@@ -793,7 +793,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="libarchive" version="3.8.9" category="archive" timestamp="2026-10-15T20:30:00Z">
+   <library id="libarchive" version="3.8.9" category="archive" timestamp="2026-10-15T21:00:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="xz" version="5.8.3"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -2035,7 +2035,7 @@
       </smoke>
    </library>
 
-   <library id="boost" version="1.92.0" category="foundation" timestamp="2026-10-15T20:30:00Z">
+   <library id="boost" version="1.92.0" category="foundation" timestamp="2026-10-15T21:00:00Z">
       <!--
          Canonical Boost model from the target-machine evidence:
          - one official upstream CMake source tree;
@@ -2380,7 +2380,7 @@
    deleted after the block has been copied into build-libraries.xml.
 -->
 
-<library id="ace" version="8.0.6" category="middleware" timestamp="2026-10-15T20:30:00Z">
+<library id="ace" version="8.0.6" category="middleware" timestamp="2026-10-15T21:00:00Z">
    <dependency library="openssl" version="3.5.9"/>
    <dependency library="xerces-c" version="3.3.0"/>
    <dependency library="zlib" version="1.3.2"/>
@@ -2620,7 +2620,7 @@
    
 </library>
 
-<library id="tao" version="4.0.6" category="middleware" timestamp="2026-10-15T20:30:00Z">
+<library id="tao" version="4.0.6" category="middleware" timestamp="2026-10-15T21:00:00Z">
    <extension library="ace" version="8.0.6" source="TAO" producer="ACE_wrappers" install=".">
       <shared path="bin"/>
       <shared path="lib"/>
@@ -3022,7 +3022,7 @@
       <smoke id="consumer" source="smokes\sqlite\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="sqlite-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-<library id="libpq" version="18.6" category="database" timestamp="2026-10-15T20:30:00Z">
+<library id="libpq" version="18.6" category="database" timestamp="2026-10-15T21:00:00Z">
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="zlib" version="1.3.2"/>
       <metadata name="PostgreSQL libpq" supplier="PostgreSQL Global Development Group" homepage="https://www.postgresql.org/" description="Official PostgreSQL C client library and wire-protocol access API." licenseSignal="green">
@@ -3186,7 +3186,7 @@
       </smoke>
    </library>
 
-   <library id="libpqxx" version="8.0.2" category="database" timestamp="2026-10-15T20:30:00Z">
+   <library id="libpqxx" version="8.0.2" category="database" timestamp="2026-10-15T21:00:00Z">
       <extension type="package" library="libpq" version="18.6"/>
       <metadata name="libpqxx" supplier="libpqxx project" homepage="https://pqxx.org/development/libpqxx/" description="Modern C++ client API for PostgreSQL built on the official libpq C client library." licenseSignal="green">
          <license name="BSD-3-Clause" file="COPYING"/>
@@ -7542,7 +7542,7 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-10-15T20:30:00Z">
+   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-10-15T21:00:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="freetype" version="2.14.3"/>
