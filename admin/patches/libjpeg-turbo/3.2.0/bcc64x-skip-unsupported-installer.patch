@@ -1,0 +1,16 @@
+diff --git a/cmakescripts/BuildPackages.cmake b/cmakescripts/BuildPackages.cmake
+--- a/cmakescripts/BuildPackages.cmake
++++ b/cmakescripts/BuildPackages.cmake
+@@ -69,9 +69,13 @@
+ ###############################################################################
+ # Windows installer (NullSoft Installer)
+ ###############################################################################
+ 
+-if(WIN32)
++# Installer import templates exist only for MSVC-compatible and MinGW builds.
++# BCC64X is neither, so generating its NSIS installer would otherwise try to
++# configure the nonexistent win/projectTargets-release.cmake.in.
++# Regular CMake install(EXPORT) targets remain available for all compilers.
++if(WIN32 AND (MSVC_LIKE OR MINGW))
+ 
+ if(MSVC_LIKE)
