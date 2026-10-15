@@ -1,0 +1,9 @@
+diff --git a/absl/strings/internal/charconv_bigint.h b/absl/strings/internal/charconv_bigint.h
+--- a/absl/strings/internal/charconv_bigint.h
++++ b/absl/strings/internal/charconv_bigint.h
+@@ -96,4 +96,4 @@
+-  static constexpr int Digits10() {
++  static consteval int Digits10() {
+     // 9975007/1035508 is very slightly less than log10(2**32).
+     return static_cast<uint64_t>(max_words) * 9975007 / 1035508;
+   }
