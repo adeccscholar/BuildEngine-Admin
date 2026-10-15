@@ -131,7 +131,7 @@
          <extract executable="{ENV:SystemRoot}\System32\WindowsPowerShell\v1.0\powershell.exe">
             <argument value="-NoProfile"/><argument value="-NonInteractive"/><argument value="-ExecutionPolicy"/><argument value="Bypass"/><argument value="-File"/>
             <argument value="{ProductionRoot}\admin\programs\web\install-web-asset.ps1"/>
-            <argument value="-Archive"/><argument value="{Archive}"/><argument value="-ManagedRoot"/>
+            <argument value="-Archive"/><argument value="{Archive}"/><argument value="-ManagedRoot"/><argument value="{ManagedRoot}"/>
             <argument value="-RelativePath"/><argument value="mermaid.min.js"/>
             <argument value="-AdditionalSource"/><argument value="{ProductionRoot}\admin\programs\web\mermaid.esm.min.mjs"/>
             <argument value="-AdditionalRelativePath"/><argument value="dist\mermaid.esm.min.mjs"/>
