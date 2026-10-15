@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.25)
+project(AbseilConsumer LANGUAGES CXX)
+find_package(absl CONFIG REQUIRED)
+add_executable(abseil-consumer main.cpp)
+set_property(TARGET abseil-consumer PROPERTY CXX_SCAN_FOR_MODULES OFF)
+target_compile_features(abseil-consumer PRIVATE cxx_std_23)
+target_link_libraries(abseil-consumer PRIVATE absl::strings)
