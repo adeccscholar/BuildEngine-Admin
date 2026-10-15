@@ -3,6 +3,7 @@
                     xsi:noNamespaceSchemaLocation="schemas/build-documentation.xsd"
                     schemaVersion="1"
                     doxygen="true"
+                    latex="false"
                     source="false"
                     inlineSource="false"
                     publicOnly="false">
