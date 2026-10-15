@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.25)
+project(OpenJpegConsumer LANGUAGES C)
+find_package(OpenJPEG CONFIG REQUIRED)
+add_executable(openjpeg-consumer main.c)
+target_link_libraries(openjpeg-consumer PRIVATE openjp2)
