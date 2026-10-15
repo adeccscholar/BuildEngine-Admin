@@ -8231,7 +8231,7 @@
       </smoke>
    </library>
 
-   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T19:30:00Z">
+   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T19:45:00Z">
       <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="yellow">
          <license name="Apache-2.0" spdx="Apache-2.0" file="licenses\abseil\LICENSE"/>
       </metadata>
@@ -8279,6 +8279,21 @@
          <execute name="dll-import-export-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-import-export.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-dll-export-all.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export-all.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="dll-export-all-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export-all.patch"/>
+         </execute>
+         <execute name="dll-export-all-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export-all.patch"/>
+         </execute>
+         <execute name="dll-export-all-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export-all.patch"/>
          </execute>
          <execute name="digits10-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
