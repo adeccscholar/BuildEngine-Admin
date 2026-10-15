@@ -1,0 +1,63 @@
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -1,16 +1,9 @@
+-function(ZLIB_findTestEnv testName)
+-    set(testEnv "PATH=")
+-
+-    if(MSVC OR MINGW)
+-        set(separator "\\\;")
+-    else()
+-        set(separator ":")
+-    endif()
+-
+-    string(APPEND testEnv "$<TARGET_FILE_DIR:ZLIB::ZLIB>${separator}")
+-    string(APPEND testEnv "$ENV{PATH}")
+-
+-    set_tests_properties(${testName} PROPERTIES ENVIRONMENT "${testEnv}")
+-endfunction()
++function(ZLIB_findTestEnv testName)
++    # CTest must resolve the DLL of the actual target under test.  In
++    # particular BCC64X is not MSVC or MinGW, and the inherited PATH alone
++    # does not necessarily contain the generated shared-library directory.
++    set_tests_properties(${testName} PROPERTIES ENVIRONMENT_MODIFICATION
++        "PATH=path_list_prepend:$<TARGET_FILE_DIR:ZLIB::ZLIB>")
++endfunction()
+ 
+ if(ZLIB_BUILD_SHARED)
+@@ -25,14 +18,7 @@
+     target_link_libraries(minigzip ZLIB::ZLIB)
+ 
+-    if(MSVC
+-       OR MSYS
+-       OR MINGW
+-       OR CYGWIN)
+-        zlib_findtestenv(zlib_example)
+-    endif(
+-        MSVC
+-        OR MSYS
+-        OR MINGW
+-        OR CYGWIN)
++    if(WIN32 OR MSYS OR CYGWIN)
++        zlib_findtestenv(zlib_example)
++    endif()
+ 
+     if(HAVE_OFF64_T)
+@@ -45,14 +31,7 @@
+         add_test(NAME zlib_example64 COMMAND zlib_example64)
+ 
+-        if(MSVC
+-           OR MSYS
+-           OR MINGW
+-           OR CYGWIN)
+-            zlib_findtestenv(zlib_example64)
+-        endif(
+-            MSVC
+-            OR MSYS
+-            OR MINGW
+-            OR CYGWIN)
++        if(WIN32 OR MSYS OR CYGWIN)
++            zlib_findtestenv(zlib_example64)
++        endif()
+     endif(HAVE_OFF64_T)
+ endif(ZLIB_BUILD_SHARED)
