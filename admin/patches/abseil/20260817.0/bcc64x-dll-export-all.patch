@@ -1,0 +1,19 @@
+diff --git a/CMake/AbseilDll.cmake b/CMake/AbseilDll.cmake
+--- a/CMake/AbseilDll.cmake
++++ b/CMake/AbseilDll.cmake
+@@ -874,8 +874,15 @@
+       $<$<BOOL:${MINGW}>:-ladvapi32>
+       $<$<BOOL:${MINGW}>:-ldbghelp>
+       $<$<BOOL:${MINGW}>:-lbcrypt>
+   )
++  # BCC64X uses Clang with the GNU-style LLD driver, not MSVC.
++  # CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not generate exports for this toolchain.
++  # Export all DLL symbols even when ABSL_DLL annotates selected symbols.
++  if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND
++     CMAKE_CXX_SIMULATE_ID STREQUAL "EMBT")
++    target_link_options(${_dll} PRIVATE "-Wl,--export-all-symbols")
++  endif()
+   set_target_properties(${_dll} PROPERTIES
+     LINKER_LANGUAGE "CXX"
+     SOVERSION ${ABSL_SOVERSION}
+   )
