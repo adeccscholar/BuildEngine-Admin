@@ -12,3 +12,4 @@ diff --git a/src/lcms2_internal.h b/src/lcms2_internal.h
  #   define cmsINLINE __inline
  #else
  #   define cmsINLINE static inline
+ #endif
