@@ -8226,7 +8226,7 @@
       </smoke>
    </library>
 
-   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T16:56:00Z">
+   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T18:11:00Z">
       <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="yellow">
          <license name="Apache-2.0" spdx="Apache-2.0" file="licenses\abseil\LICENSE"/>
       </metadata>
@@ -8258,6 +8258,10 @@
          </execute>
          <execute name="digits10-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-digits10.patch"/>
+         </execute>
+         <execute name="digits10-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-digits10.patch"/>
          </execute>
          <execute name="patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
