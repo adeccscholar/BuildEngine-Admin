@@ -588,9 +588,118 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="libzip" version="1.11.4" category="archive" timestamp="2026-08-29T22:45:00Z">
+
+<library id="xz" version="5.8.4" category="compression" timestamp="2026-10-15T21:30:00Z">
+      <metadata description="Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma." licenseSignal="yellow"/>
+      <source>
+         <download url="https://github.com/tukaani-project/xz/releases/download/v{LibraryVersion}/xz-{LibraryVersion}.tar.gz" archive="xz-{LibraryVersion}.tar.gz" sha256="0014c7886930454fe8bd4228665b51af55eeae560ea135c9c4cd33f55b2591d9"/>
+         <extract format="libarchive" root="xz-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="COPYING.0BSD"/>
+            <require path="COPYING.GPLv2"/>
+            <require path="src\liblzma\api\lzma.h"/>
+            <require path="src\liblzma\api\lzma\base.h"/>
+            <require path="src\xz\main.c"/>
+            <require path="tests\tests.cmake"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TESTING:BOOL={TestsEnabled}"/>
+         <!-- Matches XZ's own Windows CMake build guidance: translations are
+              disabled, while the full liblzma API, tools, docs, and tests remain. -->
+         <argument value="-DXZ_NLS:BOOL=OFF"/>
+         <argument value="-DXZ_DOC:BOOL=ON"/>
+         <argument value="-DXZ_TOOL_XZ:BOOL=ON"/>
+         <argument value="-DXZ_TOOL_XZDEC:BOOL=ON"/>
+         <argument value="-DXZ_TOOL_LZMADEC:BOOL=ON"/>
+         <argument value="-DXZ_TOOL_LZMAINFO:BOOL=ON"/>
+         <argument value="-DXZ_EXTERNAL_SHA256:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xz-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration};{ENV:PATH}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\liblzma.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\xz.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\xzdec.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\lzmadec.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\lzmainfo.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\liblzma.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-config-version.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-targets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\liblzma\liblzma-targets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\liblzma.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING.0BSD" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD" overwrite="true"/>
+               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING.GPLv2" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lzma.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lzma\base.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" source="smokes\xz\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xz-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+   <library id="libzip" version="1.11.4" category="archive" timestamp="2026-10-15T21:30:00Z">
       <dependency library="zlib" version="1.3.2"/>
-      <dependency library="xz" version="5.8.3"/>
+      <dependency library="xz" version="5.8.4"/>
       <dependency library="zstd" version="1.5.7"/>
       <metadata description="C library for reading, creating, and modifying ZIP archives." licenseSignal="green"/>
       <source>
@@ -628,8 +737,8 @@
          <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
          <argument value="-DENABLE_BZIP2:BOOL=OFF"/>
          <argument value="-DENABLE_LZMA:BOOL=ON"/>
-         <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={InstallRoot}\packages\xz\5.8.3\include"/>
-         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={InstallRoot}\packages\xz\5.8.3\lib\win64\{Configuration}\liblzma.lib"/>
+         <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={DependencyRoot:xz}\include"/>
+         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib"/>
          <argument value="-DENABLE_ZSTD:BOOL=ON"/>
          <argument value="-Dzstd_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\cmake\zstd"/>
          <!-- Native Windows AES implementation.  Do not introduce an OpenSSL
@@ -981,6 +1090,244 @@
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
                   <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\xz\5.8.3\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <argument value="--build"/>
+                  <argument value="."/>
+                  <argument value="--target"/>
+                  <argument value="test"/>
+               </execute>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\{ArchiveName}.lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{ArchiveName}.lib" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\pkgconfig" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig" recursive="true" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{ArchiveName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdtar.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdcpio.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdcat.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdunzip.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{ArchiveName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libarchive.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\share" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share" recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\libarchive-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive_entry.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\man\man1\bsdtar.1"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" source="smokes\libarchive\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="libarchive-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+
+<library id="libarchive" version="3.8.10" category="archive" timestamp="2026-10-15T21:30:00Z">
+      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="xz" version="5.8.4"/>
+      <dependency library="zstd" version="1.5.7"/>
+      <dependency library="bzip2" version="1.0.8"/>
+      <dependency library="openssl" version="3.5.9"/>
+      <metadata description="Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats." licenseSignal="yellow"/>
+      <source>
+         <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip" archive="libarchive-{LibraryVersion}.zip" sha256="a15b2890f31c935e5fb5b4026e0c463ed03e87fa6365060659e761e97f401183"/>
+         <extract format="zip" root="libarchive-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="build\version"/>
+            <require path="libarchive\archive.h"/>
+            <require path="libarchive\archive_entry.h"/>
+            <require path="libarchive\archive_read_support_format_tar.c"/>
+            <require path="tar\bsdtar.c"/>
+         </extract>
+         <copy source="{BuildFileDir}\patches\libarchive\3.8.10\bcc64x-modern-borland-compat.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\libarchive\3.8.10\managed-bzip2-contract.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            BCC64X compatibility backpatch for legacy __BORLANDC__ compiler
+            branches. BCC64X also defines __clang__ and must therefore use the
+            modern Clang-compatible paths for inline handling, integer types
+            and literals, Windows lseek/mbstate_t handling, open mode arguments,
+            and the corresponding tests.
+
+            The patch also includes the upstream Windows/Clang fix from commit
+            f75ed3a20526ef4ec2f46ee94216b6efd01eab0a for filter_fork_windows.c.
+            In test_read_data_large.c, an existing ftruncate macro is explicitly
+            undefined before libarchive maps ftruncate to _chsize, avoiding the
+            BCC64X MinGW macro redefinition while keeping Debug -Werror enabled.
+
+            The complete verified upstream source is extracted before the patch
+            is checked and applied.
+         -->
+         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch"/>
+         </execute>
+         <execute name="patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch"/>
+         </execute>
+         <execute name="bzip2-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch"/>
+         </execute>
+         <execute name="bzip2-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch"/>
+         </execute>
+         <execute name="bzip2-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="--fresh"/>
+         <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DENABLE_INSTALL:BOOL=ON"/>
+         <argument value="-DENABLE_TEST:BOOL={TestsEnabled}"/>
+         <!-- Complete native command line toolset. The product package contains
+              the shared runtime and import library; libarchive's internal static
+              target remains only because upstream tests link against it. -->
+         <argument value="-DENABLE_TAR:BOOL=ON"/>
+         <argument value="-DENABLE_TAR_SHARED:BOOL=ON"/>
+         <argument value="-DENABLE_CPIO:BOOL=ON"/>
+         <argument value="-DENABLE_CPIO_SHARED:BOOL=ON"/>
+         <argument value="-DENABLE_CAT:BOOL=ON"/>
+         <argument value="-DENABLE_CAT_SHARED:BOOL=ON"/>
+         <argument value="-DENABLE_UNZIP:BOOL=ON"/>
+         <argument value="-DENABLE_UNZIP_SHARED:BOOL=ON"/>
+         <!-- Declared compression/Windows backends; no accidental host-library pickup. -->
+         <argument value="-DENABLE_ZLIB:BOOL=ON"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
+         <argument value="-DENABLE_CNG:BOOL=ON"/>
+         <argument value="-DENABLE_WIN32_XMLLITE:BOOL=ON"/>
+         <argument value="-DENABLE_OPENSSL:BOOL=ON"/>
+         <argument value="-DOPENSSL_ROOT_DIR:PATH={DependencyRoot:openssl}"/>
+         <argument value="-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include"/>
+         <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libssl.lib"/>
+         <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libcrypto.lib"/>
+         <argument value="-DOPENSSL_USE_STATIC_LIBS:BOOL=FALSE"/>
+         <argument value="-DENABLE_MBEDTLS:BOOL=OFF"/>
+         <argument value="-DENABLE_NETTLE:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBB2:BOOL=OFF"/>
+         <argument value="-DENABLE_LZ4:BOOL=OFF"/>
+         <argument value="-DENABLE_LZO:BOOL=OFF"/>
+         <argument value="-DENABLE_LZMA:BOOL=ON"/>
+         <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={DependencyRoot:xz}\include"/>
+         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib"/>
+         <argument value="-DENABLE_ZSTD:BOOL=ON"/>
+         <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\include"/>
+         <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
+         <argument value="-DENABLE_BZip2:BOOL=ON"/>
+         <argument value="-DBZIP2_INCLUDE_DIR:PATH={InstallRoot}\packages\bzip2\1.0.8\include"/>
+         <argument value="-DBZIP2_LIBRARIES:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\{Configuration}\{Bzip2LibraryName}.lib"/>
+         <argument value="-DENABLE_LIBXML2:BOOL=OFF"/>
+         <argument value="-DENABLE_EXPAT:BOOL=OFF"/>
+         <!--
+            BCC64X on Windows provides no libc POSIX regex implementation.
+            With AUTO, libarchive otherwise enters its PCRE/libgcc fallback
+            even though both optional regex backends are disabled below.
+         -->
+         <argument value="-DPOSIX_REGEX_LIB:STRING=NONE"/>
+         <argument value="-DENABLE_PCREPOSIX:BOOL=OFF"/>
+         <argument value="-DENABLE_PCRE2POSIX:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBGCC:BOOL=OFF"/>
+         <argument value="-DENABLE_ICONV:BOOL=OFF"/>
+         <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="remove_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\libarchive-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="ArchiveName" value="libarchive"/>
+            <variable name="ZlibLibraryName" value="libz"/>
+            <variable name="Bzip2LibraryName" value="bzip2"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="ArchiveName" value="libarchived"/>
+            <variable name="ZlibLibraryName" value="libzd"/>
+            <variable name="Bzip2LibraryName" value="bzip2d"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <execute name="bzip2-capability-test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false" outputMode="errors">
+                  <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
+                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <argument value="--test-dir"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+                  <argument value="-R"/>
+                  <argument value="^libarchive_test_write_format_zip_compression_bzip2$"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <execute name="test" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
+                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--build"/>
                   <argument value="."/>
                   <argument value="--target"/>
@@ -6894,9 +7241,138 @@
       </smoke>
    </library>
 
-   <library id="teckit" version="2.5.13" category="text" timestamp="2026-09-21T15:59:12Z">
+<library id="expat" version="2.9.0" category="data" timestamp="2026-10-15T21:30:00Z">
+      <metadata name="Expat" supplier="Expat Project" homepage="https://libexpat.github.io/" description="Streaming XML parser used as a native dependency by TECkit SFconv and other XML-consuming components." licenseSignal="green">
+         <license name="MIT" spdx="MIT" file="COPYING"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/libexpat/libexpat.git" ref="R_2_9_0"/>
+      </security>
+      <source>
+         <download url="https://github.com/libexpat/libexpat/releases/download/R_2_9_0/expat-{LibraryVersion}.tar.xz"
+                   archive="expat-{LibraryVersion}.tar.xz"
+                   sha256="1e6371862cc31999b368c3b89b49994f0677e1bab5f1b2b85ae3741f5d803051"/>
+         <extract format="libarchive" root="expat-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="lib\expat.h"/>
+            <require path="tests\runtests.c"/>
+            <require path="xmlwf\xmlwf.c"/>
+         </extract>
+         <!--
+            Expat assumes that every non-MSVC test build needs a POSIX shell.
+            BCC64X is a native Windows Clang toolchain: the unit-test executable
+            can and should be started directly on Windows.
+         -->
+         <copy source="{BuildFileDir}\patches\expat\2.9.0\native-windows-tests.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="native-windows-tests-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"/>
+         </execute>
+         <execute name="native-windows-tests-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"/>
+         </execute>
+         <execute name="native-windows-tests-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DEXPAT_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DEXPAT_BUILD_TESTS:BOOL={TestsEnabled}"/>
+         <argument value="-DEXPAT_BUILD_TOOLS:BOOL=ON"/>
+         <argument value="-DEXPAT_BUILD_EXAMPLES:BOOL=ON"/>
+         <argument value="-DEXPAT_BUILD_DOCS:BOOL=OFF"/>
+         <argument value="-DEXPAT_BUILD_PKGCONFIG:BOOL=ON"/>
+         <argument value="-DEXPAT_BUILD_FUZZERS:BOOL=OFF"/>
+         <argument value="-DEXPAT_ENABLE_INSTALL:BOOL=ON"/>
+         <argument value="-DEXPAT_WARNINGS_AS_ERRORS:BOOL=OFF"/>
+         <cmake mode="configure"
+                executable="{Tool:cmake}"
+                source="{Workspace}\expat-{LibraryVersion}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build"
+                executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install"
+                      executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\xmlwf.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\expat-{LibraryVersion}\expat-config.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\expat-{LibraryVersion}\COPYING"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\expat.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\expat_external.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib;.a" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe" optional="false"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" source="smokes\expat\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="expat-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+
+   <library id="teckit" version="2.5.13" category="text" timestamp="2026-10-15T21:30:00Z">
       <dependency library="zlib" version="1.3.2"/>
-      <dependency library="expat" version="2.8.4"/>
+      <dependency library="expat" version="2.9.0"/>
       <metadata name="TECkit" supplier="SIL Global" homepage="https://software.sil.org/teckit/" description="Text encoding conversion toolkit with runtime engine, mapping compiler, and Unicode conversion utilities." licenseSignal="yellow"/>
       <security>
          <repository url="https://github.com/silnrsi/teckit.git" ref="v{LibraryVersion}"/>
@@ -6963,7 +7439,7 @@
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DTECKIT_SOURCE_DIR:PATH={Workspace}\teckit-{LibraryVersion}"/>
          <argument value="-DZLIB_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\cmake\zlib"/>
-         <argument value="-Dexpat_DIR:PATH={InstallRoot}\packages\expat\2.8.4\lib\win64\{Configuration}\cmake\expat-2.8.4"/>
+         <argument value="-Dexpat_DIR:PATH={DependencyRoot:expat}\lib\win64\{Configuration}\cmake\expat-{DependencyVersion:expat}"/>
          <cmake mode="configure"
                 executable="{Tool:cmake}"
                 source="{BuildFileDir}\cmake\teckit"
@@ -6990,7 +7466,7 @@
                         showOutput="false">
                   <environment name="BINDIR" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"/>
                   <environment name="SRCDIR" value="{Workspace}\teckit-{LibraryVersion}\test"/>
-                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\expat\2.8.4\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="{Workspace}\teckit-{LibraryVersion}\test\dotests.pl"/>
                </execute>
                <cmake mode="install"
