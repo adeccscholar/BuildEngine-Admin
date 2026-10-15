@@ -1,0 +1,19 @@
+diff --git a/Configurations/platform/Windows/bcc64x.pm b/Configurations/platform/Windows/bcc64x.pm
+new file mode 100644
+--- /dev/null
++++ b/Configurations/platform/Windows/bcc64x.pm
+@@ -0,0 +1,14 @@
++package platform::Windows::bcc64x;
++
++use vars qw(@ISA);
++
++require platform::Windows::cppbuilder;
++@ISA = qw(platform::Windows::cppbuilder);
++
++# BCC64X is the modern COFF/LLD toolchain and emits PDB debug information.
++# Keep the remaining C++Builder platform behavior, but do not inherit the
++# legacy TDS debug-file extension used by the older toolchains.
++sub pdbext { '.pdb' }
++
++1;
++
