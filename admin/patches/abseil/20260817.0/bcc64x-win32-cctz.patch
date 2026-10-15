@@ -1,0 +1,17 @@
+diff --git a/absl/time/internal/cctz/src/time_zone_info.cc b/absl/time/internal/cctz/src/time_zone_info.cc
+--- a/absl/time/internal/cctz/src/time_zone_info.cc
++++ b/absl/time/internal/cctz/src/time_zone_info.cc
+@@ -29,7 +29,7 @@
+-#if !defined(_MSC_VER)
++#if !defined(_WIN32)
+ #include <fcntl.h>
+ #include <sys/stat.h>
+ #include <unistd.h>
+@@ -401,7 +401,7 @@
+ // fopen(3) adaptor for reading zoneinfo files (read-only binary mode).
+ inline FilePtr FOpen(const char* path) {
+-#if defined(_MSC_VER)
++#if defined(_WIN32)
+   FILE* fp;
+   if (fopen_s(&fp, path, "rb") != 0) fp = nullptr;
+   return FilePtr(fp, fclose);
