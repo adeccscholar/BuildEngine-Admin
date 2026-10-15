@@ -8231,7 +8231,7 @@
       </smoke>
    </library>
 
-   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T18:55:00Z">
+   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T19:10:00Z">
       <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="yellow">
          <license name="Apache-2.0" spdx="Apache-2.0" file="licenses\abseil\LICENSE"/>
       </metadata>
