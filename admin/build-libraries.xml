@@ -603,6 +603,21 @@
             <require path="src\xz\main.c"/>
             <require path="tests\tests.cmake"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\xz\5.8.4\bcc64x-windres-package-name.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="windres-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch"/>
+         </execute>
+         <execute name="windres-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch"/>
+         </execute>
+         <execute name="windres-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
