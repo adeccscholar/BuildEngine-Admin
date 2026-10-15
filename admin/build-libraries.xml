@@ -1884,11 +1884,11 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-15T16:56:00Z">
-      <!-- First re-establish the historically verified curl baseline: TLS via
-           OpenSSL plus zlib.  Brotli/Zstd remain built and published packages,
-           but are re-enabled for curl only after this baseline is green. -->
-      <dependency library="openssl" version="3.5.8"/>
+   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-15T17:45:00Z">
+      <!-- curl/8.23.0 now tests the updated OpenSSL/3.5.9 dependency.
+           Keep zlib enabled; Brotli/Zstd remain disabled until independently
+           validated for this curl version and BCC64X runtime. -->
+      <dependency library="openssl" version="3.5.9"/>
       <dependency library="zlib" version="1.3.2"/>
       <metadata description="URL transfer library and command-line client supporting HTTP(S) and numerous network protocols." licenseSignal="green"/>
       <security>
@@ -1950,8 +1950,8 @@
          <argument value="-DCURL_BROTLI:STRING=OFF"/>
          <argument value="-DCURL_ZSTD:STRING=OFF"/>
          <argument value="-DCURL_USE_PKGCONFIG:BOOL=OFF"/>
-         <!-- Match the proven BCC64X baseline: module-based dependency lookup
-              with exact OpenSSL/zlib artifacts supplied below. -->
+         <!-- Preserve the proven BCC64X module-based dependency lookup.
+              OpenSSL 3.5.9 and zlib paths are selected per configuration. -->
          <argument value="-DCURL_USE_CMAKECONFIG:BOOL=OFF"/>
          <argument value="-DCMAKE_FIND_PACKAGE_PREFER_CONFIG:BOOL=OFF"/>
          <argument value="-DOPENSSL_USE_STATIC_LIBS:BOOL=OFF"/>
@@ -1981,7 +1981,7 @@
                supplies that exact directory through CMAKE_LIBRARY_PATH and the
                versioned include directory through CMAKE_INCLUDE_PATH.
             -->
-            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.9\include"/>
             <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
             <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib"/>
          </variant>
@@ -1994,7 +1994,7 @@
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
             <!-- Same FindOpenSSL rule as Release; CMAKE_LIBRARY_PATH is variant-specific. -->
-            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.9\include"/>
             <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
             <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib"/>
          </variant>
