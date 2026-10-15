@@ -7652,4 +7652,291 @@
          <argument value="-Dpugixml_DIR:PATH={InstallRoot}\packages\pugixml\1.16\lib\win64\Release\cmake\pugixml"/>
       </smoke>
    </library>
+   <library id="fast_float" version="8.2.3" category="data" timestamp="2026-10-15T12:53:00Z">
+      <metadata name="fast_float" supplier="fast_float authors" homepage="https://github.com/fastfloat/fast_float" description="High-performance C++ floating-point parser" licenseSignal="green">
+         <license name="MIT" spdx="MIT" file="licenses\fast_float\LICENSE-MIT"/>
+      </metadata>
+      <security><repository url="https://github.com/fastfloat/fast_float.git" ref="v8.2.3"/></security>
+      <source>
+         <download url="https://github.com/fastfloat/fast_float/archive/v8.2.3/fast_float-8.2.3.tar.gz" archive="fast_float-8.2.3.tar.gz" sha256="fa811076bad7b7151ce826005a7213971c879b192ee4505a7016c8413038c2d0"/>
+         <extract format="libarchive" root="fast_float-8.2.3">
+            <require path="CMakeLists.txt"/>
+            <require path="include\fast_float\fast_float.h"/>
+            <require path="LICENSE-MIT"/>
+         </extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DFASTFLOAT_TEST:BOOL=OFF"/>
+         <argument value="-DFASTFLOAT_BENCHMARKS:BOOL=OFF"/>
+         <argument value="-DFASTFLOAT_INSTALL:BOOL=ON"/>
+         <argument value="-DFASTFLOAT_SANITIZE:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\fast_float-8.2.3" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\fast_float\fast_float.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\FastFloat\FastFloatConfig.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\fast_float-8.2.3\LICENSE-MIT"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\fast_float\LICENSE-MIT" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\fast_float\LICENSE-MIT"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\fast_float\consumer"
+             configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="fast_float-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DFastFloat_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\FastFloat"/>
+      </smoke>
+   </library>
+
+   <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T12:53:00Z">
+      <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="green">
+         <license name="Apache-2.0" spdx="Apache-2.0" file="licenses\abseil\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/abseil/abseil-cpp.git" ref="20260817.0"/></security>
+      <source>
+         <download url="https://github.com/abseil/abseil-cpp/archive/20260817.0/abseil-cpp-20260817.0.tar.gz" archive="abseil-cpp-20260817.0.tar.gz" sha256="f7e05179df39c45434cad433f5783840bb3788ef322976f9138bc6b72b3a107d"/>
+         <extract format="libarchive" root="abseil-cpp-20260817.0">
+            <require path="CMakeLists.txt"/>
+            <require path="absl\strings\str_cat.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=OFF"/>
+         <argument value="-DABSL_BUILD_TESTING:BOOL=OFF"/>
+         <argument value="-DABSL_BUILD_TEST_HELPERS:BOOL=OFF"/>
+         <argument value="-DABSL_ENABLE_INSTALL:BOOL=ON"/>
+         <argument value="-DABSL_PROPAGATE_CXX_STD:BOOL=ON"/>
+         <argument value="-DABSL_BUILD_MONOLITHIC_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DABSL_USE_GOOGLETEST_HEAD:BOOL=OFF"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=20"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\abseil-cpp-20260817.0" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\absl\strings\str_cat.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\absl\abslConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\abseil-cpp-20260817.0\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\abseil\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\abseil\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\abseil\consumer"
+             configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="abseil-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Dabsl_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\absl"/>
+      </smoke>
+   </library>
+
+   <library id="lcms2" version="2.19.1" category="graphics" timestamp="2026-10-15T12:53:00Z">
+      <metadata name="lcms2" supplier="LittleCMS" homepage="https://github.com/mm2/Little-CMS" description="LittleCMS 2 ICC color-management engine (GPL plugins excluded)" licenseSignal="green">
+         <license name="MIT" spdx="MIT" file="licenses\lcms2\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/mm2/Little-CMS.git" ref="lcms2.19.1"/></security>
+      <source>
+         <download url="https://downloads.sourceforge.net/project/lcms/lcms/2.19.1/lcms2-2.19.1.tar.gz" archive="lcms2-2.19.1.tar.gz" sha256="bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8"/>
+         <extract format="libarchive" root="lcms2-2.19.1">
+            <require path="CMakeLists.txt"/>
+            <require path="include\lcms2.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DLCMS2_BUILD_SHARED:BOOL=ON"/>
+         <argument value="-DLCMS2_BUILD_STATIC:BOOL=OFF"/>
+         <argument value="-DLCMS2_BUILD_TOOLS:BOOL=OFF"/>
+         <argument value="-DLCMS2_BUILD_TESTS:BOOL=OFF"/>
+         <!-- Two upstream GPL-3.0 plugins MUST remain disabled. -->
+         <argument value="-DLCMS2_WITH_FASTFLOAT:BOOL=OFF"/>
+         <argument value="-DLCMS2_WITH_THREADED_PLUGIN:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\lcms2-2.19.1" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lcms2.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lcms2\lcms2-config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\lcms2-2.19.1\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\lcms2\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\lcms2\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\lcms2\consumer"
+             configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="lcms2-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-Dlcms2_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\lcms2"/>
+      </smoke>
+   </library>
+
+   <library id="openjpeg" version="2.5.4" category="graphics" timestamp="2026-10-15T12:53:00Z">
+      <metadata name="openjpeg" supplier="OpenJPEG developers" homepage="https://github.com/uclouvain/openjpeg" description="OpenJPEG JPEG 2000 encoder and decoder library" licenseSignal="green">
+         <license name="BSD-2-Clause" spdx="BSD-2-Clause" file="licenses\openjpeg\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/uclouvain/openjpeg.git" ref="v2.5.4"/></security>
+      <source>
+         <download url="https://github.com/uclouvain/openjpeg/archive/v2.5.4.tar.gz" archive="openjpeg-2.5.4.tar.gz" sha256="a695fbe19c0165f295a8531b1e4e855cd94d0875d2f88ec4b61080677e27188a"/>
+         <extract format="libarchive" root="openjpeg-2.5.4">
+            <require path="CMakeLists.txt"/>
+            <require path="src\lib\openjp2\openjpeg.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DBUILD_CODEC:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=OFF"/>
+         <argument value="-DBUILD_DOC:BOOL=OFF"/>
+         <argument value="-DBUILD_JPIP:BOOL=OFF"/>
+         <argument value="-DBUILD_VIEWER:BOOL=OFF"/>
+         <argument value="-DBUILD_JAVA:BOOL=OFF"/>
+         <argument value="-DOPENJPEG_INSTALL_PACKAGE_DIR:STRING=lib/win64/{Configuration}/cmake/openjpeg-2.5"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\openjpeg-2.5.4" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openjpeg-2.5\openjpeg.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\openjpeg-2.5\OpenJPEGConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\openjpeg-2.5.4\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\openjpeg\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\openjpeg\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\openjpeg\consumer"
+             configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="openjpeg-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-Dopenjpeg-2.5_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\openjpeg-2.5"/>
+      </smoke>
+   </library>
 </buildLibraries>
