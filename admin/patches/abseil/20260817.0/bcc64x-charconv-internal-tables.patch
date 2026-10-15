@@ -1,31 +1,34 @@
 diff --git a/absl/strings/internal/charconv_bigint.h b/absl/strings/internal/charconv_bigint.h
 --- a/absl/strings/internal/charconv_bigint.h
 +++ b/absl/strings/internal/charconv_bigint.h
-@@ -34,9 +34,14 @@
- // The largest power that 10 that can be raised to, and still fit in a uint32_t.
- constexpr int kMaxSmallPowerOfTen = 9;
- 
+@@ -37,3 +37,11 @@
 -ABSL_DLL extern const uint32_t
 -    kFiveToNth[kMaxSmallPowerOfFive + 1];
 -ABSL_DLL extern const uint32_t kTenToNth[kMaxSmallPowerOfTen + 1];
-+// BCC64X: local constant lookup tables avoid external symbol duplication.
-+static constexpr uint32_t kFiveToNth[kMaxSmallPowerOfFive + 1] = {
-+    1,     5,      25,      125,     625,      3125,      15625,
-+    78125, 390625, 1953125, 9765625, 48828125, 244140625, 1220703125,
-+};
-+static constexpr uint32_t kTenToNth[kMaxSmallPowerOfTen + 1] = {
-+    1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
-+};
- 
- // Large, fixed-width unsigned integer.
- //
++// No externally linked lookup-table symbols under BCC64X.
++constexpr uint32_t SmallPowerOfFive(int n) {
++  uint32_t value = 1;
++  for (int i = 0; i < n; ++i) value *= 5;
++  return value;
++}
++constexpr uint32_t SmallPowerOfTen(int n) {
++  uint32_t value = 1;
++  for (int i = 0; i < n; ++i) value *= 10;
++  return value;
++}
+@@ -176,1 +184,1 @@
+-kFiveToNth[kMaxSmallPowerOfFive]
++SmallPowerOfFive(kMaxSmallPowerOfFive)
+@@ -180,1 +188,1 @@
+-kFiveToNth[n]
++SmallPowerOfFive(n)
+@@ -194,1 +202,1 @@
+-kTenToNth[n]
++SmallPowerOfTen(n)
 diff --git a/absl/strings/internal/charconv_bigint.cc b/absl/strings/internal/charconv_bigint.cc
 --- a/absl/strings/internal/charconv_bigint.cc
 +++ b/absl/strings/internal/charconv_bigint.cc
-@@ -158,14 +158,6 @@
- int LargePowerOfFiveSize(int i) { return 2 * i; }
- }  // namespace
- 
+@@ -161,9 +161,0 @@
 -ABSL_DLL const uint32_t kFiveToNth[14] = {
 -    1,     5,      25,      125,     625,      3125,      15625,
 -    78125, 390625, 1953125, 9765625, 48828125, 244140625, 1220703125,
@@ -34,6 +37,10 @@ diff --git a/absl/strings/internal/charconv_bigint.cc b/absl/strings/internal/ch
 -ABSL_DLL const uint32_t kTenToNth[10] = {
 -    1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000,
 -};
- 
- template <int max_words>
- int BigUnsigned<max_words>::ReadFloatMantissa(const ParsedFloat& fp,
+-
+@@ -261,1 +252,1 @@
+-kTenToNth[kMaxSmallPowerOfTen]
++SmallPowerOfTen(kMaxSmallPowerOfTen)
+@@ -268,1 +259,1 @@
+-kTenToNth[digits_queued]
++SmallPowerOfTen(digits_queued)
