@@ -912,10 +912,10 @@
          <argument value="-DENABLE_CNG:BOOL=ON"/>
          <argument value="-DENABLE_WIN32_XMLLITE:BOOL=ON"/>
          <argument value="-DENABLE_OPENSSL:BOOL=ON"/>
-         <argument value="-DOPENSSL_ROOT_DIR:PATH={InstallRoot}\packages\openssl\3.5.9"/>
-         <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.9\include"/>
-         <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.9\lib\win64\{Configuration}\libssl.lib"/>
-         <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.9\lib\win64\{Configuration}\libcrypto.lib"/>
+         <argument value="-DOPENSSL_ROOT_DIR:PATH={DependencyRoot:openssl}"/>
+         <argument value="-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include"/>
+         <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libssl.lib"/>
+         <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libcrypto.lib"/>
          <argument value="-DOPENSSL_USE_STATIC_LIBS:BOOL=FALSE"/>
          <argument value="-DENABLE_MBEDTLS:BOOL=OFF"/>
          <argument value="-DENABLE_NETTLE:BOOL=OFF"/>
@@ -970,7 +970,7 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <execute name="bzip2-capability-test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false" outputMode="errors">
                   <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
-                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\xz\5.8.3\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{InstallRoot}\packages\openssl\3.5.9\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\xz\5.8.3\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--test-dir"/>
                   <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                   <argument value="-R"/>
@@ -980,7 +980,7 @@
                <execute name="test" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
-                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\xz\5.8.3\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{InstallRoot}\packages\openssl\3.5.9\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\xz\5.8.3\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--build"/>
                   <argument value="."/>
                   <argument value="--target"/>
@@ -2092,9 +2092,9 @@
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <!-- Exact managed dependency coordinates used by the evidence build. -->
-         <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.9\include"/>
-         <argument value="-DADECC_BOOST_OPENSSL_SSL_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.9\lib\win64\{Configuration}\libssl.lib"/>
-         <argument value="-DADECC_BOOST_OPENSSL_CRYPTO_LIBRARY:FILEPATH={InstallRoot}\packages\openssl\3.5.9\lib\win64\{Configuration}\libcrypto.lib"/>
+         <argument value="-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include"/>
+         <argument value="-DADECC_BOOST_OPENSSL_SSL_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libssl.lib"/>
+         <argument value="-DADECC_BOOST_OPENSSL_CRYPTO_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libcrypto.lib"/>
          <argument value="-DOPENSSL_USE_STATIC_LIBS:BOOL=OFF"/>
          <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
          <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
@@ -2485,9 +2485,9 @@
 
    <build>
       <environment name="ACE_ROOT" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"/>
-      <environment name="SSL_ROOT" value="{InstallRoot}\packages\openssl\3.5.9"/>
-      <environment name="SSL_INCDIR" value="{InstallRoot}\packages\openssl\3.5.9\include"/>
-      <environment name="SSL_LIBDIR" value="{InstallRoot}\packages\openssl\3.5.9\lib\win64\{Configuration}"/>
+      <environment name="SSL_ROOT" value="{DependencyRoot:openssl}"/>
+      <environment name="SSL_INCDIR" value="{DependencyRoot:openssl}\include"/>
+      <environment name="SSL_LIBDIR" value="{DependencyRoot:openssl}\lib\win64\{Configuration}"/>
       <environment name="XERCESC_INCDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\include"/>
       <environment name="XERCESC_LIBDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\lib\win64\{Configuration}"/>
       <environment name="XERCESLIB" value="{XercesLibrary}"/>
@@ -2501,7 +2501,7 @@
       <environment name="UNICODE" value=""/>
       <environment name="DEBUG" value="{DebugFlag}"/>
       <environment name="RELEASE" value="{ReleaseFlag}"/>
-      <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\lib;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin;{InstallRoot}\packages\openssl\3.5.9\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
+      <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\lib;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin;{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
 
       <execute name="remove-build-tree" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
          <argument value="-E"/>
@@ -2639,9 +2639,9 @@
    <build>
       <environment name="ACE_ROOT" value="{ExtensionProducerRoot}"/>
       <environment name="TAO_ROOT" value="{ExtensionProducerRoot}\TAO"/>
-      <environment name="SSL_ROOT" value="{InstallRoot}\packages\openssl\3.5.9"/>
-      <environment name="SSL_INCDIR" value="{InstallRoot}\packages\openssl\3.5.9\include"/>
-      <environment name="SSL_LIBDIR" value="{InstallRoot}\packages\openssl\3.5.9\lib\win64\{Configuration}"/>
+      <environment name="SSL_ROOT" value="{DependencyRoot:openssl}"/>
+      <environment name="SSL_INCDIR" value="{DependencyRoot:openssl}\include"/>
+      <environment name="SSL_LIBDIR" value="{DependencyRoot:openssl}\lib\win64\{Configuration}"/>
       <environment name="XERCESC_INCDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\include"/>
       <environment name="XERCESC_LIBDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\lib\win64\{Configuration}"/>
       <environment name="XERCESLIB" value="{XercesLibrary}"/>
@@ -2655,7 +2655,7 @@
       <environment name="UNICODE" value=""/>
       <environment name="DEBUG" value="{DebugFlag}"/>
       <environment name="RELEASE" value="{ReleaseFlag}"/>
-      <environment name="PATH" value="{ExtensionProducerRoot}\lib;{ExtensionProducerRoot}\bin;{InstallRoot}\packages\openssl\3.5.9\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
+      <environment name="PATH" value="{ExtensionProducerRoot}\lib;{ExtensionProducerRoot}\bin;{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
 
       <target name="generate-workspace" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO" showOutput="false">
          <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/>
@@ -3083,8 +3083,8 @@
          <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
          <environment name="WINDRES" value="{Tool:bcc64x-windres}"/>
          <environment name="PKG_CONFIG" value="{Tool:pkg-config}"/>
-         <environment name="PKG_CONFIG_PATH" value="{InstallRoot}\packages\openssl\3.5.9\lib\win64\{Configuration}\pkgconfig;{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\pkgconfig"/>
-         <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ToolDir:perl};{ToolDir:pkg-config};{InstallRoot}\packages\openssl\3.5.9\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PKG_CONFIG_PATH" value="{DependencyRoot:openssl}\lib\win64\{Configuration}\pkgconfig;{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\pkgconfig"/>
+         <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ToolDir:perl};{ToolDir:pkg-config};{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
          <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/><argument value="remove_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
@@ -3125,8 +3125,8 @@
             <argument value="-Ddocs_pdf=disabled"/>
             <argument value="-Dtap_tests=disabled"/>
             <argument value="-DPERL={Tool:perl}"/>
-            <argument value="-Dextra_include_dirs={InstallRoot}\packages\openssl\3.5.9\include,{InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="-Dextra_lib_dirs={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib,{InstallRoot}\packages\openssl\3.5.9\lib\win64\{Configuration},{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
+            <argument value="-Dextra_include_dirs={DependencyRoot:openssl}\include,{InstallRoot}\packages\zlib\1.3.2\include"/>
+            <argument value="-Dextra_lib_dirs={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib,{DependencyRoot:openssl}\lib\win64\{Configuration},{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
          </target>
          <target name="meson-compile-libpq" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false" outputMode="errors">
             <argument value="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"/>
@@ -3180,7 +3180,7 @@
              executable="libpq-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <environment name="PATH" value="{InstallRoot}\packages\openssl\3.5.9\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
+         <environment name="PATH" value="{DependencyRoot:openssl}\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
          <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={ConsumerRoot}\include"/>
          <argument value="-DPostgreSQL_LIBRARY:FILEPATH={ConsumerRoot}\lib\libpq.lib"/>
       </smoke>
@@ -3219,7 +3219,7 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <environment name="PATH" value="{InstallRoot}\packages\libpq\18.6\bin\win64\{Configuration};{InstallRoot}\packages\openssl\3.5.9\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\libpq\18.6\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -3281,7 +3281,7 @@
              executable="libpqxx-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <environment name="PATH" value="{InstallRoot}\packages\libpq\18.6\bin\win64\Release;{InstallRoot}\packages\openssl\3.5.9\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\libpq\18.6\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
          <argument value="-Dlibpqxx_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libpqxx"/>
          <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={InstallRoot}\packages\libpq\18.6\include"/>
          <argument value="-DPostgreSQL_LIBRARY:FILEPATH={InstallRoot}\packages\libpq\18.6\lib\win64\Release\libpq.lib"/>
@@ -7742,7 +7742,7 @@
          <argument value="-DPODOFO_WITH_FONTMANAGER:BOOL=ON"/>
          <argument value="-DPODOFO_WITH_WIN32GDI_FONT_SEARCH:BOOL=ON"/>
          <argument value="-DPODOFO_WITH_LCMS2:BOOL=OFF"/>
-         <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\openssl\3.5.9;{InstallRoot}\packages\freetype\2.14.3;{InstallRoot}\packages\libxml2\2.15.3;{InstallRoot}\packages\libjpeg-turbo\3.2.0;{InstallRoot}\packages\libpng\1.6.58;{InstallRoot}\packages\libtiff\4.7.2"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{DependencyRoot:openssl};{InstallRoot}\packages\freetype\2.14.3;{InstallRoot}\packages\libxml2\2.15.3;{InstallRoot}\packages\libjpeg-turbo\3.2.0;{InstallRoot}\packages\libpng\1.6.58;{InstallRoot}\packages\libtiff\4.7.2"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\podofo-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
@@ -7770,7 +7770,7 @@
                   <environment name="CTEST_PARALLEL_LEVEL" value="1"/>
                   <environment name="PODOFO_TEST_OUTPUT_PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out"/>
                   <!-- Keep the tested runtime closure deterministic. In particular, Release libz.dll must come from our zlib 1.3.2 package. -->
-                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\openssl\3.5.9\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{InstallRoot}\packages\libxml2\2.15.3\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.58\bin\win64\{Configuration};{InstallRoot}\packages\libtiff\4.7.2\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{InstallRoot}\packages\libxml2\2.15.3\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.58\bin\win64\{Configuration};{InstallRoot}\packages\libtiff\4.7.2\bin\win64\{Configuration};{ENV:PATH}"/>
                   <!-- BCC64X DLL validation: omit the intermittent teardown-only TestPruneInvalid. -->
                   <!-- Keep all other upstream and independent consumer tests enabled. -->
                   <argument value="-E"/>
