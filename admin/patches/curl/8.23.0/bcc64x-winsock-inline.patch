@@ -1,0 +1,30 @@
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -33,1 +33,5 @@
+ include("${CMAKE_CURRENT_BINARY_DIR}/Makefile.inc.cmake")
++# BuildEngine BCC64X: supplement a WinSDK GNU extern-inline helper.
++if(WIN32 AND BUILDENGINE_BCC64X_WINSDK_INLINE)
++  list(APPEND CSOURCES "${CMAKE_CURRENT_SOURCE_DIR}/bcc64x-winsock-inline.c")
++endif()
+diff --git a/lib/bcc64x-winsock-inline.c b/lib/bcc64x-winsock-inline.c
+new file mode 100644
+--- /dev/null
++++ b/lib/bcc64x-winsock-inline.c
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: curl */
++/* BuildEngine/Clang 20 BCC64X only. Windows SDK IPv6 helper linkage.
++ * IN6_IS_ADDR_V4TRANSLATED tests ::ffff:0:0/96 representation.
++ * Called via the WinSDK declaration, using Windows BOOLEAN ABI.
++ */
++#include <stdint.h>
++#if defined(_WIN32) && defined(__clang__) && defined(__BORLANDC__)
++unsigned char IN6_IS_ADDR_V4TRANSLATED(const void* p)
++{
++  const uint8_t* a = (const uint8_t*)p;
++  return (unsigned char)(
++      a[0] == 0 && a[1] == 0 && a[2] == 0 && a[3] == 0 &&
++      a[4] == 0 && a[5] == 0 && a[6] == 0 && a[7] == 0 &&
++      a[8] == 0xff && a[9] == 0xff && a[10] == 0 && a[11] == 0);
++}
++#endif
