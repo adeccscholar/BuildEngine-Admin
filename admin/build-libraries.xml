@@ -4505,31 +4505,31 @@
          <require path="src\jpeglib.h"/>
          <require path="src\turbojpeg.h"/>
          <require path="LICENSE.md"/>
-         <require path="cmakescripts\\BuildPackages.cmake"/>
-         <require path="win\\vc\\projectTargets-release.cmake.in"/>
-         <require path="win\\gcc\\projectTargets-release.cmake.in"/>
+         <require path="cmakescripts\BuildPackages.cmake"/>
+         <require path="win\vc\projectTargets-release.cmake.in"/>
+         <require path="win\gcc\projectTargets-release.cmake.in"/>
       </extract>
 
       <!-- libjpeg-turbo 3.2.0 selects NSIS templates only for MSVC or MinGW.
            BCC64X is neither, so the Windows installer section otherwise
            attempts to read win/projectTargets-release.cmake.in.  Suppress
            only that unsupported installer; upstream install(EXPORT) stays. -->
-      <copy source="{BuildFileDir}\\patches\\libjpeg-turbo\\3.2.0\\bcc64x-skip-unsupported-installer.patch"
-            target="{Workspace}\\.buildengine\\patches\\{LibraryVersion}\\bcc64x-skip-unsupported-installer.patch"
+      <copy source="{BuildFileDir}\patches\libjpeg-turbo\3.2.0\bcc64x-skip-unsupported-installer.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-skip-unsupported-installer.patch"
             overwrite="true" preserveCurrentArtifact="true"/>
       <execute name="bcc64x-installer-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
          <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
          <argument value="--whitespace=nowarn"/>
-         <argument value="{Workspace}\\.buildengine\\patches\\{LibraryVersion}\\bcc64x-skip-unsupported-installer.patch"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-skip-unsupported-installer.patch"/>
       </execute>
       <execute name="bcc64x-installer-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
          <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-         <argument value="{Workspace}\\.buildengine\\patches\\{LibraryVersion}\\bcc64x-skip-unsupported-installer.patch"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-skip-unsupported-installer.patch"/>
       </execute>
       <execute name="bcc64x-installer-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
          <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
          <argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-         <argument value="{Workspace}\\.buildengine\\patches\\{LibraryVersion}\\bcc64x-skip-unsupported-installer.patch"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-skip-unsupported-installer.patch"/>
       </execute>
    </source>
 
