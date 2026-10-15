@@ -1,0 +1,57 @@
+diff --git a/Configurations/windows-makefile.tmpl b/Configurations/windows-makefile.tmpl
+--- a/Configurations/windows-makefile.tmpl
++++ b/Configurations/windows-makefile.tmpl
+@@ -268,7 +268,11 @@ CPPFLAGS={- our $cppflags1 = join(" ",
+ CFLAGS={- join(' ', @{$config{CFLAGS}}) -}
+ LD="{- $config{LD} -}"
+ LDFLAGS={- join(' ', @{$config{LDFLAGS}}) -}
+ EX_LIBS={- join(' ', @{$config{LDLIBS}}) -}
++EX_LIBS_RESP={- join(' ', map { my $x = $_;
++                                $x =~ s|\\|/|g if $target{ld_resp_forward_slashes};
++                                $x }
++                              @{$config{LDLIBS}}) -}
+ 
+ PERL={- $config{PERL} -}
+ 
+@@ -314,7 +318,11 @@ CNF_CFLAGS={- join(' ', $target{cflags} || (),
+ CNF_CXXFLAGS={- join(' ', $target{cxxflags} || (),
+                           @{$config{cxxflags}}) -}
+ CNF_LDFLAGS={- join(' ', $target{lflags} || (),
+                          @{$config{lflags}}) -}
+ CNF_EX_LIBS={- join(' ', $target{ex_libs} || (),
+                          @{$config{ex_libs}}) -}
++CNF_EX_LIBS_RESP={- join(' ', map { my $x = $_;
++                                    $x =~ s|\\|/|g if $target{ld_resp_forward_slashes};
++                                    $x }
++                                  ($target{ex_libs} || (), @{$config{ex_libs}})) -}
+ 
+@@ -356,7 +364,7 @@ LIB_CFLAGS={- join(' ', $target{lib_cflags} || (),
+ LIB_LDFLAGS={- join(' ', $target{shared_ldflag} || (),
+                          $config{shared_ldflag} || (),
+                          '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
+-LIB_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
++LIB_EX_LIBS=$(CNF_EX_LIBS_RESP) $(EX_LIBS_RESP)
+ DSO_ASFLAGS={- join(' ', $target{dso_asflags} || (),
+                          $target{module_asflags} || (),
+                          @{$config{dso_asflags}},
+@@ -385,9 +393,9 @@ DSO_CFLAGS={- join(' ', $target{dso_cflags} || (),
+ DSO_LDFLAGS={- join(' ', $target{dso_lflags} || (),
+                          $target{module_ldflags} || (),
+                          @{$config{dso_lflags}},
+                          @{$config{module_ldflags}},
+                          '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
+-DSO_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
++DSO_EX_LIBS=$(CNF_EX_LIBS_RESP) $(EX_LIBS_RESP)
+ BIN_ASFLAGS={- join(' ', $target{bin_asflags} || (),
+                          @{$config{bin_asflags}},
+                          '$(CNF_ASFLAGS)', '$(ASFLAGS)') -}
+@@ -398,8 +406,8 @@ BIN_CPPFLAGS={- join(' ', $target{bin_cppflags} || (),
+ BIN_CFLAGS={- join(' ', $target{bin_cflags} || (),
+                         @{$config{bin_cflags}},
+                         '$(CNF_CFLAGS)', '$(CFLAGS)') -}
+ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
+                          @{$config{bin_lflags}},
+                          '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
+-BIN_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
++BIN_EX_LIBS=$(CNF_EX_LIBS_RESP) $(EX_LIBS_RESP)
+ 
