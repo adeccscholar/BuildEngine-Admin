@@ -1884,7 +1884,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-15T18:30:00Z">
+   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-15T18:31:00Z">
       <!-- curl/8.23.0 now tests the updated OpenSSL/3.5.9 dependency.
            Keep zlib enabled; Brotli/Zstd remain disabled until independently
            validated for this curl version and BCC64X runtime. -->
@@ -1918,8 +1918,9 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-winsock-inline.patch"/>
          </execute>
          <copy source="{BuildFileDir}\programs\libpq\bcc64x-winsock-compat.c"
-               target="{CurrentArtifact}\lib\bcc64x-winsock-compat.c" overwrite="true"/>
-         <require path="{CurrentArtifact}\lib\bcc64x-winsock-compat.c"/>
+               target="{CurrentArtifact}\lib\bcc64x-winsock-compat.c"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <require path="{Workspace}\curl-{LibraryVersion}\lib\bcc64x-winsock-compat.c"/>
 
       </source>
       <build>
