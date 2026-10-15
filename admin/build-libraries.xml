@@ -7658,7 +7658,7 @@
       </metadata>
       <security><repository url="https://github.com/fastfloat/fast_float.git" ref="v8.2.3"/></security>
       <source>
-         <download url="https://github.com/fastfloat/fast_float/archive/v8.2.3/fast_float-8.2.3.tar.gz" archive="fast_float-8.2.3.tar.gz" sha256="fa811076bad7b7151ce826005a7213971c879b192ee4505a7016c8413038c2d0"/>
+         <download url="https://github.com/fastfloat/fast_float/archive/refs/tags/v8.2.3.tar.gz" archive="fast_float-8.2.3.tar.gz"/>
          <extract format="libarchive" root="fast_float-8.2.3">
             <require path="CMakeLists.txt"/>
             <require path="include\fast_float\fast_float.h"/>
@@ -7725,7 +7725,7 @@
       </metadata>
       <security><repository url="https://github.com/abseil/abseil-cpp.git" ref="20260817.0"/></security>
       <source>
-         <download url="https://github.com/abseil/abseil-cpp/archive/20260817.0/abseil-cpp-20260817.0.tar.gz" archive="abseil-cpp-20260817.0.tar.gz" sha256="f7e05179df39c45434cad433f5783840bb3788ef322976f9138bc6b72b3a107d"/>
+         <download url="https://github.com/abseil/abseil-cpp/archive/refs/tags/20260817.0.tar.gz" archive="abseil-cpp-20260817.0.tar.gz"/>
          <extract format="libarchive" root="abseil-cpp-20260817.0">
             <require path="CMakeLists.txt"/>
             <require path="absl\strings\str_cat.h"/>
@@ -7798,8 +7798,8 @@
       </metadata>
       <security><repository url="https://github.com/mm2/Little-CMS.git" ref="lcms2.19.1"/></security>
       <source>
-         <download url="https://downloads.sourceforge.net/project/lcms/lcms/2.19.1/lcms2-2.19.1.tar.gz" archive="lcms2-2.19.1.tar.gz" sha256="bfc54f7bab59fbc921012014a8032e4cba4abd46db47d46b76416a8c0b2815c8"/>
-         <extract format="libarchive" root="lcms2-2.19.1">
+         <download url="https://github.com/mm2/Little-CMS/archive/refs/tags/lcms2.19.1.tar.gz" archive="Little-CMS-lcms2.19.1.tar.gz"/>
+         <extract format="libarchive" root="Little-CMS-lcms2.19.1">
             <require path="CMakeLists.txt"/>
             <require path="include\lcms2.h"/>
             <require path="LICENSE"/>
@@ -7821,7 +7821,7 @@
          <!-- Two upstream GPL-3.0 plugins MUST remain disabled. -->
          <argument value="-DLCMS2_WITH_FASTFLOAT:BOOL=OFF"/>
          <argument value="-DLCMS2_WITH_THREADED_PLUGIN:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\lcms2-2.19.1" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\Little-CMS-lcms2.19.1" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -7842,7 +7842,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\lcms2-2.19.1\LICENSE"
+               <copy source="{Workspace}\Little-CMS-lcms2.19.1\LICENSE"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\lcms2\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\lcms2\LICENSE"/>
             </common>
@@ -7871,7 +7871,7 @@
       </metadata>
       <security><repository url="https://github.com/uclouvain/openjpeg.git" ref="v2.5.4"/></security>
       <source>
-         <download url="https://github.com/uclouvain/openjpeg/archive/v2.5.4.tar.gz" archive="openjpeg-2.5.4.tar.gz" sha256="a695fbe19c0165f295a8531b1e4e855cd94d0875d2f88ec4b61080677e27188a"/>
+         <download url="https://github.com/uclouvain/openjpeg/archive/refs/tags/v2.5.4.tar.gz" archive="openjpeg-2.5.4.tar.gz"/>
          <extract format="libarchive" root="openjpeg-2.5.4">
             <require path="CMakeLists.txt"/>
             <require path="src\lib\openjp2\openjpeg.h"/>
