@@ -47,7 +47,7 @@
          <argument value="-DCMAKE_CXX_STANDARD:STRING=17"/>
          <argument value="-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"/>
          <argument value="-DCMAKE_CXX_EXTENSIONS:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\pugixml-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="BinaryName" value="libpugixml"/>
@@ -83,7 +83,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\pugixml.pc"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\pugixml-{LibraryVersion}\LICENSE.md" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\pugixml-LICENSE.md" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE.md" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\pugixml-LICENSE.md" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\pugixml.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\pugiconfig.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\pugixml-LICENSE.md"/>
@@ -138,7 +138,7 @@
          <argument value="-DZLIB_BUILD_TESTING:BOOL={TestsEnabled}"/>
          <argument value="-DZLIB_INSTALL:BOOL=ON"/>
          <argument value="-DZLIB_PREFIX:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\zlib-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="SharedName" value="libz"/>
@@ -211,7 +211,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\zlib.pc"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\zlib-{LibraryVersion}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zlib.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zconf.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\man\man3\zlib.3"/>
@@ -266,7 +266,7 @@
          <argument value="-DBROTLI_BUILD_TOOLS:BOOL=ON"/>
          <argument value="-DBROTLI_BUNDLED_MODE:BOOL=OFF"/>
          <argument value="-DBROTLI_DISABLE_TESTS:BOOL={TestsDisabled}"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\brotli-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="CommonSharedName" value="libbrotlicommon"/>
@@ -319,7 +319,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlienc.pc"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\brotli-{LibraryVersion}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\brotli\decode.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\brotli\encode.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\brotli\types.h"/>
@@ -383,14 +383,14 @@
          <argument value="-DZSTD_BUILD_CONTRIB:BOOL=OFF"/>
          <argument value="-DZSTD_LEGACY_SUPPORT:BOOL=ON"/>
          <argument value="-DZSTD_MULTITHREAD_SUPPORT:BOOL=ON"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\zstd-{LibraryVersion}\build\cmake" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\build\cmake" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <!-- Separate, non-installed validation world. Zstd's upstream CMake tests
               require libzstd_static, therefore the static library is generated only
               here and never becomes a production/install artifact. -->
-         <execute name="validation-configure" test="true" phase="validation" executable="{Tool:cmake}" workingDirectory="{Workspace}\zstd-{LibraryVersion}\build\cmake" showOutput="false">
+         <execute name="validation-configure" test="true" phase="validation" executable="{Tool:cmake}" workingDirectory="{Workspace}\build\cmake" showOutput="false">
             <argument value="-S"/>
-            <argument value="{Workspace}\zstd-{LibraryVersion}\build\cmake"/>
+            <argument value="{Workspace}\build\cmake"/>
             <argument value="-B"/>
             <argument value="{BuildRoot}\validation\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="-G"/>
@@ -458,8 +458,8 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libzstd.pc"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\zstd-{LibraryVersion}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
-               <copy source="{Workspace}\zstd-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zstd.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zstd_errors.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zdict.h"/>
@@ -518,7 +518,7 @@
          <argument value="-DXZ_TOOL_LZMADEC:BOOL=ON"/>
          <argument value="-DXZ_TOOL_LZMAINFO:BOOL=ON"/>
          <argument value="-DXZ_EXTERNAL_SHA256:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xz-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="CMakeExportConfiguration" value="release"/>
@@ -565,9 +565,9 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\liblzma.pc"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
-               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING.0BSD" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD" overwrite="true"/>
-               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING.GPLv2" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <copy source="{Workspace}\COPYING.0BSD" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD" overwrite="true"/>
+               <copy source="{Workspace}\COPYING.GPLv2" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lzma.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lzma\base.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
@@ -642,7 +642,7 @@
          <argument value="-DXZ_TOOL_LZMADEC:BOOL=ON"/>
          <argument value="-DXZ_TOOL_LZMAINFO:BOOL=ON"/>
          <argument value="-DXZ_EXTERNAL_SHA256:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xz-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="CMakeExportConfiguration" value="release"/>
@@ -689,9 +689,9 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\liblzma.pc"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
-               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING.0BSD" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD" overwrite="true"/>
-               <copy source="{Workspace}\xz-{LibraryVersion}\COPYING.GPLv2" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <copy source="{Workspace}\COPYING.0BSD" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD" overwrite="true"/>
+               <copy source="{Workspace}\COPYING.GPLv2" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lzma.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lzma\base.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
@@ -773,7 +773,7 @@
          <argument value="-DBUILD_OSSFUZZ:BOOL=OFF"/>
          <argument value="-DBUILD_EXAMPLES:BOOL=ON"/>
          <argument value="-DBUILD_DOC:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\libzip-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="ZlibImportLibrary" value="libz.lib"/>
@@ -898,7 +898,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libzip.pc"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\libzip-{LibraryVersion}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zip.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zipconf.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
@@ -1072,7 +1072,7 @@
             <argument value="remove_directory"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\libarchive-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="ArchiveName" value="libarchive"/>
@@ -1134,7 +1134,7 @@
             <common>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\share" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share" recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\libarchive-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive_entry.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\man\man1\bsdtar.1"/>
@@ -1310,7 +1310,7 @@
             <argument value="remove_directory"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\libarchive-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="ArchiveName" value="libarchive"/>
@@ -1372,7 +1372,7 @@
             <common>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\share" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share" recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\libarchive-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive_entry.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\man\man1\bsdtar.1"/>
@@ -1646,7 +1646,7 @@
                <line value="    }},"/>
                <line value=");"/>
             </temporaryFile>
-            <argument value="{Workspace}\openssl-{LibraryVersion}\Configure"/>
+            <argument value="{Workspace}\Configure"/>
             <argument value="{Target:TargetName}"/>
             <argument value="shared"/>
             <argument value="no-asm"/>
@@ -1733,7 +1733,7 @@
             </perVariant>
             <common>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\openssl-{LibraryVersion}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\ssl.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\crypto.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt"/>
@@ -2006,7 +2006,7 @@
                <line value="    }},"/>
                <line value=");"/>
             </temporaryFile>
-            <argument value="{Workspace}\openssl-{LibraryVersion}\Configure"/>
+            <argument value="{Workspace}\Configure"/>
             <argument value="{Target:TargetName}"/>
             <argument value="shared"/>
             <argument value="no-asm"/>
@@ -2093,7 +2093,7 @@
             </perVariant>
             <common>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\openssl-{LibraryVersion}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\ssl.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\crypto.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt"/>
@@ -2179,7 +2179,7 @@
          <argument value="-DUSE_NGHTTP2:BOOL=OFF"/>
          <argument value="-DUSE_NGTCP2:BOOL=OFF"/>
          <argument value="-DUSE_QUICHE:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\curl-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="CurlDll" value="libcurl.dll"/>
@@ -2227,7 +2227,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libcurl.pc"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\curl-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curl.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curlver.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt"/>
@@ -2282,7 +2282,7 @@
          <copy source="{BuildFileDir}\programs\libpq\bcc64x-winsock-compat.c"
                target="{CurrentArtifact}\lib\bcc64x-winsock-compat.c"
                overwrite="true" preserveCurrentArtifact="true"/>
-         <require path="{Workspace}\curl-{LibraryVersion}\lib\bcc64x-winsock-compat.c"/>
+         <require path="{Workspace}\lib\bcc64x-winsock-compat.c"/>
 
       </source>
       <build>
@@ -2329,7 +2329,7 @@
          <argument value="-DUSE_NGHTTP2:BOOL=OFF"/>
          <argument value="-DUSE_NGTCP2:BOOL=OFF"/>
          <argument value="-DUSE_QUICHE:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\curl-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="CurlDll" value="libcurl.dll"/>
@@ -2377,7 +2377,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libcurl.pc"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\curl-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curl.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curlver.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt"/>
@@ -2487,13 +2487,13 @@
             <argument value="-q"/>
             <argument value="-std=c++23"/>
             <argument value="-I{BuildFileDir}\cmake\boost\bcc64x-native-clang"/>
-            <argument value="-I{Workspace}\boost-{LibraryVersion}\libs\config\include"/>
+            <argument value="-I{Workspace}\libs\config\include"/>
             <argument value="-c"/>
             <argument value="{BuildFileDir}\cmake\boost\preflight\boost_config_probe.cpp"/>
             <argument value="-o"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\preflight\boost_config.o"/>
          </execute>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\boost-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="ZlibImportLibrary" value="libz.lib"/>
@@ -2576,7 +2576,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libboost_unit_test_framework.lib"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\boost-{LibraryVersion}\LICENSE_1_0.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE_1_0.txt" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE_1_0.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE_1_0.txt" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\boost\version.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\boost\filesystem\path.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE_1_0.txt"/>
@@ -2873,7 +2873,7 @@
       <execute name="copy-build-tree" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
          <argument value="-E"/>
          <argument value="copy_directory"/>
-         <argument value="{Workspace}\ACE_wrappers"/>
+         <argument value="{Workspace}"/>
          <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"/>
       </execute>
 
@@ -3126,10 +3126,10 @@
          <repository url="https://sourceware.org/git/bzip2.git"/>
       </security>
       <source><download url="https://sourceware.org/pub/bzip2/bzip2-{LibraryVersion}.tar.gz" archive="bzip2-{LibraryVersion}.tar.gz" sha256="ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"/><extract format="libarchive" root="bzip2-{LibraryVersion}"><require path="bzlib.h"/><require path="bzlib.c"/><require path="blocksort.c"/><require path="huffman.c"/><require path="crctable.c"/><require path="randtable.c"/><require path="compress.c"/><require path="decompress.c"/><require path="libbz2.def"/><require path="LICENSE"/></extract></source>
-      <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DBZIP2_SOURCE_DIR:PATH={Workspace}\bzip2-{LibraryVersion}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
+      <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DBZIP2_SOURCE_DIR:PATH={Workspace}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\bzip2" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant><variant name="Debug"><variable name="DebugPostfix" value="d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/></variant>
-         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bzip2{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\bzip2{DebugPostfix}.lib"/></perVariant><common><copy source="{Workspace}\bzip2-{LibraryVersion}\bzlib.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\bzlib.h" overwrite="true"/><copy source="{Workspace}\bzip2-{LibraryVersion}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common></install>
+         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bzip2{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\bzip2{DebugPostfix}.lib"/></perVariant><common><copy source="{Workspace}\bzlib.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\bzlib.h" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\bzip2\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="bzip2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
@@ -3139,10 +3139,10 @@
       <metadata name="GLEW" supplier="GLEW project" homepage="https://glew.sourceforge.net/" description="OpenGL Extension Wrangler Library for discovering and loading OpenGL extensions and entry points." licenseSignal="yellow"><license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="LICENSE.txt"/></metadata>
       <source><download url="https://github.com/nigels-com/glew/releases/download/glew-{LibraryVersion}/glew-{LibraryVersion}.zip" archive="glew-{LibraryVersion}.zip" sha256="09e0083ae46930aba9b53e72c92ee1a557e24ed393526fec26cb0ebabd834720"/><extract format="zip" root="glew-{LibraryVersion}"><require path="src\glew.c"/><require path="include\GL\glew.h"/><require path="LICENSE.txt"/></extract></source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
-         <argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DGLEW_SOURCE_DIR:PATH={Workspace}\glew-{LibraryVersion}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DGLEW_SOURCE_DIR:PATH={Workspace}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\glew" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant><variant name="Debug"><variable name="DebugPostfix" value="d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/></variant>
-         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\glew32{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\glew32{DebugPostfix}.lib"/></perVariant><common><copy source="{Workspace}\glew-{LibraryVersion}\include\GL" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL" recursive="true" overwrite="true"/><copy source="{Workspace}\glew-{LibraryVersion}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt" overwrite="true"/></common></install>
+         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\glew32{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\glew32{DebugPostfix}.lib"/></perVariant><common><copy source="{Workspace}\include\GL" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL" recursive="true" overwrite="true"/><copy source="{Workspace}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt" overwrite="true"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\glew\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="glew-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
@@ -3227,7 +3227,7 @@
             <argument value="{Workspace}\meson-1.12.0"/>
             <argument value="setup"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <argument value="{Workspace}\mesa-{LibraryVersion}"/>
+            <argument value="{Workspace}"/>
             <argument value="--backend=ninja"/>
             <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--bindir=bin\win64\{Configuration}"/>
@@ -3308,9 +3308,9 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libgallium_wgl.lib"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\mesa-{LibraryVersion}\include\GL" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL" recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\mesa-{LibraryVersion}\include\KHR" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\KHR" recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\mesa-{LibraryVersion}\docs\license.rst" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE-MESA.rst" overwrite="true"/>
+               <copy source="{Workspace}\include\GL" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL" recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\include\KHR" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\KHR" recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\docs\license.rst" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE-MESA.rst" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL\gl.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL\glext.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL\glcorearb.h"/>
@@ -3336,10 +3336,10 @@
       <dependency library="opengl" version="26.2.1"/>
       <metadata name="raylib" supplier="raylib project" homepage="https://www.raylib.com/" description="Simple cross-platform C library for graphics, audio, input, and game and application development." licenseSignal="green"><license name="zlib License" spdx="Zlib" file="LICENSE"/></metadata>
       <source><download url="https://github.com/raysan5/raylib/archive/dbc56a87da87d973a9c5baa4e7438a9d20121d28.zip" archive="raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28.zip"/><extract format="zip" root="raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28"><require path="LICENSE"/><require path="src\raylib.h"/><require path="src\raymath.h"/><require path="src\rcamera.h"/><require path="src\rlgl.h"/><require path="src\rcore.c"/><require path="src\rshapes.c"/><require path="src\rtextures.c"/><require path="src\rtext.c"/><require path="src\rmodels.c"/><require path="src\raudio.c"/></extract></source>
-      <build testsAffectBuild="false"><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DRAYLIB_SOURCE_DIR:PATH={Workspace}\raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28"/><argument value="-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
+      <build testsAffectBuild="false"><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DRAYLIB_SOURCE_DIR:PATH={Workspace}"/><argument value="-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\raylib" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="BaseName" value="raylib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant><variant name="Debug"><variable name="BaseName" value="raylibd"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
-         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BaseName}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BaseName}.lib"/></perVariant><common><copy source="{Workspace}\raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28\src\raylib.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raylib.h" overwrite="true"/><copy source="{Workspace}\raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28\src\raymath.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raymath.h" overwrite="true"/><copy source="{Workspace}\raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28\src\rcamera.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\rcamera.h" overwrite="true"/><copy source="{Workspace}\raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28\src\rlgl.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\rlgl.h" overwrite="true"/><copy source="{Workspace}\raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common></install>
+         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BaseName}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BaseName}.lib"/></perVariant><common><copy source="{Workspace}\src\raylib.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raylib.h" overwrite="true"/><copy source="{Workspace}\src\raymath.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raymath.h" overwrite="true"/><copy source="{Workspace}\src\rcamera.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\rcamera.h" overwrite="true"/><copy source="{Workspace}\src\rlgl.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\rlgl.h" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\raylib\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="raylib-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
@@ -3349,7 +3349,7 @@
       <source><download url="https://github.com/libsdl-org/SDL/releases/download/release-{LibraryVersion}/SDL2-{LibraryVersion}.zip" archive="SDL2-{LibraryVersion}.zip" sha256="12b2dc2eb8f2836100a7916b5d394a0c82f1f7e32693f95f98305403af242f08"/><extract format="zip" root="SDL2-{LibraryVersion}"><require path="CMakeLists.txt"/><require path="include\SDL.h"/><require path="LICENSE.txt"/></extract></source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/><argument value="-DSDL_SHARED:BOOL=ON"/><argument value="-DSDL_STATIC:BOOL=OFF"/><argument value="-DSDL_TEST:BOOL=OFF"/><argument value="-DSDL_TEST_LIBRARY:BOOL=OFF"/><argument value="-DSDL_DIRECTX:BOOL=OFF"/><argument value="-DSDL_RENDER_D3D:BOOL=OFF"/><argument value="-DSDL_RENDER_D3D11:BOOL=OFF"/><argument value="-DSDL_RENDER_D3D12:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\SDL2-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant><variant name="Debug"><variable name="DebugPostfix" value="d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/></variant>
          <install><perVariant>
             <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -3362,7 +3362,7 @@
          </perVariant><common>
             <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
             <copy source="{BuildFileDir}\cmake\sdl2-package\SDL2Config.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\SDL2\SDL2Config.cmake" overwrite="true"/>
-            <copy source="{Workspace}\SDL2-{LibraryVersion}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt" overwrite="true"/>
+            <copy source="{Workspace}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt" overwrite="true"/>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\SDL2\SDL.h"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\SDL2\SDL2Config.cmake"/>
          </common></install>
       </build>
@@ -3375,10 +3375,10 @@
          <repository url="https://github.com/sqlite/sqlite.git" ref="version-{LibraryVersion}"/>
       </security>
       <source><download url="https://www.sqlite.org/2026/sqlite-amalgamation-3530400.zip" archive="sqlite-amalgamation-3530400.zip" sha256="1e71ddf93849c6a6ecf58b827c0692073d2dd7ee40196158068f7b29f422e87d"/><extract format="zip" root="sqlite-amalgamation-3530400"><require path="sqlite3.c"/><require path="sqlite3.h"/><require path="sqlite3ext.h"/></extract></source>
-      <build testsAffectBuild="false"><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DSQLITE_SOURCE_DIR:PATH={Workspace}\sqlite-amalgamation-3530400"/><argument value="-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
+      <build testsAffectBuild="false"><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DSQLITE_SOURCE_DIR:PATH={Workspace}"/><argument value="-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\sqlite" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="BaseName" value="sqlite3"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant><variant name="Debug"><variable name="BaseName" value="sqlite3d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
-         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BaseName}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BaseName}.lib"/></perVariant><common><copy source="{Workspace}\sqlite-amalgamation-3530400\sqlite3.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\sqlite3.h" overwrite="true"/><copy source="{Workspace}\sqlite-amalgamation-3530400\sqlite3ext.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\sqlite3ext.h" overwrite="true"/></common></install>
+         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BaseName}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BaseName}.lib"/></perVariant><common><copy source="{Workspace}\sqlite3.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\sqlite3.h" overwrite="true"/><copy source="{Workspace}\sqlite3ext.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\sqlite3ext.h" overwrite="true"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\sqlite\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="sqlite-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
@@ -3468,7 +3468,7 @@
             <argument value="{ToolDir:meson}"/>
             <argument value="setup"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <argument value="{Workspace}\postgresql-{LibraryVersion}"/>
+            <argument value="{Workspace}"/>
             <argument value="--backend=ninja"/>
             <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--bindir=bin"/>
@@ -3521,10 +3521,10 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libpq.lib"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\postgresql-{LibraryVersion}\src\interfaces\libpq\libpq-fe.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libpq-fe.h" overwrite="true"/>
-               <copy source="{Workspace}\postgresql-{LibraryVersion}\src\interfaces\libpq\libpq-events.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libpq-events.h" overwrite="true"/>
-               <copy source="{Workspace}\postgresql-{LibraryVersion}\src\include\postgres_ext.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\postgres_ext.h" overwrite="true"/>
-               <copy source="{Workspace}\postgresql-{LibraryVersion}\COPYRIGHT" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYRIGHT" overwrite="true"/>
+               <copy source="{Workspace}\src\interfaces\libpq\libpq-fe.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libpq-fe.h" overwrite="true"/>
+               <copy source="{Workspace}\src\interfaces\libpq\libpq-events.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libpq-events.h" overwrite="true"/>
+               <copy source="{Workspace}\src\include\postgres_ext.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\postgres_ext.h" overwrite="true"/>
+               <copy source="{Workspace}\COPYRIGHT" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYRIGHT" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libpq-fe.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\postgres_ext.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYRIGHT"/>
@@ -3595,7 +3595,7 @@
          <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
          <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={InstallRoot}\packages\libpq\18.6\include"/>
          <argument value="-DPostgreSQL_LIBRARY:FILEPATH={InstallRoot}\packages\libpq\18.6\lib\win64\{Configuration}\libpq.lib"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\libpqxx-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="PqxxName" value="pqxx"/>
@@ -3625,7 +3625,7 @@
             <common>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\libpqxx-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\pqxx\pqxx"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
             </common>
@@ -3716,7 +3716,7 @@
          <argument value="-Dnetwork-accessor:STRING=winsock"/>
          <argument value="-Dtranscoder:STRING=windows"/>
          <argument value="-Dmessage-loader:STRING=inmemory"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xerces-c-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <execute name="build-product" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
             <argument value="--build"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -3777,8 +3777,8 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\cmake\XercesCConfigInternal-{CMakeExportConfiguration}.cmake"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\xerces-c-{LibraryVersion}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
-               <copy source="{Workspace}\xerces-c-{LibraryVersion}\NOTICE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <copy source="{Workspace}\NOTICE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xercesc\util\PlatformUtils.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xercesc\util\XercesVersion.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xercesc\dom\DOM.hpp"/>
@@ -3802,7 +3802,7 @@
             <argument value="-Dnetwork-accessor:STRING=winsock"/>
             <argument value="-Dtranscoder:STRING=windows"/>
             <argument value="-Dmessage-loader:STRING=inmemory"/>
-            <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\xerces-c-{LibraryVersion}" build="{DocumentationBuild}"/>
+            <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{DocumentationBuild}"/>
             <execute name="create-api-docs" executable="{Tool:cmake}" workingDirectory="{DocumentationBuild}" showOutput="false">
                <argument value="--build"/>
                <argument value="{DocumentationBuild}"/>
@@ -3838,13 +3838,13 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-         <argument value="-DSOIL2_SOURCE_DIR:PATH={Workspace}\SOIL2-4e2e116840c5718d7e8cbfa69d817ff90f707607"/>
+         <argument value="-DSOIL2_SOURCE_DIR:PATH={Workspace}"/>
          <argument value="-DOpenGL_DIR:PATH={InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\cmake\OpenGL"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\soil2" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant>
          <variant name="Debug"><variable name="DebugPostfix" value="d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/></variant>
-         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\soil2{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\soil2{DebugPostfix}.lib"/></perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{Workspace}\SOIL2-4e2e116840c5718d7e8cbfa69d817ff90f707607\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\SOIL2\SOIL2.h"/></common></install>
+         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\soil2{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\soil2{DebugPostfix}.lib"/></perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\SOIL2\SOIL2.h"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\soil2\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="soil2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
@@ -3864,9 +3864,9 @@
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/><argument value="-DVTK_BUILD_TESTING:BOOL=OFF"/><argument value="-DVTK_GROUP_ENABLE_StandAlone:STRING=DONT_WANT"/><argument value="-DVTK_GROUP_ENABLE_Rendering:STRING=DONT_WANT"/><argument value="-DVTK_GROUP_ENABLE_Web:STRING=DONT_WANT"/><argument value="-DVTK_GROUP_ENABLE_MPI:STRING=DONT_WANT"/><argument value="-DVTK_MODULE_ENABLE_VTK_CommonCore:STRING=YES"/><argument value="-DVTK_MODULE_ENABLE_VTK_CommonDataModel:STRING=YES"/><argument value="-DVTK_MODULE_ENABLE_VTK_FiltersCore:STRING=YES"/><argument value="-DVTK_WRAP_PYTHON:BOOL=OFF"/><argument value="-DVTK_WRAP_JAVA:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\VTK-f49a1dbafa60b58ef22f6292ec58370453162192" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/><argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant><variant name="Debug"><variable name="DebugPostfix" value="d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/></variant>
-         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libvtkCommonCore-9.6{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libvtkCommonCore-9.6{DebugPostfix}.lib"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libvtkCommonDataModel-9.6{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libvtkCommonDataModel-9.6{DebugPostfix}.lib"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libvtkFiltersCore-9.6{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libvtkFiltersCore-9.6{DebugPostfix}.lib"/></perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\share" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share" recursive="true" overwrite="true"/><copy source="{Workspace}\VTK-f49a1dbafa60b58ef22f6292ec58370453162192\Copyright.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\Copyright.txt" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\vtk-9.6\vtkVersion.h"/></common></install>
+         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libvtkCommonCore-9.6{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libvtkCommonCore-9.6{DebugPostfix}.lib"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libvtkCommonDataModel-9.6{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libvtkCommonDataModel-9.6{DebugPostfix}.lib"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libvtkFiltersCore-9.6{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libvtkFiltersCore-9.6{DebugPostfix}.lib"/></perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\share" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share" recursive="true" overwrite="true"/><copy source="{Workspace}\Copyright.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\Copyright.txt" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\vtk-9.6\vtkVersion.h"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\vtk\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="vtk-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
@@ -3882,7 +3882,7 @@
          <argument value="-DOPENCV_DNN_MLAS:BOOL=OFF"/><argument value="-DWITH_ONNXRUNTIME:BOOL=OFF"/><argument value="-DWITH_PROTOBUF:BOOL=ON"/><argument value="-DBUILD_PROTOBUF:BOOL=ON"/><argument value="-DPROTOBUF_UPDATE_FILES:BOOL=OFF"/><argument value="-DOPENCV_DISABLE_THREAD_SUPPORT:BOOL=OFF"/><argument value="-DWITH_OPENCL:BOOL=OFF"/><argument value="-DWITH_CUDA:BOOL=OFF"/><argument value="-DWITH_DIRECTML:BOOL=OFF"/><argument value="-DWITH_TBB:BOOL=OFF"/><argument value="-DWITH_OPENMP:BOOL=OFF"/>
          <argument value="-DWITH_FFMPEG:BOOL=OFF"/><argument value="-DWITH_GSTREAMER:BOOL=OFF"/><argument value="-DWITH_DSHOW:BOOL=OFF"/><argument value="-DWITH_MSMF:BOOL=OFF"/><argument value="-DWITH_QT:BOOL=OFF"/><argument value="-DWITH_GTK:BOOL=OFF"/><argument value="-DWITH_OPENGL:BOOL=OFF"/><argument value="-DWITH_UNIFONT:BOOL=OFF"/>
          <argument value="-DWITH_JPEG:BOOL=ON"/><argument value="-DBUILD_JPEG:BOOL=ON"/><argument value="-DWITH_PNG:BOOL=ON"/><argument value="-DBUILD_PNG:BOOL=ON"/><argument value="-DWITH_TIFF:BOOL=ON"/><argument value="-DBUILD_TIFF:BOOL=ON"/><argument value="-DWITH_WEBP:BOOL=ON"/><argument value="-DBUILD_WEBP:BOOL=ON"/><argument value="-DWITH_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_ZLIB:BOOL=OFF"/><argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/><argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibrary}"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><variable name="ZlibLibrary" value="libz.lib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/><argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant><variant name="Debug"><variable name="DebugPostfix" value="d"/><variable name="ZlibLibrary" value="libzd.lib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/></variant>
          <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_core500{DebugPostfix}.dll"/>
@@ -3915,7 +3915,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_videoio500{DebugPostfix}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_highgui500{DebugPostfix}.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_highgui500{DebugPostfix}.lib"/>
-            </perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\etc\licenses" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses" recursive="true" overwrite="true"/><copy source="{Workspace}\opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\core.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\dnn.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\protobuf-LICENSE"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\SoftFloat-COPYING.txt"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/></common></install>
+            </perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\etc\licenses" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses" recursive="true" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\core.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\dnn.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\protobuf-LICENSE"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\SoftFloat-COPYING.txt"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\opencv\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="opencv-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
@@ -3948,7 +3948,7 @@
          <argument value="-DCMARK_TESTS:BOOL=OFF"/>
          <argument value="-DCMARK_STATIC:BOOL=OFF"/>
          <argument value="-DCMARK_SHARED:BOOL=ON"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <execute name="build-libraries" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="--build"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--target"/><argument value="libcmark-gfm"/><argument value="libcmark-gfm-extensions"/>
@@ -3967,13 +3967,13 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcmark-gfm-extensions.lib"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\src\cmark-gfm.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm.h" overwrite="true"/>
-               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\src\cmark-gfm-extension_api.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm-extension_api.h" overwrite="true"/>
-               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\extensions\cmark-gfm-core-extensions.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm-core-extensions.h" overwrite="true"/>
+               <copy source="{Workspace}\src\cmark-gfm.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm.h" overwrite="true"/>
+               <copy source="{Workspace}\src\cmark-gfm-extension_api.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm-extension_api.h" overwrite="true"/>
+               <copy source="{Workspace}\extensions\cmark-gfm-core-extensions.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm-core-extensions.h" overwrite="true"/>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\src\cmark-gfm_export.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm_export.h" overwrite="true"/>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\src\cmark-gfm_version.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm_version.h" overwrite="true"/>
                <copy source="{BuildFileDir}\cmake\cmark-gfm\cmark-gfmConfig.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\cmark-gfm\cmark-gfmConfig.cmake" overwrite="true"/>
-               <copy source="{Workspace}\cmark-gfm-587a12bb54d95ac37241377e6ddc93ea0e45439b\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\cmark-gfm\COPYING" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\cmark-gfm\COPYING" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\cmark-gfm.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\cmark-gfm\cmark-gfmConfig.cmake"/>
             </common>
@@ -4007,7 +4007,7 @@
          <argument value="-DCMAKE_CXX_STANDARD:STRING=17"/><argument value="-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"/><argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\googletest\bcc64x-target-fixes.cmake"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/><argument value="-DBUILD_GMOCK:BOOL=ON"/><argument value="-DINSTALL_GTEST:BOOL=ON"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\googletest-52eb8108c5bdec04579160ae17225d66034bd723" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="CMakeExportConfiguration" value="release"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/></variant>
          <variant name="Debug"><variable name="CMakeExportConfiguration" value="debug"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/></variant>
@@ -4021,7 +4021,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\GTest\GTestConfig.cmake"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\googletest-52eb8108c5bdec04579160ae17225d66034bd723\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\googletest\LICENSE" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\googletest\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\gtest\gtest.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\gmock\gmock.h"/>
             </common>
@@ -4187,7 +4187,7 @@
          <cmake
             mode="configure"
             executable="{Tool:cmake}"
-            source="{Workspace}\Catch2-{LibraryVersion}"
+            source="{Workspace}"
             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
          <cmake
@@ -4273,7 +4273,7 @@
 
             <common>
                <copy
-                  source="{Workspace}\Catch2-{LibraryVersion}\LICENSE.txt"
+                  source="{Workspace}\LICENSE.txt"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\catch2\LICENSE.txt"
                   overwrite="true"/>
 
@@ -4405,12 +4405,12 @@
       -->
       <install>
          <copy
-            source="{Workspace}\BitmapPlusPlus-{LibraryVersion}\lib\include\BitmapPlusPlus.hpp"
+            source="{Workspace}\lib\include\BitmapPlusPlus.hpp"
             target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\BitmapPlusPlus.hpp"
             overwrite="true"/>
 
          <copy
-            source="{Workspace}\BitmapPlusPlus-{LibraryVersion}\LICENSE.md"
+            source="{Workspace}\LICENSE.md"
             target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\bitmapplusplus\LICENSE.md"
             overwrite="true"/>
 
@@ -4540,7 +4540,7 @@
       <cmake
          mode="configure"
          executable="{Tool:cmake}"
-         source="{Workspace}\libjpeg-turbo-{LibraryVersion}"
+         source="{Workspace}"
          build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
       <cmake
@@ -4591,7 +4591,7 @@
 
          <common>
             <copy
-               source="{Workspace}\libjpeg-turbo-{LibraryVersion}\LICENSE.md"
+               source="{Workspace}\LICENSE.md"
                target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"
                overwrite="true"/>
 
@@ -4684,7 +4684,7 @@
       <cmake
          mode="configure"
          executable="{Tool:cmake}"
-         source="{Workspace}\libpng-{LibraryVersion}"
+         source="{Workspace}"
          build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
       <cmake
@@ -4724,7 +4724,7 @@
 
          <common>
             <copy
-               source="{Workspace}\libpng-{LibraryVersion}\LICENSE"
+               source="{Workspace}\LICENSE"
                target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
                overwrite="true"/>
 
@@ -4844,7 +4844,7 @@
          <cmake
             mode="configure"
             executable="{Tool:cmake}"
-            source="{Workspace}\harfbuzz-{LibraryVersion}"
+            source="{Workspace}"
             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
          <cmake
@@ -4939,12 +4939,12 @@
                   weakening the consumer smoke test.
                -->
                <copy
-                  source="{Workspace}\harfbuzz-{LibraryVersion}\src\hb-subset-depend.h"
+                  source="{Workspace}\src\hb-subset-depend.h"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset-depend.h"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\harfbuzz-{LibraryVersion}\COPYING"
+                  source="{Workspace}\COPYING"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
                   overwrite="true"/>
 
@@ -5077,7 +5077,7 @@
       <cmake
          mode="configure"
          executable="{Tool:cmake}"
-         source="{Workspace}\freetype-{LibraryVersion}"
+         source="{Workspace}"
          build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
       <cmake
@@ -5114,7 +5114,7 @@
 
          <common>
             <copy
-               source="{Workspace}\freetype-{LibraryVersion}\LICENSE.TXT"
+               source="{Workspace}\LICENSE.TXT"
                target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"
                overwrite="true"/>
 
@@ -5216,7 +5216,7 @@
       <cmake
          mode="configure"
          executable="{Tool:cmake}"
-         source="{Workspace}\tiff-{LibraryVersion}"
+         source="{Workspace}"
          build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
       <cmake
@@ -5258,7 +5258,7 @@
 
          <common>
             <copy
-               source="{Workspace}\tiff-{LibraryVersion}\LICENSE.md"
+               source="{Workspace}\LICENSE.md"
                target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"
                overwrite="true"/>
 
@@ -6380,8 +6380,8 @@
          <target
             name="gn-gen"
             type="generic"
-            executable="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\bin\gn.exe"
-            workingDirectory="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d"
+            executable="{Workspace}\bin\gn.exe"
+            workingDirectory="{Workspace}"
             showOutput="false">
 
             <temporaryFile
@@ -6594,7 +6594,7 @@
          <execute
             name="ninja-build"
             executable="{Tool:ninja}"
-            workingDirectory="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d"
+            workingDirectory="{Workspace}"
             showOutput="false">
 
             <environment
@@ -6726,37 +6726,37 @@
 
             <common>
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\include"
+                  source="{Workspace}\include"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\include"
                   recursive="true"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\skcms"
+                  source="{Workspace}\modules\skcms"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skcms"
                   recursive="true"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\skunicode"
+                  source="{Workspace}\modules\skunicode"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skunicode"
                   recursive="true"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\skshaper"
+                  source="{Workspace}\modules\skshaper"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skshaper"
                   recursive="true"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\svg"
+                  source="{Workspace}\modules\svg"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\svg"
                   recursive="true"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\skottie"
+                  source="{Workspace}\modules\skottie"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skottie"
                   recursive="true"
                   overwrite="true"/>
@@ -6768,34 +6768,34 @@
                   installed into the consumer SDK.
                -->
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\skresources\include"
+                  source="{Workspace}\modules\skresources\include"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\skresources\include"
                   recursive="true"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\modules\sksg\include"
+                  source="{Workspace}\modules\sksg\include"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\modules\sksg\include"
                   recursive="true"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\src\core\SkTHash.h"
+                  source="{Workspace}\src\core\SkTHash.h"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkTHash.h"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\src\core\SkChecksum.h"
+                  source="{Workspace}\src\core\SkChecksum.h"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkChecksum.h"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\src\core\SkMathPriv.h"
+                  source="{Workspace}\src\core\SkMathPriv.h"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkMathPriv.h"
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\src\core\SkUTF.h"
+                  source="{Workspace}\src\core\SkUTF.h"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\src\core\SkUTF.h"
                   overwrite="true"/>
 
@@ -6805,7 +6805,7 @@
                   overwrite="true"/>
 
                <copy
-                  source="{Workspace}\skia-2eed75b956045eb8603d3690a1e84bc582a2135d\LICENSE"
+                  source="{Workspace}\LICENSE"
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\skia\LICENSE"
                   overwrite="true"/>
 
@@ -7082,7 +7082,7 @@
          <argument value="-DBUILD_TESTING:BOOL={TestsEnabled}"/>
          <argument value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
          <argument value="-DGRAPHITE2_VM_TYPE:STRING=auto"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\graphite2-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -7112,7 +7112,7 @@
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
                      recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\graphite2-{LibraryVersion}\LICENSE"
+               <copy source="{Workspace}\LICENSE"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\graphite2\Font.h"/>
@@ -7197,7 +7197,7 @@
          <argument value="-DEXPAT_WARNINGS_AS_ERRORS:BOOL=OFF"/>
          <cmake mode="configure"
                 executable="{Tool:cmake}"
-                source="{Workspace}\expat-{LibraryVersion}"
+                source="{Workspace}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build"
                 executable="{Tool:cmake}"
@@ -7231,7 +7231,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\expat-{LibraryVersion}\expat-config.cmake"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\expat-{LibraryVersion}\COPYING"
+               <copy source="{Workspace}\COPYING"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\expat.h"/>
@@ -7326,7 +7326,7 @@
          <argument value="-DEXPAT_WARNINGS_AS_ERRORS:BOOL=OFF"/>
          <cmake mode="configure"
                 executable="{Tool:cmake}"
-                source="{Workspace}\expat-{LibraryVersion}"
+                source="{Workspace}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build"
                 executable="{Tool:cmake}"
@@ -7360,7 +7360,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\expat-{LibraryVersion}\expat-config.cmake"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\expat-{LibraryVersion}\COPYING"
+               <copy source="{Workspace}\COPYING"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\expat.h"/>
@@ -7452,7 +7452,7 @@
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
-         <argument value="-DTECKIT_SOURCE_DIR:PATH={Workspace}\teckit-{LibraryVersion}"/>
+         <argument value="-DTECKIT_SOURCE_DIR:PATH={Workspace}"/>
          <argument value="-DZLIB_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\cmake\zlib"/>
          <argument value="-Dexpat_DIR:PATH={DependencyRoot:expat}\lib\win64\{Configuration}\cmake\expat-{DependencyVersion:expat}"/>
          <cmake mode="configure"
@@ -7480,9 +7480,9 @@
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test"
                         showOutput="false">
                   <environment name="BINDIR" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"/>
-                  <environment name="SRCDIR" value="{Workspace}\teckit-{LibraryVersion}\test"/>
+                  <environment name="SRCDIR" value="{Workspace}\test"/>
                   <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{ENV:PATH}"/>
-                  <argument value="{Workspace}\teckit-{LibraryVersion}\test\dotests.pl"/>
+                  <argument value="{Workspace}\test\dotests.pl"/>
                </execute>
                <cmake mode="install"
                       executable="{Tool:cmake}"
@@ -7494,7 +7494,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\teckit-{LibraryVersion}\COPYING"
+               <copy source="{Workspace}\COPYING"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\TECkit\TECkit_Common.h"/>
@@ -7574,12 +7574,12 @@
                 source="{BuildRoot}\generated\cmake\{LibraryId}\{Configuration}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}">
             <import format="vcxproj"
-                    source="{Workspace}\icu\source\stubdata\stubdata.vcxproj"
+                    source="{Workspace}\source\stubdata\stubdata.vcxproj"
                     target="icudt"
                     type="shared"
                     runtimeOutput="icudt78"
                     archiveOutput="icudt">
-               <include path="{Workspace}\icu\source\common"/>
+               <include path="{Workspace}\source\common"/>
                <define value="WIN32"/>
                <define value="WIN64"/>
                <define value="WINVER=0x0601"/>
@@ -7590,13 +7590,13 @@
             </import>
 
             <import format="vcxproj"
-                    source="{Workspace}\icu\source\common\common.vcxproj"
+                    source="{Workspace}\source\common\common.vcxproj"
                     target="icuuc"
                     type="shared"
                     runtimeOutput="icuuc78"
                     archiveOutput="icuuc"
                     debugPostfix="d">
-               <include path="{Workspace}\icu\source\common"/>
+               <include path="{Workspace}\source\common"/>
                <define value="WIN32"/>
                <define value="WIN64"/>
                <define value="WINVER=0x0601"/>
@@ -7610,14 +7610,14 @@
             </import>
 
             <import format="vcxproj"
-                    source="{Workspace}\icu\source\i18n\i18n.vcxproj"
+                    source="{Workspace}\source\i18n\i18n.vcxproj"
                     target="icuin"
                     type="shared"
                     runtimeOutput="icuin78"
                     archiveOutput="icuin"
                     debugPostfix="d">
-               <include path="{Workspace}\icu\source\common"/>
-               <include path="{Workspace}\icu\source\i18n"/>
+               <include path="{Workspace}\source\common"/>
+               <include path="{Workspace}\source\i18n"/>
                <define value="WIN32"/>
                <define value="WIN64"/>
                <define value="WINVER=0x0601"/>
@@ -7682,13 +7682,13 @@
 
             <common>
                <!-- ICU public headers are split between common/unicode and i18n/unicode. -->
-               <copy source="{Workspace}\icu\source\common\unicode"
+               <copy source="{Workspace}\source\common\unicode"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode"
                      recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\icu\source\i18n\unicode"
+               <copy source="{Workspace}\source\i18n\unicode"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode"
                      recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\icu\LICENSE"
+               <copy source="{Workspace}\LICENSE"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
                      overwrite="true"/>
 
@@ -7778,7 +7778,7 @@
          <argument value="-DLIBXML2_WITH_XPTR:BOOL=ON"/>
          <argument value="-DLIBXML2_WITH_OUTPUT:BOOL=ON"/>
          <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\libxml2-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -7807,7 +7807,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\libxml2-{LibraryVersion}\Copyright"
+               <copy source="{Workspace}\Copyright"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\Copyright"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\Copyright"/>
@@ -7940,7 +7940,7 @@
          <argument value="-DUSE_INSECURE_RANDOM:BOOL=OFF"/>
          <argument value="-DSKIP_OS_SECURE_RANDOM:BOOL=OFF"/>
          <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\libjpeg-turbo\3.2.0"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\qpdf-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -7978,7 +7978,7 @@
                </execute>
                <execute name="compare-native-smoke" test="true"
                         executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compare-for-test\qpdf-test-compare.exe"
-                        workingDirectory="{Workspace}\qpdf-{LibraryVersion}\compare-for-test\qtest\compare"
+                        workingDirectory="{Workspace}\compare-for-test\qtest\compare"
                         showOutput="false">
                   <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{ENV:PATH}"/>
                   <argument value="zlib.pdf"/>
@@ -8005,10 +8005,10 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\qpdf-{LibraryVersion}\LICENSE.txt"
+               <copy source="{Workspace}\LICENSE.txt"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt"
                      overwrite="true"/>
-               <copy source="{Workspace}\qpdf-{LibraryVersion}\NOTICE.md"
+               <copy source="{Workspace}\NOTICE.md"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE.md"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt"/>
@@ -8192,18 +8192,18 @@
                   workingDirectory="{Workspace}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
-            <argument value="{Workspace}\podofo-{LibraryVersion}\extern\resources"/>
+            <argument value="{Workspace}\extern\resources"/>
          </execute>
          <execute name="resources-extract" executable="{Tool:cmake}"
-                  workingDirectory="{Workspace}\podofo-{LibraryVersion}\extern\resources" showOutput="false">
+                  workingDirectory="{Workspace}\extern\resources" showOutput="false">
             <argument value="-E"/>
             <argument value="tar"/>
             <argument value="xf"/>
             <argument value="{Workspace}\.buildengine\podofo-resources.tar"/>
          </execute>
-         <require path="{Workspace}\podofo-{LibraryVersion}\extern\resources\Fonts\LiberationSans-Regular.ttf"/>
-         <require path="{Workspace}\podofo-{LibraryVersion}\extern\resources\TextExtractionPredefinedCmap.pdf"/>
-         <require path="{Workspace}\podofo-{LibraryVersion}\extern\resources\README.md"/>
+         <require path="{Workspace}\extern\resources\Fonts\LiberationSans-Regular.ttf"/>
+         <require path="{Workspace}\extern\resources\TextExtractionPredefinedCmap.pdf"/>
+         <require path="{Workspace}\extern\resources\README.md"/>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -8234,7 +8234,7 @@
          <argument value="-DPODOFO_WITH_WIN32GDI_FONT_SEARCH:BOOL=ON"/>
          <argument value="-DPODOFO_WITH_LCMS2:BOOL=OFF"/>
          <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{DependencyRoot:openssl};{InstallRoot}\packages\freetype\2.14.3;{InstallRoot}\packages\libxml2\2.15.3;{InstallRoot}\packages\libjpeg-turbo\3.2.0;{InstallRoot}\packages\libpng\1.6.58;{InstallRoot}\packages\libtiff\4.7.2"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\podofo-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -8275,7 +8275,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\podofo-{LibraryVersion}\NOTICE"
+               <copy source="{Workspace}\NOTICE"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE"/>
@@ -8356,7 +8356,7 @@
          <argument value="-DBUILD_STATIC:BOOL=OFF"/>
          <argument value="-DBUILD_EXECUTABLE:BOOL=OFF"/>
          <argument value="-DBUILD_TEST:BOOL={TestsEnabled}"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\win-iconv-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -8387,7 +8387,7 @@
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
                      recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\win-iconv-{LibraryVersion}\readme.txt"
+               <copy source="{Workspace}\readme.txt"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\readme.txt"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\iconv.h"/>
@@ -8487,7 +8487,7 @@
             Test integration stays explicit and will be added when that separate
             upstream data repository becomes a pinned BuildEngine participant.
          -->
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\poppler-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -8517,7 +8517,7 @@
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
                      recursive="true" overwrite="true"/>
-               <copy source="{Workspace}\poppler-{LibraryVersion}\COPYING"
+               <copy source="{Workspace}\COPYING"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
@@ -8594,7 +8594,7 @@
          <argument value="-DBoost_DIR:PATH={InstallRoot}\packages\boost\1.92.0\lib\win64\{Configuration}\cmake\Boost-1.92.0"/>
          <argument value="-DLibZip_DIR:PATH={InstallRoot}\packages\libzip\1.11.4\lib\win64\{Configuration}\cmake\libzip"/>
          <argument value="-Dpugixml_DIR:PATH={InstallRoot}\packages\pugixml\1.16\lib\win64\{Configuration}\cmake\pugixml"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\OpenXLSX-{LibraryVersion}"
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -8629,7 +8629,7 @@
             <common>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\OpenXLSX\OpenXLSX.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\OpenXLSX\headers\OpenXLSX-Exports.hpp"/>
-               <copy source="{Workspace}\OpenXLSX-{LibraryVersion}\LICENSE.md"
+               <copy source="{Workspace}\LICENSE.md"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"/>
@@ -8681,7 +8681,7 @@
          <argument value="-DFASTFLOAT_BENCHMARKS:BOOL=OFF"/>
          <argument value="-DFASTFLOAT_INSTALL:BOOL=ON"/>
          <argument value="-DFASTFLOAT_SANITIZE:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\fast_float-8.2.3" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -8702,7 +8702,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\FastFloat\FastFloatConfig.cmake"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\fast_float-8.2.3\LICENSE-MIT"
+               <copy source="{Workspace}\LICENSE-MIT"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\fast_float\LICENSE-MIT" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\fast_float\LICENSE-MIT"/>
             </common>
@@ -8816,7 +8816,7 @@
          <argument value="-DABSL_USE_GOOGLETEST_HEAD:BOOL=OFF"/>
          <argument value="-DCMAKE_CXX_STANDARD:STRING=20"/>
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\abseil-cpp-20260817.0" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -8837,7 +8837,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\abseil-cpp-20260817.0\LICENSE"
+               <copy source="{Workspace}\LICENSE"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\abseil\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\abseil\LICENSE"/>
             </common>
@@ -8904,7 +8904,7 @@
          <!-- Two upstream GPL-3.0 plugins MUST remain disabled. -->
          <argument value="-DLCMS2_WITH_FASTFLOAT:BOOL=OFF"/>
          <argument value="-DLCMS2_WITH_THREADED_PLUGIN:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\Little-CMS-lcms2.19.1" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -8925,7 +8925,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\Little-CMS-lcms2.19.1\LICENSE"
+               <copy source="{Workspace}\LICENSE"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\lcms2\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\lcms2\LICENSE"/>
             </common>
@@ -8979,7 +8979,7 @@
          <argument value="-DBUILD_VIEWER:BOOL=OFF"/>
          <argument value="-DBUILD_JAVA:BOOL=OFF"/>
          <argument value="-DOPENJPEG_INSTALL_PACKAGE_DIR:STRING=lib/win64/{Configuration}/cmake/openjpeg-2.5"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\openjpeg-2.5.4" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
@@ -9000,7 +9000,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\openjpeg-2.5.4\LICENSE"
+               <copy source="{Workspace}\LICENSE"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\openjpeg\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\openjpeg\LICENSE"/>
             </common>
