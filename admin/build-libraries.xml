@@ -1390,6 +1390,367 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
+   <library id="openssl" version="3.5.9" category="security" timestamp="2026-10-15T16:15:00Z">
+      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="brotli" version="1.2.0"/>
+      <dependency library="zstd" version="1.5.7"/>
+      <metadata description="Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives." licenseSignal="green"/>
+      <source>
+         <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz" archive="openssl-{LibraryVersion}.tar.gz" sha256="603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a"/>
+         <extract format="libarchive" root="openssl-{LibraryVersion}">
+            <require path="Configure"/>
+            <require path="LICENSE.txt"/>
+            <require path="Configurations\10-main.conf"/>
+            <require path="Configurations\shared-info.pl"/>
+            <require path="Configurations\windows-makefile.tmpl"/>
+         </extract>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.9\bcc64x-memory-barrier.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            BCC64X defines both __BORLANDC__ and __clang__. In the current
+            Embarcadero Win64/COFF headers the WinSDK MemoryBarrier macro is
+            not exposed. OpenSSL 3.5.8 uses it in both Windows thread
+            implementations. The patch supplies the missing full fence locally
+            for Clang-based Embarcadero compilers through __atomic_thread_fence
+            with sequentially consistent ordering; upstream call sites remain
+            unchanged.
+         -->
+         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.9\bcc64x-linker-response-paths.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-response-paths.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            BCC64X uses GNU/Clang response-file tokenization. A backslash in
+            OpenSSL's linker inline response file escapes the following
+            character, so crypto\aes\foo.obj arrives as cryptoaesfoo.obj.
+            The patch adds an opt-in target property that converts only paths
+            written to linker response files to forward slashes. Make paths,
+            prerequisites and compiler command lines remain unchanged.
+         -->
+         <execute name="response-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-response-paths.patch"/>
+         </execute>
+         <execute name="response-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-response-paths.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.9\bcc64x-linker-external-libs.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-external-libs.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            OpenSSL places Configure-supplied external compression libraries in
+            LIB_EX_LIBS / DSO_EX_LIBS / BIN_EX_LIBS. These values are written
+            into the same BCC64X/LLD response files, but they bypass the path
+            lists normalized by bcc64x-linker-response-paths.patch. Keep the
+            proven response-path patch unchanged and normalize only these
+            response-file copies of external library arguments.
+         -->
+         <execute name="external-libs-response-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-external-libs.patch"/>
+         </execute>
+         <execute name="external-libs-response-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-external-libs.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.9\bcc64x-quic-winsock-inline.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-quic-winsock-inline.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            The Microsoft SDK mstcpip.h and mswsockdef.h headers use GNU-style
+            extern inline declarations for non-MSVC compilers. BCC64X uses Clang
+            C inline semantics, which causes unused header helpers to become
+            emitted definitions with unresolved SDK dependencies. OpenSSL's
+            quic_reactor.c only needs SIO_UDP_CONNRESET and SIO_UDP_NETRESET from
+            mstcpip.h/mswsock.h. The patch keeps winsock2.h and supplies those
+            documented IOCTL values locally for Clang-based Embarcadero builds.
+         -->
+         <execute name="quic-inline-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-quic-winsock-inline.patch"/>
+         </execute>
+         <execute name="quic-inline-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-quic-winsock-inline.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.9\bcc64x-pdb-platform.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-pdb-platform.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            OpenSSL's Windows::cppbuilder platform still models the legacy
+            C++Builder debug sidecar as .tds. BCC64X is the modern COFF/LLD
+            toolchain and uses PDB debug information instead. The patch adds a
+            dedicated Windows::bcc64x platform that inherits the existing
+            C++Builder behavior and overrides only the debug-file extension.
+         -->
+         <execute name="pdb-platform-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-pdb-platform.patch"/>
+         </execute>
+         <execute name="pdb-platform-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-pdb-platform.patch"/>
+         </execute>
+         <execute name="verify-bcc64x-platform" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="cat"/>
+            <argument value="Configurations\platform\Windows\bcc64x.pm"/>
+         </execute>
+      </source>
+      <build>
+         <!--
+            Native BCC64X OpenSSL build.  All OpenSSL target knowledge remains in this XML contract.
+            The perl target materializes the OpenSSL Configure target file in the variant build tree.
+         -->
+         <environment name="PATH" value="{ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:nasm};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
+         <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="remove_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <execute name="create-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <!--
+            OpenSSL 3.5.8 expects unprefixed Brotli import-library filenames on Windows
+            (brotlicommon.lib, brotlidec.lib, brotlienc.lib).  The upstream Brotli/BCC64X
+            producer correctly installs libbrotli*.lib.  Keep the producer artifacts
+            untouched and create private consumer-side aliases in the OpenSSL build tree.
+            The COFF import descriptors still reference the original libbrotli*.dll names.
+         -->
+         <execute name="create-compression-imports" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs"/>
+         </execute>
+         <execute name="brotli-common-import-alias" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="copy_if_different"/>
+            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlicommon.lib"/>
+         </execute>
+         <execute name="brotli-dec-import-alias" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="copy_if_different"/>
+            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlidec.lib"/>
+         </execute>
+         <execute name="brotli-enc-import-alias" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="copy_if_different"/>
+            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlienc.lib"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlienc.lib"/>
+         </execute>
+         <target name="configure" type="perl" executable="{Tool:perl}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+            <parameter name="TargetName" value="BC-64X"/>
+            <parameter name="BaseTarget" value="BASE_Windows"/>
+            <parameter name="CC" value="bcc64x"/>
+            <parameter name="CXX" value="bcc64x"/>
+            <parameter name="CPP" value="bcc64x -E"/>
+            <parameter name="LD" value="bcc64x"/>
+            <parameter name="AR" value="llvm-ar"/>
+            <parameter name="ARFlags" value="qc"/>
+            <parameter name="RANLIB" value="llvm-ranlib"/>
+            <parameter name="RC" value="bcc64x-windres"/>
+            <parameter name="AS" value="{Tool:nasm}"/>
+            <parameter name="ASFlags" value="-g"/>
+            <parameter name="AsFlags" value="-Ox -f win64 -DNEAR"/>
+            <parameter name="AsOutFlag" value="-o "/>
+            <parameter name="CFlags" value="{OpenSSLCFlags}"/>
+            <parameter name="LDFlags" value="-g"/>
+            <parameter name="SystemLibraries" value="-lws2_32 -lgdi32 -lcrypt32 -luser32 -ladvapi32"/>
+            <parameter name="ThreadScheme" value="winthreads"/>
+            <parameter name="DsoScheme" value="win64"/>
+            <parameter name="SharedTarget" value="win-shared"/>
+            <parameter name="SharedCppFlags" value="_WINDLL"/>
+            <parameter name="PerlPlatform" value="Windows::bcc64x"/>
+            <parameter name="SysId" value="WIN64"/>
+            <parameter name="BnOps" value="SIXTY_FOUR_BIT"/>
+            <parameter name="UplinkArch" value="x86_64"/>
+            <parameter name="AsmArch" value="x86_64"/>
+            <parameter name="PerlasmScheme" value="nasm"/>
+            <parameter name="Multilib" value="-x64"/>
+            <parameter name="LdRespForwardSlashes" value="1"/>
+            <temporaryFile id="OpenSSLTargetConfig" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\BC-64X.conf">
+               <line value="my %targets = ("/>
+               <line value="    '{Target:TargetName}' =&gt; {{"/>
+               <line value="        inherit_from    =&gt; [ '{Target:BaseTarget}' ],"/>
+               <line value="        CC              =&gt; '{Target:CC}',"/>
+               <line value="        CXX             =&gt; '{Target:CXX}',"/>
+               <line value="        CPP             =&gt; '{Target:CPP}',"/>
+               <line value="        LD              =&gt; '{Target:LD}',"/>
+               <line value="        AR              =&gt; '{Target:AR}',"/>
+               <line value="        ARFLAGS         =&gt; '{Target:ARFlags}',"/>
+               <line value="        RANLIB          =&gt; '{Target:RANLIB}',"/>
+               <line value="        RC              =&gt; '{Target:RC}',"/>
+               <line value="        AS              =&gt; '{Target:AS}',"/>
+               <line value="        ASFLAGS         =&gt; '{Target:ASFlags}',"/>
+               <line value="        asflags         =&gt; '{Target:AsFlags}',"/>
+               <line value="        asoutflag       =&gt; '{Target:AsOutFlag}',"/>
+               <line value="        CFLAGS          =&gt; '{Target:CFlags}',"/>
+               <line value="        LDFLAGS         =&gt; '{Target:LDFlags}',"/>
+               <line value="        defines         =&gt; add('WIN32_LEAN_AND_MEAN', 'OPENSSL_SYS_WIN64', 'L_ENDIAN', 'DSO_WIN32', '_stricmp=stricmp', '_strnicmp=strnicmp', '_setmode=setmode'),"/>
+               <line value="        ex_libs         =&gt; add('{Target:SystemLibraries}'),"/>
+               <line value="        thread_scheme   =&gt; '{Target:ThreadScheme}',"/>
+               <line value="        dso_scheme      =&gt; '{Target:DsoScheme}',"/>
+               <line value="        shared_target   =&gt; '{Target:SharedTarget}',"/>
+               <line value="        shared_cppflags =&gt; add('{Target:SharedCppFlags}'),"/>
+               <line value="        lib_cflags      =&gt; shared('-D_WINDLL -D_DLL'),"/>
+               <line value="        coutflag        =&gt; '-o',"/>
+               <line value="        ldoutflag       =&gt; '-o',"/>
+               <line value="        ldpostoutflag   =&gt; '',"/>
+               <line value="        ld_resp_delim   =&gt; &quot; \ &quot;,"/>
+               <line value="        ld_resp_forward_slashes =&gt; {Target:LdRespForwardSlashes},"/>
+               <line value="        ar_resp_delim   =&gt; &quot; \ &quot;,"/>
+               <line value="        shared_ldflag   =&gt; '-shared',"/>
+               <line value="        ld_implib_flag  =&gt; '-Wl,--out-implib,',"/>
+               <line value="        lddefflag       =&gt; '',"/>
+               <line value="        ldresflag       =&gt; '',"/>
+               <line value="        rcoutflag       =&gt; '-o',"/>
+               <line value="        perl_platform   =&gt; '{Target:PerlPlatform}',"/>
+               <line value="        sys_id          =&gt; '{Target:SysId}',"/>
+               <line value="        bn_ops          =&gt; add('{Target:BnOps}'),"/>
+               <line value="        asm_arch        =&gt; '{Target:AsmArch}',"/>
+               <line value="        uplink_arch     =&gt; '{Target:UplinkArch}',"/>
+               <line value="        perlasm_scheme  =&gt; '{Target:PerlasmScheme}',"/>
+               <line value="        shared_rcflag   =&gt; '',"/>
+               <line value="        multilib        =&gt; '{Target:Multilib}',"/>
+               <line value="    }},"/>
+               <line value=");"/>
+            </temporaryFile>
+            <argument value="{Workspace}\openssl-{LibraryVersion}\Configure"/>
+            <argument value="{Target:TargetName}"/>
+            <argument value="shared"/>
+            <argument value="no-asm"/>
+            <argument value="no-makedepend"/>
+            <argument value="zlib"/>
+            <argument value="enable-brotli"/>
+            <argument value="enable-zstd"/>
+            <argument value="--with-zlib-include={InstallRoot}\packages\zlib\1.3.2\include"/>
+            <argument value="--with-zlib-lib={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
+            <argument value="--with-brotli-include={InstallRoot}\packages\brotli\1.2.0\include"/>
+            <argument value="--with-brotli-lib={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs"/>
+            <argument value="--with-zstd-include={InstallRoot}\packages\zstd\1.5.7\include"/>
+            <argument value="--with-zstd-lib={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
+            <argument value="{OpenSSLBuildMode}"/>
+            <argument value="--config={TargetFile:OpenSSLTargetConfig}"/>
+            <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="--openssldir={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ssl"/>
+            <argument value="--libdir=lib"/>
+         </target>
+         <target name="build" type="gmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+            <argument value="-N"/>
+            <argument value="build_sw"/>
+         </target>
+         <variant name="Release">
+            <variable name="OpenSSLBuildMode" value="--release"/>
+            <variable name="OpenSSLCFlags" value="-O2 -DNDEBUG"/>
+            <variable name="ZlibImportLibrary" value="libz.lib"/>
+            <variable name="SslDll" value="libssl-3-x64.dll"/>
+            <variable name="CryptoDll" value="libcrypto-3-x64.dll"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="OpenSSLBuildMode" value="--debug"/>
+            <variable name="OpenSSLCFlags" value="-O0 -g"/>
+            <variable name="ZlibImportLibrary" value="libzd.lib"/>
+            <variable name="SslDll" value="libssl-3-x64.dll"/>
+            <variable name="CryptoDll" value="libcrypto-3-x64.dll"/>
+         </variant>
+         <install>
+            <perVariant>
+               <!--
+                  First native proof keeps test/install in the existing perVariant sequence.
+                  Scheduler-level Release/Debug test parallelism remains a separate generic change.
+               -->
+               <target name="test" test="true" type="gmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="HARNESS_JOBS" value="{TestJobs}"/>
+                  <argument value="-N"/>
+                  <argument value="test"/>
+               </target>
+               <target name="install-upstream" type="gmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="-N"/>
+                  <argument value="install_sw"/>
+               </target>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/>
+               <!-- Generate BCC64X COFF import libraries directly from the produced native DLLs. -->
+               <execute name="ssl-def" executable="{Tool:tdump}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="-def"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SslDll}"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libssl.def"/>
+               </execute>
+               <execute name="ssl-import-lib" executable="{Tool:ld-lld}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="-m"/>
+                  <argument value="i386pep"/>
+                  <argument value="--out-implib"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libssl.lib"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libssl.def"/>
+               </execute>
+               <execute name="crypto-def" executable="{Tool:tdump}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="-def"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CryptoDll}"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libcrypto.def"/>
+               </execute>
+               <execute name="crypto-import-lib" executable="{Tool:ld-lld}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="-m"/>
+                  <argument value="i386pep"/>
+                  <argument value="--out-implib"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcrypto.lib"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libcrypto.def"/>
+               </execute>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SslDll}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CryptoDll}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libssl.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libcrypto.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\openssl-{LibraryVersion}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\ssl.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\openssl\crypto.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" source="smokes\openssl\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="openssl-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+
    <library id="curl" version="8.21.0" category="network" timestamp="2026-08-29T23:18:00Z">
       <!-- First re-establish the historically verified curl baseline: TLS via
            OpenSSL plus zlib.  Brotli/Zstd remain built and published packages,
@@ -1523,6 +1884,140 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
+   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-15T16:15:00Z">
+      <!-- First re-establish the historically verified curl baseline: TLS via
+           OpenSSL plus zlib.  Brotli/Zstd remain built and published packages,
+           but are re-enabled for curl only after this baseline is green. -->
+      <dependency library="openssl" version="3.5.8"/>
+      <dependency library="zlib" version="1.3.2"/>
+      <metadata description="URL transfer library and command-line client supporting HTTP(S) and numerous network protocols." licenseSignal="green"/>
+      <security>
+         <repository url="https://github.com/curl/curl.git" ref="curl-8_23_0"/>
+      </security>
+      <source>
+         <download url="https://curl.se/download/curl-{LibraryVersion}.tar.xz" archive="curl-{LibraryVersion}.tar.xz" sha256="8dadd7d2536a314f982ad05a651b713f426bf7d02cc2c76cffb9796f2218e6c5"/>
+         <extract format="libarchive" root="curl-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="include\curl\curl.h"/>
+            <require path="include\curl\curlver.h"/>
+            <require path="lib\CMakeLists.txt"/>
+            <require path="CMake\curl-config.in.cmake"/>
+            <require path="CMake\FindBrotli.cmake"/>
+            <require path="CMake\FindZstd.cmake"/>
+         </extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DBUILD_CURL_EXE:BOOL=OFF"/>
+         <argument value="-DBUILD_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=OFF"/>
+         <argument value="-DBUILD_LIBCURL_DOCS:BOOL=OFF"/>
+         <argument value="-DBUILD_MISC_DOCS:BOOL=OFF"/>
+         <argument value="-DENABLE_CURL_MANUAL:BOOL=OFF"/>
+         <argument value="-DCURL_ENABLE_EXPORT_TARGET:BOOL=ON"/>
+         <argument value="-DCURL_USE_OPENSSL:BOOL=ON"/>
+         <argument value="-DCURL_USE_SCHANNEL:BOOL=OFF"/>
+         <argument value="-DENABLE_ARES:BOOL=OFF"/>
+         <argument value="-DUSE_LIBIDN2:BOOL=OFF"/>
+         <argument value="-DCURL_ZLIB:STRING=ON"/>
+         <argument value="-DCURL_BROTLI:STRING=OFF"/>
+         <argument value="-DCURL_ZSTD:STRING=OFF"/>
+         <argument value="-DCURL_USE_PKGCONFIG:BOOL=OFF"/>
+         <!-- Match the proven BCC64X baseline: module-based dependency lookup
+              with exact OpenSSL/zlib artifacts supplied below. -->
+         <argument value="-DCURL_USE_CMAKECONFIG:BOOL=OFF"/>
+         <argument value="-DCMAKE_FIND_PACKAGE_PREFER_CONFIG:BOOL=OFF"/>
+         <argument value="-DOPENSSL_USE_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DZLIB_USE_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DCURL_USE_LIBPSL:BOOL=OFF"/>
+         <argument value="-DCURL_USE_LIBSSH2:BOOL=OFF"/>
+         <argument value="-DCURL_USE_LIBSSH:BOOL=OFF"/>
+         <argument value="-DUSE_NGHTTP2:BOOL=OFF"/>
+         <argument value="-DUSE_NGTCP2:BOOL=OFF"/>
+         <argument value="-DUSE_QUICHE:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\curl-{LibraryVersion}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="CurlDll" value="libcurl.dll"/>
+            <variable name="CurlImportLibrary" value="libcurl_imp.lib"/>
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+            <!--
+               CMake 4.1.1 FindOpenSSL performs its own find_library() lookup on
+               WIN32 and then rewrites OPENSSL_SSL_LIBRARY/OPENSSL_CRYPTO_LIBRARY.
+               Do not set OPENSSL_ROOT_DIR here: that activates NO_DEFAULT_PATH
+               inside FindOpenSSL and hides BuildEngine's configuration-specific
+               lib/win64/Release directory.  The generic producer integration
+               supplies that exact directory through CMAKE_LIBRARY_PATH and the
+               versioned include directory through CMAKE_INCLUDE_PATH.
+            -->
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
+            <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="CurlDll" value="libcurld.dll"/>
+            <variable name="CurlImportLibrary" value="libcurld_imp.lib"/>
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+            <!-- Same FindOpenSSL rule as Release; CMAKE_LIBRARY_PATH is variant-specific. -->
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
+            <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CurlDll}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{CurlImportLibrary}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLConfigVersion.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLTargets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CURL\CURLTargets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libcurl.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\curl-{LibraryVersion}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curl.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\curl\curlver.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" source="smokes\curl\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="curl-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+
    <library id="boost" version="1.92.0" category="foundation" timestamp="2026-08-30T16:55:00Z">
       <!--
          Canonical Boost model from the target-machine evidence:
