@@ -1,0 +1,17 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -190,9 +190,12 @@
+ #
+ # CMake 3.27 doesn't have CMAKE_RC_COMPILER_ID so we rely on
+ # CMAKE_C_COMPILER_ID.
++# BCC64X runs llvm-windres but our toolchain deliberately unsets MINGW.
+-if((MINGW OR CYGWIN) AND (
++if((MINGW OR CYGWIN OR
++        (WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "Clang" AND
++         CMAKE_C_SIMULATE_ID STREQUAL "EMBT")) AND (
+         NOT CMAKE_C_COMPILER_ID STREQUAL "Clang" OR
+         CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL "17"))
+     # Use workarounds with GNU windres and llvm-windres >= 17.0.0. The \x20
+     # in PACKAGE_NAME_DEFINITION works with gcc and clang too so we don't need
+     # to worry how to pass different flags to windres and the C compiler.
