@@ -253,3 +253,49 @@ PDFium gilt erst als **in BuildEngine integriert**, wenn:
 - FP16: https://github.com/Maratyszcza/FP16
 
 **Wichtig:** \`refs/heads/main\`-URLs sind Recherchebelege, aber **keine reproduzierbaren Build-Pins**. Vor der ersten Implementierung Commit-SHA, DEPS-Closure, Versions-/Lizenzstatus und Upstream-Quellen auf einen einheitlichen Snapshot festlegen.
+
+
+### 15. Verbindliche Präzisierung: externe DLLs und eingefrorener Source-Snapshot (2026-10-16)
+
+Diese Festlegung hat Vorrang vor älteren Passagen dieses Entwurfs, soweit diese
+für bereits verfügbare Bibliotheken nur eine Quellcode-Einbindung vorsehen.
+
+**BuildEngine-Pakete zuerst:** Sofern ein vorhandenes Paket für BCC64X als DLL
+bereitgestellt ist und die PDFium-GN-Targets dafür kompatibel angepasst werden
+können, wird dessen installierte DLL mit Importbibliothek und öffentlichen
+Headern verwendet. Eine weitere Kopie desselben Upstream-Quellcodes unter
+PDFium ist keine automatische Ausweichlösung. Zunächst sind exportierte Symbole,
+Compiler-/CRT-Kompatibilität, Threading, Debug/Release-Konfiguration und
+Funktionalität nachzuweisen. Bei einer unvereinbaren PDFium-spezifischen
+Quellvariante wird diese Abweichung dokumentiert und separat entschieden.
+Nicht jedes vorhandene Paket besitzt eine DLL; ein statisches oder header-only
+Paket darf nicht als DLL ausgegeben werden.
+
+**Unveränderliche DEPS-Auflösung:** Ein konkreter PDFium-Commit und sämtliche
+benötigten internen DEPS-Revisionspins werden vor dem Source-Schritt festgelegt.
+Die Source-Phase lädt ausschließlich diese vorab identifizierten Quellen über
+BuildEngine, prüft SHA-256 und erwartete Verzeichnisstruktur und legt das
+vollständige GN-Eingabeverzeichnis an. Die Python/GN/Ninja-Orchestrierung folgt
+dem bereits erfolgreich eingesetzten Skia-Verfahren, ohne Skia selbst zu ändern.
+
+**Netzwerksperre nach Source:** Ab Abschluss der Source-Bereitstellung dürfen
+`gn gen`, Ninja, Python-Hilfsskripte, Tests, Install, Doxygen und Publish
+keine Quellen, Tools oder Module nachladen oder synchronisieren. Kein
+`gclient sync`, kein `git-sync-deps`, keine automatischen Git-, CIPD-,
+FetchContent- oder Update-Hooks in diesen Phasen. Fehlt eine Komponente,
+muss der Lauf mit einem konkreten fehlenden Pin/Artefakt fehlschlagen,
+statt sie im Hintergrund herunterzuladen. Ein Offline-Wiederholungstest
+dieser Phasen ist ein verpflichtender Akzeptanztest.
+
+**Zuordnung und SBOM:** Zu jeder tatsächlich verwendeten Komponente dokumentieren
+wir entweder den externen BuildEngine-Paketkoordinaten samt DLL/Importlib
+oder den intern gepinnten PDFium-DEPS-Quellstand. Intern eingebundene
+Komponenten (z. B. PDFiums AGG 2.3, gegebenenfalls PartitionAlloc) werden
+wie bei Skia über `sbom/bundled-components.json` in die CycloneDX-SBOM
+und die Lizenznachweise integriert. Eine heruntergeladene, deaktivierte
+Komponente darf nicht als ausgelieferte Runtime-Abhängigkeit erscheinen.
+Die tatsächlichen GN-Targets müssen diese Klassifikation bestätigen.
+
+**Keine Bestandsinvalidierung:** Die neu anzulegende PDFium-Konfiguration
+darf keine Zeitstempel, Definitionen oder FSM-Nachweise der bisher
+erfolgreich gebauten 56 Pakete verändern.
