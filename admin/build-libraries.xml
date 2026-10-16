@@ -5373,7 +5373,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="153" category="graphics" timestamp="2026-10-16T19:40:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-10-16T16:18:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -5481,7 +5481,7 @@
             archive="skia-deps\icu-d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738.tar.gz"/>
 
          <download
-            url="https://skia.googlesource.com/external/github.com/AOMediaCodec/libavif.git/+archive/55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"
+            url="https://github.com/AOMediaCodec/libavif/archive/55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"
             archive="skia-deps\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"/>
 
          <download
@@ -5505,7 +5505,7 @@
             archive="skia-deps\piex-bb217acdca1cc0c16b704669dd6f91a1b509c406.tar.gz"/>
 
          <download
-            url="https://skia.googlesource.com/external/github.com/google/wuffs-mirror-release-c.git/+archive/e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"
+            url="https://github.com/google/wuffs-mirror-release-c/archive/e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"
             archive="skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
 
          <!-- ======================================================== -->
@@ -5517,11 +5517,11 @@
             archive="skia-deps\spirv-cross-b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz"/>
 
          <download
-            url="https://skia.googlesource.com/external/github.com/KhronosGroup/SPIRV-Headers.git/+archive/942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"
+            url="https://github.com/KhronosGroup/SPIRV-Headers/archive/942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"
             archive="skia-deps\spirv-headers-942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"/>
 
          <download
-            url="https://skia.googlesource.com/external/github.com/KhronosGroup/SPIRV-Tools.git/+archive/388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"
+            url="https://github.com/KhronosGroup/SPIRV-Tools/archive/388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"
             archive="skia-deps\spirv-tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"/>
 
          <download
@@ -5628,6 +5628,11 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\d3d12allocator\src\D3D12MemAlloc.h"/>
+         <execute name="cleanup-d3d12allocator-github-root" executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\d3d12allocator" showOutput="false">
+            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+            <argument value="{CurrentArtifact}\third_party\externals\d3d12allocator\D3D12MemoryAllocator-169895d529dfce00390a20e69c2f516066fe7a3b"/>
+         </execute>
 
          <execute name="mkdir-dng-sdk"
                   executable="{Tool:cmake}"
@@ -5730,6 +5735,21 @@
             <argument value="tar"/>
             <argument value="xzf"/>
             <argument value="{DownloadsRoot}\skia-deps\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"/>
+         </execute>
+         <!-- GitHub pinned revision, root folder libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.
+              Verify pinned source before copying and remove the staging root. -->
+         <require path="{CurrentArtifact}\third_party\externals\libavif\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000\include\avif\avif.h"/>
+         <execute name="flatten-libavif-github-archive" executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\libavif" showOutput="false">
+            <argument value="-E"/><argument value="copy_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libavif\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libavif"/>
+         </execute>
+         <require path="{CurrentArtifact}\third_party\externals\libavif\include\avif\avif.h"/>
+         <execute name="cleanup-libavif-github-root" executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\libavif" showOutput="false">
+            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+            <argument value="{CurrentArtifact}\third_party\externals\libavif\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000"/>
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\libavif\include\avif\avif.h"/>
@@ -5860,6 +5880,21 @@
             <argument value="xzf"/>
             <argument value="{DownloadsRoot}\skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
          </execute>
+         <!-- GitHub pinned revision, root folder wuffs-mirror-release-c-e3f919ccfe3ef542cfc983a82146070258fb57f8.
+              Verify pinned source before copying and remove the staging root. -->
+         <require path="{CurrentArtifact}\third_party\externals\wuffs\wuffs-mirror-release-c-e3f919ccfe3ef542cfc983a82146070258fb57f8\release\c\wuffs-v0.3.c"/>
+         <execute name="flatten-wuffs-github-archive" executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\wuffs" showOutput="false">
+            <argument value="-E"/><argument value="copy_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\wuffs\wuffs-mirror-release-c-e3f919ccfe3ef542cfc983a82146070258fb57f8"/>
+            <argument value="{CurrentArtifact}\third_party\externals\wuffs"/>
+         </execute>
+         <require path="{CurrentArtifact}\third_party\externals\wuffs\release\c\wuffs-v0.3.c"/>
+         <execute name="cleanup-wuffs-github-root" executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\wuffs" showOutput="false">
+            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+            <argument value="{CurrentArtifact}\third_party\externals\wuffs\wuffs-mirror-release-c-e3f919ccfe3ef542cfc983a82146070258fb57f8"/>
+         </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\wuffs\release\c\wuffs-v0.3.c"/>
 
@@ -5911,6 +5946,21 @@
             <argument value="xzf"/>
             <argument value="{DownloadsRoot}\skia-deps\spirv-headers-942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"/>
          </execute>
+         <!-- GitHub pinned revision, root folder SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d.
+              Verify pinned source before copying and remove the staging root. -->
+         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d\include\spirv\unified1\spirv.h"/>
+         <execute name="flatten-spirv-headers-github-archive" executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-headers" showOutput="false">
+            <argument value="-E"/><argument value="copy_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\spirv-headers\SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d"/>
+            <argument value="{CurrentArtifact}\third_party\externals\spirv-headers"/>
+         </execute>
+         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.h"/>
+         <execute name="cleanup-spirv-headers-github-root" executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-headers" showOutput="false">
+            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+            <argument value="{CurrentArtifact}\third_party\externals\spirv-headers\SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d"/>
+         </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.h"/>
          <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.hpp"/>
@@ -5932,6 +5982,21 @@
             <argument value="tar"/>
             <argument value="xzf"/>
             <argument value="{DownloadsRoot}\skia-deps\spirv-tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"/>
+         </execute>
+         <!-- GitHub pinned revision, root folder SPIRV-Tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.
+              Verify pinned source before copying and remove the staging root. -->
+         <require path="{CurrentArtifact}\third_party\externals\spirv-tools\SPIRV-Tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1\source\val\validate.cpp"/>
+         <execute name="flatten-spirv-tools-github-archive" executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-tools" showOutput="false">
+            <argument value="-E"/><argument value="copy_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\spirv-tools\SPIRV-Tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1"/>
+            <argument value="{CurrentArtifact}\third_party\externals\spirv-tools"/>
+         </execute>
+         <require path="{CurrentArtifact}\third_party\externals\spirv-tools\source\val\validate.cpp"/>
+         <execute name="cleanup-spirv-tools-github-root" executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-tools" showOutput="false">
+            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+            <argument value="{CurrentArtifact}\third_party\externals\spirv-tools\SPIRV-Tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1"/>
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\spirv-tools\source\val\validate.cpp"/>
