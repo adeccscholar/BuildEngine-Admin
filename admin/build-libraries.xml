@@ -9336,4 +9336,73 @@
          <argument value="-Dagg_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\agg"/>
       </smoke>
    </library>
+   <!-- PDFium first integration gate: pinned sources and real GN/Ninja build.
+        No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
+        PDFium BCC64X and external-Skia adapters remain required before it can pass.
+        Never mark this package ready merely because its source was downloaded. -->
+   <library id="pdfium" version="c33f1f7e2be963b55e74c28516ce566f1f45b47d" category="documentation" timestamp="2026-10-16T17:51:00Z">
+      <dependency library="skia" version="153"/>
+      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libpng" version="1.6.58"/>
+      <dependency library="freetype" version="2.14.3"/>
+      <dependency library="icu" version="78.3"/>
+      <dependency library="abseil" version="20260817.0"/>
+      <dependency library="fast_float" version="8.2.3"/>
+      <dependency library="lcms2" version="2.19.1"/>
+      <dependency library="openjpeg" version="2.5.4"/>
+      <metadata name="PDFium" supplier="PDFium Authors" homepage="https://pdfium.googlesource.com/pdfium/" description="Pinned PDFium GN/BCC64X integration; validation pending" licenseSignal="yellow"/>
+      <security>
+         <repository url="https://pdfium.googlesource.com/pdfium" commit="c33f1f7e2be963b55e74c28516ce566f1f45b47d"/>
+      </security>
+      <source>
+         <download url="https://pdfium.googlesource.com/pdfium/+archive/c33f1f7e2be963b55e74c28516ce566f1f45b47d.tar.gz" archive="pdfium-c33f1f7e2be963b55e74c28516ce566f1f45b47d.tar.gz"/>
+         <extract format="libarchive" root="pdfium-c33f1f7e2be963b55e74c28516ce566f1f45b47d">
+            <require path="DEPS"/>
+            <require path=".gn"/>
+            <require path="BUILD.gn"/>
+            <require path="pdfium.gni"/>
+            <require path="LICENSE"/>
+         </extract>
+         <!-- Chromium build/buildtools, pinned internal DEPS and external Skia GN
+              adapters must be staged here before GN. No network after source. -->
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_PYTHON" value="{Tool:python}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <target name="gn-gen" type="generic"
+                 executable="{InstallRoot}\packages\skia\153\bin\gn.exe"
+                 workingDirectory="{Workspace}" showOutput="false">
+            <temporaryFile id="gn-args" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\args.gn">
+               <line value="target_cpu = &quot;x64&quot;"/>
+               <line value="is_component_build = false"/>
+               <line value="clang_use_chrome_plugins = false"/>
+               <line value="pdf_enable_v8 = false"/>
+               <line value="pdf_enable_xfa = false"/>
+               <line value="pdf_use_partition_alloc = false"/>
+               <line value="pdf_use_skia = true"/>
+               <line value="pdf_use_agg = true"/>
+               <line value="pdf_is_standalone = false"/>
+               <line value="is_debug = {PdfiumDebug}"/>
+            </temporaryFile>
+            <argument value="gen"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="--script-executable={Tool:python}"/>
+         </target>
+         <execute name="ninja-build" executable="{Tool:ninja}"
+                  workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-C"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="pdfium"/>
+         </execute>
+         <variant name="Release">
+            <variable name="PdfiumDebug" value="false"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="PdfiumDebug" value="true"/>
+         </variant>
+      </build>
+   </library>
 </buildLibraries>
