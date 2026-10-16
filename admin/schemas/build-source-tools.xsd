@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="argumentType">
+    <xs:attribute name="value" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="commandType">
+    <xs:sequence><xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
+    <xs:attribute name="driver" type="xs:string" use="required"/>
+    <xs:attribute name="executable" type="xs:string" use="required"/>
+    <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="sourceType">
+    <xs:attribute name="repository" type="xs:string" use="required"/>
+    <xs:attribute name="commit" type="xs:string" use="required"/>
+    <xs:attribute name="archive" type="xs:string" use="required"/>
+    <xs:attribute name="sha256" type="xs:string" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="requiresType"><xs:attribute name="tool" type="xs:string" use="required"/></xs:complexType>
+  <xs:complexType name="installType">
+    <xs:attribute name="root" type="xs:string" use="required"/>
+    <xs:attribute name="executable" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="probeType">
+    <xs:sequence><xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
+    <xs:attribute name="executable" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="packageType"><xs:attribute name="archive" type="xs:string" use="required"/></xs:complexType>
+  <xs:complexType name="licenseType"><xs:attribute name="path" type="xs:string" use="required"/></xs:complexType>
+  <xs:complexType name="documentationType">
+    <xs:attribute name="category" type="xs:string" use="required"/>
+    <xs:attribute name="path" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:element name="buildSourceTools">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="tool" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="source" type="sourceType"/>
+              <xs:element name="requires" type="requiresType" minOccurs="1" maxOccurs="unbounded"/>
+              <xs:element name="build" type="commandType" minOccurs="1" maxOccurs="unbounded"/>
+              <xs:element name="install" type="installType"/>
+              <xs:element name="probe" type="probeType"/>
+              <xs:element name="package" type="packageType"/>
+              <xs:element name="license" type="licenseType"/>
+              <xs:element name="documentation" type="documentationType"/>
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:string" use="required"/>
+            <xs:attribute name="version" type="xs:string" use="required"/>
+            <xs:attribute name="host" type="xs:string" use="required"/>
+            <xs:attribute name="timestamp" type="xs:string" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="schemaVersion" type="xs:positiveInteger" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
