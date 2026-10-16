@@ -43,7 +43,6 @@
          <candidate path="{ProductionRoot}\build\thirdparty-test\skia\bin\gn.exe"/>
          <candidate path="{ProductionRoot}\tools\gn\gn.exe"/>
       </discover>
-      <probe contains="gn"><argument value="--version"/></probe>
    </tool>
    <tool id="ninja" version="1.13.2" required="always">
       <managed root="ninja\1.13.2" executable="ninja.exe">
