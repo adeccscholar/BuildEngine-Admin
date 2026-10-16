@@ -9403,6 +9403,22 @@
          <variant name="Debug">
             <variable name="PdfiumDebug" value="true"/>
          </variant>
+         <install>
+            <perVariant>
+               <!-- Do not declare success without a generated GN build and PDFium target. -->
+               <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\build.ninja"/>
+               <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\obj\pdfium.lib"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\obj\pdfium.lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pdfium.lib"
+                     overwrite="true"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\pdfium\LICENSE"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\pdfium\LICENSE"/>
+            </common>
+         </install>
       </build>
    </library>
 </buildLibraries>
