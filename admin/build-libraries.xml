@@ -9364,8 +9364,16 @@
             <require path="pdfium.gni"/>
             <require path="LICENSE"/>
          </extract>
-         <!-- Chromium build/buildtools, pinned internal DEPS and external Skia GN
-              adapters must be staged here before GN. No network after source. -->
+         <!-- Fail during Source rather than reporting success before the GN
+              imports from this pinned Chromium revision have been provided.
+              All inputs are local. This check never downloads or updates. -->
+         <execute name="verify-offline-gn-inputs"
+                  executable="{Tool:python}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="true">
+            <argument value="-c"/>
+            <argument value="import pathlib,sys; p=pathlib.Path('.'); missing=[str(x) for x in ('build/config/BUILDCONFIG.gn','build/config/clang/clang.gni','build/config/gclient_args.gni','testing/test.gni','buildtools') if not (p/x).exists()]; print('PDFIUM GN INPUTS MISSING: '+', '.join(missing) if missing else 'PDFIUM GN INPUTS: PRESENT'); sys.exit(bool(missing))"/>
+         </execute>
       </source>
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -9383,8 +9391,7 @@
                <line value="pdf_enable_xfa = false"/>
                <line value="pdf_use_partition_alloc = false"/>
                <line value="pdf_use_skia = true"/>
-               <line value="pdf_use_agg = true"/>
-               <line value="pdf_is_standalone = false"/>
+               <line value="pdf_is_standalone = true"/>
                <line value="is_debug = {PdfiumDebug}"/>
             </temporaryFile>
             <argument value="gen"/>
