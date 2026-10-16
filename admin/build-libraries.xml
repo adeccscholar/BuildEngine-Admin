@@ -9214,4 +9214,118 @@
          <argument value="-DOpenJPEG_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\openjpeg-2.5"/>
       </smoke>
    </library>
+   <library id="simdutf" version="9.3.0" category="text" timestamp="2026-10-16T16:34:00Z">
+      <metadata name="simdutf" supplier="simdutf contributors" homepage="https://github.com/simdutf/simdutf" description="SIMD accelerated Unicode and Base64 processing" licenseSignal="yellow"/>
+      <source>
+         <download url="https://github.com/simdutf/simdutf/archive/refs/tags/v9.3.0.tar.gz" archive="simdutf-9.3.0.tar.gz"/>
+         <extract format="libarchive" root="simdutf-9.3.0">
+            <require path="CMakeLists.txt"/>
+            <require path="include\simdutf.h"/>
+            <require path="LICENSE-MIT"/>
+         </extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_TESTS:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_TOOLS:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_BENCHMARKS:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_ICONV:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_INSTALL_CMAKEDIR:STRING=lib/win64/{Configuration}/cmake/simdutf"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\simdutf.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\simdutf\simdutf-config.cmake"/>
+            </perVariant>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\simdutf\consumer"
+             configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="simdutf-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Dsimdutf_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\simdutf"/>
+      </smoke>
+   </library>
+   <library id="agg" version="2.6" category="graphics" timestamp="2026-10-16T16:34:00Z">
+      <metadata name="Anti-Grain Geometry" supplier="AGG contributors" homepage="https://github.com/ghaerr/agg-2.6" description="AGG core rasterization without GPC" licenseSignal="yellow"/>
+      <source>
+         <download url="https://github.com/ghaerr/agg-2.6/archive/c4f36b4432142f22c0bf82c6fbdb41567a236be2.tar.gz" archive="agg-2.6-c4f36b44.tar.gz"/>
+         <extract format="libarchive" root="agg-2.6-c4f36b4432142f22c0bf82c6fbdb41567a236be2">
+            <require path="agg-src\include\agg_basics.h"/>
+            <require path="agg-src\src\agg_trans_affine.cpp"/>
+            <require path="agg-src\copying"/>
+         </extract>
+         <copy source="{BuildFileDir}\cmake\agg-2.6\CMakeLists.txt" target="{CurrentArtifact}\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\agg_basics.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\agg\agg-config.cmake"/>
+            </perVariant>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\agg\consumer"
+             configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="agg-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Dagg_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\agg"/>
+      </smoke>
+   </library>
 </buildLibraries>
