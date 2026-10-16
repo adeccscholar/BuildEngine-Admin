@@ -5373,7 +5373,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="153" category="graphics" timestamp="2026-09-07T17:07:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-10-16T19:40:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
@@ -5461,7 +5461,7 @@
          <!-- ======================================================== -->
 
          <download
-            url="https://skia.googlesource.com/external/github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git/+archive/169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"
+            url="https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator/archive/169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"
             archive="skia-deps\d3d12allocator-169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"/>
 
          <download
@@ -5605,6 +5605,8 @@
             <argument value="{CurrentArtifact}\third_party\externals\d3d12allocator"/>
          </execute>
 
+         <!-- GitHub's pinned tarball contains a single D3D12MemoryAllocator-SHA
+              directory, unlike the rootless Gitiles +archive tarball. -->
          <execute name="extract-d3d12allocator"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}\third_party\externals\d3d12allocator"
@@ -5613,6 +5615,16 @@
             <argument value="tar"/>
             <argument value="xzf"/>
             <argument value="{DownloadsRoot}\skia-deps\d3d12allocator-169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"/>
+         </execute>
+         <require path="{CurrentArtifact}\third_party\externals\d3d12allocator\D3D12MemoryAllocator-169895d529dfce00390a20e69c2f516066fe7a3b\src\D3D12MemAlloc.h"/>
+         <execute name="flatten-d3d12allocator-github-archive"
+                  executable="{Tool:cmake}"
+                  workingDirectory="{CurrentArtifact}\third_party\externals\d3d12allocator"
+                  showOutput="false">
+            <argument value="-E"/>
+            <argument value="copy_directory"/>
+            <argument value="{CurrentArtifact}\third_party\externals\d3d12allocator\D3D12MemoryAllocator-169895d529dfce00390a20e69c2f516066fe7a3b"/>
+            <argument value="{CurrentArtifact}\third_party\externals\d3d12allocator"/>
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\d3d12allocator\src\D3D12MemAlloc.h"/>
