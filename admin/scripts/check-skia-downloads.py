@@ -43,8 +43,8 @@ def main() -> int:
                 header = response.read(8)
                 ctype = response.headers.get("Content-Type", "")
                 actual_url = response.url
-            gzip = header.startswith(b"\\x1f\\x8b")
-            zipfile = header.startswith(b"PK\\x03\\x04")
+            gzip = header.startswith(bytes((0x1f, 0x8b)))
+            zipfile = header.startswith(bytes((0x50, 0x4b, 0x03, 0x04)))
             expected_zip = name.lower().endswith(".zip")
             valid = (zipfile if expected_zip else gzip) and status in (200, 206)
             detail = "HTTP {} type={} magic={} destination={}".format(
