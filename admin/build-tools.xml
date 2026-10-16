@@ -35,13 +35,15 @@
       <probe contains="cmake version 4.1.1"><argument value="--version"/></probe>
    </tool>
 
-   <!-- GN is a host build tool, not part of the installed Skia SDK.
-        Reuse a locally provisioned GN until an independently verified,
-        hash-locked managed binary is available. No network fetch here. -->
-   <tool id="gn" version="pinned-local" required="when-used">
+   <!-- Generic GN host tool. Resolve existing provisioned binaries without
+        altering Skia's completed source or FSM state. A dedicated managed
+        distribution needs a verified binary checksum before adoption. -->
+   <tool id="gn" version="b2afae122eeb6ce09c52d63f67dc53fc517dbdc8" required="when-used">
       <discover executable="gn.exe" path="true">
-         <candidate path="{ProductionRoot}\build\thirdparty-test\skia\bin\gn.exe"/>
+         <candidate path="{ProductionRoot}\tools\gn\b2afae122eeb6ce09c52d63f67dc53fc517dbdc8\gn.exe"/>
          <candidate path="{ProductionRoot}\tools\gn\gn.exe"/>
+         <candidate path="{ProductionRoot}\build\thirdparty-test\skia\bin\gn.exe"/>
+         <candidate path="{ProductionRoot}\build\thirdparty-test\skia\153\bin\gn.exe"/>
       </discover>
    </tool>
    <tool id="ninja" version="1.13.2" required="always">
