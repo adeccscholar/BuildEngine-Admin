@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.25)
+project(SimdutfConsumer LANGUAGES CXX)
+find_package(simdutf CONFIG REQUIRED)
+add_executable(simdutf-consumer main.cpp)
+set_property(TARGET simdutf-consumer PROPERTY CXX_SCAN_FOR_MODULES OFF)
+target_compile_features(simdutf-consumer PRIVATE cxx_std_23)
+target_link_libraries(simdutf-consumer PRIVATE simdutf::simdutf)
