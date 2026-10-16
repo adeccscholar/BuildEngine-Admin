@@ -9411,7 +9411,7 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <target name="gn-gen" type="generic"
                  executable="{Tool:gn}"
-                 workingDirectory="{Workspace}" showOutput="false">
+                 workingDirectory="{Workspace}" showOutput="true">
             <temporaryFile id="gn-args" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\args.gn">
                <line value="target_cpu = &quot;x64&quot;"/>
                <line value="is_component_build = false"/>
