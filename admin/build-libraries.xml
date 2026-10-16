@@ -9257,6 +9257,10 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\simdutf.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\simdutf\simdutf-config.cmake"/>
             </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE-MIT" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\simdutf\LICENSE-MIT" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\simdutf\LICENSE-MIT"/>
+            </common>
          </install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
@@ -9312,6 +9316,10 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\agg_basics.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\agg\agg-config.cmake"/>
             </perVariant>
+            <common>
+               <copy source="{Workspace}\agg-src\copying" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\agg\copying" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\agg\copying"/>
+            </common>
          </install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
