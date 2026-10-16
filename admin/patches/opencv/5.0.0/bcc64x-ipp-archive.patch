@@ -1,0 +1,24 @@
+diff --git a/cmake/OpenCVFindIPP.cmake b/cmake/OpenCVFindIPP.cmake
+--- a/cmake/OpenCVFindIPP.cmake
++++ b/cmake/OpenCVFindIPP.cmake
+@@ -147,9 +147,22 @@
+         set(IPP_LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
+       endif (WIN32)
+     else ()
+       set(IPP_LIB_PREFIX ${CMAKE_STATIC_LIBRARY_PREFIX})
+       set(IPP_LIB_SUFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX})
++      # Windows IPPICV uses ippicvmt.lib without the GNU "lib" prefix.
++      # BCC64X is Clang with EMBT simulation, not MinGW.
++      if(WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "Clang"
++         AND CMAKE_C_SIMULATE_ID STREQUAL "EMBT" AND HAVE_IPP_ICV)
++        if(NOT EXISTS "${IPP_LIBRARY_DIR}/${IPP_LIB_PREFIX}${IPP_PREFIX}${name}${IPP_SUFFIX}${IPP_LIB_SUFFIX}"
++           AND EXISTS "${IPP_LIBRARY_DIR}/${IPP_PREFIX}${name}${IPP_SUFFIX}${IPP_LIB_SUFFIX}")
++          set(IPP_LIB_PREFIX "")
++        endif()
++        if(NOT EXISTS "${IPP_LIBRARY_DIR}/${IPP_LIB_PREFIX}${IPP_PREFIX}${name}${IPP_SUFFIX}${IPP_LIB_SUFFIX}")
++          message(FATAL_ERROR "BCC64X IPPICV archive not found: ${IPP_LIBRARY_DIR}")
++        endif()
++      endif()
+     endif ()
+     if (EXISTS ${IPP_LIBRARY_DIR}/${IPP_LIB_PREFIX}${IPP_PREFIX}${name}${IPP_SUFFIX}${IPP_LIB_SUFFIX})
+       if (BUILD_WITH_DYNAMIC_IPP AND NOT HAVE_IPP_ICV)
