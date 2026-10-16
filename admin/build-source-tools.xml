@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <buildSourceTools schemaVersion="1">
-   <!-- Host tools are built after build-tools.xml and before build-libraries.xml.
-        This file is a declarative contract; the C++ source-tool orchestrator
-        must be implemented before it can be executed. -->
+   <!-- Independent source-tool FSM: source/patch, prepare, build Release, smoke, publish. -->
    <tool id="gn" version="07d3c6f4dc290fae5ca6152ebcb37d6815c411ab"
          host="windows-x64" timestamp="2026-10-16T22:10:00Z">
       <source repository="https://gn.googlesource.com/gn"
@@ -11,13 +9,20 @@
       <requires tool="python"/>
       <requires tool="ninja"/>
       <requires tool="bcc64x"/>
-      <build driver="python" executable="{Tool:python}" workingDirectory="{SourceRoot}">
+      <prepare executable="{Tool:python}" workingDirectory="{SourceRoot}">
+         <argument value="build/gen.py"/>
+         <argument value="--no-last-commit-position"/>
+      </prepare>
+      <build driver="ninja" executable="{Tool:python}" workingDirectory="{SourceRoot}">
          <argument value="build/gen.py"/>
          <argument value="--no-last-commit-position"/>
       </build>
       <build driver="ninja" executable="{Tool:ninja}" workingDirectory="{SourceRoot}/out">
          <argument value="gn"/>
       </build>
+      <smoke executable="{BuildRoot}/gn.exe" workingDirectory="{SourceRoot}">
+         <argument value="--version"/>
+      </smoke>
       <install root="tools/gn/{ToolVersion}" executable="gn.exe"/>
       <probe executable="gn.exe"><argument value="--version"/></probe>
       <package archive="gn-{ToolVersion}-windows-x64.zip"/>
