@@ -38,7 +38,9 @@
             <xs:sequence>
               <xs:element name="source" type="sourceType"/>
               <xs:element name="requires" type="requiresType" minOccurs="1" maxOccurs="unbounded"/>
+              <xs:element name="prepare" type="commandType" minOccurs="0"/>
               <xs:element name="build" type="commandType" minOccurs="1" maxOccurs="unbounded"/>
+              <xs:element name="smoke" type="commandType"/>
               <xs:element name="install" type="installType"/>
               <xs:element name="probe" type="probeType"/>
               <xs:element name="package" type="packageType"/>
