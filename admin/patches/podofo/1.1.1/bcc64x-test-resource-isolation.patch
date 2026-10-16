@@ -1,0 +1,51 @@
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -1,3 +1,3 @@
+-set(PDF_TEST_RESOURCE_PATH "${PROJECT_SOURCE_DIR}/extern/resources")
++set(PDF_TEST_RESOURCE_PATH "${PROJECT_SOURCE_DIR}/extern/resources" CACHE PATH "PoDoFo test input resources")
+ if(NOT EXISTS "${PDF_TEST_RESOURCE_PATH}")
+     message(WARNING "Test resources path doesn't exists, tests disabled. Try fetch git submodules if you want tests to be enabled")
+@@ -5,5 +5,5 @@
+ endif()
+ 
+-set(PDF_TEST_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/out")
++set(PDF_TEST_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/out" CACHE PATH "PoDoFo test output directory")
+ make_directory(${PDF_TEST_OUTPUT_PATH})
+ 
+diff --git a/test/unit/XMPTest.cpp b/test/unit/XMPTest.cpp
+--- a/test/unit/XMPTest.cpp
++++ b/test/unit/XMPTest.cpp
+@@ -161,6 +161,8 @@
+     charbuff buff2;
+     auto srcPath = TestUtils::GetTestInputPath() / "XMP";
+-    auto refPath = TestUtils::GetTestOutputPath() / "XMP" / "Ref";
+-    fs::create_directories(refPath);
++    // Reference data is immutable input, never a test-generated output.
++    auto refPath = srcPath / "Ref";
++    if (!fs::is_directory(refPath))
++        throw runtime_error("Missing XMP reference directory: " + refPath.u8string());
+     for (const auto& entry : fs::directory_iterator(TestUtils::GetTestInputFilePath("XMP")))
+     {
+@@ -180,5 +182,7 @@
+     if (WriteNormalized)
+     {
+-        auto normalizedPath = refFolder / path.stem().u8string().append("_Normalized").append(".xmp");
++        auto normalizedPath = TestUtils::GetTestOutputPath() / "XMP"
++            / path.stem().u8string().append("_Normalized").append(".xmp");
++        fs::create_directories(normalizedPath.parent_path());
+         buff1.clear();
+         packet->ToString(buff1);
+@@ -196,8 +200,8 @@
+         REQUIRE(buff1 == buff2);
+     }
+-    else
+-    {
+-        WriteXMPFile(refPath, buff1);
+-    }
++    else
++    {
++        throw runtime_error("Missing immutable XMP reference: " + refPath.u8string());
++    }
+ }
+ 
