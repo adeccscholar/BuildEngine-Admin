@@ -1,5 +1,6 @@
 #include <agg_basics.h>
 #include <agg_trans_affine.h>
+#include <iostream>
 
 int main() {
    agg::trans_affine theTransform;
@@ -7,5 +8,10 @@ int main() {
    double flX = 1.0;
    double flY = 2.0;
    theTransform.transform(&flX, &flY);
-   return (flX == 6.0 && flY == 9.0) ? 0 : 1;
+   bool const bOk = flX == 6.0 && flY == 9.0;
+   std::cout << "SMOKE|CHECK|affine-translation|" << (bOk ? "PASS" : "FAIL")
+             << "|AGG transform translated coordinates\n";
+   std::cout << "SMOKE|RESULT|" << (bOk ? "PASS" : "FAIL")
+             << "|AGG consumer\n";
+   return bOk ? 0 : 1;
 }
