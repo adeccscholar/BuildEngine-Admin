@@ -1,0 +1,190 @@
+diff --git a/src/podofo/private/XMPUtils.cpp b/src/podofo/private/XMPUtils.cpp
+--- a/src/podofo/private/XMPUtils.cpp
++++ b/src/podofo/private/XMPUtils.cpp
+@@ -272,35 +272,37 @@
+ {
+     assertHaveRngValidationRecovery();
+ 
+-    int rc;
+-    charbuff output;
+-    auto filter = PdfFilterFactory::Create(PdfFilterType::FlateDecode);
+-    auto& nsMap = getXMPNamespaceMap();
+-    xmlRelaxNGPtr schema;
+-    switch (level)
+-    {
+-        case PdfALevel::L1A:
+-        case PdfALevel::L1B:
+-            schema = getXMPSchema_PDFA1();
+-            break;
+-        case PdfALevel::L2A:
+-        case PdfALevel::L2B:
+-        case PdfALevel::L2U:
+-        case PdfALevel::L3A:
+-        case PdfALevel::L3B:
+-        case PdfALevel::L3U:
+-            schema = getXMPSchema_PDFA2_3();
+-            break;
+-        case PdfALevel::L4:
+-        case PdfALevel::L4E:
+-        case PdfALevel::L4F:
+-            schema = getXMPSchema_PDFA4();
+-            break;
+-        default:
+-            PODOFO_RAISE_ERROR_INFO(PdfErrorCode::InvalidEnumValue, "Unsupported PDF/A level");
+-    }
+-
+-    unique_ptr<xmlRelaxNGValidCtxt, decltype(&xmlRelaxNGFreeValidCtxt)> validCtx(xmlRelaxNGNewValidCtxt(schema), xmlRelaxNGFreeValidCtxt);
++    int rc;
++    charbuff output;
++    auto filter = PdfFilterFactory::Create(PdfFilterType::FlateDecode);
++    auto& nsMap = getXMPNamespaceMap();
++    // Keep compiled schemas in the same dynamic-module call that owns the
++    // validation context. Do not defer xmlRelaxNGFree to DLL/static teardown.
++    unique_ptr<xmlRelaxNG, decltype(&xmlRelaxNGFree)> schema(nullptr, xmlRelaxNGFree);
++    switch (level)
++    {
++        case PdfALevel::L1A:
++        case PdfALevel::L1B:
++            schema.reset(getXMPSchema_PDFA1());
++            break;
++        case PdfALevel::L2A:
++        case PdfALevel::L2B:
++        case PdfALevel::L2U:
++        case PdfALevel::L3A:
++        case PdfALevel::L3B:
++        case PdfALevel::L3U:
++            schema.reset(getXMPSchema_PDFA2_3());
++            break;
++        case PdfALevel::L4:
++        case PdfALevel::L4E:
++        case PdfALevel::L4F:
++            schema.reset(getXMPSchema_PDFA4());
++            break;
++        default:
++            PODOFO_RAISE_ERROR_INFO(PdfErrorCode::InvalidEnumValue, "Unsupported PDF/A level");
++    }
++
++    unique_ptr<xmlRelaxNGValidCtxt, decltype(&xmlRelaxNGFreeValidCtxt)> validCtx(xmlRelaxNGNewValidCtxt(schema.get()), xmlRelaxNGFreeValidCtxt);
+     if (validCtx == nullptr)
+         PODOFO_RAISE_ERROR_INFO(PdfErrorCode::OutOfMemory, "Out of memory while validating XMP packet");
+ 
+@@ -1226,82 +1228,43 @@
+     return xmlXPathNewBoolean(value);
+ }
+ 
+-xmlRelaxNGPtr getXMPSchema_PDFA1()
+-{
+-    static struct Init
+-    {
+-        Init()
+-        {
+-            m_schema = createTailoredSchema(unordered_map<string_view, bool>{
+-                { "IncludeExtensions", true },
+-                { "IsPDFA1", true },
+-                { "IsPDFA1OrGreater", true },
+-            });
+-        }
+-        ~Init()
+-        {
+-            xmlRelaxNGFree(m_schema);
+-        }
+-        xmlRelaxNGPtr m_schema;
+-    } s_init;
+-
+-    return s_init.m_schema;
+-}
+-
+-xmlRelaxNGPtr getXMPSchema_PDFA2_3()
+-{
+-    static struct Init
+-    {
+-        Init()
+-        {
+-            m_schema = createTailoredSchema(unordered_map<string_view, bool>{
+-                { "IncludeExtensions", true },
+-                { "IsPDFA1", false },
+-                { "IsPDFA1OrGreater", true },
+-                { "IsPDFA2", true },
+-                { "IsPDFA2OrGreater", true },
+-                { "IsPDFA3", true },
+-                { "IsPDFA3OrGreater", true },
+-            });
+-        }
+-        ~Init()
+-        {
+-            xmlRelaxNGFree(m_schema);
+-        }
+-        xmlRelaxNGPtr m_schema;
+-    } s_init;
+-
+-    return s_init.m_schema;
+-}
+-
+-xmlRelaxNGPtr getXMPSchema_PDFA4()
+-{
+-    static struct Init
+-    {
+-        Init()
+-        {
+-            m_schema = createTailoredSchema(unordered_map<string_view, bool>{
+-                { "IncludeExtensions", true },
+-                { "IsPDFA1", false },
+-                { "IsPDFA1OrGreater", true },
+-                { "IsPDFA2", false },
+-                { "IsPDFA2OrGreater", true },
+-                { "IsPDFA3", false },
+-                { "IsPDFA3OrGreater", true },
+-                { "IsPDFA4", true },
+-                { "IsPDFA4OrGreater", true },
+-            });
+-        }
+-        ~Init()
+-        {
+-            xmlRelaxNGFree(m_schema);
+-        }
+-        xmlRelaxNGPtr m_schema;
+-    } s_init;
+-
+-    return s_init.m_schema;
+-}
+-
++xmlRelaxNGPtr getXMPSchema_PDFA1()
++{
++    return createTailoredSchema(unordered_map<string_view, bool>{
++                { "IncludeExtensions", true },
++                { "IsPDFA1", true },
++                { "IsPDFA1OrGreater", true },
++            });
++}
++
++xmlRelaxNGPtr getXMPSchema_PDFA2_3()
++{
++    return createTailoredSchema(unordered_map<string_view, bool>{
++                { "IncludeExtensions", true },
++                { "IsPDFA1", false },
++                { "IsPDFA1OrGreater", true },
++                { "IsPDFA2", true },
++                { "IsPDFA2OrGreater", true },
++                { "IsPDFA3", true },
++                { "IsPDFA3OrGreater", true },
++            });
++}
++
++xmlRelaxNGPtr getXMPSchema_PDFA4()
++{
++    return createTailoredSchema(unordered_map<string_view, bool>{
++                { "IncludeExtensions", true },
++                { "IsPDFA1", false },
++                { "IsPDFA1OrGreater", true },
++                { "IsPDFA2", false },
++                { "IsPDFA2OrGreater", true },
++                { "IsPDFA3", false },
++                { "IsPDFA3OrGreater", true },
++                { "IsPDFA4", true },
++                { "IsPDFA4OrGreater", true },
++            });
++}
++
+ bool tryValidateElement(xmlRelaxNGValidCtxtPtr ctx, xmlDocPtr doc, xmlNodePtr elem)
+ {
+     int rc = xmlRelaxNGValidatePushElement(ctx, doc, elem);
