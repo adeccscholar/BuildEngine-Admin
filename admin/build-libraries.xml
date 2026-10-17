@@ -9481,6 +9481,13 @@
             <argument value="-c"/>
             <argument value="from pathlib import Path; p=Path('testing/BUILD.gn'); s=p.read_text(encoding='utf-8'); lines=s.splitlines(keepends=True); needle='&quot;//third_party/test_fonts&quot;,'; matches=sum(line.strip()==needle for line in lines); assert matches in (0,1), 'Unexpected PDFium test_fonts dependency count'; p.write_text(''.join(line for line in lines if line.strip()!=needle),encoding='utf-8') if matches else None; print('PDFium standalone test-font dependency excluded or already absent')"/>
          </execute>
+         <!-- Chromium's clang_revision config reads a depot_tools-managed Clang
+              stamp. Skip only that stamp lookup when using local BCC64X. -->
+         <execute name="adapt-local-clang-revision" executable="{Tool:python}"
+                  workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-c"/>
+            <argument value="from pathlib import Path; p=Path('build/config/compiler/BUILD.gn'); s=p.read_text(encoding='utf-8'); old='if (is_clang &amp;&amp; clang_base_path == default_clang_base_path &amp;&amp;'; new='if (is_clang &amp;&amp; path_exists(&quot;//third_party/llvm-build/Release+Asserts/cr_build_revision&quot;) &amp;&amp; clang_base_path == default_clang_base_path &amp;&amp;'; assert s.count(old)+s.count(new)==1, 'Unexpected Chromium clang_revision guard'; p.write_text(s.replace(old,new),encoding='utf-8') if old in s else None; print('PDFium local Clang revision guard ready')"/>
+         </execute>
          <target name="gn-gen" type="generic"
                  executable="{Tool:gn}"
                  workingDirectory="{Workspace}" showOutput="true">
