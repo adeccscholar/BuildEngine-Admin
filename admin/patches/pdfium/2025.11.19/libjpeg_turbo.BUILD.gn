@@ -1,0 +1,8 @@
+# Consume the BuildEngine libjpeg-turbo 3.2.0 shared package.
+config("installed_jpeg") {
+  include_dirs = [ getenv("CB_PDFIUM_JPEG_INCLUDE") ]
+  libs = [ getenv("CB_PDFIUM_JPEG_LIB") ]
+}
+group("libjpeg") {
+  public_configs = [ ":installed_jpeg" ]
+}
