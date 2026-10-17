@@ -12,13 +12,16 @@ toolchain("bcc64x") {
   assert(_cc != "", "BuildEngine BCC64X executable was not provided")
   assert(_ar != "", "BuildEngine LLVM archiver was not provided")
 
+  # Chromium config flags are clang-cl/MSVC-specific. Until a dedicated
+  # BCC64X compiler config is installed, only pass GN defines and includes.
+  # Do not silently forward /wdXXXX, /MT, /Zi, or Clang plugin arguments.
   tool("cc") {
-    command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
+    command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CC {{source}}"
   }
   tool("cxx") {
-    command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
+    command = "\"$_cc\" -std=c++20 -c {{source}} -o {{output}} {{defines}} {{include_dirs}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CXX {{source}}"
   }
