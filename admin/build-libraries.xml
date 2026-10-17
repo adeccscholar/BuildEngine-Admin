@@ -9387,6 +9387,19 @@
             <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
             <argument value="{DownloadsRoot}\pdfium-deps\buildtools-24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"/>
          </execute>
+         <!-- Chromium build/ revision 371ecb089d96d60e5208ec2d25c9b4f0860e556c
+              committer timestamp: 2025-11-18T01:27:43Z (1763429263).
+              Source metadata must be reproducible without gclient or git checkout. -->
+         <execute name="prepare-chromium-lastchange-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
+            <argument value="-E"/><argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\\build\\util"/>
+         </execute>
+         <execute name="generate-chromium-lastchange-committime"
+                  executable="{Tool:python}" workingDirectory="{CurrentArtifact}" showOutput="true">
+            <argument value="-c"/>
+            <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.write_text('1763429263\\n', encoding='ascii'); print('CHROMIUM LASTCHANGE.committime: 1763429263')"/>
+         </execute>
+         <require path="{CurrentArtifact}\\build\\util\\LASTCHANGE.committime"/>
          <!-- gclient_args.gni is generated deterministically instead of running gclient. -->
          <execute name="generate-offline-gclient-args" executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}" showOutput="true">
