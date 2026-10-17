@@ -9561,10 +9561,12 @@
             <argument value="--script-executable={Tool:python}"/>
          </target>
          <!-- Validate the GENERATED build, not merely the requested GN args. -->
+         <!-- Inspect commands reachable from the PDFium target, not all
+              unrelated Chromium host-toolchain rules. -->
          <execute name="verify-bcc64x-ninja-toolchain" executable="{Tool:python}"
                   workingDirectory="{Workspace}" showOutput="true">
             <argument value="-c"/>
-            <argument value="from pathlib import Path; root=Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}'); files=list(root.rglob('*.ninja')); assert files, 'No generated Ninja rules'; data='\n'.join(p.read_text(encoding='utf-8',errors='replace') for p in files); forbidden=['clang-cl.exe','VC/Tools/MSVC','VC\\Tools\\MSVC','-imsvc']; found=[x for x in forbidden if x.casefold() in data.casefold()]; assert not found, 'Forbidden Chromium/MSVC toolchain markers: '+repr(found); assert 'bcc64x' in data.casefold(), 'BCC64X not present in Ninja rules'; print('PDFium Ninja toolchain: BCC64X verified; files='+str(len(files)))"/>
+            <argument value="import subprocess; from pathlib import Path; root=Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}'); result=subprocess.run([r'{Tool:ninja}','-C',str(root),'-t','commands','pdfium'],capture_output=True,text=True,encoding='utf-8',errors='replace'); assert result.returncode==0, result.stderr; commands=result.stdout.splitlines(); assert commands, 'No PDFium target commands'; blocked=('clang-cl.exe','VC/Tools/MSVC','VC\\Tools\\MSVC','-imsvc'); bad=[(i+1,next((x for x in blocked if x.casefold() in line.casefold()),''),line[:360]) for i,line in enumerate(commands) if any(x.casefold() in line.casefold() for x in blocked)]; assert not bad, 'Forbidden PDFium target command: '+repr(bad[:5]); assert any('bcc64x' in line.casefold() for line in commands), 'BCC64X missing from PDFium commands'; print('PDFium BCC64X target commands verified: '+str(len(commands)))"/>
          </execute>
          <execute name="ninja-build" executable="{Tool:ninja}"
                   workingDirectory="{Workspace}" showOutput="false">
