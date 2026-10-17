@@ -12,16 +12,24 @@ toolchain("bcc64x") {
   assert(_cc != "", "BuildEngine BCC64X executable was not provided")
   assert(_ar != "", "BuildEngine LLVM archiver was not provided")
 
+  # Headers are consumed in-place from versioned BuildEngine packages.
+  _skia_include = getenv("CB_PDFIUM_SKIA_INCLUDE")
+  _icu_include = getenv("CB_PDFIUM_ICU_INCLUDE")
+  _abseil_include = getenv("CB_PDFIUM_ABSEIL_INCLUDE")
+  assert(_skia_include != "" && _icu_include != "" && _abseil_include != "",
+         "Versioned BuildEngine SDK include paths are required")
+  _package_includes = "-I\"${_skia_include}\" -I\"${_icu_include}\" -I\"${_abseil_include}\""
+
   # Chromium config flags are clang-cl/MSVC-specific. Until a dedicated
   # BCC64X compiler config is installed, only pass GN defines and includes.
   # Do not silently forward /wdXXXX, /MT, /Zi, or Clang plugin arguments.
   tool("cc") {
-    command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}}"
+    command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} $_package_includes"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CC {{source}}"
   }
   tool("cxx") {
-    command = "\"$_cc\" -std=c++20 -c {{source}} -o {{output}} {{defines}} {{include_dirs}}"
+    command = "\"$_cc\" -std=c++20 -c {{source}} -o {{output}} {{defines}} {{include_dirs}} $_package_includes"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CXX {{source}}"
   }
