@@ -13,7 +13,6 @@
       <requires tool="ld-lld"/>
       <prepare executable="{Tool:python}" workingDirectory="{SourceRoot}">
          <argument value="build/gen.py"/>
-         <argument value="--no-last-commit-position"/>
          <argument value="--platform"/>
          <argument value="mingw"/>
          <environment name="CC" value="{Tool:bcc64x}"/>
