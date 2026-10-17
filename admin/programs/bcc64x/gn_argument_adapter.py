@@ -62,9 +62,11 @@ def Translate(a_strArgument: str) -> list[str]:
     }
     if a_strArgument in mpIntrinsic:
         return []
-    if a_strArgument in ("/MT", "/MTd"):
-        # Do NOT select MSVC's static CRT. The BuildEngine BCC64X contract
-        # requires the dynamic RTL for all module boundaries.
+    if a_strArgument in ("/MD", "/MDd", "/MT", "/MTd"):
+        # Chromium chooses /MD and /MDd for dynamic MSVC CRT when building
+        # components. The BuildEngine BCC64X contract always selects its own
+        # dynamic RTL (-tR), never MSVC's debug or static CRT. Retain the
+        # explicit existing /MT and /MTd compatibility mapping for now.
         return ["-tR"]
     # Skia's skcms chooses ISA-specific compilation units through /arch.
     # Do not translate these to a host-dependent -march=native.
