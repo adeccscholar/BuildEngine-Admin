@@ -19,7 +19,12 @@
          <environment name="AR" value="{Tool:llvm-ar}"/>
          <environment name="LD" value="{Tool:ld-lld}"/>
       </prepare>
-      <build driver="ninja" executable="{Tool:ninja}" workingDirectory="{SourceRoot}/out"/>
+      <build driver="ninja" executable="{Tool:ninja}" workingDirectory="{SourceRoot}/out">
+         <environment name="CC" value="{Tool:bcc64x}"/>
+         <environment name="CXX" value="{Tool:bcc64x}"/>
+         <environment name="AR" value="{Tool:llvm-ar}"/>
+         <environment name="LD" value="{Tool:ld-lld}"/>
+      </build>
       <smoke executable="{SourceRoot}/out/gn.exe" workingDirectory="{SourceRoot}">
          <argument value="--version"/>
       </smoke>
