@@ -46,6 +46,10 @@ def Translate(a_strArgument: str) -> list[str]:
         "/Zi": "-gcodeview",
         "/utf-8": "-finput-charset=UTF-8",
     }
+    if a_strArgument == "/TC":
+        # The C GN tool already selects a .c source file. BCC64X infers C mode
+        # from the extension; MSVC /TC is not passed through.
+        return []
     if a_strArgument in mpDirect:
         return [mpDirect[a_strArgument]]
     # These MSVC switches have no distinct effect under the BCC64X
