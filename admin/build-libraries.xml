@@ -9560,6 +9560,12 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--script-executable={Tool:python}"/>
          </target>
+         <!-- Validate the GENERATED build, not merely the requested GN args. -->
+         <execute name="verify-bcc64x-ninja-toolchain" executable="{Tool:python}"
+                  workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-c"/>
+            <argument value="from pathlib import Path; root=Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}'); files=list(root.rglob('*.ninja')); assert files, 'No generated Ninja rules'; data='\n'.join(p.read_text(encoding='utf-8',errors='replace') for p in files); forbidden=['clang-cl.exe','VC/Tools/MSVC','VC\\Tools\\MSVC','-imsvc']; found=[x for x in forbidden if x.casefold() in data.casefold()]; assert not found, 'Forbidden Chromium/MSVC toolchain markers: '+repr(found); assert 'bcc64x' in data.casefold(), 'BCC64X not present in Ninja rules'; print('PDFium Ninja toolchain: BCC64X verified; files='+str(len(files)))"/>
+         </execute>
          <execute name="ninja-build" executable="{Tool:ninja}"
                   workingDirectory="{Workspace}" showOutput="false">
             <argument value="-C"/>
