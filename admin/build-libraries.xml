@@ -9459,10 +9459,20 @@
             <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text(str(1763561859), encoding='ascii')"/>
          </execute>
          <require path="{Workspace}\\build\\util\\LASTCHANGE.committime"/>
-         <!-- The installed Skia DLL replaces the Chromium Skia source target. -->
-         <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\skia.BUILD.gn"
-               target="{Workspace}\\skia\\BUILD.gn" overwrite="true"/>
-         <require path="{Workspace}\\skia\\BUILD.gn"/>
+         <!-- A build-level copy is not reliably executed on a resumed FSM run.
+              Perform the actual replacement as an executable step before GN. -->
+         <execute name="install-local-skia-gn-target" executable="{Tool:cmake}"
+                  workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-E"/>
+            <argument value="copy_if_different"/>
+            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\skia.BUILD.gn"/>
+            <argument value="{Workspace}\\skia\\BUILD.gn"/>
+         </execute>
+         <execute name="verify-local-skia-gn-target" executable="{Tool:python}"
+                  workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-c"/>
+            <argument value="from pathlib import Path; a=Path(r'{BuildFileDir}\\patches\\pdfium\\2025.11.19\\skia.BUILD.gn').read_bytes(); b=Path('skia/BUILD.gn').read_bytes(); assert a==b, 'Skia GN adapter is not installed'; print('PDFium Skia GN adapter verified')"/>
+         </execute>
          <!-- Tests are excluded from the PDFium product build. Remove the
               test-font dependency from the test-support target, which GN still
               parses during generation. Keep the remaining upstream file intact. -->
