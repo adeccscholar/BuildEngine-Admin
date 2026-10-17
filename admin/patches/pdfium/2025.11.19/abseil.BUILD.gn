@@ -1,0 +1,10 @@
+# BuildEngine GN adapter for its monolithic shared Abseil installation.
+# The Abseil DLL and import library are provided by the dependency FSM.
+config("installed_abseil") {
+  include_dirs = [ getenv("CB_PDFIUM_ABSEIL_INCLUDE") ]
+  libs = [ getenv("CB_PDFIUM_ABSEIL_LIB") ]
+  defines = [ "ABSL_CONSUME_DLL" ]
+}
+group("absl") {
+  public_configs = [ ":installed_abseil" ]
+}
