@@ -9387,6 +9387,36 @@
             <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
             <argument value="{DownloadsRoot}\pdfium-deps\buildtools-24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"/>
          </execute>
+         <!-- Materialize the exact PDFium DEPS checkout, not just its download. -->
+         <execute name="prepare-abseil-cpp-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
+            <argument value="-E"/><argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\abseil-cpp"/>
+         </execute>
+         <execute name="extract-abseil-cpp-upstream" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\abseil-cpp" showOutput="true">
+            <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
+            <argument value="{DownloadsRoot}\pdfium-deps\abseil-cpp-14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz"/>
+         </execute>
+         <require path="{CurrentArtifact}\third_party\abseil-cpp\BUILD.gn"/>
+         <!-- Materialize the exact PDFium DEPS checkout, not just its download. -->
+         <execute name="prepare-skia-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
+            <argument value="-E"/><argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\skia"/>
+         </execute>
+         <execute name="extract-skia-upstream" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\skia" showOutput="true">
+            <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
+            <argument value="{DownloadsRoot}\pdfium-deps\skia-a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0.tar.gz"/>
+         </execute>
+         <require path="{CurrentArtifact}\third_party\skia\BUILD.gn"/>
+         <!-- Materialize the exact PDFium DEPS checkout, not just its download. -->
+         <execute name="prepare-fast_float-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
+            <argument value="-E"/><argument value="make_directory"/>
+            <argument value="{CurrentArtifact}\third_party\fast_float\src"/>
+         </execute>
+         <execute name="extract-fast_float-upstream" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\fast_float\src" showOutput="true">
+            <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
+            <argument value="{DownloadsRoot}\pdfium-deps\fast_float-cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz"/>
+         </execute>
+         <require path="{CurrentArtifact}\third_party\fast_float\src\include\fast_float\fast_float.h"/>
          <!-- Non-configurable dependencies are provided at their PDFium DEPS revisions. -->
          <execute name="prepare-icu-gn-adapter" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\\third_party\\icu"/>
