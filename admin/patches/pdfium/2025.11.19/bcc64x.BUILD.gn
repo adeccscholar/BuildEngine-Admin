@@ -18,12 +18,12 @@ toolchain("bcc64x") {
   # PDFium dependencies are resolved in its pinned upstream source tree.
   # Preserve GN's flags; unsupported options must be diagnosed, not discarded.
   tool("cc") {
-    command = "\"$_python\" \"$_adapter\" \"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
+    command = "\"$_python\" \"$_adapter\" \"$_cc\" -DUSE_SYSTEM_ICUUC -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CC {{source}}"
   }
   tool("cxx") {
-    command = "\"$_python\" \"$_adapter\" \"$_cc\" -std=c++20 -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
+    command = "\"$_python\" \"$_adapter\" \"$_cc\" -std=c++20 -DUSE_SYSTEM_ICUUC -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CXX {{source}}"
   }
