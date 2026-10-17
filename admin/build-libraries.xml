@@ -9434,6 +9434,8 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_PDFIUM_ICU_INCLUDE" value="{InstallRoot}\\packages\\icu\\78.3\\include"/>
          <environment name="CB_PDFIUM_ICU_LIB" value="{InstallRoot}\\packages\\icu\\78.3\\lib\\win64\\{Configuration}\\{PdfiumIcuImport}.lib"/>
+         <environment name="CB_PDFIUM_FREETYPE_INCLUDE" value="{InstallRoot}\packages\freetype\2.14.3\include\freetype2"/>
+         <environment name="CB_PDFIUM_FREETYPE_LIB" value="{InstallRoot}\packages\freetype\2.14.3\lib\win64\{Configuration}\{PdfiumFreeTypeImport}.lib"/>
          <environment name="CB_PDFIUM_ZLIB_INCLUDE" value="{InstallRoot}\packages\zlib\1.3.2\include"/>
          <environment name="CB_PDFIUM_ZLIB_LIB" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{PdfiumZlibImport}.lib"/>
          <environment name="CB_PDFIUM_PNG_INCLUDE" value="{InstallRoot}\packages\libpng\1.6.58\include"/>
@@ -9506,6 +9508,11 @@
             <argument value="{Workspace}\third_party\libpng\BUILD.gn"/>
          </execute>
          <require path="{Workspace}\third_party\libpng\BUILD.gn"/>
+         <!-- Chromium's native FreeType target is wired to BuildEngine's local package. -->
+         <execute name="bind-local-freetype" executable="{Tool:python}" workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-c"/>
+            <argument value="from pathlib import Path; p=Path('build/config/freetype/BUILD.gn'); s=p.read_text(encoding='utf-8'); old='public_deps = [ &quot;//third_party/freetype&quot; ]'; new='public_configs = [ &quot;//build/config/freetype:buildengine_freetype&quot; ]'; assert s.count(old)+s.count(new)==1, 'Unexpected FreeType GN target'; s=s.replace(old,new); marker='config(&quot;buildengine_freetype&quot;) {'; s += '\\n'+marker+'\\n  include_dirs = [ getenv(&quot;CB_PDFIUM_FREETYPE_INCLUDE&quot;) ]\\n  libs = [ getenv(&quot;CB_PDFIUM_FREETYPE_LIB&quot;) ]\\n}\\n' if marker not in s else ''; p.write_text(s, encoding='utf-8'); print('Local FreeType GN target ready')"/>
+         </execute>
          <!-- Tests are excluded from the PDFium product build. Remove the
               test-font dependency from the test-support target, which GN still
               parses during generation. Keep the remaining upstream file intact. -->
@@ -9532,6 +9539,7 @@
                <line value="pdf_enable_xfa = false"/>
                <line value="pdf_use_partition_alloc = false"/>
                <line value="pdf_use_skia = true"/>
+               <line value="pdf_bundle_freetype = false"/>
                <line value="pdf_is_standalone = false"/>
                <line value="is_debug = {PdfiumDebug}"/>
             </temporaryFile>
@@ -9550,6 +9558,7 @@
             <variable name="PdfiumIcuImport" value="libicuuc"/>
             <variable name="PdfiumJpegImport" value="libjpeg"/>
             <variable name="PdfiumZlibImport" value="libz"/>
+            <variable name="PdfiumFreeTypeImport" value="libfreetype"/>
             <variable name="PdfiumPngImport" value="libpng16"/>
          </variant>
          <variant name="Debug">
@@ -9557,6 +9566,7 @@
             <variable name="PdfiumIcuImport" value="libicuucd"/>
             <variable name="PdfiumJpegImport" value="libjpegd"/>
             <variable name="PdfiumZlibImport" value="libzd"/>
+            <variable name="PdfiumFreeTypeImport" value="libfreetyped"/>
             <variable name="PdfiumPngImport" value="libpng16d"/>
          </variant>
          <install>
