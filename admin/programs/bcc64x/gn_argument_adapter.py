@@ -39,6 +39,24 @@ def Translate(a_strArgument: str) -> list[str]:
     }
     if a_strArgument in mpDirect:
         return [mpDirect[a_strArgument]]
+    # These MSVC switches have no distinct effect under the BCC64X
+    # Clang/COFF frontend. Document every consumed switch explicitly.
+    mpIntrinsic = {
+        "/FS": "PDB synchronization is MSVC-specific; BCC64X emits per-object debug data",
+        "/bigobj": "LLVM COFF writer supports extended sections natively",
+        "/Zc:inline": "Clang applies standard C++ inline semantics",
+        "/Zc:__cplusplus": "Clang reports the active standard in __cplusplus",
+    }
+    if a_strArgument in mpIntrinsic:
+        return []
+    if a_strArgument == "/MT":
+        # Do NOT select MSVC's static CRT. The BuildEngine BCC64X contract
+        # requires the dynamic RTL for all module boundaries.
+        return ["-tR"]
+    if a_strArgument.lower() == "/wd4117":
+        # MSVC C4117 is emitted for reserved/invalid macro names; the Clang
+        # preprocessor uses its own diagnostics. Do not suppress all warnings.
+        return []
     if a_strArgument.startswith("/D"):
         return ["-D" + a_strArgument[2:]]
     if a_strArgument.startswith("/std:"):
