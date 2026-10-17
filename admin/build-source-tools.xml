@@ -13,9 +13,7 @@
          <argument value="build/gen.py"/>
          <argument value="--no-last-commit-position"/>
       </prepare>
-      <build driver="ninja" executable="{Tool:ninja}" workingDirectory="{SourceRoot}/out">
-         <argument value="gn"/>
-      </build>
+      <build driver="ninja" executable="{Tool:ninja}" workingDirectory="{SourceRoot}/out"/>
       <smoke executable="{SourceRoot}/out/gn.exe" workingDirectory="{SourceRoot}">
          <argument value="--version"/>
       </smoke>
