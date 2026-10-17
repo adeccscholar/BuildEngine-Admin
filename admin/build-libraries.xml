@@ -9434,6 +9434,10 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_PDFIUM_ICU_INCLUDE" value="{InstallRoot}\\packages\\icu\\78.3\\include"/>
          <environment name="CB_PDFIUM_ICU_LIB" value="{InstallRoot}\\packages\\icu\\78.3\\lib\\win64\\{Configuration}\\{PdfiumIcuImport}.lib"/>
+         <environment name="CB_PDFIUM_ZLIB_INCLUDE" value="{InstallRoot}\packages\zlib\1.3.2\include"/>
+         <environment name="CB_PDFIUM_ZLIB_LIB" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{PdfiumZlibImport}.lib"/>
+         <environment name="CB_PDFIUM_PNG_INCLUDE" value="{InstallRoot}\packages\libpng\1.6.58\include"/>
+         <environment name="CB_PDFIUM_PNG_LIB" value="{InstallRoot}\packages\libpng\1.6.58\lib\win64\{Configuration}\{PdfiumPngImport}.lib"/>
          <environment name="CB_PDFIUM_JPEG_INCLUDE" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\include"/>
          <environment name="CB_PDFIUM_JPEG_LIB" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\{Configuration}\{PdfiumJpegImport}.lib"/>
          <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{InstallRoot}\\packages\\skia\\153\\include"/>
@@ -9484,6 +9488,24 @@
             <argument value="{Workspace}\third_party\libjpeg_turbo\BUILD.gn"/>
          </execute>
          <require path="{Workspace}\third_party\libjpeg_turbo\BUILD.gn"/>
+         <execute name="prepare-zlib-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
+            <argument value="-E"/><argument value="make_directory"/><argument value="{Workspace}\third_party\zlib"/>
+         </execute>
+         <execute name="install-zlib-gn-target" executable="{Tool:cmake}" workingDirectory="{Workspace}">
+            <argument value="-E"/><argument value="copy_if_different"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\zlib.BUILD.gn"/>
+            <argument value="{Workspace}\third_party\zlib\BUILD.gn"/>
+         </execute>
+         <require path="{Workspace}\third_party\zlib\BUILD.gn"/>
+         <execute name="prepare-libpng-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
+            <argument value="-E"/><argument value="make_directory"/><argument value="{Workspace}\third_party\libpng"/>
+         </execute>
+         <execute name="install-libpng-gn-target" executable="{Tool:cmake}" workingDirectory="{Workspace}">
+            <argument value="-E"/><argument value="copy_if_different"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\libpng.BUILD.gn"/>
+            <argument value="{Workspace}\third_party\libpng\BUILD.gn"/>
+         </execute>
+         <require path="{Workspace}\third_party\libpng\BUILD.gn"/>
          <!-- Tests are excluded from the PDFium product build. Remove the
               test-font dependency from the test-support target, which GN still
               parses during generation. Keep the remaining upstream file intact. -->
@@ -9527,11 +9549,15 @@
             <variable name="PdfiumDebug" value="false"/>
             <variable name="PdfiumIcuImport" value="libicuuc"/>
             <variable name="PdfiumJpegImport" value="libjpeg"/>
+            <variable name="PdfiumZlibImport" value="libz"/>
+            <variable name="PdfiumPngImport" value="libpng16"/>
          </variant>
          <variant name="Debug">
             <variable name="PdfiumDebug" value="true"/>
             <variable name="PdfiumIcuImport" value="libicuucd"/>
             <variable name="PdfiumJpegImport" value="libjpegd"/>
+            <variable name="PdfiumZlibImport" value="libzd"/>
+            <variable name="PdfiumPngImport" value="libpng16d"/>
          </variant>
          <install>
             <perVariant>
