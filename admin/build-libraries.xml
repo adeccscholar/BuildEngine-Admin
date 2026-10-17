@@ -9515,7 +9515,7 @@
               Clang inline ownership fix as the independently packaged LCMS2. -->
          <execute name="adapt-bundled-lcms2-clang-inline" executable="{Tool:python}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="-c"/>
-            <argument value="from pathlib import Path&#10;p = Path('third_party/lcms/src/lcms2_internal.h')&#10;s = p.read_text(encoding='utf-8')&#10;old = '#if defined(_MSC_VER) || defined(__BORLANDC__)'&#10;new = '#if defined(__clang__)\\n#   define cmsINLINE static inline\\n#elif defined(_MSC_VER) || defined(__BORLANDC__)'&#10;assert s.count(old) + s.count(new) == 1, 'Unexpected bundled LCMS2 inline contract'&#10;t = s.replace(old, new)&#10;if t != s:&#10;    p.write_text(t, encoding='utf-8')&#10;print('PDFium bundled LCMS2 Clang inline ownership ready')"/>
+            <argument value="from pathlib import Path&#10;p = Path('third_party/lcms/src/lcms2_internal.h')&#10;s = p.read_text(encoding='utf-8')&#10;old = '#if defined(_MSC_VER) || defined(__BORLANDC__)'&#10;new = '#if defined(__clang__)\n#   define cmsINLINE static inline\n#elif defined(_MSC_VER) || defined(__BORLANDC__)'&#10;assert s.count(old) + s.count(new) == 1, 'Unexpected bundled LCMS2 inline contract'&#10;t = s.replace(old, new)&#10;if t != s:&#10;    p.write_text(t, encoding='utf-8')&#10;print('PDFium bundled LCMS2 Clang inline ownership ready')"/>
          </execute>
          <execute name="exclude-standalone-test-fonts" executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}" outputMode="errors">
