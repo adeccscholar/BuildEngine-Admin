@@ -9340,7 +9340,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-17T20:05:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-17T20:25:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
@@ -9463,6 +9463,13 @@
                   workingDirectory="{CurrentArtifact}" showOutput="true">
             <argument value="-c"/>
             <argument value="from pathlib import Path; p=Path('third_party/skia/src/utils/win/SkDWriteFontFileStream.h'); s=p.read_text(encoding='utf-8'); old='ULONG fRefCount;'; new='volatile LONG fRefCount;'; assert s.count(old)+s.count(new)==1, 'Unexpected Skia DirectWrite refcount layout'; t=s.replace(old,new); p.write_text(t,encoding='utf-8') if t!=s else None; print('Skia DirectWrite refcount type ready')"/>
+         </execute>
+         <!-- BCC64X SDK exposes the two-argument COM QueryInterface only.
+              Adapt typed Skia COM pointers with exact IID and void** output. -->
+         <execute name="adapt-skia-directwrite-com-bcc64x" executable="{Tool:python}"
+                  workingDirectory="{CurrentArtifact}" showOutput="true">
+            <argument value="-c"/>
+            <argument value="from pathlib import Path&#10;import re&#10;root = Path(&quot;third_party/skia/src/ports&quot;)&#10;expected = {&quot;SkFontMgr_win_dw.cpp&quot;: (5, 2), &quot;SkTypeface_win_dw.cpp&quot;: (13, 3), &quot;SkScalerContext_win_dw.cpp&quot;: (1, 0)}&#10;rx = re.compile(r&quot;-&gt;QueryInterface\(&amp;([A-Za-z_]\w*)\)&quot;)&#10;for name, (qi_count, counter_count) in expected.items():&#10;    file = root / name&#10;    original = file.read_text(encoding=&quot;utf-8&quot;)&#10;    remaining = list(rx.finditer(original))&#10;    marker = &quot;-&gt;QueryInterface(__uuidof(**(&amp;&quot;&#10;    if len(remaining) not in (0, qi_count):&#10;        raise RuntimeError(f&quot;{name}: unexpected QueryInterface calls {len(remaining)}&quot;)&#10;    if not remaining and original.count(marker) != qi_count:&#10;        raise RuntimeError(f&quot;{name}: unexpected converted QueryInterface count&quot;)&#10;    updated = rx.sub(lambda m: &quot;-&gt;QueryInterface(__uuidof(**(&amp;&quot; + m.group(1) + &quot;)), reinterpret_cast&lt;void**&gt;(&amp;&quot; + m.group(1) + &quot;))&quot;, original)&#10;    old = &quot;ULONG fRefCount;&quot;&#10;    new = &quot;volatile LONG fRefCount;&quot;&#10;    if updated.count(old) + updated.count(new) != counter_count:&#10;        raise RuntimeError(f&quot;{name}: unexpected COM refcount declarations&quot;)&#10;    updated = updated.replace(old, new)&#10;    if updated != original:&#10;        file.write_text(updated, encoding=&quot;utf-8&quot;)&#10;    print(f&quot;{name}: COM API binding ready&quot;)&#10;"/>
          </execute>
          <!-- Rewrite Chromium-vendored header prefixes to normal public SDK
               include names. No package files are copied into PDFium. -->
