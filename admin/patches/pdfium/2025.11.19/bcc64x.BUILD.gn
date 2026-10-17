@@ -17,13 +17,16 @@ toolchain("bcc64x") {
 
   # PDFium dependencies are resolved in its pinned upstream source tree.
   # Preserve GN's flags; unsupported options must be diagnosed, not discarded.
+  # BCC64X is native Windows, not MinGW/POSIX. The pinned Abseil release
+  # defaults to pthread TLS for this detected compiler profile; force its
+  # supported C++11 thread_local/RAII identity mode throughout this toolchain.
   tool("cc") {
     command = "\"$_python\" \"$_adapter\" \"$_cc\" -DUSE_SYSTEM_ICUUC -DUSE_SYSTEM_ZLIB -DUSE_SYSTEM_LIBJPEG -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CC {{source}}"
   }
   tool("cxx") {
-    command = "\"$_python\" \"$_adapter\" \"$_cc\" -std=c++20 -DUSE_SYSTEM_ICUUC -DUSE_SYSTEM_ZLIB -DUSE_SYSTEM_LIBJPEG -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
+    command = "\"$_python\" \"$_adapter\" \"$_cc\" -std=c++20 -DUSE_SYSTEM_ICUUC -DUSE_SYSTEM_ZLIB -DUSE_SYSTEM_LIBJPEG -DABSL_FORCE_THREAD_IDENTITY_MODE=2 -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CXX {{source}}"
   }
