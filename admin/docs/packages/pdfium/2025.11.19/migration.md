@@ -209,3 +209,11 @@ The first installed-package consumer smoke failed while linking the executable i
 **Verification pending:** Re-run both native installed-package consumer smokes; inspect their complete `02-cmake-build.log` files and confirm that the Chromium ABI mismatch has actually disappeared.
 
 **FSM observation:** The technical `ready` action was marked PASS while smoke actions were failing. The library must not be considered ready until the required smokes succeed; this requires a separate sequencing/presentation correction in the FSM.
+
+## Consumer CMake package-root correction (17 October 2026)
+
+Both Release and Debug consumer CMake configure attempts failed in `PDFiumConfig.cmake:39` at the explicit managed-import existence check. The configuration initially computed `_PDFIUM_PACKAGES_ROOT` as the parent of the PDFium *version* root, which resolves to `<install>/packages/pdfium`, **not** `<install>/packages`. All sibling imports (ICU, FreeType, libpng, libjpeg-turbo, zlib) were consequently looked up below the wrong package coordinate.
+
+**Correction:** `get_filename_component(_PDFIUM_PACKAGES_ROOT "${_PDFIUM_ROOT}/../.." ABSOLUTE)`. This changes only consumer path resolution; no PDFium/GN rebuild or upstream source patch is needed for this error. Existing absolute version/configuration imports and failure-on-missing-file checks remain unchanged. Actual file names and further unresolved symbols are still subject to the next consumer configure/link test **[not verified]**.
+
+The separately uploaded `02-cmake-build(3).log` is the older 21:11:36 UTC linking run; it does not contain the newer CMake line-39 configure error and cannot identify any additional current missing import file.

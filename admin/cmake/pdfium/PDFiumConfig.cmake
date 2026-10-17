@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: MIT
 # PDFium 2025.11.19: explicit native BCC64X static archive consumer contract.
 get_filename_component(_PDFIUM_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
-get_filename_component(_PDFIUM_PACKAGES_ROOT "${_PDFIUM_ROOT}/.." ABSOLUTE)
+# The PDFium version root is <install>/packages/pdfium/<version>.
+# Two levels up reach the sibling library directories under packages/.
+get_filename_component(_PDFIUM_PACKAGES_ROOT "${_PDFIUM_ROOT}/../.." ABSOLUTE)
 if(NOT TARGET PDFium::pdfium)
    add_library(PDFium::pdfium STATIC IMPORTED GLOBAL)
    set_target_properties(PDFium::pdfium PROPERTIES
