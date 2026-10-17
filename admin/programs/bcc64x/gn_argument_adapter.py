@@ -13,10 +13,16 @@ import sys
 WARNING_EQUIVALENTS = {
     "4244": ("-Wno-shorten-64-to-32", "-Wno-implicit-int-conversion",
              "-Wno-implicit-float-conversion", "-Wno-float-conversion"),
+    "4267": ("-Wno-shorten-64-to-32", "-Wno-implicit-int-conversion"),
+    "4800": ("-Wno-bool-conversion",),
 }
 
 
 def Translate(a_strArgument: str) -> list[str]:
+    # C4117 is specific to MSVC macro diagnostics and has no Clang
+    # warning ID. The remaining warning diagnostics remain enabled.
+    if a_strArgument.lower() == "/wd4117":
+        return []
     a_match = re.fullmatch(r"/wd([0-9]{4})", a_strArgument, re.IGNORECASE)
     if a_match:
         strNumber = a_match.group(1)
@@ -53,10 +59,15 @@ def Translate(a_strArgument: str) -> list[str]:
         # Do NOT select MSVC's static CRT. The BuildEngine BCC64X contract
         # requires the dynamic RTL for all module boundaries.
         return ["-tR"]
-    if a_strArgument.lower() == "/wd4117":
-        # MSVC C4117 is emitted for reserved/invalid macro names; the Clang
-        # preprocessor uses its own diagnostics. Do not suppress all warnings.
-        return []
+    # Skia's skcms chooses ISA-specific compilation units through /arch.
+    # Do not translate these to a host-dependent -march=native.
+    mpArchitecture = {
+        "/arch:AVX2": ("-mavx2",),
+        "/arch:AVX512": ("-mavx512f", "-mavx512bw",
+                         "-mavx512dq", "-mavx512vl"),
+    }
+    if a_strArgument in mpArchitecture:
+        return list(mpArchitecture[a_strArgument])
     if a_strArgument.startswith("/D"):
         return ["-D" + a_strArgument[2:]]
     if a_strArgument.startswith("/std:"):
