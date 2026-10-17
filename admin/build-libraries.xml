@@ -9567,9 +9567,9 @@
             <argument value="-c"/>
             <argument value="from pathlib import Path; files=['third_party/icu/BUILD.gn','third_party/libjpeg_turbo/BUILD.gn','third_party/zlib/BUILD.gn','third_party/libpng/BUILD.gn','third_party/abseil-cpp/BUILD.gn','third_party/skia/BUILD.gn','tools/win/DebugVisualizers/BUILD.gn']; missing=[f for f in files if not Path(f).is_file()]; print('GN ADAPTERS MISSING: '+', '.join(missing) if missing else 'GN ADAPTERS: PRESENT'); assert not missing"/>
          </execute>
-         <target name="gn-gen" type="generic"
+         <target name="gn-gen" type="gn"
                  executable="{Tool:gn}"
-                 workingDirectory="{Workspace}" showOutput="true">
+                 workingDirectory="{Workspace}" showOutput="false">
             <temporaryFile id="gn-args" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\args.gn">
                <line value="target_cpu = &quot;x64&quot;"/>
                <line value="custom_toolchain = &quot;//build/toolchain/bcc64x:bcc64x&quot;"/>
