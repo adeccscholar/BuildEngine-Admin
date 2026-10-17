@@ -9340,7 +9340,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-17T20:50:01Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-17T22:30:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
@@ -9575,6 +9575,8 @@
                <line value="custom_toolchain = &quot;//build/toolchain/bcc64x:bcc64x&quot;"/>
                <line value="is_clang = false"/>
                <line value="is_component_build = false"/>
+               <!-- Upstream: emit a single complete static archive, rather than a source_set. -->
+               <line value="pdf_is_complete_lib = true"/>
                <line value="clang_use_chrome_plugins = false"/>
                <line value="pdf_enable_v8 = false"/>
                <line value="pdf_enable_xfa = false"/>
@@ -9622,6 +9624,7 @@
             <perVariant>
                <!-- Do not declare success without a generated GN build and PDFium target. -->
                <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\build.ninja"/>
+               <!-- With pdf_is_complete_lib=true, //:pdfium creates obj/pdfium.lib. -->
                <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\obj\pdfium.lib"/>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\obj\pdfium.lib"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pdfium.lib"
