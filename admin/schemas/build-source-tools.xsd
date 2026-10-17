@@ -7,9 +7,13 @@
     <xs:attribute name="name" type="xs:string" use="required"/>
     <xs:attribute name="value" type="xs:string" use="required"/>
   </xs:complexType>
+  <xs:complexType name="runtimePathType">
+    <xs:attribute name="tool" type="xs:string" use="required"/>
+  </xs:complexType>
   <xs:complexType name="commandType">
     <xs:sequence><xs:element name="argument" type="argumentType" minOccurs="0" maxOccurs="unbounded"/>
-    <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
+    <xs:element name="environment" type="environmentType" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:element name="runtimePath" type="runtimePathType" minOccurs="0" maxOccurs="unbounded"/></xs:sequence>
     <xs:attribute name="driver" type="xs:string" use="optional"/>
     <xs:attribute name="executable" type="xs:string" use="required"/>
     <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
