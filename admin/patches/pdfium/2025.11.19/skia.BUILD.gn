@@ -1,0 +1,19 @@
+# BuildEngine adapter: consume installed Skia 153 DLL and import library.
+# Replaces PDFium's private Chromium-Skia source build.
+config("installed_skia") {
+  include_dirs = [ getenv("CB_PDFIUM_SKIA_INCLUDE") ]
+  libs = [ getenv("CB_PDFIUM_SKIA_LIB") ]
+  defines = [ "SKIA_DLL", "SK_GANESH" ]
+}
+group("skia") {
+  public_configs = [ ":installed_skia" ]
+}
+group("skia_core_and_effects") {
+  public_deps = [ ":skia" ]
+}
+group("skia_opts") {
+  public_deps = [ ":skia" ]
+}
+group("skcms") {
+  public_deps = [ ":skia" ]
+}
