@@ -9434,6 +9434,8 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_PDFIUM_ICU_INCLUDE" value="{InstallRoot}\\packages\\icu\\78.3\\include"/>
          <environment name="CB_PDFIUM_ICU_LIB" value="{InstallRoot}\\packages\\icu\\78.3\\lib\\win64\\{Configuration}\\{PdfiumIcuImport}.lib"/>
+         <environment name="CB_PDFIUM_JPEG_INCLUDE" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\include"/>
+         <environment name="CB_PDFIUM_JPEG_LIB" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\{Configuration}\{PdfiumJpegImport}.lib"/>
          <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{InstallRoot}\\packages\\skia\\153\\include"/>
          <environment name="CB_PDFIUM_SKIA_LIB" value="{InstallRoot}\\packages\\skia\\153\\lib\\win64\\{Configuration}\\skia.lib"/>
          <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{InstallRoot}\\packages\\abseil\\20260817.0\\include"/>
@@ -9473,6 +9475,15 @@
             <argument value="-c"/>
             <argument value="from pathlib import Path; a=Path(r'{BuildFileDir}\\patches\\pdfium\\2025.11.19\\skia.BUILD.gn').read_bytes(); b=Path('skia/BUILD.gn').read_bytes(); assert a==b, 'Skia GN adapter is not installed'; print('PDFium Skia GN adapter verified')"/>
          </execute>
+         <execute name="prepare-local-jpeg-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
+            <argument value="-E"/><argument value="make_directory"/><argument value="{Workspace}\third_party\libjpeg_turbo"/>
+         </execute>
+         <execute name="install-local-jpeg-gn-target" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-E"/><argument value="copy_if_different"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\libjpeg_turbo.BUILD.gn"/>
+            <argument value="{Workspace}\third_party\libjpeg_turbo\BUILD.gn"/>
+         </execute>
+         <require path="{Workspace}\third_party\libjpeg_turbo\BUILD.gn"/>
          <!-- Tests are excluded from the PDFium product build. Remove the
               test-font dependency from the test-support target, which GN still
               parses during generation. Keep the remaining upstream file intact. -->
@@ -9515,10 +9526,12 @@
          <variant name="Release">
             <variable name="PdfiumDebug" value="false"/>
             <variable name="PdfiumIcuImport" value="libicuuc"/>
+            <variable name="PdfiumJpegImport" value="libjpeg"/>
          </variant>
          <variant name="Debug">
             <variable name="PdfiumDebug" value="true"/>
             <variable name="PdfiumIcuImport" value="libicuucd"/>
+            <variable name="PdfiumJpegImport" value="libjpegd"/>
          </variant>
          <install>
             <perVariant>
