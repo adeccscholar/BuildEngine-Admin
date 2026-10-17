@@ -10,7 +10,6 @@
       <requires tool="ninja"/>
       <requires tool="bcc64x"/>
       <requires tool="llvm-ar"/>
-      <requires tool="ld-lld"/>
       <prepare executable="{Tool:python}" workingDirectory="{SourceRoot}">
          <argument value="build/gen.py"/>
          <argument value="--platform"/>
@@ -18,13 +17,13 @@
          <environment name="CC" value="{Tool:bcc64x}"/>
          <environment name="CXX" value="{Tool:bcc64x}"/>
          <environment name="AR" value="{Tool:llvm-ar}"/>
-         <environment name="LD" value="{Tool:ld-lld}"/>
+         <environment name="LD" value="{Tool:bcc64x}"/>
       </prepare>
       <build driver="ninja" executable="{Tool:ninja}" workingDirectory="{SourceRoot}/out">
          <environment name="CC" value="{Tool:bcc64x}"/>
          <environment name="CXX" value="{Tool:bcc64x}"/>
          <environment name="AR" value="{Tool:llvm-ar}"/>
-         <environment name="LD" value="{Tool:ld-lld}"/>
+         <environment name="LD" value="{Tool:bcc64x}"/>
       </build>
       <smoke executable="{SourceRoot}/out/gn.exe" workingDirectory="{SourceRoot}">
          <argument value="--version"/>
