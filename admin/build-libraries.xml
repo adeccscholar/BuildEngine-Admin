@@ -9405,7 +9405,7 @@
          <execute name="generate-pdfium-build-timestamp" executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}" showOutput="true">
             <argument value="-c"/>
-            <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text('1763561859\\n', encoding='ascii'); print('PDFium pinned build timestamp: 1763561859')"/>
+            <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text(str(1763561859), encoding='ascii'); print('PDFium pinned build timestamp: 1763561859')"/>
          </execute>
          <require path="{CurrentArtifact}\\build\\util\\LASTCHANGE.committime"/>
          <!-- gclient_args.gni is generated deterministically instead of running gclient. -->
@@ -9454,9 +9454,17 @@
          <execute name="ensure-pdfium-build-timestamp" executable="{Tool:python}"
                   workingDirectory="{Workspace}" showOutput="true">
             <argument value="-c"/>
-            <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text('1763561859\\n', encoding='ascii')"/>
+            <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text(str(1763561859), encoding='ascii')"/>
          </execute>
          <require path="{Workspace}\\build\\util\\LASTCHANGE.committime"/>
+         <!-- Tests are excluded from the PDFium product build. Remove the
+              test-font dependency from the test-support target, which GN still
+              parses during generation. Keep the remaining upstream file intact. -->
+         <execute name="exclude-standalone-test-fonts" executable="{Tool:python}"
+                  workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-c"/>
+            <argument value="from pathlib import Path; p=Path('testing/BUILD.gn'); s=p.read_text(encoding='utf-8'); needle='    &quot;//third_party/test_fonts&quot;,\\n'; assert s.count(needle) in (0,1), 'Unexpected PDFium test_fonts references'; updated=s.replace(needle,''); p.write_text(updated,encoding='utf-8') if updated != s else None; print('PDFium test-font reference excluded')"/>
+         </execute>
          <target name="gn-gen" type="generic"
                  executable="{Tool:gn}"
                  workingDirectory="{Workspace}" showOutput="true">
