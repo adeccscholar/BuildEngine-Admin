@@ -9434,6 +9434,8 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_PDFIUM_ICU_INCLUDE" value="{InstallRoot}\\packages\\icu\\78.3\\include"/>
          <environment name="CB_PDFIUM_ICU_LIB" value="{InstallRoot}\\packages\\icu\\78.3\\lib\\win64\\{Configuration}\\{PdfiumIcuImport}.lib"/>
+         <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{InstallRoot}\\packages\\skia\\153\\include"/>
+         <environment name="CB_PDFIUM_SKIA_LIB" value="{InstallRoot}\\packages\\skia\\153\\lib\\win64\\{Configuration}\\skia.lib"/>
          <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{InstallRoot}\\packages\\abseil\\20260817.0\\include"/>
          <environment name="CB_PDFIUM_ABSEIL_LIB" value="{InstallRoot}\\packages\\abseil\\20260817.0\\lib\\win64\\{Configuration}\\abseil_dll.lib"/>
 
@@ -9457,6 +9459,10 @@
             <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text(str(1763561859), encoding='ascii')"/>
          </execute>
          <require path="{Workspace}\\build\\util\\LASTCHANGE.committime"/>
+         <!-- The installed Skia DLL replaces the Chromium Skia source target. -->
+         <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\skia.BUILD.gn"
+               target="{Workspace}\\skia\\BUILD.gn" overwrite="true"/>
+         <require path="{Workspace}\\skia\\BUILD.gn"/>
          <!-- Tests are excluded from the PDFium product build. Remove the
               test-font dependency from the test-support target, which GN still
               parses during generation. Keep the remaining upstream file intact. -->
