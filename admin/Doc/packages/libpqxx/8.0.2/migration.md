@@ -1,61 +1,63 @@
-# libpqxx 8.0.2: Migration und BCC64X-Integration
+# libpqxx 8.0.2: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `libpqxx@8.0.2` · **Category:** database · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="libpqxx" version="8.0.2">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+Compile the libpqxx C++ adapter against the exact managed libpq package with C++23 and shared-library linkage. The BCC64X Windows export macro requires a version-specific fix; upstream examples and test programs are excluded from the deliverable profile.
 
-- BCC64X Release links ThreadTest against the Xerces DLL import library, but HandlerBase is an exported polymorphic class whose virtual member implementations are inline in the upstream header. Debug links, while Release expects the HandlerBase vtable from libxerces-c.lib and reports it undefined. For the BCC64X/Clang path move HandlerBase::characters(), the first virtual member …
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-## Versionierte Abhängigkeiten
+## Dependency decisions
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+No direct BuildEngine library dependency is declared for this coordinate. This does **not** mean the generated binary uses no Windows system libraries or that its upstream bundled components are absent.
 
-## Beschaffung und reproduzierbare Quellen
+## Product profile: what is enabled and what is not
 
-**Upstream-Downloads:**
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
 
-- `https://github.com/jtv/libpqxx/archive/refs/tags/{LibraryVersion}.tar.gz`
-- `https://downloads.apache.org/xerces/c/3/sources/xerces-c-{LibraryVersion}.zip`
+### Enabled switches
 
-**Archivnamen:**
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_SHARED_LIBS` | `ON` |
 
-- `libpqxx-{LibraryVersion}.tar.gz`
-- `xerces-c-{LibraryVersion}.zip`
+### Deliberately disabled switches
 
-## Patches, Workarounds und Adapter
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_TEST` | `OFF` |
+| `BUILD_EXAMPLES` | `OFF` |
+| `BUILD_TOOLS` | `OFF` |
+| `BUILD_DOC` | `OFF` |
 
-- `libpqxx\8.0.2\bcc64x-empty-declspec.patch`
-- `{LibraryVersion}\bcc64x-empty-declspec.patch`
-- `xerces-c\3.3.0\bcc64x-handlerbase-vtable.patch`
-- `{LibraryVersion}\bcc64x-handlerbase-vtable.patch`
+### Other selected build features and external settings
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+| Contract switch | Value |
+| --- | --- |
+| `PostgreSQL_INCLUDE_DIR` | `{InstallRoot}\packages\libpq\18.6\include` |
+| `PostgreSQL_LIBRARY` | `{InstallRoot}\packages\libpq\18.6\lib\win64\{Configuration}\libpq.lib` |
+| `libpqxx_DIR` | `{ConsumerRoot}\lib\win64\{Configuration}\cmake\libpqxx` |
+| `PostgreSQL_LIBRARY` | `{InstallRoot}\packages\libpq\18.6\lib\win64\Release\libpq.lib` |
 
-## Build-Parameter und Variablen
 
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
 - `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
 - `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
-- `-DBUILD_SHARED_LIBS:BOOL=ON`
-- `-DBUILD_TEST:BOOL=OFF`
-- `-DBUILD_EXAMPLES:BOOL=OFF`
-- `-DBUILD_TOOLS:BOOL=OFF`
-- `-DBUILD_DOC:BOOL=OFF`
 - `-DCMAKE_CXX_STANDARD:STRING=23`
-- `-DPostgreSQL_INCLUDE_DIR:PATH={InstallRoot}\packages\libpq\18.6\include`
-- `-DPostgreSQL_LIBRARY:FILEPATH={InstallRoot}\packages\libpq\18.6\lib\win64\{Configuration}\libpq.lib`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
 - `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
@@ -63,76 +65,63 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `-DCMAKE_DEBUG_POSTFIX:STRING=d`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
-- `-Dlibpqxx_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libpqxx`
-- `-DPostgreSQL_LIBRARY:FILEPATH={InstallRoot}\packages\libpq\18.6\lib\win64\Release\libpq.lib`
-- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
-- `-Dnetwork-accessor:STRING=winsock`
-- `-Dtranscoder:STRING=windows`
-- `-Dmessage-loader:STRING=inmemory`
-- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2`
-- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
-- `-DDOXYGEN_EXECUTABLE:FILEPATH={Tool:doxygen}`
 
-**Explizite Umgebungsvariablen:**
+**Versioned source locations:**
 
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `PATH={InstallRoot}\packages\libpq\18.6\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `PATH={InstallRoot}\packages\libpq\18.6\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_LLVM_AR={Tool:llvm-ar}`
-- `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
-- `CTEST_PARALLEL_LEVEL={TestJobs}`
-- `PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src;{ENV:PATH}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
+- `https://github.com/jtv/libpqxx/archive/refs/tags/{LibraryVersion}.tar.gz`
 
-**Technische Execute-Actions:**
+**Declared extraction profiles:**
+
+- `libarchive / libpqxx-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/libpqxx/8.0.2/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+| Version-bound patch | Problem and justification |
+| --- | --- |
+| `admin/patches/libpqxx/8.0.2/bcc64x-empty-declspec.patch` | Repair a Windows DLL import/export declaration that expands incompatibly for this BCC64X compile mode. |
+
+### Declarative repairs and preparation actions
 
 - `empty-declspec-patch-check`
 - `empty-declspec-patch-apply`
-- `patch-check`
-- `patch-apply`
-- `build-product`
-- `build-thread-test`
-- `build-upstream-validation`
-- `test`
-- `remove-installed-bin`
-- `remove-installed-lib`
-- `create-api-docs`
 
-**Targets:**
+These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
 
-## Installations-, Paket- und Testkontrakt
+## Installation, publication and consumer responsibilities
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+**Explicit copy/repair destinations from the contract:**
 
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-empty-declspec.patch`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-handlerbase-vtable.patch`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration} -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration} -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `{Workspace}\COPYING -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING`
 
-**Consumer-Smokes:**
+**Declared smoke tests:**
 
-- `consumer`
+- `consumer (Release, scope published; source smokes\libpqxx\consumer)`
 
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
+**Selected environment inputs:**
 
-## Quellen, Wartung und offene Evidenz
+- `CB_BCC64X={Tool:bcc64x}`
+- `CB_BDS={BDS}`
 
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/libpqxx/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
+
+## Verification and evidence boundaries
+
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
+
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
+
+## Maintenance and authoritative records
+
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
+
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

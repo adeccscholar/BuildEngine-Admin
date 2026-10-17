@@ -1,85 +1,88 @@
-# graphite2 1.3.15: Migration und BCC64X-Integration
+# Graphite2 1.3.15: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `graphite2@1.3.15` · **Category:** text · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="graphite2" version="1.3.15">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+**Package purpose:** Smart-font rendering engine for Graphite fonts and complex text shaping.
 
-- Keine zusätzlichen erklärenden Sonderentscheidungen aus den XML-Kommentaren extrahiert. [nicht verifiziert], ob weitere historische Entscheidungen bestehen.
+Retain Graphite2 upstream CMake and its real upstream test suite rather than disabling tests when BCC64X reveals discrepancies. Versioned repairs cover native test fixture encoding, CRLF expectations, reference output, managed FontTools/Python discovery and the Padauk case. The integration report records 91 of 91 configured tests passing for both variants.
 
-## Versionierte Abhängigkeiten
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+## Dependency decisions
 
-## Beschaffung und reproduzierbare Quellen
+No direct BuildEngine library dependency is declared for this coordinate. This does **not** mean the generated binary uses no Windows system libraries or that its upstream bundled components are absent.
 
-**Upstream-Downloads:**
+## Product profile: what is enabled and what is not
 
-- `https://github.com/silnrsi/graphite/releases/download/{LibraryVersion}/graphite2-{LibraryVersion}.tgz`
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
 
-**Archivnamen:**
+### Enabled switches
 
-- `graphite2-{LibraryVersion}.tgz`
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_SHARED_LIBS` | `ON` |
 
-## Patches, Workarounds und Adapter
+### Deliberately disabled switches
 
-- `graphite2\1.3.15\fix-nametabletest-langtags.patch`
-- `{LibraryVersion}\fix-nametabletest-langtags.patch`
-- `graphite2\1.3.15\fix-fnttxtrender-advance.patch`
-- `{LibraryVersion}\fix-fnttxtrender-advance.patch`
-- `graphite2\1.3.15\diagnose-fnttxtrender-mismatch.patch`
-- `{LibraryVersion}\diagnose-fnttxtrender-mismatch.patch`
-- `graphite2\1.3.15\fix-gr2fonttest-log-line-endings.patch`
-- `{LibraryVersion}\fix-gr2fonttest-log-line-endings.patch`
-- `graphite2\1.3.15\fix-nametabletest-utf8-literals.patch`
-- `{LibraryVersion}\fix-nametabletest-utf8-literals.patch`
-- `graphite2\1.3.15\add-managed-fonttools-path.patch`
-- `{LibraryVersion}\add-managed-fonttools-path.patch`
-- `graphite2\1.3.15\fix-jsontest-log-line-endings.patch`
-- `{LibraryVersion}\fix-jsontest-log-line-endings.patch`
-- `graphite2\1.3.15\fix-bcc64x-padauk3-reference.patch`
-- `{LibraryVersion}\fix-bcc64x-padauk3-reference.patch`
-- `graphite2\1.3.15\bcc64x-python-dll-search.patch`
-- `{LibraryVersion}\bcc64x-python-dll-search.patch`
+No switches of this category are explicitly selected in the parsed build arguments.
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+### Other selected build features and external settings
 
-## Build-Parameter und Variablen
+| Contract switch | Value |
+| --- | --- |
+| `LIB_SUFFIX` | `/win64/{Configuration}` |
+| `BUILD_TESTING` | `{TestsEnabled}` |
+| `Python3_EXECUTABLE` | `{Tool:python}` |
+| `GRAPHITE2_VM_TYPE` | `auto` |
 
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
 - `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
-- `-DLIB_SUFFIX:STRING=/win64/{Configuration}`
-- `-DBUILD_SHARED_LIBS:BOOL=ON`
-- `-DBUILD_TESTING:BOOL={TestsEnabled}`
-- `-DPython3_EXECUTABLE:FILEPATH={Tool:python}`
-- `-DGRAPHITE2_VM_TYPE:STRING=auto`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
 - `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
 - `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
 - `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
 - `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
 
-**Explizite Umgebungsvariablen:**
+**Versioned source locations:**
 
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_LLVM_AR={Tool:llvm-ar}`
-- `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
-- `GRAPHITE2_FONTTOOLS_PATH={ToolDir:fonttools}`
-- `GRAPHITE2_DLL_SEARCH_PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src;{ToolDir:bcc64x}`
-- `CTEST_PARALLEL_LEVEL={TestJobs}`
+- `https://github.com/silnrsi/graphite/releases/download/{LibraryVersion}/graphite2-{LibraryVersion}.tgz`
 
-**Technische Execute-Actions:**
+**Declared extraction profiles:**
+
+- `libarchive / graphite2-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/graphite2/1.3.15/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+| Version-bound patch | Problem and justification |
+| --- | --- |
+| `admin/patches/graphite2/1.3.15/add-managed-fonttools-path.patch` | Use the managed FontTools tooling rather than an arbitrary PATH discovery. |
+| `admin/patches/graphite2/1.3.15/bcc64x-python-dll-search.patch` | Keep Python/test support DLL discovery scoped to the managed Windows runtime. |
+| `admin/patches/graphite2/1.3.15/diagnose-fnttxtrender-mismatch.patch` | Add diagnostic evidence around the test-render mismatch to distinguish behavior from fixture mismatch. |
+| `admin/patches/graphite2/1.3.15/fix-bcc64x-padauk3-reference.patch` | Repair the Padauk3 reference expectation for the BCC64X test case. |
+| `admin/patches/graphite2/1.3.15/fix-fnttxtrender-advance.patch` | Correct the font-test advance/reference comparison without disabling the test. |
+| `admin/patches/graphite2/1.3.15/fix-gr2fonttest-log-line-endings.patch` | Normalize platform line-ending handling for native Windows test logs. |
+| `admin/patches/graphite2/1.3.15/fix-jsontest-log-line-endings.patch` | Normalize Windows CRLF differences in JSON test evidence. |
+| `admin/patches/graphite2/1.3.15/fix-nametabletest-langtags.patch` | Update the upstream font language-tag test reference expectations for the pinned Windows test environment. |
+| `admin/patches/graphite2/1.3.15/fix-nametabletest-utf8-literals.patch` | Ensure the font-name test compares intended UTF-8 literal values under BCC64X. |
+
+### Declarative repairs and preparation actions
 
 - `nametabletest-patch-check`
 - `nametabletest-patch-apply`
@@ -106,42 +109,49 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `padauk3-reference-patch-apply`
 - `padauk3-reference-patch-verify`
 - `runtime-fix-check`
-- `runtime-fix-apply`
-- `runtime-fix-verify`
-- `test`
 
-**Targets:**
+These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
 
-## Installations-, Paket- und Testkontrakt
+## Installation, publication and consumer responsibilities
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+**Explicit copy/repair destinations from the contract:**
 
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\fix-nametabletest-langtags.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\fix-fnttxtrender-advance.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\diagnose-fnttxtrender-mismatch.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\fix-gr2fonttest-log-line-endings.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\fix-nametabletest-utf8-literals.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\add-managed-fonttools-path.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\fix-jsontest-log-line-endings.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\fix-bcc64x-padauk3-reference.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-python-dll-search.patch`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration} -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `{Workspace}\LICENSE -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE`
 
-**Consumer-Smokes:**
+**Declared smoke tests:**
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+- None declared for this category.
 
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
+**Selected environment inputs:**
 
-## Quellen, Wartung und offene Evidenz
+- `CB_BCC64X={Tool:bcc64x}`
+- `CB_BDS={BDS}`
+- `CB_LLVM_AR={Tool:llvm-ar}`
+- `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
+- `GRAPHITE2_FONTTOOLS_PATH={ToolDir:fonttools}`
+- `GRAPHITE2_DLL_SEARCH_PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src;{ToolDir:bcc64x}`
+- `CTEST_PARALLEL_LEVEL={TestJobs}`
 
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/graphite2/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
+
+## Verification and evidence boundaries
+
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
+
+- The maintained BCC64X integration findings record 91/91 configured tests passing in Release and Debug. These figures refer to that recorded run, not a new execution performed while writing this guide.
+
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
+
+## Maintenance and authoritative records
+
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
+
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

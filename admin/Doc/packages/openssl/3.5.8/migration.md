@@ -1,75 +1,75 @@
-# openssl 3.5.8: Migration und BCC64X-Integration
+# openssl 3.5.8: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `openssl@3.5.8` · **Category:** security · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="openssl" version="3.5.8">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-**Versionshinweis:** Im Vertrag als ersetzt durch `3.5.9` gekennzeichnet.
+This is a maintained historical coordinate superseded by 3.5.9; do not silently replace it in explicitly pinned dependencies.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+**Package purpose:** Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives.
 
-- BCC64X defines both __BORLANDC__ and __clang__. In the current Embarcadero Win64/COFF headers the WinSDK MemoryBarrier macro is not exposed. OpenSSL 3.5.8 uses it in both Windows thread implementations. The patch supplies the missing full fence locally for Clang-based Embarcadero compilers through __atomic_thread_fence with sequentially consistent ordering; upstream call sites …
-- BCC64X uses GNU/Clang response-file tokenization. A backslash in OpenSSL's linker inline response file escapes the following character, so crypto\aes\foo.obj arrives as cryptoaesfoo.obj. The patch adds an opt-in target property that converts only paths written to linker response files to forward slashes. Make paths, prerequisites and compiler command lines remain unchanged.
-- OpenSSL places Configure-supplied external compression libraries in LIB_EX_LIBS / DSO_EX_LIBS / BIN_EX_LIBS. These values are written into the same BCC64X/LLD response files, but they bypass the path lists normalized by bcc64x-linker-response-paths.patch. Keep the proven response-path patch unchanged and normalize only these response-file copies of external library arguments.
-- The Microsoft SDK mstcpip.h and mswsockdef.h headers use GNU-style extern inline declarations for non-MSVC compilers. BCC64X uses Clang C inline semantics, which causes unused header helpers to become emitted definitions with unresolved SDK dependencies. OpenSSL's quic_reactor.c only needs SIO_UDP_CONNRESET and SIO_UDP_NETRESET from mstcpip.h/mswsock.h. The patch keeps winsock2…
-- OpenSSL's Windows::cppbuilder platform still models the legacy C++Builder debug sidecar as .tds. BCC64X is the modern COFF/LLD toolchain and uses PDB debug information instead. The patch adds a dedicated Windows::bcc64x platform that inherits the existing C++Builder behavior and overrides only the debug-file extension.
-- Native BCC64X OpenSSL build. All OpenSSL target knowledge remains in this XML contract. The perl target materializes the OpenSSL Configure target file in the variant build tree.
-- OpenSSL 3.5.8 expects unprefixed Brotli import-library filenames on Windows (brotlicommon.lib, brotlidec.lib, brotlienc.lib). The upstream Brotli/BCC64X producer correctly installs libbrotli*.lib. Keep the producer artifacts untouched and create private consumer-side aliases in the OpenSSL build tree. The COFF import descriptors still reference the original libbrotli*.dll names…
-- First native proof keeps test/install in the existing perVariant sequence. Scheduler-level Release/Debug test parallelism remains a separate generic change.
-- Generate BCC64X COFF import libraries directly from the produced native DLLs.
+Use native OpenSSL Configure with an explicit BC-64X platform, BCC64X linker, LLVM archiver and managed compression dependencies. The package deliberately uses a controlled no-assembly shared baseline. Linker response files, QUIC WinSock declarations and PDB handling required source/build-system corrections, not a switch to MSVC.
 
-## Versionierte Abhängigkeiten
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-- `zlib 1.3.2`
-- `brotli 1.2.0`
-- `zstd 1.5.7`
+## Dependency decisions
 
-## Beschaffung und reproduzierbare Quellen
+- `zlib@1.3.2`
+- `brotli@1.2.0`
+- `zstd@1.5.7`
 
-**Upstream-Downloads:**
+These are declared direct dependencies. Transitive runtime DLLs and package CMake imports must be resolved through the BuildEngine dependency graph; they are not evidence for linking arbitrary host copies.
+
+## Product profile: what is enabled and what is not
+
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
+
+### Enabled switches
+
+No switches of this category are explicitly selected in the parsed build arguments.
+
+### Deliberately disabled switches
+
+No switches of this category are explicitly selected in the parsed build arguments.
+
+### Other selected build features and external settings
+
+No switches of this category are explicitly selected in the parsed build arguments.
+
+
+## Build architecture, variants and paths
+
+**Selected build flow:** GN/Ninja and explicit native toolchain targets. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
+
+- None declared for this category.
+
+**Versioned source locations:**
 
 - `https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz`
 
-**Archivnamen:**
+**Declared extraction profiles:**
 
-- `openssl-{LibraryVersion}.tar.gz`
+- `libarchive / openssl-{LibraryVersion}`
 
-## Patches, Workarounds und Adapter
+**Package-path convention:** `{InstallRoot}/packages/openssl/3.5.8/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
 
-- `openssl\3.5.8\bcc64x-memory-barrier.patch`
-- `{LibraryVersion}\bcc64x-memory-barrier.patch`
-- `openssl\3.5.8\bcc64x-linker-response-paths.patch`
-- `{LibraryVersion}\bcc64x-linker-response-paths.patch`
-- `openssl\3.5.8\bcc64x-linker-external-libs.patch`
-- `{LibraryVersion}\bcc64x-linker-external-libs.patch`
-- `openssl\3.5.8\bcc64x-quic-winsock-inline.patch`
-- `{LibraryVersion}\bcc64x-quic-winsock-inline.patch`
-- `openssl\3.5.8\bcc64x-pdb-platform.patch`
-- `{LibraryVersion}\bcc64x-pdb-platform.patch`
+## Difficulties, workarounds and unavoidable patches
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+| Version-bound patch | Problem and justification |
+| --- | --- |
+| `admin/patches/openssl/3.5.8/bcc64x-linker-external-libs.patch` | Preserve externally resolved compression and system libraries when writing OpenSSL linker response files. |
+| `admin/patches/openssl/3.5.8/bcc64x-linker-response-paths.patch` | Normalize path quoting/response-file input for the BCC64X and LLD linker contract. |
+| `admin/patches/openssl/3.5.8/bcc64x-memory-barrier.patch` | Provide the correct memory-barrier semantics/headers for the modern BCC64X Windows compiler rather than a legacy Borland branch. |
+| `admin/patches/openssl/3.5.8/bcc64x-pdb-platform.patch` | Use the native PDB generation model, not the older C++Builder TDS debug-file convention. |
+| `admin/patches/openssl/3.5.8/bcc64x-quic-winsock-inline.patch` | Handle Windows SDK inline declarations and compiler identity in OpenSSL's QUIC/WinSock path. |
 
-## Build-Parameter und Variablen
-
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
-
-- `-DNEAR`
-- `-D_WINDLL`
-- `-D_DLL`
-- `-DNDEBUG`
-
-**Explizite Umgebungsvariablen:**
-
-- `PATH={ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:nasm};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}`
-- `HARNESS_JOBS={TestJobs}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-
-**Technische Execute-Actions:**
+### Declarative repairs and preparation actions
 
 - `patch-check`
 - `patch-apply`
@@ -82,48 +82,57 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `pdb-platform-patch-check`
 - `pdb-platform-patch-apply`
 - `verify-bcc64x-platform`
-- `remove-build`
-- `create-build`
-- `create-compression-imports`
 - `brotli-common-import-alias`
 - `brotli-dec-import-alias`
 - `brotli-enc-import-alias`
-- `ssl-def`
-- `ssl-import-lib`
-- `crypto-def`
-- `crypto-import-lib`
 
-**Targets:**
+These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
+### Engineering constraints recorded in the executable contract
 
-- `configure`
-- `build`
-- `test`
-- `install-upstream`
+- BCC64X defines both __BORLANDC__ and __clang__. In the current Embarcadero Win64/COFF headers the WinSDK MemoryBarrier macro is not exposed. OpenSSL 3.5.8 uses it in both Windows thread implementations. The patch supplies the missing full fence locally for Clang-based Embarcadero compilers through __atomic_thread_fence with sequentially consistent ordering; upstream call sites remain unchanged.
+- BCC64X uses GNU/Clang response-file tokenization. A backslash in OpenSSL's linker inline response file escapes the following character, so crypto\aes\foo.obj arrives as cryptoaesfoo.obj. The patch adds an opt-in target property that converts only paths written to linker response files to forward slashes. Make paths, prerequisites and compiler command lines remain unchanged.
+- OpenSSL places Configure-supplied external compression libraries in LIB_EX_LIBS / DSO_EX_LIBS / BIN_EX_LIBS. These values are written into the same BCC64X/LLD response files, but they bypass the path lists normalized by bcc64x-linker-response-paths.patch. Keep the proven response-path patch unchanged and normalize only these response-file copies of external library arguments.
+- The Microsoft SDK mstcpip.h and mswsockdef.h headers use GNU-style extern inline declarations for non-MSVC compilers. BCC64X uses Clang C inline semantics, which causes unused header helpers to become emitted definitions with unresolved SDK dependencies. OpenSSL's quic_reactor.c only needs SIO_UDP_CONNRESET and SIO_UDP_NETRESET from mstcpip.h/mswsock.h. The patch keeps winsock2.h and supplies thos
+- OpenSSL's Windows::cppbuilder platform still models the legacy C++Builder debug sidecar as .tds. BCC64X is the modern COFF/LLD toolchain and uses PDB debug information instead. The patch adds a dedicated Windows::bcc64x platform that inherits the existing C++Builder behavior and overrides only the debug-file extension.
+- Native BCC64X OpenSSL build. All OpenSSL target knowledge remains in this XML contract. The perl target materializes the OpenSSL Configure target file in the variant build tree.
+- OpenSSL 3.5.8 expects unprefixed Brotli import-library filenames on Windows (brotlicommon.lib, brotlidec.lib, brotlienc.lib). The upstream Brotli/BCC64X producer correctly installs libbrotli*.lib. Keep the producer artifacts untouched and create private consumer-side aliases in the OpenSSL build tree. The COFF import descriptors still reference the original libbrotli*.dll names.
+- First native proof keeps test/install in the existing perVariant sequence. Scheduler-level Release/Debug test parallelism remains a separate generic change.
+- Generate BCC64X COFF import libraries directly from the produced native DLLs.
 
-## Installations-, Paket- und Testkontrakt
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+## Installation, publication and consumer responsibilities
 
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-response-paths.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-external-libs.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-quic-winsock-inline.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-pdb-platform.patch`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt`
+**Explicit copy/repair destinations from the contract:**
 
-**Consumer-Smokes:**
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `{Workspace}\LICENSE.txt -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\OpenSSL-LICENSE.txt`
 
-- `consumer`
+**Declared smoke tests:**
 
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
+- `consumer (Release, scope published; source smokes\openssl\consumer)`
 
-## Quellen, Wartung und offene Evidenz
+**Selected environment inputs:**
 
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/openssl/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+- `HARNESS_JOBS={TestJobs}`
+- `CB_BCC64X={Tool:bcc64x}`
+- `CB_BDS={BDS}`
+
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
+
+## Verification and evidence boundaries
+
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
+
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
+
+## Maintenance and authoritative records
+
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
+
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

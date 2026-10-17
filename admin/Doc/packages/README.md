@@ -1,23 +1,37 @@
-# Package Migration Documentation
+# BuildEngine Package Migration and Consumer Documentation
 
 [TOC|Content]
 
-The versioned migration guides in this directory document the BuildEngine Admin contract for each logical library/version. They are linked from the corresponding **Packages** overview and detail pages in the Doc Server.
+The authoritative integration record for each library version is its `migration.md`. These 57 English guides document what this BCC64X package builds, which features are explicitly enabled or excluded, dependency and runtime choices, version-bound patch motivation, workarounds, installation, smoke tests and evidence limits. They are derived from the current Admin contract and existing engineering findings, but do not replace execution evidence.
+
+## Package catalogue
 
 - [pugixml 1.16](/package/pugixml/1.16/migration)
 - [zlib 1.3.2](/package/zlib/1.3.2/migration)
 - [brotli 1.2.0](/package/brotli/1.2.0/migration)
 - [zstd 1.5.7](/package/zstd/1.5.7/migration)
 - [xz 5.8.3](/package/xz/5.8.3/migration)
+- [xz 5.8.4](/package/xz/5.8.4/migration)
 - [libzip 1.11.4](/package/libzip/1.11.4/migration)
 - [libarchive 3.8.9](/package/libarchive/3.8.9/migration)
+- [libarchive 3.8.10](/package/libarchive/3.8.10/migration)
 - [openssl 3.5.8](/package/openssl/3.5.8/migration)
 - [openssl 3.5.9](/package/openssl/3.5.9/migration)
 - [curl 8.21.0](/package/curl/8.21.0/migration)
 - [curl 8.23.0](/package/curl/8.23.0/migration)
 - [boost 1.92.0](/package/boost/1.92.0/migration)
 - [nlohmann-json 3.12.0](/package/nlohmann-json/3.12.0/migration)
+- [ace 8.0.6](/package/ace/8.0.6/migration)
+- [tao 4.0.6](/package/tao/4.0.6/migration)
+- [bzip2 1.0.8](/package/bzip2/1.0.8/migration)
+- [glew 2.3.1](/package/glew/2.3.1/migration)
+- [opengl 26.2.1](/package/opengl/26.2.1/migration)
+- [raylib 6.0](/package/raylib/6.0/migration)
+- [sdl2 2.32.10](/package/sdl2/2.32.10/migration)
+- [sqlite 3.53.4](/package/sqlite/3.53.4/migration)
+- [libpq 18.6](/package/libpq/18.6/migration)
 - [libpqxx 8.0.2](/package/libpqxx/8.0.2/migration)
+- [xerces-c 3.3.0](/package/xerces-c/3.3.0/migration)
 - [soil2 1.3.0](/package/soil2/1.3.0/migration)
 - [vtk 9.6.2](/package/vtk/9.6.2/migration)
 - [opencv 5.0.0](/package/opencv/5.0.0/migration)
@@ -25,10 +39,15 @@ The versioned migration guides in this directory document the BuildEngine Admin 
 - [googletest 1.17.0](/package/googletest/1.17.0/migration)
 - [catch2 3.16.0](/package/catch2/3.16.0/migration)
 - [bitmapplusplus 1.1.1](/package/bitmapplusplus/1.1.1/migration)
+- [libjpeg-turbo 3.2.0](/package/libjpeg-turbo/3.2.0/migration)
+- [libpng 1.6.58](/package/libpng/1.6.58/migration)
 - [harfbuzz 14.4.0](/package/harfbuzz/14.4.0/migration)
+- [freetype 2.14.3](/package/freetype/2.14.3/migration)
+- [libtiff 4.7.2](/package/libtiff/4.7.2/migration)
 - [skia 153](/package/skia/153/migration)
 - [graphite2 1.3.15](/package/graphite2/1.3.15/migration)
 - [expat 2.8.4](/package/expat/2.8.4/migration)
+- [expat 2.9.0](/package/expat/2.9.0/migration)
 - [teckit 2.5.13](/package/teckit/2.5.13/migration)
 - [icu 78.3](/package/icu/78.3/migration)
 - [libxml2 2.15.3](/package/libxml2/2.15.3/migration)
@@ -45,4 +64,6 @@ The versioned migration guides in this directory document the BuildEngine Admin 
 - [agg 2.6](/package/agg/2.6/migration)
 - [pdfium 2025.11.19](/package/pdfium/2025.11.19/migration)
 
-**Evidence policy:** Values in the XML are declared build intent; successful translation, upstream-test results, and runtime compliance require separate BuildEngine state/log evidence. Historical reasons not documented in the contract remain [nicht verifiziert].
+## Documentation rules
+
+An XML option is **declared behavior**, not proof that a test passed. A versioned patch file is evidence of a deliberate source adaptation; patches no longer referenced by the active XML must not be reported as active. Historical reasons without supporting evidence remain **[not verified]**. Changes to XML, public headers, package layout and consumers must be mirrored here when committed.

@@ -1,44 +1,75 @@
-# boost 1.92.0: Migration und BCC64X-Integration
+# boost 1.92.0: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `boost@1.92.0` · **Category:** foundation · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="boost" version="1.92.0">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+**Package purpose:** Comprehensive collection of portable C++ libraries covering containers, algorithms, networking, concurrency, and more.
 
-- Canonical Boost model from the target-machine evidence: - one official upstream CMake source tree; - one coherent Release graph and one coherent Debug graph; - 148 selected source modules covering the 171 verified logical libraries; - OpenCL/MPI/Python-dependent external ecosystems remain explicitly excluded; - component separation happens at the consumer/evidence gates, never …
-- R189/R196 evidence classifies Boost.Random as header/INTERFACE. Upstream CMake otherwise enables the optional random_device binary by default.
-- Exact managed dependency coordinates used by the evidence build.
-- Evidence preflight: fail before the large Boost graph if BCC64X or Boost.Config no longer satisfies the proven native-Clang contract.
+Use the official Boost CMake distribution with C++23 and a broad explicitly selected module closure, rather than a separately improvised Boost.Build binary tree. Early compiler-model preflights detect BCC64X/Boost.Config disagreements. Exclude dependency-heavy MPI/Python ecosystems; treat Boost.Random's random_device as interface/header use, as documented in the contract.
 
-## Versionierte Abhängigkeiten
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-- `openssl 3.5.9`
-- `zlib 1.3.2`
+## Dependency decisions
 
-## Beschaffung und reproduzierbare Quellen
+- `openssl@3.5.9`
+- `zlib@1.3.2`
 
-**Upstream-Downloads:**
+These are declared direct dependencies. Transitive runtime DLLs and package CMake imports must be resolved through the BuildEngine dependency graph; they are not evidence for linking arbitrary host copies.
 
-- `https://github.com/boostorg/boost/releases/download/boost-{LibraryVersion}/boost-{LibraryVersion}-cmake.zip`
+## Product profile: what is enabled and what is not
 
-**Archivnamen:**
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
 
-- `boost-{LibraryVersion}-cmake.zip`
+### Enabled switches
 
-## Patches, Workarounds und Adapter
+| Contract switch | Value |
+| --- | --- |
+| `BOOST_IOSTREAMS_ENABLE_ZLIB` | `ON` |
+| `BUILD_SHARED_LIBS` | `ON` |
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+### Deliberately disabled switches
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+| Contract switch | Value |
+| --- | --- |
+| `BOOST_ENABLE_MPI` | `OFF` |
+| `BOOST_ENABLE_PYTHON` | `OFF` |
+| `BOOST_RANDOM_ENABLE_RANDOM_DEVICE` | `OFF` |
+| `BUILD_TESTING` | `OFF` |
+| `OPENSSL_USE_STATIC_LIBS` | `OFF` |
 
-## Build-Parameter und Variablen
+### Other selected build features and external settings
 
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
+| Contract switch | Value |
+| --- | --- |
+| `BOOST_INSTALL_LAYOUT` | `system` |
+| `BOOST_INSTALL_CMAKEDIR` | `lib/win64/{Configuration}/cmake` |
+| `BOOST_INCLUDE_LIBRARIES` | `filesystem;system;program_options;regex;thread;chrono;json;asio;beast;accumulators;decimal;endian;geometry;histogram;integer;math;multi_array;multiprecision;numeric/conversion;numeric/interval;numeric/odeint;numeric/ublas;polygon;qvm;random;ratio;rational;safe_numerics;units;utility;bind;callable_traits;core;describe;function_types;fusion;hana;hof;lambda;lambda2;local_function;metaparse;mp11;mpl;msm;parser;pfr;phoenix;preprocessor;proto;spirit;statechart;static_assert;tti;type_traits;typeof;vmd;yap;algorithm;any;array;bimap;bloom;circular_buffer;foreach;gil;graph;heap;icl;intrusive;iterator;multi_index;optional;poly_collection;property_map;property_tree;ptr_container;range;sort;tuple;unordered;uuid;variant;variant2;cobalt;context;coroutine;coroutine2;fiber;interprocess;lockfree;mqtt5;mysql;redis;assign;charconv;contract;convert;dll;exception;format;io;iostreams;leaf;lexical_cast;locale;log;nowide;process;serialization;stacktrace;static_string;test;timer;tokenizer;type_erasure;type_index;url;wave;winapi;xpressive;align;assert;compat;concept_check;config;container_hash;conversion;crc;detail;dynamic_bitset;flyweight;function;functional;hash2;logic;move;openmethod;outcome;parameter;pool;predef;scope;scope_exit;signals2;smart_ptr;stl_interfaces;throw_exception` |
+| `OPENSSL_INCLUDE_DIR` | `{DependencyRoot:openssl}\include` |
+| `ADECC_BOOST_OPENSSL_SSL_LIBRARY` | `{DependencyRoot:openssl}\lib\win64\{Configuration}\libssl.lib` |
+| `ADECC_BOOST_OPENSSL_CRYPTO_LIBRARY` | `{DependencyRoot:openssl}\lib\win64\{Configuration}\libcrypto.lib` |
+| `ZLIB_INCLUDE_DIR` | `{InstallRoot}\packages\zlib\1.3.2\include` |
+| `ZLIB_LIBRARY` | `{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}` |
+| `BOOST_GATE` | `closure` |
+| `BOOST_PACKAGE_CMAKE_ROOT` | `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake` |
+| `ADECC_BOOST_MANAGED_INCLUDE_DIR` | `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include` |
+| `BOOST_GATE` | `math-numerics` |
+| `BOOST_GATE` | `state-parsing-meta` |
+| `BOOST_GATE` | `algorithms-containers-data` |
+| `BOOST_GATE` | `concurrency-async` |
+| `BOOST_GATE` | `system-io-runtime` |
+| `BOOST_GATE` | `foundation-language` |
+
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -49,115 +80,92 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF`
 - `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 - `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
-- `-DBOOST_INSTALL_LAYOUT:STRING=system`
-- `-DBOOST_INSTALL_CMAKEDIR:STRING=lib/win64/{Configuration}/cmake`
-- `-DBOOST_INCLUDE_LIBRARIES:STRING=filesystem;system;program_options;regex;thread;chrono;json;asio;beast;accumulators;decimal;endian;geometry;histogram;integer;math;multi_array;multiprecision;numeric/conversion;numeric/interval;numeric/odeint;numeric/ublas;polygon;qvm;random;ratio;rational;safe_numerics;units;utility;bind;callable_traits;core;describe;function_types;fusion;hana;hof;lambda;lambda2;local_function;metaparse;mp11;mpl;msm;parser;pfr;phoenix;preprocessor;proto;spirit;statechart;static_assert;tti;type_traits;typeof;vmd;yap;algorithm;any;array;bimap;bloom;circular_buffer;foreach;gil;graph;heap;icl;intrusive;iterator;multi_index;optional;poly_collection;property_map;property_tree;ptr_container;range;sort;tuple;unordered;uuid;variant;variant2;cobalt;context;coroutine;coroutine2;fiber;interprocess;lockfree;mqtt5;mysql;redis;assign;charconv;contract;convert;dll;exception;format;io;iostreams;leaf;lexical_cast;locale;log;nowide;process;serialization;stacktrace;static_string;test;timer;tokenizer;type_erasure;type_index;url;wave;winapi;xpressive;align;assert;compat;concept_check;config;container_hash;conversion;crc;detail;dynamic_bitset;flyweight;function;functional;hash2;logic;move;openmethod;outcome;parameter;pool;predef;scope;scope_exit;signals2;smart_ptr;stl_interfaces;throw_exception`
-- `-DBOOST_ENABLE_MPI:BOOL=OFF`
-- `-DBOOST_ENABLE_PYTHON:BOOL=OFF`
-- `-DBOOST_IOSTREAMS_ENABLE_ZLIB:BOOL=ON`
-- `-DBOOST_RANDOM_ENABLE_RANDOM_DEVICE:BOOL=OFF`
-- `-DBUILD_SHARED_LIBS:BOOL=ON`
-- `-DBUILD_TESTING:BOOL=OFF`
-- `-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include`
-- `-DADECC_BOOST_OPENSSL_SSL_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libssl.lib`
-- `-DADECC_BOOST_OPENSSL_CRYPTO_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libcrypto.lib`
-- `-DOPENSSL_USE_STATIC_LIBS:BOOL=OFF`
-- `-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include`
-- `-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
 - `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
 - `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
-- `-DBOOST_GATE:STRING=closure`
-- `-DBOOST_PACKAGE_CMAKE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake`
 - `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\bcc64x-native-clang\project-include.cmake`
-- `-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
-- `-DBOOST_GATE:STRING=math-numerics`
-- `-DBOOST_GATE:STRING=state-parsing-meta`
-- `-DBOOST_GATE:STRING=algorithms-containers-data`
-- `-DBOOST_GATE:STRING=concurrency-async`
-- `-DBOOST_GATE:STRING=system-io-runtime`
-- `-DBOOST_GATE:STRING=foundation-language`
 
-**Explizite Umgebungsvariablen:**
+**Versioned source locations:**
+
+- `https://github.com/boostorg/boost/releases/download/boost-{LibraryVersion}/boost-{LibraryVersion}-cmake.zip`
+
+**Declared extraction profiles:**
+
+- `zip / boost-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/boost/1.92.0/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+A consumer must place the **managed Boost include directory first**, before any other Boost installation, otherwise it can mix header revisions with different compiled Boost libraries. Avoid normalizing this important include-search-order requirement away.
+
+**No active version-bound `.patch` file is referenced by this library's present XML.** That is a meaningful result: source changes must not be invented merely because porting was difficult. Additional Admin-side adapters, generated configuration or post-install repairs may still be used.
+
+### Declarative repairs and preparation actions
+
+- `remove-installed-bin`
+- `remove-installed-lib`
+
+These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
+### Engineering constraints recorded in the executable contract
+
+- Canonical Boost model from the target-machine evidence: - one official upstream CMake source tree; - one coherent Release graph and one coherent Debug graph; - 148 selected source modules covering the 171 verified logical libraries; - OpenCL/MPI/Python-dependent external ecosystems remain explicitly excluded; - component separation happens at the consumer/evidence gates, never by merging binaries 
+- R189/R196 evidence classifies Boost.Random as header/INTERFACE. Upstream CMake otherwise enables the optional random_device binary by default.
+- Exact managed dependency coordinates used by the evidence build.
+- Evidence preflight: fail before the large Boost graph if BCC64X or Boost.Config no longer satisfies the proven native-Clang contract.
+
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
+
+## Installation, publication and consumer responsibilities
+
+**Explicit copy/repair destinations from the contract:**
+
+- `{Workspace}\LICENSE_1_0.txt -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE_1_0.txt`
+
+**Declared smoke tests:**
+
+- `closure (Release, scope published; source smokes\boost\component-gate)`
+- `closure (Debug, scope package; source smokes\boost\component-gate)`
+- `math-numerics (Release, scope published; source smokes\boost\component-gate)`
+- `math-numerics (Debug, scope package; source smokes\boost\component-gate)`
+- `state-parsing-meta (Release, scope published; source smokes\boost\component-gate)`
+- `state-parsing-meta (Debug, scope package; source smokes\boost\component-gate)`
+- `algorithms-containers-data (Release, scope published; source smokes\boost\component-gate)`
+- `algorithms-containers-data (Debug, scope package; source smokes\boost\component-gate)`
+- `concurrency-async (Release, scope published; source smokes\boost\component-gate)`
+- `concurrency-async (Debug, scope package; source smokes\boost\component-gate)`
+- `system-io-runtime (Release, scope published; source smokes\boost\component-gate)`
+- `system-io-runtime (Debug, scope package; source smokes\boost\component-gate)`
+- `foundation-language (Release, scope published; source smokes\boost\component-gate)`
+- `foundation-language (Debug, scope package; source smokes\boost\component-gate)`
+
+**Selected environment inputs:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
 - `CB_LLVM_AR={Tool:llvm-ar}`
 - `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
 
-**Technische Execute-Actions:**
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
 
-- `preflight-directory`
-- `preflight-native-noexcept`
-- `preflight-clang-feature`
-- `preflight-boost-config`
-- `remove-installed-bin`
-- `remove-installed-lib`
+**Mandatory Boost include precedence:** The managed versioned Boost include root must precede any other directory containing `boost/` headers. Resolve this in the CMake target or consumer's target-specific include ordering, never by copying headers over other packages.
 
-**Targets:**
+## Verification and evidence boundaries
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
 
-## Installations-, Paket- und Testkontrakt
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+## Maintenance and authoritative records
 
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE_1_0.txt`
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
-**Consumer-Smokes:**
-
-- `closure`
-- `math-numerics`
-- `state-parsing-meta`
-- `algorithms-containers-data`
-- `concurrency-async`
-- `system-io-runtime`
-- `foundation-language`
-
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
-
-## Consumer: Include- und Headerreihenfolge
-
-**Wichtig:** Das vom BuildEngine-Paket veröffentlichte Boost-Headerverzeichnis muss in der Include-Suchliste **vor** anderen Boost-Installationen stehen. Andernfalls können Header einer anderen Boost-Version mit den hier gebauten Binaries kombiniert werden. Die exakte Include-Root ist aus dem Publish-/Install-Vertrag der Version abzuleiten und im Consumer-Smoke zu prüfen.
-
-## Quellen, Wartung und offene Evidenz
-
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/boost/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

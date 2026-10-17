@@ -1,110 +1,111 @@
-# podofo 1.1.1: Migration und BCC64X-Integration
+# podofo 1.1.1: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `podofo@1.1.1` · **Category:** documentation · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="podofo" version="1.1.1">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+Build the PoDoFo PDF object/document APIs as a shared BCC64X Windows package using exact managed zlib, OpenSSL, FreeType, libxml2, JPEG, PNG and TIFF dependencies. Investigations proved the danger of allocating/deleting C++ objects across a DLL boundary with separate static runtimes; enforce -tR globally rather than suppressing crashing tests. Versioned source changes address genuine API/ABI/test constraints.
 
-- In shared builds, XMP tests use the DLL without re-linking internal archives. The existing upstream tests retain their original private-library access.
-- Repair the DLL-only test target without adding private static archives.
-- PoDoFo sources and upstream tests contain UTF-8 characters in ordinary narrow string literals. BCC64X 20.1.7 requires the Embarcadero execution-code-page switch for UTF-8 literal bytes. This was machine-verified previously for Catch2; generic Clang -finput-charset/-fexec-charset did not change BCC64X behaviour.
-- Keep the tested runtime closure deterministic. In particular, Release libz.dll must come from our zlib 1.3.2 package.
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-## Versionierte Abhängigkeiten
+## Dependency decisions
 
-- `zlib 1.3.2`
-- `openssl 3.5.9`
-- `freetype 2.14.3`
-- `libxml2 2.15.3`
-- `libjpeg-turbo 3.2.0`
-- `libpng 1.6.58`
-- `libtiff 4.7.2`
+- `zlib@1.3.2`
+- `openssl@3.5.9`
+- `freetype@2.14.3`
+- `libxml2@2.15.3`
+- `libjpeg-turbo@3.2.0`
+- `libpng@1.6.58`
+- `libtiff@4.7.2`
 
-## Beschaffung und reproduzierbare Quellen
+These are declared direct dependencies. Transitive runtime DLLs and package CMake imports must be resolved through the BuildEngine dependency graph; they are not evidence for linking arbitrary host copies.
 
-**Upstream-Downloads:**
+## Product profile: what is enabled and what is not
 
-- `https://github.com/podofo/podofo/archive/refs/tags/{LibraryVersion}.tar.gz`
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
 
-**Archivnamen:**
+### Enabled switches
 
-- `podofo-{LibraryVersion}.tar.gz`
+| Contract switch | Value |
+| --- | --- |
+| `PODOFO_WITH_FONTMANAGER` | `ON` |
+| `PODOFO_WITH_WIN32GDI_FONT_SEARCH` | `ON` |
 
-## Patches, Workarounds und Adapter
+### Deliberately disabled switches
 
-- `podofo\1.1.1\bcc64x-charconv-route.patch`
-- `{LibraryVersion}\bcc64x-charconv-route.patch`
-- `podofo\1.1.1\bcc64x-catch-isnan-route.patch`
-- `{LibraryVersion}\bcc64x-catch-isnan-route.patch`
-- `podofo\1.1.1\bcc64x-cid-order.patch`
-- `{LibraryVersion}\bcc64x-cid-order.patch`
-- `podofo\1.1.1\bcc64x-test-output-isolation.patch`
-- `{LibraryVersion}\bcc64x-test-output-isolation.patch`
-- `podofo\1.1.1\bcc64x-xmp-dll-boundary.patch`
-- `{LibraryVersion}\bcc64x-xmp-dll-boundary.patch`
-- `podofo\1.1.1\bcc64x-xmp-dll-link-fix.patch`
-- `{LibraryVersion}\bcc64x-xmp-dll-link-fix.patch`
-- `podofo\1.1.1\bcc64x-dll-export.patch`
-- `{LibraryVersion}\bcc64x-dll-export.patch`
-- `podofo\1.1.1\bcc64x-test-resource-isolation.patch`
-- `{LibraryVersion}\bcc64x-test-resource-isolation.patch`
-- `podofo\1.1.1\bcc64x-xmp-schema-lifetime.patch`
-- `{LibraryVersion}\bcc64x-xmp-schema-lifetime.patch`
+| Contract switch | Value |
+| --- | --- |
+| `PODOFO_BUILD_STATIC` | `OFF` |
+| `PODOFO_BUILD_EXAMPLES` | `OFF` |
+| `PODOFO_BUILD_UNSUPPORTED_TOOLS` | `OFF` |
+| `PODOFO_WITH_AFDKO` | `OFF` |
+| `PODOFO_WITH_LCMS2` | `OFF` |
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+### Other selected build features and external settings
 
-## Build-Parameter und Variablen
+| Contract switch | Value |
+| --- | --- |
+| `PODOFO_BUILD_TEST` | `{TestsEnabled}` |
+| `PDF_TEST_RESOURCE_PATH` | `{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\resources` |
+| `PDF_TEST_OUTPUT_PATH` | `{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out` |
+| `LIBXML2_LIBRARY` | `{InstallRoot}\packages\libxml2\2.15.3\lib\win64\Release\libxml2.lib` |
+| `LIBXML2_LIBRARY` | `{InstallRoot}\packages\libxml2\2.15.3\lib\win64\Debug\libxml2d.lib` |
+| `PoDoFo_DIR` | `{ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo` |
 
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
 - `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 - `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
 - `-DCMAKE_CXX_FLAGS:STRING=-fborland-exec-code-page=65001`
-- `-DPODOFO_BUILD_STATIC:BOOL=OFF`
-- `-DPODOFO_BUILD_TEST:BOOL={TestsEnabled}`
-- `-DPODOFO_BUILD_EXAMPLES:BOOL=OFF`
-- `-DPODOFO_BUILD_UNSUPPORTED_TOOLS:BOOL=OFF`
-- `-DPODOFO_WITH_AFDKO:BOOL=OFF`
-- `-DPODOFO_WITH_FONTMANAGER:BOOL=ON`
-- `-DPODOFO_WITH_WIN32GDI_FONT_SEARCH:BOOL=ON`
-- `-DPODOFO_WITH_LCMS2:BOOL=OFF`
 - `-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{DependencyRoot:openssl};{InstallRoot}\packages\freetype\2.14.3;{InstallRoot}\packages\libxml2\2.15.3;{InstallRoot}\packages\libjpeg-turbo\3.2.0;{InstallRoot}\packages\libpng\1.6.58;{InstallRoot}\packages\libtiff\4.7.2`
-- `-DPDF_TEST_RESOURCE_PATH:PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\resources`
-- `-DPDF_TEST_OUTPUT_PATH:PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
-- `-DLIBXML2_LIBRARY:FILEPATH={InstallRoot}\packages\libxml2\2.15.3\lib\win64\Release\libxml2.lib`
 - `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
-- `-DLIBXML2_LIBRARY:FILEPATH={InstallRoot}\packages\libxml2\2.15.3\lib\win64\Debug\libxml2d.lib`
 - `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
 - `-DCMAKE_DEBUG_POSTFIX:STRING=d`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
-- `-DPoDoFo_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo`
 
-**Explizite Umgebungsvariablen:**
+**Versioned source locations:**
 
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_LLVM_AR={Tool:llvm-ar}`
-- `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
-- `CTEST_PARALLEL_LEVEL=1`
-- `PODOFO_TEST_OUTPUT_PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out`
-- `PATH={InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{InstallRoot}\packages\libxml2\2.15.3\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.58\bin\win64\{Configuration};{InstallRoot}\packages\libtiff\4.7.2\bin\win64\{Configuration};{ENV:PATH}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
+- `https://github.com/podofo/podofo/archive/refs/tags/{LibraryVersion}.tar.gz`
 
-**Technische Execute-Actions:**
+**Declared extraction profiles:**
+
+- `libarchive / podofo-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/podofo/1.1.1/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+Do not hide XMP lifetime/allocator faults by omitting upstream tests. Dynamic `-tR` across EXE/DLL/MODULE boundaries is a generic compiler runtime requirement, independently of the PoDoFo DLL patch series.
+
+| Version-bound patch | Problem and justification |
+| --- | --- |
+| `admin/patches/podofo/1.1.1/bcc64x-catch-isnan-route.patch` | Avoid a legacy Catch2/CRT isnan path incompatible with this toolchain. |
+| `admin/patches/podofo/1.1.1/bcc64x-charconv-route.patch` | Select a compatible BCC64X character-conversion implementation in PoDoFo. |
+| `admin/patches/podofo/1.1.1/bcc64x-cid-order.patch` | Make CID mapping/ordering deterministic for the tested compiler and fixtures. |
+| `admin/patches/podofo/1.1.1/bcc64x-dll-export.patch` | Select DLL import/export declarations that are valid for native Windows BCC64X rather than GNU visibility attributes. |
+| `admin/patches/podofo/1.1.1/bcc64x-test-output-isolation.patch` | Keep test output files isolated by configuration so parallel Debug/Release runs cannot interfere. |
+| `admin/patches/podofo/1.1.1/bcc64x-test-resource-isolation.patch` | Isolate mutable test resources and cleanups across concurrently executed suites. |
+| `admin/patches/podofo/1.1.1/bcc64x-xmp-dll-boundary.patch` | Correct exported XMP class/interface ownership across the PoDoFo DLL boundary. |
+| `admin/patches/podofo/1.1.1/bcc64x-xmp-dll-link-fix.patch` | Provide the necessary exported XMP symbols for installed DLL consumers. |
+| `admin/patches/podofo/1.1.1/bcc64x-xmp-schema-lifetime.patch` | Address XMP schema/object lifetime ownership and destruction order. |
+
+### Declarative repairs and preparation actions
 
 - `charconv-patch-check`
 - `charconv-patch-apply`
@@ -124,53 +125,57 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `xmp-dll-link-patch-verify`
 - `dll-export-patch-check`
 - `dll-export-patch-apply`
-- `resources-clone`
-- `resources-archive`
-- `resources-directory`
-- `resources-extract`
 - `test-resource-patch-check`
 - `test-resource-patch-apply`
 - `test-resource-patch-verify`
 - `xmp-lifetime-patch-check`
 - `xmp-lifetime-patch-apply`
 - `xmp-lifetime-patch-verify`
-- `isolate-test-resources`
-- `test-output-directory`
-- `upstream-tests`
 
-**Targets:**
+These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
+### Engineering constraints recorded in the executable contract
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+- In shared builds, XMP tests use the DLL without re-linking internal archives. The existing upstream tests retain their original private-library access.
+- Repair the DLL-only test target without adding private static archives.
+- PoDoFo 1.1.1 gitlink extern/resources -> podofo-resources@1e0740f2183e01d6f8516399031f6dbccbe8cd0f. Keep Git metadata outside the materialized PoDoFo source tree.
+- Keep RELAX-NG schemas scoped to each validation, not DLL teardown.
+- PoDoFo sources and upstream tests contain UTF-8 characters in ordinary narrow string literals. BCC64X 20.1.7 requires the Embarcadero execution-code-page switch for UTF-8 literal bytes. This was machine-verified previously for Catch2; generic Clang -finput-charset/-fexec-charset did not change BCC64X behaviour.
+- Keep the tested runtime closure deterministic. In particular, Release libz.dll must come from our zlib 1.3.2 package.
 
-## Installations-, Paket- und Testkontrakt
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+## Installation, publication and consumer responsibilities
 
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-route.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-catch-isnan-route.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cid-order.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-output-isolation.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-boundary.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-link-fix.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-resource-isolation.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-schema-lifetime.patch`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE`
+**Explicit copy/repair destinations from the contract:**
 
-**Consumer-Smokes:**
+- `{Workspace}\NOTICE -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE`
 
-- `consumer`
+**Declared smoke tests:**
 
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
+- `consumer (Release, scope package; source smokes\podofo\consumer)`
 
-## Consumer: DLL-Grenzen und Runtime
+**Selected environment inputs:**
 
-Für BCC64X-Windows-EXE, DLL und MODULE gilt dynamische Runtime `-tR`. PoDoFo übergibt C++-Objekte und Ownership über DLL-Grenzen; statisch getrennte Runtime-Domänen sind nicht zulässig. Tests mit XMP-Objekten und Destruktion sind besonders wichtig.
+- `CB_BCC64X={Tool:bcc64x}`
+- `CB_BDS={BDS}`
+- `CB_LLVM_AR={Tool:llvm-ar}`
+- `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
+- `CTEST_PARALLEL_LEVEL=1`
+- `PODOFO_TEST_OUTPUT_PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out`
 
-## Quellen, Wartung und offene Evidenz
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
 
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/podofo/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+## Verification and evidence boundaries
+
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
+
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
+
+## Maintenance and authoritative records
+
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
+
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

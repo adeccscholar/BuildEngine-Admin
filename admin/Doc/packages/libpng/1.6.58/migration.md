@@ -1,38 +1,60 @@
-# libpng 1.6.58: Migrationsdokumentation
+# libpng 1.6.58: BCC64X migration and integration record
 
 [TOC|Content]
 
-**BuildEngine-Vertrag:** `admin/build-libraries.xml`, `libpng@1.6.58`. **Ziel:** Windows/BCC64X. Die Dokumentation beruht auf dem deklarativen Vertrag, nicht auf einem unabhängig verifizierten vollständigen Lauf.
+**Contract identity:** `libpng@1.6.58` · **Category:** image · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-## Entscheidungen und dokumentierte Workarounds
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-- Weitere historische Begründungen sind [nicht verifiziert] und müssen bei Bedarf anhand von Commit- und Buildlog-Evidence ergänzt werden.
+## Purpose and integration strategy
 
-## Abhängigkeiten
+**Package purpose:** Reference PNG library for reading, writing, and manipulating Portable Network Graphics images.
 
-- `zlib 1.3.2`
+Build a shared libpng package against the exact managed zlib import library. Disable upstream tests in the current product contract; consumers such as FreeType/Skia receive the external package instead of another bundled PNG producer.
 
-## Quellbeschaffung
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-- `https://download.sourceforge.net/libpng/libpng-{LibraryVersion}.tar.xz`
+## Dependency decisions
 
-## Versionsgebundene Patches und Adapter
+- `zlib@1.3.2`
 
-- Nicht explizit im lokalen Vertrag aufgeführt.
+These are declared direct dependencies. Transitive runtime DLLs and package CMake imports must be resolved through the BuildEngine dependency graph; they are not evidence for linking arbitrary host copies.
 
-## Build-Parameter und Einstellungen
+## Product profile: what is enabled and what is not
+
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
+
+### Enabled switches
+
+| Contract switch | Value |
+| --- | --- |
+| `PNG_SHARED` | `ON` |
+
+### Deliberately disabled switches
+
+| Contract switch | Value |
+| --- | --- |
+| `PNG_STATIC` | `OFF` |
+| `PNG_TESTS` | `OFF` |
+
+### Other selected build features and external settings
+
+No switches of this category are explicitly selected in the parsed build arguments.
+
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
 - `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 - `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
 - `-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2`
-- `-DPNG_SHARED:BOOL=ON`
-- `-DPNG_STATIC:BOOL=OFF`
-- `-DPNG_TESTS:BOOL=OFF`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
 - `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
@@ -41,23 +63,51 @@
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
 
-### Build-Umgebung
+**Versioned source locations:**
+
+- `https://download.sourceforge.net/libpng/libpng-{LibraryVersion}.tar.xz`
+
+**Declared extraction profiles:**
+
+- `libarchive / libpng-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/libpng/1.6.58/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+**No active version-bound `.patch` file is referenced by this library's present XML.** That is a meaningful result: source changes must not be invented merely because porting was difficult. Additional Admin-side adapters, generated configuration or post-install repairs may still be used.
+
+
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
+
+## Installation, publication and consumer responsibilities
+
+**Explicit copy/repair destinations from the contract:**
+
+- `{Workspace}\LICENSE -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE`
+
+**Declared smoke tests:**
+
+- `consumer (Release, scope published; source smokes\libpng\consumer)`
+
+**Selected environment inputs:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
 
-### Technische Arbeitsschritte
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
 
-- Nicht explizit im lokalen Vertrag aufgeführt.
+## Verification and evidence boundaries
 
-## Installation und Consumer-Hinweise
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
 
-BuildEngine-Pakete verwenden ihre deklarativen `{InstallRoot}`- und `{BuildRoot}`-Pfade sowie die Versions- und gegebenenfalls Debug/Release-Trennung. BCC64X Windows-Executables und DLLs verwenden die dynamische Runtime `-tR`. Die genaue Installationsstruktur und Verwendung sind anhand der XML-`install`-, `publish`- und `smoke`-Actions zu prüfen.
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
 
-**[nicht verifiziert]** Ob und in welchem Umfang die konkrete Variante schon durch einen vollständigen Clean-Room-Test bestätigt wurde, ist anhand der FSM-Evidence zu bestimmen.
+## Maintenance and authoritative records
 
-## Quellen
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
-- `admin/build-libraries.xml`
-- `admin/server-docs/libraries.md`
-- `docs/bcc64x-library-integration-findings.md`
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

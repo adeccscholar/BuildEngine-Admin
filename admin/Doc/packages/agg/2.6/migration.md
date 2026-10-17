@@ -1,87 +1,107 @@
-# agg 2.6: Migration und BCC64X-Integration
+# Anti-Grain Geometry 2.6: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `agg@2.6` · **Category:** graphics · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="agg" version="2.6">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+**Package purpose:** AGG core rasterization without GPC
 
-- PDFium first integration gate: pinned sources and real GN/Ninja build. No implicit DEPS synchronization; only BuildEngine-controlled source inputs. PDFium BCC64X and external-Skia adapters remain required before it can pass. Never mark this package ready merely because its source was downloaded.
+Integrate the AGG rasterization core with a static CMake package, in separate Release and Debug install trees. The static product form is deliberate and does not authorize static linking of the BCC64X runtime.
 
-## Versionierte Abhängigkeiten
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+## Dependency decisions
 
-## Beschaffung und reproduzierbare Quellen
+No direct BuildEngine library dependency is declared for this coordinate. This does **not** mean the generated binary uses no Windows system libraries or that its upstream bundled components are absent.
 
-**Upstream-Downloads:**
+## Product profile: what is enabled and what is not
 
-- `https://github.com/ghaerr/agg-2.6/archive/c4f36b4432142f22c0bf82c6fbdb41567a236be2.tar.gz`
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
 
-**Archivnamen:**
+### Enabled switches
 
-- `agg-2.6-c4f36b44.tar.gz`
+No switches of this category are explicitly selected in the parsed build arguments.
 
-## Patches, Workarounds und Adapter
+### Deliberately disabled switches
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_SHARED_LIBS` | `OFF` |
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+### Other selected build features and external settings
 
-## Build-Parameter und Variablen
+| Contract switch | Value |
+| --- | --- |
+| `agg_DIR` | `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\agg` |
 
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
 - `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 - `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
-- `-DBUILD_SHARED_LIBS:BOOL=OFF`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
-- `-Dagg_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\agg`
 
-**Explizite Umgebungsvariablen:**
+**Versioned source locations:**
+
+- `https://github.com/ghaerr/agg-2.6/archive/c4f36b4432142f22c0bf82c6fbdb41567a236be2.tar.gz`
+
+**Declared extraction profiles:**
+
+- `libarchive / agg-2.6-c4f36b4432142f22c0bf82c6fbdb41567a236be2`
+
+**Package-path convention:** `{InstallRoot}/packages/agg/2.6/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+**No active version-bound `.patch` file is referenced by this library's present XML.** That is a meaningful result: source changes must not be invented merely because porting was difficult. Additional Admin-side adapters, generated configuration or post-install repairs may still be used.
+
+
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
+
+## Installation, publication and consumer responsibilities
+
+**Explicit copy/repair destinations from the contract:**
+
+- `{Workspace}\agg-src\copying -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\agg\copying`
+
+**Declared smoke tests:**
+
+- `consumer (Release, scope package; source smokes\agg\consumer)`
+
+**Selected environment inputs:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
 - `CB_LLVM_AR={Tool:llvm-ar}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
 
-**Technische Execute-Actions:**
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+## Verification and evidence boundaries
 
-**Targets:**
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
 
-## Installations-, Paket- und Testkontrakt
+## Maintenance and authoritative records
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
-- `{CurrentArtifact}\CMakeLists.txt`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\agg\copying`
-
-**Consumer-Smokes:**
-
-- `consumer`
-
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
-
-## Quellen, Wartung und offene Evidenz
-
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/agg/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

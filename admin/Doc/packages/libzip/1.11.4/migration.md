@@ -1,14 +1,109 @@
-# libzip 1.11.4: Migration und BCC64X-Integration
+# libzip 1.11.4: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `libzip@1.11.4` · **Category:** archive · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="libzip" version="1.11.4">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+**Package purpose:** C library for reading, creating, and modifying ZIP archives.
+
+Build a shared ZIP library around the managed zlib, XZ and Zstandard dependency closure. Functional archive checks exercise XZ, Zstandard and AES features. Repair upstream tool placement during packaging instead of rewriting its consumer-facing CMake metadata.
+
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
+
+## Dependency decisions
+
+- `zlib@1.3.2`
+- `xz@5.8.4`
+- `zstd@1.5.7`
+
+These are declared direct dependencies. Transitive runtime DLLs and package CMake imports must be resolved through the BuildEngine dependency graph; they are not evidence for linking arbitrary host copies.
+
+## Product profile: what is enabled and what is not
+
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
+
+### Enabled switches
+
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_SHARED_LIBS` | `ON` |
+| `LIBZIP_DO_INSTALL` | `ON` |
+| `SHARED_LIB_VERSIONNING` | `ON` |
+| `ENABLE_LZMA` | `ON` |
+| `ENABLE_ZSTD` | `ON` |
+| `ENABLE_WINDOWS_CRYPTO` | `ON` |
+| `ENABLE_FDOPEN` | `ON` |
+| `BUILD_TOOLS` | `ON` |
+| `BUILD_EXAMPLES` | `ON` |
+
+### Deliberately disabled switches
+
+| Contract switch | Value |
+| --- | --- |
+| `ENABLE_BZIP2` | `OFF` |
+| `ENABLE_COMMONCRYPTO` | `OFF` |
+| `ENABLE_OPENSSL` | `OFF` |
+| `ENABLE_GNUTLS` | `OFF` |
+| `ENABLE_MBEDTLS` | `OFF` |
+| `BUILD_REGRESS` | `OFF` |
+| `BUILD_OSSFUZZ` | `OFF` |
+| `BUILD_DOC` | `OFF` |
+
+### Other selected build features and external settings
+
+| Contract switch | Value |
+| --- | --- |
+| `ZLIB_INCLUDE_DIR` | `{InstallRoot}\packages\zlib\1.3.2\include` |
+| `ZLIB_LIBRARY` | `{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}` |
+| `LIBLZMA_INCLUDE_DIR` | `{DependencyRoot:xz}\include` |
+| `LIBLZMA_LIBRARY` | `{DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib` |
+| `zstd_DIR` | `{InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\cmake\zstd` |
+
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+
+**Versioned source locations:**
+
+- `https://github.com/nih-at/libzip/releases/download/v{LibraryVersion}/libzip-{LibraryVersion}.tar.gz`
+
+**Declared extraction profiles:**
+
+- `libarchive / libzip-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/libzip/1.11.4/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+**No active version-bound `.patch` file is referenced by this library's present XML.** That is a meaningful result: source changes must not be invented merely because porting was difficult. Additional Admin-side adapters, generated configuration or post-install repairs may still be used.
+
+### Declarative repairs and preparation actions
+
+- `remove-installed-bin`
+- `remove-installed-lib`
+
+These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
+### Engineering constraints recorded in the executable contract
 
 - Official release asset. Use tar.gz for bootstrap so libzip does not depend on the BuildEngine's not-yet-enabled XZ extraction path.
 - Required deflate backend plus the two compression backends already produced by this BuildEngine contract.
@@ -18,114 +113,41 @@ Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Pa
 - These tests run from the build tree before installation. The working directory contains zip.dll; dependency runtime directories are supplied generically by the BuildEngine.
 - Upstream installs the three tools to literal bin rather than CMAKE_INSTALL_BINDIR. Keep that upstream location intact for libzip-bin-targets and additionally provide the configuration- specific package layout used by the BuildEngine.
 
-## Versionierte Abhängigkeiten
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
 
-- `zlib 1.3.2`
-- `xz 5.8.4`
-- `zstd 1.5.7`
+## Installation, publication and consumer responsibilities
 
-## Beschaffung und reproduzierbare Quellen
+**Explicit copy/repair destinations from the contract:**
 
-**Upstream-Downloads:**
+- `{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\zipcmp.exe -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipcmp.exe`
+- `{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\zipmerge.exe -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipmerge.exe`
+- `{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src\ziptool.exe -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ziptool.exe`
+- `{Workspace}\LICENSE -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE`
 
-- `https://github.com/nih-at/libzip/releases/download/v{LibraryVersion}/libzip-{LibraryVersion}.tar.gz`
+**Declared smoke tests:**
 
-**Archivnamen:**
+- `consumer (Release, scope published; source smokes\libzip\consumer)`
 
-- `libzip-{LibraryVersion}.tar.gz`
-
-## Patches, Workarounds und Adapter
-
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
-
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
-
-## Build-Parameter und Variablen
-
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
-
-- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
-- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
-- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
-- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
-- `-DBUILD_SHARED_LIBS:BOOL=ON`
-- `-DLIBZIP_DO_INSTALL:BOOL=ON`
-- `-DSHARED_LIB_VERSIONNING:BOOL=ON`
-- `-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include`
-- `-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}`
-- `-DENABLE_BZIP2:BOOL=OFF`
-- `-DENABLE_LZMA:BOOL=ON`
-- `-DLIBLZMA_INCLUDE_DIR:PATH={DependencyRoot:xz}\include`
-- `-DLIBLZMA_LIBRARY:FILEPATH={DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib`
-- `-DENABLE_ZSTD:BOOL=ON`
-- `-Dzstd_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\cmake\zstd`
-- `-DENABLE_WINDOWS_CRYPTO:BOOL=ON`
-- `-DENABLE_COMMONCRYPTO:BOOL=OFF`
-- `-DENABLE_OPENSSL:BOOL=OFF`
-- `-DENABLE_GNUTLS:BOOL=OFF`
-- `-DENABLE_MBEDTLS:BOOL=OFF`
-- `-DENABLE_FDOPEN:BOOL=ON`
-- `-DBUILD_TOOLS:BOOL=ON`
-- `-DBUILD_REGRESS:BOOL=OFF`
-- `-DBUILD_OSSFUZZ:BOOL=OFF`
-- `-DBUILD_EXAMPLES:BOOL=ON`
-- `-DBUILD_DOC:BOOL=OFF`
-- `-DCMAKE_BUILD_TYPE:STRING=Release`
-- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
-- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
-- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
-- `-DCMAKE_BUILD_TYPE:STRING=Debug`
-- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
-- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
-- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
-
-**Explizite Umgebungsvariablen:**
+**Selected environment inputs:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
 - `CB_LLVM_AR={Tool:llvm-ar}`
 - `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
 
-**Technische Execute-Actions:**
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
 
-- `remove-xz-smoke-archive`
-- `xz-write`
-- `xz-read`
-- `remove-zstd-smoke-archive`
-- `zstd-write`
-- `zstd-read`
-- `remove-aes-smoke-archive`
-- `aes-write`
-- `aes-read`
-- `remove-installed-bin`
-- `remove-installed-lib`
+## Verification and evidence boundaries
 
-**Targets:**
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
 
-## Installations-, Paket- und Testkontrakt
+## Maintenance and authoritative records
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipcmp.exe`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\zipmerge.exe`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ziptool.exe`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE`
-
-**Consumer-Smokes:**
-
-- `consumer`
-
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
-
-## Quellen, Wartung und offene Evidenz
-
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/libzip/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

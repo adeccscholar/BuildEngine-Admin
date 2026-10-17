@@ -1,66 +1,70 @@
-# pugixml 1.16: Migration und BCC64X-Integration
+# pugixml 1.16: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `pugixml@1.16` · **Category:** data · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="pugixml" version="1.16">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+**Package purpose:** Lightweight C++ XML processing library with DOM-style parsing, modification, and XPath support.
 
-- Upstream source and build contract required by the real pugiXML 1.16 CMake project.
-- pugiXML 1.16 upstream CMake options. The BuildEngine does not replace the library's CMakeLists.txt or package-config template!
-- Current build gate only: install and verify declared files. These <require> actions are not compile/link/runtime smoke tests.
+Use the upstream CMake package as a shared, version-pinned XML DOM/parser library rather than maintaining a downstream fork. Disable the concurrent static variant, in-tree tests, source installation and versioned libdir because the managed package is the consumer boundary.
 
-## Versionierte Abhängigkeiten
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+## Dependency decisions
 
-## Beschaffung und reproduzierbare Quellen
+No direct BuildEngine library dependency is declared for this coordinate. This does **not** mean the generated binary uses no Windows system libraries or that its upstream bundled components are absent.
 
-**Upstream-Downloads:**
+## Product profile: what is enabled and what is not
 
-- `https://github.com/zeux/pugixml/releases/download/v{LibraryVersion}/pugixml-{LibraryVersion}.zip`
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
 
-**Archivnamen:**
+### Enabled switches
 
-- `pugixml-{LibraryVersion}.zip`
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_SHARED_LIBS` | `ON` |
+| `PUGIXML_INSTALL` | `ON` |
+| `PUGIXML_CHARCONV_FLOAT` | `ON` |
 
-## Patches, Workarounds und Adapter
+### Deliberately disabled switches
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+| Contract switch | Value |
+| --- | --- |
+| `PUGIXML_BUILD_SHARED_AND_STATIC_LIBS` | `OFF` |
+| `PUGIXML_INSTALL_SOURCE` | `OFF` |
+| `PUGIXML_BUILD_TESTS` | `OFF` |
+| `PUGIXML_USE_VERSIONED_LIBDIR` | `OFF` |
+| `PUGIXML_USE_POSTFIX` | `OFF` |
+| `PUGIXML_WCHAR_MODE` | `OFF` |
+| `PUGIXML_COMPACT` | `OFF` |
+| `PUGIXML_NO_XPATH` | `OFF` |
+| `PUGIXML_NO_STL` | `OFF` |
+| `PUGIXML_NO_EXCEPTIONS` | `OFF` |
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+### Other selected build features and external settings
 
-## Build-Parameter und Variablen
+No switches of this category are explicitly selected in the parsed build arguments.
 
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
 - `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 - `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
-- `-DBUILD_SHARED_LIBS:BOOL=ON`
-- `-DPUGIXML_BUILD_SHARED_AND_STATIC_LIBS:BOOL=OFF`
-- `-DPUGIXML_INSTALL:BOOL=ON`
-- `-DPUGIXML_INSTALL_SOURCE:BOOL=OFF`
-- `-DPUGIXML_BUILD_TESTS:BOOL=OFF`
-- `-DPUGIXML_USE_VERSIONED_LIBDIR:BOOL=OFF`
-- `-DPUGIXML_USE_POSTFIX:BOOL=OFF`
-- `-DPUGIXML_WCHAR_MODE:BOOL=OFF`
-- `-DPUGIXML_COMPACT:BOOL=OFF`
-- `-DPUGIXML_CHARCONV_FLOAT:BOOL=ON`
-- `-DPUGIXML_NO_XPATH:BOOL=OFF`
-- `-DPUGIXML_NO_STL:BOOL=OFF`
-- `-DPUGIXML_NO_EXCEPTIONS:BOOL=OFF`
 - `-DCMAKE_CXX_STANDARD:STRING=17`
 - `-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON`
 - `-DCMAKE_CXX_EXTENSIONS:BOOL=OFF`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
 - `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
@@ -69,37 +73,57 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
 
-**Explizite Umgebungsvariablen:**
+**Versioned source locations:**
+
+- `https://github.com/zeux/pugixml/releases/download/v{LibraryVersion}/pugixml-{LibraryVersion}.zip`
+
+**Declared extraction profiles:**
+
+- `zip / pugixml-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/pugixml/1.16/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+**No active version-bound `.patch` file is referenced by this library's present XML.** That is a meaningful result: source changes must not be invented merely because porting was difficult. Additional Admin-side adapters, generated configuration or post-install repairs may still be used.
+
+### Engineering constraints recorded in the executable contract
+
+- Upstream source and build contract required by the real pugiXML 1.16 CMake project.
+- pugiXML 1.16 upstream CMake options. The BuildEngine does not replace the library's CMakeLists.txt or package-config template!
+- CMake initializes DEBUG_POSTFIX on library targets from this variable.
+- Current build gate only: install and verify declared files. These <require> actions are not compile/link/runtime smoke tests.
+
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
+
+## Installation, publication and consumer responsibilities
+
+**Explicit copy/repair destinations from the contract:**
+
+- `{Workspace}\LICENSE.md -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\pugixml-LICENSE.md`
+
+**Declared smoke tests:**
+
+- `consumer (Release, scope published; source smokes\pugixml\consumer)`
+
+**Selected environment inputs:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
 
-**Technische Execute-Actions:**
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+## Verification and evidence boundaries
 
-**Targets:**
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
 
-## Installations-, Paket- und Testkontrakt
+## Maintenance and authoritative records
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\pugixml-LICENSE.md`
-
-**Consumer-Smokes:**
-
-- `consumer`
-
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
-
-## Quellen, Wartung und offene Evidenz
-
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/pugixml/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

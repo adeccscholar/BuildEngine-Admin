@@ -453,3 +453,7 @@ The PoDoFo investigation established a project-wide invariant: **all BCC64X Wind
 This is separate from whether a third-party library is packaged as a static or shared library. Public C++ APIs may move strings, exceptions, STL containers or owning pointers across a DLL boundary. Separate static C++ runtime/allocator domains can then corrupt ownership or fail during destruction.
 
 The generic CMake rules now encode and assert the dynamic-only policy so it cannot silently regress.
+
+## Per-package migration and consumer records
+
+Each logical library version has an English integration dossier in `admin/Doc/packages/<library>/<version>/migration.md`, visible through the package's `/package/<library>/<version>/migration` route. The files explain the selected product scope, explicitly disabled features, source/build approach, managed dependencies, version-bound patch reasons, packaging repairs, consumer ABI/runtime requirements and test evidence. The XML remains the executable authority; the dossier is the architectural rationale. An unverified build outcome must not be presented as a passed test.

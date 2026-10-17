@@ -1,129 +1,161 @@
-# curl 8.23.0: Migration und BCC64X-Integration
+# curl 8.23.0: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `curl@8.23.0` · **Category:** network · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="curl" version="8.23.0">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+The public overview describes the earlier 8.21.0 baseline; use this newer version's XML contract for exact feature switches.
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+## Purpose and integration strategy
 
-- curl/8.23.0 now tests the updated OpenSSL/3.5.9 dependency. Keep zlib enabled; Brotli/Zstd remain disabled until independently validated for this curl version and BCC64X runtime.
-- Preserve the proven BCC64X module-based dependency lookup. OpenSSL 3.5.9 and zlib paths are selected per configuration.
-- CMake 4.1.1 FindOpenSSL performs its own find_library() lookup on WIN32 and then rewrites OPENSSL_SSL_LIBRARY/OPENSSL_CRYPTO_LIBRARY. Do not set OPENSSL_ROOT_DIR here: that activates NO_DEFAULT_PATH inside FindOpenSSL and hides BuildEngine's configuration-specific lib/win64/Release directory. The generic producer integration supplies that exact directory through CMAKE_LIBRARY_P…
-- Same FindOpenSSL rule as Release; CMAKE_LIBRARY_PATH is variant-specific.
+**Package purpose:** URL transfer library and command-line client supporting HTTP(S) and numerous network protocols.
 
-## Versionierte Abhängigkeiten
+Consume BuildEngine OpenSSL for TLS and the managed zlib package through upstream CMake. Keep optional protocol and resolver stacks outside this baseline, and do not silently select Windows Schannel or unrelated host OpenSSL installations. Newer curl has a dedicated BCC64X WinSock compatibility patch.
 
-- `openssl 3.5.9`
-- `zlib 1.3.2`
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-## Beschaffung und reproduzierbare Quellen
+## Dependency decisions
 
-**Upstream-Downloads:**
+- `openssl@3.5.9`
+- `zlib@1.3.2`
 
-- `https://curl.se/download/curl-{LibraryVersion}.tar.xz`
+These are declared direct dependencies. Transitive runtime DLLs and package CMake imports must be resolved through the BuildEngine dependency graph; they are not evidence for linking arbitrary host copies.
 
-**Archivnamen:**
+## Product profile: what is enabled and what is not
 
-- `curl-{LibraryVersion}.tar.xz`
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
 
-## Patches, Workarounds und Adapter
+### Enabled switches
 
-- `curl\8.23.0\bcc64x-winsock-inline.patch`
-- `{LibraryVersion}\bcc64x-winsock-inline.patch`
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_SHARED_LIBS` | `ON` |
+| `BUILDENGINE_BCC64X_WINSDK_INLINE` | `ON` |
+| `CURL_ENABLE_EXPORT_TARGET` | `ON` |
+| `CURL_USE_OPENSSL` | `ON` |
+| `CURL_ZLIB` | `ON` |
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+### Deliberately disabled switches
 
-## Build-Parameter und Variablen
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_STATIC_LIBS` | `OFF` |
+| `BUILD_CURL_EXE` | `OFF` |
+| `BUILD_EXAMPLES` | `OFF` |
+| `BUILD_TESTING` | `OFF` |
+| `BUILD_LIBCURL_DOCS` | `OFF` |
+| `BUILD_MISC_DOCS` | `OFF` |
+| `ENABLE_CURL_MANUAL` | `OFF` |
+| `CURL_USE_SCHANNEL` | `OFF` |
+| `ENABLE_ARES` | `OFF` |
+| `USE_LIBIDN2` | `OFF` |
+| `CURL_BROTLI` | `OFF` |
+| `CURL_ZSTD` | `OFF` |
+| `CURL_USE_PKGCONFIG` | `OFF` |
+| `CURL_USE_CMAKECONFIG` | `OFF` |
+| `OPENSSL_USE_STATIC_LIBS` | `OFF` |
+| `ZLIB_USE_STATIC_LIBS` | `OFF` |
+| `CURL_USE_LIBPSL` | `OFF` |
+| `CURL_USE_LIBSSH2` | `OFF` |
+| `CURL_USE_LIBSSH` | `OFF` |
+| `USE_NGHTTP2` | `OFF` |
+| `USE_NGTCP2` | `OFF` |
+| `USE_QUICHE` | `OFF` |
 
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
+### Other selected build features and external settings
+
+| Contract switch | Value |
+| --- | --- |
+| `OPENSSL_INCLUDE_DIR` | `{InstallRoot}\packages\openssl\3.5.9\include` |
+| `ZLIB_INCLUDE_DIR` | `{InstallRoot}\packages\zlib\1.3.2\include` |
+| `ZLIB_LIBRARY` | `{InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib` |
+| `ZLIB_LIBRARY` | `{InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib` |
+
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
 - `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 - `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
 - `-DCMAKE_DEBUG_POSTFIX:STRING=d`
-- `-DBUILD_SHARED_LIBS:BOOL=ON`
-- `-DBUILDENGINE_BCC64X_WINSDK_INLINE:BOOL=ON`
-- `-DBUILD_STATIC_LIBS:BOOL=OFF`
-- `-DBUILD_CURL_EXE:BOOL=OFF`
-- `-DBUILD_EXAMPLES:BOOL=OFF`
-- `-DBUILD_TESTING:BOOL=OFF`
-- `-DBUILD_LIBCURL_DOCS:BOOL=OFF`
-- `-DBUILD_MISC_DOCS:BOOL=OFF`
-- `-DENABLE_CURL_MANUAL:BOOL=OFF`
-- `-DCURL_ENABLE_EXPORT_TARGET:BOOL=ON`
-- `-DCURL_USE_OPENSSL:BOOL=ON`
-- `-DCURL_USE_SCHANNEL:BOOL=OFF`
-- `-DENABLE_ARES:BOOL=OFF`
-- `-DUSE_LIBIDN2:BOOL=OFF`
-- `-DCURL_ZLIB:STRING=ON`
-- `-DCURL_BROTLI:STRING=OFF`
-- `-DCURL_ZSTD:STRING=OFF`
-- `-DCURL_USE_PKGCONFIG:BOOL=OFF`
-- `-DCURL_USE_CMAKECONFIG:BOOL=OFF`
 - `-DCMAKE_FIND_PACKAGE_PREFER_CONFIG:BOOL=OFF`
-- `-DOPENSSL_USE_STATIC_LIBS:BOOL=OFF`
-- `-DZLIB_USE_STATIC_LIBS:BOOL=OFF`
-- `-DCURL_USE_LIBPSL:BOOL=OFF`
-- `-DCURL_USE_LIBSSH2:BOOL=OFF`
-- `-DCURL_USE_LIBSSH:BOOL=OFF`
-- `-DUSE_NGHTTP2:BOOL=OFF`
-- `-DUSE_NGTCP2:BOOL=OFF`
-- `-DUSE_QUICHE:BOOL=OFF`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
 - `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
-- `-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.9\include`
-- `-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include`
-- `-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
 - `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
-- `-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib`
 
-**Explizite Umgebungsvariablen:**
+**Versioned source locations:**
+
+- `https://curl.se/download/curl-{LibraryVersion}.tar.xz`
+
+**Declared extraction profiles:**
+
+- `libarchive / curl-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/curl/8.23.0/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+| Version-bound patch | Problem and justification |
+| --- | --- |
+| `admin/patches/curl/8.23.0/bcc64x-winsock-inline.patch` | Correct the WinSock inline declaration/compiler branch for native Clang-based BCC64X. |
+
+### Declarative repairs and preparation actions
+
+- `win-inline-patch-check`
+- `win-inline-patch-apply`
+
+These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
+### Engineering constraints recorded in the executable contract
+
+- curl/8.23.0 now tests the updated OpenSSL/3.5.9 dependency. Keep zlib enabled; Brotli/Zstd remain disabled until independently validated for this curl version and BCC64X runtime.
+- Preserve the proven BCC64X module-based dependency lookup. OpenSSL 3.5.9 and zlib paths are selected per configuration.
+- CMake 4.1.1 FindOpenSSL performs its own find_library() lookup on WIN32 and then rewrites OPENSSL_SSL_LIBRARY/OPENSSL_CRYPTO_LIBRARY. Do not set OPENSSL_ROOT_DIR here: that activates NO_DEFAULT_PATH inside FindOpenSSL and hides BuildEngine's configuration-specific lib/win64/Release directory. The generic producer integration supplies that exact directory through CMAKE_LIBRARY_PATH and the versione
+- Same FindOpenSSL rule as Release; CMAKE_LIBRARY_PATH is variant-specific.
+
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
+
+## Installation, publication and consumer responsibilities
+
+**Explicit copy/repair destinations from the contract:**
+
+- `{Workspace}\COPYING -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt`
+
+**Declared smoke tests:**
+
+- `consumer (Release, scope published; source smokes\curl\consumer)`
+
+**Selected environment inputs:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
 - `CB_LLVM_AR={Tool:llvm-ar}`
 - `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
 
-**Technische Execute-Actions:**
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
 
-- `win-inline-patch-check`
-- `win-inline-patch-apply`
+## Verification and evidence boundaries
 
-**Targets:**
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
 
-## Installations-, Paket- und Testkontrakt
+## Maintenance and authoritative records
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-winsock-inline.patch`
-- `{CurrentArtifact}\lib\bcc64x-winsock-compat.c`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\curl-COPYING.txt`
-
-**Consumer-Smokes:**
-
-- `consumer`
-
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
-
-## Quellen, Wartung und offene Evidenz
-
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/curl/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

@@ -1,92 +1,132 @@
-# poppler 26.09.0: Migration und BCC64X-Integration
+# Poppler 26.09.0: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `poppler@26.09.0` · **Category:** documentation · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="poppler" version="26.09.0">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+**Package purpose:** PDF rendering and parsing library derived from Xpdf and used by document-processing toolchains.
 
-- Poppler's Win32 backend includes the Microsoft-style Windows SDK headers. BCC64X identifies the target with _WIN64/__MINGW64__, while winnt.h requires the SDK architecture selector _AMD64_ on x64. Keep this bridge local to Poppler; the proven generic BCC64X toolchain remains unchanged.
-- Upstream release tarballs do not contain poppler/test-data. Test integration stays explicit and will be added when that separate upstream data repository becomes a pinned BuildEngine participant.
+Use upstream CMake for Poppler with managed compression/image/font packages and the C++ API enabled. Add _AMD64_ and NOMINMAX only for this Windows SDK consumer, not globally. Optional frontends and the separately distributed upstream test-data repository are outside the present evidence boundary; GPL implications remain a product decision.
 
-## Versionierte Abhängigkeiten
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-- `zlib 1.3.2`
-- `freetype 2.14.3`
-- `libjpeg-turbo 3.2.0`
-- `libpng 1.6.58`
-- `libtiff 4.7.2`
-- `win-iconv 0.0.8`
+## Dependency decisions
 
-## Beschaffung und reproduzierbare Quellen
+- `zlib@1.3.2`
+- `freetype@2.14.3`
+- `libjpeg-turbo@3.2.0`
+- `libpng@1.6.58`
+- `libtiff@4.7.2`
+- `win-iconv@0.0.8`
 
-**Upstream-Downloads:**
+These are declared direct dependencies. Transitive runtime DLLs and package CMake imports must be resolved through the BuildEngine dependency graph; they are not evidence for linking arbitrary host copies.
 
-- `https://poppler.freedesktop.org/poppler-{LibraryVersion}.tar.xz`
+## Product profile: what is enabled and what is not
 
-**Archivnamen:**
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
 
-- `poppler-{LibraryVersion}.tar.xz`
+### Enabled switches
 
-## Patches, Workarounds und Adapter
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_SHARED_LIBS` | `ON` |
+| `ENABLE_CPP` | `ON` |
+| `ENABLE_UNSTABLE_API_ABI_HEADERS` | `ON` |
+| `ENABLE_LIBJPEG` | `ON` |
+| `ENABLE_LIBTIFF` | `ON` |
+| `ENABLE_RELOCATABLE` | `ON` |
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+### Deliberately disabled switches
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+| Contract switch | Value |
+| --- | --- |
+| `ENABLE_UTILS` | `OFF` |
+| `ENABLE_GLIB` | `OFF` |
+| `ENABLE_QT5` | `OFF` |
+| `ENABLE_QT6` | `OFF` |
+| `ENABLE_BOOST` | `OFF` |
+| `ENABLE_BROTLI` | `OFF` |
+| `ENABLE_LIBOPENJPEG` | `OFF` |
+| `ENABLE_LCMS` | `OFF` |
+| `ENABLE_LIBCURL` | `OFF` |
+| `ENABLE_NSS3` | `OFF` |
+| `ENABLE_GPGME` | `OFF` |
+| `BUILD_GTK_TESTS` | `OFF` |
+| `BUILD_QT5_TESTS` | `OFF` |
+| `BUILD_QT6_TESTS` | `OFF` |
+| `BUILD_CPP_TESTS` | `OFF` |
+| `BUILD_MANUAL_TESTS` | `OFF` |
+| `RUN_GPERF_IF_PRESENT` | `OFF` |
 
-## Build-Parameter und Variablen
+### Other selected build features and external settings
 
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
+| Contract switch | Value |
+| --- | --- |
+| `FONT_CONFIGURATION` | `win32` |
+| `Iconv_INCLUDE_DIR` | `{InstallRoot}\packages\win-iconv\0.0.8\include` |
+| `Iconv_LIBRARY` | `{InstallRoot}\packages\win-iconv\0.0.8\lib\win64\Release\libiconv.lib` |
+| `Iconv_LIBRARY` | `{InstallRoot}\packages\win-iconv\0.0.8\lib\win64\Debug\libiconv.lib` |
 
-- `-D_AMD64_`
-- `-DNOMINMAX`
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
+
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
 - `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
 - `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin`
-- `-DBUILD_SHARED_LIBS:BOOL=ON`
 - `-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF`
-- `-DFONT_CONFIGURATION:STRING=win32`
-- `-DENABLE_CPP:BOOL=ON`
-- `-DENABLE_UNSTABLE_API_ABI_HEADERS:BOOL=ON`
-- `-DENABLE_UTILS:BOOL=OFF`
-- `-DENABLE_GLIB:BOOL=OFF`
-- `-DENABLE_QT5:BOOL=OFF`
-- `-DENABLE_QT6:BOOL=OFF`
-- `-DENABLE_BOOST:BOOL=OFF`
-- `-DENABLE_BROTLI:BOOL=OFF`
-- `-DENABLE_LIBOPENJPEG:BOOL=OFF`
-- `-DENABLE_LCMS:BOOL=OFF`
-- `-DENABLE_LIBCURL:BOOL=OFF`
-- `-DENABLE_NSS3:BOOL=OFF`
-- `-DENABLE_GPGME:BOOL=OFF`
-- `-DENABLE_LIBJPEG:BOOL=ON`
-- `-DENABLE_LIBTIFF:BOOL=ON`
-- `-DBUILD_GTK_TESTS:BOOL=OFF`
-- `-DBUILD_QT5_TESTS:BOOL=OFF`
-- `-DBUILD_QT6_TESTS:BOOL=OFF`
-- `-DBUILD_CPP_TESTS:BOOL=OFF`
-- `-DBUILD_MANUAL_TESTS:BOOL=OFF`
-- `-DRUN_GPERF_IF_PRESENT:BOOL=OFF`
-- `-DENABLE_RELOCATABLE:BOOL=ON`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
-- `-DIconv_INCLUDE_DIR:PATH={InstallRoot}\packages\win-iconv\0.0.8\include`
-- `-DIconv_LIBRARY:FILEPATH={InstallRoot}\packages\win-iconv\0.0.8\lib\win64\Release\libiconv.lib`
 - `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
 - `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
-- `-DIconv_LIBRARY:FILEPATH={InstallRoot}\packages\win-iconv\0.0.8\lib\win64\Debug\libiconv.lib`
 - `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
 - `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
 
-**Explizite Umgebungsvariablen:**
+**Versioned source locations:**
+
+- `https://poppler.freedesktop.org/poppler-{LibraryVersion}.tar.xz`
+
+**Declared extraction profiles:**
+
+- `libarchive / poppler-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/poppler/26.09.0/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+**No active version-bound `.patch` file is referenced by this library's present XML.** That is a meaningful result: source changes must not be invented merely because porting was difficult. Additional Admin-side adapters, generated configuration or post-install repairs may still be used.
+
+### Engineering constraints recorded in the executable contract
+
+- Poppler's Win32 backend includes the Microsoft-style Windows SDK headers. BCC64X identifies the target with _WIN64/__MINGW64__, while winnt.h requires the SDK architecture selector _AMD64_ on x64. Keep this bridge local to Poppler; the proven generic BCC64X toolchain remains unchanged.
+- Upstream release tarballs do not contain poppler/test-data. Test integration stays explicit and will be added when that separate upstream data repository becomes a pinned BuildEngine participant.
+
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
+
+## Installation, publication and consumer responsibilities
+
+**Explicit copy/repair destinations from the contract:**
+
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}`
+- `{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `{Workspace}\COPYING -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING`
+
+**Declared smoke tests:**
+
+- None declared for this category.
+
+**Selected environment inputs:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -94,37 +134,21 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
 - `CXXFLAGS=-D_AMD64_ -DNOMINMAX`
 
-**Technische Execute-Actions:**
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+**Legal constraint:** Poppler GPL licensing requires independent product-level review before proprietary deployment. Successful compilation does not grant a license exception.
 
-**Targets:**
+## Verification and evidence boundaries
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+No successful upstream-test run can be inferred from the declarative block. An intentionally excluded upstream suite is not a successful test suite.
 
-## Installations-, Paket- und Testkontrakt
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+## Maintenance and authoritative records
 
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING`
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
-**Consumer-Smokes:**
-
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
-
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
-
-## Consumer: Lizenzentscheidung
-
-Die GPL-Lizenzbewertung ist eine eigenständige Freigabeschranke für die Verwendung in proprietären Produkten, unabhängig von der technischen Übersetzbarkeit.
-
-## Quellen, Wartung und offene Evidenz
-
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/poppler/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

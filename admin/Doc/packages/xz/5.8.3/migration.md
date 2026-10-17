@@ -1,65 +1,66 @@
-# xz 5.8.3: Migration und BCC64X-Integration
+# xz 5.8.3: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `xz@5.8.3` · **Category:** compression · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="xz" version="5.8.3">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-**Versionshinweis:** Im Vertrag als ersetzt durch `5.8.4` gekennzeichnet.
+This is a maintained historical coordinate superseded by 5.8.4; do not silently replace it in explicitly pinned dependencies.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+**Package purpose:** Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma.
 
-- BCC64X must emit liblzma.dll, not libliblzma.dll.
-- Matches XZ's own Windows CMake build guidance: translations are disabled, while the full liblzma API, tools, docs, and tests remain.
+Expose liblzma and the selected XZ command-line utilities using the native Windows CMake path. The resource-compiler/package-name and Windows DLL naming corrections are version-specific so downstream imports and test programs reference the produced files.
 
-## Versionierte Abhängigkeiten
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+## Dependency decisions
 
-## Beschaffung und reproduzierbare Quellen
+No direct BuildEngine library dependency is declared for this coordinate. This does **not** mean the generated binary uses no Windows system libraries or that its upstream bundled components are absent.
 
-**Upstream-Downloads:**
+## Product profile: what is enabled and what is not
 
-- `https://github.com/tukaani-project/xz/releases/download/v{LibraryVersion}/xz-{LibraryVersion}.tar.gz`
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
 
-**Archivnamen:**
+### Enabled switches
 
-- `xz-{LibraryVersion}.tar.gz`
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_SHARED_LIBS` | `ON` |
+| `XZ_DOC` | `ON` |
+| `XZ_TOOL_XZ` | `ON` |
+| `XZ_TOOL_XZDEC` | `ON` |
+| `XZ_TOOL_LZMADEC` | `ON` |
+| `XZ_TOOL_LZMAINFO` | `ON` |
 
-## Patches, Workarounds und Adapter
+### Deliberately disabled switches
 
-- `xz\5.8.3\bcc64x-windres-package-name.patch`
-- `{LibraryVersion}\bcc64x-windres-package-name.patch`
-- `xz\5.8.3\bcc64x-liblzma-dll-name.patch`
-- `{LibraryVersion}\bcc64x-liblzma-dll-name.patch`
-- `xz\5.8.4\bcc64x-windres-package-name.patch`
-- `xz\5.8.4\bcc64x-liblzma-dll-name.patch`
+| Contract switch | Value |
+| --- | --- |
+| `XZ_NLS` | `OFF` |
+| `XZ_EXTERNAL_SHA256` | `OFF` |
 
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
+### Other selected build features and external settings
 
-## Build-Parameter und Variablen
+| Contract switch | Value |
+| --- | --- |
+| `BUILD_TESTING` | `{TestsEnabled}` |
 
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
+
+## Build architecture, variants and paths
+
+**Selected build flow:** CMake/Ninja using BCC64X. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
 - `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 - `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
-- `-DBUILD_SHARED_LIBS:BOOL=ON`
-- `-DBUILD_TESTING:BOOL={TestsEnabled}`
-- `-DXZ_NLS:BOOL=OFF`
-- `-DXZ_DOC:BOOL=ON`
-- `-DXZ_TOOL_XZ:BOOL=ON`
-- `-DXZ_TOOL_XZDEC:BOOL=ON`
-- `-DXZ_TOOL_LZMADEC:BOOL=ON`
-- `-DXZ_TOOL_LZMAINFO:BOOL=ON`
-- `-DXZ_EXTERNAL_SHA256:BOOL=OFF`
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
 - `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2`
-- `-DNDEBUG`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
@@ -67,26 +68,24 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
 
-**Explizite Umgebungsvariablen:**
+**Versioned source locations:**
 
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_LLVM_AR={Tool:llvm-ar}`
-- `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
-- `CTEST_PARALLEL_LEVEL={TestJobs}`
-- `PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration};{ENV:PATH}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
-- `CB_LLVM_AR={Tool:llvm-ar}`
-- `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
-- `CTEST_PARALLEL_LEVEL={TestJobs}`
-- `PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration};{ENV:PATH}`
-- `CB_BCC64X={Tool:bcc64x}`
-- `CB_BDS={BDS}`
+- `https://github.com/tukaani-project/xz/releases/download/v{LibraryVersion}/xz-{LibraryVersion}.tar.gz`
 
-**Technische Execute-Actions:**
+**Declared extraction profiles:**
+
+- `libarchive / xz-{LibraryVersion}`
+
+**Package-path convention:** `{InstallRoot}/packages/xz/5.8.3/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+| Version-bound patch | Problem and justification |
+| --- | --- |
+| `admin/patches/xz/5.8.3/bcc64x-liblzma-dll-name.patch` | Align the Windows liblzma DLL/import naming with the actual BCC64X producer and consumer expectation. |
+| `admin/patches/xz/5.8.3/bcc64x-windres-package-name.patch` | The resource compiler/platform package name did not match the real BCC64X Windows toolchain; select the native resource build. |
+
+### Declarative repairs and preparation actions
 
 - `windres-patch-check`
 - `windres-patch-apply`
@@ -94,34 +93,50 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `dll-name-patch-check`
 - `dll-name-patch-apply`
 - `dll-name-patch-verify`
-- `test`
 - `remove-installed-bin`
 - `remove-installed-lib`
 
-**Targets:**
+These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
+### Engineering constraints recorded in the executable contract
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
+- BCC64X must emit liblzma.dll, not libliblzma.dll.
+- Matches XZ's own Windows CMake build guidance: translations are disabled, while the full liblzma API, tools, docs, and tests remain.
 
-## Installations-, Paket- und Testkontrakt
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+## Installation, publication and consumer responsibilities
 
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-windres-package-name.patch`
-- `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-liblzma-dll-name.patch`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2`
+**Explicit copy/repair destinations from the contract:**
 
-**Consumer-Smokes:**
+- `{Workspace}\COPYING -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING`
+- `{Workspace}\COPYING.0BSD -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.0BSD`
+- `{Workspace}\COPYING.GPLv2 -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.GPLv2`
 
-- `consumer`
+**Declared smoke tests:**
 
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
+- `consumer (Release, scope published; source smokes\xz\consumer)`
 
-## Quellen, Wartung und offene Evidenz
+**Selected environment inputs:**
 
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/xz/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+- `CB_BCC64X={Tool:bcc64x}`
+- `CB_BDS={BDS}`
+- `CB_LLVM_AR={Tool:llvm-ar}`
+- `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
+- `CTEST_PARALLEL_LEVEL={TestJobs}`
+
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
+
+## Verification and evidence boundaries
+
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
+
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
+
+## Maintenance and authoritative records
+
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
+
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.

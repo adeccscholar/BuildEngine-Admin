@@ -1,16 +1,126 @@
-# pdfium 2025.11.19: Migration und BCC64X-Integration
+# PDFium 2025.11.19: BCC64X migration and integration record
 
 [TOC|Content]
 
-**Status:** Vertragsdokumentation, Stand 17.10.2026. Die Existenz eines BuildEngine-Vertrags beweist für sich allein keinen erfolgreichen Clean-Room-Lauf. Individuelle Testresultate sind anhand der FSM- und Log-Evidence zu verifizieren.
+**Contract identity:** `pdfium@2025.11.19` · **Category:** documentation · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
-**Quelle:** `admin/build-libraries.xml`, `<library id="pdfium" version="2025.11.19">`. **Compilerziel:** RAD Studio 13, BCC64X, Windows Win64. **Runtime:** dynamisch (`-tR`) für EXE/DLL/MODULE.
+**Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
-## Motivation und Bauentscheidungen
+## Purpose and integration strategy
 
-Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Paket. Der XML-Vertrag ist für tatsächlich gewählte Quellen, Schritte, Abhängigkeiten und Flags maßgeblich. Historische Gründe sind nur dann als Entscheidung dokumentiert, wenn eine Quelle sie belegt.
+**Package purpose:** Pinned PDFium GN/BCC64X integration; validation pending
+
+Pin the PDFium and Chromium-DEPS revisions and build entirely offline from the downloaded source evidence via GN/Ninja/BCC64X. Use a single complete static pdfium.lib, preserve separate Debug and Release GN build directories, and prevent parallel variants from modifying shared source. The Windows DirectWrite, COM and aligned-memory compatibility changes are confined to the one-time source preparation.
+
+**Why this boundary matters:** Each producer is controlled by the Admin XML and consumed via installed or published artifacts. Build variants and dependencies are explicit rather than discovered opportunistically from the developer workstation. Library product form (shared/static/header-only) is separate from the mandatory dynamic BCC64X Windows runtime for executable and DLL consumers (`-tR`).
+
+## Dependency decisions
+
+- `zlib@1.3.2`
+- `libjpeg-turbo@3.2.0`
+- `libpng@1.6.58`
+- `freetype@2.14.3`
+- `icu@78.3`
+- `lcms2@2.19.1`
+- `openjpeg@2.5.4`
+
+These are declared direct dependencies. Transitive runtime DLLs and package CMake imports must be resolved through the BuildEngine dependency graph; they are not evidence for linking arbitrary host copies.
+
+## Product profile: what is enabled and what is not
+
+The entries below are actual flags in `build-libraries.xml`, not a generic upstream capability list. **Enabled** means the declared setting requests the feature; **disabled** means this integration profile explicitly excludes it. BuildEngine variables such as `{TestsEnabled}` are runtime-resolved and must not be interpreted as unconditional ON/OFF.
+
+### Enabled switches
+
+No switches of this category are explicitly selected in the parsed build arguments.
+
+### Deliberately disabled switches
+
+No switches of this category are explicitly selected in the parsed build arguments.
+
+### Other selected build features and external settings
+
+No switches of this category are explicitly selected in the parsed build arguments.
+
+### GN arguments for the pinned target graph
+
+```gn
+target_cpu = "x64"
+custom_toolchain = "//build/toolchain/bcc64x:bcc64x"
+is_clang = false
+is_component_build = false
+pdf_is_complete_lib = true
+clang_use_chrome_plugins = false
+pdf_enable_v8 = false
+pdf_enable_xfa = false
+pdf_use_partition_alloc = false
+pdf_use_skia = true
+pdf_bundle_freetype = false
+pdf_is_standalone = false
+is_debug = {PdfiumDebug}
+```
+
+**GN false switches:** `is_clang = false`, `is_component_build = false`, `clang_use_chrome_plugins = false`, `pdf_enable_v8 = false`, `pdf_enable_xfa = false`, `pdf_use_partition_alloc = false`, `pdf_bundle_freetype = false`, `pdf_is_standalone = false`. These are build-profile exclusions, not a claim about unsupported upstream capabilities.
+
+
+## Build architecture, variants and paths
+
+**Selected build flow:** GN/Ninja and explicit native toolchain targets. **Declared variants:** Release, Debug. **State boundary:** Source acquisition and version-bound patches precede the build; install and publication consume completed variant artifacts.
+
+**Representative compiler, installation and workflow arguments:**
+
+- None declared for this category.
+
+**Versioned source locations:**
+
+- `https://chromium.googlesource.com/chromium/src/build/+archive/371ecb089d96d60e5208ec2d25c9b4f0860e556c.tar.gz`
+- `https://chromium.googlesource.com/chromium/src/buildtools/+archive/24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz`
+- `https://chromium.googlesource.com/chromium/src/third_party/abseil-cpp/+archive/14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz`
+- `https://skia.googlesource.com/skia/+archive/a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0.tar.gz`
+- `https://chromium.googlesource.com/external/github.com/fastfloat/fast_float/+archive/cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz`
+- `https://chromium.googlesource.com/chromium/src/tools/win/+archive/24494b071e019a2baea4355d9870ffc5fc0bbafe.tar.gz`
+- `https://github.com/chromium/pdfium/archive/a84323421e94f484faca52dd9d027934eba42ab8.tar.gz`
+
+**Declared extraction profiles:**
+
+- `libarchive / pdfium-a84323421e94f484faca52dd9d027934eba42ab8`
+
+**Package-path convention:** `{InstallRoot}/packages/pdfium/2025.11.19/`; variant-specific binaries/import libraries generally use `lib/win64/{Configuration}` and `bin/win64/{Configuration}`, unless the actual per-library install contract specifies another layout. The XML is authoritative for each copied file; do not assume every package has all these directories.
+
+## Difficulties, workarounds and unavoidable patches
+
+PDFium source adjustments are deliberately completed in the single Source state. A previous FreeType `BUILD.gn` write from both Debug and Release caused an apparent race; moving every GN adapter and shared-source mutation ahead of the two parallel builds prevents this class of failure. The complete static archive uses `pdf_is_complete_lib = true`, and GN/llvm-ar uses a response file to handle long object lists.
+
+**No active version-bound `.patch` file is referenced by this library's present XML.** That is a meaningful result: source changes must not be invented merely because porting was difficult. Additional Admin-side adapters, generated configuration or post-install repairs may still be used.
+
+### Declarative repairs and preparation actions
+
+- `prepare-chromium-build-dir`
+- `prepare-chromium-buildtools-dir`
+- `prepare-abseil-cpp-source-dir`
+- `prepare-skia-source-dir`
+- `prepare-fast_float-source-dir`
+- `prepare-chromium-tools-win-dir`
+- `prepare-icu-gn-adapter`
+- `verify-offline-gn-inputs`
+- `prepare-jpeg-gn-dir`
+- `prepare-zlib-gn-dir`
+- `prepare-libpng-gn-dir`
+- `install-jpeg-gn-adapter`
+- `install-zlib-gn-adapter`
+- `install-libpng-gn-adapter`
+- `prepare-bcc64x-toolchain-dir`
+- `install-bcc64x-toolchain`
+- `verify-pdfium-gn-adapters`
+- `verify-bcc64x-ninja-toolchain`
+- `prepare-pdfium-cmake-package`
+
+These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
+### Engineering constraints recorded in the executable contract
 
 - Pinned Chromium GN sources from the PDFium DEPS snapshot.
+- Materialize the exact PDFium DEPS checkout, not just its download.
+- Non-configurable dependencies are provided at their PDFium DEPS revisions.
 - Pinned PDFium revision a84323421e94f484faca52dd9d027934eba42ab8 commit timestamp, used as reproducible standalone build timestamp.
 - gclient_args.gni is generated deterministically instead of running gclient.
 - Fail during Source rather than reporting success before the GN imports from this pinned Chromium revision have been provided. All inputs are local. This check never downloads or updates.
@@ -22,58 +132,29 @@ Das Ziel ist die reproduzierbare Bereitstellung als versioniertes BuildEngine-Pa
 - Validate source evidence on resumed builds before generating GN targets.
 - Use the locally provisioned Windows toolchain; avoid Chromium depot_tools.
 - Verify the GN inputs installed by the single Source scope, read-only.
+- Upstream: emit a single complete static archive, rather than a source_set.
 - Validate the GENERATED build, not merely the requested GN args.
+- Inspect commands reachable from the PDFium target, not all unrelated Chromium host-toolchain rules.
 - Do not declare success without a generated GN build and PDFium target.
 
-## Versionierte Abhängigkeiten
+**Patch criterion:** A source or build-system patch is justified only when the selected upstream revision cannot satisfy this BCC64X contract by configuration or packaging alone. Version-bound patches must be checked against the exact source state and applied in their declared order. Packaging omissions and generic toolchain defects belong to their respective layers instead.
 
-- `zlib 1.3.2`
-- `libjpeg-turbo 3.2.0`
-- `libpng 1.6.58`
-- `freetype 2.14.3`
-- `icu 78.3`
-- `lcms2 2.19.1`
-- `openjpeg 2.5.4`
+## Installation, publication and consumer responsibilities
 
-## Beschaffung und reproduzierbare Quellen
+**Explicit copy/repair destinations from the contract:**
 
-**Upstream-Downloads:**
+- `{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\obj\pdfium.lib -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pdfium.lib`
+- `{Workspace}\public -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `{BuildFileDir}\cmake\pdfium\PDFiumConfig.cmake -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\PDFium\PDFiumConfig.cmake`
+- `{Workspace}\LICENSE -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\pdfium\LICENSE`
+- `{BuildFileDir}\patches\pdfium\2025.11.19\bundled-components.json -> {InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json`
 
-- `https://chromium.googlesource.com/chromium/src/build/+archive/371ecb089d96d60e5208ec2d25c9b4f0860e556c.tar.gz`
-- `https://chromium.googlesource.com/chromium/src/buildtools/+archive/24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz`
-- `https://chromium.googlesource.com/chromium/src/third_party/abseil-cpp/+archive/14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz`
-- `https://skia.googlesource.com/skia/+archive/a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0.tar.gz`
-- `https://chromium.googlesource.com/external/github.com/fastfloat/fast_float/+archive/cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz`
-- `https://chromium.googlesource.com/chromium/src/tools/win/+archive/24494b071e019a2baea4355d9870ffc5fc0bbafe.tar.gz`
-- `https://github.com/chromium/pdfium/archive/a84323421e94f484faca52dd9d027934eba42ab8.tar.gz`
+**Declared smoke tests:**
 
-**Archivnamen:**
+- `consumer (Release, scope package; source smokes\pdfium\consumer)`
+- `consumer (Debug, scope package; source smokes\pdfium\consumer)`
 
-- `pdfium-deps\build-371ecb089d96d60e5208ec2d25c9b4f0860e556c.tar.gz`
-- `pdfium-deps\buildtools-24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz`
-- `pdfium-deps\abseil-cpp-14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz`
-- `pdfium-deps\skia-a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0.tar.gz`
-- `pdfium-deps\fast_float-cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz`
-- `pdfium-deps\tools-win-24494b071e019a2baea4355d9870ffc5fc0bbafe.tar.gz`
-- `pdfium-a84323421e94f484faca52dd9d027934eba42ab8.tar.gz`
-
-## Patches, Workarounds und Adapter
-
-- `pdfium\2025.11.19\icu.BUILD.gn`
-- `pdfium\2025.11.19\libjpeg_turbo.BUILD.gn`
-- `pdfium\2025.11.19\zlib.BUILD.gn`
-- `pdfium\2025.11.19\libpng.BUILD.gn`
-- `pdfium\2025.11.19\bcc64x.BUILD.gn`
-
-Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei indirekt erzeugten Dateien ist zusätzlich die ausführende XML-Action maßgeblich. Die Reihenfolge ist aus der Sequenz der Actions abzuleiten; die Patches sind nicht beliebig vertauschbar.
-
-## Build-Parameter und Variablen
-
-**Explizite CMake-/Compileroptionen (Auszug der im XML vorkommenden Flags):**
-
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
-
-**Explizite Umgebungsvariablen:**
+**Selected environment inputs:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -92,81 +173,23 @@ Die aufgelisteten Adapter oder Patchpfade sind aus dem Vertrag abgeleitet. Bei i
 - `CB_PDFIUM_JPEG_INCLUDE={InstallRoot}\packages\libjpeg-turbo\3.2.0\include`
 - `CB_PDFIUM_JPEG_LIB={InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\{Configuration}\{PdfiumJpegImport}.lib`
 
-**Technische Execute-Actions:**
+**Consumer rule:** Use the actual package export/target when present and the matching Debug/Release artifact and transitive dependency closure. An installed archive or DLL alone does not prove the installed application links, loads and releases resources correctly.
 
-- `prepare-chromium-build-dir`
-- `extract-chromium-build`
-- `prepare-chromium-buildtools-dir`
-- `extract-chromium-buildtools`
-- `prepare-abseil-cpp-source-dir`
-- `extract-abseil-cpp-upstream`
-- `prepare-skia-source-dir`
-- `extract-skia-upstream`
-- `prepare-fast_float-source-dir`
-- `extract-fast_float-upstream`
-- `prepare-chromium-tools-win-dir`
-- `extract-chromium-tools-win`
-- `prepare-icu-gn-adapter`
-- `generate-pdfium-build-timestamp`
-- `generate-offline-gclient-args`
-- `verify-offline-gn-inputs`
-- `adapt-skia-dwrite-refcount-bcc64x`
-- `adapt-skia-directwrite-com-bcc64x`
-- `adapt-pdfium-win32-aligned-memory`
-- `prepare-jpeg-gn-dir`
-- `prepare-zlib-gn-dir`
-- `prepare-libpng-gn-dir`
-- `install-jpeg-gn-adapter`
-- `install-zlib-gn-adapter`
-- `install-libpng-gn-adapter`
-- `bind-local-freetype`
-- `exclude-standalone-test-fonts`
-- `adapt-local-clang-revision`
-- `prepare-bcc64x-toolchain-dir`
-- `install-bcc64x-toolchain`
-- `verify-pdfium-gn-adapters`
-- `verify-bcc64x-ninja-toolchain`
-- `ninja-build`
+**Static PDFium:** The complete `pdfium.lib` uses an installed `PDFium::pdfium` package contract, public C API headers and a consumer smoke that creates/renders a small PDF in memory. Static dependency closure is still subject to actual link verification; do not infer its completeness from `ready`.
 
-**Targets:**
+## Verification and evidence boundaries
 
-- `gn-gen`
+The contract includes one or more upstream tests, validation actions or consumer smokes. Their mere declaration does not establish a successful execution; use the FSM state evidence and process logs for the specific version and configuration.
 
-## Installations-, Paket- und Testkontrakt
+- The supplied FSM trace on 17 October 2026 reports Release/Debug Build PASS (736.2 s / 736.5 s), per-variant Install PASS, metadata PASS, Doxygen PASS and Ready PASS. The newly added external consumer smoke has **not** been shown passing.
 
-**Explizite Zielpfade im XML (soweit als Attribute vorhanden):**
+**Gate checklist:** source pin/extract → ordered checked patches → BCC64X compile/link → installed headers and exact artifacts → configured test suite → external installed-package consumer → metadata/SBOM → documentation and ready state. A project-specific stage may be absent from the current contract; report it as a coverage gap rather than synthesizing a PASS.
 
-- `{CurrentArtifact}\\third_party\\icu\\BUILD.gn`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pdfium.lib`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\pdfium\LICENSE`
-- `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json`
+## Maintenance and authoritative records
 
-**Consumer-Smokes:**
+1. Confirm this version's active switches, source revisions and patch sequence against `admin/build-libraries.xml` before any upgrade.
+2. For a version upgrade, rebase each necessary patch against the correct preceding source state; verify the complete resulting file and rerun the installed consumer.
+3. Record any new failure as a specific compiler, test, packaging, ABI or runtime issue. Fix it at the owning layer and update this migration record with cause, decision and evidence.
+4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
-- Im untersuchten Vertragsabschnitt nicht explizit aufgeführt.
-
-Die aktiven Produktpfade hängen von `{InstallRoot}`, `{BuildRoot}`, `{LibraryId}`, `{LibraryVersion}` und gegebenenfalls `{Configuration}` ab. Für Release und Debug sind die jeweils installierten Importbibliotheken und DLLs zu verwenden. Kein ungeprüfter Fallback auf global installierte SDKs.
-
-## Consumer: gegenwärtiger Verifikationsstatus
-
-PDFium befindet sich am 17.10.2026 noch in der GN/Ninja-Buildintegration. Erfolgreiche GN-Generierung ist **kein** Nachweis eines vollständig gebauten und getesteten Pakets. Shared Source wird ausschließlich im Source-State verändert, nicht parallel durch Debug und Release.
-
-## Quellen, Wartung und offene Evidenz
-
-- Normativer Vertrag: `admin/build-libraries.xml`.
-- Versionierte Anpassungen: `admin/patches/pdfium/` und die im XML angegebenen Adapter.
-- Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
-- **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
-- Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
-
-## Build-Nachweis und Archivierungsentscheidung vom 17. Oktober 2026
-
-Der reale BCC64X-Lauf absolvierte die GN-Generierung und Ninja-Buildphase für Release (797,7 s) und Debug (797,8 s) erfolgreich. Die anschließende Installationsprüfung scheiterte jeweils an dem fehlenden Artefakt `obj/pdfium.lib` (Windows error 2). Das ist kein Compilerfehler. Der bisherige GN-Vertrag setzte `is_component_build=false`, aber nicht `pdf_is_complete_lib=true`.
-
-**Ursache, durch den gepinnten PDFium-Upstream-Vertrag bestätigt:** `pdf_is_complete_lib` ist standardmäßig `false`; die Datei `BUILD.gn` setzt bei aktiviertem Schalter für `component("pdfium")` ausdrücklich `static_component_type = "static_library"` und `complete_static_lib = true`. Zugleich verlangt Upstream `!is_component_build` für diesen Modus. Ein eigenes Umschreiben der Original-`BUILD.gn` ist daher nicht erforderlich.
-
-**Gewählte Korrektur:** Die GN-`args.gn` enthält nun zusätzlich `pdf_is_complete_lib = true`. Der bestehende Installationsvertrag erwartet weiterhin `{BuildRoot}\\packages\\pdfium\\2025.11.19\\{Configuration}\\obj\\pdfium.lib`; die tatsächlich erfolgte Erzeugung muss der nächste Lauf bestätigen **[nicht verifiziert]**.
-
-**Archivierung:** Das BCC64X-GN-Toolchain-Target `alink` verwendet eine durch GN/Ninja erzeugte Response-Datei (`rspfile`, `rspfile_content`). Das vermeidet überlange Windows-Prozesskommandozeilen, wenn der vollständige Bibliotheksverbund aus sehr vielen Objektdateien zusammengesetzt wird. Der Archivierungsbefehl bleibt `llvm-ar rcs`; keine Compiler- oder Toolchain-Substitution erfolgt.
-
-**Verifikation:** Beide Konfigurationen müssen je ein nichtleeres, lesbares `obj/pdfium.lib` erzeugen und anschließend den Installations-Scope ohne Fehler abschließen. Ein erfolgreicher Installations-Scope allein beweist noch nicht, dass eine extern konsumierende Anwendung sämtliche PDFium-Abhängigkeiten korrekt auflöst; hierfür fehlt noch ein eigener Consumer-Smoke.
+**Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.
