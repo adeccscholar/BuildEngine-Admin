@@ -38,6 +38,9 @@ def Translate(a_strArgument: str) -> list[str]:
         "/Gw": "-fdata-sections",
         "/Oy-": "-fno-omit-frame-pointer",
         "/O2": "-O2",
+        "/Od": "-O0",
+        "/Ob0": "-fno-inline",
+        "/GF": "-fmerge-all-constants",
         "/GR-": "-fno-rtti",
         "/GR": "-frtti",
         "/Zi": "-gcodeview",
@@ -55,16 +58,16 @@ def Translate(a_strArgument: str) -> list[str]:
     }
     if a_strArgument in mpIntrinsic:
         return []
-    if a_strArgument == "/MT":
+    if a_strArgument in ("/MT", "/MTd"):
         # Do NOT select MSVC's static CRT. The BuildEngine BCC64X contract
         # requires the dynamic RTL for all module boundaries.
         return ["-tR"]
     # Skia's skcms chooses ISA-specific compilation units through /arch.
     # Do not translate these to a host-dependent -march=native.
     mpArchitecture = {
-        "/arch:AVX2": ("-mavx2", "-mf16c"),
+        "/arch:AVX2": ("-mavx2", "-mf16c", "-mfma"),
         "/arch:AVX512": ("-mavx512f", "-mavx512bw",
-                         "-mavx512dq", "-mavx512vl"),
+                         "-mavx512dq", "-mavx512vl", "-mf16c", "-mfma"),
     }
     if a_strArgument in mpArchitecture:
         return list(mpArchitecture[a_strArgument])
@@ -100,6 +103,11 @@ def Main() -> int:
     # Restore the precise always-inline intent only for that Skia configuration.
     if any("SK_USER_CONFIG_HEADER=" in arg for arg in vecArguments):
         vecArguments.append("-D__forceinline=inline __attribute__((always_inline))")
+    # HSW raster code explicitly calls fused multiply-add intrinsics.
+    # Restrict the target feature to its dedicated object.
+    if any(arg.replace(chr(92), "/").endswith("/src/opts/SkOpts_hsw.cpp")
+           for arg in vecArguments) and "-mfma" not in vecArguments:
+        vecArguments.append("-mfma")
     if lstErrors:
         print("BCC64X argument translation failed:", file=sys.stderr)
         for strError in lstErrors:
