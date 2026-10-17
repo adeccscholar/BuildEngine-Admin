@@ -193,3 +193,19 @@ The contract includes one or more upstream tests, validation actions or consumer
 4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
 **Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.
+
+## Native BCC64X libc++ ABI and installed-package link closure (17 October 2026)
+
+The first installed-package consumer smoke failed while linking the executable in Release and Debug. The linker reported 22 errors and first identified `std::__Cr::__libcpp_verbose_abort(char const*, ...)`. The PDFium archive, installation, publication and Doxygen had completed. This was not a compiler error.
+
+**ABI investigation:** Chromium uses a private `__Cr` libc++ ABI namespace to separate its own standard library implementation from the system implementation. PDFium is instead linked into a native Embarcadero BCC64X executable using the BCC64X libc++ runtime. The pinned GN profile now explicitly sets `use_custom_libcxx = false`, alongside `is_component_build = false` and `pdf_is_complete_lib = true`, to avoid mixing distinct standard library ABIs. Its effect requires a fresh GN compilation and a consumer smoke. **[not verified]**
+
+**External dependency propagation:** The PDFium GN environment binds the exact managed ICU, FreeType, libpng, libjpeg-turbo and zlib version-specific import libraries. The installed CMake target `PDFium::pdfium` now publishes those same five imports for Release/Debug via `INTERFACE_LINK_LIBRARIES`, using absolute BuildEngine package paths with fail-fast missing-file checks. No host discovery is used.
+
+**Scope:** LCMS2 and OpenJPEG are declared PDFium package dependencies but not currently passed to GN via the same five explicit import variables; do not add more libraries without examining the complete remaining unresolved symbol list.
+
+**Runtime policy:** Consumers continue to use the mandatory dynamic BCC64X runtime (`-tR`). Do not provide a synthetic `std::__Cr::__libcpp_verbose_abort`, ignore unresolved errors, or link a foreign libc++ archive.
+
+**Verification pending:** Re-run both native installed-package consumer smokes; inspect their complete `02-cmake-build.log` files and confirm that the Chromium ABI mismatch has actually disappeared.
+
+**FSM observation:** The technical `ready` action was marked PASS while smoke actions were failing. The library must not be considered ready until the required smokes succeed; this requires a separate sequencing/presentation correction in the FSM.
