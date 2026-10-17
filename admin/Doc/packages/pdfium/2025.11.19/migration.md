@@ -158,3 +158,15 @@ PDFium befindet sich am 17.10.2026 noch in der GN/Ninja-Buildintegration. Erfolg
 - Architektur und Querverweise: `admin/server-docs/libraries.md` sowie `docs/bcc64x-library-integration-findings.md`.
 - **[nicht verifiziert]** Ein lückenloser Nachweis *aller* historischen Diskussionen und Gründe ist aus dem XML allein nicht möglich. Fehlende Begründungen sind anhand von Commits und Buildlogs nachzutragen, ohne Vermutungen als Tatsachen darzustellen.
 - Die maßgeblichen Build-Erfolge und -Fehler sind im BuildEngine-FSM-State und den originalen Prozesslogs nachzuweisen.
+
+## Build-Nachweis und Archivierungsentscheidung vom 17. Oktober 2026
+
+Der reale BCC64X-Lauf absolvierte die GN-Generierung und Ninja-Buildphase für Release (797,7 s) und Debug (797,8 s) erfolgreich. Die anschließende Installationsprüfung scheiterte jeweils an dem fehlenden Artefakt `obj/pdfium.lib` (Windows error 2). Das ist kein Compilerfehler. Der bisherige GN-Vertrag setzte `is_component_build=false`, aber nicht `pdf_is_complete_lib=true`.
+
+**Ursache, durch den gepinnten PDFium-Upstream-Vertrag bestätigt:** `pdf_is_complete_lib` ist standardmäßig `false`; die Datei `BUILD.gn` setzt bei aktiviertem Schalter für `component("pdfium")` ausdrücklich `static_component_type = "static_library"` und `complete_static_lib = true`. Zugleich verlangt Upstream `!is_component_build` für diesen Modus. Ein eigenes Umschreiben der Original-`BUILD.gn` ist daher nicht erforderlich.
+
+**Gewählte Korrektur:** Die GN-`args.gn` enthält nun zusätzlich `pdf_is_complete_lib = true`. Der bestehende Installationsvertrag erwartet weiterhin `{BuildRoot}\\packages\\pdfium\\2025.11.19\\{Configuration}\\obj\\pdfium.lib`; die tatsächlich erfolgte Erzeugung muss der nächste Lauf bestätigen **[nicht verifiziert]**.
+
+**Archivierung:** Das BCC64X-GN-Toolchain-Target `alink` verwendet eine durch GN/Ninja erzeugte Response-Datei (`rspfile`, `rspfile_content`). Das vermeidet überlange Windows-Prozesskommandozeilen, wenn der vollständige Bibliotheksverbund aus sehr vielen Objektdateien zusammengesetzt wird. Der Archivierungsbefehl bleibt `llvm-ar rcs`; keine Compiler- oder Toolchain-Substitution erfolgt.
+
+**Verifikation:** Beide Konfigurationen müssen je ein nichtleeres, lesbares `obj/pdfium.lib` erzeugen und anschließend den Installations-Scope ohne Fehler abschließen. Ein erfolgreicher Installations-Scope allein beweist noch nicht, dass eine extern konsumierende Anwendung sämtliche PDFium-Abhängigkeiten korrekt auflöst; hierfür fehlt noch ein eigener Consumer-Smoke.
