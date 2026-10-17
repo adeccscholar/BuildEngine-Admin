@@ -1,0 +1,48 @@
+# Package Migration Documentation
+
+[TOC|Content]
+
+The versioned migration guides in this directory document the BuildEngine Admin contract for each logical library/version. They are linked from the corresponding **Packages** overview and detail pages in the Doc Server.
+
+- [pugixml 1.16](/package/pugixml/1.16/migration)
+- [zlib 1.3.2](/package/zlib/1.3.2/migration)
+- [brotli 1.2.0](/package/brotli/1.2.0/migration)
+- [zstd 1.5.7](/package/zstd/1.5.7/migration)
+- [xz 5.8.3](/package/xz/5.8.3/migration)
+- [libzip 1.11.4](/package/libzip/1.11.4/migration)
+- [libarchive 3.8.9](/package/libarchive/3.8.9/migration)
+- [openssl 3.5.8](/package/openssl/3.5.8/migration)
+- [openssl 3.5.9](/package/openssl/3.5.9/migration)
+- [curl 8.21.0](/package/curl/8.21.0/migration)
+- [curl 8.23.0](/package/curl/8.23.0/migration)
+- [boost 1.92.0](/package/boost/1.92.0/migration)
+- [nlohmann-json 3.12.0](/package/nlohmann-json/3.12.0/migration)
+- [libpqxx 8.0.2](/package/libpqxx/8.0.2/migration)
+- [soil2 1.3.0](/package/soil2/1.3.0/migration)
+- [vtk 9.6.2](/package/vtk/9.6.2/migration)
+- [opencv 5.0.0](/package/opencv/5.0.0/migration)
+- [cmark-gfm 0.29.0.gfm.13](/package/cmark-gfm/0.29.0.gfm.13/migration)
+- [googletest 1.17.0](/package/googletest/1.17.0/migration)
+- [catch2 3.16.0](/package/catch2/3.16.0/migration)
+- [bitmapplusplus 1.1.1](/package/bitmapplusplus/1.1.1/migration)
+- [harfbuzz 14.4.0](/package/harfbuzz/14.4.0/migration)
+- [skia 153](/package/skia/153/migration)
+- [graphite2 1.3.15](/package/graphite2/1.3.15/migration)
+- [expat 2.8.4](/package/expat/2.8.4/migration)
+- [teckit 2.5.13](/package/teckit/2.5.13/migration)
+- [icu 78.3](/package/icu/78.3/migration)
+- [libxml2 2.15.3](/package/libxml2/2.15.3/migration)
+- [qpdf 12.4.1](/package/qpdf/12.4.1/migration)
+- [podofo 1.1.1](/package/podofo/1.1.1/migration)
+- [win-iconv 0.0.8](/package/win-iconv/0.0.8/migration)
+- [poppler 26.09.0](/package/poppler/26.09.0/migration)
+- [openxlsx 0.5.1](/package/openxlsx/0.5.1/migration)
+- [fast_float 8.2.3](/package/fast_float/8.2.3/migration)
+- [abseil 20260817.0](/package/abseil/20260817.0/migration)
+- [lcms2 2.19.1](/package/lcms2/2.19.1/migration)
+- [openjpeg 2.5.4](/package/openjpeg/2.5.4/migration)
+- [simdutf 9.3.0](/package/simdutf/9.3.0/migration)
+- [agg 2.6](/package/agg/2.6/migration)
+- [pdfium 2025.11.19](/package/pdfium/2025.11.19/migration)
+
+**Evidence policy:** Values in the XML are declared build intent; successful translation, upstream-test results, and runtime compliance require separate BuildEngine state/log evidence. Historical reasons not documented in the contract remain [nicht verifiziert].
