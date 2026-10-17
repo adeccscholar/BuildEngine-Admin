@@ -27,6 +27,7 @@
       </build>
       <smoke executable="{SourceRoot}/out/gn.exe" workingDirectory="{SourceRoot}">
          <argument value="--version"/>
+         <runtimePath tool="bcc64x"/>
       </smoke>
       <install root="tools/gn/{ToolVersion}" executable="gn.exe"/>
       <probe executable="gn.exe"><argument value="--version"/></probe>
