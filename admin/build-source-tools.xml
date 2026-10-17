@@ -9,6 +9,8 @@
       <requires tool="python"/>
       <requires tool="ninja"/>
       <requires tool="bcc64x"/>
+      <requires tool="llvm-ar"/>
+      <requires tool="ld-lld"/>
       <prepare executable="{Tool:python}" workingDirectory="{SourceRoot}">
          <argument value="build/gen.py"/>
          <argument value="--no-last-commit-position"/>
