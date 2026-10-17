@@ -1,0 +1,54 @@
+# BuildEngine BCC64X toolchain for PDFium on Windows x64.
+# Use the locally provisioned Embarcadero compiler and LLVM archive tool.
+toolchain("bcc64x") {
+  toolchain_args = {
+    current_cpu = "x64"
+    current_os = "win"
+    is_clang = false
+  }
+
+  _cc = getenv("CB_BCC64X")
+  _ar = getenv("CB_LLVM_AR")
+  assert(_cc != "", "BuildEngine BCC64X executable was not provided")
+  assert(_ar != "", "BuildEngine LLVM archiver was not provided")
+
+  tool("cc") {
+    command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
+    depfile = "{{output}}.d"
+    depsformat = "gcc"
+    outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
+    description = "BCC64X CC {{source}}"
+  }
+  tool("cxx") {
+    command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
+    depfile = "{{output}}.d"
+    depsformat = "gcc"
+    outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
+    description = "BCC64X CXX {{source}}"
+  }
+  tool("alink") {
+    command = "\"$_ar\" rcs {{output}} {{inputs}}"
+    outputs = [ "{{target_out_dir}}/{{target_output_name}}.a" ]
+    description = "AR {{output}}"
+  }
+  tool("link") {
+    command = "\"$_cc\" {{ldflags}} {{inputs}} {{solibs}} {{libs}} -o {{output}}"
+    outputs = [ "{{root_out_dir}}/{{target_output_name}}.exe" ]
+    description = "BCC64X LINK {{output}}"
+  }
+  tool("solink") {
+    command = "\"$_cc\" -shared {{ldflags}} {{inputs}} {{solibs}} {{libs}} -o {{output}}"
+    outputs = [ "{{root_out_dir}}/{{target_output_name}}.dll" ]
+    default_output_extension = ".dll"
+    description = "BCC64X SHARED {{output}}"
+  }
+  tool("stamp") {
+    command = "cmd /c copy /b nul {{output}} >nul"
+    outputs = [ "{{target_out_dir}}/{{target_output_name}}.stamp" ]
+    description = "STAMP {{output}}"
+  }
+  tool("copy") {
+    command = "cmd /c copy /y {{source}} {{output}} >nul"
+    description = "COPY {{source}}"
+  }
+}
