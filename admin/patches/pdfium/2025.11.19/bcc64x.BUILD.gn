@@ -14,21 +14,17 @@ toolchain("bcc64x") {
 
   tool("cc") {
     command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
-    depfile = "{{output}}.d"
-    depsformat = "gcc"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CC {{source}}"
   }
   tool("cxx") {
     command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
-    depfile = "{{output}}.d"
-    depsformat = "gcc"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CXX {{source}}"
   }
   tool("alink") {
     command = "\"$_ar\" rcs {{output}} {{inputs}}"
-    outputs = [ "{{target_out_dir}}/{{target_output_name}}.a" ]
+    outputs = [ "{{target_out_dir}}/{{target_output_name}}.lib" ]
     description = "AR {{output}}"
   }
   tool("link") {
