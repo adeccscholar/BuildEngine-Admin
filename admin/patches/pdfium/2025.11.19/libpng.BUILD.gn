@@ -1,0 +1,8 @@
+# BuildEngine installed libpng shared package GN bridge.
+config("installed") {
+  include_dirs = [ getenv("CB_PDFIUM_PNG_INCLUDE") ]
+  libs = [ getenv("CB_PDFIUM_PNG_LIB") ]
+}
+group("libpng") {
+  public_configs = [ ":installed" ]
+}
