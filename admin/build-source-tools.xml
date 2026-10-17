@@ -12,6 +12,12 @@
       <prepare executable="{Tool:python}" workingDirectory="{SourceRoot}">
          <argument value="build/gen.py"/>
          <argument value="--no-last-commit-position"/>
+         <argument value="--platform"/>
+         <argument value="mingw"/>
+         <environment name="CC" value="{Tool:bcc64x}"/>
+         <environment name="CXX" value="{Tool:bcc64x}"/>
+         <environment name="AR" value="{Tool:llvm-ar}"/>
+         <environment name="LD" value="{Tool:ld-lld}"/>
       </prepare>
       <build driver="ninja" executable="{Tool:ninja}" workingDirectory="{SourceRoot}/out"/>
       <smoke executable="{SourceRoot}/out/gn.exe" workingDirectory="{SourceRoot}">
