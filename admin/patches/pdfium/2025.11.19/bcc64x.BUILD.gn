@@ -40,7 +40,6 @@ toolchain("bcc64x") {
   }
   tool("stamp") {
     command = "cmd /c copy /b nul {{output}} >nul"
-    outputs = [ "{{target_out_dir}}/{{target_output_name}}.stamp" ]
     description = "STAMP {{output}}"
   }
   tool("copy") {
