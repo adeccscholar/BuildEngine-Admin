@@ -9554,6 +9554,8 @@
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\pdfium\LICENSE"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\pdfium\LICENSE"/>
+               <copy source="{BuildFileDir}\patches\pdfium\2025.11.19\bundled-components.json" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json"/>
             </common>
          </install>
       </build>
