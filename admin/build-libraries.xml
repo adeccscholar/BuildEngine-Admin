@@ -9341,14 +9341,11 @@
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
    <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-17T03:45:00Z">
-      <dependency library="skia" version="153"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
       <dependency library="freetype" version="2.14.3"/>
       <dependency library="icu" version="78.3"/>
-      <dependency library="abseil" version="20260817.0"/>
-      <dependency library="fast_float" version="8.2.3"/>
       <dependency library="lcms2" version="2.19.1"/>
       <dependency library="openjpeg" version="2.5.4"/>
       <metadata name="PDFium" supplier="PDFium Authors" homepage="https://pdfium.googlesource.com/pdfium/" description="Pinned PDFium GN/BCC64X integration; validation pending" licenseSignal="yellow"/>
@@ -9362,6 +9359,9 @@
          <download url="https://chromium.googlesource.com/chromium/src/buildtools/+archive/24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"
                    archive="pdfium-deps\buildtools-24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"/>
          <download url="https://github.com/chromium/pdfium/archive/a84323421e94f484faca52dd9d027934eba42ab8.tar.gz" archive="pdfium-a84323421e94f484faca52dd9d027934eba42ab8.tar.gz"/>
+         <download url="https://chromium.googlesource.com/chromium/src/third_party/abseil-cpp/+archive/14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz" archive="pdfium-deps\abseil-cpp-14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz"/>
+         <download url="https://skia.googlesource.com/skia/+archive/a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0.tar.gz" archive="pdfium-deps\skia-a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0.tar.gz"/>
+         <download url="https://chromium.googlesource.com/external/github.com/fastfloat/fast_float/+archive/cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz" archive="pdfium-deps\fast_float-cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz"/>
          <extract format="libarchive" root="pdfium-a84323421e94f484faca52dd9d027934eba42ab8">
             <require path="DEPS"/>
             <require path=".gn"/>
@@ -9387,20 +9387,15 @@
             <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
             <argument value="{DownloadsRoot}\pdfium-deps\buildtools-24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"/>
          </execute>
-         <!-- Reuse the installed BuildEngine dependencies through GN group targets. -->
+         <!-- Non-configurable dependencies are provided at their PDFium DEPS revisions. -->
          <execute name="prepare-icu-gn-adapter" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\\third_party\\icu"/>
          </execute>
          <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\icu.BUILD.gn"
                target="{CurrentArtifact}\\third_party\\icu\\BUILD.gn" overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="prepare-abseil-gn-adapter" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
-            <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\\third_party\\abseil-cpp"/>
-         </execute>
-         <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil.BUILD.gn"
-               target="{CurrentArtifact}\\third_party\\abseil-cpp\\BUILD.gn" overwrite="true" preserveCurrentArtifact="true"/>
-         <require path="{CurrentArtifact}\\third_party\\icu\\BUILD.gn"/>
-         <require path="{CurrentArtifact}\\third_party\\abseil-cpp\\BUILD.gn"/>
-         <!-- Pinned PDFium revision a84323421e94f484faca52dd9d027934eba42ab8
+
+<require path="{CurrentArtifact}\\third_party\\icu\\BUILD.gn"/>
+<!-- Pinned PDFium revision a84323421e94f484faca52dd9d027934eba42ab8
               commit timestamp, used as reproducible standalone build timestamp. -->
          <execute name="generate-pdfium-build-timestamp" executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}" showOutput="true">
@@ -9412,7 +9407,7 @@
          <execute name="generate-offline-gclient-args" executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}" showOutput="true">
             <argument value="-c"/>
-            <argument value="from pathlib import Path; p=Path('build/config/gclient_args.gni'); p.parent.mkdir(parents=True,exist_ok=True); p.write_text('checkout_android = false\ncheckout_skia = false\n', encoding='utf-8')"/>
+            <argument value="from pathlib import Path; p=Path('build/config/gclient_args.gni'); p.parent.mkdir(parents=True,exist_ok=True); p.write_text('checkout_android = false\ncheckout_skia = true\n', encoding='utf-8')"/>
          </execute>
          <!-- Fail during Source rather than reporting success before the GN
               imports from this pinned Chromium revision have been provided.
@@ -9426,18 +9421,10 @@
          </execute>
          <!-- Rewrite Chromium-vendored header prefixes to normal public SDK
               include names. No package files are copied into PDFium. -->
-         <execute name="normalize-external-sdk-includes" executable="{Tool:python}"
-                  workingDirectory="{CurrentArtifact}" showOutput="true">
-            <argument value="-c"/>
-            <argument value="from pathlib import Path; root=Path('.'); mapping=(('third_party/abseil-cpp/absl/','absl/'),('third_party/icu/source/common/unicode/','unicode/'),('third_party/icu/source/i18n/unicode/','unicode/'),('third_party/skia/include/','include/')); changed=0; files=(p for p in root.rglob('*') if p.suffix in ('.h','.cc','.cpp','.c','.hpp') and not p.is_symlink()); exec('for p in files:\n s=p.read_text(encoding=\u0027utf-8\u0027); t=s;\n for old,new in mapping: t=t.replace(\u0027&quot;\u0027+old,\u0027&quot;\u0027+new);\n if t!=s: p.write_text(t,encoding=\u0027utf-8\u0027); changed+=1'); print('PDFium SDK include normalization: files='+str(changed))"/>
-         </execute>
-      </source>
-         <execute name="normalize-external-sdk-includes-on-resume" executable="{Tool:python}"
-                  workingDirectory="{Workspace}" showOutput="true">
-            <argument value="-c"/>
-            <argument value="from pathlib import Path; root=Path('.'); mapping=(('third_party/abseil-cpp/absl/','absl/'),('third_party/icu/source/common/unicode/','unicode/'),('third_party/icu/source/i18n/unicode/','unicode/'),('third_party/skia/include/','include/')); changed=0; files=(p for p in root.rglob('*') if p.suffix in ('.h','.cc','.cpp','.c','.hpp') and not p.is_symlink()); exec('for p in files:\n s=p.read_text(encoding=\u0027utf-8\u0027); t=s;\n for old,new in mapping: t=t.replace(\u0027&quot;\u0027+old,\u0027&quot;\u0027+new);\n if t!=s: p.write_text(t,encoding=\u0027utf-8\u0027); changed+=1'); print('PDFium SDK include normalization: files='+str(changed))"/>
-         </execute>
-      <build>
+
+</source>
+
+<build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_PYTHON" value="{Tool:python}"/>
@@ -9455,10 +9442,6 @@
          <environment name="CB_PDFIUM_PNG_LIB" value="{InstallRoot}\packages\libpng\1.6.58\lib\win64\{Configuration}\{PdfiumPngImport}.lib"/>
          <environment name="CB_PDFIUM_JPEG_INCLUDE" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\include"/>
          <environment name="CB_PDFIUM_JPEG_LIB" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\{Configuration}\{PdfiumJpegImport}.lib"/>
-         <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{InstallRoot}\\packages\\skia\\153\\include\\include"/>
-         <environment name="CB_PDFIUM_SKIA_LIB" value="{InstallRoot}\\packages\\skia\\153\\lib\\win64\\{Configuration}\\skia.lib"/>
-         <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{InstallRoot}\\packages\\abseil\\20260817.0\\include"/>
-         <environment name="CB_PDFIUM_ABSEIL_LIB" value="{InstallRoot}\\packages\\abseil\\20260817.0\\lib\\win64\\{Configuration}\\abseil_dll.lib"/>
 
          <!-- Source may already be marked complete by the FSM. Materialize the
               pinned GN adapters again before GN generation on resumed builds. -->
@@ -9467,60 +9450,14 @@
          </execute>
          <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\icu.BUILD.gn"
                target="{Workspace}\\third_party\\icu\\BUILD.gn" overwrite="true"/>
-         <execute name="ensure-abseil-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
-            <argument value="-E"/><argument value="make_directory"/><argument value="{Workspace}\\third_party\\abseil-cpp"/>
-         </execute>
-         <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil.BUILD.gn"
-               target="{Workspace}\\third_party\\abseil-cpp\\BUILD.gn" overwrite="true"/>
-         <require path="{Workspace}\\third_party\\icu\\BUILD.gn"/>
-         <require path="{Workspace}\\third_party\\abseil-cpp\\BUILD.gn"/>
-         <execute name="ensure-pdfium-build-timestamp" executable="{Tool:python}"
+
+<require path="{Workspace}\\third_party\\icu\\BUILD.gn"/>
+<execute name="ensure-pdfium-build-timestamp" executable="{Tool:python}"
                   workingDirectory="{Workspace}" showOutput="true">
             <argument value="-c"/>
             <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text(str(1763561859), encoding='ascii')"/>
          </execute>
          <require path="{Workspace}\\build\\util\\LASTCHANGE.committime"/>
-         <!-- A build-level copy is not reliably executed on a resumed FSM run.
-              Perform the actual replacement as an executable step before GN. -->
-         <execute name="install-local-skia-gn-target" executable="{Tool:cmake}"
-                  workingDirectory="{Workspace}" showOutput="true">
-            <argument value="-E"/>
-            <argument value="copy_if_different"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\skia.BUILD.gn"/>
-            <argument value="{Workspace}\\skia\\BUILD.gn"/>
-         </execute>
-         <execute name="verify-local-skia-gn-target" executable="{Tool:python}"
-                  workingDirectory="{Workspace}" showOutput="true">
-            <argument value="-c"/>
-            <argument value="from pathlib import Path; a=Path(r'{BuildFileDir}\\patches\\pdfium\\2025.11.19\\skia.BUILD.gn').read_bytes(); b=Path('skia/BUILD.gn').read_bytes(); assert a==b, 'Skia GN adapter is not installed'; print('PDFium Skia GN adapter verified')"/>
-         </execute>
-         <execute name="prepare-local-jpeg-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
-            <argument value="-E"/><argument value="make_directory"/><argument value="{Workspace}\third_party\libjpeg_turbo"/>
-         </execute>
-         <execute name="install-local-jpeg-gn-target" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="true">
-            <argument value="-E"/><argument value="copy_if_different"/>
-            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\libjpeg_turbo.BUILD.gn"/>
-            <argument value="{Workspace}\third_party\libjpeg_turbo\BUILD.gn"/>
-         </execute>
-         <require path="{Workspace}\third_party\libjpeg_turbo\BUILD.gn"/>
-         <execute name="prepare-zlib-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
-            <argument value="-E"/><argument value="make_directory"/><argument value="{Workspace}\third_party\zlib"/>
-         </execute>
-         <execute name="install-zlib-gn-target" executable="{Tool:cmake}" workingDirectory="{Workspace}">
-            <argument value="-E"/><argument value="copy_if_different"/>
-            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\zlib.BUILD.gn"/>
-            <argument value="{Workspace}\third_party\zlib\BUILD.gn"/>
-         </execute>
-         <require path="{Workspace}\third_party\zlib\BUILD.gn"/>
-         <execute name="prepare-libpng-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
-            <argument value="-E"/><argument value="make_directory"/><argument value="{Workspace}\third_party\libpng"/>
-         </execute>
-         <execute name="install-libpng-gn-target" executable="{Tool:cmake}" workingDirectory="{Workspace}">
-            <argument value="-E"/><argument value="copy_if_different"/>
-            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\libpng.BUILD.gn"/>
-            <argument value="{Workspace}\third_party\libpng\BUILD.gn"/>
-         </execute>
-         <require path="{Workspace}\third_party\libpng\BUILD.gn"/>
          <!-- Chromium's native FreeType target is wired to BuildEngine's local package. -->
          <execute name="bind-local-freetype" executable="{Tool:python}" workingDirectory="{Workspace}" showOutput="true">
             <argument value="-c"/>
