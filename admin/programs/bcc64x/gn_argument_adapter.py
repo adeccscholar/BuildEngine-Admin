@@ -25,6 +25,26 @@ def Translate(a_strArgument: str) -> list[str]:
                 f"no verified BCC64X warning equivalent for MSVC C{strNumber}"
             )
         return list(WARNING_EQUIVALENTS[strNumber])
+    # Semantically corresponding Clang/GNU frontend options.
+    mpDirect = {
+        "/WX": "-Werror",
+        "/Gy": "-ffunction-sections",
+        "/Gw": "-fdata-sections",
+        "/Oy-": "-fno-omit-frame-pointer",
+        "/O2": "-O2",
+        "/GR-": "-fno-rtti",
+        "/GR": "-frtti",
+        "/Zi": "-gcodeview",
+        "/utf-8": "-finput-charset=UTF-8",
+    }
+    if a_strArgument in mpDirect:
+        return [mpDirect[a_strArgument]]
+    if a_strArgument.startswith("/D"):
+        return ["-D" + a_strArgument[2:]]
+    if a_strArgument.startswith("/std:"):
+        return ["-std=" + a_strArgument[5:]]
+    if a_strArgument.startswith("/clang:"):
+        return [a_strArgument[7:]]
     if a_strArgument.startswith("/") and not a_strArgument.startswith("//"):
         raise ValueError(f"unsupported MSVC option for BCC64X: {a_strArgument}")
     return [a_strArgument]
@@ -35,11 +55,17 @@ def Main() -> int:
         print("usage: gn_argument_adapter.py <compiler> <arguments...>", file=sys.stderr)
         return 2
     vecArguments = []
-    try:
-        for strArgument in sys.argv[2:]:
+    lstErrors = []
+    for strArgument in sys.argv[2:]:
+        try:
             vecArguments.extend(Translate(strArgument))
-    except ValueError as aError:
-        print(f"BCC64X argument translation failed: {aError}", file=sys.stderr)
+        except ValueError as aError:
+            if str(aError) not in lstErrors:
+                lstErrors.append(str(aError))
+    if lstErrors:
+        print("BCC64X argument translation failed:", file=sys.stderr)
+        for strError in lstErrors:
+            print("  " + strError, file=sys.stderr)
         return 2
     return subprocess.call([sys.argv[1], *vecArguments])
 
