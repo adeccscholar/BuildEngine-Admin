@@ -9541,9 +9541,7 @@
             <argument value="-c"/>
             <argument value="from pathlib import Path; files=['third_party/icu/BUILD.gn','third_party/libjpeg_turbo/BUILD.gn','third_party/zlib/BUILD.gn','third_party/libpng/BUILD.gn','third_party/abseil-cpp/BUILD.gn','third_party/skia/BUILD.gn','tools/win/DebugVisualizers/BUILD.gn']; missing=[f for f in files if not Path(f).is_file()]; print('GN ADAPTERS MISSING: '+', '.join(missing) if missing else 'GN ADAPTERS: PRESENT'); assert not missing"/>
          </execute>
-execute>
-
-<!-- Chromium's native FreeType target is wired to BuildEngine's local package. -->
+         <!-- Chromium's native FreeType target is wired to BuildEngine's local package. -->
          <execute name="bind-local-freetype" executable="{Tool:python}" workingDirectory="{Workspace}" showOutput="true">
             <argument value="-c"/>
             <argument value="from pathlib import Path; p=Path('build/config/freetype/BUILD.gn'); s=p.read_text(encoding='utf-8'); old='public_deps = [ &quot;//third_party/freetype&quot; ]'; new='public_configs = [ &quot;//build/config/freetype:buildengine_freetype&quot; ]'; marker='config(&quot;buildengine_freetype&quot;) '+chr(123); assert s.count(old)+s.count(new) in (1,2), 'Unexpected FreeType GN target'; assert s.count(old)&lt;=1 and s.count(new)&lt;=1, 'Duplicate FreeType config'; t=s.replace(old,new); t += '\n'+marker+'\n  include_dirs = [ getenv(&quot;CB_PDFIUM_FREETYPE_INCLUDE&quot;) ]\n  libs = [ getenv(&quot;CB_PDFIUM_FREETYPE_LIB&quot;) ]\n'+chr(125)+'\n' if marker not in t else ''; p.write_text(t,encoding='utf-8') if t!=s else None; print('Local FreeType GN target ready')"/>
