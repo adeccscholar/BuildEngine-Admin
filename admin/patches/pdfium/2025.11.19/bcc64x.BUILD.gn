@@ -8,6 +8,9 @@ toolchain("bcc64x") {
   }
 
   _cc = getenv("CB_BCC64X")
+  _python = getenv("CB_PYTHON")
+  _adapter = getenv("CB_GN_ARGUMENT_ADAPTER")
+  assert(_python != "" && _adapter != "", "BCC64X argument adapter must be provided")
   _ar = getenv("CB_LLVM_AR")
   assert(_cc != "", "BuildEngine BCC64X executable was not provided")
   assert(_ar != "", "BuildEngine LLVM archiver was not provided")
@@ -15,12 +18,12 @@ toolchain("bcc64x") {
   # PDFium dependencies are resolved in its pinned upstream source tree.
   # Preserve GN's flags; unsupported options must be diagnosed, not discarded.
   tool("cc") {
-    command = "\"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
+    command = "\"$_python\" \"$_adapter\" \"$_cc\" -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CC {{source}}"
   }
   tool("cxx") {
-    command = "\"$_cc\" -std=c++20 -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
+    command = "\"$_python\" \"$_adapter\" \"$_cc\" -std=c++20 -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CXX {{source}}"
   }
