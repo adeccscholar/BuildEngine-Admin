@@ -9535,8 +9535,8 @@
                   workingDirectory="{Workspace}" showOutput="true">
             <argument value="-E"/>
             <argument value="copy_directory"/>
-            <argument value="{InstallRoot}\packages\skia\153\include"/>
-            <argument value="{Workspace}\third_party\skia"/>
+            <argument value="{InstallRoot}\packages\skia\153\include\include"/>
+            <argument value="{Workspace}\third_party\skia\include"/>
          </execute>
          <require path="{Workspace}\third_party\skia\include\core\SkRefCnt.h"/>
          <!-- The target compiler is BCC64X. Do not reuse Chromium clang-cl. -->
