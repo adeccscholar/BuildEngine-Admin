@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-get_filename_component(_PDFIUM_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+get_filename_component(_PDFIUM_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 if(NOT TARGET PDFium::pdfium)
    add_library(PDFium::pdfium STATIC IMPORTED GLOBAL)
    set_target_properties(PDFium::pdfium PROPERTIES
