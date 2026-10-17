@@ -9441,6 +9441,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_PYTHON" value="{Tool:python}"/>
+         <environment name="CB_GN_ARGUMENT_ADAPTER" value="{BuildFileDir}\\programs\\bcc64x\\gn_argument_adapter.py"/>
          <!-- Use the locally provisioned Windows toolchain; avoid Chromium depot_tools. -->
          <environment name="DEPOT_TOOLS_WIN_TOOLCHAIN" value="0"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
