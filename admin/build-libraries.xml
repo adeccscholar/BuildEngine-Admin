@@ -9387,6 +9387,19 @@
             <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
             <argument value="{DownloadsRoot}\pdfium-deps\buildtools-24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"/>
          </execute>
+         <!-- Reuse the installed BuildEngine dependencies through GN group targets. -->
+         <execute name="prepare-icu-gn-adapter" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
+            <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\\third_party\\icu"/>
+         </execute>
+         <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\icu.BUILD.gn"
+               target="{CurrentArtifact}\\third_party\\icu\\BUILD.gn" overwrite="true"/>
+         <execute name="prepare-abseil-gn-adapter" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
+            <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\\third_party\\abseil-cpp"/>
+         </execute>
+         <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil.BUILD.gn"
+               target="{CurrentArtifact}\\third_party\\abseil-cpp\\BUILD.gn" overwrite="true"/>
+         <require path="{CurrentArtifact}\\third_party\\icu\\BUILD.gn"/>
+         <require path="{CurrentArtifact}\\third_party\\abseil-cpp\\BUILD.gn"/>
          <!-- gclient_args.gni is generated deterministically instead of running gclient. -->
          <execute name="generate-offline-gclient-args" executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}" showOutput="true">
@@ -9411,6 +9424,11 @@
          <!-- Use the locally provisioned Windows toolchain; avoid Chromium depot_tools. -->
          <environment name="DEPOT_TOOLS_WIN_TOOLCHAIN" value="0"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_PDFIUM_ICU_INCLUDE" value="{InstallRoot}\\packages\\icu\\78.3\\include"/>
+         <environment name="CB_PDFIUM_ICU_LIB" value="{InstallRoot}\\packages\\icu\\78.3\\lib\\win64\\{Configuration}\\{PdfiumIcuImport}.lib"/>
+         <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{InstallRoot}\\packages\\abseil\\20260817.0\\include"/>
+         <environment name="CB_PDFIUM_ABSEIL_LIB" value="{InstallRoot}\\packages\\abseil\\20260817.0\\lib\\win64\\{Configuration}\\abseil_dll.lib"/>
+
          <target name="gn-gen" type="generic"
                  executable="{Tool:gn}"
                  workingDirectory="{Workspace}" showOutput="true">
@@ -9437,9 +9455,11 @@
          </execute>
          <variant name="Release">
             <variable name="PdfiumDebug" value="false"/>
+            <variable name="PdfiumIcuImport" value="libicuuc"/>
          </variant>
          <variant name="Debug">
             <variable name="PdfiumDebug" value="true"/>
+            <variable name="PdfiumIcuImport" value="libicuucd"/>
          </variant>
          <install>
             <perVariant>
