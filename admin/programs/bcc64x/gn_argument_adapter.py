@@ -62,7 +62,7 @@ def Translate(a_strArgument: str) -> list[str]:
     # Skia's skcms chooses ISA-specific compilation units through /arch.
     # Do not translate these to a host-dependent -march=native.
     mpArchitecture = {
-        "/arch:AVX2": ("-mavx2",),
+        "/arch:AVX2": ("-mavx2", "-mf16c"),
         "/arch:AVX512": ("-mavx512f", "-mavx512bw",
                          "-mavx512dq", "-mavx512vl"),
     }
@@ -91,6 +91,15 @@ def Main() -> int:
         except ValueError as aError:
             if str(aError) not in lstErrors:
                 lstErrors.append(str(aError))
+    # Chromium fixes predefined build timestamps for reproducibility.
+    # Retain their values; suppress only Clang's dedicated redefinition warning.
+    if any(arg.startswith(("-D__DATE__=", "-D__TIME__=",
+                           "-D__TIMESTAMP__=")) for arg in vecArguments):
+        vecArguments.append("-Wno-builtin-macro-redefined")
+    # Some Skia revisions select the MSVC spelling in SkAttributes.h.
+    # Restore the precise always-inline intent only for that Skia configuration.
+    if any("SK_USER_CONFIG_HEADER=" in arg for arg in vecArguments):
+        vecArguments.append("-D__forceinline=inline __attribute__((always_inline))")
     if lstErrors:
         print("BCC64X argument translation failed:", file=sys.stderr)
         for strError in lstErrors:
