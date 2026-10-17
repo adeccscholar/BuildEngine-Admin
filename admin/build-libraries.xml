@@ -9516,7 +9516,8 @@
          <execute name="prepare-libpng-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
             <argument value="-E"/><argument value="make_directory"/>
             <argument value="{Workspace}\third_party\libpng"/>
-         </         <!-- BuildVariantJob executes execute/target/cmake, not copy/require. -->
+         </execute>
+         <!-- BuildVariantJob executes execute/target/cmake, not copy/require. -->
          <execute name="install-icu-gn-adapter" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="true">
             <argument value="-E"/><argument value="copy_if_different"/>
             <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\icu.BUILD.gn"/>
