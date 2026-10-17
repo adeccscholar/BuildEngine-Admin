@@ -9528,11 +9528,24 @@
             <argument value="-c"/>
             <argument value="from pathlib import Path; p=Path('build/config/compiler/BUILD.gn'); s=p.read_text(encoding='utf-8'); old='if (is_clang &amp;&amp; clang_base_path == default_clang_base_path &amp;&amp;'; new='if (is_clang &amp;&amp; path_exists(&quot;//third_party/llvm-build/Release+Asserts/cr_build_revision&quot;) &amp;&amp; clang_base_path == default_clang_base_path &amp;&amp;'; assert s.count(old)+s.count(new)==1, 'Unexpected Chromium clang_revision guard'; p.write_text(s.replace(old,new),encoding='utf-8') if old in s else None; print('PDFium local Clang revision guard ready')"/>
          </execute>
+         <!-- The target compiler is BCC64X. Do not reuse Chromium clang-cl. -->
+         <execute name="prepare-bcc64x-toolchain-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
+            <argument value="-E"/><argument value="make_directory"/>
+            <argument value="{Workspace}\build\toolchain\bcc64x"/>
+         </execute>
+         <execute name="install-bcc64x-toolchain" executable="{Tool:cmake}" workingDirectory="{Workspace}">
+            <argument value="-E"/><argument value="copy_if_different"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x.BUILD.gn"/>
+            <argument value="{Workspace}\build\toolchain\bcc64x\BUILD.gn"/>
+         </execute>
+         <require path="{Workspace}\build\toolchain\bcc64x\BUILD.gn"/>
          <target name="gn-gen" type="generic"
                  executable="{Tool:gn}"
                  workingDirectory="{Workspace}" showOutput="true">
             <temporaryFile id="gn-args" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\args.gn">
                <line value="target_cpu = &quot;x64&quot;"/>
+               <line value="custom_toolchain = &quot;//build/toolchain/bcc64x:bcc64x&quot;"/>
+               <line value="is_clang = false"/>
                <line value="is_component_build = false"/>
                <line value="clang_use_chrome_plugins = false"/>
                <line value="pdf_enable_v8 = false"/>
