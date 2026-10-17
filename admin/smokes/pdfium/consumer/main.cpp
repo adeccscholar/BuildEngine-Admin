@@ -46,5 +46,6 @@ int main() {
    if(theDocument) FPDF_CloseDocument(theDocument);
    FPDF_DestroyLibrary();
    std::println("SMOKE|CHECK|memory-pdf-render|{}|installed PDFium", bOk ? "PASS" : "FAIL");
+   std::println("SMOKE|RESULT|{}|PDFium in-memory render", bOk ? "PASS" : "FAIL");
    return bOk ? 0 : 1;
 }
