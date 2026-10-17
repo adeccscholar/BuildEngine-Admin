@@ -9463,7 +9463,7 @@
          <execute name="exclude-standalone-test-fonts" executable="{Tool:python}"
                   workingDirectory="{Workspace}" showOutput="true">
             <argument value="-c"/>
-            <argument value="from pathlib import Path; p=Path('testing/BUILD.gn'); s=p.read_text(encoding='utf-8'); needle='    &quot;//third_party/test_fonts&quot;,\\n'; assert s.count(needle) in (0,1), 'Unexpected PDFium test_fonts references'; updated=s.replace(needle,''); p.write_text(updated,encoding='utf-8') if updated != s else None; print('PDFium test-font reference excluded')"/>
+            <argument value="from pathlib import Path; p=Path('testing/BUILD.gn'); s=p.read_text(encoding='utf-8'); lines=s.splitlines(keepends=True); needle='&quot;//third_party/test_fonts&quot;,'; matches=sum(line.strip()==needle for line in lines); assert matches==1, 'Expected exactly one PDFium test_fonts dependency'; p.write_text(''.join(line for line in lines if line.strip()!=needle),encoding='utf-8'); print('PDFium standalone test-font dependency excluded')"/>
          </execute>
          <target name="gn-gen" type="generic"
                  executable="{Tool:gn}"
