@@ -245,3 +245,7 @@ Documentation status follows the logical library identity. New package extension
 The hierarchical Documentation FSM, standard/collection/linked modes, dynamic collection-scope materialization and explicit Doxygen tagfile relationships are implemented in the active source.
 
 Targeted BCC64X compilation has been performed for major parts of this path. A complete fresh documentation/clean-room run across all library profiles remains **[nicht verifiziert]** until separately executed and recorded.
+
+## StackBuilder distribution documentation
+
+The [StackBuilder manual](/docs/stackbuilder.md) describes the separate packaging program, schema-2 package selection, reproducible ZIP preparation, text/XML SHA-256 lock files, security limits and an executable CLI example. This is separate from the library documentation FSM: StackBuilder packages already installed outputs but does not build or test them.
