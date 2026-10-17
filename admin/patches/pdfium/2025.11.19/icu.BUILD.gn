@@ -3,7 +3,6 @@
 config("installed_icu") {
   include_dirs = [ getenv("CB_PDFIUM_ICU_INCLUDE") ]
   libs = [ getenv("CB_PDFIUM_ICU_LIB") ]
-  defines = [ "U_STATIC_IMPLEMENTATION=0" ]
 }
 group("icuuc") {
   public_configs = [ ":installed_icu" ]
