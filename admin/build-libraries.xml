@@ -9392,12 +9392,12 @@
             <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\\third_party\\icu"/>
          </execute>
          <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\icu.BUILD.gn"
-               target="{CurrentArtifact}\\third_party\\icu\\BUILD.gn" overwrite="true"/>
+               target="{CurrentArtifact}\\third_party\\icu\\BUILD.gn" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="prepare-abseil-gn-adapter" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\\third_party\\abseil-cpp"/>
          </execute>
          <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil.BUILD.gn"
-               target="{CurrentArtifact}\\third_party\\abseil-cpp\\BUILD.gn" overwrite="true"/>
+               target="{CurrentArtifact}\\third_party\\abseil-cpp\\BUILD.gn" overwrite="true" preserveCurrentArtifact="true"/>
          <require path="{CurrentArtifact}\\third_party\\icu\\BUILD.gn"/>
          <require path="{CurrentArtifact}\\third_party\\abseil-cpp\\BUILD.gn"/>
          <!-- Pinned PDFium revision a84323421e94f484faca52dd9d027934eba42ab8
