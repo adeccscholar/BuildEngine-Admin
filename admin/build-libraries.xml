@@ -9528,6 +9528,17 @@
             <argument value="-c"/>
             <argument value="from pathlib import Path; p=Path('build/config/compiler/BUILD.gn'); s=p.read_text(encoding='utf-8'); old='if (is_clang &amp;&amp; clang_base_path == default_clang_base_path &amp;&amp;'; new='if (is_clang &amp;&amp; path_exists(&quot;//third_party/llvm-build/Release+Asserts/cr_build_revision&quot;) &amp;&amp; clang_base_path == default_clang_base_path &amp;&amp;'; assert s.count(old)+s.count(new)==1, 'Unexpected Chromium clang_revision guard'; p.write_text(s.replace(old,new),encoding='utf-8') if old in s else None; print('PDFium local Clang revision guard ready')"/>
          </execute>
+         <!-- PDFium source includes third_party/skia/include/... while the
+              installed Skia SDK keeps headers in include/include/... .
+              Reuse the installed SDK tree, never rebuild Skia sources. -->
+         <execute name="stage-installed-skia-headers" executable="{Tool:cmake}"
+                  workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-E"/>
+            <argument value="copy_directory"/>
+            <argument value="{InstallRoot}\packages\skia\153\include"/>
+            <argument value="{Workspace}\third_party\skia"/>
+         </execute>
+         <require path="{Workspace}\third_party\skia\include\core\SkRefCnt.h"/>
          <!-- The target compiler is BCC64X. Do not reuse Chromium clang-cl. -->
          <execute name="prepare-bcc64x-toolchain-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
             <argument value="-E"/><argument value="make_directory"/>
