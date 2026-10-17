@@ -21,12 +21,12 @@ toolchain("bcc64x") {
   # defaults to pthread TLS for this detected compiler profile; force its
   # supported C++11 thread_local/RAII identity mode throughout this toolchain.
   tool("cc") {
-    command = "\"$_python\" \"$_adapter\" \"$_cc\" -DUSE_SYSTEM_ICUUC -DUSE_SYSTEM_ZLIB -DUSE_SYSTEM_LIBJPEG -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
+    command = "\"$_python\" \"$_adapter\" \"$_cc\" -DWIN32 -DUSE_SYSTEM_ICUUC -DUSE_SYSTEM_ZLIB -DUSE_SYSTEM_LIBJPEG -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_c}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CC {{source}}"
   }
   tool("cxx") {
-    command = "\"$_python\" \"$_adapter\" \"$_cc\" -std=c++20 -DUSE_SYSTEM_ICUUC -DUSE_SYSTEM_ZLIB -DUSE_SYSTEM_LIBJPEG -DABSL_FORCE_THREAD_IDENTITY_MODE=2 -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
+    command = "\"$_python\" \"$_adapter\" \"$_cc\" -std=c++20 -DWIN32 -DUSE_SYSTEM_ICUUC -DUSE_SYSTEM_ZLIB -DUSE_SYSTEM_LIBJPEG -DABSL_FORCE_THREAD_IDENTITY_MODE=2 -c {{source}} -o {{output}} {{defines}} {{include_dirs}} {{cflags}} {{cflags_cc}}"
     outputs = [ "{{source_out_dir}}/{{target_output_name}}.{{source_name_part}}.o" ]
     description = "BCC64X CXX {{source}}"
   }
@@ -43,10 +43,18 @@ toolchain("bcc64x") {
     description = "BCC64X LINK {{output}}"
   }
   tool("solink") {
-    command = "\"$_cc\" -shared {{ldflags}} {{inputs}} {{solibs}} {{libs}} -o {{output}}"
-    outputs = [ "{{root_out_dir}}/{{target_output_name}}.dll" ]
+    dllname = "{{root_out_dir}}/{{target_output_name}}.dll"
+    implib = "{{root_out_dir}}/{{target_output_name}}.lib"
+    rspfile = "$dllname.rsp"
+    rspfile_content = "{{ldflags}} {{inputs}} {{solibs}} {{libs}}"
+    command = "\"$_cc\" -tD -tR -Wl,--out-implib,$implib -o $dllname @$rspfile"
+    outputs = [ dllname, implib ]
     default_output_extension = ".dll"
-    description = "BCC64X SHARED {{output}}"
+    default_output_dir = "{{root_out_dir}}"
+    link_output = implib
+    depend_output = implib
+    runtime_outputs = [ dllname ]
+    description = "BCC64X DLL $dllname"
   }
   tool("stamp") {
     command = "cmd /c copy /b nul {{output}} >nul"

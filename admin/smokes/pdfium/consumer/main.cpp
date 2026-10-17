@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 #include <fpdfview.h>
+#include <windows.h>
 #include <array>
 #include <format>
 #include <print>
@@ -45,6 +46,12 @@ int main() {
    }
    if(theDocument) FPDF_CloseDocument(theDocument);
    FPDF_DestroyLibrary();
+   HMODULE const hPdfium = ::GetModuleHandleW(L"pdfium.dll");
+   bool const bDynamic = hPdfium != nullptr &&
+      ::GetProcAddress(hPdfium, "FPDF_InitLibraryWithConfig") != nullptr &&
+      ::GetProcAddress(hPdfium, "FPDF_RenderPageBitmap") != nullptr;
+   std::println("SMOKE|CHECK|dll-loading|{}|installed PDFium DLL and public exports", bDynamic ? "PASS" : "FAIL");
+   bOk = bOk && bDynamic;
    std::println("SMOKE|CHECK|memory-pdf-render|{}|installed PDFium", bOk ? "PASS" : "FAIL");
    std::println("SMOKE|RESULT|{}|PDFium in-memory render", bOk ? "PASS" : "FAIL");
    return bOk ? 0 : 1;

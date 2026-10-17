@@ -258,3 +258,19 @@ The separately uploaded `02-cmake-build(3).log` is the older 21:11:36 UTC linkin
 **Pinned source ownership:** `core/fxcrt/string_view_template.h` defines the affected methods inline and contains `extern template class StringViewTemplate<char>` and `<wchar_t>`; `bytestring.cpp` and `widestring.cpp` explicitly instantiate the corresponding classes. The source-phase BCC64X adapter now removes only those two extern-template suppressions, retaining both upstream explicit instantiations, so normal use-site inline COMDAT emission is possible. The adapter fails on an unexpected source version and is idempotent. No synthetic implementations, ignored unresolved symbols or changes to the generic toolchain were introduced.
 
 **Verification boundary:** This is a targeted correction derived from source and linker evidence; **[not verified]** BCC64X archive symbol emission, Debug consumer linking and both consumer smoke results require a new native run. The PDFium library timestamp was incremented to invalidate stale state and rebuild the changed producer.
+
+## Required shared-library correction (18 October 2026)
+
+**Architectural decision:** PDFium is shipped and consumed as a **native BCC64X Windows DLL**, not a complete static archive. Earlier `pdf_is_complete_lib=true` and `PDFium::pdfium STATIC IMPORTED` integration was a violation of this project's shared-library boundary, regardless of successful consumer smokes on that artifact.
+
+**Pinned upstream mechanism:** `component("pdfium")` in PDFium's `BUILD.gn` switches to a shared library with GN `is_component_build=true`; `pdf_is_complete_lib=false` removes the complete-static override. `fpdfsdk/BUILD.gn` consumes the upstream public-headers implementation config that provides `FPDF_IMPLEMENTATION` for its exported C API.
+
+**Compiler and linker:** Version-pinned BCC64X GN toolchain `solink` now uses `-tD -tR`, emits a Windows DLL plus a deterministic COFF import library via `-Wl,--out-implib`, writes long link arguments to a response file, and declares both outputs to GN. Link dependencies use the import library; runtime uses the DLL. `WIN32` is explicitly defined for PDFium's upstream `FPDF_EXPORT` branches. Source preparation remains single-writer before Debug and Release variants.
+
+**Early failing gate:** Generated-Ninja preflight requires a BCC64X DLL link command with import-library emission, dynamic RTL, and `COMPONENT_BUILD`/`FPDF_IMPLEMENTATION` defines for `fpdfsdk/fpdf_view.cpp`. This check precedes expensive compilation.
+
+**Installed and published artifacts:** Each variant requires and installs `bin/win64/<Configuration>/pdfium.dll` and `lib/win64/<Configuration>/pdfium.lib`; the Release publish scope also includes the DLL. Both artifacts must exist before the package can progress. A complete static PDFium archive is no longer installed or exported.
+
+**External consumer contract:** `PDFium::pdfium` is `SHARED IMPORTED` with separate `IMPORTED_LOCATION_<CONFIG>` and `IMPORTED_IMPLIB_<CONFIG>`, and the consumer gets `COMPONENT_BUILD`. Runtime smoke checks the loaded `pdfium.dll` and public C exports via `GetModuleHandleW`/`GetProcAddress`, in addition to rendering the memory PDF. Dependency closure and runtime DLL search paths are supplied by BuildEngine's existing package-scope smoke environment.
+
+**Status:** Changes reflect a checked static-source contract and toolchain documentation. **[nicht verifiziert]** GN regeneration, Windows BCC64X component linking, DLL exports and both consumer-smoke runs still require real local evidence. Never report this as a completed DLL build without that evidence.
