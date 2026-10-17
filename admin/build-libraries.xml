@@ -9358,10 +9358,10 @@
                    archive="pdfium-deps\build-371ecb089d96d60e5208ec2d25c9b4f0860e556c.tar.gz"/>
          <download url="https://chromium.googlesource.com/chromium/src/buildtools/+archive/24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"
                    archive="pdfium-deps\buildtools-24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"/>
-         <download url="https://github.com/chromium/pdfium/archive/a84323421e94f484faca52dd9d027934eba42ab8.tar.gz" archive="pdfium-a84323421e94f484faca52dd9d027934eba42ab8.tar.gz"/>
          <download url="https://chromium.googlesource.com/chromium/src/third_party/abseil-cpp/+archive/14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz" archive="pdfium-deps\abseil-cpp-14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz"/>
          <download url="https://skia.googlesource.com/skia/+archive/a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0.tar.gz" archive="pdfium-deps\skia-a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0.tar.gz"/>
          <download url="https://chromium.googlesource.com/external/github.com/fastfloat/fast_float/+archive/cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz" archive="pdfium-deps\fast_float-cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz"/>
+         <download url="https://github.com/chromium/pdfium/archive/a84323421e94f484faca52dd9d027934eba42ab8.tar.gz" archive="pdfium-a84323421e94f484faca52dd9d027934eba42ab8.tar.gz"/>
          <extract format="libarchive" root="pdfium-a84323421e94f484faca52dd9d027934eba42ab8">
             <require path="DEPS"/>
             <require path=".gn"/>
