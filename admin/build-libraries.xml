@@ -9437,6 +9437,26 @@
          <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{InstallRoot}\\packages\\abseil\\20260817.0\\include"/>
          <environment name="CB_PDFIUM_ABSEIL_LIB" value="{InstallRoot}\\packages\\abseil\\20260817.0\\lib\\win64\\{Configuration}\\abseil_dll.lib"/>
 
+         <!-- Source may already be marked complete by the FSM. Materialize the
+              pinned GN adapters again before GN generation on resumed builds. -->
+         <execute name="ensure-icu-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
+            <argument value="-E"/><argument value="make_directory"/><argument value="{Workspace}\\third_party\\icu"/>
+         </execute>
+         <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\icu.BUILD.gn"
+               target="{Workspace}\\third_party\\icu\\BUILD.gn" overwrite="true"/>
+         <execute name="ensure-abseil-gn-dir" executable="{Tool:cmake}" workingDirectory="{Workspace}">
+            <argument value="-E"/><argument value="make_directory"/><argument value="{Workspace}\\third_party\\abseil-cpp"/>
+         </execute>
+         <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil.BUILD.gn"
+               target="{Workspace}\\third_party\\abseil-cpp\\BUILD.gn" overwrite="true"/>
+         <require path="{Workspace}\\third_party\\icu\\BUILD.gn"/>
+         <require path="{Workspace}\\third_party\\abseil-cpp\\BUILD.gn"/>
+         <execute name="ensure-pdfium-build-timestamp" executable="{Tool:python}"
+                  workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-c"/>
+            <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text('1763561859\\n', encoding='ascii')"/>
+         </execute>
+         <require path="{Workspace}\\build\\util\\LASTCHANGE.committime"/>
          <target name="gn-gen" type="generic"
                  executable="{Tool:gn}"
                  workingDirectory="{Workspace}" showOutput="true">
