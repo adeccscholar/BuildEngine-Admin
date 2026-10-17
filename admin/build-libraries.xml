@@ -9429,9 +9429,14 @@
          <execute name="normalize-external-sdk-includes" executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}" showOutput="true">
             <argument value="-c"/>
-            <argument value="from pathlib import Path; root=Path('.'); mapping={'third_party/abseil-cpp/absl/':'absl/','third_party/icu/source/common/unicode/':'unicode/','third_party/icu/source/i18n/unicode/':'unicode/','third_party/skia/include/':'include/'}; changed=0; files=(p for p in root.rglob('*') if p.suffix in ('.h','.cc','.cpp','.c','.hpp') and not p.is_symlink()); exec('for p in files:\n s=p.read_text(encoding=\u0027utf-8\u0027); t=s;\n for old,new in mapping.items(): t=t.replace(\u0027&quot;\u0027+old,\u0027&quot;\u0027+new);\n if t!=s: p.write_text(t,encoding=\u0027utf-8\u0027); changed+=1'); print('PDFium SDK include normalization: files='+str(changed))"/>
+            <argument value="from pathlib import Path; root=Path('.'); mapping=(('third_party/abseil-cpp/absl/','absl/'),('third_party/icu/source/common/unicode/','unicode/'),('third_party/icu/source/i18n/unicode/','unicode/'),('third_party/skia/include/','include/')); changed=0; files=(p for p in root.rglob('*') if p.suffix in ('.h','.cc','.cpp','.c','.hpp') and not p.is_symlink()); exec('for p in files:\n s=p.read_text(encoding=\u0027utf-8\u0027); t=s;\n for old,new in mapping: t=t.replace(\u0027&quot;\u0027+old,\u0027&quot;\u0027+new);\n if t!=s: p.write_text(t,encoding=\u0027utf-8\u0027); changed+=1'); print('PDFium SDK include normalization: files='+str(changed))"/>
          </execute>
       </source>
+         <execute name="normalize-external-sdk-includes-on-resume" executable="{Tool:python}"
+                  workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-c"/>
+            <argument value="from pathlib import Path; root=Path('.'); mapping=(('third_party/abseil-cpp/absl/','absl/'),('third_party/icu/source/common/unicode/','unicode/'),('third_party/icu/source/i18n/unicode/','unicode/'),('third_party/skia/include/','include/')); changed=0; files=(p for p in root.rglob('*') if p.suffix in ('.h','.cc','.cpp','.c','.hpp') and not p.is_symlink()); exec('for p in files:\n s=p.read_text(encoding=\u0027utf-8\u0027); t=s;\n for old,new in mapping: t=t.replace(\u0027&quot;\u0027+old,\u0027&quot;\u0027+new);\n if t!=s: p.write_text(t,encoding=\u0027utf-8\u0027); changed+=1'); print('PDFium SDK include normalization: files='+str(changed))"/>
+         </execute>
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
