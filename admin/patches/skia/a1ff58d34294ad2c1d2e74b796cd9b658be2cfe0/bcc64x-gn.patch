@@ -145,123 +145,122 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
  
    if (is_android) {
      _prefix = "$ndk/toolchains/llvm/prebuilt/$ndk_host/bin"
-@@ -162,35 +164,51 @@
+@@ -305,7 +307,7 @@
+         rspfile = "{{output}}.rsp"
+         rspfile_content = "{{inputs}}"
+         rm_py = rebase_path("../rm.py")
++        command = "$shell $python_executable \"$rm_py\" \"{{output}}\" && $ar rcs {{output}} @$rspfile"
+-        command = "$shell python3 \"$rm_py\" \"{{output}}\" && $ar rcs {{output}} @$rspfile"
+       }
+ 
+       outputs =
+@@ -319,41 +321,63 @@
      }
  
      tool("solink") {
--      dllname = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
--      libname = "${dllname}.lib"
--      pdbname = "${dllname}.pdb"
--      rspfile = "${dllname}.rsp"
--
--      command = "$link /nologo /IMPLIB:$libname /DLL /OUT:$dllname /PDB:$pdbname @$rspfile"
--      outputs = [
--        dllname,
--        libname,
--        pdbname,
--      ]
--      default_output_extension = ".dll"
--      default_output_dir = "{{root_out_dir}}"
--
--      link_output = libname
--      depend_output = libname
--      runtime_outputs = [
--        dllname,
--        pdbname,
--      ]
--
--      # I don't quite understand this.  Aping Chrome's toolchain/win/BUILD.gn.
--      restat = true
--
--      # inputs_newline works around a fixed per-line buffer size in the linker.
--      rspfile_content = "{{inputs_newline}} {{libs}} {{solibs}} {{ldflags}}"
--      description = "link {{output}}"
--      if (0 <= link_pool_depth) {
--        pool = ":link_pool($default_toolchain)"
 +      if (skia_use_bcc64x && current_toolchain == default_toolchain) {
 +        dllname = "{{root_out_dir}}/{{target_output_name}}{{output_extension}}"
 +        libname = "{{root_out_dir}}/{{target_output_name}}.lib"
 +        rspfile = "${dllname}.rsp"
++        command = "$shell $link --rsp-quoting=windows -L\"$bcc64x_mingw_lib_dir\" -tD -o$dllname @$rspfile -Wl,--out-implib,$libname"
 +        rspfile_content = "{{inputs}} {{libs}} {{solibs}} {{ldflags}}"
-+        command = "$shell $link --rsp-quoting=windows -L\"$bcc64x_mingw_lib_dir\" -tD -tR -o$dllname @$rspfile -Wl,--out-implib,$libname"
-+        outputs = [ dllname, libname ]
++        outputs = [
++          dllname,
++          libname,
++        ]
 +        default_output_extension = ".dll"
 +        default_output_dir = "{{root_out_dir}}"
 +        link_output = libname
 +        depend_output = libname
 +        runtime_outputs = [ dllname ]
 +        restat = true
-+        description = "BCC64X DLL {{output}}"
-+      } else {
-+        dllname = "{{output_dir}}/{{target_output_name}}{{output_extension}}"
-+        libname = "${dllname}.lib"
-+        pdbname = "${dllname}.pdb"
-+        rspfile = "${dllname}.rsp"
-+  
-+        command = "$link /nologo /IMPLIB:$libname /DLL /OUT:$dllname /PDB:$pdbname @$rspfile"
-+        outputs = [
-+          dllname,
-+          libname,
-+          pdbname,
-+        ]
-+        default_output_extension = ".dll"
-+        default_output_dir = "{{root_out_dir}}"
-+  
-+        link_output = libname
-+        depend_output = libname
-+        runtime_outputs = [
-+          dllname,
-+          pdbname,
-+        ]
-+  
-+        # I don't quite understand this.  Aping Chrome's toolchain/win/BUILD.gn.
-+        restat = true
-+  
-+        # inputs_newline works around a fixed per-line buffer size in the linker.
-+        rspfile_content = "{{inputs_newline}} {{libs}} {{solibs}} {{ldflags}}"
 +        description = "link {{output}}"
 +        if (0 <= link_pool_depth) {
 +          pool = ":link_pool($default_toolchain)"
 +        }
++      } else {
++        soname = "{{target_output_name}}{{output_extension}}"
+-      soname = "{{target_output_name}}{{output_extension}}"
+ 
++        rpath = "-Wl,-soname,$soname"
++        if (is_mac || is_ios) {
++          rpath = "-Wl,-install_name,@rpath/$soname"
++        }
+-      rpath = "-Wl,-soname,$soname"
+-      if (is_mac || is_ios) {
+-        rpath = "-Wl,-install_name,@rpath/$soname"
+-      }
+ 
++        rspfile = "{{output}}.rsp"
++        rspfile_content = "{{inputs}}"
+-      rspfile = "{{output}}.rsp"
+-      rspfile_content = "{{inputs}}"
+ 
++        # --start-group/--end-group let us link multiple .a {{inputs}}
++        # without worrying about their relative order on the link line.
++        #
++        # This is mostly important for traditional linkers like GNU ld and Gold.
++        # The Mac/iOS linker neither needs nor accepts these flags.
++        # LLD doesn't need these flags, but accepts and ignores them.
++        _start_group = "-Wl,--start-group"
++        _end_group = "-Wl,--end-group"
++        if (is_mac || is_ios) {
++          _start_group = ""
++          _end_group = ""
++        }
+-      # --start-group/--end-group let us link multiple .a {{inputs}}
+-      # without worrying about their relative order on the link line.
+-      #
+-      # This is mostly important for traditional linkers like GNU ld and Gold.
+-      # The Mac/iOS linker neither needs nor accepts these flags.
+-      # LLD doesn't need these flags, but accepts and ignores them.
+-      _start_group = "-Wl,--start-group"
+-      _end_group = "-Wl,--end-group"
+-      if (is_mac || is_ios) {
+-        _start_group = ""
+-        _end_group = ""
+-      }
+ 
++        command = "$link -shared {{ldflags}} $_start_group @$rspfile {{frameworks}} {{solibs}} $_end_group {{libs}} $rpath -o {{output}}"
++        outputs = [ "{{root_out_dir}}/$soname" ]
++        output_prefix = "lib"
++        if (is_mac || is_ios) {
++          default_output_extension = ".dylib"
++        } else {
++          default_output_extension = ".so"
++        }
++        description = "link {{output}}"
++        if (0 <= link_pool_depth) {
++          pool = ":link_pool($default_toolchain)"
++        }
+-      command = "$link -shared {{ldflags}} $_start_group @$rspfile {{frameworks}} {{solibs}} $_end_group {{libs}} $rpath -o {{output}}"
+-      outputs = [ "{{root_out_dir}}/$soname" ]
+-      output_prefix = "lib"
+-      if (is_mac || is_ios) {
+-        default_output_extension = ".dylib"
+-      } else {
+-        default_output_extension = ".so"
        }
+-      description = "link {{output}}"
+-      if (0 <= link_pool_depth) {
+-        pool = ":link_pool($default_toolchain)"
+-      }
      }
  
-@@ -305,7 +323,7 @@
-         rspfile = "{{output}}.rsp"
-         rspfile_content = "{{inputs}}"
-         rm_py = rebase_path("../rm.py")
--        command = "$shell python3 \"$rm_py\" \"{{output}}\" && $ar rcs {{output}} @$rspfile"
-+        command = "$shell $python_executable \"$rm_py\" \"{{output}}\" && $ar rcs {{output}} @$rspfile"
-       }
- 
-       outputs =
-@@ -373,7 +391,12 @@
-         _start_group = ""
-         _end_group = ""
-       }
--      command = "$link {{ldflags}} $_start_group @$rspfile {{frameworks}} {{solibs}} $_end_group {{libs}} -o $exe_name"
-+      if (skia_use_bcc64x && current_toolchain == default_toolchain) {
-+        rspfile_content = "{{inputs}} {{libs}} {{solibs}} {{ldflags}}"
-+        command = "$shell $link --rsp-quoting=windows -L\"$bcc64x_mingw_lib_dir\" -tR -o $exe_name @$rspfile"
-+      } else {
-+        command = "$link {{ldflags}} $_start_group @$rspfile {{frameworks}} {{solibs}} $_end_group {{libs}} -o $exe_name"
-+      }
- 
-       outputs = [ "$exe_name" ]
-       description = "link {{output}}"
-@@ -389,13 +412,13 @@
+     tool("link") {
+@@ -389,13 +413,13 @@
  
      tool("copy") {
        cp_py = rebase_path("../cp.py")
--      command = "python3 \"$cp_py\" {{source}} {{output}}"
 +      command = "$python_executable \"$cp_py\" {{source}} {{output}}"
+-      command = "python3 \"$cp_py\" {{source}} {{output}}"
        description = "copy {{source}} {{output}}"
      }
  
      tool("copy_bundle_data") {
        cp_py = rebase_path("../cp.py")
--      command = "python3 \"$cp_py\" {{source}} {{output}}"
 +      command = "$python_executable \"$cp_py\" {{source}} {{output}}"
+-      command = "python3 \"$cp_py\" {{source}} {{output}}"
        description = "copy_bundle_data {{source}} {{output}}"
      }
  
