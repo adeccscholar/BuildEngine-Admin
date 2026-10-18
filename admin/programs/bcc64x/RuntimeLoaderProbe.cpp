@@ -5,6 +5,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <cstdio>
+#include <cstddef>
 #include <cstring>
 #include <cwchar>
 #include <iterator>
@@ -206,6 +207,86 @@ void DiagnoseImage(std::wstring const& path) {
          static_cast<unsigned>(rawValid), static_cast<unsigned>(rvaValid));
    }
    std::wprintf(L"[LOADER] IMAGE: suspicious-section-count=%u\n", invalidSections);
+
+
+   // DllCharacteristics=0x4000 marks Control Flow Guard support. An invalid
+   // load-config directory or invalid TLS virtual addresses are especially
+   // relevant when SEC_IMAGE mapping succeeds but normal LoadLibrary fails.
+   // Read RVA-backed structures from file offsets; never treat an RVA as an
+   // ordinary pointer into the raw-mapped file.
+   auto rawOffset = [&](DWORD rva, std::size_t bytes) -> std::size_t {
+      for(unsigned i = 0; i < nt->FileHeader.NumberOfSections; ++i) {
+         auto const* section = file.At<IMAGE_SECTION_HEADER>(
+            sectionOffset + i * sizeof(IMAGE_SECTION_HEADER));
+         if(!section || rva < section->VirtualAddress) continue;
+         std::size_t const displacement = rva - section->VirtualAddress;
+         if(displacement > section->SizeOfRawData ||
+            bytes > section->SizeOfRawData - displacement) continue;
+         std::size_t const offset = section->PointerToRawData + displacement;
+         if(offset <= file.length && bytes <= file.length - offset) return offset;
+      }
+      return file.length;
+   };
+   if(opt.NumberOfRvaAndSizes > IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG) {
+      auto const& load = opt.DataDirectory[IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG];
+      bool const guardCf = (opt.DllCharacteristics &
+         IMAGE_DLLCHARACTERISTICS_GUARD_CF) != 0U;
+      std::wprintf(L"[LOADER] IMAGE: CFG-flag=%u LoadConfigRVA=0x%08lX LoadConfigSize=0x%08lX\n",
+         static_cast<unsigned>(guardCf),
+         static_cast<unsigned long>(load.VirtualAddress),
+         static_cast<unsigned long>(load.Size));
+      if(load.VirtualAddress != 0U && load.Size >= sizeof(DWORD)) {
+         std::size_t const at = rawOffset(load.VirtualAddress, sizeof(DWORD));
+         auto const* declaredSize = file.At<DWORD>(at);
+         if(declaredSize)
+            std::wprintf(L"[LOADER] IMAGE: LoadConfigDeclaredSize=0x%08lX\n",
+               static_cast<unsigned long>(*declaredSize));
+         constexpr std::size_t guardOffset =
+            offsetof(IMAGE_LOAD_CONFIG_DIRECTORY64, GuardFlags);
+         if(load.Size >= guardOffset + sizeof(DWORD)) {
+            std::size_t const guardAt = rawOffset(
+               load.VirtualAddress + static_cast<DWORD>(guardOffset), sizeof(DWORD));
+            auto const* const flags = file.At<DWORD>(guardAt);
+            if(flags)
+               std::wprintf(L"[LOADER] IMAGE: LoadConfig.GuardFlags=0x%08lX\n",
+                  static_cast<unsigned long>(*flags));
+            else
+               std::wprintf(L"[LOADER] IMAGE: LoadConfig.GuardFlags RVA INVALID\n");
+         }
+      }
+   }
+   if(opt.NumberOfRvaAndSizes > IMAGE_DIRECTORY_ENTRY_TLS) {
+      auto const& tls = opt.DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS];
+      std::wprintf(L"[LOADER] IMAGE: TLS-RVA=0x%08lX TLS-Size=0x%08lX\n",
+         static_cast<unsigned long>(tls.VirtualAddress),
+         static_cast<unsigned long>(tls.Size));
+      if(tls.VirtualAddress != 0U) {
+         std::size_t const at = rawOffset(tls.VirtualAddress,
+            sizeof(IMAGE_TLS_DIRECTORY64));
+         auto const* t = file.At<IMAGE_TLS_DIRECTORY64>(at);
+         if(!t) {
+            std::wprintf(L"[LOADER] IMAGE: TLS directory truncated or not in raw section\n");
+         }
+         else {
+            auto inImage = [&](ULONGLONG va) -> unsigned {
+               return static_cast<unsigned>(va >= opt.ImageBase &&
+                  va - opt.ImageBase < opt.SizeOfImage);
+            };
+            std::wprintf(L"[LOADER] IMAGE: TLS RawStart=0x%llX RawEnd=0x%llX IndexVA=0x%llX CallbackVA=0x%llX\n",
+               static_cast<unsigned long long>(t->StartAddressOfRawData),
+               static_cast<unsigned long long>(t->EndAddressOfRawData),
+               static_cast<unsigned long long>(t->AddressOfIndex),
+               static_cast<unsigned long long>(t->AddressOfCallBacks));
+            std::wprintf(L"[LOADER] IMAGE: TLS index-in-image=%u callbacks-in-image=%u raw-start-in-image=%u raw-end-in-image=%u ZeroFill=%lu\n",
+               inImage(t->AddressOfIndex),
+               static_cast<unsigned>(t->AddressOfCallBacks == 0U ||
+                  inImage(t->AddressOfCallBacks)),
+               inImage(t->StartAddressOfRawData),
+               inImage(t->EndAddressOfRawData),
+               static_cast<unsigned long>(t->SizeOfZeroFill));
+         }
+      }
+   }
 
    HANDLE const rawFile = ::CreateFileW(path.c_str(), GENERIC_READ,
       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr,

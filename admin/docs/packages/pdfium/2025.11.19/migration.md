@@ -374,3 +374,11 @@ After making the explicitly required Embarcadero `libwinpthread-1-370.dll` avail
 For any `ERROR_BAD_EXE_FORMAT`, the generic native C++ RuntimeLoaderProbe now logs the PE file's size, DLL characteristic, image/header sizes, entry point, alignments, base relocations/import/exception directories and section raw/RVA bounds. Then it tests `CreateFileMappingW(PAGE_READONLY | SEC_IMAGE_NO_EXECUTE)` followed by `MapViewOfFile` on that same DLL. This asks Windows to map the PE as an image **without resolving its imports or invoking its DLL entry point**. If kernel image mapping fails, focus on the PDFium PE/LLD output. If mapping succeeds but `LoadLibraryExW` remains 193, investigate the dynamic loader's processing of imports/relocations and other loader-only checks. Neither result on its own proves a specific root cause. Diagnostics are informational and do not modify source, GN link parameters, installed packages or the runtime DLL closure.
 
 **Native test pending.** The previous Release evidence demonstrates import closure but does not prove the DLL image is valid.
+
+## CFG and TLS image metadata investigation (18 October 2026)
+
+The uploaded Release loader evidence shows all 13 prerequisite DLLs load successfully and the 8,841,216-byte `pdfium.dll` maps via `SEC_IMAGE_NO_EXECUTE`. Its seven PE sections have valid recorded raw/RVA bounds, but regular `LoadLibraryExW` still fails Win32=193. Crucially, its `DllCharacteristics=0x4160` includes the `IMAGE_DLLCHARACTERISTICS_GUARD_CF` (0x4000) bit. The image has a `.tls` section; whether TLS/CFG loader metadata is internally valid remains unverified.
+
+The generic `RuntimeLoaderProbe.cpp` now records the actual load-config directory RVA/size, its declared size and `GuardFlags` when safely readable, plus the TLS directory and key VA ranges. It converts RVA to raw-file offsets using section headers and range bounds; it does **not** reinterpret raw file RVAs as pointers. These read-only diagnostics run only on a DLL reporting `ERROR_BAD_EXE_FORMAT` and **do not change linker options, compilation, package dependencies or DLL contents**. A missing/invalid load-config in a CFG-marked PE would justify a precise subsequent GN/LLD investigation; it is not assumed in advance.
+
+**Native output pending:** The exact LoadConfig and TLS values are unknown until the next Release probe run.
