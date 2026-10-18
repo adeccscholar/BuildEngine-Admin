@@ -46,6 +46,10 @@ def Translate(a_strArgument: str) -> list[str]:
         "/GR": "-frtti",
         "/Zi": "-gcodeview",
         "/utf-8": "-finput-charset=UTF-8",
+        "/Zc:sizedDealloc-": "-fno-sized-deallocation",
+        "/Z7": "-gcodeview",
+        "/W3": "-Wall",
+        "/guard:cf": "-mguard=cf",
     }
     if a_strArgument == "/TC":
         # The C GN tool already selects a .c source file. BCC64X infers C mode
@@ -59,6 +63,8 @@ def Translate(a_strArgument: str) -> list[str]:
         "/FS": "PDB synchronization is MSVC-specific; BCC64X emits per-object debug data",
         "/bigobj": "LLVM COFF writer supports extended sections natively",
         "/Zc:inline": "Clang applies standard C++ inline semantics",
+        "/Zc:twoPhase": "Clang applies standard two-phase C++ name lookup",
+        "/Brepro": "Clang reproducibility is enforced by existing -ffile-reproducible and debug-prefix configuration",
         "/Zc:__cplusplus": "Clang reports the active standard in __cplusplus",
     }
     if a_strArgument in mpIntrinsic:
