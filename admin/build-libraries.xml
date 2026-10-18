@@ -9340,7 +9340,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-18T16:50:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-18T16:55:00Z">
       <dependency library="skia" version="153"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
@@ -9440,6 +9440,23 @@
          </execute>
          <require path="{CurrentArtifact}\third_party\skia\include\core\SkSurface.h"/>
          <require path="{CurrentArtifact}\third_party\skia\modules\skcms\skcms.h"/>
+         <!-- Port PDFium's old gradient factories to installed Skia 153.
+              Use the pinned, independently verified Git patch; never modify Skia. -->
+         <execute name="skia153-gradient-patch-check" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-skia153-gradient.patch"/>
+         </execute>
+         <execute name="skia153-gradient-patch-apply" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-skia153-gradient.patch"/>
+         </execute>
+         <execute name="skia153-gradient-patch-verify" executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-skia153-gradient.patch"/>
+         </execute>
          <!-- Materialize the exact PDFium DEPS checkout, not just its download. -->
          <execute name="prepare-fast_float-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/>
