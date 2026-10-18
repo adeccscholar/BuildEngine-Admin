@@ -122,6 +122,128 @@ void ReportImports(std::wstring const& path) {
 }
 
 
+void DiagnoseImage(std::wstring const& path) {
+   // A PE32+ AMD64 signature is not sufficient to prove Windows can map an
+   // image. Inspect its section table and ask the kernel to create an
+   // image section without resolving imports or calling DllMain.
+   MappedFile const file { path };
+   auto const* dos = file.At<IMAGE_DOS_HEADER>(0U);
+   if(!dos || dos->e_magic != IMAGE_DOS_SIGNATURE || dos->e_lfanew < 0) {
+      std::wprintf(L"[LOADER] IMAGE: cannot inspect DOS header\n");
+      return;
+   }
+   std::size_t const ntOffset = static_cast<std::size_t>(dos->e_lfanew);
+   auto const* nt = file.At<IMAGE_NT_HEADERS64>(ntOffset);
+   if(!nt || nt->Signature != IMAGE_NT_SIGNATURE ||
+      nt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+      std::wprintf(L"[LOADER] IMAGE: cannot inspect PE32+ optional header\n");
+      return;
+   }
+
+   WORD const characteristics = nt->FileHeader.Characteristics;
+   auto const& opt = nt->OptionalHeader;
+   std::wprintf(L"[LOADER] IMAGE: FileBytes=%llu DLL=%u Characteristics=0x%04X\n",
+      static_cast<unsigned long long>(file.length),
+      static_cast<unsigned>((characteristics & IMAGE_FILE_DLL) != 0U),
+      static_cast<unsigned>(characteristics));
+   std::wprintf(L"[LOADER] IMAGE: SizeOfImage=0x%08lX SizeOfHeaders=0x%08lX EntryRVA=0x%08lX\n",
+      static_cast<unsigned long>(opt.SizeOfImage),
+      static_cast<unsigned long>(opt.SizeOfHeaders),
+      static_cast<unsigned long>(opt.AddressOfEntryPoint));
+   std::wprintf(L"[LOADER] IMAGE: ImageBase=0x%llX SectionAlignment=0x%08lX FileAlignment=0x%08lX DllCharacteristics=0x%04X\n",
+      static_cast<unsigned long long>(opt.ImageBase),
+      static_cast<unsigned long>(opt.SectionAlignment),
+      static_cast<unsigned long>(opt.FileAlignment),
+      static_cast<unsigned>(opt.DllCharacteristics));
+
+   if(opt.NumberOfRvaAndSizes > IMAGE_DIRECTORY_ENTRY_BASERELOC) {
+      auto const& reloc = opt.DataDirectory[IMAGE_DIRECTORY_ENTRY_BASERELOC];
+      std::wprintf(L"[LOADER] IMAGE: BaseRelocRVA=0x%08lX BaseRelocSize=0x%08lX\n",
+         static_cast<unsigned long>(reloc.VirtualAddress),
+         static_cast<unsigned long>(reloc.Size));
+   }
+   if(opt.NumberOfRvaAndSizes > IMAGE_DIRECTORY_ENTRY_IMPORT) {
+      auto const& imports = opt.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+      std::wprintf(L"[LOADER] IMAGE: ImportRVA=0x%08lX ImportSize=0x%08lX\n",
+         static_cast<unsigned long>(imports.VirtualAddress),
+         static_cast<unsigned long>(imports.Size));
+   }
+   if(opt.NumberOfRvaAndSizes > IMAGE_DIRECTORY_ENTRY_EXCEPTION) {
+      auto const& unwind = opt.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXCEPTION];
+      std::wprintf(L"[LOADER] IMAGE: ExceptionRVA=0x%08lX ExceptionSize=0x%08lX\n",
+         static_cast<unsigned long>(unwind.VirtualAddress),
+         static_cast<unsigned long>(unwind.Size));
+   }
+
+   std::size_t const sectionOffset = ntOffset + sizeof(DWORD) +
+      sizeof(IMAGE_FILE_HEADER) + nt->FileHeader.SizeOfOptionalHeader;
+   unsigned invalidSections = 0U;
+   for(unsigned i = 0U; i < nt->FileHeader.NumberOfSections; ++i) {
+      auto const* section = file.At<IMAGE_SECTION_HEADER>(
+         sectionOffset + i * sizeof(IMAGE_SECTION_HEADER));
+      if(!section) {
+         std::wprintf(L"[LOADER] IMAGE: section table truncated at %u\n", i);
+         ++invalidSections;
+         break;
+      }
+      char sectionName[9] {};
+      for(std::size_t j = 0U; j < sizeof(section->Name); ++j) {
+         unsigned char const c = section->Name[j];
+         sectionName[j] = (c == 0U || (c >= 32U && c < 127U))
+            ? static_cast<char>(c) : '?';
+      }
+      std::size_t const raw = section->PointerToRawData;
+      bool const rawValid = (section->SizeOfRawData == 0U) ||
+         (raw <= file.length && section->SizeOfRawData <= file.length - raw);
+      bool const rvaValid = section->VirtualAddress <= opt.SizeOfImage &&
+         section->Misc.VirtualSize <= opt.SizeOfImage - section->VirtualAddress;
+      if(!rawValid || !rvaValid) ++invalidSections;
+      std::wprintf(L"[LOADER] IMAGE: section[%u] %hs RVA=0x%08lX VirtualSize=0x%08lX Raw=0x%08lX RawSize=0x%08lX rawValid=%u rvaValid=%u\n",
+         i, sectionName, static_cast<unsigned long>(section->VirtualAddress),
+         static_cast<unsigned long>(section->Misc.VirtualSize),
+         static_cast<unsigned long>(section->PointerToRawData),
+         static_cast<unsigned long>(section->SizeOfRawData),
+         static_cast<unsigned>(rawValid), static_cast<unsigned>(rvaValid));
+   }
+   std::wprintf(L"[LOADER] IMAGE: suspicious-section-count=%u\n", invalidSections);
+
+   HANDLE const rawFile = ::CreateFileW(path.c_str(), GENERIC_READ,
+      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr,
+      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+   if(rawFile == INVALID_HANDLE_VALUE) {
+      DWORD const error = ::GetLastError();
+      std::wprintf(L"[LOADER] IMAGE CreateFileW FAILED: Win32=%lu\n",
+         static_cast<unsigned long>(error));
+      SystemError(error);
+      return;
+   }
+   HANDLE const imageMapping = ::CreateFileMappingW(rawFile, nullptr,
+      PAGE_READONLY | SEC_IMAGE_NO_EXECUTE, 0U, 0U, nullptr);
+   if(!imageMapping) {
+      DWORD const error = ::GetLastError();
+      std::wprintf(L"[LOADER] IMAGE CreateFileMappingW(SEC_IMAGE_NO_EXECUTE) FAILED: Win32=%lu (0x%08lX)\n",
+         static_cast<unsigned long>(error), static_cast<unsigned long>(error));
+      SystemError(error);
+      ::CloseHandle(rawFile);
+      return;
+   }
+   void const* const image = ::MapViewOfFile(imageMapping, FILE_MAP_READ,
+      0U, 0U, 0U);
+   if(image) {
+      std::wprintf(L"[LOADER] IMAGE SEC_IMAGE_NO_EXECUTE mapping PASS (imports and DllMain not executed)\n");
+      ::UnmapViewOfFile(image);
+   }
+   else {
+      DWORD const error = ::GetLastError();
+      std::wprintf(L"[LOADER] IMAGE MapViewOfFile FAILED: Win32=%lu (0x%08lX)\n",
+         static_cast<unsigned long>(error), static_cast<unsigned long>(error));
+      SystemError(error);
+   }
+   ::CloseHandle(imageMapping);
+   ::CloseHandle(rawFile);
+}
+
+
 bool ProbeOne(std::wstring const& name, std::wstring const& appDirectory,
               std::size_t index, std::size_t total) {
    std::wprintf(L"[LOADER] BEGIN %zu/%zu: %ls\n", index, total, name.c_str());
@@ -170,6 +292,9 @@ bool ProbeOne(std::wstring const& name, std::wstring const& appDirectory,
       std::wprintf(L"[LOADER] LoadLibraryExW FAILED: Win32=%lu (0x%08lX), DLL=%ls\n",
          static_cast<unsigned long>(error), static_cast<unsigned long>(error), name.c_str());
       SystemError(error);
+      if(error == ERROR_BAD_EXE_FORMAT) {
+         DiagnoseImage(path);
+      }
       std::wprintf(L"[LOADER] RESULT %ls: FAIL\n", name.c_str());
       std::fflush(stdout);
       return false;
