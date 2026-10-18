@@ -1,0 +1,56 @@
+diff --git a/core/fxge/skia/fx_skia_device.cpp b/core/fxge/skia/fx_skia_device.cpp
+--- a/core/fxge/skia/fx_skia_device.cpp
++++ b/core/fxge/skia/fx_skia_device.cpp
+@@ -77,7 +77,7 @@
+ #include "third_party/skia/include/core/SkTileMode.h"
+ #include "third_party/skia/include/core/SkTypeface.h"
+ #include "third_party/skia/include/effects/SkDashPathEffect.h"
+-#include "third_party/skia/include/effects/SkGradientShader.h"
++#include "third_party/skia/include/effects/SkGradient.h"
+ #include "third_party/skia/include/pathops/SkPathOps.h"
+ 
+ namespace {
+@@ -1235,7 +1235,19 @@
+       return false;
+     }
+   }
+-  RetainPtr<const CPDF_Array> pArray = dict->GetArrayFor("Extend");
++  // Skia 153 uses SkColor4f spans rather than packed SkColor arrays.
++  std::vector<SkColor4f> gradient_colors;
++  gradient_colors.reserve(sk_colors.size());
++  for (SkColor color : sk_colors) {
++    gradient_colors.push_back(SkColor4f::FromColor(color));
++  }
++  const SkGradient gradient(
++      SkGradient::Colors(
++          SkSpan<const SkColor4f>(gradient_colors.data(), gradient_colors.size()),
++          SkSpan<const float>(sk_pos.data(), sk_pos.size()),
++          SkTileMode::kClamp),
++      SkGradient::Interpolation{});
++  RetainPtr<const CPDF_Array> pArray = dict->GetArrayFor("Extend");
+   bool clipStart = !pArray || !pArray->GetIntegerAt(0);
+   bool clipEnd = !pArray || !pArray->GetIntegerAt(1);
+   SkPaint paint;
+@@ -1253,9 +1265,7 @@
+     float end_y = pCoords->GetFloatAt(3);
+     SkPoint pts[] = {{start_x, start_y}, {end_x, end_y}};
+     skMatrix.mapPoints(pts);
+-    paint.setShader(SkGradientShader::MakeLinear(
+-        pts, sk_colors.data(), sk_pos.data(),
+-        fxcrt::CollectionSize<int>(sk_colors), SkTileMode::kClamp));
++    paint.setShader(SkShaders::LinearGradient(pts, gradient));
+     if (clipStart || clipEnd) {
+       // if the gradient is horizontal or vertical, modify the draw rectangle
+       if (pts[0].fX == pts[1].fX) {  // vertical
+@@ -1300,9 +1310,8 @@
+     float end_r = pCoords->GetFloatAt(5);
+     SkPoint pts[] = {{start_x, start_y}, {end_x, end_y}};
+ 
+-    paint.setShader(SkGradientShader::MakeTwoPointConical(
+-        pts[0], start_r, pts[1], end_r, sk_colors.data(), sk_pos.data(),
+-        fxcrt::CollectionSize<int>(sk_colors), SkTileMode::kClamp));
++    paint.setShader(SkShaders::TwoPointConicalGradient(
++        pts[0], start_r, pts[1], end_r, gradient));
+     if (clipStart || clipEnd) {
+       if (clipStart && start_r) {
+         skClip.addCircle(pts[0].fX, pts[0].fY, start_r);
