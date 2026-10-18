@@ -137,3 +137,16 @@ now schedule and install Skia 144 before PDFium's build.
 no Windows `gn gen`, `ninja`, DLL load or smoke evidence has been collected.
 Build success must not be inferred. If the new 144 producer fails, PDFium is
 correctly blocked rather than reverting silently to 153.
+
+
+## PDFium link closure: PathOps and empty font manager (19 October 2026)
+
+The uploaded Release `04-execute.log` reached `[604/604] BCC64X DLL ./pdfium.dll` without a preceding C++ compilation error and failed at link with **two** undefined symbols, not only the first diagnostic printed by the FSM summary:
+- `SkFontMgr_New_Custom_Empty()`, required by `CFX_GlyphCache::GetDeviceCache()`.
+- `Op(SkPath const&, SkPath const&, SkPathOp)`, required by `CFX_SkiaDeviceDriver::DrawPath()`.
+
+Both APIs and their implementation sources exist in the **pinned** Skia 144 upstream tree. `SkFontMgr_New_Custom_Empty` is provided through Skia's optional `:fontmgr_custom_empty` GN target; `Op` comes from `:pathops`. Skia's present BuildEngine CPU/raster GN profile sets `skia_use_freetype = false`, which disables the default empty font manager, and the `skia` component's dependency list does not explicitly retain both interfaces for the external PDFium consumer. A successful independent Skia smoke did not prove these particular exports.
+
+The new checked, revision-specific source patch `admin/patches/skia/a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0/bcc64x-pdfium-symbol-closure.patch` adds `:pathops` and `:fontmgr_custom_empty` to the Skia DLL GN dependency closure. The Skia 144 XML build now explicitly enables `skia_enable_fontmgr_custom_empty` and configures the existing BuildEngine FreeType 2.14.3 include directory and variant-matched import library via `skia_use_system_freetype2`. The source patch runs with ordered Git preimage/reverse checks before Debug/Release builds. The PDFium Skia 144 dependency and independently installed DLL/import-library architecture are unchanged. **No private Skia objects are linked or recompiled inside PDFium.**
+
+**Evidence boundary:** The source definitions and link errors support this correction, but exported PE symbol names, the transitive FreeType closure, successful Skia rebuild, and Debug/Release PDFium relinking remain **[not verified]** until the next native Windows run. If a GN dependency or export still fails, inspect its exact producer symbol table and generated GN graph; do not hide it with a PDFium-local shim or copied object file.
