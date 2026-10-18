@@ -375,6 +375,24 @@ bool ProbeOne(std::wstring const& name, std::wstring const& appDirectory,
       SystemError(error);
       if(error == ERROR_BAD_EXE_FORMAT) {
          DiagnoseImage(path);
+
+         // Diagnostic only: map the target DLL without resolving imports or
+         // invoking its entry point. Never call exports from this handle.
+         // This does not identify the failing transitive dependency.
+         ::SetLastError(ERROR_SUCCESS);
+         HMODULE const imageOnly = ::LoadLibraryExW(
+            path.c_str(), nullptr, DONT_RESOLVE_DLL_REFERENCES);
+         if(imageOnly) {
+            std::wprintf(L"[LOADER] DONT_RESOLVE_DLL_REFERENCES: PASS (target mapped without import resolution or DllMain)\n");
+            ::FreeLibrary(imageOnly);
+         }
+         else {
+            DWORD const mapError = ::GetLastError();
+            std::wprintf(L"[LOADER] DONT_RESOLVE_DLL_REFERENCES: FAIL Win32=%lu (0x%08lX)\n",
+               static_cast<unsigned long>(mapError),
+               static_cast<unsigned long>(mapError));
+            SystemError(mapError);
+         }
       }
       std::wprintf(L"[LOADER] RESULT %ls: FAIL\n", name.c_str());
       std::fflush(stdout);
