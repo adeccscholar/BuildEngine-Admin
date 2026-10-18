@@ -5373,7 +5373,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-18T19:01:00Z">
+   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-18T19:02:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
@@ -5420,6 +5420,20 @@
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-system-packages.patch"/>
          </execute>
+         <!-- Port the validated Skia 153 DirectWrite COM/refcount compatibility
+              against the exact pinned Skia 144 source revision. -->
+         <execute name="skia144-directwrite-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-directwrite.patch"/>
+         </execute>
+         <execute name="skia144-directwrite-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-directwrite.patch"/>
+         </execute>
+         <execute name="skia144-directwrite-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-directwrite.patch"/>
+         </execute>
       </source>
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -5453,6 +5467,7 @@
                <line value="skia_enable_tools = false"/>
                <line value="skia_build_fuzzers = false"/>
                <line value="skia_build_rust_targets = false"/>
+               <line value="skia_enable_spirv_validation = false"/>
                <line value="skia_enable_ganesh = false"/>
                <line value="skia_enable_graphite = false"/>
                <line value="skia_use_gl = false"/>
