@@ -4,7 +4,7 @@ toolchain("bcc64x") {
   toolchain_args = {
     current_cpu = "x64"
     current_os = "win"
-    is_clang = false
+    is_clang = true
   }
 
   _cc = getenv("CB_BCC64X")
