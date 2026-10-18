@@ -94,3 +94,26 @@ untested package that would block the existing working stack.
   https://github.com/google/skia/blob/a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0/include/core/SkMilestone.h
 - Skia 153 milestone:
   https://github.com/google/skia/blob/2eed75b956045eb8603d3690a1e84bc582a2135d/include/core/SkMilestone.h
+
+## Porting evidence — 2026-10-18
+
+A version-specific patch was committed at:
+
+`admin/patches/skia/a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0/bcc64x-gn.patch`
+
+It adapts the eight upstream Skia 144 GN/toolchain files to BuildEngine's
+BCC64X driver and dynamically linked RTL. **All 28 patch hunks in eight
+files were compared with the exact pinned 144 sources**, and match their
+pre-images. It also names the principal library `skia144.dll`/`skia144.lib`
+to avoid Windows loader basename collisions with Skia 153.
+
+This proves patch preimage compatibility, **not** successful GN generation,
+DLL linking, or ABI export completeness. The broader 153 desktop, GPU,
+third-party dependency and generated component patches are not generally
+applicable to Skia 144 and must be ported separately; they have deliberately
+not been silently reused. The active XML library entry still needs its
+own complete validated dependency closure and installation contract.
+
+Do not mark Skia 144 as installed and do not switch PDFium to it until those
+steps are completed. When registered, the Schema 17 attribute must be
+`supersededBy="153"` on `<library id="skia" version="144" ...>`.
