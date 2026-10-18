@@ -5373,7 +5373,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-18T19:02:00Z">
+   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-18T19:03:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
@@ -5499,7 +5499,7 @@
                <line value="bcc64x_libpng_lib = getenv(&quot;CB_SKIA_LIBPNG_LIB&quot;)"/>
                <line value="bcc64x_libjpeg_include = getenv(&quot;CB_SKIA_LIBJPEG_INCLUDE&quot;)"/>
                <line value="bcc64x_libjpeg_lib = getenv(&quot;CB_SKIA_LIBJPEG_LIB&quot;)"/>
-               <line value="extra_cflags = [&quot;-DWIN32_LEAN_AND_MEAN&quot;,&quot;-DNOMINMAX&quot;]"/>
+               <line value="extra_cflags = [&quot;-DWIN32_LEAN_AND_MEAN&quot;,&quot;-DNOMINMAX&quot;,&quot;-Wno-unknown-pragmas&quot;]"/>
             </temporaryFile>
             <argument value="gen"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--script-executable={Tool:python}"/>
