@@ -1,7 +1,9 @@
 diff --git a/BUILD.gn b/BUILD.gn
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -1654,6 +1654,7 @@
+@@ -1651,9 +1651,10 @@
+     ":gpu",
+     ":graphite",
      ":jpeg_encode",
      ":pdf",
      ":pdf_jpeg_helpers",
@@ -9,7 +11,8 @@ diff --git a/BUILD.gn b/BUILD.gn
      ":webp_encode",
      ":xps",
    ]
-@@ -1663,6 +1664,7 @@
+@@ -1660,9 +1661,10 @@
+   deps = [
      ":android_utils",
      ":avif",
      ":crabbyavif",
@@ -17,3 +20,5 @@ diff --git a/BUILD.gn b/BUILD.gn
      ":hsw",
      ":jpeg_decode",
      ":jpegxl_decode",
+     ":lasx",
+     ":minify_sksl",
