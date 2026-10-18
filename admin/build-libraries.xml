@@ -9778,7 +9778,7 @@
 
 <build>
          <!-- No header staging: Skia 144 is consumed directly from its installation. -->
-         <require path="{InstallRoot}\packages\skia\144\include\core\SkSurface.h"/>
+         <require path="{InstallRoot}\packages\skia\144\include\include\core\SkSurface.h"/>
          <require path="{InstallRoot}\packages\skia\144\lib\win64\{Configuration}\skia144.lib"/>
          <!-- Validate source evidence on resumed builds before generating GN targets. -->
 
