@@ -348,7 +348,20 @@ diff --git a/BUILD.gn b/BUILD.gn
      cflags = [ "/arch:AVX512" ]
    } else {
      cflags = [ "-march=skylake-avx512" ]
-@@ -1643,6 +1643,10 @@
+@@ -493,7 +493,11 @@
+   public_defines = [ "SK_FONTMGR_GDI_AVAILABLE" ]
+   public = skia_ports_windows_fonts_public
+   sources = skia_ports_fonthost_win_sources
+-  libs = [ "Gdi32.lib" ]
++  if (skia_use_bcc64x) {
++    libs = [ "Gdi32" ]
++  } else {
++    libs = [ "Gdi32.lib" ]
++  }
+ }
+ 
+ if (skia_lex) {
+@@ -1643,6 +1647,10 @@
  }
  
  skia_component("skia") {
@@ -359,7 +372,7 @@ diff --git a/BUILD.gn b/BUILD.gn
    public_configs = [ ":skia_public" ]
    configs = skia_library_configs
  
-@@ -1735,10 +1739,11 @@
+@@ -1735,17 +1743,26 @@
                   "src/ports/SkDebug_win.cpp",
                   "src/ports/SkImageGeneratorWIC.cpp",
                 ]
@@ -374,7 +387,27 @@ diff --git a/BUILD.gn b/BUILD.gn
 +    }
  
      if (!skia_enable_winuwp) {
-       libs += [
+-      libs += [
+-        "FontSub.lib",
+-        "User32.lib",
+-        "Usp10.lib",
+-      ]
++      if (skia_use_bcc64x) {
++        libs += [
++          "FontSub",
++          "User32",
++          "Usp10",
++        ]
++      } else {
++        libs += [
++          "FontSub.lib",
++          "User32.lib",
++          "Usp10.lib",
++        ]
++      }
+     }
+   } else {
+     sources += [ "src/ports/SkOSFile_posix.cpp" ]
 diff --git a/third_party/third_party.gni b/third_party/third_party.gni
 --- a/third_party/third_party.gni
 +++ b/third_party/third_party.gni
