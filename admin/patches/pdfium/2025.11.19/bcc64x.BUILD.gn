@@ -11,6 +11,10 @@ toolchain("bcc64x") {
   _python = getenv("CB_PYTHON")
   _adapter = getenv("CB_GN_ARGUMENT_ADAPTER")
   assert(_python != "" && _adapter != "", "BCC64X argument adapter must be provided")
+  _bds = getenv("CB_BDS")
+  assert(_bds != "", "BuildEngine BCC64X installation root was not provided")
+  _rad_lib = _bds + "/lib/win64x/release"
+  _rad_psdk = _bds + "/lib/win64x/release/psdk"
   _ar = getenv("CB_LLVM_AR")
   _ucrt = getenv("CB_BCC64X_UCRT_COMPAT")
   assert(_ucrt != "", "BuildEngine BCC64X UCRT compatibility archive was not provided")
@@ -42,7 +46,7 @@ toolchain("bcc64x") {
   tool("link") {
     rspfile = "{{output}}.rsp"
     rspfile_content = "{{ldflags}} {{inputs}} $_ucrt {{solibs}} {{libs}}"
-    command = "\"$_python\" \"$_adapter\" --link-rsp \"$_cc\" \"$rspfile\" --rsp-quoting=windows -tR -o {{output}}"
+    command = "\"$_python\" \"$_adapter\" --link-rsp \"$_cc\" \"$rspfile\" --rsp-quoting=windows -L"$_rad_lib" -L"$_rad_psdk" -tR -o {{output}}"
     outputs = [ "{{root_out_dir}}/{{target_output_name}}.exe" ]
     description = "BCC64X LINK {{output}}"
   }
@@ -51,7 +55,7 @@ toolchain("bcc64x") {
     implib = "{{root_out_dir}}/{{target_output_name}}.lib"
     rspfile = "$dllname.rsp"
     rspfile_content = "{{ldflags}} {{inputs}} $_ucrt {{solibs}} {{libs}}"
-    command = "\"$_python\" \"$_adapter\" --link-rsp \"$_cc\" \"$rspfile\" --rsp-quoting=windows -tD -tR -Wl,--out-implib,$implib -o $dllname"
+    command = "\"$_python\" \"$_adapter\" --link-rsp \"$_cc\" \"$rspfile\" --rsp-quoting=windows -L"$_rad_lib" -L"$_rad_psdk" -tD -tR -Wl,--out-implib,$implib -o $dllname"
     outputs = [ dllname, implib ]
     default_output_extension = ".dll"
     default_output_dir = "{{root_out_dir}}"
