@@ -9340,7 +9340,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-18T00:32:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-18T00:33:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
@@ -9398,6 +9398,25 @@
             <argument value="{DownloadsRoot}\pdfium-deps\abseil-cpp-14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz"/>
          </execute>
          <require path="{CurrentArtifact}\third_party\abseil-cpp\BUILD.gn"/>
+         <!-- Reuse the proven standalone Abseil BCC64X Digits10 fix for
+              PDFium's independently pinned Chromium-DEPS Abseil sources.
+              Git --directory applies the original patch without a fork. -->
+         <execute name="bundled-abseil-digits10-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--directory=third_party/abseil-cpp"/>
+            <argument value="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-charconv-digits10.patch"/>
+         </execute>
+         <execute name="bundled-abseil-digits10-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="--directory=third_party/abseil-cpp"/>
+            <argument value="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-charconv-digits10.patch"/>
+         </execute>
+         <execute name="bundled-abseil-digits10-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--directory=third_party/abseil-cpp"/>
+            <argument value="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-charconv-digits10.patch"/>
+         </execute>
+
          <!-- Materialize the exact PDFium DEPS checkout, not just its download. -->
          <execute name="prepare-skia-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/>
