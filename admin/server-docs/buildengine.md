@@ -1,5 +1,7 @@
 # BuildEngine
 
+> **Shared translation inventory:** [BCC64X compiler/linker translation rules](translation-rules.md) records the implemented compiler flags, linker response rewriting, library-specific GN/Skia decisions, and verification limits. This migration records package-specific evidence rather than duplicating the generic adapter table.
+
 [TOC|Content]
 
 **Status:** current architecture contract as of 25 September 2026. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
