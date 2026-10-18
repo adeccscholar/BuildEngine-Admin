@@ -67,7 +67,7 @@ function(adecc_stage_runtime a_strTarget)
    set(theToolchainDllsFile
       "${CMAKE_CURRENT_BINARY_DIR}/${a_strTarget}.buildengine-toolchain-dlls.txt")
    file(WRITE "${theToolchainDllsFile}" "${strToolchainDlls}\n")
-   list(JOIN vecRoots "\n" strRoots
+   list(JOIN vecRoots "\n" strRoots)
    set(theRootsFile "${CMAKE_CURRENT_BINARY_DIR}/${a_strTarget}.buildengine-runtime-roots.txt")
    file(WRITE "${theRootsFile}" "${strRoots}\n")
    add_custom_command(TARGET "${a_strTarget}" POST_BUILD
