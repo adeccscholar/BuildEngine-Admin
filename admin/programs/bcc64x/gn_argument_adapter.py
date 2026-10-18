@@ -51,6 +51,11 @@ def Translate(a_strArgument: str) -> list[str]:
         "/W3": "-Wall",
         "/guard:cf": "-mguard=cf",
     }
+    # Chromium's newer Clang accepts this warning suppression; BCC64X's
+    # pinned Clang does not define that diagnostic. It cannot suppress an
+    # unknown diagnostic, so the exact upstream suppression is inapplicable.
+    if a_strArgument == "-Wno-uninitialized-const-pointer":
+        return []
     if a_strArgument == "/TC":
         # The C GN tool already selects a .c source file. BCC64X infers C mode
         # from the extension; MSVC /TC is not passed through.
@@ -167,7 +172,21 @@ def Main() -> int:
         return 2
     vecArguments = []
     lstErrors = []
-    for strArgument in sys.argv[2:]:
+    # This LLVM backend tuning option belongs to Chromium's own LLVM
+    # revision, not BCC64X. Consume only the exact two-token sequence;
+    # every other -mllvm option is still forwarded for compiler validation.
+    arguments = iter(sys.argv[2:])
+    for strArgument in arguments:
+        if strArgument == "-mllvm":
+            try:
+                strBackendOption = next(arguments)
+            except StopIteration:
+                lstErrors.append("missing value after -mllvm")
+                break
+            if strBackendOption == "-pick-merged-source-locations":
+                continue
+            vecArguments.extend(("-mllvm", strBackendOption))
+            continue
         try:
             vecArguments.extend(Translate(strArgument))
         except ValueError as aError:
