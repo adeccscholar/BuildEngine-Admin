@@ -1,17 +1,15 @@
-# BuildEngine PDFium bridge to the installed Skia 144 shared package.
+# BuildEngine PDFium bridge to the installed Skia 153 shared package.
 # This file replaces PDFium's //skia/BUILD.gn and its private Chromium Skia
 # source sets. The installation supplies both headers and import library.
 _skia_include = getenv("CB_PDFIUM_SKIA_INCLUDE")
 _skia_library = getenv("CB_PDFIUM_SKIA_LIB")
-_skia_overlay = getenv("CB_PDFIUM_SKIA_VFS_OVERLAY")
-assert(_skia_include != "" && _skia_library != "" && _skia_overlay != "",
-       "Skia 144 installed headers, import library and read-only VFS overlay are required")
+assert(_skia_include != "" && _skia_library != "",
+       "Skia 153 installed include root and import library are required")
 
-# Consume the installed Skia 144 headers without copying or modifying them.
+# Match INTERFACE_COMPILE_DEFINITIONS in the installed SkiaConfig.cmake.
 # Do not compile Skia implementation sources or use SkPdfiumUserConfig.h.
 config("skia_config") {
   include_dirs = [ _skia_include ]
-  cflags = [ "-ivfsoverlay", _skia_overlay ]
   libs = [ _skia_library ]
   defines = [
     "SKIA_DLL",
