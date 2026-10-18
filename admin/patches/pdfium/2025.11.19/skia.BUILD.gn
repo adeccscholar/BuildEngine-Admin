@@ -1,8 +1,12 @@
-# BuildEngine adapter: consume installed Skia 153 DLL and import library.
-# Replaces PDFium's private Chromium-Skia source build.
+# BuildEngine PDFium adapter: installed Skia 153 shared package only.
+# Both headers and import libraries come from the same configured package.
+_skia_include = getenv("CB_PDFIUM_SKIA_INCLUDE")
+_skia_library = getenv("CB_PDFIUM_SKIA_LIB")
+assert(_skia_include != "" && _skia_library != "",
+       "Installed Skia 153 package include and import library are required")
 config("installed_skia") {
-  include_dirs = [ getenv("CB_PDFIUM_SKIA_INCLUDE") ]
-  libs = [ getenv("CB_PDFIUM_SKIA_LIB") ]
+  include_dirs = [ _skia_include ]
+  libs = [ _skia_library ]
   defines = [ "SKIA_DLL", "SK_GANESH" ]
 }
 group("skia") {
