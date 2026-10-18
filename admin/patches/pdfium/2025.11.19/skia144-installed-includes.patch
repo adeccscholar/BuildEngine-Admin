@@ -170,3 +170,16 @@ diff --git a/testing/image_diff/image_diff_png_skia.cpp b/testing/image_diff/ima
  #endif
  
  namespace image_diff_png {
+diff --git a/core/fxge/dib/cfx_dibbase.h b/core/fxge/dib/cfx_dibbase.h
+--- a/core/fxge/dib/cfx_dibbase.h
++++ b/core/fxge/dib/cfx_dibbase.h
+@@ -17,9 +17,9 @@
+ #include "core/fxcrt/span_util.h"
+ #include "core/fxge/dib/fx_dib.h"
+ 
+ #if defined(PDF_USE_SKIA)
+-#include "third_party/skia/include/core/SkRefCnt.h"  // nogncheck
++#include "include/core/SkRefCnt.h"  // nogncheck
+ #endif
+ 
+ class CFX_AggClipRgn;
