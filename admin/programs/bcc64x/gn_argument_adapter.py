@@ -49,6 +49,7 @@ def Translate(a_strArgument: str) -> list[str]:
         "/Zc:sizedDealloc-": "-fno-sized-deallocation",
         "/Z7": "-gcodeview",
         "/W3": "-Wall",
+        "/W4": ("-Wall", "-Wextra"),
         "/guard:cf": "-mguard=cf",
     }
     # Chromium's newer Clang accepts this warning suppression; BCC64X's
