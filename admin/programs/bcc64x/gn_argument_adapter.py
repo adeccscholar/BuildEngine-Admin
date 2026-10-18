@@ -102,6 +102,15 @@ def TranslateLinkResponse(strContent: str) -> str:
     """
     if re.search(r'(?<!\S)"/[A-Za-z][^"]*"', strContent):
         raise ValueError("quoted MSVC linker switch requires explicit handling")
+    # GN's default -l prefix combined with Windows libs=["advapi32.lib"]
+    # produces -ladvapi32.lib. LLD MinGW's -l<name> search itself appends
+    # .lib (see lld/MinGW/Driver.cpp:searchLibrary), so -lname.lib
+    # incorrectly searches for name.lib.lib. Strip only the redundant
+    # suffix for plain -lname.lib tokens, preserving -l:exact.lib,
+    # path-qualified import libraries and existing GNU library names.
+    strContent = re.sub(
+        r'(?<!\S)-l([A-Za-z0-9_+.-]+)\.lib(?=\s|$)',
+        r'-l\1', strContent, flags=re.IGNORECASE)
     return re.sub(r'(?<!\S)/(?=[A-Za-z])',
                   "-Xlinker -Xlink=/", strContent)
 

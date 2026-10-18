@@ -296,3 +296,13 @@ The source-phase patch has `git apply --check`, `git apply`, and `git apply --re
 **Integration:** Both `link` and `solink` in the versioned PDFium GN BCC64X toolchain now invoke the *existing* argument adapter in `--link-rsp` mode, write a deterministic translated response file next to the GN original, then run BCC64X with dynamic RTL. A generated-Ninja preflight checks the mode plus direct tests of /CETCOMPAT, /NXCOMPAT, /DYNAMICBASE, /FIXED:NO and /OPT:REF,ICF before the expensive Ninja build. `is_component_build=false` and `shared_library("pdfium")` are unchanged.
 
 **Verification boundary:** The mapping is source-verified against LLVM 20.1.7, but a native BCC64X PDFium DLL link and both consumer smokes remain **[not verified]**.
+
+## Windows import-library naming in the BCC64X GN response adapter (18 October 2026)
+
+**Observed native linker failure:** Both DLL variants completed their compilation phase and reached LLD, which rejected `-ladvapi32.lib` with `unable to find library -ladvapi32.lib`. This is the GN default `-l` library switch applied to PDFium's Windows-style `libs = [ "advapi32.lib", "gdi32.lib", "user32.lib" ]` entries. It is not evidence that the Windows SDK or those system libraries are missing.
+
+**Verified LLVM 20.1.7 MinGW lookup semantics:** `lld/MinGW/Driver.cpp::searchLibrary` resolves `-l<name>` by searching for `lib<name>.dll.a`, `lib<name>.a` and `<name>.lib` in configured library directories. GN's `-ladvapi32.lib` therefore requests the wrong logical library name and can search for `advapi32.lib.lib`. The existing GN linker response adapter now normalizes the exact token form `-lname.lib` to `-lname` (case-insensitive), so LLD may find `name.lib` using its own established library search. There is no change to Windows SDK paths or dynamic RTL, and no static PDFium fallback.
+
+**Safety boundary:** No transformation of `-l:exact.lib`, existing `-lname`, or path-qualified `D:/.../libname.lib` tokens. The PDFium generated-Ninja preflight checks advapi32, gdi32, user32 and ole32 normalization plus exact-filename and absolute-path preservation before launching compilation. This is a link-only adapter correction; the library's source timestamp is deliberately unchanged so completed source evidence is not invalidated solely to alter a response-file translation.
+
+**Status:** The six focused normalizer cases were executed locally; the native BCC64X DLL link and consumer smokes are **[not verified]** until the next run.
