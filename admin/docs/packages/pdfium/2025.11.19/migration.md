@@ -450,3 +450,7 @@ The simultaneously uploaded Release Ninja log successfully compiles numerous Abs
 ## Corrected unified-diff hunk count (19 October 2026)
 
 The initial addition of the shared `core/fxge/dib/cfx_dibbase.h` Skia include hunk declared `@@ -17,9 +17,9 @@` although the hunk contains only eight original and eight resulting lines. `git apply` rejected the patch as corrupt at line 186 before any PDFium compilation. The patch header now reads `@@ -17,8 +17,8 @@`; all seven hunk headers were checked against the actual counted context/addition/deletion lines. This fixes unified-diff structure, but an on-host `git apply --check` against the pinned source and a native FSM rerun are still required for confirmation.
+
+## Image-cache Skia includes (19 October 2026)
+
+The next native Debug and Release logs progress beyond the previously fixed `cfx_dibbase.h` inclusion and compile many PDFium units. Both stop on `core/fpdfapi/page/cpdf_pageimagecache.cpp:31` because the pinned upstream still includes `third_party/skia/include/core/SkImage.h` and `SkRefCnt.h`. Both exact includes are now rewritten to `include/core/...` by the versioned `skia144-installed-includes.patch`. All eight patch hunks have their old/new line counts checked, but native `git apply --check`, complete include-source inventory and final Windows loader smoke remain outstanding. FSM timestamp: `2026-10-19T03:00:00Z`.
