@@ -1,0 +1,33 @@
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -127,7 +127,7 @@
+ }
+ 
+ config("pdfium_implementation_config") {
+-  defines = [ "FPDF_IMPLEMENTATION" ]
++  defines = [ "FPDF_IMPLEMENTATION", "BUILDENGINE_PDFIUM_DLL" ]
+   visibility = [ ":pdfium_public_headers" ]
+ }
+ 
+@@ -223,7 +223,7 @@
+   ]
+ }
+ 
+-component("pdfium") {
++shared_library("pdfium") {
+   output_name = "pdfium"
+   libs = []
+   configs += [ ":pdfium_strict_config" ]
+diff --git a/public/fpdfview.h b/public/fpdfview.h
+--- a/public/fpdfview.h
++++ b/public/fpdfview.h
+@@ -203,7 +203,7 @@
+ // Dictionary value types.
+ typedef int FPDF_OBJECT_TYPE;
+ 
+-#if defined(COMPONENT_BUILD)
++#if defined(COMPONENT_BUILD) || defined(BUILDENGINE_PDFIUM_DLL)
+ // FPDF_EXPORT should be consistent with |export| in the pdfium_fuzzer
+ // template in testing/fuzzers/BUILD.gn.
+ #if defined(WIN32)
