@@ -1,10 +1,17 @@
 # Copyright (c) 2026 adecc Systemhaus GmbH
 # SPDX-License-Identifier: MIT
 # One selected version per package. No PATH or newest-version discovery.
-if(NOT DEFINED ADECC_RUNTIME_PACKAGE_ROOTS OR
+if(NOT DEFINED ADECC_RUNTIME_ROOTS_FILE OR
    NOT DEFINED ADECC_RUNTIME_CONFIGURATION OR
    NOT DEFINED ADECC_RUNTIME_OUTPUT_DIR)
-   message(FATAL_ERROR "BuildEngine runtime staging requires roots, configuration and output directory")
+   message(FATAL_ERROR "BuildEngine runtime staging requires a roots file, configuration and output directory")
+endif()
+if(NOT EXISTS "${ADECC_RUNTIME_ROOTS_FILE}")
+   message(FATAL_ERROR "Runtime package roots manifest is missing: ${ADECC_RUNTIME_ROOTS_FILE}")
+endif()
+file(STRINGS "${ADECC_RUNTIME_ROOTS_FILE}" vecRoots ENCODING UTF-8)
+if(NOT vecRoots)
+   message(FATAL_ERROR "Runtime package roots manifest is empty: ${ADECC_RUNTIME_ROOTS_FILE}")
 endif()
 if(NOT ADECC_RUNTIME_CONFIGURATION MATCHES "^(Debug|Release)$")
    message(FATAL_ERROR "Unsupported runtime variant: ${ADECC_RUNTIME_CONFIGURATION}")
@@ -12,11 +19,14 @@ endif()
 if(NOT IS_DIRECTORY "${ADECC_RUNTIME_OUTPUT_DIR}")
    message(FATAL_ERROR "Runtime output directory missing: ${ADECC_RUNTIME_OUTPUT_DIR}")
 endif()
-string(REPLACE "|" ";" vecRoots "${ADECC_RUNTIME_PACKAGE_ROOTS}")
+
 set(vecNames)
 set(vecSources)
 set(uStaged 0)
 foreach(theRoot IN LISTS vecRoots)
+   if(NOT IS_DIRECTORY "${theRoot}")
+      message(FATAL_ERROR "Declared runtime package root is missing: ${theRoot}")
+   endif()
    foreach(theBin IN ITEMS "${theRoot}/bin/win64/${ADECC_RUNTIME_CONFIGURATION}" "${theRoot}/bin")
       if(NOT IS_DIRECTORY "${theBin}")
          continue()

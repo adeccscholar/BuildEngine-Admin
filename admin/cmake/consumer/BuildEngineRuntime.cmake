@@ -32,10 +32,16 @@ function(adecc_stage_runtime a_strTarget)
          message(FATAL_ERROR "Invalid pipe character in package root: ${theRoot}")
       endif()
    endforeach()
-   string(JOIN "|" strRoots ${vecRoots})
+   # A command-line list separator ('|' or ';') passes through cmd.exe,
+   # where '|' is a pipeline operator. Generate a manifest at configure time
+   # and pass only its single filename to the CMake -P staging subprocess.
+   # list(JOIN) keeps spaces inside individual paths unchanged.
+   list(JOIN vecRoots "\n" strRoots)
+   set(theRootsFile "${CMAKE_CURRENT_BINARY_DIR}/${a_strTarget}.buildengine-runtime-roots.txt")
+   file(WRITE "${theRootsFile}" "${strRoots}\n")
    add_custom_command(TARGET "${a_strTarget}" POST_BUILD
       COMMAND "${CMAKE_COMMAND}"
-         "-DADECC_RUNTIME_PACKAGE_ROOTS=${strRoots}"
+         "-DADECC_RUNTIME_ROOTS_FILE:FILEPATH=${theRootsFile}"
          "-DADECC_RUNTIME_CONFIGURATION=$<CONFIG>"
          "-DADECC_RUNTIME_OUTPUT_DIR=$<TARGET_FILE_DIR:${a_strTarget}>"
          -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/BuildEngineStageRuntime.cmake"
