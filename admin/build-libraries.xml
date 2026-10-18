@@ -5373,7 +5373,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-18T19:03:00Z">
+   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-18T19:04:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
@@ -5433,6 +5433,19 @@
          <execute name="skia144-directwrite-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-directwrite.patch"/>
+         </execute>
+         <!-- BCC64X inline attributes: same compiler mapping as Skia 153. -->
+         <execute name="skia144-attributes-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-attributes.patch"/>
+         </execute>
+         <execute name="skia144-attributes-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-attributes.patch"/>
+         </execute>
+         <execute name="skia144-attributes-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-attributes.patch"/>
          </execute>
       </source>
       <build>
