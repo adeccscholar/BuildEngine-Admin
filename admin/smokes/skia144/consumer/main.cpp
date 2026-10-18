@@ -4,6 +4,7 @@
 
 #include "include/core/SkCanvas.h"
 #include "include/core/SkImageInfo.h"
+#include "include/core/SkFontMgr.h"
 #include "include/core/SkSurface.h"
 #include "include/ports/SkFontMgr_empty.h"
 #include "include/pathops/SkPathOps.h"
