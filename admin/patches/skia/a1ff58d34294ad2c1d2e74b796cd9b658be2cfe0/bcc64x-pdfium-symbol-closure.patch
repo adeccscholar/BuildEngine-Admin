@@ -1,0 +1,19 @@
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -1654,6 +1654,7 @@
+     ":jpeg_encode",
+     ":pdf",
+     ":pdf_jpeg_helpers",
++    ":pathops",
+     ":webp_encode",
+     ":xps",
+   ]
+@@ -1663,6 +1664,7 @@
+     ":android_utils",
+     ":avif",
+     ":crabbyavif",
++    ":fontmgr_custom_empty",
+     ":hsw",
+     ":jpeg_decode",
+     ":jpegxl_decode",
