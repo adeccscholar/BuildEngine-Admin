@@ -102,12 +102,29 @@ def TranslateLinkResponse(strContent: str) -> str:
     """
     if re.search(r'(?<!\S)"/[A-Za-z][^"]*"', strContent):
         raise ValueError("quoted MSVC linker switch requires explicit handling")
-    # GN's default -l prefix combined with Windows libs=["advapi32.lib"]
-    # produces -ladvapi32.lib. LLD MinGW's -l<name> search itself appends
-    # .lib (see lld/MinGW/Driver.cpp:searchLibrary), so -lname.lib
-    # incorrectly searches for name.lib.lib. Strip only the redundant
-    # suffix for plain -lname.lib tokens, preserving -l:exact.lib,
-    # path-qualified import libraries and existing GNU library names.
+    # GN prefixes *both* system libraries and full absolute import-library
+    # paths with -l. LLD MinGW looks up -lfoo by name, so -lD:\...\foo.lib
+    # is never an exact file path. Convert drive-qualified imports into
+    # direct input files with forward slashes *before* the BCC64X driver
+    # tokenizes backslashes as response-file escapes. Preserve quoting.
+    def full_lib_path(match: re.Match[str]) -> str:
+        return match.group(1).replace("\\", "/")
+
+    strContent = re.sub(
+        r'(?<!\S)"-l([A-Za-z]:[\\/][^"]+)"',
+        lambda m: '"' + full_lib_path(m) + '"', strContent)
+    strContent = re.sub(
+        r'(?<!\S)-l"([A-Za-z]:[\\/][^"]+)"',
+        lambda m: '"' + full_lib_path(m) + '"', strContent)
+    strContent = re.sub(
+        r'(?<!\S)-l([A-Za-z]:[\\/][^\s"]+)',
+        full_lib_path, strContent)
+    if re.search(r'(?<!\S)-l[A-Za-z]:', strContent):
+        raise ValueError("unhandled drive-qualified GN import-library path")
+
+    # For GN system libraries, -ladvapi32.lib causes LLD's -l lookup
+    # to append .lib again. Plain -lname.lib becomes -lname; exact -l:
+    # names and path-qualified import libraries are not changed.
     strContent = re.sub(
         r'(?<!\S)-l([A-Za-z0-9_+.-]+)\.lib(?=\s|$)',
         r'-l\1', strContent, flags=re.IGNORECASE)
