@@ -454,3 +454,7 @@ The initial addition of the shared `core/fxge/dib/cfx_dibbase.h` Skia include hu
 ## Image-cache Skia includes (19 October 2026)
 
 The next native Debug and Release logs progress beyond the previously fixed `cfx_dibbase.h` inclusion and compile many PDFium units. Both stop on `core/fpdfapi/page/cpdf_pageimagecache.cpp:31` because the pinned upstream still includes `third_party/skia/include/core/SkImage.h` and `SkRefCnt.h`. Both exact includes are now rewritten to `include/core/...` by the versioned `skia144-installed-includes.patch`. All eight patch hunks have their old/new line counts checked, but native `git apply --check`, complete include-source inventory and final Windows loader smoke remain outstanding. FSM timestamp: `2026-10-19T03:00:00Z`.
+
+## Shared glyph cache Skia include (19 October 2026)
+
+Native Debug and Release reach roughly 350/604 Ninja compilation steps, but multiple FXGE units fail via `core/fxge/cfx_glyphcache.h:21`, where upstream still includes `third_party/skia/include/core/SkRefCnt.h`. The versioned installed-Skia patch now replaces that exact shared-header include with `include/core/SkRefCnt.h`. All nine unified-diff hunk counts were checked. PDFium timestamp: `2026-10-19T03:15:00Z`. A complete source-wide include inventory remains pending, so the build may expose other unconverted headers. Prior uploaded execution logs were deleted only from the assistant's local working directory, retaining the newest `04-execute(20261018-234155).log`; user-side BuildEngine logs and any historical conversation attachments are unaffected.
