@@ -51,6 +51,9 @@ def Translate(a_strArgument: str) -> list[str]:
         "/W3": "-Wall",
         "/W4": ("-Wall", "-Wextra"),
         "/guard:cf": "-mguard=cf",
+        # BCC64X has no verified nochecks variant; retain CFG instrumentation
+        # and checks rather than silently disabling the security feature.
+        "/guard:cf,nochecks": "-mguard=cf",
     }
     # Chromium's newer Clang accepts this warning suppression; BCC64X's
     # pinned Clang does not define that diagnostic. It cannot suppress an
