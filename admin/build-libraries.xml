@@ -9574,10 +9574,10 @@
          <require path="{CurrentArtifact}\build\toolchain\bcc64x\BUILD.gn"/>
          <require path="{CurrentArtifact}\build\config\freetype\BUILD.gn"/>
 
-         <!-- The pinned PDFium checkout supplies Chromium/Skia GN metadata and
-              source-level compatibility headers only. Replace its actual Skia
-              build targets with the existing installed Skia 153 import adapter.
-              The BuildEngine dependency above owns Skia compilation. -->
+         <!-- PDFium must consume Skia 153 headers and dynamic import libraries
+              from the same installed BuildEngine package. No second Skia
+              checkout, private headers or Skia source compilation is allowed.
+              GN target compatibility remains a build-time gate. -->
          <copy source="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\skia.BUILD.gn"
                target="{CurrentArtifact}\\third_party\\skia\\BUILD.gn"
                overwrite="true"/>
