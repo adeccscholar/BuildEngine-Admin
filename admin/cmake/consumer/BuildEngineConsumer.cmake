@@ -32,6 +32,7 @@ list(REMOVE_DUPLICATES CMAKE_PROGRAM_PATH)
 list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 
 set(ADECC_BUILDENGINE_RUNTIME_PATH "${ADECC_BUILDENGINE_SDK_ROOT}/bin")
+include("${CMAKE_CURRENT_LIST_DIR}/BuildEngineRuntime.cmake")
 
 # Boost 1.92.0 uses a capability-based BCC64X/Clang Boost.Config policy.  The
 # consumer hook activates itself only when Boost has actually been published.
