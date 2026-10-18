@@ -1,7 +1,7 @@
 diff --git a/BUILD.gn b/BUILD.gn
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -1651,9 +1651,10 @@
+@@ -1651,8 +1651,9 @@
      ":gpu",
      ":graphite",
      ":jpeg_encode",
