@@ -1,0 +1,172 @@
+diff --git a/core/fxge/skia/fx_skia_device.cpp b/core/fxge/skia/fx_skia_device.cpp
+--- a/core/fxge/skia/fx_skia_device.cpp
++++ b/core/fxge/skia/fx_skia_device.cpp
+@@ -52,33 +52,33 @@
+ #include "core/fxge/dib/cstretchengine.h"
+ #include "core/fxge/dib/fx_dib.h"
+ #include "core/fxge/text_char_pos.h"
+-#include "third_party/skia/include/core/SkBlendMode.h"
++#include "core/SkBlendMode.h"
+-#include "third_party/skia/include/core/SkCanvas.h"
++#include "core/SkCanvas.h"
+-#include "third_party/skia/include/core/SkClipOp.h"
++#include "core/SkClipOp.h"
+-#include "third_party/skia/include/core/SkColorFilter.h"
++#include "core/SkColorFilter.h"
+-#include "third_party/skia/include/core/SkColorType.h"
++#include "core/SkColorType.h"
+-#include "third_party/skia/include/core/SkImage.h"
++#include "core/SkImage.h"
+-#include "third_party/skia/include/core/SkImageInfo.h"
++#include "core/SkImageInfo.h"
+-#include "third_party/skia/include/core/SkMaskFilter.h"
++#include "core/SkMaskFilter.h"
+-#include "third_party/skia/include/core/SkPaint.h"
++#include "core/SkPaint.h"
+-#include "third_party/skia/include/core/SkPath.h"
++#include "core/SkPath.h"
+-#include "third_party/skia/include/core/SkPathBuilder.h"
++#include "core/SkPathBuilder.h"
+-#include "third_party/skia/include/core/SkPathEffect.h"
++#include "core/SkPathEffect.h"
+-#include "third_party/skia/include/core/SkPathUtils.h"
++#include "core/SkPathUtils.h"
+-#include "third_party/skia/include/core/SkPixmap.h"
++#include "core/SkPixmap.h"
+-#include "third_party/skia/include/core/SkRSXform.h"
++#include "core/SkRSXform.h"
+-#include "third_party/skia/include/core/SkRect.h"
++#include "core/SkRect.h"
+-#include "third_party/skia/include/core/SkRefCnt.h"
++#include "core/SkRefCnt.h"
+-#include "third_party/skia/include/core/SkSamplingOptions.h"
++#include "core/SkSamplingOptions.h"
+-#include "third_party/skia/include/core/SkShader.h"
++#include "core/SkShader.h"
+-#include "third_party/skia/include/core/SkStream.h"
++#include "core/SkStream.h"
+-#include "third_party/skia/include/core/SkSurface.h"
++#include "core/SkSurface.h"
+-#include "third_party/skia/include/core/SkTextBlob.h"
++#include "core/SkTextBlob.h"
+-#include "third_party/skia/include/core/SkTileMode.h"
++#include "core/SkTileMode.h"
+-#include "third_party/skia/include/core/SkTypeface.h"
++#include "core/SkTypeface.h"
+-#include "third_party/skia/include/effects/SkDashPathEffect.h"
++#include "effects/SkDashPathEffect.h"
+-#include "third_party/skia/include/effects/SkGradientShader.h"
++#include "effects/SkGradientShader.h"
+-#include "third_party/skia/include/pathops/SkPathOps.h"
++#include "pathops/SkPathOps.h"
+ 
+ namespace {
+ 
+diff --git a/core/fxge/skia/fx_skia_device.h b/core/fxge/skia/fx_skia_device.h
+--- a/core/fxge/skia/fx_skia_device.h
++++ b/core/fxge/skia/fx_skia_device.h
+@@ -18,9 +18,9 @@
+ #include "core/fxge/cfx_fillrenderoptions.h"
+ #include "core/fxge/cfx_path.h"
+ #include "core/fxge/renderdevicedriver_iface.h"
+-#include "third_party/skia/include/core/SkPoint.h"
++#include "core/SkPoint.h"
+-#include "third_party/skia/include/core/SkRSXform.h"
++#include "core/SkRSXform.h"
+-#include "third_party/skia/include/core/SkRefCnt.h"
++#include "core/SkRefCnt.h"
+ 
+ class CFX_Font;
+ class CFX_Matrix;
+diff --git a/core/fxge/skia/cfx_dibbase_skia.cpp b/core/fxge/skia/cfx_dibbase_skia.cpp
+--- a/core/fxge/skia/cfx_dibbase_skia.cpp
++++ b/core/fxge/skia/cfx_dibbase_skia.cpp
+@@ -23,13 +23,13 @@
+ #include "core/fxge/calculate_pitch.h"
+ #include "core/fxge/dib/cfx_dibitmap.h"
+ #include "core/fxge/dib/fx_dib.h"
+-#include "third_party/skia/include/core/SkAlphaType.h"
++#include "core/SkAlphaType.h"
+-#include "third_party/skia/include/core/SkColor.h"
++#include "core/SkColor.h"
+-#include "third_party/skia/include/core/SkColorType.h"
++#include "core/SkColorType.h"
+-#include "third_party/skia/include/core/SkImage.h"
++#include "core/SkImage.h"
+-#include "third_party/skia/include/core/SkImageInfo.h"
++#include "core/SkImageInfo.h"
+-#include "third_party/skia/include/core/SkPixmap.h"
++#include "core/SkPixmap.h"
+-#include "third_party/skia/include/core/SkRefCnt.h"
++#include "core/SkRefCnt.h"
+ 
+ namespace {
+ 
+diff --git a/core/fxcodec/png/skia_png_decoder.cpp b/core/fxcodec/png/skia_png_decoder.cpp
+--- a/core/fxcodec/png/skia_png_decoder.cpp
++++ b/core/fxcodec/png/skia_png_decoder.cpp
+@@ -16,13 +16,13 @@
+ #include "core/fxcrt/notreached.h"
+ #include "core/fxcrt/span.h"
+ #include "core/fxcrt/unowned_ptr.h"
+-#include "third_party/skia/include/codec/SkCodec.h"
++#include "codec/SkCodec.h"
+-#include "third_party/skia/include/core/SkStream.h"
++#include "core/SkStream.h"
+ 
+ #ifdef PDF_ENABLE_RUST_PNG
+-#include "third_party/skia/include/codec/SkPngRustDecoder.h"
++#include "codec/SkPngRustDecoder.h"
+ #else
+-#include "third_party/skia/include/codec/SkPngDecoder.h"
++#include "codec/SkPngDecoder.h"
+ #endif
+ 
+ namespace fxcodec {
+diff --git a/core/fxge/skia/fx_skia_device_embeddertest.cpp b/core/fxge/skia/fx_skia_device_embeddertest.cpp
+--- a/core/fxge/skia/fx_skia_device_embeddertest.cpp
++++ b/core/fxge/skia/fx_skia_device_embeddertest.cpp
+@@ -27,10 +27,10 @@
+ #include "testing/embedder_test.h"
+ #include "testing/gmock/include/gmock/gmock.h"
+ #include "testing/gtest/include/gtest/gtest.h"
+-#include "third_party/skia/include/core/SkCanvas.h"
++#include "core/SkCanvas.h"
+-#include "third_party/skia/include/core/SkImage.h"
++#include "core/SkImage.h"
+-#include "third_party/skia/include/core/SkSize.h"
++#include "core/SkSize.h"
+-#include "third_party/skia/include/utils/SkNoDrawCanvas.h"
++#include "utils/SkNoDrawCanvas.h"
+ 
+ namespace {
+ 
+diff --git a/testing/image_diff/image_diff_png_skia.cpp b/testing/image_diff/image_diff_png_skia.cpp
+--- a/testing/image_diff/image_diff_png_skia.cpp
++++ b/testing/image_diff/image_diff_png_skia.cpp
+@@ -14,17 +14,17 @@
+ #include "core/fxcrt/numerics/checked_math.h"
+ #include "core/fxcrt/span.h"
+ #include "core/fxcrt/span_util.h"
+-#include "third_party/skia/include/core/SkColorSpace.h"
++#include "core/SkColorSpace.h"
+-#include "third_party/skia/include/core/SkColorType.h"
++#include "core/SkColorType.h"
+-#include "third_party/skia/include/core/SkImageInfo.h"
++#include "core/SkImageInfo.h"
+-#include "third_party/skia/include/core/SkStream.h"
++#include "core/SkStream.h"
+ 
+ #ifdef PDF_ENABLE_RUST_PNG
+-#include "third_party/skia/include/codec/SkPngRustDecoder.h"
++#include "codec/SkPngRustDecoder.h"
+-#include "third_party/skia/include/encode/SkPngRustEncoder.h"
++#include "encode/SkPngRustEncoder.h"
+ #else
+-#include "third_party/skia/include/codec/SkPngDecoder.h"
++#include "codec/SkPngDecoder.h"
+-#include "third_party/skia/include/encode/SkPngEncoder.h"
++#include "encode/SkPngEncoder.h"
+ #endif
+ 
+ namespace image_diff_png {
