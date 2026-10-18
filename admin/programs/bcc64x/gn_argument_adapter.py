@@ -62,7 +62,8 @@ def Translate(a_strArgument: str) -> list[str]:
         # from the extension; MSVC /TC is not passed through.
         return []
     if a_strArgument in mpDirect:
-        return [mpDirect[a_strArgument]]
+        mapping = mpDirect[a_strArgument]
+        return list(mapping) if isinstance(mapping, tuple) else [mapping]
     # These MSVC switches have no distinct effect under the BCC64X
     # Clang/COFF frontend. Document every consumed switch explicitly.
     mpIntrinsic = {
