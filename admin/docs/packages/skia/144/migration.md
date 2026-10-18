@@ -1,5 +1,7 @@
 # Skia 144 for PDFium 2025.11.19 — independent BuildEngine package
 
+> **Shared translation inventory:** [General BCC64X/GN translation rules](../../../../server-docs/translation-rules.md) records the implemented compiler flags, linker response rewriting, library-specific GN/Skia decisions, and verification limits. This migration records package-specific evidence rather than duplicating the generic adapter table.
+
 **Status (2026-10-18): UPSTREAM PIN VERIFIED; NATIVE BCC64X DLL BUILD NOT YET PORTED OR VALIDATED.**
 
 ## Version evidence
