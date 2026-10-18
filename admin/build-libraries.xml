@@ -5447,6 +5447,19 @@
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-attributes.patch"/>
          </execute>
+         <!-- The PDFium consumer requires exported PathOps and the empty font manager. -->
+         <execute name="skia144-pdfium-symbols-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-pdfium-symbol-closure.patch"/>
+         </execute>
+         <execute name="skia144-pdfium-symbols-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-pdfium-symbol-closure.patch"/>
+         </execute>
+         <execute name="skia144-pdfium-symbols-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\skia\a1ff58d34294ad2c1d2e74b796cd9b658be2cfe0\bcc64x-pdfium-symbol-closure.patch"/>
+         </execute>
       </source>
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -5492,6 +5505,10 @@
                <line value="skia_enable_svg = false"/>
                <line value="skia_enable_skottie = false"/>
                <line value="skia_use_freetype = false"/>
+               <line value="skia_enable_fontmgr_custom_empty = true"/>
+               <line value="skia_use_system_freetype2 = true"/>
+               <line value="skia_system_freetype2_include_path = getenv(&quot;CB_SKIA_FREETYPE_INCLUDE&quot;)"/>
+               <line value="skia_system_freetype2_lib = getenv(&quot;CB_SKIA_FREETYPE_LIB&quot;)"/>
                <line value="skia_use_icu = false"/>
                <line value="skia_use_harfbuzz = false"/>
                <line value="skia_use_expat = false"/>
