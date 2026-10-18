@@ -38,7 +38,9 @@ toolchain("bcc64x") {
     description = "AR {{output}}"
   }
   tool("link") {
-    command = "\"$_cc\" {{ldflags}} {{inputs}} {{solibs}} {{libs}} -o {{output}}"
+    rspfile = "{{output}}.rsp"
+    rspfile_content = "{{ldflags}} {{inputs}} {{solibs}} {{libs}}"
+    command = "\"$_python\" \"$_adapter\" --link-rsp \"$_cc\" \"$rspfile\" -tR -o {{output}}"
     outputs = [ "{{root_out_dir}}/{{target_output_name}}.exe" ]
     description = "BCC64X LINK {{output}}"
   }
@@ -47,7 +49,7 @@ toolchain("bcc64x") {
     implib = "{{root_out_dir}}/{{target_output_name}}.lib"
     rspfile = "$dllname.rsp"
     rspfile_content = "{{ldflags}} {{inputs}} {{solibs}} {{libs}}"
-    command = "\"$_cc\" -tD -tR -Wl,--out-implib,$implib -o $dllname @$rspfile"
+    command = "\"$_python\" \"$_adapter\" --link-rsp \"$_cc\" \"$rspfile\" -tD -tR -Wl,--out-implib,$implib -o $dllname"
     outputs = [ dllname, implib ]
     default_output_extension = ".dll"
     default_output_dir = "{{root_out_dir}}"

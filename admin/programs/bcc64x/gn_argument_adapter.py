@@ -8,6 +8,7 @@ An unsupported MSVC option fails before invoking the compiler.
 import re
 import subprocess
 import sys
+from pathlib import Path
 
 
 WARNING_EQUIVALENTS = {
@@ -88,7 +89,47 @@ def Translate(a_strArgument: str) -> list[str]:
     return [a_strArgument]
 
 
+
+def TranslateLinkResponse(strContent: str) -> str:
+    """Forward GN's MSVC linker switches to LLD's COFF driver on Windows.
+
+    BCC64X uses Clang's MinGW driver: an unconverted /CETCOMPAT is a file
+    name. -Xlinker passes -Xlink=/CETCOMPAT to lld's MinGW driver, which
+    forwards that exact switch to lld's COFF driver. Preserve comma-valued
+    options such as /OPT:REF,ICF by using -Xlinker, not -Wl's comma syntax.
+    Leave paths and GNU flags unchanged. The COFF driver still validates
+    whether a forwarded switch is supported.
+    """
+    if re.search(r'(?<!\\S)"/[A-Za-z][^"]*"', strContent):
+        raise ValueError("quoted MSVC linker switch requires explicit handling")
+    return re.sub(r'(?<!\\S)/(?=[A-Za-z])',
+                  "-Xlinker -Xlink=/", strContent)
+
+
+def RunLinkResponse() -> int:
+    if len(sys.argv) < 5:
+        print("usage: gn_argument_adapter.py --link-rsp <compiler> <GN-rsp> <compiler-flags>",
+              file=sys.stderr)
+        return 2
+    strCompiler, strInput = sys.argv[2], sys.argv[3]
+    theSource = Path(strInput)
+    try:
+        strOriginal = theSource.read_text(encoding="utf-8")
+        strTranslated = TranslateLinkResponse(strOriginal)
+        if re.search(r'(?<!\\S)/[A-Za-z]', strTranslated):
+            raise ValueError("raw MSVC-style linker switch remains after translation")
+        theTranslated = Path(str(theSource) + ".bcc64x")
+        theTranslated.write_text(strTranslated, encoding="utf-8", newline="\\n")
+    except (OSError, ValueError) as theError:
+        print("BCC64X linker response translation failed: " + str(theError),
+              file=sys.stderr)
+        return 2
+    return subprocess.call([strCompiler, *sys.argv[4:], "@" + str(theTranslated)])
+
+
 def Main() -> int:
+    if len(sys.argv) > 1 and sys.argv[1] == "--link-rsp":
+        return RunLinkResponse()
     if len(sys.argv) < 3:
         print("usage: gn_argument_adapter.py <compiler> <arguments...>", file=sys.stderr)
         return 2
