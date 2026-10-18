@@ -158,3 +158,7 @@ Native Debug and Release builds of `skia144.dll` subsequently failed with unreso
 The Skia 144 XML GN profile now sets `skia_use_freetype = true`, while disabling the unnecessary custom directory and embedded font managers and retaining `skia_enable_fontmgr_custom_empty = true`. The existing installed FreeType 2.14.3 paths remain the source of external FreeType headers and import libraries, rather than compiling a second FreeType implementation. The logical library timestamp was advanced to `2026-10-19T01:00:00Z` to invalidate prior Skia 144 FSM evidence and force rebuilding before PDFium relinks.
 
 **Validation remains pending:** native Debug/Release compile, Skia DLL link, exported symbols and PDFium external consumer. Do not attribute these C++ unresolved symbols to a missing external FreeType import library alone.
+
+## Installed Skia 144 consumer smoke (19 October 2026)
+
+A dedicated `admin/smokes/skia144/consumer` CMake/BCC64X consumer has been added to the XML FSM in both Debug and Release. It links explicitly against the installed per-variant `skia144.lib`, stages `skia144.dll` alongside its executable, and exercises CPU raster surfaces, `SkFontMgr_New_Custom_Empty()`, and the `Op(..., kUnion_SkPathOp)` API. It uses the same BCC64X toolchain and the external installed FreeType runtime rather than any second Skia compilation. Its scope is intentionally much smaller than the existing Skia 153 desktop feature smoke. **Native run pending**; the contract timestamp changed to require fresh FSM evidence.
