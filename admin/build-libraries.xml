@@ -5496,10 +5496,12 @@
          <variant name="Release">
             <variable name="SkiaOfficialBuild" value="true"/><variable name="SkiaDebug" value="false"/>
             <variable name="ZlibLibraryName" value="libz"/><variable name="LibPngLibraryName" value="libpng16"/><variable name="LibJpegLibraryName" value="libjpeg"/>
+            <variable name="FreeTypeLibraryName" value="libfreetype"/>
          </variant>
          <variant name="Debug">
             <variable name="SkiaOfficialBuild" value="false"/><variable name="SkiaDebug" value="true"/>
             <variable name="ZlibLibraryName" value="libzd"/><variable name="LibPngLibraryName" value="libpng16d"/><variable name="LibJpegLibraryName" value="libjpegd"/>
+            <variable name="FreeTypeLibraryName" value="libfreetyped"/>
          </variant>
          <install>
             <perVariant>
@@ -9576,18 +9578,7 @@
                target="{CurrentArtifact}\skia\BUILD.gn"
                overwrite="true" preserveCurrentArtifact="true"/>
          <require path="{CurrentArtifact}\skia\BUILD.gn"/>
-         <!-- PDFium uses literal third_party/skia/include/... paths.
-              Materialize those headers exclusively from the installed Skia 144
-              package. Never retrieve or build a second Skia revision. -->
-         <execute name="stage-installed-skia-headers" executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="-E"/>
-            <argument value="copy_directory"/>
-            <argument value="{InstallRoot}\packages\skia\144\include"/>
-            <argument value="{CurrentArtifact}\third_party\skia"/>
-         </execute>
-         <require path="{CurrentArtifact}\third_party\skia\include\core\SkSurface.h"/>
-         <require path="{CurrentArtifact}\third_party\skia\modules\skcms\skcms.h"/>
+         <!-- Installed Skia headers are staged in Build after the dependency-install barrier. -->
          <!-- Materialize the exact PDFium DEPS checkout, not just its download. -->
          <execute name="prepare-fast_float-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/>
@@ -9745,6 +9736,18 @@
       </source>
 
 <build>
+         <!-- PDFium uses literal third_party/skia/include/... paths.
+              Stage installed version-matched headers after Skia 144 Install. -->
+         <execute name="stage-installed-skia-headers" executable="{Tool:cmake}"
+                  workingDirectory="{Workspace}" outputMode="errors">
+            <argument value="-E"/>
+            <argument value="copy_directory"/>
+            <argument value="{InstallRoot}\packages\skia\144\include"/>
+            <argument value="{Workspace}\third_party\skia"/>
+         </execute>
+         <require path="{Workspace}\third_party\skia\include\core\SkSurface.h"/>
+         <require path="{Workspace}\third_party\skia\modules\skcms\skcms.h"/>
+         <require path="{InstallRoot}\packages\skia\144\lib\win64\{Configuration}\skia144.lib"/>
          <!-- Validate source evidence on resumed builds before generating GN targets. -->
 
 <require path="{Workspace}\tools\win\DebugVisualizers\BUILD.gn"/>
