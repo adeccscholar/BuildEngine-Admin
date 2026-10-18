@@ -183,3 +183,17 @@ diff --git a/core/fxge/dib/cfx_dibbase.h b/core/fxge/dib/cfx_dibbase.h
  #endif
  
  class CFX_AggClipRgn;
+diff --git a/core/fpdfapi/page/cpdf_pageimagecache.cpp b/core/fpdfapi/page/cpdf_pageimagecache.cpp
+--- a/core/fpdfapi/page/cpdf_pageimagecache.cpp
++++ b/core/fpdfapi/page/cpdf_pageimagecache.cpp
+@@ -28,8 +28,8 @@
+ #if defined(PDF_USE_SKIA)
+ #include "core/fxcrt/data_vector.h"
+ #include "core/fxge/cfx_defaultrenderdevice.h"
+-#include "third_party/skia/include/core/SkImage.h"   // nogncheck
+-#include "third_party/skia/include/core/SkRefCnt.h"  // nogncheck
++#include "include/core/SkImage.h"   // nogncheck
++#include "include/core/SkRefCnt.h"  // nogncheck
+ #endif
+ 
+ namespace {
