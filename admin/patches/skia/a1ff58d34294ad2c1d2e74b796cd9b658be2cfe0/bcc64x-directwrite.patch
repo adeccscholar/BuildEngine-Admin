@@ -1,0 +1,224 @@
+diff --git a/src/utils/win/SkDWrite.h b/src/utils/win/SkDWrite.h
+--- a/src/utils/win/SkDWrite.h
++++ b/src/utils/win/SkDWrite.h
+@@ -14,6 +14,11 @@
+ #include <dwrite.h>
+ #include <winsdkver.h>
+ 
++template <typename Interface>
++HRESULT SkQueryInterface(IUnknown* object, Interface** result) {
++    return object->QueryInterface(__uuidof(Interface), reinterpret_cast<void**>(result));
++}
++
+ class SkString;
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+diff --git a/src/ports/SkFontMgr_win_dw.cpp b/src/ports/SkFontMgr_win_dw.cpp
+--- a/src/ports/SkFontMgr_win_dw.cpp
++++ b/src/ports/SkFontMgr_win_dw.cpp
+@@ -171,10 +171,10 @@
+ 
+ static HRESULT are_same(IUnknown* a, IUnknown* b, bool& same) {
+     SkTScopedComPtr<IUnknown> iunkA;
++    HRM(SkQueryInterface(a, &iunkA), "Failed to QI<IUnknown> for a.");
+-    HRM(a->QueryInterface(&iunkA), "Failed to QI<IUnknown> for a.");
+ 
+     SkTScopedComPtr<IUnknown> iunkB;
++    HRM(SkQueryInterface(b, &iunkB), "Failed to QI<IUnknown> for b.");
+-    HRM(b->QueryInterface(&iunkB), "Failed to QI<IUnknown> for b.");
+ 
+     same = (iunkA.get() == iunkB.get());
+     return S_OK;
+@@ -193,8 +193,8 @@
+     // IDWriteFontFace5 introduced both Equals and HasVariations
+     SkTScopedComPtr<IDWriteFontFace5> cshFontFace5;
+     SkTScopedComPtr<IDWriteFontFace5> ctxFontFace5;
++    SkQueryInterface(cshFace->fDWriteFontFace.get(), &cshFontFace5);
++    SkQueryInterface(ctxFace->fDWriteFontFace, &ctxFontFace5);
+-    cshFace->fDWriteFontFace->QueryInterface(&cshFontFace5);
+-    ctxFace->fDWriteFontFace->QueryInterface(&ctxFontFace5);
+     if (cshFontFace5 && ctxFontFace5) {
+         return cshFontFace5->Equals(ctxFontFace5.get());
+     }
+@@ -481,7 +481,7 @@
+ private:
+     virtual ~FontFallbackRenderer() { }
+ 
++    LONG fRefCount;
+-    ULONG fRefCount;
+     sk_sp<const SkFontMgr_DirectWrite> fOuter;
+     UINT32 fCharacter;
+     sk_sp<SkTypeface> fResolvedTypeface;
+@@ -581,7 +581,7 @@
+ private:
+     virtual ~FontFallbackSource() { }
+ 
++    LONG fRefCount;
+-    ULONG fRefCount;
+     const WCHAR* fString;
+     UINT32 fLength;
+     const WCHAR* fLocale;
+@@ -900,7 +900,7 @@
+     SkTScopedComPtr<IDWriteFontFallback> systemFontFallback;
+     if (nullptr == fallback) {
+         SkTScopedComPtr<IDWriteFactory2> factory2;
++        if (!SUCCEEDED(SkQueryInterface(factory, &factory2))) {
+-        if (!SUCCEEDED(factory->QueryInterface(&factory2))) {
+             // IUnknown::QueryInterface states that if it fails, punk will be set to nullptr.
+             // http://blogs.msdn.com/b/oldnewthing/archive/2004/03/26/96777.aspx
+             SkASSERT_RELEASE(nullptr == factory2.get());
+diff --git a/src/ports/SkTypeface_win_dw.cpp b/src/ports/SkTypeface_win_dw.cpp
+--- a/src/ports/SkTypeface_win_dw.cpp
++++ b/src/ports/SkTypeface_win_dw.cpp
+@@ -50,7 +50,7 @@
+ #if defined(NTDDI_WIN10_RS3) && NTDDI_VERSION >= NTDDI_WIN10_RS3
+     [&weight, &width, &slant, fontFace]() -> void {
+         SkTScopedComPtr<IDWriteFontFace5> fontFace5;
++        if (FAILED(SkQueryInterface(fontFace, &fontFace5))) {
+-        if (FAILED(fontFace->QueryInterface(&fontFace5))) {
+             return;
+         }
+         if (!fontFace5->HasVariations()) {
+@@ -180,23 +180,23 @@
+     , fPaletteEntryCount(0)
+     , fLoaders(std::move(loaders))
+ {
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace1))) {
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace1))) {
+         // IUnknown::QueryInterface states that if it fails, punk will be set to nullptr.
+         // http://blogs.msdn.com/b/oldnewthing/archive/2004/03/26/96777.aspx
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace1.get());
+     }
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace2))) {
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace2))) {
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace2.get());
+     }
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace4))) {
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace4))) {
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace4.get());
+     }
+ #if DWRITE_CORE || (defined(NTDDI_WIN11_ZN) && NTDDI_VERSION >= NTDDI_WIN11_ZN)
++    if (!SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fDWriteFontFace7))) {
+-    if (!SUCCEEDED(fDWriteFontFace->QueryInterface(&fDWriteFontFace7))) {
+         SkASSERT_RELEASE(nullptr == fDWriteFontFace7/*.get()*/);
+     }
+ #endif
++    if (!SUCCEEDED(SkQueryInterface(fFactory.get(), &fFactory2))) {
+-    if (!SUCCEEDED(fFactory->QueryInterface(&fFactory2))) {
+         SkASSERT_RELEASE(nullptr == fFactory2.get());
+     }
+ 
+@@ -280,7 +280,7 @@
+                "Could not get font file loader.", numFiles);
+ 
+     SkTScopedComPtr<IDWriteLocalFontFileLoader> localFontFileLoader;
++    HR_GENERAL(SkQueryInterface(fontFileLoader.get(), &localFontFileLoader),
+-    HR_GENERAL(fontFileLoader->QueryInterface(&localFontFileLoader),
+                nullptr, numFiles);
+ 
+     UINT32 fontFilePathLen;
+@@ -401,7 +401,7 @@
+ #if defined(NTDDI_WIN10_RS3) && NTDDI_VERSION >= NTDDI_WIN10_RS3
+ 
+     SkTScopedComPtr<IDWriteFontFace5> fontFace5;
++    if (FAILED(SkQueryInterface(fDWriteFontFace.get(), &fontFace5))) {
+-    if (FAILED(fDWriteFontFace->QueryInterface(&fontFace5))) {
+         return -1;
+     }
+ 
+@@ -450,7 +450,7 @@
+ #if defined(NTDDI_WIN10_RS3) && NTDDI_VERSION >= NTDDI_WIN10_RS3
+ 
+     SkTScopedComPtr<IDWriteFontFace5> fontFace5;
++    if (FAILED(SkQueryInterface(fDWriteFontFace.get(), &fontFace5))) {
+-    if (FAILED(fDWriteFontFace->QueryInterface(&fontFace5))) {
+         return -1;
+     }
+ 
+@@ -563,7 +563,7 @@
+ 
+     SkTScopedComPtr<IDWriteFontFace5> fontFace5;
+ 
++    if (SUCCEEDED(SkQueryInterface(fDWriteFontFace.get(), &fontFace5)) && fontFace5->HasVariations()) {
+-    if (SUCCEEDED(fDWriteFontFace->QueryInterface(&fontFace5)) && fontFace5->HasVariations()) {
+         UINT32 fontAxisCount = fontFace5->GetFontAxisValueCount();
+         UINT32 argsCoordCount = args.getVariationDesignPosition().coordinateCount;
+         AutoSTMalloc<8, DWRITE_FONT_AXIS_VALUE> fontAxisValue(fontAxisCount);
+@@ -587,7 +587,7 @@
+                                          &newFontFace5));
+ 
+         SkTScopedComPtr<IDWriteFontFace> newFontFace;
++        HRN(SkQueryInterface(newFontFace5.get(), &newFontFace));
+-        HRN(newFontFace5->QueryInterface(&newFontFace));
+         return DWriteFontTypeface::Make(fFactory.get(),
+                                         newFontFace.get(),
+                                         fDWriteFont.get(),
+@@ -874,7 +874,7 @@
+     virtual ~StreamFontFileLoader() { }
+ 
+     std::unique_ptr<SkStreamAsset> fStream;
++    LONG fRefCount;
+-    ULONG fRefCount;
+ };
+ 
+ SK_STDMETHODIMP StreamFontFileLoader::QueryInterface(REFIID iid, void** ppvObject) {
+@@ -934,7 +934,7 @@
+     StreamFontFileEnumerator(IDWriteFactory* factory, IDWriteFontFileLoader* fontFileLoader);
+     virtual ~StreamFontFileEnumerator() { }
+ 
++    LONG fRefCount;
+-    ULONG fRefCount;
+ 
+     SkTScopedComPtr<IDWriteFactory> fFactory;
+     SkTScopedComPtr<IDWriteFontFile> fCurrentFile;
+@@ -1032,7 +1032,7 @@
+     { }
+     virtual ~StreamFontCollectionLoader() { }
+ 
++    LONG fRefCount;
+-    ULONG fRefCount;
+     SkTScopedComPtr<IDWriteFontFileLoader> fFontFileLoader;
+ };
+ 
+@@ -1112,7 +1112,7 @@
+ #if defined(NTDDI_WIN10_RS3) && NTDDI_VERSION >= NTDDI_WIN10_RS3
+ 
+     SkTScopedComPtr<IDWriteFontFace5> fontFace5;
++    if (FAILED(SkQueryInterface(fontFace.get(), &fontFace5)) || !fontFace5->HasVariations()) {
+-    if (FAILED(fontFace->QueryInterface(&fontFace5)) || !fontFace5->HasVariations()) {
+         return S_OK;
+     }
+ 
+@@ -1141,7 +1141,7 @@
+         variation.get(), fontAxisCount,
+         &fontFace5_Out));
+     fontFace.reset();
++    HR(SkQueryInterface(fontFace5_Out.get(), &fontFace));
+-    HR(fontFace5_Out->QueryInterface(&fontFace));
+ #endif
+     return S_OK;
+ }
+diff --git a/src/ports/SkScalerContext_win_dw.cpp b/src/ports/SkScalerContext_win_dw.cpp
+--- a/src/ports/SkScalerContext_win_dw.cpp
++++ b/src/ports/SkScalerContext_win_dw.cpp
+@@ -1865,7 +1865,7 @@
+     metrics->fFlags |= SkFontMetrics::kStrikeoutPositionIsValid_Flag;
+ 
+     SkTScopedComPtr<IDWriteFontFace5> fontFace5;
++    if (SUCCEEDED(SkQueryInterface(this->getDWriteTypeface()->fDWriteFontFace.get(), &fontFace5))) {
+-    if (SUCCEEDED(this->getDWriteTypeface()->fDWriteFontFace->QueryInterface(&fontFace5))) {
+         if (fontFace5->HasVariations()) {
+             // The bounds are only valid for the default variation.
+             metrics->fFlags |= SkFontMetrics::kBoundsInvalid_Flag;
+diff --git a/src/utils/win/SkDWriteFontFileStream.h b/src/utils/win/SkDWriteFontFileStream.h
+--- a/src/utils/win/SkDWriteFontFileStream.h
++++ b/src/utils/win/SkDWriteFontFileStream.h
+@@ -81,7 +81,7 @@
+     explicit SkDWriteFontFileStreamWrapper(SkStreamAsset* stream);
+     virtual ~SkDWriteFontFileStreamWrapper() { }
+ 
++    LONG fRefCount;
+-    ULONG fRefCount;
+     std::unique_ptr<SkStreamAsset> fStream;
+     SkMutex fStreamMutex;
+ };
