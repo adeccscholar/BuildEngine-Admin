@@ -117,3 +117,23 @@ own complete validated dependency closure and installation contract.
 Do not mark Skia 144 as installed and do not switch PDFium to it until those
 steps are completed. When registered, the Schema 17 attribute must be
 `supersededBy="153"` on `<library id="skia" version="144" ...>`.
+
+
+## FSM activation — 2026-10-18
+
+Registered `skia@144` in `admin/build-libraries.xml` with
+`supersededBy="153"`. The library has a dedicated pinned source, checked
+BCC64X GN patch sequence, GN/Ninja Debug and Release DLL build,
+and per-version header/import library installation. This is a small CPU/raster
+profile intended for PDFium, not a reproduction of all Skia 153 desktop/GPU
+features. Existing Skia 153 is unchanged.
+
+PDFium `2025.11.19` now declares `skia@144`, with Skia headers and
+`skia144.lib` from its installed package. Its Skia-153 gradient compatibility
+patch is no longer executed. BuildEngine's dependency-install barrier must
+now schedule and install Skia 144 before PDFium's build.
+
+**Verification state:** GitHub XML and pinned upstream patch preimage review;
+no Windows `gn gen`, `ninja`, DLL load or smoke evidence has been collected.
+Build success must not be inferred. If the new 144 producer fails, PDFium is
+correctly blocked rather than reverting silently to 153.
