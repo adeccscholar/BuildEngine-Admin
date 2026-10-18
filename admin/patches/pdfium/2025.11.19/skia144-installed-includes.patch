@@ -210,3 +210,36 @@ diff --git a/core/fxge/cfx_glyphcache.h b/core/fxge/cfx_glyphcache.h
  
  class CFX_Font;
  class CFX_GlyphBitmap;
+diff --git a/core/fxge/cfx_glyphcache.cpp b/core/fxge/cfx_glyphcache.cpp
+--- a/core/fxge/cfx_glyphcache.cpp
++++ b/core/fxge/cfx_glyphcache.cpp
+@@ -22,13 +22,13 @@
+ 
+ #if defined(PDF_USE_SKIA)
+-#include "third_party/skia/include/core/SkFontMgr.h"         // nogncheck
++#include "include/core/SkFontMgr.h"         // nogncheck
+-#include "third_party/skia/include/core/SkStream.h"          // nogncheck
++#include "include/core/SkStream.h"          // nogncheck
+-#include "third_party/skia/include/core/SkTypeface.h"        // nogncheck
++#include "include/core/SkTypeface.h"        // nogncheck
+-#include "third_party/skia/include/ports/SkFontMgr_empty.h"  // nogncheck
++#include "include/ports/SkFontMgr_empty.h"  // nogncheck
+ 
+ #if BUILDFLAG(IS_WIN)
+-#include "third_party/skia/include/ports/SkTypeface_win.h"  // nogncheck
++#include "include/ports/SkTypeface_win.h"  // nogncheck
+ #elif BUILDFLAG(IS_APPLE)
+-#include "third_party/skia/include/ports/SkFontMgr_mac_ct.h"  // nogncheck
++#include "include/ports/SkFontMgr_mac_ct.h"  // nogncheck
+ #endif
+ 
+diff --git a/core/fxge/cfx_renderdevice.cpp b/core/fxge/cfx_renderdevice.cpp
+--- a/core/fxge/cfx_renderdevice.cpp
++++ b/core/fxge/cfx_renderdevice.cpp
+@@ -39,5 +39,5 @@
+ 
+ #if defined(PDF_USE_SKIA)
+-#include "third_party/skia/include/core/SkTypes.h"  // nogncheck
++#include "include/core/SkTypes.h"  // nogncheck
+ #endif
+ 
