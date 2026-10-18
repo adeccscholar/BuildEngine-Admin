@@ -13,3 +13,11 @@ if(NOT DEFINED ADECC_RUNTIME_PACKAGE_ROOTS OR ADECC_RUNTIME_PACKAGE_ROOTS STREQU
    message(FATAL_ERROR "PDFium smoke requires ADECC_RUNTIME_PACKAGE_ROOTS")
 endif()
 adecc_stage_runtime(pdfium-consumer PACKAGE_ROOTS ${ADECC_RUNTIME_PACKAGE_ROOTS})
+
+# Explicit loader preflight: this executable intentionally does not import
+# PDFium, so a Windows loader failure can be distinguished from the smoke
+# executable itself failing before entering main().
+add_executable(pdfium-loader-probe
+   "${CMAKE_CURRENT_LIST_DIR}/../../../programs/bcc64x/RuntimeLoaderProbe.cpp")
+set_property(TARGET pdfium-loader-probe PROPERTY CXX_SCAN_FOR_MODULES OFF)
+target_compile_features(pdfium-loader-probe PRIVATE cxx_std_23)

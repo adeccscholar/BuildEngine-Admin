@@ -9723,6 +9723,8 @@
              executable="pdfium-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLL" value="pdfium.dll"/>
+         <run executable="pdfium-loader-probe.exe"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\pdfium\consumer" configuration="Debug"
              cmake="{Tool:cmake}" ninja="{Tool:ninja}"
@@ -9730,6 +9732,8 @@
              executable="pdfium-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLL" value="pdfium.dll"/>
+         <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
 </buildLibraries>
