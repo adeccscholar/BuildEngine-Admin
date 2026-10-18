@@ -100,9 +100,9 @@ def TranslateLinkResponse(strContent: str) -> str:
     Leave paths and GNU flags unchanged. The COFF driver still validates
     whether a forwarded switch is supported.
     """
-    if re.search(r'(?<!\\S)"/[A-Za-z][^"]*"', strContent):
+    if re.search(r'(?<!\S)"/[A-Za-z][^"]*"', strContent):
         raise ValueError("quoted MSVC linker switch requires explicit handling")
-    return re.sub(r'(?<!\\S)/(?=[A-Za-z])',
+    return re.sub(r'(?<!\S)/(?=[A-Za-z])',
                   "-Xlinker -Xlink=/", strContent)
 
 
@@ -116,10 +116,10 @@ def RunLinkResponse() -> int:
     try:
         strOriginal = theSource.read_text(encoding="utf-8")
         strTranslated = TranslateLinkResponse(strOriginal)
-        if re.search(r'(?<!\\S)/[A-Za-z]', strTranslated):
+        if re.search(r'(?<!\S)/[A-Za-z]', strTranslated):
             raise ValueError("raw MSVC-style linker switch remains after translation")
         theTranslated = Path(str(theSource) + ".bcc64x")
-        theTranslated.write_text(strTranslated, encoding="utf-8", newline="\\n")
+        theTranslated.write_text(strTranslated, encoding="utf-8", newline="\n")
     except (OSError, ValueError) as theError:
         print("BCC64X linker response translation failed: " + str(theError),
               file=sys.stderr)
