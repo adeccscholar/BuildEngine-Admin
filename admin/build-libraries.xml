@@ -9606,7 +9606,20 @@
                target="{CurrentArtifact}\skia\BUILD.gn"
                overwrite="true" preserveCurrentArtifact="true"/>
          <require path="{CurrentArtifact}\skia\BUILD.gn"/>
-         <!-- Installed Skia headers are staged in Build after the dependency-install barrier. -->
+         <!-- Rewrite pinned PDFium Skia includes to the installed Skia 144 include root. -->
+         <execute name="pdfium-skia144-includes-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\skia144-installed-includes.patch"/>
+         </execute>
+         <execute name="pdfium-skia144-includes-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\skia144-installed-includes.patch"/>
+         </execute>
+         <execute name="pdfium-skia144-includes-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\skia144-installed-includes.patch"/>
+         </execute>
+         <!-- Source patch uses the installed Skia 144 include root at compile time. -->
          <!-- Materialize the exact PDFium DEPS checkout, not just its download. -->
          <execute name="prepare-fast_float-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/>
@@ -9764,17 +9777,8 @@
       </source>
 
 <build>
-         <!-- PDFium uses literal third_party/skia/include/... paths.
-              Stage installed version-matched headers after Skia 144 Install. -->
-         <execute name="stage-installed-skia-headers" executable="{Tool:cmake}"
-                  workingDirectory="{Workspace}" outputMode="errors">
-            <argument value="-E"/>
-            <argument value="copy_directory"/>
-            <argument value="{InstallRoot}\packages\skia\144\include"/>
-            <argument value="{Workspace}\third_party\skia"/>
-         </execute>
-         <require path="{Workspace}\third_party\skia\include\core\SkSurface.h"/>
-         <require path="{Workspace}\third_party\skia\modules\skcms\skcms.h"/>
+         <!-- No header staging: Skia 144 is consumed directly from its installation. -->
+         <require path="{InstallRoot}\packages\skia\144\include\core\SkSurface.h"/>
          <require path="{InstallRoot}\packages\skia\144\lib\win64\{Configuration}\skia144.lib"/>
          <!-- Validate source evidence on resumed builds before generating GN targets. -->
 
