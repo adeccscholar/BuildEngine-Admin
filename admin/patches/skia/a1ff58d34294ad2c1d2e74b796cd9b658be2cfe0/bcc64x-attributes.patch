@@ -19,3 +19,162 @@ diff --git a/include/private/base/SkAttributes.h b/include/private/base/SkAttrib
  #    define SK_NEVER_INLINE __declspec(noinline)
  #  else
  #    define SK_NEVER_INLINE SK_ATTRIBUTE(noinline)
+diff --git a/src/base/SkBase64.cpp b/src/base/SkBase64.cpp
+--- a/src/base/SkBase64.cpp
++++ b/src/base/SkBase64.cpp
+@@ -29,7 +29,7 @@
+     41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
+ };
+ 
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))  // disable 'two', etc. may be used without having been initialized
+-#if defined _WIN32  // disable 'two', etc. may be used without having been initialized
+ #pragma warning ( push )
+ #pragma warning ( disable : 4701 )
+ #endif
+@@ -106,7 +106,7 @@
+     return kNoError;
+ }
+ 
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))
+-#if defined _WIN32
+ #pragma warning ( pop )
+ #endif
+ 
+diff --git a/src/base/SkMathPriv.h b/src/base/SkMathPriv.h
+--- a/src/base/SkMathPriv.h
++++ b/src/base/SkMathPriv.h
+@@ -171,10 +171,14 @@
+             _BitScanReverse(&index, mask);
+             // Suppress this bogus /analyze warning. The check for non-zero
+             // guarantees that _BitScanReverse will succeed.
++#if !(defined(__BORLANDC__) && defined(__clang__))
+             #pragma warning(push)
+             #pragma warning(suppress : 6102) // Using 'index' from failed function call
++#endif
+             return static_cast<int>(index ^ 0x1F);
++#if !(defined(__BORLANDC__) && defined(__clang__))
+             #pragma warning(pop)
++#endif
+         } else {
+             return 32;
+         }
+@@ -211,10 +215,14 @@
+             _BitScanForward(&index, mask);
+             // Suppress this bogus /analyze warning. The check for non-zero
+             // guarantees that _BitScanReverse will succeed.
++#if !(defined(__BORLANDC__) && defined(__clang__))
+             #pragma warning(push)
+             #pragma warning(suppress : 6102) // Using 'index' from failed function call
++#endif
+             return static_cast<int>(index);
++#if !(defined(__BORLANDC__) && defined(__clang__))
+             #pragma warning(pop)
++#endif
+         } else {
+             return 32;
+         }
+diff --git a/include/private/base/SkFloatingPoint.h b/include/private/base/SkFloatingPoint.h
+--- a/include/private/base/SkFloatingPoint.h
++++ b/include/private/base/SkFloatingPoint.h
+@@ -153,7 +153,7 @@
+ 
+ // IEEE defines how float divide behaves for non-finite values and zero-denoms, but C does not,
+ // so we have a helper that suppresses the possible undefined-behavior warnings.
++#if defined(SK_BUILD_FOR_WIN) && !(defined(__BORLANDC__) && defined(__clang__))
+-#ifdef SK_BUILD_FOR_WIN
+ #pragma warning(push)
+ #pragma warning(disable : 4723)
+ #endif
+@@ -166,7 +166,7 @@
+ static constexpr double sk_ieee_double_divide(double numer, double denom) {
+     return numer / denom;
+ }
++#if defined(SK_BUILD_FOR_WIN) && !(defined(__BORLANDC__) && defined(__clang__))
+-#ifdef SK_BUILD_FOR_WIN
+ #pragma warning( pop )
+ #endif
+ 
+diff --git a/src/core/SkBlitter_ARGB32.cpp b/src/core/SkBlitter_ARGB32.cpp
+--- a/src/core/SkBlitter_ARGB32.cpp
++++ b/src/core/SkBlitter_ARGB32.cpp
+@@ -1455,7 +1455,7 @@
+     fPMColor = SkPreMultiplyColor(fColor);
+ }
+ 
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))  // disable warning : local variable used without having been initialized
+-#if defined _WIN32  // disable warning : local variable used without having been initialized
+ #pragma warning ( push )
+ #pragma warning ( disable : 4701 )
+ #endif
+@@ -1684,7 +1684,7 @@
+     }
+ }
+ 
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))
+-#if defined _WIN32
+ #pragma warning ( pop )
+ #endif
+ 
+diff --git a/src/core/SkScan_Path.cpp b/src/core/SkScan_Path.cpp
+--- a/src/core/SkScan_Path.cpp
++++ b/src/core/SkScan_Path.cpp
+@@ -103,7 +103,7 @@
+     #define validate_edges_for_y(edge, curr_y)
+ #endif
+ 
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))  // disable warning : local variable used without having been initialized
+-#if defined _WIN32  // disable warning : local variable used without having been initialized
+ #pragma warning ( push )
+ #pragma warning ( disable : 4701 )
+ #endif
+@@ -364,7 +364,7 @@
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ 
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))
+-#if defined _WIN32
+ #pragma warning ( pop )
+ #endif
+ 
+diff --git a/src/core/SkRegion.cpp b/src/core/SkRegion.cpp
+--- a/src/core/SkRegion.cpp
++++ b/src/core/SkRegion.cpp
+@@ -670,7 +670,7 @@
+ 
+ ///////////////////////////////////////////////////////////////////////////////
+ 
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))  // disable warning : local variable used without having been initialized
+-#if defined _WIN32  // disable warning : local variable used without having been initialized
+ #pragma warning ( push )
+ #pragma warning ( disable : 4701 )
+ #endif
+@@ -819,7 +819,7 @@
+     return dst - &(*array)[0];
+ }
+ 
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))
+-#if defined _WIN32
+ #pragma warning ( pop )
+ #endif
+ 
+diff --git a/src/core/SkDraw_text.cpp b/src/core/SkDraw_text.cpp
+--- a/src/core/SkDraw_text.cpp
++++ b/src/core/SkDraw_text.cpp
+@@ -32,7 +32,7 @@
+ namespace sktext { class GlyphRunList; }
+ 
+ // disable warning : local variable used without having been initialized
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))
+-#if defined _WIN32
+ #pragma warning ( push )
+ #pragma warning ( disable : 4701 )
+ #endif
+@@ -139,7 +139,7 @@
+ }
+ }  // namespace skcpu
+ 
++#if defined(_WIN32) && !(defined(__BORLANDC__) && defined(__clang__))
+-#if defined _WIN32
+ #pragma warning ( pop )
+ #endif
+ 
