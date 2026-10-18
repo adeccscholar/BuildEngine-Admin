@@ -1,0 +1,132 @@
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -128,6 +128,9 @@
+ config("skia_library") {
+   visibility = [ "./*" ]
+   defines = [ "SKIA_IMPLEMENTATION=1" ]
++  if (is_component_build && skia_use_bcc64x) {
++    cflags = [ "-fvisibility=default" ]
++  }
+ }
+ 
+ skia_library_configs = [
+diff --git a/third_party/third_party.gni b/third_party/third_party.gni
+--- a/third_party/third_party.gni
++++ b/third_party/third_party.gni
+@@ -105,7 +105,15 @@
+   config(target_name + "_public") {
+     forward_variables_from(invoker, "*", [])
+   }
++  if (skia_use_bcc64x && defined(invoker.ldflags)) {
++    config(target_name + "_bcc64x_link") {
++      ldflags = invoker.ldflags
++    }
++  }
+   group(target_name) {
+     public_configs = [ ":" + target_name + "_public" ]
++    if (skia_use_bcc64x && defined(invoker.ldflags)) {
++      all_dependent_configs = [ ":" + target_name + "_bcc64x_link" ]
++    }
+   }
+ }
+diff --git a/third_party/zlib/BUILD.gn b/third_party/zlib/BUILD.gn
+--- a/third_party/zlib/BUILD.gn
++++ b/third_party/zlib/BUILD.gn
+@@ -6,9 +6,21 @@
+ import("../third_party.gni")
+ import("zlib.gni")
+ 
++declare_args() {
++  bcc64x_zlib_include = ""
++  bcc64x_zlib_lib = ""
++}
++
+ if (skia_use_system_zlib) {
+   system("zlib") {
+-    libs = [ "z" ]
++    if (skia_use_bcc64x) {
++      assert(bcc64x_zlib_include != "" && bcc64x_zlib_lib != "",
++             "Installed BuildEngine zlib package required")
++      include_dirs = [ bcc64x_zlib_include ]
++      ldflags = [ bcc64x_zlib_lib ]
++    } else {
++      libs = [ "z" ]
++    }
+   }
+ } else {
+   config("zlib_internal_config") {
+diff --git a/third_party/libjpeg-turbo/BUILD.gn b/third_party/libjpeg-turbo/BUILD.gn
+--- a/third_party/libjpeg-turbo/BUILD.gn
++++ b/third_party/libjpeg-turbo/BUILD.gn
+@@ -5,6 +5,8 @@
+ 
+ declare_args() {
+   skia_use_system_libjpeg_turbo = is_official_build && !is_wasm
++  bcc64x_libjpeg_include = ""
++  bcc64x_libjpeg_lib = ""
+ }
+ 
+ import("../third_party.gni")
+@@ -11,7 +13,14 @@
+ 
+ if (skia_use_system_libjpeg_turbo) {
+   system("libjpeg") {
+-    libs = [ "jpeg" ]
++    if (skia_use_bcc64x) {
++      assert(bcc64x_libjpeg_include != "" && bcc64x_libjpeg_lib != "",
++             "Installed BuildEngine libjpeg-turbo package required")
++      include_dirs = [ bcc64x_libjpeg_include ]
++      ldflags = [ bcc64x_libjpeg_lib ]
++    } else {
++      libs = [ "jpeg" ]
++    }
+   }
+ } else {
+   source_set("libjpeg_headers") {
+diff --git a/third_party/libpng/BUILD.gn b/third_party/libpng/BUILD.gn
+--- a/third_party/libpng/BUILD.gn
++++ b/third_party/libpng/BUILD.gn
+@@ -5,6 +5,8 @@
+ 
+ declare_args() {
+   skia_use_system_libpng = is_official_build && !is_wasm
++  bcc64x_libpng_include = ""
++  bcc64x_libpng_lib = ""
+ }
+ 
+ import("../third_party.gni")
+@@ -11,7 +13,14 @@
+ 
+ if (skia_use_system_libpng) {
+   system("libpng") {
+-    libs = [ "png" ]
++    if (skia_use_bcc64x) {
++      assert(bcc64x_libpng_include != "" && bcc64x_libpng_lib != "",
++             "Installed BuildEngine libpng package required")
++      include_dirs = [ bcc64x_libpng_include ]
++      ldflags = [ bcc64x_libpng_lib ]
++    } else {
++      libs = [ "png" ]
++    }
+   }
+ } else {
+   third_party("libpng") {
+diff --git a/third_party/freetype2/BUILD.gn b/third_party/freetype2/BUILD.gn
+--- a/third_party/freetype2/BUILD.gn
++++ b/third_party/freetype2/BUILD.gn
+@@ -23,7 +23,13 @@
+ if (skia_use_system_freetype2) {
+   system("freetype2") {
+     include_dirs = [ skia_system_freetype2_include_path ]
+-    libs = [ skia_system_freetype2_lib ]
++    if (skia_use_bcc64x) {
++      assert(skia_system_freetype2_lib != "", "Installed BuildEngine FreeType package required")
++      ldflags = [ skia_system_freetype2_lib ]
++      defines = [ "SK_FREETYPE_MINIMUM_RUNTIME_VERSION_IS_BUILD_VERSION=1" ]
++    } else {
++      libs = [ skia_system_freetype2_lib ]
++    }
+   }
+ } else {
+   third_party("freetype2") {
