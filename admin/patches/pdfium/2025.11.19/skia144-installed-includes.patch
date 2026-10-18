@@ -197,3 +197,16 @@ diff --git a/core/fpdfapi/page/cpdf_pageimagecache.cpp b/core/fpdfapi/page/cpdf_
  #endif
  
  namespace {
+diff --git a/core/fxge/cfx_glyphcache.h b/core/fxge/cfx_glyphcache.h
+--- a/core/fxge/cfx_glyphcache.h
++++ b/core/fxge/cfx_glyphcache.h
+@@ -18,8 +18,8 @@
+ 
+ #if defined(PDF_USE_SKIA)
+ #include "core/fxge/fx_font.h"
+-#include "third_party/skia/include/core/SkRefCnt.h"  // nogncheck
++#include "include/core/SkRefCnt.h"  // nogncheck
+ #endif
+ 
+ class CFX_Font;
+ class CFX_GlyphBitmap;
