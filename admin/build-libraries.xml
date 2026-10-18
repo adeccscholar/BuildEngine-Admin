@@ -5373,7 +5373,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-18T22:20:00Z">
+   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-19T01:00:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
@@ -5504,7 +5504,9 @@
                <line value="skia_use_xps = false"/>
                <line value="skia_enable_svg = false"/>
                <line value="skia_enable_skottie = false"/>
-               <line value="skia_use_freetype = false"/>
+               <line value="skia_use_freetype = true"/>
+               <line value="skia_enable_fontmgr_custom_directory = false"/>
+               <line value="skia_enable_fontmgr_custom_embedded = false"/>
                <line value="skia_enable_fontmgr_custom_empty = true"/>
                <line value="skia_use_system_freetype2 = true"/>
                <line value="skia_system_freetype2_include_path = getenv(&quot;CB_SKIA_FREETYPE_INCLUDE&quot;)"/>
