@@ -173,7 +173,7 @@ diff --git a/testing/image_diff/image_diff_png_skia.cpp b/testing/image_diff/ima
 diff --git a/core/fxge/dib/cfx_dibbase.h b/core/fxge/dib/cfx_dibbase.h
 --- a/core/fxge/dib/cfx_dibbase.h
 +++ b/core/fxge/dib/cfx_dibbase.h
-@@ -17,9 +17,9 @@
+@@ -17,8 +17,8 @@
  #include "core/fxcrt/span_util.h"
  #include "core/fxge/dib/fx_dib.h"
  
