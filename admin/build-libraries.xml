@@ -9940,7 +9940,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\pdfium\consumer" configuration="Debug"
@@ -9950,7 +9950,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libicuuc78.dll;libfreetype.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
