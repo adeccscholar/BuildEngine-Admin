@@ -67,6 +67,8 @@ These conditions are not a substitute for checking which C++ preprocessor branch
 
 ## Link response-file translation
 
+The linker-response adapter also rewrites the exact GN/LLVM driver token `--color-diagnostics` to the BCC64X-recognized `-fcolor-diagnostics`. Other unknown linker flags remain subject to driver errors.
+
 The same script supports `--link-rsp` to process GN's Windows/MSVC-flavored linker response file **before** invoking `bcc64x`. It currently:
 
 1. Converts GN's `-lD:\\...\\package.lib`, `"-lD:\\...\\package.lib"` and `-l"D:\\...\\package.lib"` forms to **literal drive-qualified input paths**, normalized to forward slashes. These must not be resolved via the generic `-lname` lookup.
