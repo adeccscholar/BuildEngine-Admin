@@ -408,6 +408,17 @@ diff --git a/BUILD.gn b/BUILD.gn
      }
    } else {
      sources += [ "src/ports/SkOSFile_posix.cpp" ]
+@@ -998,5 +998,9 @@
+       ]
+       if (target_cpu != "arm64") {
+-        libs += [ "OpenGL32.lib" ]
++        if (skia_use_bcc64x) {
++          libs += [ "OpenGL32" ]
++        } else {
++          libs += [ "OpenGL32.lib" ]
++        }
+       }
+     } else {
 diff --git a/third_party/third_party.gni b/third_party/third_party.gni
 --- a/third_party/third_party.gni
 +++ b/third_party/third_party.gni
