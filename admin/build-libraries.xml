@@ -9555,7 +9555,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-19T03:30:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-19T03:45:00Z">
       <dependency library="skia" version="144"/>
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
@@ -9631,6 +9631,24 @@
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="--directory=third_party/abseil-cpp"/>
             <argument value="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-charconv-digits10.patch"/>
+         </execute>
+
+         <!-- Version-pinned Abseil Windows symbolizer: MSVC-only warning pragmas
+              are not accepted by BCC64X under -Werror. Keep the dbghelp include. -->
+         <execute name="pdfium-abseil-symbolize-pragmas-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--directory=third_party/abseil-cpp"/>
+            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil-bcc64x-symbolize-win32.patch"/>
+         </execute>
+         <execute name="pdfium-abseil-symbolize-pragmas-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="--directory=third_party/abseil-cpp"/>
+            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil-bcc64x-symbolize-win32.patch"/>
+         </execute>
+         <execute name="pdfium-abseil-symbolize-pragmas-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--directory=third_party/abseil-cpp"/>
+            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil-bcc64x-symbolize-win32.patch"/>
          </execute>
 
          <!-- Prepare a GN adapter directory only. Installed Skia 144 owns its
