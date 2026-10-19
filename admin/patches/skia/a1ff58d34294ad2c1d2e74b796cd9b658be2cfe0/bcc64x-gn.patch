@@ -408,14 +408,15 @@ diff --git a/BUILD.gn b/BUILD.gn
      }
    } else {
      sources += [ "src/ports/SkOSFile_posix.cpp" ]
-@@ -998,5 +998,11 @@
+@@ -998,5 +998,12 @@
        ]
        if (target_cpu != "arm64") {
 -        libs += [ "OpenGL32.lib" ]
 +        if (skia_use_bcc64x) {
 +          _opengl_import = getenv("CB_SKIA_OPENGL_LIB")
 +          assert(_opengl_import != "", "BuildEngine OpenGL import library is required")
-+          libs += [ _opengl_import ]
++          lib_dirs += [ get_path_info(_opengl_import, "dir") ]
++          libs += [ "opengl32" ]
 +        } else {
 +          libs += [ "OpenGL32.lib" ]
 +        }
