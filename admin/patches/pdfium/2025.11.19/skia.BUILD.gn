@@ -6,13 +6,13 @@ _skia_library = getenv("CB_PDFIUM_SKIA_LIB")
 assert(_skia_include != "" && _skia_library != "",
        "Skia 144 installed include root and import library are required")
 
-# Skia 144 is built for PDFium with Ganesh, OpenGL and Direct3D; Skia PDF output remains disabled.
+# Skia 144 is built for PDFium with Ganesh and OpenGL; Skia PDF output remains disabled.
 # Consumer feature defines must match the exact installed Skia 144 build.
 # Do not inject Skia 153's feature defines or compile Skia implementation sources.
 config("skia_config") {
   include_dirs = [ _skia_include ]
   libs = [ _skia_library ]
-  defines = [ "SKIA_DLL", "SK_GANESH", "SK_GL", "SK_DIRECT3D" ]
+  defines = [ "SKIA_DLL", "SK_GANESH", "SK_GL", ]
 }
 
 group("skia") {
