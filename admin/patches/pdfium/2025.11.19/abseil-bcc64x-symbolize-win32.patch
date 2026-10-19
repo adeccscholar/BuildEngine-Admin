@@ -1,0 +1,17 @@
+diff --git a/absl/debugging/symbolize_win32.inc b/absl/debugging/symbolize_win32.inc
+--- a/absl/debugging/symbolize_win32.inc
++++ b/absl/debugging/symbolize_win32.inc
+@@ -19,9 +19,13 @@
+ #include <winternl.h>
+ 
+ // MSVC header dbghelp.h has a warning for an ignored typedef.
++#if defined(_MSC_VER) && !defined(__clang__)
+ #pragma warning(push)
+ #pragma warning(disable:4091)
++#endif
+ #include <dbghelp.h>
++#if defined(_MSC_VER) && !defined(__clang__)
+ #pragma warning(pop)
++#endif
+ 
+ #pragma comment(lib, "dbghelp.lib")
