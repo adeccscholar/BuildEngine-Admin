@@ -3389,7 +3389,7 @@
          <environment name="PATH" value="{InstallRoot}\Win64x\bin;{ENV:PATH}"/>
       </smoke>
    </library>
-<library id="raylib" version="6.0" category="graphics" timestamp="2026-09-01T12:45:00Z">
+<library id="raylib" version="6.0" category="graphics" timestamp="2026-10-20T00:55:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <metadata name="raylib" supplier="raylib project" homepage="https://www.raylib.com/" description="Simple cross-platform C library for graphics, audio, input, and game and application development." licenseSignal="green"><license name="zlib License" spdx="Zlib" file="LICENSE"/></metadata>
       <source><download url="https://github.com/raysan5/raylib/archive/dbc56a87da87d973a9c5baa4e7438a9d20121d28.zip" archive="raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28.zip"/><extract format="zip" root="raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28"><require path="LICENSE"/><require path="src\raylib.h"/><require path="src\raymath.h"/><require path="src\rcamera.h"/><require path="src\rlgl.h"/><require path="src\rcore.c"/><require path="src\rshapes.c"/><require path="src\rtextures.c"/><require path="src\rtext.c"/><require path="src\rmodels.c"/><require path="src\raudio.c"/></extract></source>
@@ -3426,7 +3426,7 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\sdl2\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="sdl2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
-<library id="sqlite" version="3.53.4" category="database" timestamp="2026-09-01T12:45:00Z">
+<library id="sqlite" version="3.53.4" category="database" timestamp="2026-10-20T00:55:00Z">
       <metadata name="SQLite" supplier="SQLite Consortium" homepage="https://www.sqlite.org/" description="Embedded relational database engine providing a self-contained SQL database in a single library." licenseSignal="green"><license name="Public Domain" spdx="blessing"/></metadata>
       <security>
          <repository url="https://github.com/sqlite/sqlite.git" ref="version-{LibraryVersion}"/>
