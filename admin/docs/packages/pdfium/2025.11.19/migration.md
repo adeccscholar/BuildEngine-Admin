@@ -470,3 +470,7 @@ Both native Debug and Release runs now reach the Abseil symbolizer unit, where t
 ## GN linker diagnostic driver flag (19 October 2026)
 
 The Release Ninja run compiles every object and reaches `[604/604] BCC64X DLL ./pdfium.dll` before the BCC64X driver rejects `--color-diagnostics` in the generated GN linker response file; the driver explicitly recommends `-fcolor-diagnostics`. The generic `gn_argument_adapter.py` `--link-rsp` path now converts that exact token, retaining all other flags for normal strict driver validation. The rule is also in `admin/server-docs/translation-rules.md`. The PDFium FSM contract timestamp was updated to `2026-10-19T04:00:00Z`. Build, link, installed-consumer smoke, and DLL loader smoke remain to be verified on the user's Windows host.
+
+## Linker flag correction: regex escape mistake (19 October 2026)
+
+The first translation for `--color-diagnostics` did not actually match: the adapter's Python raw-string regex had doubled backslashes (`\\S`, `\\s`) rather than proper whitespace boundary patterns (`\S`, `\s`). Both native variants therefore reached the BCC64X DLL link step and failed identically on the unchanged `--color-diagnostics` argument. The corrected exact-token regex is `r'(?<!\S)--color-diagnostics(?=\s|$)'` and converts the flag to `-fcolor-diagnostics`. This is a repair to the previous adapter fix, not another upstream compiler issue. FSM timestamp is now `2026-10-19T04:15:00Z`; native validation is still pending.
