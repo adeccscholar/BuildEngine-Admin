@@ -12,7 +12,8 @@ assert(_skia_include != "" && _skia_library != "",
 config("skia_config") {
   include_dirs = [ _skia_include ]
   libs = [ _skia_library ]
-  defines = [ "SKIA_DLL" ]}
+  defines = [ "SKIA_DLL" ]
+}
 
 group("skia") {
   public_configs = [ ":skia_config" ]
