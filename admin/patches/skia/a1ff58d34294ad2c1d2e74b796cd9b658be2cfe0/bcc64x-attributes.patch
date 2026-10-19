@@ -178,3 +178,45 @@ diff --git a/src/core/SkDraw_text.cpp b/src/core/SkDraw_text.cpp
  #pragma warning ( pop )
  #endif
  
+diff --git a/src/gpu/ganesh/GrTextureRenderTargetProxy.h b/src/gpu/ganesh/GrTextureRenderTargetProxy.h
+--- a/src/gpu/ganesh/GrTextureRenderTargetProxy.h
++++ b/src/gpu/ganesh/GrTextureRenderTargetProxy.h
+@@ -31,7 +31,7 @@
+ enum class Mipmapped : bool;
+ }  // namespace skgpu
+ 
+-#ifdef SK_BUILD_FOR_WIN
++#if defined(SK_BUILD_FOR_WIN) && !(defined(__BORLANDC__) && defined(__clang__))
+ // Windows gives warnings about inheriting asTextureProxy/asRenderTargetProxy via dominance.
+ #pragma warning(push)
+ #pragma warning(disable: 4250)
+@@ -93,7 +93,7 @@
+     SkDEBUGCODE(void onValidateSurface(const GrSurface*) override;)
+ };
+ 
+-#ifdef SK_BUILD_FOR_WIN
++#if defined(SK_BUILD_FOR_WIN) && !(defined(__BORLANDC__) && defined(__clang__))
+ #pragma warning(pop)
+ #endif
+ 
+diff --git a/src/gpu/ganesh/gl/GrGLTextureRenderTarget.h b/src/gpu/ganesh/gl/GrGLTextureRenderTarget.h
+--- a/src/gpu/ganesh/gl/GrGLTextureRenderTarget.h
++++ b/src/gpu/ganesh/gl/GrGLTextureRenderTarget.h
+@@ -24,7 +24,7 @@
+ enum class Budgeted : bool;
+ }
+ 
+-#ifdef SK_BUILD_FOR_WIN
++#if defined(SK_BUILD_FOR_WIN) && !(defined(__BORLANDC__) && defined(__clang__))
+ // Windows gives bogus warnings about inheriting asTexture/asRenderTarget via dominance.
+ #pragma warning(push)
+ #pragma warning(disable: 4250)
+@@ -87,7 +87,7 @@
+     void onSetLabel() override;
+ };
+ 
+-#ifdef SK_BUILD_FOR_WIN
++#if defined(SK_BUILD_FOR_WIN) && !(defined(__BORLANDC__) && defined(__clang__))
+ #pragma warning(pop)
+ #endif
+ 
