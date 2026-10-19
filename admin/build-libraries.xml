@@ -5528,7 +5528,6 @@
                <line value="skia_use_system_zlib = true"/>
                <line value="skia_use_system_libpng = true"/>
                <line value="skia_use_system_libjpeg_turbo = true"/>
-               <line value="bcc64x_opengl_lib = getenv(&quot;CB_SKIA_OPENGL_LIB&quot;)"/>
                <line value="bcc64x_zlib_include = getenv(&quot;CB_SKIA_ZLIB_INCLUDE&quot;)"/>
                <line value="bcc64x_zlib_lib = getenv(&quot;CB_SKIA_ZLIB_LIB&quot;)"/>
                <line value="bcc64x_libpng_include = getenv(&quot;CB_SKIA_LIBPNG_INCLUDE&quot;)"/>
