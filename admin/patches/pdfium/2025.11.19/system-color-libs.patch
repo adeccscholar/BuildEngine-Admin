@@ -9,8 +9,7 @@ diff --git a/third_party/BUILD.gn b/third_party/BUILD.gn
 -    packages = [ "lcms2" ]
 +    include_dirs = [ getenv("CB_PDFIUM_LCMS_INCLUDE") ]
 +    libs = [ getenv("CB_PDFIUM_LCMS_LIB") ]
--  }
-+  }
+   }
 @@ -373,5 +373,6 @@
  if (use_system_libopenjpeg2) {
 -  pkg_config("libopenjpeg2_from_pkgconfig") {
@@ -19,5 +18,4 @@ diff --git a/third_party/BUILD.gn b/third_party/BUILD.gn
 -    packages = [ "libopenjp2" ]
 +    include_dirs = [ getenv("CB_PDFIUM_OPENJPEG_INCLUDE") ]
 +    libs = [ getenv("CB_PDFIUM_OPENJPEG_LIB") ]
--  }
-+  }
+   }
