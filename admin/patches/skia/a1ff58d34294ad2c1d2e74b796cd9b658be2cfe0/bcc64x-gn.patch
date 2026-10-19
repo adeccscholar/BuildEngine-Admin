@@ -415,7 +415,7 @@ diff --git a/BUILD.gn b/BUILD.gn
 +        if (skia_use_bcc64x) {
 +          _opengl_import = getenv("CB_SKIA_OPENGL_LIB")
 +          assert(_opengl_import != "", "BuildEngine OpenGL import library is required")
-+          lib_dirs += [ get_path_info(_opengl_import, "dir") ]
++          lib_dirs = [ get_path_info(_opengl_import, "dir") ]
 +          libs += [ "opengl32" ]
 +        } else {
 +          libs += [ "OpenGL32.lib" ]
