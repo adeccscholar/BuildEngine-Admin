@@ -1,0 +1,15 @@
+diff --git a/build/config/win/BUILD.gn b/build/config/win/BUILD.gn
+--- a/build/config/win/BUILD.gn
++++ b/build/config/win/BUILD.gn
+@@ -97,7 +97,10 @@
+-    if (is_component_build) {
++    # BCC64X uses the GNU-style Clang driver, not clang-cl. Its component
++    # DLLs retain regular COFF exports for inline member functions.
++    if (is_component_build &&
++        current_toolchain != "//build/toolchain/bcc64x:bcc64x") {
+       cflags += [
+         # Do not export inline member functions. This makes component builds
+         # faster. This is similar to -fvisibility-inlines-hidden.
+         "/Zc:dllexportInlines-",
+       ]
+     }
