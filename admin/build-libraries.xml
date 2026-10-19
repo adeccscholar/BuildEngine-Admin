@@ -9562,8 +9562,6 @@
       <dependency library="libpng" version="1.6.58"/>
       <dependency library="freetype" version="2.14.3"/>
       <dependency library="icu" version="78.3"/>
-      <dependency library="lcms2" version="2.19.1"/>
-      <dependency library="openjpeg" version="2.5.4"/>
       <metadata name="PDFium" supplier="PDFium Authors" homepage="https://pdfium.googlesource.com/pdfium/" description="Pinned PDFium GN/BCC64X integration; validation pending" licenseSignal="yellow"/>
       <security>
          <repository url="https://pdfium.googlesource.com/pdfium" commit="a84323421e94f484faca52dd9d027934eba42ab8"/>
