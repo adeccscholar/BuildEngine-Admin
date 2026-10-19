@@ -413,7 +413,7 @@ diff --git a/BUILD.gn b/BUILD.gn
        if (target_cpu != "arm64") {
 -        libs += [ "OpenGL32.lib" ]
 +        if (skia_use_bcc64x) {
-+          libs += [ "OpenGL32" ]
++          libs += [ bcc64x_opengl_lib ]
 +        } else {
 +          libs += [ "OpenGL32.lib" ]
 +        }
