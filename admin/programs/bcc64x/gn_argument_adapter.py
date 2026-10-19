@@ -119,7 +119,7 @@ def TranslateLinkResponse(strContent: str) -> str:
     # Chromium GN emits the LLVM-driver spelling in linker ldflags.
     # BCC64X accepts the corresponding Clang driver spelling instead.
     # Rewrite the exact token only; do not mask other unknown ldflags.
-    strContent = re.sub(r'(?<!\\S)--color-diagnostics(?=\\s|$)',
+    strContent = re.sub(r'(?<!\S)--color-diagnostics(?=\s|$)',
                         '-fcolor-diagnostics', strContent)
     if re.search(r'(?<!\S)"/[A-Za-z][^"]*"', strContent):
         raise ValueError("quoted MSVC linker switch requires explicit handling")
