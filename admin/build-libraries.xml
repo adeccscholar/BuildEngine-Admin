@@ -5373,7 +5373,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-19T18:10:00Z">
+   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-19T18:50:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.58"/>
@@ -5494,11 +5494,11 @@
                <line value="skia_build_fuzzers = false"/>
                <line value="skia_build_rust_targets = false"/>
                <line value="skia_enable_spirv_validation = false"/>
-               <!-- PDFium uses Skia Ganesh on Windows. Enable the native GL and D3D backends. -->
+               <!-- PDFium uses Skia Ganesh on Windows. Enable the native GL backend; D3D needs an external SPIRV-Cross package. -->
                <line value="skia_enable_ganesh = true"/>
                <line value="skia_enable_graphite = false"/>
                <line value="skia_use_gl = true"/>
-               <line value="skia_use_direct3d = true"/>
+               <line value="skia_use_direct3d = false"/>
                <line value="skia_use_vulkan = false"/>
                <line value="skia_use_dawn = false"/>
                <line value="skia_enable_pdf = false"/>
