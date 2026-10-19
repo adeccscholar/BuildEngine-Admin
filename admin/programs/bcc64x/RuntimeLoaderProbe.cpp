@@ -373,6 +373,22 @@ bool ProbeOne(std::wstring const& name, std::wstring const& appDirectory,
       std::wprintf(L"[LOADER] LoadLibraryExW FAILED: Win32=%lu (0x%08lX), DLL=%ls\n",
          static_cast<unsigned long>(error), static_cast<unsigned long>(error), name.c_str());
       SystemError(error);
+      for(wchar_t const* szDependency : {L"libc++-370.dll", L"libunwind-370.dll"}) {
+         HMODULE const hExisting = ::GetModuleHandleW(szDependency);
+         ::SetLastError(ERROR_SUCCESS);
+         HMODULE const hModule = hExisting ? hExisting :
+            ::LoadLibraryExW(szDependency, nullptr, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+         DWORD const uDependencyError = hModule ? ERROR_SUCCESS : ::GetLastError();
+         wchar_t szResolved[32768] {};
+         if(hModule)
+            ::GetModuleFileNameW(hModule, szResolved, static_cast<DWORD>(std::size(szResolved)));
+         std::wprintf(L"[LOADER] RUNTIME %ls: %ls already-loaded=%u Win32=%lu path=%ls\n",
+            szDependency, hModule ? L"PASS" : L"FAIL",
+            static_cast<unsigned>(hExisting != nullptr),
+            static_cast<unsigned long>(uDependencyError),
+            hModule ? szResolved : L"<unresolved>");
+         if(hModule && !hExisting) ::FreeLibrary(hModule);
+      }
       if(error == ERROR_BAD_EXE_FORMAT) {
          DiagnoseImage(path);
 
