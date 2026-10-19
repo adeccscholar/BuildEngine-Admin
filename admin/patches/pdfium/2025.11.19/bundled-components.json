@@ -5,7 +5,7 @@
     "version": "a84323421e94f484faca52dd9d027934eba42ab8",
     "versionScheme": "git"
   },
-  "purpose": "Pinned upstream PDFium dependencies; inclusion in shipping target must be reconciled against GN target closure before release.",
+  "purpose": "External packages reflect current BuildEngine imports; bundled sources require reconciliation against generated GN target closure before release.",
   "externalBuildEngineDependencies": [
     {
       "name": "zlib",
@@ -26,14 +26,6 @@
     {
       "name": "ICU",
       "version": "78.3"
-    },
-    {
-      "name": "lcms2",
-      "version": "2.19.1"
-    },
-    {
-      "name": "openjpeg",
-      "version": "2.5.4"
     }
   ],
   "bundledComponents": [
@@ -54,6 +46,18 @@
       "version": "cb1d42aaa1e14b09e1452cfdef373d051b8c02a4",
       "versionScheme": "git",
       "repository": "https://chromium.googlesource.com/external/github.com/fastfloat/fast_float"
+    },
+    {
+      "name": "LCMS2",
+      "version": "PDFium pinned upstream sources",
+      "versionScheme": "source",
+      "integration": "bundled in PDFium third_party/lcms; not linked against BuildEngine lcms2 DLL"
+    },
+    {
+      "name": "OpenJPEG",
+      "version": "PDFium pinned upstream sources",
+      "versionScheme": "source",
+      "integration": "bundled PDFium third_party/libopenjpeg; final GN closure must be verified"
     }
   ]
 }
