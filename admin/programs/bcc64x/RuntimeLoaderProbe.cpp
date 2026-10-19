@@ -10,6 +10,9 @@
 #include <cwchar>
 #include <iterator>
 #include <initializer_list>
+#include <set>
+#include <functional>
+#include <cwctype>
 #include <string>
 #include <vector>
 
@@ -326,6 +329,131 @@ void DiagnoseImage(std::wstring const& path) {
 }
 
 
+
+void ReportDependencyTree(std::wstring const& strRoot, std::wstring const& strAppDir) {
+   std::set<std::wstring> setVisited;
+   unsigned uMissing = 0U, uInvalid = 0U, uNodes = 0U;
+   std::function<void(std::wstring const&, unsigned)> Visit;
+   Visit = [&](std::wstring const& strPath, unsigned uDepth) {
+      if(uDepth > 32U || uNodes >= 512U) {
+         std::wprintf(L"[LOADER] TREE LIMIT depth=%u nodes=%u\n", uDepth, uNodes);
+         return;
+      }
+      std::wstring strKey = strPath;
+      for(wchar_t& ch : strKey) ch = std::towlower(ch);
+      if(!setVisited.insert(strKey).second) {
+         std::wprintf(L"[LOADER] TREE REVISIT depth=%u path=%ls\n", uDepth, strPath.c_str());
+         return;
+      }
+      ++uNodes;
+      MappedFile const aFile(strPath);
+      auto const* pDos = aFile.At<IMAGE_DOS_HEADER>(0U);
+      if(!pDos || pDos->e_magic != IMAGE_DOS_SIGNATURE || pDos->e_lfanew < 0) {
+         ++uInvalid;
+         std::wprintf(L"[LOADER] TREE INVALID depth=%u path=%ls reason=DOS\n", uDepth, strPath.c_str());
+         return;
+      }
+      auto const* pNt = aFile.At<IMAGE_NT_HEADERS64>(static_cast<std::size_t>(pDos->e_lfanew));
+      if(!pNt || pNt->Signature != IMAGE_NT_SIGNATURE ||
+         pNt->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC ||
+         pNt->FileHeader.Machine != IMAGE_FILE_MACHINE_AMD64) {
+         ++uInvalid;
+         std::wprintf(L"[LOADER] TREE INVALID depth=%u path=%ls reason=architecture-or-PE\n", uDepth, strPath.c_str());
+         return;
+      }
+      std::wprintf(L"[LOADER] TREE NODE depth=%u machine=0x%04X subsystem=%u path=%ls\n",
+         uDepth, static_cast<unsigned>(pNt->FileHeader.Machine),
+         static_cast<unsigned>(pNt->OptionalHeader.Subsystem), strPath.c_str());
+      std::size_t const uSections = static_cast<std::size_t>(pDos->e_lfanew) +
+         sizeof(DWORD) + sizeof(IMAGE_FILE_HEADER) + pNt->FileHeader.SizeOfOptionalHeader;
+      auto ToOffset = [&](DWORD uRva, std::size_t uRequired) -> std::size_t {
+         if(uRva < pNt->OptionalHeader.SizeOfHeaders &&
+            uRva <= aFile.length && uRequired <= aFile.length - uRva)
+            return uRva;
+         for(unsigned u = 0; u < pNt->FileHeader.NumberOfSections; ++u) {
+            auto const* pSection = aFile.At<IMAGE_SECTION_HEADER>(
+               uSections + static_cast<std::size_t>(u) * sizeof(IMAGE_SECTION_HEADER));
+            if(!pSection || uRva < pSection->VirtualAddress) continue;
+            std::size_t const uDelta = uRva - pSection->VirtualAddress;
+            if(uDelta > pSection->SizeOfRawData ||
+               uRequired > pSection->SizeOfRawData - uDelta) continue;
+            std::size_t const uOffset = pSection->PointerToRawData + uDelta;
+            if(uOffset <= aFile.length && uRequired <= aFile.length - uOffset)
+               return uOffset;
+         }
+         return aFile.length;
+      };
+      if(pNt->OptionalHeader.NumberOfRvaAndSizes <= IMAGE_DIRECTORY_ENTRY_IMPORT) return;
+      auto const& aDir = pNt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+      if(!aDir.VirtualAddress || !aDir.Size) return;
+      for(unsigned u = 0; u < 1024U; ++u) {
+         unsigned long long const uDescriptorRva =
+            static_cast<unsigned long long>(aDir.VirtualAddress) +
+            static_cast<unsigned long long>(u) * sizeof(IMAGE_IMPORT_DESCRIPTOR);
+         if(uDescriptorRva > 0xFFFFFFFFULL) break;
+         auto const* pImport = aFile.At<IMAGE_IMPORT_DESCRIPTOR>(
+            ToOffset(static_cast<DWORD>(uDescriptorRva), sizeof(IMAGE_IMPORT_DESCRIPTOR)));
+         if(!pImport) {
+            ++uInvalid;
+            std::wprintf(L"[LOADER] TREE INVALID depth=%u path=%ls reason=import-table\n", uDepth, strPath.c_str());
+            break;
+         }
+         if(pImport->Name == 0U) break;
+         std::size_t const uNameOffset = ToOffset(pImport->Name, 1U);
+         if(uNameOffset >= aFile.length) { ++uInvalid; continue; }
+         char const* szImport = reinterpret_cast<char const*>(aFile.data + uNameOffset);
+         void const* pEnd = std::memchr(szImport, 0, aFile.length - uNameOffset);
+         if(!pEnd) { ++uInvalid; continue; }
+         std::string const strImport(szImport);
+         std::wstring const strName(strImport.begin(), strImport.end());
+         if(strName.empty() || strName.find_first_of(L"\\/:") != std::wstring::npos) {
+            ++uInvalid;
+            continue;
+         }
+         std::wstring strCandidate = strAppDir + strName;
+         DWORD uAttributes = ::GetFileAttributesW(strCandidate.c_str());
+         wchar_t szResolved[32768] {};
+         wchar_t const* szKind = L"app-local";
+         if(uAttributes == INVALID_FILE_ATTRIBUTES ||
+            (uAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0U) {
+            HMODULE const hLoaded = ::GetModuleHandleW(strName.c_str());
+            DWORD const uLength = hLoaded
+               ? ::GetModuleFileNameW(hLoaded, szResolved, static_cast<DWORD>(std::size(szResolved))) : 0U;
+            if(uLength > 0U && uLength < std::size(szResolved)) {
+               strCandidate.assign(szResolved, uLength);
+               szKind = L"already-loaded";
+            }
+            else {
+               wchar_t szSystem[32768] {};
+               unsigned const uSystemLen = ::GetSystemDirectoryW(
+                  szSystem, static_cast<unsigned>(std::size(szSystem)));
+               bool bFound = false;
+               if(uSystemLen > 0U && uSystemLen < std::size(szSystem)) {
+                  strCandidate = std::wstring(szSystem) + L"\\" + strName;
+                  uAttributes = ::GetFileAttributesW(strCandidate.c_str());
+                  bFound = uAttributes != INVALID_FILE_ATTRIBUTES &&
+                     (uAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0U;
+               }
+               if(!bFound) {
+                  std::wprintf(L"[LOADER] TREE UNRESOLVED depth=%u import=%ls parent=%ls (API-set or search path not simulated)\n",
+                     uDepth + 1U, strName.c_str(), strPath.c_str());
+                  ++uMissing;
+                  continue;
+               }
+               szKind = L"System32-candidate";
+            }
+         }
+         std::wprintf(L"[LOADER] TREE EDGE depth=%u import=%ls resolution=%ls path=%ls\n",
+            uDepth + 1U, strName.c_str(), szKind, strCandidate.c_str());
+         Visit(strCandidate, uDepth + 1U);
+      }
+   };
+   std::wprintf(L"[LOADER] TREE BEGIN root=%ls (static imports, no DLL execution)\n", strRoot.c_str());
+   Visit(strRoot, 0U);
+   std::wprintf(L"[LOADER] TREE SUMMARY nodes=%u invalid=%u unresolved=%u\n",
+      uNodes, uInvalid, uMissing);
+}
+
 bool ProbeOne(std::wstring const& name, std::wstring const& appDirectory,
               std::size_t index, std::size_t total) {
    std::wprintf(L"[LOADER] BEGIN %zu/%zu: %ls\n", index, total, name.c_str());
@@ -392,6 +520,7 @@ bool ProbeOne(std::wstring const& name, std::wstring const& appDirectory,
       }
       if(error == ERROR_BAD_EXE_FORMAT) {
          DiagnoseImage(path);
+         ReportDependencyTree(path, appDirectory);
 
          // Diagnostic only: map the target DLL without resolving imports or
          // invoking its entry point. Never call exports from this handle.
