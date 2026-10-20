@@ -20,7 +20,8 @@ add_library(bzip2 SHARED
   "${BZIP2_SOURCE_DIR}/randtable.c" "${BZIP2_SOURCE_DIR}/compress.c" "${BZIP2_SOURCE_DIR}/decompress.c"
   "${BZIP2_SOURCE_DIR}/bzlib.c" "${BZIP2_DEF_FILE}")
 target_include_directories(bzip2 PUBLIC $<BUILD_INTERFACE:${BZIP2_SOURCE_DIR}> $<INSTALL_INTERFACE:include>)
-set_target_properties(bzip2 PROPERTIES OUTPUT_NAME bzip2 DEBUG_POSTFIX d PREFIX "" IMPORT_PREFIX "")
+# Canonical DLL and import library names: libbzip2[d].dll / libbzip2[d].lib.
+set_target_properties(bzip2 PROPERTIES OUTPUT_NAME bzip2 DEBUG_POSTFIX d PREFIX "lib" IMPORT_PREFIX "lib")
 install(TARGETS bzip2 EXPORT BZip2Targets RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 install(EXPORT BZip2Targets FILE BZip2Targets.cmake NAMESPACE BZip2:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/BZip2")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/BZip2Config.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/BZip2Config.cmake" @ONLY)

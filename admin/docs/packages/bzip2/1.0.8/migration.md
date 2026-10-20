@@ -102,3 +102,7 @@ The contract includes one or more upstream tests, validation actions or consumer
 4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
 **Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.
+
+## 2026-10-20: Canonical Win64 Modern library naming
+
+The BuildEngine-owned BZip2 CMake project no longer suppresses `PREFIX` and `IMPORT_PREFIX`. Release uses `libbzip2.dll` and `libbzip2.lib`; Debug uses `libbzip2d.dll` and `libbzip2d.lib`. The export target remains `BZip2::bzip2`. Version-specific build-stage and install `bin/lib` destinations are cleaned before installing new files; both configurations now declare external consumer smokes. Consumers of the old unprefixed DLLs must relink. Windows results remain **[not verified]**.

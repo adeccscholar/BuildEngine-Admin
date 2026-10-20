@@ -3178,7 +3178,7 @@
    
 </library>
 
-<library id="bzip2" version="1.0.8" category="compression" timestamp="2026-09-01T14:43:00Z">
+<library id="bzip2" version="1.0.8" category="compression" timestamp="2026-10-20T20:30:00Z">
       <metadata name="bzip2" supplier="Julian Seward / sourceware.org" description="Lossless block-sorting compression library implementing the bzip2 format." licenseSignal="green"><license name="bzip2 License" spdx="bzip2-1.0.6" file="LICENSE"/></metadata>
       <security>
          <repository url="https://sourceware.org/git/bzip2.git"/>
@@ -3187,10 +3187,25 @@
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DBZIP2_SOURCE_DIR:PATH={Workspace}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\bzip2" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant><variant name="Debug"><variable name="DebugPostfix" value="d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/></variant>
-         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bzip2{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\bzip2{DebugPostfix}.lib"/></perVariant><common><copy source="{Workspace}\bzlib.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\bzlib.h" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common></install>
+         <install><perVariant>
+            <!-- Purge previous unprefixed variant artifacts, including the build stage. -->
+            <execute name="clean-old-bzip2-stage" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+               <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+               <argument value="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            </execute>
+            <execute name="clean-old-bzip2-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+               <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+               <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+            </execute>
+            <execute name="clean-old-bzip2-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+               <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+               <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+            </execute>
+            <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libbzip2{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libbzip2{DebugPostfix}.lib"/></perVariant><common><copy source="{Workspace}\bzlib.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\bzlib.h" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\bzip2\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="bzip2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
+      <smoke id="consumer" source="smokes\bzip2\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="bzip2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 <library id="glew" version="2.3.1" category="graphics" timestamp="2026-09-01T23:21:00Z">
       <dependency library="opengl" version="26.2.1"/>
@@ -4841,7 +4856,7 @@
    </smoke>
 </library>
 
-   <library id="harfbuzz" version="14.4.0" category="text" timestamp="2026-09-06T17:30:00Z">
+   <library id="harfbuzz" version="14.4.0" category="text" timestamp="2026-10-20T20:30:00Z">
 
       <metadata
          name="HarfBuzz"
@@ -4877,6 +4892,23 @@
             <require path="src\harfbuzz-config.cmake.in"/>
             <require path="COPYING"/>
          </extract>
+
+         <!-- Verified against HarfBuzz 14.4.0 CMakeLists.txt. -->
+         <copy source="{BuildFileDir}\patches\harfbuzz\14.4.0\bcc64x-canonical-dll-names.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-canonical-dll-names.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="dll-names-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-canonical-dll-names.patch"/>
+         </execute>
+         <execute name="dll-names-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-canonical-dll-names.patch"/>
+         </execute>
+         <execute name="dll-names-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-canonical-dll-names.patch"/>
+         </execute>
       </source>
 
       <build>
@@ -4939,6 +4971,7 @@
 
          <variant name="Release">
             <variable name="CMakeExportConfiguration" value="release"/>
+            <variable name="DebugPostfix" value=""/>
 
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -4950,6 +4983,7 @@
 
          <variant name="Debug">
             <variable name="CMakeExportConfiguration" value="debug"/>
+            <variable name="DebugPostfix" value="d"/>
 
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
@@ -4963,6 +4997,15 @@
 
          <install>
             <perVariant>
+               <!-- Do not retain DLLs/import libraries from an earlier naming contract. -->
+               <execute name="clean-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="clean-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
                <cmake
                   mode="install"
                   executable="{Tool:cmake}"
@@ -5011,6 +5054,14 @@
                <require
                   path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig"
                   kind="directory"/>
+
+               <!-- Check the actual producer ABI filenames, not only directories. -->
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libharfbuzz{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libharfbuzz-subset{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libharfbuzz-subset{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\harfbuzz.pc"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\harfbuzz-subset.pc"/>
             </perVariant>
 
             <common>
@@ -5101,9 +5152,22 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
+
+      <smoke
+         id="consumer"
+         source="smokes\harfbuzz\consumer"
+         configuration="Debug"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="harfbuzz-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
    </library>
 
-<library id="freetype" version="2.14.3" category="text" timestamp="2026-09-06T04:41:00Z">
+<library id="freetype" version="2.14.3" category="text" timestamp="2026-10-20T20:30:00Z">
    <dependency library="zlib" version="1.3.2"/>
    <dependency library="bzip2" version="1.0.8"/>
    <dependency library="brotli" version="1.2.0"/>
@@ -5159,6 +5223,17 @@
       <argument
          value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\bzip2\1.0.8;{InstallRoot}\packages\brotli\1.2.0;{InstallRoot}\packages\libpng\1.6.58;{InstallRoot}\packages\harfbuzz\14.4.0"/>
 
+      <!-- Bind the exact variant's import libraries, not host/system search results. -->
+      <argument value="-DHarfBuzz_LIBRARY:FILEPATH={InstallRoot}\packages\harfbuzz\14.4.0\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
+      <argument value="-DHarfBuzz_INCLUDE_DIR:PATH={InstallRoot}\packages\harfbuzz\14.4.0\include\harfbuzz"/>
+      <argument value="-DBZIP2_LIBRARY_RELEASE:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\Release\libbzip2.lib"/>
+      <argument value="-DBZIP2_LIBRARY_DEBUG:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\Debug\libbzip2d.lib"/>
+      <argument value="-DBZIP2_INCLUDE_DIR:PATH={InstallRoot}\packages\bzip2\1.0.8\include"/>
+      <require path="{InstallRoot}\packages\harfbuzz\14.4.0\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
+      <require path="{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\{Configuration}\libharfbuzz{DebugPostfix}.dll"/>
+      <require path="{InstallRoot}\packages\bzip2\1.0.8\lib\win64\{Configuration}\libbzip2{DebugPostfix}.lib"/>
+      <require path="{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration}\libbzip2{DebugPostfix}.dll"/>
+
       <cmake
          mode="configure"
          executable="{Tool:cmake}"
@@ -5171,6 +5246,7 @@
          build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
 
       <variant name="Release">
+         <variable name="DebugPostfix" value=""/>
          <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
          <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
@@ -5178,6 +5254,7 @@
       </variant>
 
       <variant name="Debug">
+         <variable name="DebugPostfix" value="d"/>
          <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
          <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
          <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
@@ -5195,6 +5272,8 @@
             <require
                path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
                kind="directory"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libfreetype{DebugPostfix}.dll"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libfreetype{DebugPostfix}.lib"/>
          </perVariant>
 
          <common>
@@ -5250,6 +5329,19 @@
       id="consumer"
       source="smokes\freetype\consumer"
       configuration="Release"
+      cmake="{Tool:cmake}"
+      ninja="{Tool:ninja}"
+      toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+      executable="freetype-consumer.exe">
+
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+   </smoke>
+
+   <smoke
+      id="consumer"
+      source="smokes\freetype\consumer"
+      configuration="Debug"
       cmake="{Tool:cmake}"
       ninja="{Tool:ninja}"
       toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
@@ -9562,7 +9654,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-20T20:03:58Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-20T20:30:00Z">
       <dependency library="abseil" version="20260817.0"/>
       <dependency library="skia" version="144"/>
       <dependency library="zlib" version="1.3.2"/>
@@ -10002,7 +10094,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\pdfium\consumer" configuration="Debug"
@@ -10012,7 +10104,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2d.dll;libpng16d.dll;harfbuzz.dll;libicuuc78d.dll;libfreetyped.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2d.dll;libpng16d.dll;libharfbuzzd.dll;libicuuc78d.dll;libfreetyped.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>

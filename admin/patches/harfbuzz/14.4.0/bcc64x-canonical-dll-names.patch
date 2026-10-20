@@ -1,0 +1,29 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -588,4 +588,6 @@
+ ## Define harfbuzz library
+ add_library(harfbuzz ${project_sources} ${project_extra_sources} ${project_headers})
++set_target_properties(harfbuzz PROPERTIES
++  PREFIX "lib" IMPORT_PREFIX "lib" DEBUG_POSTFIX "d")
+ target_link_libraries(harfbuzz ${THIRD_PARTY_LIBS})
+ if (MINGW)
+@@ -629,5 +631,7 @@
+ ## Define harfbuzz-subset library
+ if (HB_BUILD_SUBSET)
+   add_library(harfbuzz-subset ${subset_project_sources} ${subset_project_headers})
++  set_target_properties(harfbuzz-subset PROPERTIES
++    PREFIX "lib" IMPORT_PREFIX "lib" DEBUG_POSTFIX "d")
+   list(APPEND project_headers ${PROJECT_SOURCE_DIR}/src/hb-subset.h ${PROJECT_SOURCE_DIR}/src/hb-subset-serialize.h)
+   add_dependencies(harfbuzz-subset harfbuzz)
+@@ -1159,5 +1163,10 @@
+   string(REPLACE "%requires_private_extra%" "${_pc_requires_private_extra}" FSTR ${FSTR})
+   string(REPLACE "%libs_private_extra%" "${_pc_libs_private_extra}" FSTR ${FSTR})
++  # Keep pkg-config module names stable; link the matching Debug import libraries.
++  if (CMAKE_BUILD_TYPE STREQUAL "Debug" AND
++      (name STREQUAL "harfbuzz" OR name STREQUAL "harfbuzz-subset"))
++    string(REPLACE "-l${name}" "-l${name}d" FSTR "${FSTR}")
++  endif ()
+ 
+   file(WRITE "${PROJECT_BINARY_DIR}/${name}.pc" ${FSTR})
+ 

@@ -124,3 +124,7 @@ The contract includes one or more upstream tests, validation actions or consumer
 4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
 **Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.
+
+## 2026-10-20: Exact HarfBuzz/BZip2 Release and Debug imports
+
+The PDFium Debug loader reported an absent `harfbuzz.dll` while `libfreetyped.dll` imported it, cascading to Win32 126 for Skia and PDFium. The correct resolution is **producer naming plus consumer relink**, not a DLL alias. FreeType now passes exact `HarfBuzz_LIBRARY`, `HarfBuzz_INCLUDE_DIR`, `BZIP2_LIBRARY_RELEASE`, `BZIP2_LIBRARY_DEBUG`, and `BZIP2_INCLUDE_DIR` paths to its CMake find modules. Preflight requirements check the selected variant's canonical import libraries and DLLs. Install requirements check `libfreetype[d].dll/.lib`. Both FreeType consumer configurations are declared; Debug evidence is **[not verified]**.

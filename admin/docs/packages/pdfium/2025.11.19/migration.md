@@ -567,3 +567,9 @@ The Release Ninja run compiles every object and reaches `[604/604] BCC64X DLL ./
 ## Linker flag correction: regex escape mistake (19 October 2026)
 
 The first translation for `--color-diagnostics` did not actually match: the adapter's Python raw-string regex had doubled backslashes (`\\S`, `\\s`) rather than proper whitespace boundary patterns (`\S`, `\s`). Both native variants therefore reached the BCC64X DLL link step and failed identically on the unchanged `--color-diagnostics` argument. The corrected exact-token regex is `r'(?<!\S)--color-diagnostics(?=\s|$)'` and converts the flag to `-fcolor-diagnostics`. This is a repair to the previous adapter fix, not another upstream compiler issue. FSM timestamp is now `2026-10-19T04:15:00Z`; native validation is still pending.
+
+## 2026-10-20: Dependency DLL naming after the Release PASS
+
+The native PDFium Release loader smoke passed after the previous BCC64X subsystem alignment. The Debug log instead identified the missing `harfbuzz.dll` first, followed by `libfreetyped.dll` (which imported the wrong HarfBuzz name), Skia and PDFium (Win32 126). `libabseil_dll.dll` passed. Producer output names and FreeType's imported archives are now corrected for HarfBuzz and BZip2, and PDFium's loader smoke expects `libbzip2.dll` in Release plus `libbzip2d.dll` and `libharfbuzzd.dll` in Debug. No PDFium subsystem/ABI flags were reverted.
+
+The convention is `lib` prefix and Debug `d` postfix on managed DLLs/import archives unless the product contract deliberately preserves an upstream or fixed name. This migration changes only the directly affected BZip2/HarfBuzz chain; other existing exceptions in the dependency stack are not silently renamed. A full native dependency-chain rebuild/relink and loader/consumer smoke remains **[not verified]**.

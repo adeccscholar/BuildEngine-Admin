@@ -133,3 +133,7 @@ The contract includes one or more upstream tests, validation actions or consumer
 4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
 **Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.
+
+## 2026-10-20: Canonical Win64 Modern library naming
+
+HarfBuzz 14.4.0 and its subset DLL now enforce the same BCC64X artifact contract: Release `libharfbuzz.dll`/`libharfbuzz.lib` and Debug `libharfbuzzd.dll`/`libharfbuzzd.lib`; subset names follow `libharfbuzz-subset[d]`. A versioned upstream CMake patch fixes `PREFIX`, `IMPORT_PREFIX`, `DEBUG_POSTFIX`, and the Debug `Libs:` entries of the installed pkg-config files. Package installation rejects missing canonical DLLs and import libraries and first removes stale variant output directories. Both configurations have declared HarfBuzz consumer smokes. Windows rebuild and loader evidence are **[not verified]**.
