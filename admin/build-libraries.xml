@@ -9615,15 +9615,12 @@
          </execute>
          <copy source="{BuildFileDir}\patches\pdfium\2025.11.19\abseil.BUILD.gn" target="{CurrentArtifact}\third_party\abseil-cpp\BUILD.gn" overwrite="true" preserveCurrentArtifact="true"/>
          <require path="{CurrentArtifact}\third_party\abseil-cpp\BUILD.gn"/>
-         <!-- Version-pinned PDFium include rewrite for installed Abseil. -->
-         <execute name="pdfium-external-abseil-includes-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--check"/><argument value="{BuildFileDir}\patches\pdfium\2025.11.19\abseil-installed-includes.patch"/>
-         </execute>
-         <execute name="pdfium-external-abseil-includes-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="{BuildFileDir}\patches\pdfium\2025.11.19\abseil-installed-includes.patch"/>
-         </execute>
-         <execute name="pdfium-external-abseil-includes-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="{BuildFileDir}\patches\pdfium\2025.11.19\abseil-installed-includes.patch"/>
+         <!-- Version-pinned full-tree CMake source patch for installed Abseil includes.
+              Idempotent across resumed Source states; no Python or header copies. -->
+         <execute name="patch-pdfium-installed-abseil-includes" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="-DPDFIUM_SOURCE_ROOT:PATH={CurrentArtifact}"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\abseil-installed-includes.cmake"/>
          </execute>
          <!-- Prepare a GN adapter directory only. Installed Skia 144 owns its
               headers, DLL and import library; never extract another Skia. -->
