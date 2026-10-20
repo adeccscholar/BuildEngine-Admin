@@ -8,7 +8,7 @@ function(adecc_stage_runtime a_strTarget)
    if(NOT TARGET "${a_strTarget}")
       message(FATAL_ERROR "Unknown application target: ${a_strTarget}")
    endif()
-   cmake_parse_arguments(a_Arg "" "" "PACKAGE_ROOTS;TOOLCHAIN_DLLS" ${ARGN})
+   cmake_parse_arguments(a_Arg "" "" "PACKAGE_ROOTS;TOOLCHAIN_DLLS;EXCLUDE_DLLS" ${ARGN})
    if(a_Arg_UNPARSED_ARGUMENTS)
       message(FATAL_ERROR "Unexpected runtime arguments: ${a_Arg_UNPARSED_ARGUMENTS}")
    endif()
@@ -63,6 +63,22 @@ function(adecc_stage_runtime a_strTarget)
          endif()
       endforeach()
    endif()
+   # Exact, explicitly retired DLL names. Never infer exclusions from a
+   # wildcard or PATH; the consumer remains responsible for its PE imports.
+   set(vecExcludedDlls)
+   foreach(strDll IN LISTS a_Arg_EXCLUDE_DLLS)
+      if(NOT strDll MATCHES "^[A-Za-z0-9_+.-]+[.]dll$")
+         message(FATAL_ERROR "Invalid excluded runtime DLL basename: ${strDll}")
+      endif()
+      string(TOLOWER "${strDll}" strDllLower)
+      list(APPEND vecExcludedDlls "${strDllLower}")
+   endforeach()
+   list(REMOVE_DUPLICATES vecExcludedDlls)
+   list(JOIN vecExcludedDlls "\n" strExcludedDlls)
+   set(theExcludedDllsFile
+      "${CMAKE_CURRENT_BINARY_DIR}/${a_strTarget}.buildengine-excluded-dlls.txt")
+   file(WRITE "${theExcludedDllsFile}" "${strExcludedDlls}\n")
+
    list(JOIN vecToolchainDlls "\n" strToolchainDlls)
    set(theToolchainDllsFile
       "${CMAKE_CURRENT_BINARY_DIR}/${a_strTarget}.buildengine-toolchain-dlls.txt")
@@ -74,6 +90,7 @@ function(adecc_stage_runtime a_strTarget)
       COMMAND "${CMAKE_COMMAND}"
          "-DADECC_RUNTIME_ROOTS_FILE:FILEPATH=${theRootsFile}"
          "-DADECC_RUNTIME_TOOLCHAIN_DLLS_FILE:FILEPATH=${theToolchainDllsFile}"
+         "-DADECC_RUNTIME_EXCLUDED_DLLS_FILE:FILEPATH=${theExcludedDllsFile}"
          "-DADECC_RUNTIME_TOOLCHAIN_BIN:PATH=${strToolchainBin}"
          "-DADECC_RUNTIME_CONFIGURATION=$<CONFIG>"
          "-DADECC_RUNTIME_OUTPUT_DIR=$<TARGET_FILE_DIR:${a_strTarget}>"
@@ -90,6 +107,7 @@ function(adecc_stage_runtime a_strTarget)
       COMMAND "${CMAKE_COMMAND}"
          "-DADECC_RUNTIME_ROOTS_FILE:FILEPATH=${theRootsFile}"
          "-DADECC_RUNTIME_TOOLCHAIN_DLLS_FILE:FILEPATH=${theToolchainDllsFile}"
+         "-DADECC_RUNTIME_EXCLUDED_DLLS_FILE:FILEPATH=${theExcludedDllsFile}"
          "-DADECC_RUNTIME_TOOLCHAIN_BIN:PATH=${strToolchainBin}"
          "-DADECC_RUNTIME_CONFIGURATION=$<CONFIG>"
          "-DADECC_RUNTIME_OUTPUT_DIR=$<TARGET_FILE_DIR:${a_strTarget}>"

@@ -4,6 +4,41 @@
 
 [TOC|Content]
 
+## 21 October 2026: retire Chromium Abseil DLL, synchronize SBOM
+
+PDFium uses installed `abseil@20260817.0` via the versioned GN
+`third_party/abseil-cpp/BUILD.gn` group. That target references
+`libabseil_dll.lib` and `ABSL_CONSUME_DLL`, not Chromium's
+`component("absl")`. The PDFium installation gate verifies the binary
+imports `libabseil_dll.dll` and rejects imports of
+`third_party_abseil-cpp_absl.dll`.
+
+A former component DLL can remain on disk in a reused build or package
+directory without being imported. The PDFium per-variant installation now
+deletes the retired DLL name from its installed `bin/win64/<Config>`
+directory. The SDL2 example declares this DLL in `EXCLUDE_DLLS` to
+BuildEngine runtime staging; existing files of exactly that name are
+removed from the application's output, and subsequent staging does not
+reintroduce them. The remaining runtime files and PDFium linker
+parameters are unchanged. No DLL is renamed to conceal an import.
+
+The PDFium `sbom/bundled-components.json` manifest now declares
+Abseil as external (`libraryId=abseil`, `version=20260817.0`,
+`runtimeDll=libabseil_dll.dll`) and no longer lists the obsolete
+Chromium-DEPS Abseil source pin as an internal bundled component.
+`fast_float` remains bundled. BuildEngine's CycloneDX generator checks
+the optional external manifest inventory against the exact XML direct
+dependencies, checks that no component is both external and bundled,
+and exposes `runtimeDll` as a **declared**, not observed, DLL identity.
+
+**Verification pending:** Native Release/Debug packaging and SDL2 runtime
+staging, inspection of the installed `pdfium.dll` import table, and
+regeneration/inspection of `sbom.cdx.json` and `LICENSE-INFO.txt`.
+An old, already generated SBOM does not change without rerunning the
+installation and metadata states.
+
+
+
 **Contract identity:** `pdfium@2025.11.19` · **Category:** documentation · **Target:** RAD Studio 13 / native BCC64X / Windows x64.
 
 **Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.

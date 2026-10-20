@@ -46,6 +46,41 @@ install/packages/<LibraryId>/<LibraryVersion>/sbom.upstream.json
 
 erhalten. Die von BuildEngine erzeugte kumulierte Datei `sbom.cdx.json` bleibt davon getrennt. Ihr Dependency-Graph wird weiterhin ausschließlich aus dem tatsächlich durch BuildEngine aufgelösten Buildvertrag erzeugt. Dadurch werden optionale, Test-, Tool- oder sonstige Upstream-Abhängigkeiten einer gelieferten SBOM nicht ungeprüft als tatsächlich gebaute Abhängigkeiten übernommen.
 
+## Versionierte Komponenten- und Herkunftsmanifeste
+
+Bibliotheken können unter `sbom/bundled-components.json` ein versioniertes
+Komponentenmanifest bereitstellen. Es ergänzt den **autoritativen
+BuildEngine-Abhängigkeitsgraphen** und darf keine zusätzliche Kopie einer
+bereits extern installierten Bibliothek als gebündelt ausweisen.
+
+- `externalBuildEngineDependencies`: Name, Version und optional die exakte
+  XML-Bibliotheks-ID (`libraryId`). Alle angegebenen Koordinaten werden
+  gegen die **direkten** XML-`<dependency>`-Kanten geprüft. Ist diese Liste
+  vorhanden, muss sie vollständig und frei von Duplikaten sein. Die
+  externen Komponenten erscheinen bereits im üblichen CycloneDX-Graphen.
+- `bundledComponents`: tatsächlich mitgelieferte, intern gebaute
+  Quellkomponenten. Diese werden zusätzlich als gebündelte Komponenten im
+  CycloneDX-Graphen und im kumulierten Lizenzbericht geführt.
+  Extern und gebündelt dürfen keine doppelte Komponentenidentität erhalten.
+- `runtimeDll` (optional für eine externe Abhängigkeit): ausschließlich
+  der **deklarierte DLL-Basisname**, beispielsweise `libabseil_dll.dll`.
+  Die Komponente erhält die CycloneDX-Property
+  `adecc:buildengine:declared-runtime-dll`. Diese Angabe ist
+  **kein** Nachweis der tatsächlich im PE-Importverzeichnis gelinkten DLL.
+
+**PDFium 2025.11.19:** Abseil ist über die direkte XML-Abhängigkeit
+`abseil@20260817.0` und die Runtime-DLL `libabseil_dll.dll` extern.
+Die alte Chromium-Komponente `third_party_abseil-cpp_absl.dll`
+gehört **nicht** zur Auslieferung und darf nicht zusätzlich als
+`pdfium:bundled:Abseil` in der CycloneDX-SBOM erscheinen.
+Die aktuell gebündelte `fast_float`-Quelle bleibt davon unberührt.
+
+Das Manifest wird bei der Installation in das Paket kopiert und bei der
+anschließenden Metadata-FSM ausgewertet. Eine bereits installierte,
+unveränderte ältere SBOM wird **nicht** durch die Änderung der
+Repository-Quelldatei rückwirkend korrigiert: Installation und Metadatenlauf
+müssen die aktualisierte Evidenz verarbeiten.
+
 ## Optionale Metadaten im Bibliotheksvertrag
 
 Schema 16 kennt weiterhin einen optionalen `metadata`-Knoten:

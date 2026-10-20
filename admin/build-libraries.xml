@@ -10042,6 +10042,13 @@
                   <argument value="-c"/>
                   <argument value="from pathlib import Path&#10;p=Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.dll')&#10;b=p.read_bytes().lower()&#10;assert b'abseil_dll.dll' in b, 'PDFium PE lacks installed abseil_dll.dll import'&#10;assert b'third_party_abseil-cpp_absl.dll' not in b, 'Stale PDFium imports bundled Chromium Abseil DLL'&#10;print('PDFium installed Abseil DLL import verified')"/>
                </execute>
+               <!-- Chromium's retired Abseil component must not survive in a
+                    previously populated PDFium package bin. The DLL import
+                    gate above first verifies that pdfium.dll uses external Abseil. -->
+               <execute name="remove-retired-chromium-abseil" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" outputMode="errors">
+                  <argument value="-E"/><argument value="rm"/><argument value="-f"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\third_party_abseil-cpp_absl.dll"/>
+               </execute>
                <execute name="stage-installed-abseil-runtime" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" outputMode="errors">
                   <argument value="-DABSEIL_PACKAGE_ROOT:PATH={InstallRoot}\packages\abseil\20260817.0"/>
                   <argument value="-DPDFIUM_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
