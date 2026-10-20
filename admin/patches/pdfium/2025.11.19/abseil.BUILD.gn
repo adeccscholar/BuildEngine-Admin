@@ -12,7 +12,7 @@ config("installed_abseil") {
   include_dirs = [ _absl_include ]
   # Link the installed GNU/LLVM import archive as an absolute file, not
   # via -labseil_dll. The BCC64X GN response adapter handles absolute paths.
-  libs = [ _absl_libdir + "/libabseil_dll.dll.a" ]
+  libs = [ _absl_libdir + "/libabseil_dll.lib" ]
   defines = [ "ABSL_CONSUME_DLL" ]
 }
 
