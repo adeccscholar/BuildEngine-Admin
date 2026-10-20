@@ -3442,7 +3442,7 @@
       <smoke id="consumer" source="smokes\sqlite\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="sqlite-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-<library id="libpq" version="18.6" category="database" timestamp="2026-10-20T15:41:54Z">
+<library id="libpq" version="18.6" category="database" timestamp="2026-10-15T21:00:00Z">
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="zlib" version="1.3.2"/>
       <metadata name="PostgreSQL libpq" supplier="PostgreSQL Global Development Group" homepage="https://www.postgresql.org/" description="Official PostgreSQL C client library and wire-protocol access API." licenseSignal="green">
@@ -3488,16 +3488,6 @@
          <copy source="{BuildFileDir}\programs\libpq\bcc64x-winsock-compat.c"
                target="{CurrentArtifact}\src\interfaces\libpq\bcc64x-winsock-compat.c"
                overwrite="true"/>
-         <!-- Pinned PostgreSQL 18.6 BCC64X ABI and glob declaration corrections. -->
-         <copy source="{BuildFileDir}\patches\libpq\18.6\bcc64x-setjmp-glob.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-setjmp-glob.patch" overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="setjmp-glob-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-setjmp-glob.patch"/>
-         </execute>
-         <execute name="setjmp-glob-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--no-index"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-setjmp-glob.patch"/>
-         </execute>
          <!-- Reuse the proven generic Meson bootstrap already used by the native BCC64X Mesa build. -->
          <copy source="{BuildFileDir}\programs\meson\bcc64x_bootstrap.py"
                target="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"
