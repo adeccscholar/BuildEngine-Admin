@@ -1,37 +1,20 @@
-# BuildEngine GN adapter for installed Abseil 20260817.0.
-# Use the actual import library from the versioned configuration; do not
-# assume a Windows-Clang or Windows-GNU library filename convention.
+# BuildEngine GN bridge for installed Abseil 20260817.0.
+# Resolve the monolithic import library through BCC64X/LLD's native -l search.
+# The versioned package directory is supplied by the BuildEngine dependency.
+# Do not call GN path_exists() on external absolute Windows paths: the pinned
+# GN binary terminates during path processing on this profile.
 _absl_include = getenv("CB_PDFIUM_ABSEIL_INCLUDE")
 _absl_libdir = getenv("CB_PDFIUM_ABSEIL_LIBDIR")
 assert(_absl_include != "" && _absl_libdir != "",
-       "Installed Abseil include and import-library directory are required")
-assert(path_exists(_absl_include + "/absl/strings/str_cat.h"),
-       "Installed Abseil include root is missing")
-
-_absl_candidates = [
-  _absl_libdir + "/abseil_dll.lib",
-  _absl_libdir + "/libabseil_dll.lib",
-  _absl_libdir + "/abseil_dll.dll.a",
-  _absl_libdir + "/libabseil_dll.dll.a",
-]
-_absl_existing = []
-foreach(_file, _absl_candidates) {
-  if (path_exists(_file)) {
-    _absl_existing += [ _file ]
-  }
-}
-assert(_absl_existing != [],
-       "No installed Abseil 20260817.0 import library found in " + _absl_libdir)
-assert(_absl_existing == [ _absl_existing[0] ],
-       "Ambiguous Abseil import libraries: " + _absl_existing[0])
-_absl_library = _absl_existing[0]
-print("BuildEngine Abseil import library: " + _absl_library)
+       "Installed Abseil include directory and library directory are required")
 
 config("installed_abseil") {
   include_dirs = [ _absl_include ]
-  libs = [ _absl_library ]
+  lib_dirs = [ _absl_libdir ]
+  libs = [ "abseil_dll" ]
   defines = [ "ABSL_CONSUME_DLL" ]
 }
+
 group("absl") {
   public_configs = [ ":installed_abseil" ]
 }
