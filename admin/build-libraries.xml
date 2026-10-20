@@ -9837,6 +9837,7 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
          <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{InstallRoot}\packages\abseil\20260817.0\include"/>
+         <require path="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}\libabseil_dll.lib"/>
          <environment name="CB_PDFIUM_ABSEIL_LIBDIR" value="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}"/>
          <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{InstallRoot}\packages\skia\144\include"/>
          <environment name="CB_PDFIUM_SKIA_LIB" value="{InstallRoot}\packages\skia\144\lib\win64\{Configuration}\skia144.lib"/>
