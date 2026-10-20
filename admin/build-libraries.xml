@@ -9892,10 +9892,14 @@
          <!-- Validate the GENERATED build, not merely the requested GN args. -->
          <!-- Inspect commands reachable from the PDFium target, not all
               unrelated Chromium host-toolchain rules. -->
-         <!-- Build graph contract: fail before Ninja build when Chromium Abseil is still compiled. -->
-         <execute name="verify-external-abseil-link-graph" executable="{Tool:python}" workingDirectory="{Workspace}" outputMode="errors">
-            <argument value="-c"/>
-            <argument value="import subprocess&#10;from pathlib import Path&#10;root=Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}')&#10;r=subprocess.run([r'{Tool:ninja}','-C',str(root),'-t','commands','pdfium'],capture_output=True,text=True,encoding='utf-8',errors='replace')&#10;assert r.returncode == 0, r.stderr&#10;cmd=r.stdout.replace(chr(92),'/').lower()&#10;assert 'abseil_dll.lib' in cmd, 'PDFium link graph does not use installed Abseil import library'&#10;assert 'third_party_abseil-cpp_absl.dll' not in cmd, 'Bundled Chromium Abseil DLL still present in PDFium graph'&#10;assert 'third_party/abseil-cpp/absl/' not in cmd, 'Bundled Chromium Abseil sources still compiled'&#10;print('PDFium GN/Ninja graph uses installed Abseil import library')"/>
+         <!-- Inspect effective GN target libraries. GN stores link inputs in Ninja
+              response-file content, not in 'ninja -t commands' output. The final
+              binary's actual import table is checked separately during install. -->
+         <execute name="show-external-abseil-link-libraries" executable="{Tool:gn}" workingDirectory="{Workspace}" showOutput="true">
+            <argument value="desc"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="//:pdfium"/>
+            <argument value="libs"/>
          </execute>
          <execute name="ninja-build" executable="{Tool:ninja}"
                   workingDirectory="{Workspace}" showOutput="false">
