@@ -2,11 +2,17 @@
 
 [TOC|Content]
 
-**Status:** general engineering reference as of 22 September 2026.
+**Status:** license engineering reference reviewed 21 October 2026.
 
 This page is intentionally **license-centered**. It explains the license types that occur in the BuildEngine third-party stack without turning the page into a library-to-license inventory.
 
 It is an engineering aid, not legal advice. The authoritative terms are always the exact license, copyright and notice files of the distributed upstream version. Mixed projects and bundled components can contain file-level terms that are more specific than the project-level license.
+
+## Current package-level SBOM provenance (21 October 2026)
+
+The active XML inventory covers **58 library/version records across 52 library IDs**. Per-library license status comes from versioned package metadata and verified sources, not a claim that all builds passed. BuildEngine generates `LICENSE-INFO.txt` and CycloneDX 1.7 `sbom.cdx.json` from resolved dependencies, upstream evidence, and optional bundled component manifests.
+
+For PDFium 2025.11.19, `abseil@20260817.0` is **external** and declares `libabseil_dll.dll`. The retired Chromium `third_party_abseil-cpp_absl.dll` must not be represented as a second bundled component. An external manifest list must agree with the XML dependency graph, and a declared runtime DLL name is not PE-import evidence. See [SBOM contract](../../docs/library-license-sbom.md) and [PDFium migration](/package/pdfium/2025.11.19/migration).
 
 ## License traffic light
 

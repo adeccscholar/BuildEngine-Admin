@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current contract as of 25 September 2026. Documentation is integrated into the active Library-FSM architecture. Individual end-to-end documentation paths remain subject to targeted BCC64X/runtime verification.
+**Status:** reviewed 21 October 2026. Documentation is integrated into the active Library-FSM architecture. Individual end-to-end documentation paths remain subject to targeted BCC64X/runtime verification.
 
 BuildEngine treats documentation as a reproducible build product. `Documentation` is a first-class Library-FSM state; below it, hierarchical runtime substates select standard, collection or linked documentation and the applicable Doxygen/PDF stages. Persistent Current-State remains attached to logical documentation scopes, not to those runtime substates.
 
@@ -12,6 +12,12 @@ Central files:
 - `admin/build-documentation.xml` – synchronized documentation contract
 - `admin/schemas/build-documentation.xsd` – XML schema
 - `admin/build-tools.xml` – Doxygen, Graphviz, MiKTeX and browser resources
+
+## Current documentation scale and evidence (21 October 2026)
+
+The synchronized contract lists 58 versioned library entries and 52 logical IDs. Documentation scope is determined by the active Library-FSM, not by a fixed list of 44 packages. The current `admin/build-documentation.xml` remains the authority for inherited Doxygen defaults and individual/collection overrides. Doxygen 1.18.0 and Graphviz 15.1.1 are pinned tools. The generated HTML, optional LaTeX/PDF, and actual documentation state must be verified per logical scope; no blanket all-library PASS is claimed.
+
+The documentation server presents Markdown directly and can render diagrams and mathematical content through pinned Mermaid 11.17.2, highlight.js 11.12.0 and MathJax 3.2.2 assets. A versioned package's `migration.md` is engineering evidence rather than a substitute for its installed state. See [libraries](libraries.md), [tool inventory](tools.md), and [server](server.md).
 
 ## Fundamental rule
 
@@ -236,7 +242,7 @@ Do not reintroduce:
 
 ## Library-catalog scale
 
-The active library contract currently contains 44 logical libraries. Documentation generation therefore spans not only the original compression/network/graphics/middleware set but also PostgreSQL clients, test frameworks, Unicode/text engines, XML processing and the PDF/document stack.
+The active Schema-17 library contract contains **58 versioned library entries / 52 library IDs** (six retained predecessor versions). Documentation generation therefore spans not only the original compression/network/graphics/middleware set but also PostgreSQL clients, test frameworks, Unicode/text engines, XML processing and the PDF/document stack.
 
 Documentation status follows the logical library identity. New package extensions such as libpqxx/libpq and shared-producer extensions such as TAO/ACE therefore remain separate documentation identities even when their physical integration models differ.
 

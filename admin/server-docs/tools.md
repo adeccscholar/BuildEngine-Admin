@@ -6,6 +6,42 @@ This page describes the tools currently used by BuildEngine and their roles. The
 
 The list deliberately separates **general BuildEngine tools**, **C++Builder/BCC64X tools**, **documentation tools**, and **browser resources**. An entry on this page does not replace the technical contract in `build-tools.xml`.
 
+## Exact active XML inventory (21 October 2026)
+
+The **27 declared tool identities** from `admin/build-tools.xml` are listed here. A version is an XML provisioning contract, not a machine-level PASS indication.
+
+| Tool ID | Declared version | Provisioning requirement |
+| --- | --- | --- |
+| `git` | `2.55.0.3` | `always` |
+| `bash` | `5.2` | `when-used` |
+| `cmake` | `4.1.1` | `always` |
+| `gn` | `07d3c6f4dc290fae5ca6152ebcb37d6815c411ab` | `when-used` |
+| `ninja` | `1.13.2` | `always` |
+| `perl` | `5.42.2.1` | `always` |
+| `python` | `3.14.7` | `always` |
+| `fonttools` | `4.65.0` | `when-used` |
+| `meson` | `1.12.0` | `always` |
+| `winflexbison` | `2.5.24` | `always` |
+| `pkg-config` | `0.28-1` | `always` |
+| `doxygen` | `1.18.0` | `always` |
+| `graphviz` | `15.1.1` | `always` |
+| `web-mermaid` | `11.17.2` | `always` |
+| `web-highlight` | `11.12.0` | `always` |
+| `web-mathjax` | `3.2.2` | `always` |
+| `bcc64x` | `20.1.7` | `always` |
+| `embarcadero-make` | `5.43` | `always` |
+| `llvm-ar` | `20.1.7` | `always` |
+| `llvm-ranlib` | `20.1.7` | `always` |
+| `ld-lld` | `20.1.7` | `always` |
+| `bcc64x-windres` | `20.1.7` | `always` |
+| `bcc64x-ucrt-compat` | `20.1.7-compat1` | `always` |
+| `tdump` | `RADStudio-13` | `always` |
+| `llvm-cov` | `20.1.7` | `always` |
+| `windows-rc` | `Windows-SDK` | `always` |
+| `nasm` | `3.02` | `always` |
+
+The PDFium/Skia path uses pinned GN, managed Ninja 1.13.2 and BCC64X 20.1.7. Browser documentation assets are Mermaid 11.17.2, highlight.js 11.12.0 and MathJax 3.2.2. Doxygen 1.18.0 and Graphviz 15.1.1 are separate documentation requirements; tool declarations do not assert all documentation scopes passed.
+
 ## General build and source tools
 
 | Tool ID | Version | Provisioning | Role |

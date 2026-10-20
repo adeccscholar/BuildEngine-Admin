@@ -35,140 +35,149 @@ The marker does not replace the original upstream license text. See [Open-Source
 
 ## Dependency overview
 
+The diagram highlights current integration boundaries; it is intentionally
+selective. The **complete, version-resolved dependency inventory** is in the
+table below and the authoritative `admin/build-libraries.xml` contract.
+
 ```mermaid
 flowchart LR
-   zlib --> libzip
-   xz --> libzip
-   zstd --> libzip
-
-   zlib --> libarchive
-   xz --> libarchive
-   zstd --> libarchive
-   bzip2 --> libarchive
-   openssl --> libarchive
-
-   zlib --> openssl
-   brotli --> openssl
-   zstd --> openssl
-
-   openssl --> curl
-   zlib --> curl
-
-   openssl --> libpq[libpq]
-   zlib --> libpq
-   libpq --> libpqxx[libpqxx]
-
-   openssl --> boost
-   zlib --> boost
-
-   openssl --> ace[ACE]
-   xerces[Xerces-C] --> ace
-   zlib --> ace
-   ace --> tao[TAO]
-
-   opengl[OpenGL / Mesa] --> glew
-   opengl --> raylib
-   opengl --> soil2
-
-   zlib --> libpng
-   zlib --> libtiff
-   jpeg[libjpeg-turbo] --> libtiff
-
-   zlib --> freetype[FreeType]
-   bzip2 --> freetype
-   brotli --> freetype
-   libpng --> freetype
-   harfbuzz[HarfBuzz] --> freetype
-
-   opengl --> skia
-   zlib --> skia
-   brotli --> skia
-   jpeg --> skia
-   libpng --> skia
-   harfbuzz --> skia
-   freetype --> skia
-
-   zlib --> opencv[OpenCV]
-
-   zlib --> teckit[TECkit]
-   expat[Expat] --> teckit
-
-   winiconv[win-iconv] --> poppler
-   zlib --> libxml2[libxml2]
-
-   zlib --> qpdf[QPDF]
-   jpeg --> qpdf
-
-   zlib --> podofo[PoDoFo]
-   openssl --> podofo
-   freetype --> podofo
-   libxml2 --> podofo
-   jpeg --> podofo
-   libpng --> podofo
-   libtiff --> podofo
-
-   zlib --> poppler[Poppler]
-   freetype --> poppler
-   jpeg --> poppler
-   libpng --> poppler
-   libtiff --> poppler
+    zlib["zlib 1.3.2"] --> libarchive["libarchive 3.8.10"]
+    xz["XZ 5.8.4"] --> libarchive
+    bzip2["BZip2 1.0.8"] --> libarchive
+    openssl["OpenSSL 3.5.9"] --> curl["curl 8.23.0"]
+    openssl --> libpq["libpq 18.6"]
+    libpq --> libpqxx["libpqxx 8.0.2 (package extension)"]
+    openssl --> ace["ACE 8.0.6"]
+    ace --> tao["TAO 4.0.6 (shared-source extension)"]
+    harfbuzz["HarfBuzz 14.4.0"] --> freetype["FreeType 2.14.3"]
+    freetype --> skia144["Skia 144 (pinned)"]
+    skia144 --> pdfium["PDFium 2025.11.19"]
+    abseil["Abseil 20260817.0 (external)"] --> pdfium
+    icu["ICU 78.3"] --> pdfium
+    lcms["LittleCMS 2.19.1"] --> pdfium
+    openjpeg["OpenJPEG 2.5.4"] --> pdfium
+    sdl2["SDL2 2.32.10"] --> viewerSDL["PDFium SDL2 GUI test"]
+    pdfium --> viewerSDL
+    pdfium --> viewerVCL["PDFium VCL GUI test"]
+    skia153["Skia 153 (current general version)"]
 ```
 
-HarfBuzz is deliberately built without FreeType. FreeType is then built with HarfBuzz, keeping that part of the graph acyclic.
+Notable distinctions:
 
-ACE and TAO are separate logical libraries in the dependency graph. This does **not** mean that their upstream output is physically separated. TAO is built on the already prepared ACE `ACE_wrappers` tree; `TAO_ROOT` is below `ACE_ROOT`, and ACE and TAO both write libraries and tools into the shared `ACE_wrappers\lib` and `ACE_wrappers\bin` directories. The logical `tao -> ace` edge therefore describes scheduling, state, metadata and SBOM ownership while preserving the upstream physical layout.
+- The XML retains **six explicitly superseded versions** for reproducible
+  consumers: XZ 5.8.3 → 5.8.4, libarchive 3.8.9 → 3.8.10,
+  OpenSSL 3.5.8 → 3.5.9, curl 8.21.0 → 8.23.0,
+  Skia 144 → 153 and Expat 2.8.4 → 2.9.0. Supersession
+  does not silently rewrite pinned dependency edges.
+- PDFium 2025.11.19 **still pins Skia 144**. Skia 153 is the later
+  general-purpose version; it is not a substitute for the tested PDFium
+  dependency without an explicit migration and rebuild.
+- `tao@4.0.6` is a shared-source extension of `ace@8.0.6`,
+  while `libpqxx@8.0.2` is a package extension of `libpq@18.6`.
+  Both retain independent logical metadata and scheduling.
+- HarfBuzz is built independently of FreeType; FreeType consumes HarfBuzz.
+  PDFium's Abseil is the external `abseil@20260817.0` runtime, **not**
+  the retired `third_party_abseil-cpp_absl.dll` Chromium component.
 
-## Current inventory
+## Current inventory (21 October 2026)
 
-The active Schema-16 contract currently contains **44 logical libraries**.
+The **Schema-17** XML declares **58 versioned library records with 52
+distinct logical library IDs**. The difference is six retained predecessor
+versions, not six failed or duplicate libraries. The catalog includes only
+versioned `<library>` elements, not explanatory XML examples or historical
+comments.
 
+The table is a **declarative inventory**. A declared smoke test is *not*
+a claim that it passed: `R/pub` = Release published-scope smoke,
+`D/pkg` = Debug installed-package smoke, and `—` = no smoke defined.
+The exact configurations and scope flags follow the live XML.
 
-| Library | Version | License | Category | Description | BuildEngine dependencies | Integration notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| pugiXML | 1.16 | 🟢 Green | data | Lightweight C++ XML processing library with DOM-style parsing and XPath support. | — | Shared package, Release/Debug, installed package smoke. |
-| zlib | 1.3.2 | 🟢 Green | compression | General-purpose DEFLATE compression library used as a foundational compression dependency. | — | Core compression dependency used by several packages. |
-| Brotli | 1.2.0 | 🟢 Green | compression | Lossless compression library and codec optimized for web and general data compression. | — | Shared compression package; also consumed by OpenSSL, FreeType, and Skia. |
-| Zstandard | 1.5.7 | 🟢 Green | compression | Fast lossless compression library offering a wide compression-speed trade-off. | — | Shared compression package used by libzip, libarchive, and OpenSSL. |
-| XZ / liblzma | 5.8.3 | 🟡 Yellow | compression | LZMA/LZMA2 compression library and XZ container implementation. | — | Shared compression package used by libzip and libarchive. |
-| libzip | 1.11.4 | 🟢 Green | archive | C library for reading, creating, and modifying ZIP archives. | zlib, XZ, Zstandard | Shared library plus zip tools; AES/XZ/Zstd functional checks; upstream documentation build is not part of the package build because it writes shared source-tree outputs. |
-| libarchive | 3.8.9 | 🟡 Yellow | archive | Multi-format archive and compression library backing tar/cpio-style workflows. | zlib, XZ, Zstandard, bzip2, OpenSSL | Shared libarchive plus tar/cpio/cat/unzip; BZip2 enabled explicitly for in-process `.tar.bz2` extraction; BCC64X compatibility patch for legacy `__BORLANDC__` branches and Windows/Clang details. |
-| OpenSSL | 3.5.8 | 🟢 Green | security | TLS/SSL and general-purpose cryptography toolkit and provider library. | zlib, Brotli, Zstandard | Native BCC64X Configure target, shared build, version-bound linker/Windows/PDB patches; no-asm baseline. |
-| curl | 8.21.0 | 🟢 Green | network | Client-side URL transfer library with HTTP(S) and related protocol support. | OpenSSL, zlib | Shared libcurl baseline with OpenSSL + zlib; Schannel, Brotli, Zstd and several optional protocol dependencies deliberately disabled in the current proof. |
-| Boost | 1.92.0 | 🟢 Green | foundation | Large collection of portable C++ libraries extending the standard library ecosystem. | OpenSSL, zlib | C++23 shared build from the official CMake tree; broad selected module set; MPI/Python excluded; BCC64X native-Clang preflight gates. |
-| nlohmann-json | 3.12.0 | 🟢 Green | data | Header-only modern C++ JSON parser, serializer, and data model. | — | Header-only package. |
-| ACE | 8.0.6 | 🟢 Green | middleware | Adaptive Communication Environment providing portable networking, concurrency, IPC, and OS abstraction. | OpenSSL, Xerces-C, zlib | Native BCC64X MPC/BMake base; owns the shared `ACE_wrappers` producer tree used later by TAO. |
-| TAO | 4.0.6 | 🟢 Green | middleware | CORBA object request broker and middleware services built on top of ACE. | ACE | Logical TAO package continues inside ACE's physical `ACE_wrappers` tree; shared `bin`/`lib`, `tao_idl`, Naming, COS Event and RT Event services. |
-| bzip2 | 1.0.8 | 🟢 Green | compression | Lossless block-sorting compression library implementing the bzip2 format. | — | BuildEngine CMake wrapper creates the shared Win64 package and package metadata. |
-| GLEW | 2.3.1 | 🟡 Yellow | graphics | OpenGL extension loading library exposing modern OpenGL entry points. | OpenGL | Shared package built against the managed OpenGL package. |
-| OpenGL / Mesa | 26.2.1 | 🟡 Yellow | graphics | Mesa software OpenGL implementation providing the managed Windows desktop OpenGL runtime. | — | Mesa/Meson softpipe WGL profile; OpenGL enabled, LLVM/Vulkan/GLES/EGL/GLX disabled; BCC64X-derived import libraries generated from built DLLs. |
-| raylib | 6.0 | 🟢 Green | graphics | Small C game-programming library for graphics, input, audio, and windowing. | OpenGL | BuildEngine CMake wrapper, shared Release/Debug package. |
-| SDL2 | 2.32.10 | 🟢 Green | graphics | Cross-platform low-level multimedia library for windows, input, audio, and graphics integration. | — | Shared-only package; test targets and Direct3D renderer paths disabled in the current Windows proof. |
-| SQLite | 3.53.4 | 🟢 Green | database | Embedded transactional SQL database engine delivered as a self-contained library. | — | Amalgamation-based shared package with BuildEngine CMake wrapper. |
-| PostgreSQL libpq | 18.6 | 🟢 Green | database | Official PostgreSQL C client library and wire-protocol access API. | OpenSSL, zlib | Managed BCC64X package with Windows ntsecapi/Winsock compatibility repairs; Release/Debug build/install/publish and installed consumer smoke are PASS. |
-| libpqxx | 8.0.2 | 🟢 Green | database | Modern C++ PostgreSQL client API built on libpq. | libpq 18.6 via package extension | Independent source/build/package roots; BCC64X fixes cover empty __declspec(), hot/cold attributes and MinGW-like CMake naming; installed package consumer smoke is PASS. |
-| Xerces-C | 3.3.0 | 🟢 Green | data | C++ XML parser and validation library implementing DOM/SAX and XML Schema support. | — | Shared Windows package using Winsock, Windows transcoder and in-memory message loader; upstream API-documentation target retained. |
-| SOIL2 | 1.3.0 | 🟢 Green | graphics | Small OpenGL texture-loading library for common image formats. | OpenGL | BuildEngine CMake wrapper and managed OpenGL package. |
-| VTK | 9.6.2 | 🟢 Green | graphics | Visualization Toolkit for scientific data structures, processing, and visualization pipelines. | — | Deliberately narrow shared profile: CommonCore, CommonDataModel and FiltersCore; large module groups and language wrappers disabled. |
-| OpenCV | 5.0.0 | 🟡 Yellow | graphics | Computer vision and image-processing library with broad algorithm and matrix support. | zlib | Reduced package profile with a version-bound BCC64X patch making MLAS optional. |
-| cmark-gfm | 0.29.0.gfm.13 | 🟢 Green | documentation | GitHub-flavored CommonMark parser and renderer used for BuildEngine documentation. | — | GitHub-flavored CommonMark library used by BuildEngine documentation rendering. |
-| GoogleTest | 1.17.0 | 🟢 Green | testing | C++ unit-testing and mocking framework from the GoogleTest project. | — | Managed test-framework package with CMake package consumption. |
-| Catch2 | 3.16.0 | 🟢 Green | testing | Modern C++ unit-testing framework with self-contained test registration and assertions. | — | Deliberate static test-framework package; BCC64X-specific compile definitions/code-page setting, no source patch. |
-| BitmapPlusPlus | 1.1.1 | 🟢 Green | graphics | Header-only C++ bitmap utility for reading, writing, and manipulating BMP images. | — | Header-only; no artificial binary build; BuildEngine supplies missing package-config metadata and Release/Debug consumer smokes. |
-| libjpeg-turbo | 3.2.0 | 🟡 Yellow | image | High-performance JPEG codec using the libjpeg API and TurboJPEG interface. | — | Shared library, TurboJPEG enabled, SIMD disabled for the current baseline. |
-| libpng | 1.6.58 | 🟢 Green | image | Reference PNG image encoding and decoding library. | zlib | Shared package using managed zlib; static library and upstream tests disabled in the current contract. |
-| HarfBuzz | 14.4.0 | 🟡 Yellow | text | OpenType text shaping engine converting Unicode text into positioned glyphs. | — | Shared core shaping + subset package; optional frameworks and FreeType disabled to keep the graph acyclic; package/export repairs applied at install time. |
-| FreeType | 2.14.3 | 🟡 Yellow | text | Font rasterization engine for loading and rendering scalable and bitmap fonts. | zlib, bzip2, Brotli, libpng, HarfBuzz | Shared package with all declared dependencies explicitly required; HarfBuzz integration is part of the consumer proof. |
-| libtiff | 4.7.2 | 🟢 Green | image | TIFF image file reading, writing, and image metadata library. | zlib, libjpeg-turbo | Shared package; tools/contrib/docs/tests disabled in the current contract. |
-| Skia | 153 | 🟡 Yellow | graphics | 2D graphics engine for raster, vector, text, image, and GPU-backed rendering. | OpenGL, zlib, Brotli, libjpeg-turbo, libpng, HarfBuzz, FreeType | Broad Windows desktop component build at pinned source commit `2eed75b956045eb8603d3690a1e84bc582a2135d`; extensive BCC64X GN/system-library/component repairs and bundled-component SBOM evidence. |
-| Graphite2 | 1.3.15 | 🟡 Yellow | text | Smart-font rendering engine for Graphite fonts and complex text shaping. | — | Upstream CMake with full Release/Debug tests; several exact-version test portability/reference/encoding patches, currently 91/91 tests in both variants. |
-| Expat | 2.8.4 | 🟢 Green | data | Streaming XML parser used by TECkit/SFconv and other XML consumers. | — | Upstream CMake; exact-version patch corrects the upstream assumption that every non-MSVC test build requires Bash. |
-| TECkit | 2.5.13 | 🟡 Yellow | text | Text encoding conversion toolkit, mapping compiler and conversion utilities. | zlib, Expat | Deliberate native CMake/Ninja/BCC64X adapter derived from upstream Makefile.am inventories; original Perl regression suite retained; no Autotools/MinGW-crossbuild runtime. |
-| ICU4C | 78.3 | 🟡 Yellow | text | Unicode and globalization library for locale, normalization, collation and conversion. | — | VCXPROJ files are read only as source/resource inventory; BuildEngine owns CMake/Ninja/BCC64X. Current bootstrap builds stubdata, common and i18n without MSBuild/MSVC/NMAKE/MSYS. |
-| win-iconv | 0.0.8 | 🟢 Green | text | Small Windows iconv implementation backed by Win32 character conversion APIs. | — | Explicit Iconv dependency for Poppler's C++ API; source/build/test/install/publish/doxygen and installed consumer smoke have passed. |
-| libxml2 | 2.15.3 | 🟢 Green | data | C XML toolkit with XPath, XML Schema, Relax NG, XInclude and serialization support. | zlib | New shared upstream CMake profile with tests/programs, schema/Relax NG/XPath/XInclude and zlib enabled; Python, ICU, modules and external iconv disabled for the first BCC64X proof. **[nicht verifiziert]** |
-| QPDF | 12.4.1 | 🟢 Green | documentation | PDF structural inspection and transformation library for rewriting, encryption and validation workflows. | zlib, libjpeg-turbo | New shared upstream CMake profile, static library disabled, QPDF native crypto required to keep the runtime closure independent of OpenSSL/Brotli/Zstd, upstream tests and package consumer smoke retained. **[nicht verifiziert]** |
-| PoDoFo | 1.1.1 | 🟡 Yellow | documentation | C++ PDF parsing, creation and modification library with form, annotation, signing and incremental-update APIs. | zlib, OpenSSL, FreeType, libxml2, libjpeg-turbo, libpng, libtiff | Shared upstream CMake profile with Win32 GDI font search; build/test/install/metadata/publish/doxygen reached PASS before the final runtime-policy correction. PoDoFo exposed the project-wide requirement for dynamic BCC64X runtime linkage (-tR) across EXE/DLL boundaries; the full 220-test plus installed XMP-DLL smoke rerun is the remaining final evidence gate. |
-| Poppler | 26.09.0 | 🔴 Red | documentation | PDF parser and rendering foundation used in document-processing toolchains. | zlib, FreeType, libjpeg-turbo, libpng, libtiff, win-iconv | Release/Debug builds and install/common/metadata/publish/doxygen/ready have passed with ENABLE_CPP=ON; upstream test-data remains a separate pinned future participant. GPL licensing remains a deliberate product-architecture constraint. |
+| Library ID | Version / supersession | License signal | Category | Purpose (contract metadata) | Direct dependencies / extension | Declared smokes | Detail |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `pugixml` | `1.16` | 🟢 | data | Lightweight C++ XML processing library with DOM-style parsing, modification, and XPath support. | — | R/pub | [Migration](/package/pugixml/1.16/migration) |
+| `zlib` | `1.3.2` | 🟢 | compression | General-purpose DEFLATE compression library used for gzip-compatible data and streams. | — | R/pub | [Migration](/package/zlib/1.3.2/migration) |
+| `brotli` | `1.2.0` | 🟢 | compression | General-purpose lossless compression library providing Brotli encoder and decoder support. | — | R/pub | [Migration](/package/brotli/1.2.0/migration) |
+| `zstd` | `1.5.7` | 🟢 | compression | High-performance lossless compression library implementing the Zstandard format. | — | R/pub | [Migration](/package/zstd/1.5.7/migration) |
+| `xz` | `5.8.3` → `5.8.4` (retained) | 🟡 | compression | Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma. | — | R/pub | [Migration](/package/xz/5.8.3/migration) |
+| `xz` | `5.8.4` | 🟡 | compression | Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma. | — | R/pub | [Migration](/package/xz/5.8.4/migration) |
+| `libzip` | `1.11.4` | 🟢 | archive | C library for reading, creating, and modifying ZIP archives. | zlib 1.3.2, xz 5.8.4, zstd 1.5.7 | R/pub | [Migration](/package/libzip/1.11.4/migration) |
+| `libarchive` | `3.8.9` → `3.8.10` (retained) | 🟡 | archive | Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats. | zlib 1.3.2, xz 5.8.3, zstd 1.5.7, bzip2 1.0.8, openssl 3.5.9 | R/pub | [Migration](/package/libarchive/3.8.9/migration) |
+| `libarchive` | `3.8.10` | 🟡 | archive | Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats. | zlib 1.3.2, xz 5.8.4, zstd 1.5.7, bzip2 1.0.8, openssl 3.5.9 | R/pub | [Migration](/package/libarchive/3.8.10/migration) |
+| `openssl` | `3.5.8` → `3.5.9` (retained) | 🟢 | security | Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives. | zlib 1.3.2, brotli 1.2.0, zstd 1.5.7 | R/pub | [Migration](/package/openssl/3.5.8/migration) |
+| `openssl` | `3.5.9` | 🟢 | security | Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives. | zlib 1.3.2, brotli 1.2.0, zstd 1.5.7 | R/pub | [Migration](/package/openssl/3.5.9/migration) |
+| `curl` | `8.21.0` → `8.23.0` (retained) | 🟢 | network | URL transfer library and command-line client supporting HTTP(S) and numerous network protocols. | openssl 3.5.8, zlib 1.3.2 | R/pub | [Migration](/package/curl/8.21.0/migration) |
+| `curl` | `8.23.0` | 🟢 | network | URL transfer library and command-line client supporting HTTP(S) and numerous network protocols. | openssl 3.5.9, zlib 1.3.2 | R/pub | [Migration](/package/curl/8.23.0/migration) |
+| `boost` | `1.92.0` | 🟢 | foundation | Comprehensive collection of portable C++ libraries covering containers, algorithms, networking, concurrency, and more. | openssl 3.5.9, zlib 1.3.2 | R/pub, D/pkg | [Migration](/package/boost/1.92.0/migration) |
+| `nlohmann-json` | `3.12.0` | 🟢 | data | Modern C++ JSON library offering intuitive STL-like parsing, serialization, and data access. | — | R/pub | [Migration](/package/nlohmann-json/3.12.0/migration) |
+| `ace` | `8.0.6` | 🟢 | middleware | Adaptive Communication Environment providing portable networking, concurrency, IPC, and OS abstraction. | openssl 3.5.9, xerces-c 3.3.0, zlib 1.3.2 | — | [Migration](/package/ace/8.0.6/migration) |
+| `tao` | `4.0.6` | 🟢 | middleware | CORBA object request broker and middleware services built on top of ACE. | extension: ace 8.0.6 | R/pkg | [Migration](/package/tao/4.0.6/migration) |
+| `bzip2` | `1.0.8` | 🟢 | compression | Lossless block-sorting compression library implementing the bzip2 format. | — | R/pub, D/pkg | [Migration](/package/bzip2/1.0.8/migration) |
+| `glew` | `2.3.1` | 🟡 | graphics | OpenGL Extension Wrangler Library for discovering and loading OpenGL extensions and entry points. | opengl 26.2.1 | R/pub | [Migration](/package/glew/2.3.1/migration) |
+| `opengl` | `26.2.1` | 🟡 | graphics | Mesa-based OpenGL runtime and development package for hardware-accelerated graphics on Windows. | — | R/pub | [Migration](/package/opengl/26.2.1/migration) |
+| `raylib` | `6.0` | 🟢 | graphics | Simple cross-platform C library for graphics, audio, input, and game and application development. | opengl 26.2.1 | R/pub | [Migration](/package/raylib/6.0/migration) |
+| `sdl2` | `2.32.10` | 🟢 | graphics | Cross-platform multimedia library for windows, input, audio, rendering, and platform integration. | — | R/pub | [Migration](/package/sdl2/2.32.10/migration) |
+| `sqlite` | `3.53.4` | 🟢 | database | Embedded relational database engine providing a self-contained SQL database in a single library. | — | R/pub | [Migration](/package/sqlite/3.53.4/migration) |
+| `libpq` | `18.6` | 🟢 | database | Official PostgreSQL C client library and wire-protocol access API. | openssl 3.5.9, zlib 1.3.2 | R/pub | [Migration](/package/libpq/18.6/migration) |
+| `libpqxx` | `8.0.2` | 🟢 | database | Modern C++ client API for PostgreSQL built on the official libpq C client library. | extension: libpq 18.6 | R/pub | [Migration](/package/libpqxx/8.0.2/migration) |
+| `xerces-c` | `3.3.0` | 🟢 | data | Apache C++ XML parser supporting DOM, SAX, validation, and XML Schema. | — | R/pub | [Migration](/package/xerces-c/3.3.0/migration) |
+| `soil2` | `1.3.0` | 🟢 | graphics | Small image-loading helper library for OpenGL textures based on stb image decoders. | opengl 26.2.1 | R/pub | [Migration](/package/soil2/1.3.0/migration) |
+| `vtk` | `9.6.2` | 🟢 | graphics | Visualization Toolkit for 3D computer graphics, image processing, scientific visualization, and data analysis. | — | R/pub | [Migration](/package/vtk/9.6.2/migration) |
+| `opencv` | `5.0.0` | 🟡 | graphics | Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning. | zlib 1.3.2 | R/pub | [Migration](/package/opencv/5.0.0/migration) |
+| `cmark-gfm` | `0.29.0.gfm.13` | 🟢 | documentation | CommonMark parser with GitHub Flavored Markdown extensions. | — | R/pkg | [Migration](/package/cmark-gfm/0.29.0.gfm.13/migration) |
+| `googletest` | `1.17.0` | 🟢 | testing | C++ testing framework providing GoogleTest and GoogleMock for unit tests and mocks. | — | R/pkg | [Migration](/package/googletest/1.17.0/migration) |
+| `catch2` | `3.16.0` | 🟢 | testing | Modern C++ testing framework for unit tests, assertions, and test discovery. | — | R/pkg, D/pkg | [Migration](/package/catch2/3.16.0/migration) |
+| `bitmapplusplus` | `1.1.1` | 🟢 | graphics | Header-only C++ bitmap image library for loading, manipulating, and saving BMP data. | — | R/pkg, D/pkg | [Migration](/package/bitmapplusplus/1.1.1/migration) |
+| `libjpeg-turbo` | `3.2.0` | 🟡 | image | High-performance JPEG codec using SIMD acceleration while remaining API-compatible with libjpeg. | — | R/pub | [Migration](/package/libjpeg-turbo/3.2.0/migration) |
+| `libpng` | `1.6.58` | 🟢 | image | Reference PNG library for reading, writing, and manipulating Portable Network Graphics images. | zlib 1.3.2 | R/pub | [Migration](/package/libpng/1.6.58/migration) |
+| `harfbuzz` | `14.4.0` | 🟡 | text | Text shaping engine that converts Unicode text into positioned glyph sequences for complex scripts. | — | R/pub, D/pkg | [Migration](/package/harfbuzz/14.4.0/migration) |
+| `freetype` | `2.14.3` | 🟡 | text | Font rendering library for loading, rasterizing, and querying scalable and bitmap font formats. | zlib 1.3.2, bzip2 1.0.8, brotli 1.2.0, libpng 1.6.58, harfbuzz 14.4.0 | R/pub, D/pkg | [Migration](/package/freetype/2.14.3/migration) |
+| `libtiff` | `4.7.2` | 🟢 | image | TIFF image library for reading, writing, and manipulating Tagged Image File Format images. | zlib 1.3.2, libjpeg-turbo 3.2.0 | R/pub | [Migration](/package/libtiff/4.7.2/migration) |
+| `skia` | `144` → `153` (retained) | 🟡 | graphics | Pinned Skia 144 shared CPU/raster package for PDFium 2025.11.19. Superseded for general consumers by Skia 153. | zlib 1.3.2, libjpeg-turbo 3.2.0, libpng 1.6.58, freetype 2.14.3, opengl 26.2.1 | R/pkg, D/pkg | [Migration](/package/skia/144/migration) |
+| `skia` | `153` | 🟡 | graphics | 2D graphics engine providing raster, vector, text, image, and GPU-accelerated rendering capabilities. | opengl 26.2.1, zlib 1.3.2, brotli 1.2.0, libjpeg-turbo 3.2.0, libpng 1.6.58, harfbuzz 14.4.0, freetype 2.14.3 | R/pkg, D/pkg | [Migration](/package/skia/153/migration) |
+| `graphite2` | `1.3.15` | 🟡 | text | Smart-font rendering engine for Graphite fonts and complex text shaping. | — | — | [Migration](/package/graphite2/1.3.15/migration) |
+| `expat` | `2.8.4` → `2.9.0` (retained) | 🟢 | data | Streaming XML parser used as a native dependency by TECkit SFconv and other XML-consuming components. | — | R/pub | [Migration](/package/expat/2.8.4/migration) |
+| `expat` | `2.9.0` | 🟢 | data | Streaming XML parser used as a native dependency by TECkit SFconv and other XML-consuming components. | — | R/pub | [Migration](/package/expat/2.9.0/migration) |
+| `teckit` | `2.5.13` | 🟡 | text | Text encoding conversion toolkit with runtime engine, mapping compiler, and Unicode conversion utilities. | zlib 1.3.2, expat 2.9.0 | — | [Migration](/package/teckit/2.5.13/migration) |
+| `icu` | `78.3` | 🟡 | text | Unicode and globalization library providing text, locale, normalization, collation, and conversion services. | — | — | [Migration](/package/icu/78.3/migration) |
+| `libxml2` | `2.15.3` | 🟢 | data | C XML toolkit providing parsing, XPath, XML Schema, Relax NG, XInclude and serialization support. | zlib 1.3.2 | R/pkg | [Migration](/package/libxml2/2.15.3/migration) |
+| `qpdf` | `12.4.1` | 🟢 | documentation | PDF structural transformation library and command-line toolkit for inspecting, rewriting, encrypting and validating PDF files. | zlib 1.3.2, libjpeg-turbo 3.2.0 | R/pkg | [Migration](/package/qpdf/12.4.1/migration) |
+| `podofo` | `1.1.1` | 🟡 | documentation | C++ PDF parsing, creation and modification library with forms, annotations, signing and incremental-update support. | zlib 1.3.2, openssl 3.5.9, freetype 2.14.3, libxml2 2.15.3, libjpeg-turbo 3.2.0, libpng 1.6.58, libtiff 4.7.2 | R/pkg | [Migration](/package/podofo/1.1.1/migration) |
+| `win-iconv` | `0.0.8` | 🟢 | text | Small Windows iconv implementation using the Win32 character conversion APIs. | — | R/pkg | [Migration](/package/win-iconv/0.0.8/migration) |
+| `poppler` | `26.09.0` | 🔴 | documentation | PDF rendering and parsing library derived from Xpdf and used by document-processing toolchains. | zlib 1.3.2, freetype 2.14.3, libjpeg-turbo 3.2.0, libpng 1.6.58, libtiff 4.7.2, win-iconv 0.0.8 | — | [Migration](/package/poppler/26.09.0/migration) |
+| `openxlsx` | `0.5.1` | 🟢 | data | C++ library for reading and writing Office Open XML XLSX workbooks. | pugixml 1.16, libzip 1.11.4, boost 1.92.0 | R/pub | [Migration](/package/openxlsx/0.5.1/migration) |
+| `fast_float` | `8.2.3` | 🟡 | data | High-performance C++ floating-point parser | — | R/pkg | [Migration](/package/fast_float/8.2.3/migration) |
+| `abseil` | `20260817.0` | 🟡 | core | Google Abseil C++ utilities and containers | — | R/pkg | [Migration](/package/abseil/20260817.0/migration) |
+| `lcms2` | `2.19.1` | 🟡 | graphics | LittleCMS 2 ICC color-management engine (GPL plugins excluded) | — | R/pkg | [Migration](/package/lcms2/2.19.1/migration) |
+| `openjpeg` | `2.5.4` | 🟡 | graphics | OpenJPEG JPEG 2000 encoder and decoder library | — | R/pkg | [Migration](/package/openjpeg/2.5.4/migration) |
+| `simdutf` | `9.3.0` | 🟡 | text | SIMD accelerated Unicode and Base64 processing | — | R/pkg | [Migration](/package/simdutf/9.3.0/migration) |
+| `agg` | `2.6` | 🟡 | graphics | AGG core rasterization without GPC | — | R/pkg | [Migration](/package/agg/2.6/migration) |
+| `pdfium` | `2025.11.19` | 🟡 | documentation | Pinned PDFium GN/BCC64X integration; validation pending | abseil 20260817.0, skia 144, zlib 1.3.2, libjpeg-turbo 3.2.0, libpng 1.6.58, freetype 2.14.3, icu 78.3, lcms2 2.19.1, openjpeg 2.5.4 | R/pkg, D/pkg | [Migration](/package/pdfium/2025.11.19/migration) |
+
+## Build and acceptance evidence (not the inventory)
+
+**Known native results reported for the recent PDFium consumer sequence:**
+the PDFium loader consumers passed **Release and Debug**, and FreeType passed
+both configurations after correcting the external-Abseil and shared-runtime
+dependency closure. A preceding full-run summary reported **56/58** with
+BZip2 Debug and HarfBuzz Debug consumer *CMake-configure* failures; their
+package-scope configuration paths were subsequently corrected in the Admin
+contract. A post-correction **58/58 run has not been supplied as evidence**
+here. BuildEngine's current machine state and per-library logs take
+precedence over all such historical snapshots.
+
+**Not separately verified here:** the fresh installed package/SBOM refresh
+after the retired Chromium Abseil DLL exclusion, and the standalone
+PDFium+SDL2 and PDFium+VCL GUI applications. A successful PDFium loader
+smoke does not establish that either interactive viewer passed.
+
+**DLL naming and ownership:** the managed BZip2, HarfBuzz and FreeType
+DLLs/import archives follow `lib` prefix plus `d` Debug postfix;
+exceptions such as `pdfium.dll`, `skia144.dll` and
+`libabseil_dll.dll` are deliberate named contracts, not aliases.
+The SDL2 test excludes the retired
+`third_party_abseil-cpp_absl.dll` during runtime staging.
+The [PDFium migration dossier](/package/pdfium/2025.11.19/migration)
+and [library contract](build-libraries.md) describe the gates in detail.
 
 ## PostgreSQL client stack
 
@@ -211,7 +220,7 @@ Upstream installs some command-line tools to a literal `bin` location instead of
 
 The upstream documentation target is deliberately not part of the current build contract because it writes common generated files into the shared source tree and therefore conflicts with parallel Release/Debug builds. This is a build-system/output-layout constraint, not a reason to serialize the entire BuildEngine graph.
 
-### libarchive 3.8.9
+### libarchive 3.8.10 (3.8.9 retained)
 
 libarchive consumes zlib, XZ, Zstandard, bzip2 and OpenSSL and enables the native tar, cpio, cat and unzip tools. BZip2 is enabled explicitly and bound to the managed `bzip2 1.0.8` package rather than to an accidental host installation. CNG and Windows XMLLite are enabled; optional backends not represented by explicit BuildEngine dependencies are disabled.
 
@@ -219,7 +228,7 @@ The version-bound `bcc64x-modern-borland-compat.patch` separates modern Clang-ba
 
 ## Security and network stack
 
-### OpenSSL 3.5.8
+### OpenSSL 3.5.9 (3.5.8 retained)
 
 OpenSSL uses a native BCC64X Configure platform named `BC-64X`. The tool contract supplies BCC64X, `llvm-ar`, `llvm-ranlib`, BCC64X windres and NASM. The current reproducible baseline is shared and uses `no-asm`; zlib, Brotli and Zstandard are explicit package dependencies.
 
@@ -232,7 +241,7 @@ The current version-bound repairs include:
 
 Brotli's BCC64X producer names its import libraries `libbrotli*.lib`, while OpenSSL's Windows integration expects unprefixed names. BuildEngine creates private consumer-side aliases inside the OpenSSL build tree; producer artifacts are not renamed.
 
-### curl 8.21.0
+### curl 8.23.0 (8.21.0 retained)
 
 The current curl contract intentionally re-establishes a narrow known baseline first: TLS through managed OpenSSL and compression through managed zlib. Schannel is disabled and Brotli/Zstd are currently not enabled for curl even though those packages exist independently. Optional c-ares, IDN2, libpsl, SSH and HTTP/3 dependency paths are also disabled.
 
@@ -369,7 +378,7 @@ These patches are intentionally version-bound under `admin/patches/graphite2/1.3
 
 The resulting current evidence is strong: both Release and Debug completed the complete configured suite with 91/91 tests. This is a useful example where preserving the tests was more valuable than disabling inconvenient cases.
 
-### Expat 2.8.4
+### Expat 2.9.0 (2.8.4 retained)
 
 Expat is classified as **data**, because its primary role is XML parsing. Its use by TECkit/SFconv is a dependency relationship and does not make Expat a text-processing library.
 

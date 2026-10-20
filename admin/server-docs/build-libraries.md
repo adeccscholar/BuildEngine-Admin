@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current declarative contract as of 25 September 2026. The active `admin/build-libraries.xml` and `schemas/build-libraries.xsd` use **schemaVersion 16**.
+**Status:** current declarative contract reviewed **21 October 2026**. The active `admin/build-libraries.xml` uses **schemaVersion 17** and `schemas/build-libraries.xsd`.
 
 `admin/build-libraries.xml` is the executable declarative contract for C and C++ libraries managed by BuildEngine. It describes logical library identity, exact versions, dependencies, source acquisition/preparation, build variants, tests, installation, publication, smoke tests, metadata/security evidence, documentation and library extensions.
 
@@ -17,13 +17,51 @@ Related documents:
 - [Third-party licenses](licenses.md)
 - [PDF and E-invoice processing roadmap](pdf-processing.md)
 
+## Current declarative scope and acceptance (21 October 2026)
+
+The active Schema-17 XML contains **58 `<library>` records for 52
+logical IDs** (six superseded versions deliberately retained), with
+direct versioned `dependency` edges, optional `extension` relations,
+managed build/test/install variants and smoke scopes. The complete
+inventory is in [Integrated Third-Party Libraries](libraries.md).
+BuildEngine resolves and executes the XML; a source/metadata comment or
+historical example is never another executable library.
+
+Six version lines are marked `supersededBy`: XZ 5.8.3→5.8.4,
+libarchive 3.8.9→3.8.10, OpenSSL 3.5.8→3.5.9,
+curl 8.21.0→8.23.0, Skia 144→153 and Expat 2.8.4→2.9.0.
+A dependent package may intentionally pin a predecessor (for example,
+PDFium→Skia 144). Do not change such edges merely because a later
+version exists.
+
+**Smoke configuration contract:** `scope="published"` (default)
+requires `configuration` equal to the library's publish configuration;
+`scope="package"` tests the installed variant independently. BZip2,
+HarfBuzz and FreeType declare Release published smokes plus Debug package
+smokes. The Debug BZip2/HarfBuzz CMake-config-location corrections were
+committed; they require a new native smoke run before being reported PASS.
+
+**Runtime naming:** selected managed DLL/import pairs follow `lib`
+prefix and Debug `d` postfix, while upstream names such as
+`pdfium.dll`, `skia144.dll` and `libabseil_dll.dll` remain deliberate
+exceptions. Installed runtime staging uses exact package roots and can
+explicitly exclude retired DLLs; no rename/shadow-copy should conceal an
+incorrect PE import.
+
+**SBOM provenance:** the PDFium manifest distinguishes external
+`abseil@20260817.0` from bundled `fast_float`. The external list is
+validated against the XML dependency graph and a declared runtime DLL
+name is not equivalent to binary import evidence. See
+[license/SBOM integration](licenses.md) and
+[PDF processing](pdf-processing.md).
+
 ## Contract authority
 
 The XML is the source of library/build knowledge. Runtime code evaluates this contract; it must not contain hidden per-library alternatives.
 
 ```mermaid
 flowchart TD
-    XML[build-libraries.xml schema 16] --> XSD[schemas/build-libraries.xsd]
+    XML[build-libraries.xml schema 17] --> XSD[schemas/build-libraries.xsd]
     XML --> BE[BuildEngine]
     XML --> C[BuildEngine-Common LibraryCatalog]
     BE --> STATE[Logical scope state]

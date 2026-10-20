@@ -2,7 +2,15 @@
 
 [TOC|Content]
 
-**Status:** active architectural and BuildEngine integration direction as of 25 September 2026. Poppler 26.09.0, win-iconv 0.0.8, libxml2 2.15.3, QPDF 12.4.1 and PoDoFo 1.1.1 are declared in the Schema-16 BuildEngine stack. Poppler and win-iconv have target-machine package evidence. PoDoFo reached build/test/install/metadata/publish/doxygen PASS before the final BCC64X runtime-policy correction; the dynamic-runtime rerun and installed XMP DLL smoke are its remaining final evidence gate.
+**Status:** PDF/XML/PDFium integration snapshot reviewed **21 October 2026**. Poppler 26.09.0, win-iconv 0.0.8, libxml2 2.15.3, QPDF 12.4.1 and PoDoFo 1.1.1 are declared in the Schema-16 BuildEngine stack. Poppler and win-iconv have target-machine package evidence. PoDoFo reached build/test/install/metadata/publish/doxygen PASS before the final BCC64X runtime-policy correction; the dynamic-runtime rerun and installed XMP DLL smoke are its remaining final evidence gate.
+
+## PDFium rendering and application proofs (October 2026)
+
+The Schema-17 catalog includes `pdfium@2025.11.19` in addition to QPDF, PoDoFo, Poppler and libxml2. PDFium renders and inspects page content; QPDF and PoDoFo retain their distinct roles in structural rewriting and higher-level C++ editing. No one PDF library is assumed to replace the others automatically.
+
+PDFium's pinned BuildEngine runtime uses **Skia 144** (Skia 153 is the later, separate general version), FreeType 2.14.3, ICU 78.3, LittleCMS2 2.19.1, OpenJPEG 2.5.4 and **external Abseil 20260817.0**. The retired Chromium Abseil DLL must neither be an imported runtime dependency nor a second bundled SBOM component. PDFium's installed import/loader gates check the external Abseil identity; the SDL2 runtime stager excludes the retired component filename.
+
+**Reported native evidence:** the PDFium consumer/loader smokes passed Release and Debug after the BCC64X subsystem alignment and DLL dependency fixes. That is not evidence that the two graphical demo applications have compiled and run successfully. The standalone C++Builder applications are [SDL2/CMake without VCL](https://github.com/adeccscholar/BuildEngine/tree/main/Test/PDFiumSDL2) and [VCL Unit + DFM](https://github.com/adeccscholar/BuildEngine/tree/main/Test/PDFiumVCL). Both use shared PDFium raster/view-navigation code, zoom, pan and cross-page scrolling. Their native GUI tests and the regenerated package SBOM remain **not independently verified** here.
 
 ## License traffic light for this stack
 

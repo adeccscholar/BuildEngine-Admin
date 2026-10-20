@@ -2,11 +2,19 @@
 
 [TOC|Content]
 
-**Status:** current architecture contract as of 15 September 2026. The server is Common-based, but several extension/package details are still open implementation issues and are explicitly identified below.
+**Status:** server contract reviewed 21 October 2026. The server is Common-based, but several extension/package details are still open implementation issues and are explicitly identified below.
 
 BuildEngine Server is the read-only HTTP presentation and machine-interface layer for one BuildEngine production tree. It exposes the logical library catalog, package metadata, generated documentation, CycloneDX data, dependency/usage information, security results, package export, project documentation and a browser UI.
 
 The server is **not** an independent state or repository authority.
+
+## Server-facing catalog update (21 October 2026)
+
+The synchronized Schema-17 contract declares **58 library/version records across 52 logical IDs**. Six version lines have a `supersededBy` successor; both a predecessor and a successor remain addressable where logically installed. The server must reflect the resolved catalog, not assume that a directory count, a previous 44-library figure, or a file's presence proves successful installation. Details: [full inventory](libraries.md).
+
+The latest PDFium package uses external Abseil `20260817.0` (`libabseil_dll.dll`) and pinned Skia 144, while Skia 153 is a separately declared newer general package. The retired Chromium `third_party_abseil-cpp_absl.dll` is excluded from the SDL2 consumer runtime and should not appear as a second bundled Abseil SBOM component. CycloneDX/LICENCE data become current only after the corrected package install and metadata stages run. See [PDF workflow](pdf-processing.md).
+
+The REST/browser layer remains **read-only** and must show provenance/status from package/machine evidence. The existing Common extension existence, ownership and ZIP export gaps described below remain explicitly **unverified**; this documentation refresh does not declare them fixed.
 
 ## Common/DLL is the leading repository view
 
@@ -139,7 +147,7 @@ The individual route-validation bug described above is an implementation gap, no
 
 ## Current catalog breadth
 
-The synchronized Common catalog currently exposes 44 logical third-party libraries across compression, archives, security, networking, embedded/client-server databases, middleware, graphics, image codecs, testing, text/Unicode, XML and PDF/document processing.
+The synchronized XML contract declares **58 versioned entries / 52 logical third-party library IDs** across compression, archives, security, networking, embedded/client-server databases, middleware, graphics, image codecs, testing, text/Unicode, XML and PDF/document processing.
 
 Recent additions include the PostgreSQL client pair libpq/libpqxx and the document-processing branch win-iconv/libxml2/QPDF/PoDoFo/Poppler. The Server presents these from the same Common catalog and license/security metadata as every earlier library; it does not maintain a separate hard-coded roster.
 

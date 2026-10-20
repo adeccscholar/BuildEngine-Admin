@@ -951,7 +951,7 @@ XML is a decisive part of that concentration. It keeps the changing knowledge fl
 
 The expansion into PostgreSQL and PDF processing added another lesson that was easy to overlook while individual libraries were still the focus.
 
-The active catalog has grown to **44 logical libraries**, including libpq/libpqxx for PostgreSQL and a document stack built around libxml2, QPDF, PoDoFo, win-iconv and Poppler. This breadth exposed not only library-specific compatibility issues but also assumptions in the toolchain layer itself.
+The catalog had grown to **44 logical libraries at this stage of the story**, including libpq/libpqxx for PostgreSQL and a document stack built around libxml2, QPDF, PoDoFo, win-iconv and Poppler. This breadth exposed not only library-specific compatibility issues but also assumptions in the toolchain layer itself.
 
 PoDoFo was particularly useful because its public C++ API transfers ownership across a DLL boundary. A factory such as `PdfXMPPacket::Create()` can allocate an object inside the DLL and return an owning C++ pointer to the caller. That makes the runtime model observable: if the executable and DLL carry separate static C++ runtimes, allocation and destruction may occur in different allocator/runtime domains.
 
@@ -966,6 +966,14 @@ The same investigation reinforced another distinction. BCC64X is **Clang/LLVM**,
 Finally, repeated patch work hardened the source-repair discipline. A patch is no longer thought of as a diff against a pristine release in isolation. Its input is the complete file state at its exact place in the ordered patch chain. The intended full target file is constructed first, the diff is generated mechanically, and reapplication must reproduce the target byte-for-byte.
 
 These rules are important because they move knowledge upward: from a single failing library into the reusable integration architecture.
+
+## October 2026 update: 58 versioned packages, two PDF viewers
+
+The later Schema-17 catalog declares **58 library/version records across 52 logical library IDs**, retaining six superseded version lines deliberately. That later snapshot does not change the chronology of the earlier 44-library milestone. BuildEngine now also integrates PDFium 2025.11.19 with pinned Skia 144, external Abseil 20260817.0, and a larger native PDF/image/text dependency closure. A newer Skia 153 is maintained independently.
+
+The next evidence layer is practical application consumption: two PDFium navigation viewers, one pure SDL2/CMake/BCC64X window and one native C++Builder VCL Unit/DFM application. Shared page rasterization and viewport/navigation logic demonstrates how the same binary stack serves different UI frameworks. The GUI applications remain an ongoing test, not a claim of verified native startup. The earlier PDFium Release/Debug loader smokes passed, but later runtime-staging and SBOM revisions still require fresh machine evidence.
+
+The license and SBOM work now distinguishes external BuildEngine components from genuinely bundled third-party sources. In particular, PDFium's internal Chromium Abseil DLL has been retired in favour of the version-pinned installed Abseil package. This is the same architectural theme as the initial experiment: reproducible libraries are useful only when their dependency ownership, ABI boundaries and deployment evidence are explicit.
 
 ## 24. The project is still evolving
 

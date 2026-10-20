@@ -11,6 +11,50 @@ Related documents:
 - [Documentation contract](documentation.md)
 - [BuildEngine configuration](configuration.md)
 
+## Active tool declaration snapshot (21 October 2026)
+
+The XML currently declares **27 tool IDs**. A pin in this list is
+a provisioning/selection contract, **not** proof of readiness on any
+particular machine. The current machine state and tool logs carry that
+evidence. See [Tool Overview](tools.md) for roles and the
+`required="always"` versus `required="when-used"` policy.
+
+| Tool ID | Pinned/declared version | Provisioning requirement |
+| --- | --- | --- |
+| `git` | `2.55.0.3` | `always` |
+| `bash` | `5.2` | `when-used` |
+| `cmake` | `4.1.1` | `always` |
+| `gn` | `07d3c6f4dc290fae5ca6152ebcb37d6815c411ab` | `when-used` |
+| `ninja` | `1.13.2` | `always` |
+| `perl` | `5.42.2.1` | `always` |
+| `python` | `3.14.7` | `always` |
+| `fonttools` | `4.65.0` | `when-used` |
+| `meson` | `1.12.0` | `always` |
+| `winflexbison` | `2.5.24` | `always` |
+| `pkg-config` | `0.28-1` | `always` |
+| `doxygen` | `1.18.0` | `always` |
+| `graphviz` | `15.1.1` | `always` |
+| `web-mermaid` | `11.17.2` | `always` |
+| `web-highlight` | `11.12.0` | `always` |
+| `web-mathjax` | `3.2.2` | `always` |
+| `bcc64x` | `20.1.7` | `always` |
+| `embarcadero-make` | `5.43` | `always` |
+| `llvm-ar` | `20.1.7` | `always` |
+| `llvm-ranlib` | `20.1.7` | `always` |
+| `ld-lld` | `20.1.7` | `always` |
+| `bcc64x-windres` | `20.1.7` | `always` |
+| `bcc64x-ucrt-compat` | `20.1.7-compat1` | `always` |
+| `tdump` | `RADStudio-13` | `always` |
+| `llvm-cov` | `20.1.7` | `always` |
+| `windows-rc` | `Windows-SDK` | `always` |
+| `nasm` | `3.02` | `always` |
+
+For the PDFium/Skia GN branch, the `gn` tool is pinned by its exact
+revision, while the generator uses managed Ninja 1.13.2 and the
+BCC64X 20.1.7 toolchain. Browser documentation uses managed Mermaid,
+highlight.js and MathJax assets. Doxygen 1.18.0 and Graphviz 15.1.1
+are independent documentation-tool requirements.
+
 ## Basic structure
 
 ```xml

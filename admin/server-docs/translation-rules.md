@@ -2,7 +2,13 @@
 
 [TOC|Content]
 
-**Status:** implementation inventory, 19 October 2026. **Scope:** shared `admin/programs/bcc64x/gn_argument_adapter.py`, the PDFium-specific GN toolchain and declarative source adjustments. Rules below describe the **implemented behavior**, not a claim of equal compiler semantics or a successful PDFium loader smoke. The source adapter and versioned XML remain authoritative if they change.
+**Status:** implementation inventory reviewed 21 October 2026. **Scope:** shared `admin/programs/bcc64x/gn_argument_adapter.py`, the PDFium-specific GN toolchain and declarative source adjustments. Rules below describe the **implemented behavior**, not a claim of equal compiler semantics or a successful PDFium loader smoke. The source adapter and versioned XML remain authoritative if they change.
+
+## Latest PDFium/Skia and ABI boundary (21 October 2026)
+
+The active PDFium 2025.11.19 BCC64X/Windows DLL contract retains its successful GUI subsystem alignment with Skia 144. The native Release/Debug loader smokes were reported PASS; do not revert this to an old console-vs-GUI link assumption. External Abseil `20260817.0` is the intended provider (`libabseil_dll.dll`), not the retired Chromium-generated `third_party_abseil-cpp_absl.dll`. Exact versioned GN patches, the argument adapter and XML-defined actions remain authoritative.
+
+Runtime naming changes for BZip2/HarfBuzz use the `lib` prefix and `d` Debug postfix; FreeType links configuration-matched imports. The generated test's success must not be inferred merely from the presence of these rules. This document records generic translation rules, while the detailed [PDFium migration](/package/pdfium/2025.11.19/migration) records package-specific execution and verification history.
 
 ## Purpose and boundary
 

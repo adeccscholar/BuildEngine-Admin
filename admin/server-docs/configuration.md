@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Status:** current configuration contract as of 25 September 2026. The Library-FSM architecture is active. `build-libraries.xml` and `schemas/build-libraries.xsd` use schema version 16.
+**Status:** configuration reviewed **21 October 2026**. The Library-FSM is active and `admin/build-libraries.xml` now declares schema version **17**.
 
 BuildEngine combines one local machine/deployment configuration with synchronized administration contracts.
 
@@ -20,6 +20,34 @@ Related documents:
 - [Documentation contract](documentation.md)
 - [Server and REST interface](server.md)
 - [Tool contract](build-tools.md)
+
+## October 2026 local configuration checklist
+
+For the current catalog (**58 library versions / 52 IDs**), keep the
+following boundaries separate:
+
+| Area | Authoritative input | Not a replacement |
+| --- | --- | --- |
+| Machine and parallelism | local `BuildEngine.xml` | repository metadata |
+| Tools | `admin/build-tools.xml` (27 tool IDs) | undeclared PATH changes |
+| Library/variant/dependencies | Schema-17 `admin/build-libraries.xml` | package directory names |
+| Documentation | `admin/build-documentation.xml` | per-library ad-hoc Doxygen scripts |
+| Executed evidence | logical FSM state, logs, installed artifacts | XML-declared tests alone |
+| Licenses and provenance | installed `LICENSE-INFO.txt` and `sbom.cdx.json` | raw source SBOM alone |
+
+When configuring a standalone BCC64X CMake consumer (for example
+`Test/PDFiumSDL2`), set **both** `CB_BDS` and `CB_BCC64X` as
+environment variables in the *same cmd.exe session* before CMake
+configure. `-DCB_BDS=...` alone does not satisfy the toolchain's
+`ENV{CB_BDS}` requirement. Use a single physical command line per CMake
+invocation, the exact toolchain file, Ninja and versioned package roots.
+
+The latest BuildEngine runtime stager supports explicit
+`EXCLUDE_DLLS` for a **named retired DLL**, including removal of a
+stale copy from an incremental consumer output folder. The SDL2 viewer
+excludes `third_party_abseil-cpp_absl.dll`; it still requires
+`libabseil_dll.dll`. The package and executable import rules remain
+separate from staging composition checks.
 
 ## Local `BuildEngine.xml`
 
