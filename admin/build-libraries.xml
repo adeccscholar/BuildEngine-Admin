@@ -9892,10 +9892,10 @@
          <!-- Validate the GENERATED build, not merely the requested GN args. -->
          <!-- Inspect commands reachable from the PDFium target, not all
               unrelated Chromium host-toolchain rules. -->
-         <execute name="verify-bcc64x-ninja-toolchain" executable="{Tool:python}"
-                  workingDirectory="{Workspace}" outputMode="errors">
+         <!-- Build graph contract: fail before Ninja build when Chromium Abseil is still compiled. -->
+         <execute name="verify-external-abseil-link-graph" executable="{Tool:python}" workingDirectory="{Workspace}" outputMode="errors">
             <argument value="-c"/>
-            <argument value="import os&#10;import subprocess&#10;from pathlib import Path&#10;root = Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}')&#10;result = subprocess.run([r'{Tool:ninja}', '-C', str(root), '-t', 'commands', 'pdfium'], capture_output=True, text=True, encoding='utf-8', errors='replace')&#10;assert result.returncode == 0, result.stderr&#10;commands = result.stdout.splitlines()&#10;assert commands, 'No PDFium target commands'&#10;print('PDFium shared DLL toolchain, exported C API and FreeType commands verified: ' + str(len(commands)))"/>
+            <argument value="import subprocess&#10;from pathlib import Path&#10;root=Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}')&#10;r=subprocess.run([r'{Tool:ninja}','-C',str(root),'-t','commands','pdfium'],capture_output=True,text=True,encoding='utf-8',errors='replace')&#10;assert r.returncode == 0, r.stderr&#10;cmd=r.stdout.replace(chr(92),'/').lower()&#10;assert 'abseil_dll.lib' in cmd, 'PDFium link graph does not use installed Abseil import library'&#10;assert 'third_party_abseil-cpp_absl.dll' not in cmd, 'Bundled Chromium Abseil DLL still present in PDFium graph'&#10;assert 'third_party/abseil-cpp/absl/' not in cmd, 'Bundled Chromium Abseil sources still compiled'&#10;print('PDFium GN/Ninja graph uses installed Abseil import library')"/>
          </execute>
          <execute name="ninja-build" executable="{Tool:ninja}"
                   workingDirectory="{Workspace}" showOutput="false">
@@ -9926,6 +9926,11 @@
                <!-- Native BCC64X DLL and its COFF import library, both GN outputs. -->
                <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.dll"/>
                <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.lib"/>
+               <!-- Before installation reject a DLL that still imports Chromium's Abseil. -->
+               <execute name="verify-pdfium-external-abseil-import" executable="{Tool:python}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+                  <argument value="-c"/>
+                  <argument value="from pathlib import Path&#10;p=Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.dll')&#10;b=p.read_bytes().lower()&#10;assert b'abseil_dll.dll' in b, 'PDFium PE lacks installed abseil_dll.dll import'&#10;assert b'third_party_abseil-cpp_absl.dll' not in b, 'Stale PDFium imports bundled Chromium Abseil DLL'&#10;print('PDFium installed Abseil DLL import verified')"/>
+               </execute>
                <require path="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}\abseil_dll.lib"/>
                <copy source="{InstallRoot}\packages\abseil\20260817.0\bin\win64\{Configuration}\abseil_dll.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\abseil_dll.dll" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\abseil_dll.dll"/>
