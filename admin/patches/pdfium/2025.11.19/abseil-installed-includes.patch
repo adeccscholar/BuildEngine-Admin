@@ -1,7 +1,7 @@
 diff --git a/core/fpdfapi/page/cpdf_sampledfunc.cpp b/core/fpdfapi/page/cpdf_sampledfunc.cpp
 --- a/core/fpdfapi/page/cpdf_sampledfunc.cpp
 +++ b/core/fpdfapi/page/cpdf_sampledfunc.cpp
-@@ -17,7 +17,7 @@
+@@ -17,6 +17,6 @@
  #include "core/fxcrt/compiler_specific.h"
  #include "core/fxcrt/fx_memory_wrappers.h"
  #include "core/fxcrt/fx_safe_types.h"
