@@ -21,3 +21,6 @@ add_executable(pdfium-loader-probe
    "${CMAKE_CURRENT_LIST_DIR}/../../../programs/bcc64x/RuntimeLoaderProbe.cpp")
 set_property(TARGET pdfium-loader-probe PROPERTY CXX_SCAN_FOR_MODULES OFF)
 target_compile_features(pdfium-loader-probe PRIVATE cxx_std_23)
+# A loader probe is meaningful only after the PDFium dependency runtime closure is staged.
+add_dependencies(pdfium-loader-probe buildengine-stage-pdfium-consumer)
+
