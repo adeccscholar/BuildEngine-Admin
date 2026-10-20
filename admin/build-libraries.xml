@@ -3205,7 +3205,7 @@
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\bzip2\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="bzip2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
-      <smoke id="consumer" source="smokes\bzip2\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="bzip2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
+      <smoke scope="package" id="consumer" source="smokes\bzip2\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="bzip2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 <library id="glew" version="2.3.1" category="graphics" timestamp="2026-09-01T23:21:00Z">
       <dependency library="opengl" version="26.2.1"/>
@@ -5153,7 +5153,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
 
-      <smoke
+      <smoke scope="package"
          id="consumer"
          source="smokes\harfbuzz\consumer"
          configuration="Debug"
@@ -5338,7 +5338,7 @@
       <environment name="CB_BDS" value="{BDS}"/>
    </smoke>
 
-   <smoke
+   <smoke scope="package"
       id="consumer"
       source="smokes\freetype\consumer"
       configuration="Debug"
