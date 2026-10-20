@@ -1,0 +1,17 @@
+diff --git a/BUILD.gn b/BUILD.gn
+index a929c27..1886ddf 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -229,6 +229,12 @@ component("pdfium") {
+   configs += [ ":pdfium_strict_config" ]
+   public_configs = [ ":pdfium_public_config" ]
+ 
++  if (is_component_build &&
++      current_toolchain == "//build/toolchain/bcc64x:bcc64x") {
++    # Let the native BCC64X DLL driver select the subsystem, as for Skia.
++    configs -= [ "//build/config/win:console" ]
++  }
++
+   deps = [
+     "constants",
+     "core/fpdfapi/page",

@@ -9572,7 +9572,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-20T15:41:54Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-20T20:03:58Z">
       <dependency library="abseil" version="20260817.0"/>
       <dependency library="skia" version="144"/>
       <dependency library="zlib" version="1.3.2"/>
@@ -9793,6 +9793,19 @@
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\bcc64x-chromium-clangcl-options.patch"/>
          </execute>
+         <!-- Match Skia 144: the native BCC64X DLL mode owns subsystem selection. -->
+         <execute name="pdfium-bcc64x-dll-subsystem-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-dll-subsystem.patch"/>
+         </execute>
+         <execute name="pdfium-bcc64x-dll-subsystem-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-dll-subsystem.patch"/>
+         </execute>
+         <execute name="pdfium-bcc64x-dll-subsystem-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-dll-subsystem.patch"/>
+         </execute>
          <execute name="prepare-bcc64x-toolchain-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/>
             <argument value="{CurrentArtifact}\build\toolchain\bcc64x"/>
@@ -9868,7 +9881,7 @@
          <!-- Diagnostic CFG-off: disable Chromium compiler/linker CFG at GN origin, PDFium only. -->
          <execute name="disable-pdfium-chromium-cfg" executable="{Tool:python}" workingDirectory="{Workspace}" outputMode="errors">
             <argument value="-c"/>
-            <argument value="from pathlib import Path&#10;p = Path('build/config/win/BUILD.gn')&#10;s = p.read_text(encoding='utf-8')&#10;for name in ('default_cfg_compiler', 'cfi_linker'):&#10;    key = 'config(&quot;' + name + '&quot;) ' + chr(123)&#10;    start = s.find(key)&#10;    assert start >= 0 and s.find(key, start + 1) < 0, 'CFG GN config not unique: ' + name&#10;    level = 0&#10;    end = None&#10;    for i in range(start + len(key) - 1, len(s)):&#10;        if s[i] == chr(123):&#10;            level += 1&#10;        elif s[i] == chr(125):&#10;            level -= 1&#10;            if level == 0:&#10;                end = i + 1&#10;                break&#10;    assert end is not None, 'Unclosed CFG GN config: ' + name&#10;    replacement = key + '\n  # PDFium BCC64X CFG-off loader diagnostic.\n' + chr(125)&#10;    old = s[start:end]&#10;    assert name != 'default_cfg_compiler' or ('/guard:cf' in old or old == replacement), 'Compiler CFG guard source changed'&#10;    assert name != 'cfi_linker' or ('/guard:cf' in old or old == replacement), 'Linker CFG guard source changed'&#10;    s = s[:start] + replacement + s[end:]&#10;p.write_text(s, encoding='utf-8')&#10;print('PDFium Chromium CFG configs disabled at source:', p)"/>
+            <argument value="from pathlib import Path&#10;p = Path('build/config/win/BUILD.gn')&#10;s = p.read_text(encoding='utf-8')&#10;for name in ('default_cfg_compiler', 'cfi_linker'):&#10;    key = 'config(&quot;' + name + '&quot;) ' + chr(123)&#10;    start = s.find(key)&#10;    assert start >= 0 and s.find(key, start + 1) &lt; 0, 'CFG GN config not unique: ' + name&#10;    level = 0&#10;    end = None&#10;    for i in range(start + len(key) - 1, len(s)):&#10;        if s[i] == chr(123):&#10;            level += 1&#10;        elif s[i] == chr(125):&#10;            level -= 1&#10;            if level == 0:&#10;                end = i + 1&#10;                break&#10;    assert end is not None, 'Unclosed CFG GN config: ' + name&#10;    replacement = key + '\n  # PDFium BCC64X CFG-off loader diagnostic.\n' + chr(125)&#10;    old = s[start:end]&#10;    assert name != 'default_cfg_compiler' or ('/guard:cf' in old or old == replacement), 'Compiler CFG guard source changed'&#10;    assert name != 'cfi_linker' or ('/guard:cf' in old or old == replacement), 'Linker CFG guard source changed'&#10;    s = s[:start] + replacement + s[end:]&#10;p.write_text(s, encoding='utf-8')&#10;print('PDFium Chromium CFG configs disabled at source:', p)"/>
          </execute>
          <!-- Read-only guard for resumed build states. The Source scope owns mutations. -->
          <execute name="verify-pdfium-installed-abseil-includes" executable="{Tool:cmake}" workingDirectory="{Workspace}" outputMode="errors">
@@ -9999,7 +10012,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\pdfium\consumer" configuration="Debug"
@@ -10009,7 +10022,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2d.dll;libpng16d.dll;harfbuzz.dll;libicuuc78d.dll;libfreetyped.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2d.dll;libpng16d.dll;harfbuzz.dll;libicuuc78d.dll;libfreetyped.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>

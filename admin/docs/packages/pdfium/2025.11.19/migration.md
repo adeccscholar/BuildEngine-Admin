@@ -8,6 +8,99 @@
 
 **Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
+## Current loader investigation: Abseil coverage and native DLL subsystem (2026-10-20)
+
+This checkpoint describes the active native component build
+(`is_component_build = true`, `pdf_is_complete_lib = false`,
+`use_custom_libcxx = false`). The static-archive and isolated-DLL approaches
+recorded later in this migration are earlier integration stages.
+
+### Evidence and implemented changes
+
+The supplied 2026-10-20 loader report shows PDFium failing a normal
+`LoadLibraryExW` call with Win32 193. Its x64 image passes both
+`SEC_IMAGE_NO_EXECUTE` mapping and `DONT_RESOLVE_DLL_REFERENCES`. Skia 144
+loads successfully with PE subsystem 2; PDFium reports subsystem 3. These facts
+do not identify the first rejected module or prove a DLL-initialization failure.
+
+The report lists `libabseil_dll.dll` as a direct PDFium import, but the previous
+Release and Debug probe lists did not load it explicitly. Both XML lists now
+include that DLL immediately before `pdfium.dll`. The existing generic probe
+performs a real load and reports an independent result for Abseil; finding its
+name and PE header in the static dependency tree is no longer the only check.
+The probe still releases each successful load through its existing path.
+
+The subsystem difference has a verified source in the pinned Chromium build:
+
+- `build/config/BUILDCONFIG.gn` adds `//build/config/win:console` to the
+  linker defaults, including shared-library and component defaults.
+- `build/config/win/BUILD.gn` implements that config as
+  `/SUBSYSTEM:CONSOLE,10.0`.
+- PDFium's upstream `component("pdfium")` inherits the config. The argument
+  adapter preserves it in the translated linker response.
+- Skia 144 excludes its corresponding MSVC linker block for BCC64X and lets
+  the native `-tD -tR` DLL link mode select the subsystem.
+
+The version-bound `bcc64x-dll-subsystem.patch` removes only
+`//build/config/win:console` from PDFium's root component when the active
+toolchain is BCC64X and component mode is enabled. The PDFium DLL link rule
+also drops its competing `--subsystem,windows` argument. Both integrations
+therefore delegate subsystem selection to the same native BCC64X DLL mode.
+Removing the inherited option also removes its explicit subsystem-version
+suffix; no additional Windows-version support is claimed.
+
+The patch is checked, applied and reverse-checked in the single Source scope.
+The PDFium logical timestamp is updated. A pre-existing raw `<` inside the
+CFG diagnostic's XML attribute is escaped as `&lt;`; the decoded Python
+comparison is unchanged.
+
+### Review of the additional ABI, export and TLS hypotheses
+
+The external diagnosis provides useful areas to inspect, but its individual
+claims need separate evidence:
+
+| Claim | Assessment against the current sources and log |
+|---|---|
+| A foreign MSVC-built PDFium DLL causes the mismatch. | The active contract downloads PDFium source at `a84323421e94f484faca52dd9d027934eba42ab8` and builds it with BCC64X. It does not consume a bblanchon prebuilt DLL. |
+| BCC64X uses an incompatible alternative Windows calling convention. | Embarcadero documents Microsoft x64 calling conventions, Itanium C++ name mangling, libc++ and UCRT. Internal C++ ABI boundaries remain relevant; a general C-DLL incompatibility does not follow. |
+| Missing or differently decorated imports necessarily become error 193. | **[not verified]**. Microsoft distinguishes invalid-image, missing-entrypoint and missing-ordinal status codes. Missing names and malformed import structures are different hypotheses. |
+| `FPDFSDK_EXPORTS` controls `dllexport`. | Incorrect for the pinned header. `FPDF_EXPORT` uses `COMPONENT_BUILD`, `WIN32` and `FPDF_IMPLEMENTATION`; `FPDFSDK_EXPORTS` controls `FPDF_CALLCONV`. |
+| A DLL with no exported functions is inherently unloadable. | Incorrect as a general rule. Microsoft documents resource-only DLLs. PDFium needs its public API exports for consumer calls, but their absence alone does not explain this independent probe's failing load. |
+| A fundamental PDFium section-alignment defect prevents image mapping. | The reported mapping passes, with section/file alignment `0x1000/0x200`. This proposed failure point does not match the supplied result. |
+| TLS contents, callbacks or related relocations are defective. | **[not verified]**. The existing range checks and non-executing mapping do not prove full TLS initialization is correct. |
+
+The public PDFium API has C linkage. Its internal imports from Abseil, Skia and
+the C++ runtime must still be checked against the DLLs actually loaded. The
+maintainer's response in bblanchon issue 17 reports MinGW compatibility and a
+CMake compiler-versus-platform condition; it does not establish the alleged
+general loader incompatibility.
+
+### Verification boundary
+
+Patch application is verified against the complete pinned upstream
+`BUILD.gn`, whose Git blob is
+`a929c276e53569858188c1da3dec190de81f5cb9`. No earlier active Source action
+changes that root file. Applying and reversing the generated patch reproduces
+the complete expected target and source bytes.
+
+The next Windows run must record the independent Abseil result, the generated
+PDFium subsystem and the normal PDFium load result. The translated
+`pdfium.dll.rsp.bcc64x` should be checked for any remaining console override.
+A rebuilt subsystem value of 2 and a successful load are **[not verified]**.
+This change addresses the demonstrated configuration difference; it is not
+yet evidence that error 193 is resolved. If loading still fails, loader snaps
+must identify the first rejected module and original NTSTATUS.
+
+Primary references:
+
+- [Pinned Chromium linker defaults](https://github.com/chromium/chromium/blob/8cfcf65247a24a233ac13dfafce5f23cba3eff41/build/config/BUILDCONFIG.gn) and [Windows subsystem config](https://github.com/chromium/chromium/blob/8cfcf65247a24a233ac13dfafce5f23cba3eff41/build/config/win/BUILD.gn), corresponding to build pin `371ecb089d96d60e5208ec2d25c9b4f0860e556c`.
+- [Pinned PDFium public header](https://github.com/chromium/pdfium/blob/a84323421e94f484faca52dd9d027934eba42ab8/public/fpdfview.h).
+- [Embarcadero BCC64X](https://docwiki.embarcadero.com/RADStudio/Florence/en/BCC64X).
+- [Microsoft NTSTATUS definitions](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/596a1078-e883-4972-9bbc-49e60bebca55).
+- [Microsoft resource-only DLLs](https://learn.microsoft.com/en-us/cpp/build/creating-a-resource-only-dll).
+- [Microsoft PE format and TLS](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format).
+- [PDFium binary-distribution maintainer's issue-17 response](https://github.com/bblanchon/pdfium-binaries/issues/17#issuecomment-1013683325).
+
 ## Purpose and integration strategy
 
 **Package purpose:** Pinned PDFium GN/BCC64X integration; validation pending
