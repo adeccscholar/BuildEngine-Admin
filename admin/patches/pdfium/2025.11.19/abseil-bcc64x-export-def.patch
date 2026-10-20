@@ -1,12 +1,13 @@
 diff --git a/BUILD.gn b/BUILD.gn
 --- a/BUILD.gn
 +++ b/BUILD.gn
-@@ -21,6 +21,7 @@
- component("absl") {
-   public_deps = [ ":absl_component_deps" ]
+@@ -22,7 +22,8 @@
    if (is_component_build) {
      public_configs = [ ":absl_component_build" ]
  
 -    if (is_win && is_clang) {
 +    if (is_win && is_clang &&
 +        current_toolchain != "//build/toolchain/bcc64x:bcc64x") {
+       file = "symbols_${current_cpu}"
+       if (is_debug) {
+         file = "${file}_dbg"
