@@ -9825,7 +9825,7 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
          <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{InstallRoot}\packages\abseil\20260817.0\include"/>
-         <environment name="CB_PDFIUM_ABSEIL_LIB" value="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}\abseil_dll.lib"/>
+         <environment name="CB_PDFIUM_ABSEIL_LIBDIR" value="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}"/>
          <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{InstallRoot}\packages\skia\144\include"/>
          <environment name="CB_PDFIUM_SKIA_LIB" value="{InstallRoot}\packages\skia\144\lib\win64\{Configuration}\skia144.lib"/>
          <environment name="CB_PDFIUM_LCMS_INCLUDE" value="{InstallRoot}\packages\lcms2\2.19.1\include"/>
@@ -9933,9 +9933,13 @@
                   <argument value="-c"/>
                   <argument value="from pathlib import Path&#10;p=Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.dll')&#10;b=p.read_bytes().lower()&#10;assert b'abseil_dll.dll' in b, 'PDFium PE lacks installed abseil_dll.dll import'&#10;assert b'third_party_abseil-cpp_absl.dll' not in b, 'Stale PDFium imports bundled Chromium Abseil DLL'&#10;print('PDFium installed Abseil DLL import verified')"/>
                </execute>
-               <require path="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}\abseil_dll.lib"/>
-               <copy source="{InstallRoot}\packages\abseil\20260817.0\bin\win64\{Configuration}\abseil_dll.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\abseil_dll.dll" overwrite="true"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\abseil_dll.dll"/>
+               <execute name="stage-installed-abseil-runtime" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+                  <argument value="-DABSEIL_PACKAGE_ROOT:PATH={InstallRoot}\packages\abseil\20260817.0"/>
+                  <argument value="-DPDFIUM_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+                  <argument value="-DBUILD_CONFIGURATION:STRING={Configuration}"/>
+                  <argument value="-P"/>
+                  <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\abseil-runtime.cmake"/>
+               </execute>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.dll"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\pdfium.dll"
                      overwrite="true"/>
@@ -9982,7 +9986,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;abseil_dll.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\pdfium\consumer" configuration="Debug"
@@ -9992,7 +9996,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2d.dll;libpng16d.dll;harfbuzz.dll;libicuuc78d.dll;libfreetyped.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;abseil_dll.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2d.dll;libpng16d.dll;harfbuzz.dll;libicuuc78d.dll;libfreetyped.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
