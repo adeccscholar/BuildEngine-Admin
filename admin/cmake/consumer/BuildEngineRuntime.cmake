@@ -80,6 +80,23 @@ function(adecc_stage_runtime a_strTarget)
          -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/BuildEngineStageRuntime.cmake"
       COMMENT "Stage BuildEngine runtime DLLs for ${a_strTarget}"
       VERBATIM)
+
+   # POST_BUILD runs only after relinking. The package closure can change
+   # without changing the consumer executable (e.g., a new GN component DLL).
+   # Therefore refresh and validate the runtime package closure on every
+   # default build and provide an explicit target for diagnostic probes.
+   set(strRuntimeStageTarget "buildengine-stage-${a_strTarget}")
+   add_custom_target("${strRuntimeStageTarget}" ALL
+      COMMAND "${CMAKE_COMMAND}"
+         "-DADECC_RUNTIME_ROOTS_FILE:FILEPATH=${theRootsFile}"
+         "-DADECC_RUNTIME_TOOLCHAIN_DLLS_FILE:FILEPATH=${theToolchainDllsFile}"
+         "-DADECC_RUNTIME_TOOLCHAIN_BIN:PATH=${strToolchainBin}"
+         "-DADECC_RUNTIME_CONFIGURATION=$<CONFIG>"
+         "-DADECC_RUNTIME_OUTPUT_DIR=$<TARGET_FILE_DIR:${a_strTarget}>"
+         -P "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/BuildEngineStageRuntime.cmake"
+      COMMENT "Refresh BuildEngine runtime DLLs for ${a_strTarget}"
+      VERBATIM)
+   add_dependencies("${strRuntimeStageTarget}" "${a_strTarget}")
 endfunction()
 
 function(adecc_install_application a_strTarget)
