@@ -1,0 +1,11 @@
+diff --git a/core/fpdfapi/page/cpdf_sampledfunc.cpp b/core/fpdfapi/page/cpdf_sampledfunc.cpp
+--- a/core/fpdfapi/page/cpdf_sampledfunc.cpp
++++ b/core/fpdfapi/page/cpdf_sampledfunc.cpp
+@@ -17,7 +17,7 @@
+ #include "core/fxcrt/compiler_specific.h"
+ #include "core/fxcrt/fx_memory_wrappers.h"
+ #include "core/fxcrt/fx_safe_types.h"
+-#include "third_party/abseil-cpp/absl/container/inlined_vector.h"
++#include "absl/container/inlined_vector.h"
+ 
+ namespace {
