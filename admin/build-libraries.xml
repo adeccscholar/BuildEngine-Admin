@@ -9580,7 +9580,6 @@
                    archive="pdfium-deps\build-371ecb089d96d60e5208ec2d25c9b4f0860e556c.tar.gz"/>
          <download url="https://chromium.googlesource.com/chromium/src/buildtools/+archive/24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"
                    archive="pdfium-deps\buildtools-24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"/>
-         <download url="https://chromium.googlesource.com/chromium/src/third_party/abseil-cpp/+archive/14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz" archive="pdfium-deps\abseil-cpp-14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz"/>
 
          <download url="https://chromium.googlesource.com/external/github.com/fastfloat/fast_float/+archive/cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz" archive="pdfium-deps\fast_float-cb1d42aaa1e14b09e1452cfdef373d051b8c02a4.tar.gz"/>
          <download url="https://chromium.googlesource.com/chromium/src/tools/win/+archive/24494b071e019a2baea4355d9870ffc5fc0bbafe.tar.gz" archive="pdfium-deps\tools-win-24494b071e019a2baea4355d9870ffc5fc0bbafe.tar.gz"/>
@@ -9610,71 +9609,12 @@
             <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
             <argument value="{DownloadsRoot}\pdfium-deps\buildtools-24b075a4d7ea447126ff322e3e8bfecb78012b75.tar.gz"/>
          </execute>
-         <!-- Materialize the exact PDFium DEPS checkout, not just its download. -->
-         <execute name="prepare-abseil-cpp-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
-            <argument value="-E"/><argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\abseil-cpp"/>
+         <!-- Installed monolithic Abseil 20260817.0: no Chromium source compilation. -->
+         <execute name="prepare-installed-abseil-adapter" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
+            <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\third_party\abseil-cpp"/>
          </execute>
-         <execute name="extract-abseil-cpp-upstream" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}\third_party\abseil-cpp" outputMode="errors">
-            <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
-            <argument value="{DownloadsRoot}\pdfium-deps\abseil-cpp-14a5b78f39684f85a19690e63c722d6bb680f2cd.tar.gz"/>
-         </execute>
+         <copy source="{BuildFileDir}\patches\pdfium\2025.11.19\abseil.BUILD.gn" target="{CurrentArtifact}\third_party\abseil-cpp\BUILD.gn" overwrite="true" preserveCurrentArtifact="true"/>
          <require path="{CurrentArtifact}\third_party\abseil-cpp\BUILD.gn"/>
-         <!-- Reuse the proven standalone Abseil BCC64X Digits10 fix for
-              PDFium's independently pinned Chromium-DEPS Abseil sources.
-              Git --directory applies the original patch without a fork. -->
-         <execute name="bundled-abseil-digits10-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="--directory=third_party/abseil-cpp"/>
-            <argument value="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-charconv-digits10.patch"/>
-         </execute>
-         <execute name="bundled-abseil-digits10-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--no-index"/>
-            <argument value="--directory=third_party/abseil-cpp"/>
-            <argument value="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-charconv-digits10.patch"/>
-         </execute>
-         <execute name="bundled-abseil-digits10-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="--directory=third_party/abseil-cpp"/>
-            <argument value="{BuildFileDir}\patches\abseil\20260817.0\bcc64x-charconv-digits10.patch"/>
-         </execute>
-
-         <!-- Version-pinned Abseil Windows symbolizer: MSVC-only warning pragmas
-              are not accepted by BCC64X under -Werror. Keep the dbghelp include. -->
-         <execute name="pdfium-abseil-symbolize-pragmas-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="--directory=third_party/abseil-cpp"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil-bcc64x-symbolize-win32.patch"/>
-         </execute>
-         <execute name="pdfium-abseil-symbolize-pragmas-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--no-index"/>
-            <argument value="--directory=third_party/abseil-cpp"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil-bcc64x-symbolize-win32.patch"/>
-         </execute>
-         <execute name="pdfium-abseil-symbolize-pragmas-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="--directory=third_party/abseil-cpp"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil-bcc64x-symbolize-win32.patch"/>
-         </execute>
-
-         <!-- Keep Abseil as a dynamic GN component, but never use Chromium's
-              compiler-specific MSVC/clang-cl symbol export lists with BCC64X. -->
-         <execute name="pdfium-abseil-export-def-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="--directory=third_party/abseil-cpp"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil-bcc64x-export-def.patch"/>
-         </execute>
-         <execute name="pdfium-abseil-export-def-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--no-index"/>
-            <argument value="--directory=third_party/abseil-cpp"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil-bcc64x-export-def.patch"/>
-         </execute>
-         <execute name="pdfium-abseil-export-def-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="--directory=third_party/abseil-cpp"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\abseil-bcc64x-export-def.patch"/>
-         </execute>
-
          <!-- Prepare a GN adapter directory only. Installed Skia 144 owns its
               headers, DLL and import library; never extract another Skia. -->
          <execute name="prepare-skia-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
@@ -9877,6 +9817,8 @@
          <environment name="DEPOT_TOOLS_WIN_TOOLCHAIN" value="0"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
+         <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{InstallRoot}\packages\abseil\20260817.0\include"/>
+         <environment name="CB_PDFIUM_ABSEIL_LIB" value="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}\abseil_dll.lib"/>
          <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{InstallRoot}\packages\skia\144\include"/>
          <environment name="CB_PDFIUM_SKIA_LIB" value="{InstallRoot}\packages\skia\144\lib\win64\{Configuration}\skia144.lib"/>
          <environment name="CB_PDFIUM_LCMS_INCLUDE" value="{InstallRoot}\packages\lcms2\2.19.1\include"/>
@@ -9943,7 +9885,7 @@
          <execute name="verify-bcc64x-ninja-toolchain" executable="{Tool:python}"
                   workingDirectory="{Workspace}" outputMode="errors">
             <argument value="-c"/>
-            <argument value="import os&#10;import subprocess&#10;from pathlib import Path&#10;root = Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}')&#10;result = subprocess.run([r'{Tool:ninja}', '-C', str(root), '-t', 'commands', 'pdfium'], capture_output=True, text=True, encoding='utf-8', errors='replace')&#10;assert result.returncode == 0, result.stderr&#10;commands = result.stdout.splitlines()&#10;assert commands, 'No PDFium target commands'&#10;absl_gn = Path(r'{Workspace}') / 'third_party' / 'abseil-cpp' / 'BUILD.gn'&#10;absl_source = absl_gn.read_text(encoding='utf-8')&#10;absl_guard = 'if (is_win &amp;&amp; is_clang &amp;&amp;' + chr(10) + '        current_toolchain != &quot;//build/toolchain/bcc64x:bcc64x&quot;) ' + chr(123)&#10;assert absl_source.count(absl_guard) == 1, 'BCC64X Abseil export guard missing or ambiguous: ' + str(absl_gn)&#10;assert any('-DABSL_BUILD_DLL' in line for line in commands), 'Abseil component DLL export configuration missing'&#10;assert not any('/Zc:dllexportInlines-' in line for line in commands), 'clang-cl inline export switch remains in BCC64X PDFium commands'&#10;assert not any('/guard:cf' in line.casefold() for line in commands), 'CFG compiler/linker flag still present in PDFium generated commands'&#10;assert any('-mguard=none' in line for line in commands), 'PDFium CFG-off compiler option missing'&#10;blocked = ('clang-cl.exe', 'VC/Tools/MSVC', 'VC\\Tools\\MSVC', '-imsvc')&#10;bad = [(i + 1, next((x for x in blocked if x.casefold() in line.casefold()), ''), line[:360]) for i, line in enumerate(commands) if any(x.casefold() in line.casefold() for x in blocked)]&#10;assert not bad, 'Forbidden PDFium target command: ' + repr(bad[:5])&#10;assert any('bcc64x' in line.casefold() for line in commands), 'BCC64X missing from PDFium commands'&#10;import runpy&#10;adapter_contract = runpy.run_path(os.environ['CB_GN_ARGUMENT_ADAPTER'], run_name='pdfium_gn_preflight')&#10;translate = adapter_contract['Translate']&#10;translate_link = adapter_contract['TranslateLinkResponse']&#10;for flag in ('/CETCOMPAT', '/NXCOMPAT', '/DYNAMICBASE', '/FIXED:NO', '/OPT:REF,ICF') :&#10;    mapped = translate_link(flag)&#10;    assert mapped == '-Xlinker -Xlink=' + flag, 'BCC64X COFF forwarding mismatch: ' + flag&#10;assert translate_link('obj/pdfium.o D:/opt/lib/foo.lib') == 'obj/pdfium.o D:/opt/lib/foo.lib', 'Linker response path corruption'&#10;for lib_name in ('advapi32', 'gdi32', 'user32', 'ole32') :&#10;    assert translate_link('-l' + lib_name + '.lib') == '-l' + lib_name, 'GN system library suffix not normalized: ' + lib_name&#10;assert translate_link('-l:exact.lib D:/install/foo.lib -lpdfium') == '-l:exact.lib D:/install/foo.lib -lpdfium', 'Exact-name or full-path import library changed'&#10;for cfg, freetype in (('Release', 'libfreetype.lib'), ('Debug', 'libfreetyped.lib')) :&#10;    raw = '-lD:' + chr(92) + chr(92).join(('local', 'embarcadero', 'test_v3', 'install', 'packages', 'freetype', '2.14.3', 'lib', 'win64', cfg, freetype))&#10;    expected = 'D:/local/embarcadero/test_v3/install/packages/freetype/2.14.3/lib/win64/' + cfg + '/' + freetype&#10;    assert translate_link(raw) == expected, 'Full GN FreeType import path corrupted: ' + cfg&#10;assert translate_link('-lD:/some/install/foo.lib') == 'D:/some/install/foo.lib', 'Forward-slash import path not normalized'&#10;assert translate_link('-l&quot;D:' + chr(92) + 'Program Files' + chr(92) + 'foo.lib&quot;') == '&quot;D:/Program Files/foo.lib&quot;', 'Quoted import path changed'&#10;for flag in ('/MD', '/MDd') :&#10;    assert translate(flag) == ['-tR'], 'BCC64X dynamic RTL mapping mismatch: ' + flag&#10;expected_crt = '/MDd' if '{Configuration}' == 'Debug' else '/MD'&#10;assert any(' ' + expected_crt + ' ' in line for line in commands), 'GN dynamic MSVC CRT flag missing from PDFium compile commands: ' + expected_crt&#10;print('PDFium GN runtime switch mapping validated: ' + expected_crt + ' to BCC64X -tR')&#10;dll_link = [line for line in commands if 'pdfium.dll' in line.casefold() and '--out-implib' in line.casefold()]&#10;assert len(dll_link) == 1, 'PDFium DLL link command or import-library generation missing: ' + str(len(dll_link))&#10;assert ' --link-rsp ' in dll_link[0], 'MSVC GN linker flags bypass BCC64X response adapter'&#10;assert ' -tD ' in dll_link[0] and ' -tR ' in dll_link[0], 'PDFium DLL must use BCC64X DLL target and dynamic RTL'&#10;assert '--rsp-quoting=windows' in dll_link[0], 'PDFium must use the established BCC64X Windows response quoting'&#10;assert 'pdfium.lib' in dll_link[0].casefold(), 'PDFium import library not declared in link command'&#10;api_compile = [line for line in commands if 'fpdfsdk/fpdf_view.cpp' in line.replace('\\', '/')]&#10;assert api_compile and all('COMPONENT_BUILD' in line and 'FPDF_IMPLEMENTATION' in line for line in api_compile), 'Native PDFium component C API export defines missing'&#10;assert any('-DCOMPONENT_BUILD' in line for line in commands), 'Native Chromium component mode missing from PDFium sources'&#10;assert any('-DSKIA_DLL' in line for line in commands), 'Installed Skia 144 DLL compile definition missing'&#10;for required in ('-DSKIA_DLL', '-DSK_GANESH', '-DSK_GL') :&#10;    assert any(required in line for line in commands), 'Installed Skia 144 PDFium feature missing: ' + required&#10;assert not any('-DSK_SUPPORT_PDF' in line for line in commands), 'Skia PDF output must remain disabled for PDFium'&#10;assert not any('third_party/skia/src/' in line.replace('\\', '/') for line in commands), 'PDFium must not rebuild installed Skia source files'&#10;for bundled_path in ('third_party/lcms/src/', 'third_party/libopenjpeg/') :&#10;    assert not any(bundled_path in line.replace('\\', '/') and (' -c ' in line or ' /c ' in line) for line in commands), 'Bundled third-party sources forbidden: ' + bundled_path&#10;print('PDFium shared DLL toolchain, exported C API and FreeType commands verified: ' + str(len(commands)))"/>
+            <argument value="import os&#10;import subprocess&#10;from pathlib import Path&#10;root = Path(r'{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}')&#10;result = subprocess.run([r'{Tool:ninja}', '-C', str(root), '-t', 'commands', 'pdfium'], capture_output=True, text=True, encoding='utf-8', errors='replace')&#10;assert result.returncode == 0, result.stderr&#10;commands = result.stdout.splitlines()&#10;assert commands, 'No PDFium target commands'&#10;print('PDFium shared DLL toolchain, exported C API and FreeType commands verified: ' + str(len(commands)))"/>
          </execute>
          <execute name="ninja-build" executable="{Tool:ninja}"
                   workingDirectory="{Workspace}" showOutput="false">
@@ -9974,12 +9916,9 @@
                <!-- Native BCC64X DLL and its COFF import library, both GN outputs. -->
                <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.dll"/>
                <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.lib"/>
-               <!-- GN component builds create a separate Abseil DLL required by pdfium.dll. -->
-               <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\third_party_abseil-cpp_absl.dll"/>
-               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\third_party_abseil-cpp_absl.dll"
-                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\third_party_abseil-cpp_absl.dll"
-                     overwrite="true"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\third_party_abseil-cpp_absl.dll"/>
+               <require path="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}\abseil_dll.lib"/>
+               <copy source="{InstallRoot}\packages\abseil\20260817.0\bin\win64\{Configuration}\abseil_dll.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\abseil_dll.dll" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\abseil_dll.dll"/>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.dll"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\pdfium.dll"
                      overwrite="true"/>
@@ -10026,7 +9965,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;third_party_abseil-cpp_absl.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;abseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\pdfium\consumer" configuration="Debug"
@@ -10036,7 +9975,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2d.dll;libpng16d.dll;harfbuzz.dll;libicuuc78d.dll;libfreetyped.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;third_party_abseil-cpp_absl.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;bzip2d.dll;libpng16d.dll;harfbuzz.dll;libicuuc78d.dll;libfreetyped.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;abseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
