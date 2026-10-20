@@ -2345,6 +2345,7 @@
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
          <argument value="-G"/>
@@ -3527,6 +3528,7 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="{Workspace}"/>
             <argument value="--backend=ninja"/>
+            <argument value="--native-file={BuildFileDir}\patches\libpq\18.6\bcc64x-native.ini"/>
             <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--bindir=bin"/>
             <argument value="--libdir=lib"/>
