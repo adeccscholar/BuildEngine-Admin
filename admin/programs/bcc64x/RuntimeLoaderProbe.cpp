@@ -412,24 +412,24 @@ void ReportDependencyTree(std::wstring const& strRoot, std::wstring const& strAp
          }
          std::wstring strCandidate = strAppDir + strName;
          DWORD uAttributes = ::GetFileAttributesW(strCandidate.c_str());
-         wchar_t szResolved[32768] {};
+         std::vector<wchar_t> szResolved(32768U);
          wchar_t const* szKind = L"app-local";
          if(uAttributes == INVALID_FILE_ATTRIBUTES ||
             (uAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0U) {
             HMODULE const hLoaded = ::GetModuleHandleW(strName.c_str());
             DWORD const uLength = hLoaded
-               ? ::GetModuleFileNameW(hLoaded, szResolved, static_cast<DWORD>(std::size(szResolved))) : 0U;
-            if(uLength > 0U && uLength < std::size(szResolved)) {
-               strCandidate.assign(szResolved, uLength);
+               ? ::GetModuleFileNameW(hLoaded, szResolved.data(), static_cast<DWORD>(szResolved.size())) : 0U;
+            if(uLength > 0U && uLength < szResolved.size()) {
+               strCandidate.assign(szResolved.data(), uLength);
                szKind = L"already-loaded";
             }
             else {
-               wchar_t szSystem[32768] {};
+               std::vector<wchar_t> szSystem(32768U);
                unsigned const uSystemLen = ::GetSystemDirectoryW(
-                  szSystem, static_cast<unsigned>(std::size(szSystem)));
+                  szSystem.data(), static_cast<unsigned>(szSystem.size()));
                bool bFound = false;
-               if(uSystemLen > 0U && uSystemLen < std::size(szSystem)) {
-                  strCandidate = std::wstring(szSystem) + L"\\" + strName;
+               if(uSystemLen > 0U && uSystemLen < szSystem.size()) {
+                  strCandidate = std::wstring(szSystem.data()) + L"\\" + strName;
                   uAttributes = ::GetFileAttributesW(strCandidate.c_str());
                   bFound = uAttributes != INVALID_FILE_ATTRIBUTES &&
                      (uAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0U;
@@ -448,7 +448,7 @@ void ReportDependencyTree(std::wstring const& strRoot, std::wstring const& strAp
          Visit(strCandidate, uDepth + 1U);
       }
    };
-   std::wprintf(L"[LOADER] TREE BEGIN root=%ls (static imports, no DLL execution)\n", strRoot.c_str());
+   std::wprintf(L"[LOADER] TREE BEGIN root=%ls (PE import directory traversal, no DLL loading or initialization)\n", strRoot.c_str());
    Visit(strRoot, 0U);
    std::wprintf(L"[LOADER] TREE SUMMARY nodes=%u invalid=%u unresolved=%u\n",
       uNodes, uInvalid, uMissing);
