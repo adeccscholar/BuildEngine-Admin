@@ -9892,15 +9892,9 @@
          <!-- Validate the GENERATED build, not merely the requested GN args. -->
          <!-- Inspect commands reachable from the PDFium target, not all
               unrelated Chromium host-toolchain rules. -->
-         <!-- Inspect effective GN target libraries. GN stores link inputs in Ninja
-              response-file content, not in 'ninja -t commands' output. The final
-              binary's actual import table is checked separately during install. -->
-         <execute name="show-external-abseil-link-libraries" executable="{Tool:gn}" workingDirectory="{Workspace}" showOutput="true">
-            <argument value="desc"/>
-            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <argument value="//:pdfium"/>
-            <argument value="libs"/>
-         </execute>
+         <!-- GN gen already validates GN target resolution; do not run gn desc
+              again without the gn-gen script execution context. The install
+              gate verifies the resulting DLL imports after Ninja links it. -->
          <execute name="ninja-build" executable="{Tool:ninja}"
                   workingDirectory="{Workspace}" showOutput="false">
             <argument value="-C"/>
