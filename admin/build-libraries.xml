@@ -9725,18 +9725,14 @@
 <require path="{CurrentArtifact}\\third_party\\icu\\BUILD.gn"/>
 <!-- Pinned PDFium revision a84323421e94f484faca52dd9d027934eba42ab8
               commit timestamp, used as reproducible standalone build timestamp. -->
-         <execute name="generate-pdfium-build-timestamp" executable="{Tool:python}"
-                  workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="-c"/>
-            <argument value="from pathlib import Path; p=Path('build/util/LASTCHANGE.committime'); p.parent.mkdir(parents=True, exist_ok=True); p.write_text(str(1763561859), encoding='ascii'); print('PDFium pinned build timestamp: 1763561859')"/>
-         </execute>
+         <copy source="{BuildFileDir}\patches\pdfium\2025.11.19\LASTCHANGE.committime"
+               target="{CurrentArtifact}\build\util\LASTCHANGE.committime"
+               overwrite="true" preserveCurrentArtifact="true"/>
          <require path="{CurrentArtifact}\\build\\util\\LASTCHANGE.committime"/>
          <!-- gclient_args.gni is generated deterministically instead of running gclient. -->
-         <execute name="generate-offline-gclient-args" executable="{Tool:python}"
-                  workingDirectory="{CurrentArtifact}" outputMode="errors">
-            <argument value="-c"/>
-            <argument value="from pathlib import Path; p=Path('build/config/gclient_args.gni'); p.parent.mkdir(parents=True,exist_ok=True); p.write_text('checkout_android = false\ncheckout_skia = true\n', encoding='utf-8')"/>
-         </execute>
+         <copy source="{BuildFileDir}\patches\pdfium\2025.11.19\gclient_args.gni"
+               target="{CurrentArtifact}\build\config\gclient_args.gni"
+               overwrite="true" preserveCurrentArtifact="true"/>
          <!-- Fail during Source rather than reporting success before the GN
               imports from this pinned Chromium revision have been provided.
               All inputs are local. This check never downloads or updates. -->
@@ -9898,10 +9894,14 @@
          <environment name="CB_PDFIUM_JPEG_LIB" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\{Configuration}\{PdfiumJpegImport}.lib"/>
 
          <!-- Verify the GN inputs installed by the single Source scope, read-only. -->
-         <execute name="verify-pdfium-gn-adapters" executable="{Tool:python}" workingDirectory="{Workspace}" outputMode="errors">
-            <argument value="-c"/>
-            <argument value="from pathlib import Path; files=['third_party/icu/BUILD.gn','third_party/libjpeg_turbo/BUILD.gn','third_party/zlib/BUILD.gn','third_party/libpng/BUILD.gn','third_party/abseil-cpp/BUILD.gn','skia/BUILD.gn','tools/win/DebugVisualizers/BUILD.gn']; missing=[f for f in files if not Path(f).is_file()]; print('GN ADAPTERS MISSING: '+', '.join(missing) if missing else 'GN ADAPTERS: PRESENT'); assert not missing"/>
-         </execute>
+         <!-- Declarative GN-adapter preconditions: no Python inspection script. -->
+         <require path="{Workspace}\third_party\icu\BUILD.gn"/>
+         <require path="{Workspace}\third_party\libjpeg_turbo\BUILD.gn"/>
+         <require path="{Workspace}\third_party\zlib\BUILD.gn"/>
+         <require path="{Workspace}\third_party\libpng\BUILD.gn"/>
+         <require path="{Workspace}\third_party\abseil-cpp\BUILD.gn"/>
+         <require path="{Workspace}\skia\BUILD.gn"/>
+         <require path="{Workspace}\tools\win\DebugVisualizers\BUILD.gn"/>
          <!-- Diagnostic CFG-off: disable Chromium compiler/linker CFG at GN origin, PDFium only. -->
          <execute name="disable-pdfium-chromium-cfg" executable="{Tool:python}" workingDirectory="{Workspace}" outputMode="errors">
             <argument value="-c"/>
