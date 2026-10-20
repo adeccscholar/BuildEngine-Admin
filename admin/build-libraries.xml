@@ -3488,6 +3488,16 @@
          <copy source="{BuildFileDir}\programs\libpq\bcc64x-winsock-compat.c"
                target="{CurrentArtifact}\src\interfaces\libpq\bcc64x-winsock-compat.c"
                overwrite="true"/>
+         <!-- Pinned PostgreSQL 18.6 BCC64X ABI and glob declaration corrections. -->
+         <copy source="{BuildFileDir}\patches\libpq\18.6\bcc64x-setjmp-glob.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-setjmp-glob.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="setjmp-glob-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-setjmp-glob.patch"/>
+         </execute>
+         <execute name="setjmp-glob-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-setjmp-glob.patch"/>
+         </execute>
          <!-- Reuse the proven generic Meson bootstrap already used by the native BCC64X Mesa build. -->
          <copy source="{BuildFileDir}\programs\meson\bcc64x_bootstrap.py"
                target="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"
