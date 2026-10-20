@@ -9973,6 +9973,12 @@
                <!-- Native BCC64X DLL and its COFF import library, both GN outputs. -->
                <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.dll"/>
                <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.lib"/>
+               <!-- GN component builds create a separate Abseil DLL required by pdfium.dll. -->
+               <require path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\third_party_abseil-cpp_absl.dll"/>
+               <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\third_party_abseil-cpp_absl.dll"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\third_party_abseil-cpp_absl.dll"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\third_party_abseil-cpp_absl.dll"/>
                <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\pdfium.dll"
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\pdfium.dll"
                      overwrite="true"/>
