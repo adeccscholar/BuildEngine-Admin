@@ -1,0 +1,29 @@
+diff --git a/src/common/exec.c b/src/common/exec.c
+--- a/src/common/exec.c
++++ b/src/common/exec.c
+@@ -46,7 +46,8 @@
+ 
+ /* Inhibit mingw CRT's auto-globbing of command line arguments */
+ #if defined(WIN32) && !defined(_MSC_VER)
+-extern int	_CRT_glob = 0;		/* 0 turns off globbing; 1 turns it on */
++extern int	_CRT_glob;
++int		_CRT_glob = 0;		/* 0 turns off globbing; 1 turns it on */
+ #endif
+ 
+ /*
+diff --git a/src/include/c.h b/src/include/c.h
+--- a/src/include/c.h
++++ b/src/include/c.h
+@@ -1346,7 +1346,11 @@
+  */
+ #ifdef WIN32
+ #ifdef __MINGW64__
+-typedef intptr_t sigjmp_buf[5];
++#if defined(__clang__) && defined(__BORLANDC__)
++typedef void *sigjmp_buf[5];	/* BCC64X builtin expects void ** */
++#else
++typedef intptr_t sigjmp_buf[5];
++#endif
+ #define sigsetjmp(x,y) __builtin_setjmp(x)
+ #define siglongjmp __builtin_longjmp
+ #else							/* !__MINGW64__ */
