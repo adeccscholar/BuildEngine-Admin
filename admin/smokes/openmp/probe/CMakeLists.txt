@@ -14,3 +14,5 @@ set_property(TARGET openmp-probe PROPERTY CXX_SCAN_FOR_MODULES OFF)
 target_compile_features(openmp-probe PRIVATE cxx_std_23)
 target_compile_options(openmp-probe PRIVATE -fopenmp)
 target_link_options(openmp-probe PRIVATE -fopenmp)
+
+install(TARGETS openmp-probe RUNTIME DESTINATION bin/win64/Release)
