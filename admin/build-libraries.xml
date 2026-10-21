@@ -10245,7 +10245,7 @@
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
-   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T17:20:00Z">
+   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T17:45:00Z">
       <metadata name="Intel oneTBB" supplier="UXL Foundation" homepage="https://github.com/uxlfoundation/oneTBB"
          description="Task-based C++ parallelism runtime, parallel algorithms and flow graphs." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
@@ -10295,6 +10295,22 @@
          <execute name="clang-exports-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-exports.patch"/>
+         </execute>
+         <!-- Exclude only the non-portable std::terminate/longjmp subcase; keep all other upstream tests. -->
+         <copy source="{BuildFileDir}\patches\onetbb\2023.1.0\bcc64x-terminate-conformance.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-terminate-conformance.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="terminate-conformance-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-terminate-conformance.patch"/>
+         </execute>
+         <execute name="terminate-conformance-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-terminate-conformance.patch"/>
+         </execute>
+         <execute name="terminate-conformance-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-terminate-conformance.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="true">
@@ -10371,6 +10387,15 @@
          <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ENV:PATH}"/>
          <argument value="-DTBB_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\TBB"/>
       </smoke>
-   </library>
+         <smoke id="terminate" scope="package" source="smokes\onetbb\terminate" configuration="Release"
+         cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="onetbb-terminate-smoke.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-DTBB_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\TBB"/>
+      </smoke>
+</library>
 
 </buildLibraries>
