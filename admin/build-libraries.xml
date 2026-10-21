@@ -10245,4 +10245,93 @@
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
+   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T13:19:00Z">
+      <metadata name="Intel oneTBB" supplier="UXL Foundation" homepage="https://github.com/uxlfoundation/oneTBB"
+         description="Task-based C++ parallelism runtime, parallel algorithms and flow graphs." licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/uxlfoundation/oneTBB.git" ref="v2023.1.0"
+            commit="3046c8b0c29df995980003ea24f4d78c80ec0c8d"/>
+      </security>
+      <source>
+         <download
+            url="https://github.com/uxlfoundation/oneTBB/archive/3046c8b0c29df995980003ea24f4d78c80ec0c8d.zip"
+            archive="onetbb-3046c8b0c29df995980003ea24f4d78c80ec0c8d.zip"/>
+         <extract format="zip" root="oneTBB-3046c8b0c29df995980003ea24f4d78c80ec0c8d">
+            <require path="CMakeLists.txt"/>
+            <require path="include\oneapi\tbb\parallel_for.h"/>
+            <require path="include\oneapi\tbb\flow_graph.h"/>
+            <require path="LICENSE.txt"/>
+         </extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DTBB_BUILD:BOOL=ON"/>
+         <argument value="-DTBBMALLOC_BUILD:BOOL=OFF"/>
+         <argument value="-DTBBMALLOC_PROXY_BUILD:BOOL=OFF"/>
+         <argument value="-DTBB_TEST:BOOL=OFF"/>
+         <argument value="-DTBB_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DTBB4PY_BUILD:BOOL=OFF"/>
+         <argument value="-DTBB_STRICT:BOOL=OFF"/>
+         <argument value="-DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH:BOOL=ON"/>
+         <argument value="-DTBB_ENABLE_IPO:BOOL=OFF"/>
+         <argument value="-DTBB_INSTALL:BOOL=ON"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}"
+                  build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\oneapi\tbb\parallel_for.h"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.txt"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\onetbb\consumer" configuration="Release"
+         cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="onetbb-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-DTBB_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\TBB"/>
+      </smoke>
+   </library>
+
 </buildLibraries>
