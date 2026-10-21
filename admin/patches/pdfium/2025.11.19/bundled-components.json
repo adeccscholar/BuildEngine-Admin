@@ -5,7 +5,7 @@
     "version": "a84323421e94f484faca52dd9d027934eba42ab8",
     "versionScheme": "git"
   },
-  "purpose": "BuildEngine PDFium binary/runtime composition: listed installed BuildEngine libraries are external dependencies; only sources actually compiled inside PDFium are bundled components. DLL names are declared identities, not independent component coordinates.",
+  "purpose": "PDFium built with version-pinned external BuildEngine library dependencies; fast_float and Abseil are external components, not bundled Chromium source.",
   "externalBuildEngineDependencies": [
     {
       "name": "Abseil",
@@ -52,14 +52,13 @@
       "name": "openjpeg",
       "version": "2.5.4",
       "libraryId": "openjpeg"
-    }
-  ],
-  "bundledComponents": [
+    },
     {
       "name": "fast_float",
-      "version": "cb1d42aaa1e14b09e1452cfdef373d051b8c02a4",
-      "versionScheme": "git",
-      "repository": "https://chromium.googlesource.com/external/github.com/fastfloat/fast_float"
+      "libraryId": "fast_float",
+      "version": "8.2.3",
+      "headerOnly": true
     }
-  ]
+  ],
+  "bundledComponents": []
 }

@@ -1,0 +1,10 @@
+# BuildEngine PDFium 2025.11.19 -> installed fast_float 8.2.3, header-only.
+# Retain //third_party/fast_float as the exact upstream GN dependency.
+_fast_float_include = getenv("CB_PDFIUM_FAST_FLOAT_INCLUDE")
+assert(_fast_float_include != "", "Installed BuildEngine fast_float include root required")
+config("fast_float_config") {
+  include_dirs = [ _fast_float_include ]
+}
+group("fast_float") {
+  public_configs = [ ":fast_float_config" ]
+}

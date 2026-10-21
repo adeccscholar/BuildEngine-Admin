@@ -3,6 +3,44 @@
 > **Shared translation inventory:** [General BCC64X/GN translation rules](../../../../server-docs/translation-rules.md) records the implemented compiler flags, linker response rewriting, library-specific GN/Skia decisions, and verification limits. This migration records package-specific evidence rather than duplicating the generic adapter table.
 
 [TOC|Content]
+## 21 October 2026: switch PDFium to installed fast_float 8.2.3
+
+The pinned PDFium revision previously downloaded fast_float from Chromium's
+DEPS (`cb1d42aaa1e14b09e1452cfdef373d051b8c02a4`), extracted it into
+`third_party/fast_float/src`, and included the vendored header by its
+hard-coded path in two FXCRT source files. It is now an explicit direct
+BuildEngine dependency on **`fast_float@8.2.3`**.
+
+The source FSM no longer downloads or extracts the Chromium fast_float
+archive. It removes only the exact obsolete PDFium-local
+`third_party/fast_float/src` directory, writes the versioned
+`fast_float.BUILD.gn` adapter retaining `//third_party/fast_float:fast_float`,
+and applies `fast-float-installed-includes.patch` to
+`core/fxcrt/fx_extension.cpp` and `core/fxcrt/fx_string.cpp`.
+The source patch is checked before and after application; a resumed Build
+state verifies it read-only. The GN adapter consumes
+`CB_PDFIUM_FAST_FLOAT_INCLUDE`, resolved to
+`install/packages/fast_float/8.2.3/include`, and compiles no fast_float
+implementation (header-only).
+
+The installed `sbom/bundled-components.json` now lists fast_float
+among **externalBuildEngineDependencies** and contains **no bundled
+components**. The CycloneDX dependency graph must therefore contain the
+direct `fast_float@8.2.3` edge without a duplicate bundled entry.
+Expected declarative PDFium dependency count changes from 9 to 10
+(direct), and from 13 to 14 including transitive dependencies; the
+overall component count should remain 15 including PDFium.
+
+This is a source-level dependency version update and intentionally changes
+PDFium's library timestamp to `2026-10-21T21:00:00Z` to invalidate its
+Source/Build/Install/Metadata and consumer-smoke evidence. It **requires**
+new native BCC64X Debug and Release builds; it does not merely rerun metadata.
+The existing subsystem, Skia 144, Abseil DLL and GN linker parameters were
+not altered. **Native compile/ABI and numeric parsing behavior have not yet
+been verified**; inspect boundary cases in `fast_float::from_chars` (including
+`allow_leading_plus`), loader smokes and the regenerated CycloneDX.
+
+
 
 ## 21 October 2026: retire Chromium Abseil DLL, synchronize SBOM
 

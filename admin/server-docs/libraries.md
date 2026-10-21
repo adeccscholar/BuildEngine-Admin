@@ -153,6 +153,16 @@ The exact configurations and scope flags follow the live XML.
 | `agg` | `2.6` | 🟡 | graphics | AGG core rasterization without GPC | — | R/pkg | [Migration](/package/agg/2.6/migration) |
 | `pdfium` | `2025.11.19` | 🟡 | documentation | Pinned PDFium GN/BCC64X integration; validation pending | abseil 20260817.0, skia 144, zlib 1.3.2, libjpeg-turbo 3.2.0, libpng 1.6.58, freetype 2.14.3, icu 78.3, lcms2 2.19.1, openjpeg 2.5.4 | R/pkg, D/pkg | [Migration](/package/pdfium/2025.11.19/migration) |
 
+## Current PDFium fast_float externalization
+
+PDFium 2025.11.19 now declares **10 direct XML dependencies** including
+`fast_float@8.2.3` (header-only). The Chromium-DEPS copy is removed, the
+pinned PDFium FXCRT include sites use the installed header, and
+`bundled-components.json` now declares zero bundled components.
+The changed PDFium timestamp forces a native recompilation. Earlier
+Release/Debug loader smoke PASS results describe the previous PDFium
+binary and **do not establish success after this migration**.
+
 ## Build and acceptance evidence (not the inventory)
 
 **Known native results reported for the recent PDFium consumer sequence:**

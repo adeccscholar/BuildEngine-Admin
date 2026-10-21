@@ -104,7 +104,7 @@ bereits extern installierten Bibliothek als gebündelt ausweisen.
 Die alte Chromium-Komponente `third_party_abseil-cpp_absl.dll`
 gehört **nicht** zur Auslieferung und darf nicht zusätzlich als
 `pdfium:bundled:Abseil` in der CycloneDX-SBOM erscheinen.
-Die aktuell gebündelte `fast_float`-Quelle bleibt davon unberührt.
+Die aktuell gebündelte `fast_float`-Quelle wird durch die neue PDFium-Migration ebenfalls aus dem Bundle entfernt und stattdessen als externes `fast_float@8.2.3` aus dem BuildEngine-Paket bezogen.
 
 Das Manifest wird bei der Installation in das Paket kopiert und bei der
 anschließenden Metadata-FSM ausgewertet. Eine bereits installierte,

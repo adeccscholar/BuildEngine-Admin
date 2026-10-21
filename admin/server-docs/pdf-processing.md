@@ -4,6 +4,18 @@
 
 **Status:** PDF/XML/PDFium integration snapshot reviewed **21 October 2026**. Poppler 26.09.0, win-iconv 0.0.8, libxml2 2.15.3, QPDF 12.4.1 and PoDoFo 1.1.1 are declared in the Schema-16 BuildEngine stack. Poppler and win-iconv have target-machine package evidence. PoDoFo reached build/test/install/metadata/publish/doxygen PASS before the final BCC64X runtime-policy correction; the dynamic-runtime rerun and installed XMP DLL smoke are its remaining final evidence gate.
 
+## PDFium 2025.11.19 / fast_float source migration
+
+The latest version-pinned PDFium integration now consumes installed,
+header-only `fast_float@8.2.3` as a direct BuildEngine dependency.
+Neither the old Chromium-DEPS fast_float archive nor its
+`third_party/fast_float/src` headers are used. A GN adapter and two
+checked include patches keep PDFium's upstream target name while selecting
+installed headers. PDFium's source timestamp has changed: existing loader
+PASS evidence predates this modification and the new native Debug/Release
+build and consumer tests are **pending**. PDFium's SBOM now has zero
+declared bundled components (fast_float and Abseil are external).
+
 ## PDFium rendering and application proofs (October 2026)
 
 The Schema-17 catalog includes `pdfium@2025.11.19` in addition to QPDF, PoDoFo, Poppler and libxml2. PDFium renders and inspects page content; QPDF and PoDoFo retain their distinct roles in structural rewriting and higher-level C++ editing. No one PDF library is assumed to replace the others automatically.
