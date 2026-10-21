@@ -71,7 +71,10 @@ if(DEFINED ENV{CB_WINDOWS_RC} AND NOT "$ENV{CB_WINDOWS_RC}" STREQUAL "")
          message(FATAL_ERROR "Registered Windows RC SDK include path missing: ${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
       endif()
    endforeach()
+   # RC cache values survive CMake reconfiguration: keep registered SDK includes authoritative.
    set(CMAKE_RC_FLAGS_INIT "/I\"${_CB_RC_INCLUDE_ROOT}/um\" /I\"${_CB_RC_INCLUDE_ROOT}/shared\"")
+   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS_INIT}"
+      CACHE STRING "BuildEngine Windows SDK RC include directories" FORCE)
    unset(_CB_RC_BIN_DIR)
    unset(_CB_RC_VERSION_DIR)
    unset(_CB_RC_VERSION)
