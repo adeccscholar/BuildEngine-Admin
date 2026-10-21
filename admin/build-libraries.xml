@@ -10245,7 +10245,7 @@
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
-   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T15:35:00Z">
+   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T15:50:00Z">
       <metadata name="Intel oneTBB" supplier="UXL Foundation" homepage="https://github.com/uxlfoundation/oneTBB"
          description="Task-based C++ parallelism runtime, parallel algorithms and flow graphs." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
@@ -10284,6 +10284,7 @@
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <argument value="-G"/>
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
