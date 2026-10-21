@@ -10297,7 +10297,7 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-exports.patch"/>
          </execute>
       </source>
-      <build>
+      <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
@@ -10340,6 +10340,11 @@
          </variant>
          <install>
             <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
                <cmake mode="install" executable="{Tool:cmake}"
                   build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\oneapi\tbb\parallel_for.h"/>
