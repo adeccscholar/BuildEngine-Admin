@@ -10245,7 +10245,7 @@
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
-   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T16:30:00Z">
+   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T17:20:00Z">
       <metadata name="Intel oneTBB" supplier="UXL Foundation" homepage="https://github.com/uxlfoundation/oneTBB"
          description="Task-based C++ parallelism runtime, parallel algorithms and flow graphs." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
@@ -10310,15 +10310,16 @@
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DTBB_BUILD:BOOL=ON"/>
-         <argument value="-DTBBMALLOC_BUILD:BOOL=OFF"/>
+         <argument value="-DTBBMALLOC_BUILD:BOOL=ON"/>
          <argument value="-DTBBMALLOC_PROXY_BUILD:BOOL=OFF"/>
-         <argument value="-DTBB_TEST:BOOL=OFF"/>
+         <argument value="-DTBB_TEST:BOOL=ON"/>
          <argument value="-DTBB_EXAMPLES:BOOL=OFF"/>
          <argument value="-DTBB4PY_BUILD:BOOL=OFF"/>
          <argument value="-DTBB_STRICT:BOOL=OFF"/>
          <argument value="-DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH:BOOL=ON"/>
          <argument value="-DTBB_ENABLE_IPO:BOOL=OFF"/>
          <argument value="-DTBB_INSTALL:BOOL=ON"/>
+         <argument value="-DTBB_FILE_TRIM:BOOL=ON"/>
          <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
