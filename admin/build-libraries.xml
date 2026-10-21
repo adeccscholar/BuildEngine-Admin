@@ -10245,7 +10245,7 @@
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
-   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T13:19:00Z">
+   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T15:35:00Z">
       <metadata name="Intel oneTBB" supplier="UXL Foundation" homepage="https://github.com/uxlfoundation/oneTBB"
          description="Task-based C++ parallelism runtime, parallel algorithms and flow graphs." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
@@ -10264,6 +10264,22 @@
             <require path="include\oneapi\tbb\flow_graph.h"/>
             <require path="LICENSE.txt"/>
          </extract>
+         <!-- BCC64X exposes __MINGW32__ but uses the Windows wide-character ITT API. -->
+         <copy source="{BuildFileDir}\patches\onetbb\2023.1.0\bcc64x-profiling-widechar.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-profiling-widechar.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="profiling-widechar-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-profiling-widechar.patch"/>
+         </execute>
+         <execute name="profiling-widechar-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-profiling-widechar.patch"/>
+         </execute>
+         <execute name="profiling-widechar-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-profiling-widechar.patch"/>
+         </execute>
       </source>
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
