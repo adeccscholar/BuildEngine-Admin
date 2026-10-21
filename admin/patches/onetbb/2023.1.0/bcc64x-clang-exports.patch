@@ -1,0 +1,17 @@
+diff --git a/cmake/compilers/Clang.cmake b/cmake/compilers/Clang.cmake
+--- a/cmake/compilers/Clang.cmake
++++ b/cmake/compilers/Clang.cmake
+@@ -25,9 +25,13 @@
+     unset(TBB_EMSCRIPTEN_STACK_SIZE)
+ endif()
+ 
+-if (MINGW)
++# BCC64X is Clang/EMBT with GNU/LLVM C++ ABI and COFF output.
++# Do not pass the MSVC-decorated win64-tbb.def to LLD; use the
++# explicit dllexport declarations in oneTBB headers instead.
++if (MINGW OR (WIN32 AND CMAKE_CXX_SIMULATE_ID STREQUAL "EMBT"))
+     set(TBB_LINK_DEF_FILE_FLAG "")
+     set(TBB_DEF_FILE_PREFIX "")
+ elseif (APPLE)
+     set(TBB_LINK_DEF_FILE_FLAG -Wl,-exported_symbols_list,)
+     set(TBB_DEF_FILE_PREFIX mac${TBB_ARCH})
