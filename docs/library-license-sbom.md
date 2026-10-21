@@ -46,6 +46,37 @@ install/packages/<LibraryId>/<LibraryVersion>/sbom.upstream.json
 
 erhalten. Die von BuildEngine erzeugte kumulierte Datei `sbom.cdx.json` bleibt davon getrennt. Ihr Dependency-Graph wird weiterhin ausschließlich aus dem tatsächlich durch BuildEngine aufgelösten Buildvertrag erzeugt. Dadurch werden optionale, Test-, Tool- oder sonstige Upstream-Abhängigkeiten einer gelieferten SBOM nicht ungeprüft als tatsächlich gebaute Abhängigkeiten übernommen.
 
+## 21 October 2026: upstream license scanner diagnosis and repair
+
+The generic BuildEngine source metadata scanner previously formed the source
+root as `WorkspaceRoot / library ID / archive extraction root`. This was
+wrong: ExtractJob **promotes** the declared archive root to
+`WorkspaceRoot / library ID / version`. The scanner therefore returned no
+evidence for many successful packages, even when verified LICENSE files were
+present. The C++ implementation now uses the same
+`library_extension::SourceRoot()` convention as the FSM, including
+shared-source extensions, and fails metadata generation with a concrete
+missing path rather than silently emitting `[not detected automatically]`.
+
+The scanner includes version-grounded recognition for the upstream FreeType
+license choice `FTL OR GPL-2.0-or-later`, with both original text files
+required; libpng's PNG Reference Library License v2 (`libpng-2.0`); and
+copyright notices where the heading precedes an isolated `(C)` line,
+as with zlib. CycloneDX emits a real `expression` entry for the
+FreeType OR choice instead of mistaking it for a simple license ID.
+Explicit XML license entries still override the detected identity, but
+matching automatic provenance/author details are retained when missing from
+the override. Unsupported/missing upstream license documents remain visible
+rather than guessed.
+
+The C++ regression source is `test/UpstreamMetadataTest.cpp`; native BCC64X
+compilation and a fresh full-catalog metadata run have **not yet been
+verified**. The metadata state generator schema changed to 6 so cached
+output is invalidated. Re-run the metadata phase and inspect
+`LICENSE-INFO.txt` and `sbom.cdx.json` for FreeType and dependencies.
+The presence of a license header/contract does not prove every bundled
+subcomponent has the same license.
+
 ## Versionierte Komponenten- und Herkunftsmanifeste
 
 Bibliotheken können unter `sbom/bundled-components.json` ein versioniertes
