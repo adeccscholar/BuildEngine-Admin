@@ -12,8 +12,8 @@
 #include <stdexcept>
 
 namespace {
-bool Check(char const* const szName, bool const bResult) {
-   std::println("SMOKE|CHECK|{}|{}", szName, bResult ? "PASS" : "FAIL");
+bool Check(char const* const szName, bool const bResult, char const* const szDetail) {
+   std::println("SMOKE|CHECK|{}|{}|{}", szName, bResult ? "PASS" : "FAIL", szDetail);
    return bResult;
 }
 }
@@ -38,14 +38,14 @@ int main() {
             return iLeft + iRight;
          }
       );
-      bSuccess = Check("parallel-reduce", iSum == (iEnd - 1) * iEnd / 2) && bSuccess;
+      bSuccess = Check("parallel-reduce", iSum == (iEnd - 1) * iEnd / 2, "parallel sum matches arithmetic series") && bSuccess;
 
       std::atomic<int> theCount { 0 };
       oneapi::tbb::task_group theGroup;
       for(int i = 0; i < 64; ++i)
          theGroup.run([&theCount] { theCount.fetch_add(1, std::memory_order_relaxed); });
       theGroup.wait();
-      bSuccess = Check("task-group", theCount.load() == 64) && bSuccess;
+      bSuccess = Check("task-group", theCount.load() == 64, "all scheduled tasks completed") && bSuccess;
 
       oneapi::tbb::flow::graph theGraph;
       std::atomic<int> theGraphSum { 0 };
@@ -59,14 +59,14 @@ int main() {
       for(int i = 1; i <= 100; ++i)
          theNode.try_put(i);
       theGraph.wait_for_all();
-      bSuccess = Check("flow-graph", theGraphSum.load() == 5050) && bSuccess;
+      bSuccess = Check("flow-graph", theGraphSum.load() == 5050, "flow graph messages processed") && bSuccess;
 
       oneapi::tbb::task_group theFailureGroup;
       theFailureGroup.run([] { throw std::runtime_error { "expected task failure" }; });
       bool bCaught = false;
       try { theFailureGroup.wait(); }
       catch(std::runtime_error const&) { bCaught = true; }
-      bSuccess = Check("exception-propagation", bCaught) && bSuccess;
+      bSuccess = Check("exception-propagation", bCaught, "worker exception reaches task_group wait") && bSuccess;
    }
    catch(std::exception const& theException) {
       std::println("SMOKE|ERROR|{}", theException.what());
