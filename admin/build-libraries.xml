@@ -1134,14 +1134,14 @@
          <variant name="Release">
             <variable name="ArchiveName" value="libarchive"/>
             <variable name="ZlibLibraryName" value="libz"/>
-            <variable name="Bzip2LibraryName" value="bzip2"/>
+            <variable name="Bzip2LibraryName" value="libbzip2"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
          </variant>
          <variant name="Debug">
             <variable name="ArchiveName" value="libarchived"/>
             <variable name="ZlibLibraryName" value="libzd"/>
-            <variable name="Bzip2LibraryName" value="bzip2d"/>
+            <variable name="Bzip2LibraryName" value="libbzip2d"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
@@ -1372,14 +1372,14 @@
          <variant name="Release">
             <variable name="ArchiveName" value="libarchive"/>
             <variable name="ZlibLibraryName" value="libz"/>
-            <variable name="Bzip2LibraryName" value="bzip2"/>
+            <variable name="Bzip2LibraryName" value="libbzip2"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
          </variant>
          <variant name="Debug">
             <variable name="ArchiveName" value="libarchived"/>
             <variable name="ZlibLibraryName" value="libzd"/>
-            <variable name="Bzip2LibraryName" value="bzip2d"/>
+            <variable name="Bzip2LibraryName" value="libbzip2d"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
