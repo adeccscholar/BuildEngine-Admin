@@ -1,0 +1,19 @@
+diff --git a/test/conformance/conformance_global_control.cpp b/test/conformance/conformance_global_control.cpp
+--- a/test/conformance/conformance_global_control.cpp
++++ b/test/conformance/conformance_global_control.cpp
+@@ -380,6 +380,9 @@
+ // Overall, the test case is not safe because the dtors might not be called during long jump.
+ // Therefore, it makes sense to run the test case after all other test cases.
+ //! Test terminate_on_exception behavior
+ //! \brief \ref interface \ref requirement
++#if !defined(__BORLANDC__)
++// BCC64X: do not longjmp from std::terminate through C++ stack frames.
++// Tested instead by an isolated BuildEngine consumer smoke process.
+ TEST_CASE("terminate_on_exception: enabled") {
+     oneapi::tbb::global_control c(oneapi::tbb::global_control::terminate_on_exception, 1);
+@@ -430,4 +433,5 @@
+ #endif
+     CHECK(terminate_handler_called);
+ }
++#endif // !defined(__BORLANDC__)
+ #endif
