@@ -805,14 +805,14 @@
          <argument value="-DSHARED_LIB_VERSIONNING:BOOL=ON"/>
          <!-- Required deflate backend plus the two compression backends already
               produced by this BuildEngine contract. -->
-         <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
          <argument value="-DENABLE_BZIP2:BOOL=OFF"/>
          <argument value="-DENABLE_LZMA:BOOL=ON"/>
          <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={DependencyRoot:xz}\include"/>
          <argument value="-DLIBLZMA_LIBRARY:FILEPATH={DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib"/>
          <argument value="-DENABLE_ZSTD:BOOL=ON"/>
-         <argument value="-Dzstd_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\cmake\zstd"/>
+         <argument value="-Dzstd_DIR:PATH={DependencyRoot:zstd}\lib\win64\{Configuration}\cmake\zstd"/>
          <!-- Native Windows AES implementation.  Do not introduce an OpenSSL
               dependency when BCrypt is the upstream-preferred Windows backend. -->
          <argument value="-DENABLE_WINDOWS_CRYPTO:BOOL=ON"/>
@@ -1088,8 +1088,8 @@
          <argument value="-DENABLE_UNZIP_SHARED:BOOL=ON"/>
          <!-- Declared compression/Windows backends; no accidental host-library pickup. -->
          <argument value="-DENABLE_ZLIB:BOOL=ON"/>
-         <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
          <argument value="-DENABLE_CNG:BOOL=ON"/>
          <argument value="-DENABLE_WIN32_XMLLITE:BOOL=ON"/>
          <argument value="-DENABLE_OPENSSL:BOOL=ON"/>
@@ -1104,14 +1104,14 @@
          <argument value="-DENABLE_LZ4:BOOL=OFF"/>
          <argument value="-DENABLE_LZO:BOOL=OFF"/>
          <argument value="-DENABLE_LZMA:BOOL=ON"/>
-         <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={InstallRoot}\packages\xz\5.8.3\include"/>
-         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={InstallRoot}\packages\xz\5.8.3\lib\win64\{Configuration}\liblzma.lib"/>
+         <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={DependencyRoot:xz}\include"/>
+         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib"/>
          <argument value="-DENABLE_ZSTD:BOOL=ON"/>
-         <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\include"/>
-         <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
+         <argument value="-DZSTD_INCLUDE_DIR:PATH={DependencyRoot:zstd}\include"/>
+         <argument value="-DZSTD_LIBRARY:FILEPATH={DependencyRoot:zstd}\lib\win64\{Configuration}\libzstd.lib"/>
          <argument value="-DENABLE_BZip2:BOOL=ON"/>
-         <argument value="-DBZIP2_INCLUDE_DIR:PATH={InstallRoot}\packages\bzip2\1.0.8\include"/>
-         <argument value="-DBZIP2_LIBRARIES:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\{Configuration}\{Bzip2LibraryName}.lib"/>
+         <argument value="-DBZIP2_INCLUDE_DIR:PATH={DependencyRoot:bzip2}\include"/>
+         <argument value="-DBZIP2_LIBRARIES:FILEPATH={DependencyRoot:bzip2}\lib\win64\{Configuration}\{Bzip2LibraryName}.lib"/>
          <argument value="-DENABLE_LIBXML2:BOOL=OFF"/>
          <argument value="-DENABLE_EXPAT:BOOL=OFF"/>
          <!--
@@ -1151,7 +1151,7 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <execute name="bzip2-capability-test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false" outputMode="errors">
                   <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
-                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\xz\5.8.3\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--test-dir"/>
                   <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                   <argument value="-R"/>
@@ -1161,7 +1161,7 @@
                <execute name="test" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
-                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\xz\5.8.3\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--build"/>
                   <argument value="."/>
                   <argument value="--target"/>
@@ -1326,8 +1326,8 @@
          <argument value="-DENABLE_UNZIP_SHARED:BOOL=ON"/>
          <!-- Declared compression/Windows backends; no accidental host-library pickup. -->
          <argument value="-DENABLE_ZLIB:BOOL=ON"/>
-         <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
          <argument value="-DENABLE_CNG:BOOL=ON"/>
          <argument value="-DENABLE_WIN32_XMLLITE:BOOL=ON"/>
          <argument value="-DENABLE_OPENSSL:BOOL=ON"/>
@@ -1345,11 +1345,11 @@
          <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={DependencyRoot:xz}\include"/>
          <argument value="-DLIBLZMA_LIBRARY:FILEPATH={DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib"/>
          <argument value="-DENABLE_ZSTD:BOOL=ON"/>
-         <argument value="-DZSTD_INCLUDE_DIR:PATH={InstallRoot}\packages\zstd\1.5.7\include"/>
-         <argument value="-DZSTD_LIBRARY:FILEPATH={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
+         <argument value="-DZSTD_INCLUDE_DIR:PATH={DependencyRoot:zstd}\include"/>
+         <argument value="-DZSTD_LIBRARY:FILEPATH={DependencyRoot:zstd}\lib\win64\{Configuration}\libzstd.lib"/>
          <argument value="-DENABLE_BZip2:BOOL=ON"/>
-         <argument value="-DBZIP2_INCLUDE_DIR:PATH={InstallRoot}\packages\bzip2\1.0.8\include"/>
-         <argument value="-DBZIP2_LIBRARIES:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\{Configuration}\{Bzip2LibraryName}.lib"/>
+         <argument value="-DBZIP2_INCLUDE_DIR:PATH={DependencyRoot:bzip2}\include"/>
+         <argument value="-DBZIP2_LIBRARIES:FILEPATH={DependencyRoot:bzip2}\lib\win64\{Configuration}\{Bzip2LibraryName}.lib"/>
          <argument value="-DENABLE_LIBXML2:BOOL=OFF"/>
          <argument value="-DENABLE_EXPAT:BOOL=OFF"/>
          <!--
@@ -1389,7 +1389,7 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <execute name="bzip2-capability-test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false" outputMode="errors">
                   <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
-                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--test-dir"/>
                   <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                   <argument value="-R"/>
@@ -1399,7 +1399,7 @@
                <execute name="test" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
-                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{InstallRoot}\packages\zstd\1.5.7\bin\win64\{Configuration};{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--build"/>
                   <argument value="."/>
                   <argument value="--target"/>
@@ -1611,19 +1611,19 @@
          <execute name="brotli-common-import-alias" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="copy_if_different"/>
-            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
+            <argument value="{DependencyRoot:brotli}\lib\win64\{Configuration}\libbrotlicommon.lib"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlicommon.lib"/>
          </execute>
          <execute name="brotli-dec-import-alias" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="copy_if_different"/>
-            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
+            <argument value="{DependencyRoot:brotli}\lib\win64\{Configuration}\libbrotlidec.lib"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlidec.lib"/>
          </execute>
          <execute name="brotli-enc-import-alias" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="copy_if_different"/>
-            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlienc.lib"/>
+            <argument value="{DependencyRoot:brotli}\lib\win64\{Configuration}\libbrotlienc.lib"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlienc.lib"/>
          </execute>
          <target name="configure" type="perl" executable="{Tool:perl}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
@@ -1711,12 +1711,12 @@
             <argument value="zlib"/>
             <argument value="enable-brotli"/>
             <argument value="enable-zstd"/>
-            <argument value="--with-zlib-include={InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="--with-zlib-lib={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
-            <argument value="--with-brotli-include={InstallRoot}\packages\brotli\1.2.0\include"/>
+            <argument value="--with-zlib-include={DependencyRoot:zlib}\include"/>
+            <argument value="--with-zlib-lib={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
+            <argument value="--with-brotli-include={DependencyRoot:brotli}\include"/>
             <argument value="--with-brotli-lib={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs"/>
-            <argument value="--with-zstd-include={InstallRoot}\packages\zstd\1.5.7\include"/>
-            <argument value="--with-zstd-lib={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
+            <argument value="--with-zstd-include={DependencyRoot:zstd}\include"/>
+            <argument value="--with-zstd-lib={DependencyRoot:zstd}\lib\win64\{Configuration}\libzstd.lib"/>
             <argument value="{OpenSSLBuildMode}"/>
             <argument value="--config={TargetFile:OpenSSLTargetConfig}"/>
             <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -1971,19 +1971,19 @@
          <execute name="brotli-common-import-alias" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="copy_if_different"/>
-            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
+            <argument value="{DependencyRoot:brotli}\lib\win64\{Configuration}\libbrotlicommon.lib"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlicommon.lib"/>
          </execute>
          <execute name="brotli-dec-import-alias" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="copy_if_different"/>
-            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
+            <argument value="{DependencyRoot:brotli}\lib\win64\{Configuration}\libbrotlidec.lib"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlidec.lib"/>
          </execute>
          <execute name="brotli-enc-import-alias" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="copy_if_different"/>
-            <argument value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlienc.lib"/>
+            <argument value="{DependencyRoot:brotli}\lib\win64\{Configuration}\libbrotlienc.lib"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs\brotlienc.lib"/>
          </execute>
          <target name="configure" type="perl" executable="{Tool:perl}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
@@ -2071,12 +2071,12 @@
             <argument value="zlib"/>
             <argument value="enable-brotli"/>
             <argument value="enable-zstd"/>
-            <argument value="--with-zlib-include={InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="--with-zlib-lib={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
-            <argument value="--with-brotli-include={InstallRoot}\packages\brotli\1.2.0\include"/>
+            <argument value="--with-zlib-include={DependencyRoot:zlib}\include"/>
+            <argument value="--with-zlib-lib={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
+            <argument value="--with-brotli-include={DependencyRoot:brotli}\include"/>
             <argument value="--with-brotli-lib={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\.buildengine\compression-libs"/>
-            <argument value="--with-zstd-include={InstallRoot}\packages\zstd\1.5.7\include"/>
-            <argument value="--with-zstd-lib={InstallRoot}\packages\zstd\1.5.7\lib\win64\{Configuration}\libzstd.lib"/>
+            <argument value="--with-zstd-include={DependencyRoot:zstd}\include"/>
+            <argument value="--with-zstd-lib={DependencyRoot:zstd}\lib\win64\{Configuration}\libzstd.lib"/>
             <argument value="{OpenSSLBuildMode}"/>
             <argument value="--config={TargetFile:OpenSSLTargetConfig}"/>
             <argument value="--prefix={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -2255,9 +2255,9 @@
                supplies that exact directory through CMAKE_LIBRARY_PATH and the
                versioned include directory through CMAKE_INCLUDE_PATH.
             -->
-            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
-            <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib"/>
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include"/>
+            <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\Release\libz.lib"/>
          </variant>
          <variant name="Debug">
             <variable name="CurlDll" value="libcurld.dll"/>
@@ -2268,9 +2268,9 @@
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
             <!-- Same FindOpenSSL rule as Release; CMAKE_LIBRARY_PATH is variant-specific. -->
-            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.8\include"/>
-            <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib"/>
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include"/>
+            <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\Debug\libzd.lib"/>
          </variant>
          <install>
             <perVariant>
@@ -2406,9 +2406,9 @@
                supplies that exact directory through CMAKE_LIBRARY_PATH and the
                versioned include directory through CMAKE_INCLUDE_PATH.
             -->
-            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.9\include"/>
-            <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib"/>
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include"/>
+            <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\Release\libz.lib"/>
          </variant>
          <variant name="Debug">
             <variable name="CurlDll" value="libcurld.dll"/>
@@ -2419,9 +2419,9 @@
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
             <!-- Same FindOpenSSL rule as Release; CMAKE_LIBRARY_PATH is variant-specific. -->
-            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={InstallRoot}\packages\openssl\3.5.9\include"/>
-            <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib"/>
+            <argument value="-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include"/>
+            <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+            <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\Debug\libzd.lib"/>
          </variant>
          <install>
             <perVariant>
@@ -2516,8 +2516,8 @@
          <argument value="-DADECC_BOOST_OPENSSL_SSL_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libssl.lib"/>
          <argument value="-DADECC_BOOST_OPENSSL_CRYPTO_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libcrypto.lib"/>
          <argument value="-DOPENSSL_USE_STATIC_LIBS:BOOL=OFF"/>
-         <argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-         <argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
          <!-- Evidence preflight: fail before the large Boost graph if BCC64X or
               Boost.Config no longer satisfies the proven native-Clang contract. -->
          <execute name="preflight-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
@@ -2908,12 +2908,12 @@
       <environment name="SSL_ROOT" value="{DependencyRoot:openssl}"/>
       <environment name="SSL_INCDIR" value="{DependencyRoot:openssl}\include"/>
       <environment name="SSL_LIBDIR" value="{DependencyRoot:openssl}\lib\win64\{Configuration}"/>
-      <environment name="XERCESC_INCDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\include"/>
-      <environment name="XERCESC_LIBDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\lib\win64\{Configuration}"/>
+      <environment name="XERCESC_INCDIR" value="{DependencyRoot:xerces-c}\include"/>
+      <environment name="XERCESC_LIBDIR" value="{DependencyRoot:xerces-c}\lib\win64\{Configuration}"/>
       <environment name="XERCESLIB" value="{XercesLibrary}"/>
-      <environment name="ZLIB_ROOT" value="{InstallRoot}\packages\zlib\1.3.2"/>
-      <environment name="ZLIB_INCDIR" value="{InstallRoot}\packages\zlib\1.3.2\include"/>
-      <environment name="ZLIB_LIBDIR" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
+      <environment name="ZLIB_ROOT" value="{DependencyRoot:zlib}"/>
+      <environment name="ZLIB_INCDIR" value="{DependencyRoot:zlib}\include"/>
+      <environment name="ZLIB_LIBDIR" value="{DependencyRoot:zlib}\lib\win64\{Configuration}"/>
       <environment name="BCC32C" value=""/>
       <environment name="BCC64" value=""/>
       <environment name="BCC64X" value="1"/>
@@ -2921,7 +2921,7 @@
       <environment name="UNICODE" value=""/>
       <environment name="DEBUG" value="{DebugFlag}"/>
       <environment name="RELEASE" value="{ReleaseFlag}"/>
-      <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\lib;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin;{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
+      <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\lib;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin;{DependencyRoot:openssl}\bin\win64\{Configuration};{DependencyRoot:xerces-c}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
 
       <execute name="remove-build-tree" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
          <argument value="-E"/>
@@ -3212,7 +3212,7 @@
       <metadata name="GLEW" supplier="GLEW project" homepage="https://glew.sourceforge.net/" description="OpenGL Extension Wrangler Library for discovering and loading OpenGL extensions and entry points." licenseSignal="yellow"><license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="LICENSE.txt"/></metadata>
       <source><download url="https://github.com/nigels-com/glew/releases/download/glew-{LibraryVersion}/glew-{LibraryVersion}.zip" archive="glew-{LibraryVersion}.zip" sha256="09e0083ae46930aba9b53e72c92ee1a557e24ed393526fec26cb0ebabd834720"/><extract format="zip" root="glew-{LibraryVersion}"><require path="src\glew.c"/><require path="include\GL\glew.h"/><require path="LICENSE.txt"/></extract></source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
-         <argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DGLEW_SOURCE_DIR:PATH={Workspace}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DGLEW_SOURCE_DIR:PATH={Workspace}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={DependencyRoot:opengl}\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\glew" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant><variant name="Debug"><variable name="DebugPostfix" value="d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/></variant>
          <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\glew32{DebugPostfix}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\glew32{DebugPostfix}.lib"/></perVariant><common><copy source="{Workspace}\include\GL" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\GL" recursive="true" overwrite="true"/><copy source="{Workspace}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt" overwrite="true"/></common></install>
@@ -3409,7 +3409,7 @@
       <dependency library="opengl" version="26.2.1"/>
       <metadata name="raylib" supplier="raylib project" homepage="https://www.raylib.com/" description="Simple cross-platform C library for graphics, audio, input, and game and application development." licenseSignal="green"><license name="zlib License" spdx="Zlib" file="LICENSE"/></metadata>
       <source><download url="https://github.com/raysan5/raylib/archive/dbc56a87da87d973a9c5baa4e7438a9d20121d28.zip" archive="raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28.zip"/><extract format="zip" root="raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28"><require path="LICENSE"/><require path="src\raylib.h"/><require path="src\raymath.h"/><require path="src\rcamera.h"/><require path="src\rlgl.h"/><require path="src\rcore.c"/><require path="src\rshapes.c"/><require path="src\rtextures.c"/><require path="src\rtext.c"/><require path="src\rmodels.c"/><require path="src\raudio.c"/></extract></source>
-      <build testsAffectBuild="false"><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DRAYLIB_SOURCE_DIR:PATH={Workspace}"/><argument value="-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
+      <build testsAffectBuild="false"><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DRAYLIB_SOURCE_DIR:PATH={Workspace}"/><argument value="-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={DependencyRoot:opengl}\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\raylib" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="BaseName" value="raylib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant><variant name="Debug"><variable name="BaseName" value="raylibd"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
          <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BaseName}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BaseName}.lib"/></perVariant><common><copy source="{Workspace}\src\raylib.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raylib.h" overwrite="true"/><copy source="{Workspace}\src\raymath.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raymath.h" overwrite="true"/><copy source="{Workspace}\src\rcamera.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\rcamera.h" overwrite="true"/><copy source="{Workspace}\src\rlgl.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\rlgl.h" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common></install>
@@ -3518,8 +3518,8 @@
          <environment name="RANLIB" value="{Tool:llvm-ranlib}"/>
          <environment name="WINDRES" value="{Tool:bcc64x-windres}"/>
          <environment name="PKG_CONFIG" value="{Tool:pkg-config}"/>
-         <environment name="PKG_CONFIG_PATH" value="{DependencyRoot:openssl}\lib\win64\{Configuration}\pkgconfig;{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\pkgconfig"/>
-         <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ToolDir:perl};{ToolDir:pkg-config};{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PKG_CONFIG_PATH" value="{DependencyRoot:openssl}\lib\win64\{Configuration}\pkgconfig;{DependencyRoot:zlib}\lib\win64\{Configuration}\pkgconfig"/>
+         <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ToolDir:perl};{ToolDir:pkg-config};{DependencyRoot:openssl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{ENV:PATH}"/>
          <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/><argument value="remove_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
@@ -3528,12 +3528,12 @@
          </execute>
          <execute name="stage-zlib-import-name" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/><argument value="copy_if_different"/>
-            <argument value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportName}"/>
+            <argument value="{DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportName}"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib\libz.lib"/>
          </execute>
          <execute name="stage-zlib-gnu-name" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/><argument value="copy_if_different"/>
-            <argument value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibImportName}"/>
+            <argument value="{DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportName}"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib\libz.a"/>
          </execute>
          <target name="meson-setup" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false" outputMode="errors">
@@ -3561,8 +3561,8 @@
             <argument value="-Ddocs_pdf=disabled"/>
             <argument value="-Dtap_tests=disabled"/>
             <argument value="-DPERL={Tool:perl}"/>
-            <argument value="-Dextra_include_dirs={DependencyRoot:openssl}\include,{InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="-Dextra_lib_dirs={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib,{DependencyRoot:openssl}\lib\win64\{Configuration},{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
+            <argument value="-Dextra_include_dirs={DependencyRoot:openssl}\include,{DependencyRoot:zlib}\include"/>
+            <argument value="-Dextra_lib_dirs={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib,{DependencyRoot:openssl}\lib\win64\{Configuration},{DependencyRoot:zlib}\lib\win64\{Configuration}"/>
          </target>
          <target name="meson-compile-libpq" type="meson" executable="{Tool:python}" workingDirectory="{ProductionRoot}" showOutput="false" outputMode="errors">
             <argument value="{Workspace}\.buildengine\meson_bcc64x_bootstrap.py"/>
@@ -3616,7 +3616,7 @@
              executable="libpq-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <environment name="PATH" value="{DependencyRoot:openssl}\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
+         <environment name="PATH" value="{DependencyRoot:openssl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{ENV:PATH}"/>
          <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={ConsumerRoot}\include"/>
          <argument value="-DPostgreSQL_LIBRARY:FILEPATH={ConsumerRoot}\lib\libpq.lib"/>
       </smoke>
@@ -3913,7 +3913,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DSOIL2_SOURCE_DIR:PATH={Workspace}"/>
-         <argument value="-DOpenGL_DIR:PATH={InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\cmake\OpenGL"/>
+         <argument value="-DOpenGL_DIR:PATH={DependencyRoot:opengl}\lib\win64\{Configuration}\cmake\OpenGL"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\soil2" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant>
@@ -3956,7 +3956,7 @@
          <!-- Temporary toolchain baseline: IPPICV MSVC /GS symbols need a verified BCC64X runtime provider. -->
          <argument value="-DWITH_IPP:BOOL=OFF"/><argument value="-DOPENCV_DNN_MLAS:BOOL=OFF"/><argument value="-DWITH_ONNXRUNTIME:BOOL=OFF"/><argument value="-DWITH_PROTOBUF:BOOL=ON"/><argument value="-DBUILD_PROTOBUF:BOOL=ON"/><argument value="-DPROTOBUF_UPDATE_FILES:BOOL=OFF"/><argument value="-DOPENCV_DISABLE_THREAD_SUPPORT:BOOL=OFF"/><argument value="-DWITH_OPENCL:BOOL=OFF"/><argument value="-DWITH_CUDA:BOOL=OFF"/><argument value="-DWITH_DIRECTML:BOOL=OFF"/><argument value="-DWITH_TBB:BOOL=OFF"/><argument value="-DWITH_OPENMP:BOOL=OFF"/>
          <argument value="-DWITH_FFMPEG:BOOL=OFF"/><argument value="-DWITH_GSTREAMER:BOOL=OFF"/><argument value="-DWITH_DSHOW:BOOL=OFF"/><argument value="-DWITH_MSMF:BOOL=OFF"/><argument value="-DWITH_OBSENSOR:BOOL=OFF"/><argument value="-DWITH_QT:BOOL=OFF"/><argument value="-DWITH_GTK:BOOL=OFF"/><argument value="-DWITH_OPENGL:BOOL=OFF"/><argument value="-DWITH_UNIFONT:BOOL=OFF"/>
-         <argument value="-DWITH_JPEG:BOOL=ON"/><argument value="-DBUILD_JPEG:BOOL=ON"/><argument value="-DWITH_PNG:BOOL=ON"/><argument value="-DBUILD_PNG:BOOL=ON"/><argument value="-DWITH_TIFF:BOOL=ON"/><argument value="-DBUILD_TIFF:BOOL=ON"/><argument value="-DWITH_WEBP:BOOL=ON"/><argument value="-DBUILD_WEBP:BOOL=ON"/><argument value="-DWITH_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_ZLIB:BOOL=OFF"/><argument value="-DZLIB_INCLUDE_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\include"/><argument value="-DZLIB_LIBRARY:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibrary}"/>
+         <argument value="-DWITH_JPEG:BOOL=ON"/><argument value="-DBUILD_JPEG:BOOL=ON"/><argument value="-DWITH_PNG:BOOL=ON"/><argument value="-DBUILD_PNG:BOOL=ON"/><argument value="-DWITH_TIFF:BOOL=ON"/><argument value="-DBUILD_TIFF:BOOL=ON"/><argument value="-DWITH_WEBP:BOOL=ON"/><argument value="-DBUILD_WEBP:BOOL=ON"/><argument value="-DWITH_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_ZLIB:BOOL=OFF"/><argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/><argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibLibrary}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="DebugPostfix" value=""/><variable name="ZlibLibrary" value="libz.lib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/><argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant><variant name="Debug"><variable name="DebugPostfix" value="d"/><variable name="ZlibLibrary" value="libzd.lib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/></variant>
          <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/>
@@ -4776,7 +4776,7 @@
       <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
 
-      <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2"/>
+      <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib}"/>
       <argument value="-DPNG_SHARED:BOOL=ON"/>
       <argument value="-DPNG_STATIC:BOOL=OFF"/>
       <argument value="-DPNG_TESTS:BOOL=OFF"/>
@@ -4886,7 +4886,7 @@
       <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
 
-      <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2"/>
+      <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib}"/>
       <argument value="-DPNG_SHARED:BOOL=ON"/>
       <argument value="-DPNG_STATIC:BOOL=OFF"/>
       <argument value="-DPNG_TESTS:BOOL=OFF"/>
@@ -5332,18 +5332,18 @@
       <argument value="-DFT_REQUIRE_HARFBUZZ:BOOL=ON"/>
 
       <argument
-         value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\bzip2\1.0.8;{InstallRoot}\packages\brotli\1.2.0;{InstallRoot}\packages\libpng\1.6.59;{InstallRoot}\packages\harfbuzz\14.4.0"/>
+         value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib};{DependencyRoot:bzip2};{DependencyRoot:brotli};{DependencyRoot:libpng};{DependencyRoot:harfbuzz}"/>
 
       <!-- Bind the exact variant's import libraries, not host/system search results. -->
-      <argument value="-DHarfBuzz_LIBRARY:FILEPATH={InstallRoot}\packages\harfbuzz\14.4.0\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
-      <argument value="-DHarfBuzz_INCLUDE_DIR:PATH={InstallRoot}\packages\harfbuzz\14.4.0\include\harfbuzz"/>
-      <argument value="-DBZIP2_LIBRARY_RELEASE:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\Release\libbzip2.lib"/>
-      <argument value="-DBZIP2_LIBRARY_DEBUG:FILEPATH={InstallRoot}\packages\bzip2\1.0.8\lib\win64\Debug\libbzip2d.lib"/>
-      <argument value="-DBZIP2_INCLUDE_DIR:PATH={InstallRoot}\packages\bzip2\1.0.8\include"/>
-      <require path="{InstallRoot}\packages\harfbuzz\14.4.0\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
-      <require path="{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\{Configuration}\libharfbuzz{DebugPostfix}.dll"/>
-      <require path="{InstallRoot}\packages\bzip2\1.0.8\lib\win64\{Configuration}\libbzip2{DebugPostfix}.lib"/>
-      <require path="{InstallRoot}\packages\bzip2\1.0.8\bin\win64\{Configuration}\libbzip2{DebugPostfix}.dll"/>
+      <argument value="-DHarfBuzz_LIBRARY:FILEPATH={DependencyRoot:harfbuzz}\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
+      <argument value="-DHarfBuzz_INCLUDE_DIR:PATH={DependencyRoot:harfbuzz}\include\harfbuzz"/>
+      <argument value="-DBZIP2_LIBRARY_RELEASE:FILEPATH={DependencyRoot:bzip2}\lib\win64\Release\libbzip2.lib"/>
+      <argument value="-DBZIP2_LIBRARY_DEBUG:FILEPATH={DependencyRoot:bzip2}\lib\win64\Debug\libbzip2d.lib"/>
+      <argument value="-DBZIP2_INCLUDE_DIR:PATH={DependencyRoot:bzip2}\include"/>
+      <require path="{DependencyRoot:harfbuzz}\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
+      <require path="{DependencyRoot:harfbuzz}\bin\win64\{Configuration}\libharfbuzz{DebugPostfix}.dll"/>
+      <require path="{DependencyRoot:bzip2}\lib\win64\{Configuration}\libbzip2{DebugPostfix}.lib"/>
+      <require path="{DependencyRoot:bzip2}\bin\win64\{Configuration}\libbzip2{DebugPostfix}.dll"/>
 
       <cmake
          mode="configure"
@@ -5499,7 +5499,7 @@
       <argument value="-Dtiff-contrib:BOOL=OFF"/>
       <argument value="-Dtiff-docs:BOOL=OFF"/>
 
-      <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\libjpeg-turbo\3.2.0"/>
+      <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib};{DependencyRoot:libjpeg-turbo}"/>
 
       <cmake
          mode="configure"
@@ -5673,16 +5673,16 @@
          <environment name="CB_PYTHON" value="{Tool:python}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
-         <environment name="CB_SKIA_OPENGL_LIB" value="{InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/>
-         <environment name="CB_SKIA_ZLIB_INCLUDE" value="{InstallRoot}\packages\zlib\1.3.2\include"/>
-         <environment name="CB_SKIA_ZLIB_LIB" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
-         <environment name="CB_SKIA_LIBPNG_INCLUDE" value="{InstallRoot}\packages\libpng\1.6.59\include"/>
-         <environment name="CB_SKIA_LIBPNG_LIB" value="{InstallRoot}\packages\libpng\1.6.59\lib\win64\{Configuration}\{LibPngLibraryName}.lib"/>
-         <environment name="CB_SKIA_LIBJPEG_INCLUDE" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\include"/>
-         <environment name="CB_SKIA_LIBJPEG_LIB" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\{Configuration}\{LibJpegLibraryName}.lib"/>
-         <environment name="CB_SKIA_FREETYPE_INCLUDE" value="{InstallRoot}\packages\freetype\2.14.3\include\freetype2"/>
-         <environment name="CB_SKIA_FREETYPE_LIB" value="{InstallRoot}\packages\freetype\2.14.3\lib\win64\{Configuration}\{FreeTypeLibraryName}.lib"/>
-         <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.59\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+         <environment name="CB_SKIA_OPENGL_LIB" value="{DependencyRoot:opengl}\lib\win64\{Configuration}\opengl32.lib"/>
+         <environment name="CB_SKIA_ZLIB_INCLUDE" value="{DependencyRoot:zlib}\include"/>
+         <environment name="CB_SKIA_ZLIB_LIB" value="{DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
+         <environment name="CB_SKIA_LIBPNG_INCLUDE" value="{DependencyRoot:libpng}\include"/>
+         <environment name="CB_SKIA_LIBPNG_LIB" value="{DependencyRoot:libpng}\lib\win64\{Configuration}\{LibPngLibraryName}.lib"/>
+         <environment name="CB_SKIA_LIBJPEG_INCLUDE" value="{DependencyRoot:libjpeg-turbo}\include"/>
+         <environment name="CB_SKIA_LIBJPEG_LIB" value="{DependencyRoot:libjpeg-turbo}\lib\win64\{Configuration}\{LibJpegLibraryName}.lib"/>
+         <environment name="CB_SKIA_FREETYPE_INCLUDE" value="{DependencyRoot:freetype}\include\freetype2"/>
+         <environment name="CB_SKIA_FREETYPE_LIB" value="{DependencyRoot:freetype}\lib\win64\{Configuration}\{FreeTypeLibraryName}.lib"/>
+         <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
          <target name="gn-gen" type="generic" executable="{Tool:gn}" workingDirectory="{Workspace}" outputMode="errors">
             <temporaryFile id="gn-args" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\args.gn">
                <line value="skia_use_bcc64x = true"/>
@@ -5782,7 +5782,7 @@
       <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
       <environment name="CB_BDS" value="{BDS}"/>
       <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
-      <environment name="PATH" value="{InstallRoot}\packages\skia\144\bin\win64\Release;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{InstallRoot}\packages\libpng\1.6.59\bin\win64\Release;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Release;{ENV:PATH}"/>
+      <environment name="PATH" value="{InstallRoot}\packages\skia\144\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{ENV:PATH}"/>
    </smoke>
    <smoke id="consumer" scope="package" source="smokes\skia144\consumer" configuration="Debug"
           cmake="{Tool:cmake}" ninja="{Tool:ninja}"
@@ -5791,7 +5791,7 @@
       <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
       <environment name="CB_BDS" value="{BDS}"/>
       <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
-      <environment name="PATH" value="{InstallRoot}\packages\skia\144\bin\win64\Debug;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Debug;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Debug;{InstallRoot}\packages\libpng\1.6.59\bin\win64\Debug;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Debug;{ENV:PATH}"/>
+      <environment name="PATH" value="{InstallRoot}\packages\skia\144\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{ENV:PATH}"/>
    </smoke>
 </library>
 
@@ -6891,69 +6891,69 @@
          <!-- OpenGL. -->
          <environment
             name="CB_SKIA_OPENGL_LIB"
-            value="{InstallRoot}\packages\opengl\26.2.1\lib\win64\{Configuration}\opengl32.lib"/>
+            value="{DependencyRoot:opengl}\lib\win64\{Configuration}\opengl32.lib"/>
 
          <!-- zlib. -->
          <environment
             name="CB_SKIA_ZLIB_INCLUDE"
-            value="{InstallRoot}\packages\zlib\1.3.2\include"/>
+            value="{DependencyRoot:zlib}\include"/>
 
          <environment
             name="CB_SKIA_ZLIB_LIB"
-            value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
+            value="{DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
 
          <!-- Brotli. -->
          <environment
             name="CB_SKIA_BROTLI_INCLUDE"
-            value="{InstallRoot}\packages\brotli\1.2.0\include"/>
+            value="{DependencyRoot:brotli}\include"/>
 
          <environment
             name="CB_SKIA_BROTLI_COMMON_LIB"
-            value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlicommon.lib"/>
+            value="{DependencyRoot:brotli}\lib\win64\{Configuration}\libbrotlicommon.lib"/>
 
          <environment
             name="CB_SKIA_BROTLI_DECODE_LIB"
-            value="{InstallRoot}\packages\brotli\1.2.0\lib\win64\{Configuration}\libbrotlidec.lib"/>
+            value="{DependencyRoot:brotli}\lib\win64\{Configuration}\libbrotlidec.lib"/>
 
          <!-- libpng. -->
          <environment
             name="CB_SKIA_LIBPNG_INCLUDE"
-            value="{InstallRoot}\packages\libpng\1.6.59\include"/>
+            value="{DependencyRoot:libpng}\include"/>
 
          <environment
             name="CB_SKIA_LIBPNG_LIB"
-            value="{InstallRoot}\packages\libpng\1.6.59\lib\win64\{Configuration}\{LibPngLibraryName}.lib"/>
+            value="{DependencyRoot:libpng}\lib\win64\{Configuration}\{LibPngLibraryName}.lib"/>
 
          <!-- libjpeg-turbo. -->
          <environment
             name="CB_SKIA_LIBJPEG_INCLUDE"
-            value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\include"/>
+            value="{DependencyRoot:libjpeg-turbo}\include"/>
 
          <environment
             name="CB_SKIA_LIBJPEG_LIB"
-            value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\{Configuration}\{LibJpegLibraryName}.lib"/>
+            value="{DependencyRoot:libjpeg-turbo}\lib\win64\{Configuration}\{LibJpegLibraryName}.lib"/>
 
          <!-- HarfBuzz. -->
          <environment
             name="CB_SKIA_HARFBUZZ_INCLUDE"
-            value="{InstallRoot}\packages\harfbuzz\14.4.0\include\harfbuzz"/>
+            value="{DependencyRoot:harfbuzz}\include\harfbuzz"/>
 
          <environment
             name="CB_SKIA_HARFBUZZ_LIB"
-            value="{InstallRoot}\packages\harfbuzz\14.4.0\lib\win64\{Configuration}\{HarfBuzzLibraryName}.lib"/>
+            value="{DependencyRoot:harfbuzz}\lib\win64\{Configuration}\{HarfBuzzLibraryName}.lib"/>
 
          <environment
             name="CB_SKIA_HARFBUZZ_SUBSET_LIB"
-            value="{InstallRoot}\packages\harfbuzz\14.4.0\lib\win64\{Configuration}\{HarfBuzzSubsetLibraryName}.lib"/>
+            value="{DependencyRoot:harfbuzz}\lib\win64\{Configuration}\{HarfBuzzSubsetLibraryName}.lib"/>
 
          <!-- FreeType. -->
          <environment
             name="CB_SKIA_FREETYPE_INCLUDE"
-            value="{InstallRoot}\packages\freetype\2.14.3\include\freetype2"/>
+            value="{DependencyRoot:freetype}\include\freetype2"/>
 
          <environment
             name="CB_SKIA_FREETYPE_LIB"
-            value="{InstallRoot}\packages\freetype\2.14.3\lib\win64\{Configuration}\{FreeTypeLibraryName}.lib"/>
+            value="{DependencyRoot:freetype}\lib\win64\{Configuration}\{FreeTypeLibraryName}.lib"/>
 
          <!--
             Runtime DLL resolution for all BuildEngine package dependencies.
@@ -6962,7 +6962,7 @@
          -->
          <environment
             name="PATH"
-            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\brotli\1.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.59\bin\win64\{Configuration};{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
          <target
             name="gn-gen"
@@ -7171,7 +7171,7 @@
 
             <environment
                name="PATH"
-               value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\brotli\1.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.59\bin\win64\{Configuration};{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="gen"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -7186,7 +7186,7 @@
 
             <environment
                name="PATH"
-               value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{InstallRoot}\packages\brotli\1.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.59\bin\win64\{Configuration};{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="-C"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -7459,7 +7459,7 @@
 
          <environment
             name="PATH"
-            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{InstallRoot}\packages\brotli\1.2.0\bin\win64\Release;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Release;{InstallRoot}\packages\libpng\1.6.59\bin\win64\Release;{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\Release;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Release;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:brotli}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:harfbuzz}\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
 
       <smoke
@@ -7478,7 +7478,7 @@
 
          <environment
             name="PATH"
-            value="{InstallRoot}\packages\opengl\26.2.1\bin\win64\Debug;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Debug;{InstallRoot}\packages\brotli\1.2.0\bin\win64\Debug;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\Debug;{InstallRoot}\packages\libpng\1.6.59\bin\win64\Debug;{InstallRoot}\packages\harfbuzz\14.4.0\bin\win64\Debug;{InstallRoot}\packages\freetype\2.14.3\bin\win64\Debug;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:brotli}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:harfbuzz}\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{ENV:PATH}"/>
       </smoke>
    </library>
    
@@ -8040,7 +8040,7 @@
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DTECKIT_SOURCE_DIR:PATH={Workspace}"/>
-         <argument value="-DZLIB_DIR:PATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\cmake\zlib"/>
+         <argument value="-DZLIB_DIR:PATH={DependencyRoot:zlib}\lib\win64\{Configuration}\cmake\zlib"/>
          <argument value="-Dexpat_DIR:PATH={DependencyRoot:expat}\lib\win64\{Configuration}\cmake\expat-{DependencyVersion:expat}"/>
          <cmake mode="configure"
                 executable="{Tool:cmake}"
@@ -8068,7 +8068,7 @@
                         showOutput="false">
                   <environment name="BINDIR" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"/>
                   <environment name="SRCDIR" value="{Workspace}\test"/>
-                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin;{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin;{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="{Workspace}\test\dotests.pl"/>
                </execute>
                <cmake mode="install"
@@ -8364,7 +8364,7 @@
          <argument value="-DLIBXML2_WITH_XINCLUDE:BOOL=ON"/>
          <argument value="-DLIBXML2_WITH_XPTR:BOOL=ON"/>
          <argument value="-DLIBXML2_WITH_OUTPUT:BOOL=ON"/>
-         <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
@@ -8526,15 +8526,15 @@
          <argument value="-DREQUIRE_CRYPTO_NATIVE:BOOL=ON"/>
          <argument value="-DUSE_INSECURE_RANDOM:BOOL=OFF"/>
          <argument value="-DSKIP_OS_SECURE_RANDOM:BOOL=OFF"/>
-         <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{InstallRoot}\packages\libjpeg-turbo\3.2.0"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib};{DependencyRoot:libjpeg-turbo}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
-            <argument value="-DZLIB_H_PATH:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="-DZLIB_LIB_PATH:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Release\libz.lib"/>
-            <argument value="-DLIBJPEG_H_PATH:PATH={InstallRoot}\packages\libjpeg-turbo\3.2.0\include"/>
-            <argument value="-DLIBJPEG_LIB_PATH:FILEPATH={InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\Release\libjpeg.lib"/>
+            <argument value="-DZLIB_H_PATH:PATH={DependencyRoot:zlib}\include"/>
+            <argument value="-DZLIB_LIB_PATH:FILEPATH={DependencyRoot:zlib}\lib\win64\Release\libz.lib"/>
+            <argument value="-DLIBJPEG_H_PATH:PATH={DependencyRoot:libjpeg-turbo}\include"/>
+            <argument value="-DLIBJPEG_LIB_PATH:FILEPATH={DependencyRoot:libjpeg-turbo}\lib\win64\Release\libjpeg.lib"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
@@ -8542,10 +8542,10 @@
          </variant>
          <variant name="Debug">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
-            <argument value="-DZLIB_H_PATH:PATH={InstallRoot}\packages\zlib\1.3.2\include"/>
-            <argument value="-DZLIB_LIB_PATH:FILEPATH={InstallRoot}\packages\zlib\1.3.2\lib\win64\Debug\libzd.lib"/>
-            <argument value="-DLIBJPEG_H_PATH:PATH={InstallRoot}\packages\libjpeg-turbo\3.2.0\include"/>
-            <argument value="-DLIBJPEG_LIB_PATH:FILEPATH={InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\Debug\libjpegd.lib"/>
+            <argument value="-DZLIB_H_PATH:PATH={DependencyRoot:zlib}\include"/>
+            <argument value="-DZLIB_LIB_PATH:FILEPATH={DependencyRoot:zlib}\lib\win64\Debug\libzd.lib"/>
+            <argument value="-DLIBJPEG_H_PATH:PATH={DependencyRoot:libjpeg-turbo}\include"/>
+            <argument value="-DLIBJPEG_LIB_PATH:FILEPATH={DependencyRoot:libjpeg-turbo}\lib\win64\Debug\libjpegd.lib"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
@@ -8616,7 +8616,7 @@
              executable="qpdf-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <environment name="PATH" value="{ConsumerRoot}\bin;{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PATH" value="{ConsumerRoot}\bin;{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{ENV:PATH}"/>
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
@@ -8845,7 +8845,7 @@
          <argument value="-DPODOFO_WITH_FONTMANAGER:BOOL=ON"/>
          <argument value="-DPODOFO_WITH_WIN32GDI_FONT_SEARCH:BOOL=ON"/>
          <argument value="-DPODOFO_WITH_LCMS2:BOOL=OFF"/>
-         <argument value="-DCMAKE_PREFIX_PATH:PATH={InstallRoot}\packages\zlib\1.3.2;{DependencyRoot:openssl};{InstallRoot}\packages\freetype\2.14.3;{InstallRoot}\packages\libxml2\2.15.3;{InstallRoot}\packages\libjpeg-turbo\3.2.0;{InstallRoot}\packages\libpng\1.6.59;{InstallRoot}\packages\libtiff\4.7.2"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib};{DependencyRoot:openssl};{DependencyRoot:freetype};{DependencyRoot:libxml2};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libpng};{DependencyRoot:libtiff}"/>
          <execute name="isolate-test-resources" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/><argument value="copy_directory"/>
             <argument value="{Workspace}\extern\resources"/>
@@ -8857,14 +8857,14 @@
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
-            <argument value="-DLIBXML2_LIBRARY:FILEPATH={InstallRoot}\packages\libxml2\2.15.3\lib\win64\Release\libxml2.lib"/>
+            <argument value="-DLIBXML2_LIBRARY:FILEPATH={DependencyRoot:libxml2}\lib\win64\Release\libxml2.lib"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
          </variant>
          <variant name="Debug">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
-            <argument value="-DLIBXML2_LIBRARY:FILEPATH={InstallRoot}\packages\libxml2\2.15.3\lib\win64\Debug\libxml2d.lib"/>
+            <argument value="-DLIBXML2_LIBRARY:FILEPATH={DependencyRoot:libxml2}\lib\win64\Debug\libxml2d.lib"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
@@ -8880,7 +8880,7 @@
                   <environment name="CTEST_PARALLEL_LEVEL" value="1"/>
                   <environment name="PODOFO_TEST_OUTPUT_PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out"/>
                   <!-- Keep the tested runtime closure deterministic. In particular, Release libz.dll must come from our zlib 1.3.2 package. -->
-                  <environment name="PATH" value="{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\freetype\2.14.3\bin\win64\{Configuration};{InstallRoot}\packages\libxml2\2.15.3\bin\win64\{Configuration};{InstallRoot}\packages\libjpeg-turbo\3.2.0\bin\win64\{Configuration};{InstallRoot}\packages\libpng\1.6.59\bin\win64\{Configuration};{InstallRoot}\packages\libtiff\4.7.2\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{DependencyRoot:libxml2}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:libtiff}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--output-on-failure"/>
                </execute>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -9106,15 +9106,15 @@
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
-            <argument value="-DIconv_INCLUDE_DIR:PATH={InstallRoot}\packages\win-iconv\0.0.8\include"/>
-            <argument value="-DIconv_LIBRARY:FILEPATH={InstallRoot}\packages\win-iconv\0.0.8\lib\win64\Release\libiconv.lib"/>
+            <argument value="-DIconv_INCLUDE_DIR:PATH={DependencyRoot:win-iconv}\include"/>
+            <argument value="-DIconv_LIBRARY:FILEPATH={DependencyRoot:win-iconv}\lib\win64\Release\libiconv.lib"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
          </variant>
          <variant name="Debug">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
-            <argument value="-DIconv_INCLUDE_DIR:PATH={InstallRoot}\packages\win-iconv\0.0.8\include"/>
-            <argument value="-DIconv_LIBRARY:FILEPATH={InstallRoot}\packages\win-iconv\0.0.8\lib\win64\Debug\libiconv.lib"/>
+            <argument value="-DIconv_INCLUDE_DIR:PATH={DependencyRoot:win-iconv}\include"/>
+            <argument value="-DIconv_LIBRARY:FILEPATH={DependencyRoot:win-iconv}\lib\win64\Debug\libiconv.lib"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
          </variant>
@@ -9204,11 +9204,11 @@
          <argument value="-DTestPackage_LOG_LEVEL:STRING=DEBUG"/>
          <argument value="-DCMAKE_MESSAGE_LOG_LEVEL:STRING=VERBOSE"/>
          <argument value="-DFORCE_FETCH_ALL:BOOL=OFF"/>
-         <argument value="-DCMAKE_PREFIX_PATH:STRING={InstallRoot}\packages\boost\1.92.0\lib\win64\{Configuration}\cmake\boost_nowide-1.92.0-shared;{InstallRoot}\packages\boost\1.92.0\lib\win64\{Configuration}\cmake;{InstallRoot}\packages\pugixml\1.16\lib\win64\{Configuration}\cmake;{InstallRoot}\packages\libzip\1.11.4\lib\win64\{Configuration}\cmake"/>
-         <argument value="-Dboost_nowide_DIR:PATH={InstallRoot}\packages\boost\1.92.0\lib\win64\{Configuration}\cmake\boost_nowide-1.92.0-shared"/>
-         <argument value="-DBoost_DIR:PATH={InstallRoot}\packages\boost\1.92.0\lib\win64\{Configuration}\cmake\Boost-1.92.0"/>
-         <argument value="-DLibZip_DIR:PATH={InstallRoot}\packages\libzip\1.11.4\lib\win64\{Configuration}\cmake\libzip"/>
-         <argument value="-Dpugixml_DIR:PATH={InstallRoot}\packages\pugixml\1.16\lib\win64\{Configuration}\cmake\pugixml"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:boost}\lib\win64\{Configuration}\cmake\boost_nowide-1.92.0-shared;{DependencyRoot:boost}\lib\win64\{Configuration}\cmake;{DependencyRoot:pugixml}\lib\win64\{Configuration}\cmake;{DependencyRoot:libzip}\lib\win64\{Configuration}\cmake"/>
+         <argument value="-Dboost_nowide_DIR:PATH={DependencyRoot:boost}\lib\win64\{Configuration}\cmake\boost_nowide-1.92.0-shared"/>
+         <argument value="-DBoost_DIR:PATH={DependencyRoot:boost}\lib\win64\{Configuration}\cmake\Boost-1.92.0"/>
+         <argument value="-DLibZip_DIR:PATH={DependencyRoot:libzip}\lib\win64\{Configuration}\cmake\libzip"/>
+         <argument value="-Dpugixml_DIR:PATH={DependencyRoot:pugixml}\lib\win64\{Configuration}\cmake\pugixml"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}"
@@ -9263,11 +9263,11 @@
              executable="openxlsx-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <environment name="PATH" value="{InstallRoot}\packages\openxlsx\0.5.1\bin\win64\Release;{InstallRoot}\packages\boost\1.92.0\bin\win64\Release;{InstallRoot}\packages\libzip\1.11.4\bin\win64\Release;{InstallRoot}\packages\pugixml\1.16\bin\win64\Release;{ENV:PATH}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\openxlsx\0.5.1\bin\win64\Release;{DependencyRoot:boost}\bin\win64\Release;{DependencyRoot:libzip}\bin\win64\Release;{DependencyRoot:pugixml}\bin\win64\Release;{ENV:PATH}"/>
          <argument value="-DOpenXLSX_DIR:PATH={InstallRoot}\packages\openxlsx\0.5.1\lib\win64\Release\cmake\OpenXLSX"/>
-         <argument value="-DBoost_DIR:PATH={InstallRoot}\packages\boost\1.92.0\lib\win64\Release\cmake\Boost-1.92.0"/>
-         <argument value="-DLibZip_DIR:PATH={InstallRoot}\packages\libzip\1.11.4\lib\win64\Release\cmake\libzip"/>
-         <argument value="-Dpugixml_DIR:PATH={InstallRoot}\packages\pugixml\1.16\lib\win64\Release\cmake\pugixml"/>
+         <argument value="-DBoost_DIR:PATH={DependencyRoot:boost}\lib\win64\Release\cmake\Boost-1.92.0"/>
+         <argument value="-DLibZip_DIR:PATH={DependencyRoot:libzip}\lib\win64\Release\cmake\libzip"/>
+         <argument value="-Dpugixml_DIR:PATH={DependencyRoot:pugixml}\lib\win64\Release\cmake\pugixml"/>
       </smoke>
    </library>
    <library id="fast_float" version="8.2.3" category="data" timestamp="2026-10-15T12:53:00Z">
@@ -10037,16 +10037,16 @@
 
 <build>
          <!-- Validate the exact imported CMake library artifacts before GN/Ninja. -->
-         <require path="{InstallRoot}\packages\lcms2\2.19.1\lib\win64\{Configuration}\liblcms2.lib"/>
-         <require path="{InstallRoot}\packages\openjpeg\2.5.4\lib\win64\{Configuration}\libopenjp2.lib"/>
+         <require path="{DependencyRoot:lcms2}\lib\win64\{Configuration}\liblcms2.lib"/>
+         <require path="{DependencyRoot:openjpeg}\lib\win64\{Configuration}\libopenjp2.lib"/>
          <!-- No header staging: Skia 144 is consumed directly from its installation. -->
-         <require path="{InstallRoot}\packages\skia\144\include\include\core\SkSurface.h"/>
-         <require path="{InstallRoot}\packages\skia\144\lib\win64\{Configuration}\skia144.lib"/>
+         <require path="{DependencyRoot:skia}\include\include\core\SkSurface.h"/>
+         <require path="{DependencyRoot:skia}\lib\win64\{Configuration}\skia144.lib"/>
          <!-- Validate source evidence on resumed builds before generating GN targets. -->
 
 <require path="{Workspace}\tools\win\DebugVisualizers\BUILD.gn"/>
 
-<require path="{InstallRoot}\packages\fast_float\8.2.3\include\fast_float\fast_float.h"/>
+<require path="{DependencyRoot:fast_float}\include\fast_float\fast_float.h"/>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_PYTHON" value="{Tool:python}"/>
@@ -10055,26 +10055,26 @@
          <environment name="DEPOT_TOOLS_WIN_TOOLCHAIN" value="0"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_BCC64X_UCRT_COMPAT" value="{Tool:bcc64x-ucrt-compat}"/>
-         <environment name="CB_PDFIUM_FAST_FLOAT_INCLUDE" value="{InstallRoot}\packages\fast_float\8.2.3\include"/>
-         <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{InstallRoot}\packages\abseil\20260817.0\include"/>
-         <require path="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}\libabseil_dll.lib"/>
-         <environment name="CB_PDFIUM_ABSEIL_LIBDIR" value="{InstallRoot}\packages\abseil\20260817.0\lib\win64\{Configuration}"/>
-         <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{InstallRoot}\packages\skia\144\include"/>
-         <environment name="CB_PDFIUM_SKIA_LIB" value="{InstallRoot}\packages\skia\144\lib\win64\{Configuration}\skia144.lib"/>
-         <environment name="CB_PDFIUM_LCMS_INCLUDE" value="{InstallRoot}\packages\lcms2\2.19.1\include"/>
-         <environment name="CB_PDFIUM_LCMS_LIB" value="{InstallRoot}\packages\lcms2\2.19.1\lib\win64\{Configuration}\liblcms2.lib"/>
-         <environment name="CB_PDFIUM_OPENJPEG_INCLUDE" value="{InstallRoot}\packages\openjpeg\2.5.4\include\openjpeg-2.5"/>
-         <environment name="CB_PDFIUM_OPENJPEG_LIB" value="{InstallRoot}\packages\openjpeg\2.5.4\lib\win64\{Configuration}\libopenjp2.lib"/>
+         <environment name="CB_PDFIUM_FAST_FLOAT_INCLUDE" value="{DependencyRoot:fast_float}\include"/>
+         <environment name="CB_PDFIUM_ABSEIL_INCLUDE" value="{DependencyRoot:abseil}\include"/>
+         <require path="{DependencyRoot:abseil}\lib\win64\{Configuration}\libabseil_dll.lib"/>
+         <environment name="CB_PDFIUM_ABSEIL_LIBDIR" value="{DependencyRoot:abseil}\lib\win64\{Configuration}"/>
+         <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{DependencyRoot:skia}\include"/>
+         <environment name="CB_PDFIUM_SKIA_LIB" value="{DependencyRoot:skia}\lib\win64\{Configuration}\skia144.lib"/>
+         <environment name="CB_PDFIUM_LCMS_INCLUDE" value="{DependencyRoot:lcms2}\include"/>
+         <environment name="CB_PDFIUM_LCMS_LIB" value="{DependencyRoot:lcms2}\lib\win64\{Configuration}\liblcms2.lib"/>
+         <environment name="CB_PDFIUM_OPENJPEG_INCLUDE" value="{DependencyRoot:openjpeg}\include\openjpeg-2.5"/>
+         <environment name="CB_PDFIUM_OPENJPEG_LIB" value="{DependencyRoot:openjpeg}\lib\win64\{Configuration}\libopenjp2.lib"/>
          <environment name="CB_PDFIUM_ICU_INCLUDE" value="{InstallRoot}\\packages\\icu\\78.3\\include"/>
          <environment name="CB_PDFIUM_ICU_LIB" value="{InstallRoot}\\packages\\icu\\78.3\\lib\\win64\\{Configuration}\\{PdfiumIcuImport}.lib"/>
-         <environment name="CB_PDFIUM_FREETYPE_INCLUDE" value="{InstallRoot}\packages\freetype\2.14.3\include\freetype2"/>
-         <environment name="CB_PDFIUM_FREETYPE_LIB" value="{InstallRoot}\packages\freetype\2.14.3\lib\win64\{Configuration}\{PdfiumFreeTypeImport}.lib"/>
-         <environment name="CB_PDFIUM_ZLIB_INCLUDE" value="{InstallRoot}\packages\zlib\1.3.2\include"/>
-         <environment name="CB_PDFIUM_ZLIB_LIB" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}\{PdfiumZlibImport}.lib"/>
-         <environment name="CB_PDFIUM_PNG_INCLUDE" value="{InstallRoot}\packages\libpng\1.6.59\include"/>
-         <environment name="CB_PDFIUM_PNG_LIB" value="{InstallRoot}\packages\libpng\1.6.59\lib\win64\{Configuration}\{PdfiumPngImport}.lib"/>
-         <environment name="CB_PDFIUM_JPEG_INCLUDE" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\include"/>
-         <environment name="CB_PDFIUM_JPEG_LIB" value="{InstallRoot}\packages\libjpeg-turbo\3.2.0\lib\win64\{Configuration}\{PdfiumJpegImport}.lib"/>
+         <environment name="CB_PDFIUM_FREETYPE_INCLUDE" value="{DependencyRoot:freetype}\include\freetype2"/>
+         <environment name="CB_PDFIUM_FREETYPE_LIB" value="{DependencyRoot:freetype}\lib\win64\{Configuration}\{PdfiumFreeTypeImport}.lib"/>
+         <environment name="CB_PDFIUM_ZLIB_INCLUDE" value="{DependencyRoot:zlib}\include"/>
+         <environment name="CB_PDFIUM_ZLIB_LIB" value="{DependencyRoot:zlib}\lib\win64\{Configuration}\{PdfiumZlibImport}.lib"/>
+         <environment name="CB_PDFIUM_PNG_INCLUDE" value="{DependencyRoot:libpng}\include"/>
+         <environment name="CB_PDFIUM_PNG_LIB" value="{DependencyRoot:libpng}\lib\win64\{Configuration}\{PdfiumPngImport}.lib"/>
+         <environment name="CB_PDFIUM_JPEG_INCLUDE" value="{DependencyRoot:libjpeg-turbo}\include"/>
+         <environment name="CB_PDFIUM_JPEG_LIB" value="{DependencyRoot:libjpeg-turbo}\lib\win64\{Configuration}\{PdfiumJpegImport}.lib"/>
 
          <!-- Verify the GN inputs installed by the single Source scope, read-only. -->
          <!-- Declarative GN-adapter preconditions: no Python inspection script. -->
@@ -10179,7 +10179,7 @@
                   <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\third_party_abseil-cpp_absl.dll"/>
                </execute>
                <execute name="stage-installed-abseil-runtime" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}" outputMode="errors">
-                  <argument value="-DABSEIL_PACKAGE_ROOT:PATH={InstallRoot}\packages\abseil\20260817.0"/>
+                  <argument value="-DABSEIL_PACKAGE_ROOT:PATH={DependencyRoot:abseil}"/>
                   <argument value="-DPDFIUM_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
                   <argument value="-DBUILD_CONFIGURATION:STRING={Configuration}"/>
                   <argument value="-P"/>
