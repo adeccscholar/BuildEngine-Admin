@@ -1,7 +1,7 @@
 diff --git a/cmake/compilers/Clang.cmake b/cmake/compilers/Clang.cmake
 --- a/cmake/compilers/Clang.cmake
 +++ b/cmake/compilers/Clang.cmake
-@@ -25,9 +25,13 @@
+@@ -25,9 +25,12 @@
      unset(TBB_EMSCRIPTEN_STACK_SIZE)
  endif()
  
