@@ -205,17 +205,20 @@
       <probe contains="LLVM version 20.1.7"><argument value="--version"/></probe>
    </tool>
 
-   <!-- Microsoft MASM x64, used only for LLVM OpenMP ASM_MASM sources.
-        The compiler and linker remain BCC64X. Discovery is deliberately
-        restricted to installed Visual Studio toolsets, not arbitrary PATH. -->
-   <tool id="ml64" version="MSVC-toolset" required="when-used">
-      <discover executable="ml64.exe" path="false">
-         <candidate path="{ProgramFiles}\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC\*\bin\Hostx64\x64\ml64.exe"/>
-         <candidate path="{ProgramFiles}\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\*\bin\Hostx64\x64\ml64.exe"/>
-         <candidate path="{ProgramFiles}\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\*\bin\Hostx64\x64\ml64.exe"/>
-         <candidate path="{ProgramFilesX86}\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\*\bin\Hostx64\x64\ml64.exe"/>
-         <candidate path="{ProgramFiles}\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\*\bin\Hostx64\x64\ml64.exe"/>
-      </discover>
+   <!-- Standalone MASM-compatible LLVM tool. No Visual Studio installation.
+        Use only with ASM_MASM; C/C++ always use RAD Studio BCC64X. -->
+   <tool id="llvm-ml" version="20.1.7" required="when-used">
+      <managed root="llvm-ml\\20.1.7" executable="bin\\llvm-ml.exe">
+         <download url="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/clang%2Bllvm-20.1.7-x86_64-pc-windows-msvc.tar.xz"
+                   archive="clang+llvm-20.1.7-x86_64-pc-windows-msvc.tar.xz"
+                   sha256="34a66bb4891584b32d32bbe5f129e345899b255593dab2c359b730b92e304b3e"/>
+         <nativeExtract format="libarchive" root="clang+llvm-20.1.7-x86_64-pc-windows-msvc">
+            <include path="bin/llvm-ml.exe"/>
+            <include path="bin/*.dll"/>
+            <include path="LICENSE.TXT"/>
+            <require path="bin/llvm-ml.exe"/>
+         </nativeExtract>
+      </managed>
    </tool>
 
    <tool id="windows-rc" version="Windows-SDK" required="always">
