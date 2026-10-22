@@ -10398,7 +10398,7 @@
       </smoke>
 </library>
 
-   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T18:30:00Z">
+   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T18:45:00Z">
       <metadata name="LLVM OpenMP Runtime" supplier="LLVM Project"
          homepage="https://openmp.llvm.org/"
          description="Self-built dynamic LLVM libomp runtime, BCC64X compiler consumer validation." licenseSignal="green">
