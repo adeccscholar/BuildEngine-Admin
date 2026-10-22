@@ -10505,4 +10505,41 @@
       </smoke>
    </library>
 
+   <library id="eigen" version="5.0.1" category="math" timestamp="2026-10-22T21:55:00Z">
+      <metadata name="Eigen" supplier="Eigen contributors" homepage="https://eigen.tuxfamily.org/"
+                description="Header-only C++ matrix, geometry and sparse linear algebra templates. No DLL or import archive."
+                licenseSignal="yellow">
+         <license name="Mozilla Public License 2.0 and upstream third-party notices" spdx="MPL-2.0" file="COPYING.README"/>
+      </metadata>
+      <security><repository url="https://gitlab.com/libeigen/eigen.git" ref="5.0.1"/></security>
+      <source>
+         <download url="https://gitlab.com/libeigen/eigen/-/archive/5.0.1/eigen-5.0.1.tar.gz" archive="eigen-5.0.1.tar.gz"/>
+         <extract format="libarchive" root="eigen-5.0.1">
+            <require path="Eigen\\Core"/>
+            <require path="Eigen\\Dense"/>
+            <require path="unsupported\\Eigen\\CXX11\\Tensor"/>
+            <require path="COPYING.README"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\\Eigen" target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\include\\eigen3\\Eigen" recursive="true" overwrite="true"/>
+         <copy source="{Workspace}\\unsupported" target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\include\\eigen3\\unsupported" recursive="true" overwrite="true"/>
+         <copy source="{Workspace}\\COPYING.README" target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\COPYING.README" overwrite="true"/>
+         <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\include\\eigen3\\Eigen\\Core"/>
+         <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\include\\eigen3\\unsupported\\Eigen\\CXX11\\Tensor"/>
+         <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\COPYING.README"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\\cmake\\consumer">
+         <tree source="include" target="include" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\\eigen\\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\\cmake\\toolchains\\bcc64x-buildengine-cxx.cmake"
+             executable="eigen-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DEIGEN_PACKAGE_ROOT:PATH={InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}"/>
+      </smoke>
+   </library>
+
 </buildLibraries>
