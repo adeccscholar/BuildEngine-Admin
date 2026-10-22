@@ -10398,7 +10398,7 @@
       </smoke>
 </library>
 
-   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T17:30:00Z">
+   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T18:00:00Z">
       <metadata name="LLVM OpenMP Runtime" supplier="LLVM Project"
          homepage="https://openmp.llvm.org/"
          description="Self-built dynamic LLVM libomp runtime, BCC64X compiler consumer validation." licenseSignal="green">
@@ -10410,7 +10410,7 @@
       <source>
          <download url="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/openmp-20.1.7.src.tar.xz"
             archive="openmp-20.1.7.src.tar.xz"/>
-         <extract format="tar.xz" root="openmp-20.1.7.src">
+         <extract format="libarchive" root="openmp-20.1.7.src">
             <require path="CMakeLists.txt"/>
             <require path="runtime\CMakeLists.txt"/>
             <require path="runtime\src\include\omp.h.var"/>
