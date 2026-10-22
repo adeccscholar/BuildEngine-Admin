@@ -18,9 +18,16 @@ int main() {
 
    cv::dnn::Net theNet;
    std::string const strBuildInformation = cv::getBuildInformation();
-   bool const bTbb = strBuildInformation.find("Parallel framework: TBB") != std::string::npos;
-   std::println("SMOKE|CHECK|tbb-backend|{}|OpenCV build reports native TBB parallel framework",
-      bTbb ? "PASS" : "FAIL");
+   std::size_t const uParallelLine = strBuildInformation.find("Parallel framework:");
+   std::string strParallel = "not reported";
+   if(uParallelLine != std::string::npos) {
+      std::size_t const uLineEnd = strBuildInformation.find('\n', uParallelLine);
+      strParallel = strBuildInformation.substr(uParallelLine, uLineEnd - uParallelLine);
+   }
+   std::println("SMOKE|INFO|parallel-framework|{}", strParallel);
+   bool const bTbb = strParallel.find("TBB") != std::string::npos;
+   std::println("SMOKE|CHECK|tbb-backend|{}|OpenCV build parallel framework: {}",
+      bTbb ? "PASS" : "FAIL", strParallel);
    bool const bRuntime = !theGray.empty() && !theDecoded.empty() && theNet.empty();
 
    std::println("SMOKE|CHECK|runtime|{}|OpenCV {} core/imgproc/imgcodecs/dnn runtime",
