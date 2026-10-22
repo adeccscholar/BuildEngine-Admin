@@ -5,6 +5,10 @@
 #include <cstdint>
 #include <print>
 #include <cwchar>
+#include <cstdlib>
+#include <string>
+#include <algorithm>
+#include <cwctype>
 #include <vector>
 #ifdef _WIN32
 #include <windows.h>
@@ -127,12 +131,22 @@ bool PrintRuntimeIdentity() {
    if(chosen) {
       wchar_t path[32768] {};
       DWORD const size = GetModuleFileNameW(chosen, path, 32768);
-      if(size > 0 && size < 32768)
+      if(size > 0 && size < 32768) {
          std::wprintf(L"SMOKE|INFO|openmp-runtime|%ls\n", path);
+         wchar_t const* expected = _wgetenv(L"OPENMP_PACKAGE_RUNTIME_DLL");
+         if(!expected || !*expected) return false;
+         std::wstring actualPath(path), expectedPath(expected);
+         auto Normalize = [](std::wstring& strPath) {
+            std::ranges::transform(strPath, strPath.begin(), [](wchar_t ch) { return std::towlower(ch == L'/' ? L'\\' : ch); });
+         };
+         Normalize(actualPath);
+         Normalize(expectedPath);
+         return actualPath == expectedPath;
+      }
    } else {
       std::println("SMOKE|INFO|openmp-runtime|DLL name not identified");
    }
-   return chosen != nullptr;
+   return false;
 #else
    return false;
 #endif
