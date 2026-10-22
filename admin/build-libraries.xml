@@ -10468,6 +10468,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="PATH" value="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\Release;{ENV:PATH}"/>
+         <environment name="OPENMP_PACKAGE_RUNTIME_DLL" value="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\Release\\libomp.dll"/>
          <argument value="-DOPENMP_PACKAGE_ROOT:PATH={InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}"/>
          <argument value="-DOPENMP_CONFIGURATION:STRING=Release"/>
       </smoke>
@@ -10478,6 +10479,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="PATH" value="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\Debug;{ENV:PATH}"/>
+         <environment name="OPENMP_PACKAGE_RUNTIME_DLL" value="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\Debug\\libomp.dll"/>
          <argument value="-DOPENMP_PACKAGE_ROOT:PATH={InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}"/>
          <argument value="-DOPENMP_CONFIGURATION:STRING=Debug"/>
       </smoke>
