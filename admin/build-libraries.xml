@@ -10398,7 +10398,7 @@
       </smoke>
 </library>
 
-   <library id="openmp-probe" version="20.1.7" category="toolchain" timestamp="2026-10-21T19:40:00Z">
+   <library id="openmp-probe" version="20.1.7" category="toolchain" timestamp="2026-10-22T16:30:00Z">
       <metadata name="BCC64X OpenMP capability probe" supplier="adecc Scholar"
          description="Zero-download capability test for BCC64X -fopenmp and installed OpenMP runtime." licenseSignal="green">
          <license name="MIT" spdx="MIT"/>
