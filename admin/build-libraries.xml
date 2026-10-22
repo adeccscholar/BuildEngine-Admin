@@ -10398,7 +10398,7 @@
       </smoke>
 </library>
 
-   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T19:00:00Z">
+   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T19:15:00Z">
       <metadata name="LLVM OpenMP Runtime" supplier="LLVM Project"
          homepage="https://openmp.llvm.org/"
          description="Self-built dynamic LLVM libomp runtime, BCC64X compiler consumer validation." licenseSignal="green">
@@ -10440,6 +10440,13 @@
          <argument value="-DOPENMP_ENABLE_OMPT_TOOLS:BOOL=OFF"/>
          <argument value="-DOPENMP_ENABLE_WERROR:BOOL=OFF"/>
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <!-- Compiler identities are sticky in CMakeFiles; reset only the
+              variant-local configure state when this XML build reruns. -->
+         <execute name="reset-stale-masm-cmake-identity" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" outputMode="errors">
+            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\CMakeCache.txt"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\CMakeFiles"/>
+         </execute>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}"
