@@ -128,9 +128,9 @@ void PrintRuntimeIdentity() {
       wchar_t path[32768] {};
       DWORD const size = GetModuleFileNameW(chosen, path, 32768);
       if(size > 0 && size < 32768)
-         std::wprintf(L"SMOKE|INFO|openmp-runtime|%ls\n", path);
+         std::wprintf(L"[OPENMP] runtime: %ls\n", path);
    } else {
-      std::println("SMOKE|INFO|openmp-runtime|DLL name not identified");
+      std::println("[OPENMP] runtime: DLL name not identified");
    }
 #endif
 }
