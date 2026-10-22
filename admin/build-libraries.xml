@@ -10398,29 +10398,48 @@
       </smoke>
 </library>
 
-   <library id="openmp-probe" version="20.1.7" category="toolchain" timestamp="2026-10-22T16:30:00Z">
-      <metadata name="BCC64X OpenMP capability probe" supplier="adecc Scholar"
-         description="Zero-download capability test for BCC64X -fopenmp and installed OpenMP runtime." licenseSignal="green">
-         <license name="MIT" spdx="MIT"/>
+   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T16:30:00Z">
+      <metadata name="LLVM OpenMP Runtime" supplier="LLVM Project"
+         homepage="https://openmp.llvm.org/"
+         description="Self-built dynamic LLVM libomp runtime, BCC64X compiler consumer validation." licenseSignal="green">
+         <license name="Apache License 2.0 with LLVM Exceptions" spdx="Apache-2.0 WITH LLVM-exception"/>
       </metadata>
+      <security>
+         <repository url="https://github.com/llvm/llvm-project.git" ref="llvmorg-20.1.7"/>
+      </security>
       <source>
-         <copy source="{BuildFileDir}\smokes\openmp\probe\CMakeLists.txt"
-            target="{Workspace}\CMakeLists.txt" overwrite="true"/>
-         <copy source="{BuildFileDir}\smokes\openmp\probe\main.cpp"
-            target="{Workspace}\main.cpp" overwrite="true"/>
+         <download url="https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/openmp-20.1.7.src.tar.xz"
+            archive="openmp-20.1.7.src.tar.xz"/>
+         <extract format="tar.xz" root="openmp-20.1.7.src">
+            <require path="CMakeLists.txt"/>
+            <require path="runtime\\CMakeLists.txt"/>
+            <require path="runtime\\src\\include\\omp.h.var"/>
+         </extract>
       </source>
       <build>
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <argument value="-G"/><argument value="Ninja"/>
-         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\\cmake\\toolchains\\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
-         
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DOPENMP_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DLIBOMP_LIB_TYPE:STRING=normal"/>
+         <argument value="-DLIBOMP_ARCH:STRING=x86_64"/>
+         <argument value="-DLIBOMP_COPY_EXPORTS:BOOL=OFF"/>
+         <argument value="-DLIBOMP_FORTRAN_MODULES:BOOL=OFF"/>
+         <argument value="-DLIBOMP_USE_HWLOC:BOOL=OFF"/>
+         <argument value="-DOPENMP_ENABLE_LIBOMPTARGET:BOOL=OFF"/>
+         <argument value="-DOPENMP_ENABLE_OMPT_TOOLS:BOOL=OFF"/>
+         <argument value="-DOPENMP_ENABLE_WERROR:BOOL=OFF"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
-            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}"
-            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
          </variant>
@@ -10429,18 +10448,40 @@
          </variant>
          <install>
             <perVariant>
-            <cmake mode="install" executable="{Tool:cmake}"
-               build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release\openmp-probe.exe"/>
+               <cmake mode="install" executable="{Tool:cmake}"
+                  build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
+               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\include\\omp.h"/>
+               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\{Configuration}\\libomp.dll"/>
+               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\lib\\win64\\{Configuration}\\libomp.lib"/>
             </perVariant>
          </install>
       </build>
-      <smoke id="runtime" scope="package" source="smokes\openmp\probe" configuration="Release"
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\\cmake\\consumer" requiresAllVariants="true">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\\win64\\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\\win64\\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\\llvm-openmp\\consumer" configuration="Release"
          cmake="{Tool:cmake}" ninja="{Tool:ninja}"
-         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
-         executable="openmp-probe.exe">
+         toolchain="{BuildFileDir}\\cmake\\toolchains\\bcc64x-buildengine-cxx.cmake"
+         executable="llvm-openmp-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\Release;{ENV:PATH}"/>
+         <environment name="OPENMP_PACKAGE_RUNTIME_DLL" value="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\Release\\libomp.dll"/>
+         <argument value="-DOPENMP_PACKAGE_ROOT:PATH={InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}"/>
+         <argument value="-DOPENMP_CONFIGURATION:STRING=Release"/>
+      </smoke>
+      <smoke id="consumer" scope="package" source="smokes\\llvm-openmp\\consumer" configuration="Debug"
+         cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\\cmake\\toolchains\\bcc64x-buildengine-cxx.cmake"
+         executable="llvm-openmp-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\Debug;{ENV:PATH}"/>
+         <environment name="OPENMP_PACKAGE_RUNTIME_DLL" value="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\Debug\\libomp.dll"/>
+         <argument value="-DOPENMP_PACKAGE_ROOT:PATH={InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}"/>
+         <argument value="-DOPENMP_CONFIGURATION:STRING=Debug"/>
       </smoke>
    </library>
 
