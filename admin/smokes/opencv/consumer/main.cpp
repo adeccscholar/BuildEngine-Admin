@@ -16,11 +16,14 @@ int main() {
    cv::Mat const theDecoded = bEncoded ? cv::imdecode(vecEncoded, cv::IMREAD_COLOR) : cv::Mat {};
 
    cv::dnn::Net theNet;
+   bool const bTbb = cv::currentParallelFramework() == "tbb";
+   std::println("SMOKE|CHECK|tbb-backend|{}|OpenCV runtime parallel framework {}",
+      bTbb ? "PASS" : "FAIL", cv::currentParallelFramework());
    bool const bRuntime = !theGray.empty() && !theDecoded.empty() && theNet.empty();
 
    std::println("SMOKE|CHECK|runtime|{}|OpenCV {} core/imgproc/imgcodecs/dnn runtime",
                 bRuntime ? "PASS" : "FAIL", CV_VERSION);
    std::println("SMOKE|RESULT|{}|OpenCV 15-module consumer usable",
-                bRuntime ? "PASS" : "FAIL");
-   return bRuntime ? 0 : 1;
+                (bRuntime && bTbb) ? "PASS" : "FAIL");
+   return (bRuntime && bTbb) ? 0 : 1;
 }
