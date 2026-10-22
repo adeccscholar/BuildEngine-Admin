@@ -10398,7 +10398,7 @@
       </smoke>
 </library>
 
-   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T19:15:00Z">
+   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T19:30:00Z">
       <metadata name="LLVM OpenMP Runtime" supplier="LLVM Project"
          homepage="https://openmp.llvm.org/"
          description="Self-built dynamic LLVM libomp runtime, BCC64X compiler consumer validation." licenseSignal="green">
@@ -10463,6 +10463,12 @@
                   build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\omp.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libomp.dll"/>
+               <!-- Upstream LLVM uses the DLL filename as the import archive base,
+                    producing libomp.dll.lib with the BCC64X .lib suffix. -->
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libomp.dll.lib"/>
+               <copy source="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libomp.dll.lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libomp.lib"
+                     overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libomp.lib"/>
             </perVariant>
          </install>
