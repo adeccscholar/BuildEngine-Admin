@@ -10400,7 +10400,7 @@
       </smoke>
 </library>
 
-   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T20:55:00Z">
+   <library id="llvm-openmp" version="20.1.7" category="concurrency" timestamp="2026-10-22T21:20:00Z">
       <metadata name="LLVM OpenMP Runtime" supplier="LLVM Project"
          homepage="https://openmp.llvm.org/"
          description="Self-built dynamic LLVM libomp runtime, BCC64X compiler consumer validation." licenseSignal="green">
@@ -10426,6 +10426,7 @@
          <argument value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
          <!-- LLVM MASM-compatible assembler only; C/C++/link remain BCC64X. -->
          <argument value="-DCMAKE_ASM_MASM_COMPILER:FILEPATH={Tool:llvm-ml}"/>
+         <argument value="-DCMAKE_ASM_MASM_FLAGS:STRING=-m64"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
