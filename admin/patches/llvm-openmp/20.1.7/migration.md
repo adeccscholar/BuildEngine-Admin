@@ -10,3 +10,9 @@ The initial XML integration is intentionally subject to the Windows/BCC64X confi
 License: Apache-2.0 WITH LLVM-exception. Build must produce a DLL, not a static runtime.
 
 Validation pending: the upstream 20.1.7 source archive structure, MASM configuration, BCC64X compiler/linker compatibility, generated import-library name, and Windows DLL load evidence are not yet verified by an actual BuildEngine run. The current branch is an integration candidate, not a passing library build.
+
+## MASM toolchain policy (2026-10-22)
+
+Visual Studio is not a prerequisite. The previous `ml64` discovery tied OpenMP to an existing MSVC installation and was removed. The BuildEngine tool catalog now provisions `llvm-ml` 20.1.7 from a pinned LLVM Windows binary release and passes it only to `CMAKE_ASM_MASM_COMPILER`. C, C++, generic ASM and DLL linking remain on the registered BCC64X toolchain. The full LLVM archive is extracted selectively, never installed as a replacement compiler suite.
+
+Validation still required on a clean machine without Visual Studio: tool archive must contain `bin/llvm-ml.exe`, `llvm-ml` must assemble `z_Windows_NT-586_asm.asm` in both Debug and Release, and the resulting runtime DLL plus import library must pass the consumer smoke. Treat this as unverified until evidence is available.
