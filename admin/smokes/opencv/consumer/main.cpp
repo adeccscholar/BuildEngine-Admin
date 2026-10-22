@@ -4,6 +4,7 @@
 #include <opencv2/imgproc.hpp>
 
 #include <print>
+#include <string>
 #include <vector>
 
 int main() {
@@ -16,9 +17,10 @@ int main() {
    cv::Mat const theDecoded = bEncoded ? cv::imdecode(vecEncoded, cv::IMREAD_COLOR) : cv::Mat {};
 
    cv::dnn::Net theNet;
-   bool const bTbb = cv::currentParallelFramework() == "tbb";
-   std::println("SMOKE|CHECK|tbb-backend|{}|OpenCV runtime parallel framework {}",
-      bTbb ? "PASS" : "FAIL", cv::currentParallelFramework());
+   std::string const strBuildInformation = cv::getBuildInformation();
+   bool const bTbb = strBuildInformation.find("Parallel framework: TBB") != std::string::npos;
+   std::println("SMOKE|CHECK|tbb-backend|{}|OpenCV build reports native TBB parallel framework",
+      bTbb ? "PASS" : "FAIL");
    bool const bRuntime = !theGray.empty() && !theDecoded.empty() && theNet.empty();
 
    std::println("SMOKE|CHECK|runtime|{}|OpenCV {} core/imgproc/imgcodecs/dnn runtime",
