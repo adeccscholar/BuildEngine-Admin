@@ -6,7 +6,7 @@ find_package(wil CONFIG REQUIRED)
 add_executable(wil-consumer main.cpp)
 set_property(TARGET wil-consumer PROPERTY CXX_SCAN_FOR_MODULES OFF)
 target_compile_features(wil-consumer PRIVATE cxx_std_23)
-target_compile_definitions(wil-consumer PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
+target_compile_definitions(wil-consumer PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX ADECC_BCC64X_WIL_SDK_ATOMICS)
 target_link_libraries(wil-consumer PRIVATE WIL::WIL)
 
 # WeakReference.h is supplied in the Windows SDK winrt include directory,
