@@ -3,7 +3,7 @@ project(BuildEngineSmokeOpenCV LANGUAGES CXX)
 
 find_package(OpenCV 5.0 CONFIG REQUIRED COMPONENTS
    core imgproc geometry flann features video photo stereo ptcloud
-   calib dnn objdetect imgcodecs videoio highgui
+   calib ml dnn objdetect imgcodecs videoio highgui stitching
 )
 
 add_executable(opencv-consumer main.cpp)
