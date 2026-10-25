@@ -3987,12 +3987,14 @@
          <argument value="-DLeptonica_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\leptonica"/>
       </smoke>
    </library>
-   <library id="tesseract" version="5.5.3" category="text" timestamp="2026-10-25T23:10:00Z">
+   <library id="tesseract" version="5.5.3" category="text" timestamp="2026-10-26T00:05:00Z">
       <dependency library="leptonica" version="1.87.0"/>
       <metadata name="Tesseract OCR" supplier="Tesseract OCR Project" homepage="https://github.com/tesseract-ocr/tesseract" description="Dynamically linked C++ OCR engine; language traineddata is provisioned and licensed separately." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source>
          <download url="https://github.com/tesseract-ocr/tesseract/archive/db0ec62f81b0737fbbe184d8fea40af5738f8eef.zip" archive="tesseract-db0ec62f81b0737fbbe184d8fea40af5738f8eef.zip"/>
          <extract format="zip" root="tesseract-db0ec62f81b0737fbbe184d8fea40af5738f8eef"><require path="CMakeLists.txt"/><require path="include\tesseract\baseapi.h"/><require path="LICENSE"/></extract><copy source="{BuildFileDir}\patches\tesseract\5.5.3\bcc64x-runtime-install.patch" target="{Workspace}\.buildengine\patches\bcc64x-runtime-install.patch" overwrite="true" preserveCurrentArtifact="true"/><execute name="runtime-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\bcc64x-runtime-install.patch"/></execute><execute name="runtime-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\bcc64x-runtime-install.patch"/></execute>
+      <download url="https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/eng.traineddata" archive="tessdata-fast-eng-87416418657359cb625c412a48b6e1d6d41c29bd.traineddata" sha256="7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2"/>
+         <copy source="{CurrentArtifact}" target="{Workspace}\tessdata\eng.traineddata" overwrite="true" preserveCurrentArtifact="true"/>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
@@ -4013,7 +4015,7 @@
             <perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\tesseract\TesseractConfig.cmake"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
-            <common><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tesseract\baseapi.h"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common>
+            <common><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tesseract\baseapi.h"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><copy source="{Workspace}\tessdata\eng.traineddata" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata\eng.traineddata" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata\eng.traineddata"/></common>
          </install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin" target="bin" extensions=".dll;.exe"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
@@ -4021,6 +4023,12 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{ENV:PATH}"/>
          <argument value="-DLeptonica_DIR:PATH={DependencyRoot:leptonica}\lib\win64\Release\cmake\leptonica"/>
          <argument value="-DTesseract_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\tesseract"/>
+      </smoke>
+   <smoke id="ocr" scope="package" source="smokes\tesseract\ocr" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="tesseract-ocr-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{ENV:PATH}"/>
+         <argument value="-DLeptonica_DIR:PATH={DependencyRoot:leptonica}\lib\win64\Release\cmake\leptonica"/>
+         <argument value="-DTesseract_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\tesseract"/>
+         <argument value="-DOCR_TESSDATA_DIRECTORY:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata"/>
       </smoke>
    </library>
    <library id="wil" version="1.0.260126.7" category="foundation" timestamp="2026-10-26T00:00:00Z">
