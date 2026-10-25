@@ -59,3 +59,33 @@ Mandatory acceptance checks before treating integration as finished:
 7. Only then introduce pinned `eng.traineddata`, reproducible OCR assertions, and the optional user-permission-based webcam test.
 
 **Known unverified integration risks:** Windows BCC64X/Clang support for DirectShow, with MSMF still blocked by MSVC COM helpers, Leptonica's package target export in Release/Debug, import-library filename conventions, and Tesseract's upstream Windows build. Any failure must be fixed in the XML-driven build contract and versioned source patches, not by falling back to MSVC, static linking, ad-hoc scripts, or PATH workarounds.
+
+## Microsoft WIL as a first-class header-only BuildEngine package
+
+The Windows Implementation Library (WIL) has been added as a separately
+versioned header-only package (`wil@1.0.260126.7`). The source is pinned
+to the official GitHub release commit `cbf677fb0a942557d08fd129f4c106a76247b2ec`.
+Its upstream CMake interface target `WIL::WIL` is installed without
+building a binary library. WIL uses the MIT license; both `LICENSE` and
+`ThirdPartyNotices.txt` are retained.
+
+A native BCC64X consumer in `admin/smokes/wil/consumer` compiles
+`wil/com.h` and `wil/resource.h`, then tests COM interface ownership:
+attach, AddRef/copy, move, QueryInterface, detach, and final Release.
+The consumer does not use a synthetic replacement for WIL, any MSVC
+C++ runtime, or a camera. It is a **mandatory compatibility gate** before
+introducing WIL into OpenCV's Media Foundation code.
+
+OpenCV MSMF remains disabled until WIL's real BCC64X smoke passes.
+The subsequent versioned OpenCV patch must replace the upstream
+`_COM_SMARTPTR_TYPEDEF` / `_com_ptr_t` dependencies with
+`wil::com_ptr_nothrow<T>` and explicit `put()`, `get()`, `reset()`,
+`query_to()`, and `attach()` operations, preserving COM ownership rules.
+It must also replace the upstream `_com_error` catches and declare
+Media Foundation system libraries explicitly for the non-MSVC linker.
+Only after **both** compilation and native runtime tests pass may
+`WITH_MSMF=ON` be restored.
+
+**Status: not verified.** The repository has no native BCC64X runtime
+available to run the consumer. Enabling MSMF now would bypass the
+explicit compatibility gate and repeat the previous failed build.
