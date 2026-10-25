@@ -154,3 +154,10 @@ OpenCV 5.0.0 + pinned contrib build before installation. The ML DLL
 process must execute and print its checks, the WIL COM lifetime consumer
 must pass, and both OpenCV variants must build, install and pass the
 17-module consumer smoke.
+
+
+## OCR recognition smoke and WIL COM correction (October 2026)
+
+New `tesseract@5.5.3` smoke `ocr` checks actual text `OCR TEST 4711` via pinned `tessdata_fast` model commit `87416418657359cb625c412a48b6e1d6d41c29bd` (SHA-256 `7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2`). The existing model-free consumer remains separate. Model retrieval uses BuildEngine XML and SHA-256 validation; the PNG is synthetic. Native BCC64X execution is pending.
+
+WIL's original query check wrongly expected the compatible IUnknown-to-IUnknown fast path to call QueryInterface. Upstream uses AddRef directly. The smoke now validates this path and tests explicit IID QueryInterface independently. No WIL upstream patch was changed.

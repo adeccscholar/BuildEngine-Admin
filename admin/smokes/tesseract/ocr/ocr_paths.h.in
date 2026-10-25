@@ -1,0 +1,3 @@
+#pragma once
+inline constexpr char szOcrTessdataDirectory[] = R"ocr(@OCR_TESSDATA_DIRECTORY@)ocr";
+inline constexpr char szOcrImagePath[] = R"ocr(@CMAKE_CURRENT_SOURCE_DIR@/testdata/ocr-test-4711.png)ocr";
