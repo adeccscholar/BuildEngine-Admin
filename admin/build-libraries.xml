@@ -4023,6 +4023,48 @@
          <argument value="-DTesseract_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\tesseract"/>
       </smoke>
    </library>
+   <library id="wil" version="1.0.260126.7" category="foundation" timestamp="2026-10-25T21:30:00Z">
+      <metadata name="Windows Implementation Library (WIL)" supplier="Microsoft" homepage="https://github.com/microsoft/wil" description="Microsoft MIT-licensed header-only Windows COM and RAII library. BCC64X compatibility requires a native consumer smoke before use by OpenCV." licenseSignal="yellow"><license name="MIT License" spdx="MIT" file="LICENSE"/></metadata>
+      <source>
+         <download url="https://github.com/microsoft/wil/archive/cbf677fb0a942557d08fd129f4c106a76247b2ec.zip" archive="wil-cbf677fb0a942557d08fd129f4c106a76247b2ec.zip"/>
+         <extract format="zip" root="wil-cbf677fb0a942557d08fd129f4c106a76247b2ec">
+            <require path="CMakeLists.txt"/><require path="include\wil\com.h"/><require path="include\wil\resource.h"/><require path="LICENSE"/><require path="ThirdPartyNotices.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_DATADIR:STRING=share"/>
+         <argument value="-DWIL_BUILD_PACKAGING:BOOL=OFF"/><argument value="-DWIL_BUILD_TESTS:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\wil\com.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\cmake\WIL\wilConfig.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <copy source="{Workspace}\ThirdPartyNotices.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ThirdPartyNotices.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ThirdPartyNotices.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <cmake source="share\cmake" target="share\cmake"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\wil\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="wil-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Dwil_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\cmake\WIL"/>
+      </smoke>
+   </library>
    <library id="opencv" version="5.0.0" category="graphics" timestamp="2026-10-25T20:50:00Z">
       <dependency library="onetbb" version="2023.1.0"/><dependency library="llvm-openmp" version="20.1.7"/>
       <dependency library="zlib" version="1.3.2"/>
