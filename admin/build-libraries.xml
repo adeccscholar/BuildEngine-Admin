@@ -2455,7 +2455,7 @@
       </smoke>
    </library>
 
-   <library id="boost" version="1.92.0" category="foundation" timestamp="2026-10-15T21:00:00Z">
+   <library id="boost" version="1.92.0" category="foundation" timestamp="2026-10-26T00:30:00Z">
       <!--
          Canonical Boost model from the target-machine evidence:
          - one official upstream CMake source tree;
@@ -2635,6 +2635,13 @@
             </perVariant>
             <common>
                <copy source="{Workspace}\LICENSE_1_0.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE_1_0.txt" overwrite="true"/>
+               <!-- The bcc64x consumer overlay belongs to the installed package.
+                    StackBuilder includes it as a sibling with <additional path>. -->
+               <copy source="{BuildFileDir}\cmake\consumer\boost\bcc64x-native-clang"
+                  target="{InstallRoot}\packages\{LibraryId}\bcc64x-native-clang"
+                  recursive="true" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\bcc64x-native-clang\boost\config\user.hpp"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\bcc64x-native-clang\project-include.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\boost\version.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\boost\filesystem\path.hpp"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE_1_0.txt"/>
