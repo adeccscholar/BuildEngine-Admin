@@ -3977,7 +3977,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\leptonica\LeptonicaConfig.cmake"/>
             </perVariant>
-            <common><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\leptonica\allheaders.h"/><copy source="{Workspace}\leptonica-license.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/></common>
+            <common><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\leptonica\allheaders.h"/><copy source="{Workspace}\leptonica-license.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><copy source="{Workspace}\leptonica-license.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\leptonica-license.txt" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\leptonica-license.txt"/></common>
          </install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
