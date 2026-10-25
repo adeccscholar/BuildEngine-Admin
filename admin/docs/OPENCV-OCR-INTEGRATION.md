@@ -120,3 +120,37 @@ All changes are made through the production XML contract and versioned
 consumer sources on `main`. A passing BCC64X build, registered DirectShow
 backend, and full PE runtime closure are still required before calling the
 integration complete.
+
+## DLL loader and WIL compatibility follow-up
+
+In the next BuildEngine run, Tesseract's model-free consumer built but exited
+with Windows `0xC0000135` before producing smoke evidence. This code means
+a DLL could not be loaded; it does **not** identify the specific DLL.
+The original upstream Tesseract install script hardcodes `bin`, whereas
+BuildEngine's package-scope smoke assembles `PATH` from version-specific
+`bin/win64/Release` directories for the package and its entire declared
+dependency closure. A versioned source patch now changes Tesseract's DLL and
+CLI install destinations to `CMAKE_INSTALL_BINDIR` and the XML selects
+`bin/win64/{Configuration}`. The loader's exact missing DLL remains
+**unverified** until the smoke reruns. Do not work around this by copying
+MSVC DLLs, adding arbitrary PATH locations, or linking statically.
+
+WIL's native consumer encountered `WriteRelease` type conflicts in the
+upstream MinGW compatibility section of `include/wil/common.h`. A narrow
+source patch guards only that group of fallback atomic declarations with
+`ADECC_BCC64X_WIL_SDK_ATOMICS`. The BCC64X smoke defines the flag so it uses
+the installed Windows SDK facilities instead. Other consumers retain the
+unmodified default behavior. The Windows SDK and subsequent WIL compile
+results must still be validated by a real BCC64X run.
+
+OpenCV's ML import check also failed because the existing FSM evidence
+resumed at `install` and did not rebuild the previously absent
+`opencv_contrib` module. The OpenCV catalog timestamp has been increased
+to invalidate the source and build evidence and allow a fresh
+OpenCV 5.0.0 + pinned contrib build before installation. The ML DLL
+`require` remains mandatory.
+
+**Acceptance:** A green installation alone is not enough; the Tesseract
+process must execute and print its checks, the WIL COM lifetime consumer
+must pass, and both OpenCV variants must build, install and pass the
+17-module consumer smoke.
