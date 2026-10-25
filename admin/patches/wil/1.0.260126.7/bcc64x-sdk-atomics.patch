@@ -8,7 +8,7 @@
  extern "C"
  {
      inline void WriteRelease(long* p, long v)
-@@ -150,6 +151,7 @@
+@@ -150,5 +151,6 @@
          return __builtin_return_address(0);
      }
  #endif
