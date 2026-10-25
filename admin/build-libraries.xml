@@ -4023,7 +4023,7 @@
          <argument value="-DTesseract_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\tesseract"/>
       </smoke>
    </library>
-   <library id="wil" version="1.0.260126.7" category="foundation" timestamp="2026-10-25T23:40:00Z">
+   <library id="wil" version="1.0.260126.7" category="foundation" timestamp="2026-10-26T00:00:00Z">
       <metadata name="Windows Implementation Library (WIL)" supplier="Microsoft" homepage="https://github.com/microsoft/wil" description="Microsoft MIT-licensed header-only Windows COM and RAII library. BCC64X compatibility requires a native consumer smoke before use by OpenCV." licenseSignal="yellow"><license name="MIT License" spdx="MIT" file="LICENSE"/></metadata>
       <source>
          <download url="https://github.com/microsoft/wil/archive/cbf677fb0a942557d08fd129f4c106a76247b2ec.zip" archive="wil-cbf677fb0a942557d08fd129f4c106a76247b2ec.zip"/>

@@ -123,10 +123,20 @@ int main() {
          wil::com_ptr_nothrow<IUnknown> theMoved=std::move(theCopy);
          bPass=Check(!theCopy && bool(theMoved),"move-no-addref") && bPass;
 
+         // Compatible interfaces use WIL's AddRef fast path, not QueryInterface.
          wil::com_ptr_nothrow<IUnknown> theQueried;
-         HRESULT const hr=theObject.query_to(theQueried.put());
-         bPass=Check(hr==S_OK && bool(theQueried) &&
-            aCounters.uQuery==1 && aCounters.uAddRef==2,"query-interface") && bPass;
+         HRESULT const hrFast=theObject.query_to(theQueried.put());
+         bPass=Check(hrFast==S_OK && bool(theQueried) &&
+            aCounters.uQuery==0 && aCounters.uAddRef==2,
+            "query-compatible-fastpath") && bPass;
+
+         // Explicit IID overload must invoke IUnknown::QueryInterface.
+         wil::com_ptr_nothrow<IUnknown> theQueriedViaIID;
+         HRESULT const hr=theObject.query_to(
+            IID_IUnknown,reinterpret_cast<void**>(theQueriedViaIID.put()));
+         bPass=Check(hr==S_OK && bool(theQueriedViaIID) &&
+            aCounters.uQuery==1 && aCounters.uAddRef==3,
+            "query-interface") && bPass;
 
          IUnknown* pRaw=theQueried.detach();
          bPass=Check(!theQueried && pRaw!=nullptr,"detach") && bPass;
@@ -135,12 +145,12 @@ int main() {
       }
 
       bPass=Check(aCounters.uActive==1 &&
-         aCounters.uRelease==2,"scope-releases") && bPass;
+         aCounters.uRelease==3,"scope-releases") && bPass;
       theObject.reset();
    }
 
    bPass=Check(aCounters.uActive==0 && aCounters.uDestroyed==1 &&
-      aCounters.uRelease==3,"final-release") && bPass;
+      aCounters.uRelease==4,"final-release") && bPass;
 
    std::println("SMOKE|RESULT|{}|WIL header-only COM consumer",
       bPass?"PASS":"FAIL");
