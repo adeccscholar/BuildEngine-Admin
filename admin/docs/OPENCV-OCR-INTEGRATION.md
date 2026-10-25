@@ -13,14 +13,14 @@ These changes have been committed on **main**, but are **not yet verified by a W
 
 The XML `BUILD_LIST` adds `ml` (machine learning) and `stitching` (panorama processing) to the existing core, image-processing, calibration, video, object detection, DNN, codecs, and UI modules. The following Windows camera options are enabled:
 
-- `WITH_MSMF=ON`: Microsoft Media Foundation capture.
-- `WITH_DSHOW=ON`: DirectShow capture.
+- `WITH_MSMF=OFF`: Microsoft Media Foundation is postponed: upstream `cap_msmf.cpp` requires MSVC-specific `<comdef.h>`, `_COM_SMARTPTR_TYPEDEF`, and `_com_error`, unavailable to the native BCC64X toolchain. A dedicated COM lifetime and import-library port is required before re-enabling it.
+- `WITH_DSHOW=ON`: DirectShow capture, subject to BCC64X build and runtime verification.
 - `WITH_MSMF_DXVA=OFF`: do not require hardware acceleration.
 - `VIDEOIO_ENABLE_PLUGINS=OFF`: use the configured built-in backends, not runtime-downloaded plugins.
 
 FFmpeg, GStreamer, CUDA, OpenCL, DirectML, and OpenCV's optional external ONNX Runtime remain disabled. OpenCV's internal DNN code stays enabled. A video input **backend** is not the same thing as an attached camera: automated CI checks backend registration; a separate interactive test must verify actual camera access and Windows privacy permissions.
 
-The existing OpenCV consumer now requires `ml` and `stitching`, creates the corresponding objects, and checks registration for both `CAP_MSMF` and `CAP_DSHOW`. It still verifies PNG image encoding/decoding and oneTBB runtime selection. Failing registration is an intentional smoke failure, not a silently skipped test.
+The existing OpenCV consumer now requires `ml` and `stitching`, creates the corresponding objects, and reports both camera backends but requires registration only for `CAP_DSHOW`. It still verifies PNG image encoding/decoding and oneTBB runtime selection. Failing registration is an intentional smoke failure, not a silently skipped test.
 
 ## Leptonica as a separate DLL package
 
@@ -51,11 +51,11 @@ The libraries are inserted into `admin/build-libraries.xml`, preserving `leptoni
 Mandatory acceptance checks before treating integration as finished:
 
 1. Parse the XML contract with the actual BuildEngine configuration validator and verify that all declared libraries/dependencies resolve.
-2. Rebuild both OpenCV variants and verify `opencv_ml500` and `opencv_stitching500` import libraries and DLLs, plus MSMF/DirectShow registration in the consumer smoke.
+2. Rebuild both OpenCV variants and verify `opencv_ml500` and `opencv_stitching500` import libraries and DLLs, plus DirectShow registration in the consumer smoke.
 3. Build both Leptonica variants and verify headers, exported CMake targets, import libraries, DLLs, and license text.
 4. Build both Tesseract variants and verify `TesseractConfig.cmake`, `Tesseract::libtesseract`, headers, import libraries, DLL, and correct closure to Leptonica.
 5. Run the model-free C and C++ consumers without leaking other installed versions through PATH.
 6. Stage the actual PE-import closure. Verify SHA-256, package SBOM, and original licenses.
 7. Only then introduce pinned `eng.traineddata`, reproducible OCR assertions, and the optional user-permission-based webcam test.
 
-**Known unverified integration risks:** Windows BCC64X/Clang support for MSMF and DirectShow, Leptonica's package target export in Release/Debug, import-library filename conventions, and Tesseract's upstream Windows build. Any failure must be fixed in the XML-driven build contract and versioned source patches, not by falling back to MSVC, static linking, ad-hoc scripts, or PATH workarounds.
+**Known unverified integration risks:** Windows BCC64X/Clang support for DirectShow, with MSMF still blocked by MSVC COM helpers, Leptonica's package target export in Release/Debug, import-library filename conventions, and Tesseract's upstream Windows build. Any failure must be fixed in the XML-driven build contract and versioned source patches, not by falling back to MSVC, static linking, ad-hoc scripts, or PATH workarounds.
