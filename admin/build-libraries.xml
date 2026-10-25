@@ -4008,7 +4008,7 @@
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/></variant>
-         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/><argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/></variant>
          <install>
             <perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\tesseract\TesseractConfig.cmake"/>
