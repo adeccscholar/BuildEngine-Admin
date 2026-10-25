@@ -3952,7 +3952,7 @@
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libtiff" version="4.7.2"/>
-      <metadata name="Leptonica" supplier="Leptonica Project" homepage="https://github.com/DanBloomberg/leptonica" description="Image normalization, binarization, morphology and OCR preprocessing for Tesseract." licenseSignal="yellow"><license name="Leptonica license" spdx="BSD-2-Clause" file="leptonica-license.txt"/></metadata>
+      <metadata name="Leptonica" supplier="Leptonica Project" homepage="https://github.com/DanBloomberg/leptonica" description="Image normalization, binarization, morphology and OCR preprocessing for Tesseract." licenseSignal="yellow"><license name="Leptonica license" spdx="BSD-2-Clause" file="LICENSE"/></metadata>
       <source>
          <download url="https://github.com/DanBloomberg/leptonica/releases/download/{LibraryVersion}/leptonica-{LibraryVersion}.tar.gz" archive="leptonica-{LibraryVersion}.tar.gz" sha256="c73363397f96eb1295602bf44d708a994ad42046c791bf03ea0505d829bdb6a7"/>
          <extract format="libarchive" root="leptonica-{LibraryVersion}"><require path="CMakeLists.txt"/><require path="src\allheaders.h"/><require path="leptonica-license.txt"/></extract>
@@ -3977,7 +3977,7 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\leptonica\LeptonicaConfig.cmake"/>
             </perVariant>
-            <common><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\leptonica\allheaders.h"/><copy source="{Workspace}\leptonica-license.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common>
+            <common><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\leptonica\allheaders.h"/><copy source="{Workspace}\leptonica-license.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/></common>
          </install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
