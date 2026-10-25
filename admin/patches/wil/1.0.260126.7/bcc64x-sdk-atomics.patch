@@ -1,0 +1,18 @@
+--- a/include/wil/common.h
++++ b/include/wil/common.h
+@@ -126,6 +126,7 @@
+ #ifndef _Ret_opt_bytecap_
+ #define _Ret_opt_bytecap_(n)
+ #endif
++#if !defined(ADECC_BCC64X_WIL_SDK_ATOMICS)
+ extern "C"
+ {
+     inline void WriteRelease(long* p, long v)
+@@ -150,6 +151,7 @@
+         return __builtin_return_address(0);
+     }
+ #endif
+ }
++#endif // ADECC_BCC64X_WIL_SDK_ATOMICS
+ #endif
+ 
