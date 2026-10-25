@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeTesseract LANGUAGES CXX)
+find_package(Leptonica 1.87 CONFIG REQUIRED)
+find_package(Tesseract 5.5 CONFIG REQUIRED)
+add_executable(tesseract-consumer main.cpp)
+set_property(TARGET tesseract-consumer PROPERTY CXX_SCAN_FOR_MODULES OFF)
+target_compile_features(tesseract-consumer PRIVATE cxx_std_23)
+target_link_libraries(tesseract-consumer PRIVATE Tesseract::libtesseract)
