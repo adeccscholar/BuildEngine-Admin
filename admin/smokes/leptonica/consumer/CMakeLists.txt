@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeLeptonica LANGUAGES C)
+find_package(Leptonica 1.87 CONFIG REQUIRED)
+add_executable(leptonica-consumer main.c)
+target_include_directories(leptonica-consumer PRIVATE ${Leptonica_INCLUDE_DIRS})
+target_link_libraries(leptonica-consumer PRIVATE ${Leptonica_LIBRARIES})
