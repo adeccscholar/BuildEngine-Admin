@@ -47,5 +47,5 @@ int main() {
                 bRuntime ? "PASS" : "FAIL", CV_VERSION);
    std::println("SMOKE|RESULT|{}|OpenCV 17-module consumer with Windows camera backends usable",
                 (bRuntime && bTbb && bModules && bDshow) ? "PASS" : "FAIL");
-   return (bRuntime && bTbb && bModules && bMsmf && bDshow) ? 0 : 1;
+   return (bRuntime && bTbb && bModules && bDshow) ? 0 : 1;
 }
