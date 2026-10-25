@@ -3987,19 +3987,19 @@
          <argument value="-DLeptonica_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\leptonica"/>
       </smoke>
    </library>
-   <library id="tesseract" version="5.5.3" category="text" timestamp="2026-10-25T21:00:00Z">
+   <library id="tesseract" version="5.5.3" category="text" timestamp="2026-10-25T23:10:00Z">
       <dependency library="leptonica" version="1.87.0"/>
       <metadata name="Tesseract OCR" supplier="Tesseract OCR Project" homepage="https://github.com/tesseract-ocr/tesseract" description="Dynamically linked C++ OCR engine; language traineddata is provisioned and licensed separately." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source>
          <download url="https://github.com/tesseract-ocr/tesseract/archive/db0ec62f81b0737fbbe184d8fea40af5738f8eef.zip" archive="tesseract-db0ec62f81b0737fbbe184d8fea40af5738f8eef.zip"/>
-         <extract format="zip" root="tesseract-db0ec62f81b0737fbbe184d8fea40af5738f8eef"><require path="CMakeLists.txt"/><require path="include\tesseract\baseapi.h"/><require path="LICENSE"/></extract>
+         <extract format="zip" root="tesseract-db0ec62f81b0737fbbe184d8fea40af5738f8eef"><require path="CMakeLists.txt"/><require path="include\tesseract\baseapi.h"/><require path="LICENSE"/></extract><copy source="{BuildFileDir}\patches\tesseract\5.5.3\bcc64x-runtime-install.patch" target="{Workspace}\.buildengine\patches\bcc64x-runtime-install.patch" overwrite="true" preserveCurrentArtifact="true"/><execute name="runtime-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\bcc64x-runtime-install.patch"/></execute><execute name="runtime-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\bcc64x-runtime-install.patch"/></execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/><argument value="-DBUILD_TRAINING_TOOLS:BOOL=OFF"/><argument value="-DBUILD_TESTS:BOOL=OFF"/>
          <argument value="-DOPENMP_BUILD:BOOL=OFF"/><argument value="-DENABLE_NATIVE:BOOL=OFF"/><argument value="-DENABLE_PRECOMPILED_HEADERS:BOOL=OFF"/><argument value="-DENABLE_CCACHE:BOOL=OFF"/>
          <argument value="-DDISABLE_TIFF:BOOL=ON"/><argument value="-DDISABLE_ARCHIVE:BOOL=ON"/><argument value="-DDISABLE_CURL:BOOL=ON"/>
@@ -4011,14 +4011,14 @@
          <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/></variant>
          <install>
             <perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\tesseract\TesseractConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\tesseract\TesseractConfig.cmake"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tesseract\baseapi.h"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common>
          </install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin" target="bin" extensions=".dll;.exe"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" scope="package" source="smokes\tesseract\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="tesseract-consumer.exe">
-         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{DependencyRoot:leptonica}\bin\win64\Release;{ENV:PATH}"/>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{ENV:PATH}"/>
          <argument value="-DLeptonica_DIR:PATH={DependencyRoot:leptonica}\lib\win64\Release\cmake\leptonica"/>
          <argument value="-DTesseract_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\tesseract"/>
       </smoke>
@@ -4066,7 +4066,7 @@
          <argument value="-Dwil_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\cmake\WIL"/>
       </smoke>
    </library>
-   <library id="opencv" version="5.0.0" category="graphics" timestamp="2026-10-25T20:50:00Z">
+   <library id="opencv" version="5.0.0" category="graphics" timestamp="2026-10-25T23:10:00Z">
       <dependency library="onetbb" version="2023.1.0"/><dependency library="llvm-openmp" version="20.1.7"/>
       <dependency library="zlib" version="1.3.2"/>
       <metadata name="OpenCV" supplier="OpenCV project" homepage="https://opencv.org/" description="Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning, Windows DirectShow camera capture (MSMF COM compatibility pending), and image stitching. Native oneTBB 2023.1 parallel backend confirmed by the Release consumer smoke; LLVM OpenMP 20.1.7 enabled as a build dependency." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
