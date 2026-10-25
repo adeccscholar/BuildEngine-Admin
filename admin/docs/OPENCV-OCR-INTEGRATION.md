@@ -89,3 +89,34 @@ Only after **both** compilation and native runtime tests pass may
 **Status: not verified.** The repository has no native BCC64X runtime
 available to run the consumer. Enabling MSMF now would bypass the
 explicit compatibility gate and repeat the previous failed build.
+
+## Integration fixes after first OpenCV / WIL / Tesseract smoke run
+
+The first integration run exposed three independent issues:
+
+1. **Tesseract**: the installed upstream `Tesseract::libtesseract`
+   export does not provide the include root expected by the consumer.
+   The consumer now takes `Tesseract_INCLUDE_DIRS` from the actual
+   `TesseractConfig.cmake`, verifies `tesseract/baseapi.h` at that
+   location and adds it explicitly. No hardcoded system include path.
+2. **WIL**: `wil/com.h` includes the Windows SDK's
+   `WeakReference.h`, which resides under the SDK `winrt` include
+   directory. The WIL consumer derives that SDK version and root from
+   BuildEngine's registered `windows-rc` executable, verifies the
+   header and adds only that include root. WIL itself remains unchanged.
+   The compiler/runtime result is still unverified.
+3. **OpenCV**: OpenCV 5.0 moved the `ml` module to
+   `opencv_contrib`. The source contract now downloads the separately
+   pinned matching `opencv_contrib` 5.0.0 commit
+   `755e50675d97db9b7d449d8bd6b09888646f6c6e` and extracts it
+   alongside the primary OpenCV source. The OpenCV configure step uses
+   `OPENCV_EXTRA_MODULES_PATH` to build its `ml` module. This
+   retains the complete intended 17-module list rather than deleting
+   an expected DLL or bypassing the install requirement. Source patch
+   checks remain anchored to the primary OpenCV workspace after the
+   second archive extraction.
+
+All changes are made through the production XML contract and versioned
+consumer sources on `main`. A passing BCC64X build, registered DirectShow
+backend, and full PE runtime closure are still required before calling the
+integration complete.
