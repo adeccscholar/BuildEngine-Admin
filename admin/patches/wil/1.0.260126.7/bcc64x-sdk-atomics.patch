@@ -15,4 +15,14 @@
  }
 +#endif // ADECC_BCC64X_WIL_SDK_ATOMICS
  #endif
+--- a/include/wil/result_macros.h
++++ b/include/wil/result_macros.h
+@@ -3492,7 +3492,7 @@
+     }
  
+     //! Provides a string representing the FailureInfo from this exception.
+-    WI_NODISCARD const char* __CLR_OR_THIS_CALL what() const WI_NOEXCEPT override
++    WI_NODISCARD const char* what() const WI_NOEXCEPT override
+     {
+ #if !defined(NONLS) && !defined(NOAPISET)
+         if (!m_what)
