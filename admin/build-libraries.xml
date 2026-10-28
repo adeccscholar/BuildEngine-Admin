@@ -10680,7 +10680,7 @@
       </smoke>
    </library>
 
-   <library id="mariadb-connector-c" version="3.4.11" category="database" timestamp="2026-10-28T16:41:00Z">
+   <library id="mariadb-connector-c" version="3.4.11" category="database" timestamp="2026-10-28T17:10:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="zstd" version="1.5.7"/>
       <metadata name="MariaDB Connector/C" supplier="MariaDB Foundation" homepage="https://mariadb.com/docs/connectors/mariadb-connector-c/" description="MariaDB native C client as a BCC64X-built shared DLL." licenseSignal="green">
@@ -10709,8 +10709,10 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
@@ -10768,6 +10770,7 @@
       </publish>
       <smoke id="consumer" source="smokes\mariadb-connector-c\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="mariadb-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <argument value="-DMARIADB_INCLUDE_DIR:PATH={ConsumerRoot}\include"/>
          <argument value="-DMARIADB_LIBRARY:FILEPATH={ConsumerRoot}\lib\libmariadb.lib"/>
       </smoke>
