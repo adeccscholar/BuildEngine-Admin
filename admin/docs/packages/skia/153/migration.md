@@ -18,7 +18,7 @@ Pin Skia to an exact upstream commit and build a broad Windows desktop rendering
 - `zlib@1.3.2`
 - `brotli@1.2.0`
 - `libjpeg-turbo@3.2.0`
-- `libpng@1.6.58`
+- `libpng@1.6.59`
 - `harfbuzz@14.4.0`
 - `freetype@2.14.3`
 
@@ -203,7 +203,7 @@ Skia component exporting and the absolute import-library flag propagation must r
 These steps are owned by the XML-driven FSM, not by a separately invoked ad hoc build script. The presence of an action is not a license to run it concurrently from Debug and Release if it changes shared source.
 ### Engineering constraints recorded in the executable contract
 
-- Broad Windows desktop profile. BuildEngine-provided external dependencies: OpenGL 26.2.1 zlib 1.3.2 Brotli 1.2.0 libjpeg-turbo 3.2.0 libpng 1.6.58 HarfBuzz 14.4.0 FreeType 2.14.3 These components are NOT downloaded or rebuilt inside Skia. Their exact package versions are represented by BuildEngine dependencies above. Bundled Skia dependencies remain pinned to the commits selected by this Skia revi
+- Broad Windows desktop profile. BuildEngine-provided external dependencies: OpenGL 26.2.1 zlib 1.3.2 Brotli 1.2.0 libjpeg-turbo 3.2.0 libpng 1.6.59 HarfBuzz 14.4.0 FreeType 2.14.3 These components are NOT downloaded or rebuilt inside Skia. Their exact package versions are represented by BuildEngine dependencies above. Bundled Skia dependencies remain pinned to the commits selected by this Skia revi
 - ========================================================
 - Bundled compression / text / image dependencies.
 - Generic BuildEngine action. Inspect every pinned sibling download before any expensive source extraction or build starts.
