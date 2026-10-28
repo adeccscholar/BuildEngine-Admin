@@ -10680,4 +10680,96 @@
       </smoke>
    </library>
 
+   <library id="mariadb-connector-c" version="3.4.11" category="database" timestamp="2026-10-28T16:41:00Z">
+      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="zstd" version="1.5.7"/>
+      <metadata name="MariaDB Connector/C" supplier="MariaDB Foundation" homepage="https://mariadb.com/docs/connectors/mariadb-connector-c/" description="MariaDB native C client as a BCC64X-built shared DLL." licenseSignal="green">
+         <license name="LGPL-2.1-or-later" spdx="LGPL-2.1-or-later" file="COPYING.LIB"/>
+      </metadata>
+      <security><repository url="https://github.com/mariadb-corporation/mariadb-connector-c.git" ref="v3.4.11"/></security>
+      <source>
+         <download url="https://github.com/mariadb-corporation/mariadb-connector-c/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="mariadb-connector-c-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="mariadb-connector-c-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING.LIB"/>
+            <require path="include\mysql.h"/>
+            <require path="libmariadb\CMakeLists.txt"/>
+         </extract>
+         <copy source="{BuildFileDir}\patches\mariadb-connector-c\3.4.11\dll-only.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\dll-only.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="dll-only-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\dll-only.patch"/>
+         </execute>
+         <execute name="dll-only-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\dll-only.patch"/>
+         </execute>
+         <execute name="dll-only-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\dll-only.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DWITH_UNIT_TESTS:BOOL=OFF"/>
+         <argument value="-DWITH_TOOLS:BOOL=OFF"/>
+         <argument value="-DWITH_CURL:BOOL=OFF"/>
+         <argument value="-DREMOTEIO_PLUGIN_TYPE:STRING=OFF"/>
+         <argument value="-DWITH_BOOST_CONTEXT:BOOL=OFF"/>
+         <argument value="-DWITH_EXTERNAL_ZLIB:BOOL=ON"/>
+         <argument value="-DWITH_SSL:STRING=SCHANNEL"/>
+         <argument value="-DDEFAULT_SSL_VERIFY_SERVER_CERT:BOOL=ON"/>
+         <argument value="-DENABLED_LOCAL_INFILE:STRING=OFF"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImport}"/>
+         <argument value="-DZSTD_INCLUDE_DIR:PATH={DependencyRoot:zstd}\include"/>
+         <argument value="-DZSTD_LIBRARY:FILEPATH={DependencyRoot:zstd}\lib\win64\{Configuration}\libzstd.lib"/>
+         <argument value="-DINSTALL_LAYOUT:STRING=DEFAULT"/>
+         <argument value="-DINSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DINSTALL_PLUGINDIR:STRING=lib/win64/{Configuration}/plugin"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="ZlibImport" value="libz.lib"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DINSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DINSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="ZlibImport" value="libzd.lib"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DINSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DINSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <copy source="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libmariadb.dll" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libmariadb.dll" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libmariadb.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libmariadb.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\COPYING.LIB" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.LIB" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\mysql.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.LIB"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <tree source="lib\win64\{Configuration}\plugin" target="lib\plugin" optional="true"/>
+      </publish>
+      <smoke id="consumer" source="smokes\mariadb-connector-c\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="mariadb-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DMARIADB_INCLUDE_DIR:PATH={ConsumerRoot}\include"/>
+         <argument value="-DMARIADB_LIBRARY:FILEPATH={ConsumerRoot}\lib\libmariadb.lib"/>
+      </smoke>
+   </library>
 </buildLibraries>

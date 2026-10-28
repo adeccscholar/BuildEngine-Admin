@@ -1,0 +1,49 @@
+diff --git a/libmariadb/CMakeLists.txt b/libmariadb/CMakeLists.txt
+--- a/libmariadb/CMakeLists.txt
++++ b/libmariadb/CMakeLists.txt
+@@ -414,8 +414,7 @@
+                    "FILE_DESCRIPTION:Dynamic lib for client/server communication")
+ ENDIF()
+ 
+-ADD_LIBRARY(mariadbclient STATIC  ${MARIADB_OBJECTS} ${EMPTY_FILE})
+-TARGET_LINK_LIBRARIES(mariadbclient ${SYSTEM_LIBS} ${CRYPT_LIBS})
++# BCC64X DLL-only: do not create a static mariadbclient target.
+ 
+ IF(UNIX)
+   ADD_LIBRARY(libmariadb SHARED ${libmariadb_RC} ${MARIADB_OBJECTS} ${EMPTY_FILE})
+@@ -438,7 +437,6 @@
+   SET_TARGET_PROPERTIES(libmariadb PROPERTIES LINK_FLAGS "${CC_BINARY_DIR}/libmariadb/mariadbclient.def")
+ ENDIF()
+ 
+-SET_TARGET_PROPERTIES(mariadbclient PROPERTIES IMPORTED_INTERFACE_LINK_LIBRARIES "${SYSTEM_LIBS}")
+ SET_TARGET_PROPERTIES(libmariadb PROPERTIES IMPORTED_INTERFACE_LINK_LIBRARIES "${SYSTEM_LIBS}")
+ 
+ SET_TARGET_PROPERTIES(libmariadb PROPERTIES PREFIX "")
+@@ -456,27 +454,15 @@
+   create_symlink(libmysqlclient${CMAKE_SHARED_LIBRARY_SUFFIX} libmariadb ${INSTALL_LIBDIR})
+   create_symlink(libmysqlclient_r${CMAKE_SHARED_LIBRARY_SUFFIX} libmariadb ${INSTALL_LIBDIR})
+   IF(NOT CMAKE_SYSTEM_NAME MATCHES AIX)
+-    create_symlink(libmysqlclient${CMAKE_STATIC_LIBRARY_SUFFIX} mariadbclient ${INSTALL_LIBDIR})
+-    create_symlink(libmysqlclient_r${CMAKE_STATIC_LIBRARY_SUFFIX} mariadbclient ${INSTALL_LIBDIR})
+   ENDIF()
+ ENDIF()
+ 
+ # In DEB layout, mariadbclient is already named libmariadb.a — skip the symlink.
+-IF(NOT INSTALL_LAYOUT STREQUAL "DEB")
+-  create_symlink(libmariadb${CMAKE_STATIC_LIBRARY_SUFFIX} mariadbclient ${INSTALL_LIBDIR})
+-ENDIF()
+ 
+ SET_TARGET_PROPERTIES(libmariadb PROPERTIES VERSION
+  ${CPACK_PACKAGE_VERSION_MAJOR}
+  SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR})
+ 
+-IF(NOT WIN32)
+-  SET_TARGET_PROPERTIES(mariadbclient PROPERTIES OUTPUT_NAME "${LIBMARIADB_STATIC_NAME}")
+-ENDIF()
+-
+-INSTALL(TARGETS mariadbclient
+-          COMPONENT Development
+-          DESTINATION ${INSTALL_LIBDIR})
+ IF(WIN32)
+ INSTALL(TARGETS libmariadb
+         COMPONENT SharedLibraries
