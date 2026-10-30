@@ -6,6 +6,8 @@
 
 **Evidence policy:** This document describes the version-specific, declared integration and the documented engineering decisions. A switch being present does not prove the corresponding upstream tests passed. Any result that is not backed by the FSM evidence or a maintained integration report is marked **[not verified]**.
 
+**Supersession:** This historical coordinate is superseded by `brotli@1.2.1`. It remains available for explicitly pinned consumers; no dependency is automatically migrated. The replacement is a security release addressing CVE-2026-111497.
+
 ## Purpose and integration strategy
 
 **Package purpose:** General-purpose lossless compression library providing Brotli encoder and decoder support.
