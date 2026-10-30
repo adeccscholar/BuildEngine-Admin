@@ -1916,7 +1916,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="openssl" version="3.5.9" category="security" timestamp="2026-10-30T19:15:00Z">
+   <library id="openssl" version="3.5.9" category="security" timestamp="2026-10-30T19:45:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.1"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -2053,6 +2053,9 @@
             The perl target materializes the OpenSSL Configure target file in the variant build tree.
          -->
          <environment name="PATH" value="{ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:nasm};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
+         <!-- OpenSSL Configure prefers inherited RC/WINDRES over target RC.
+              Pin native BCC64X windres so rcoutflag=-o always matches the tool. -->
+         <environment name="RC" value="{Tool:bcc64x-windres}"/>
          <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="remove_directory"/>
