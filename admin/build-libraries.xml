@@ -242,7 +242,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="brotli" version="1.2.0" category="compression" timestamp="2026-08-29T17:38:02Z">
+   <library id="brotli" version="1.2.0" supersededBy="1.2.1" category="compression" timestamp="2026-10-30T18:45:00Z">
       <metadata description="General-purpose lossless compression library providing Brotli encoder and decoder support." licenseSignal="green"/>
       <source>
          <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="brotli-{LibraryVersion}.tar.gz" sha256="816c96e8e8f193b40151dad7e8ff37b1221d019dbcb9c35cd3fadbfe6477dfec"/>
@@ -263,6 +263,113 @@
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
          <!-- Stock Brotli CMake build: no BCC64X source patch or replacement build file. -->
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <!-- Shared-only product; upstream tests and command line tool remain enabled. -->
+         <argument value="-DBROTLI_BUILD_FOR_PACKAGE:BOOL=OFF"/>
+         <argument value="-DBROTLI_BUILD_TOOLS:BOOL=ON"/>
+         <argument value="-DBROTLI_BUNDLED_MODE:BOOL=OFF"/>
+         <argument value="-DBROTLI_DISABLE_TESTS:BOOL={TestsDisabled}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="CommonSharedName" value="libbrotlicommon"/>
+            <variable name="DecodeSharedName" value="libbrotlidec"/>
+            <variable name="EncodeSharedName" value="libbrotlienc"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="CommonSharedName" value="libbrotlicommon"/>
+            <variable name="DecodeSharedName" value="libbrotlidec"/>
+            <variable name="EncodeSharedName" value="libbrotlienc"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <!-- Release and Debug are separated by directory.  Keep the
+                 artifact names emitted by the stock Brotli CMake project
+                 with the active BCC64X/CMake toolchain; do not normalize
+                 them for a downstream consumer. -->
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{CommonSharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{DecodeSharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{EncodeSharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\brotli.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{CommonSharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{DecodeSharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{EncodeSharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlicommon.pc"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlidec.pc"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libbrotlienc.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\brotli\decode.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\brotli\encode.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\brotli\types.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" source="smokes\brotli\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="brotli-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+   <library id="brotli" version="1.2.1" category="compression" timestamp="2026-10-30T18:45:00Z">
+      <metadata description="General-purpose lossless compression library providing Brotli encoder and decoder support." licenseSignal="green"/>
+      <source>
+         <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="brotli-{LibraryVersion}.tar.gz" sha256="98d35d11a78dc453aebb7d10c3748f3f73ff78c8267c0dc697b8631f67bf7e8f"/>
+         <extract format="libarchive" root="brotli-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE"/>
+            <require path="c\include\brotli\decode.h"/>
+            <require path="c\include\brotli\encode.h"/>
+            <require path="c\include\brotli\types.h"/>
+            <require path="c\common\version.h"/>
+            <require path="c\tools\brotli.c"/>
+            <require path="tests\run-roundtrip-test.cmake"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <!-- Brotli 1.2.1 source upgrade: stock CMake/Ninja BCC64X contract; native build pending. -->
          <argument value="-G"/>
          <argument value="Ninja"/>
          <argument value="-Wno-dev"/>
