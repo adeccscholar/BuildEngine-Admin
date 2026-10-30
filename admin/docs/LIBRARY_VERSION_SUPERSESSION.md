@@ -18,6 +18,7 @@ The attribute is **descriptive**: it must not automatically rewire pinned consum
 Initial entries:
 - `openssl/3.5.8` superseded by `openssl/3.5.9`.
 - `curl/8.21.0` superseded by `curl/8.23.0`.
+- `brotli/1.2.0` superseded by `brotli/1.2.1` (security release, 2026-10-21).
 
 ## Server dashboard
 - Count only non-superseded versions in active version, installed and documented metrics.
