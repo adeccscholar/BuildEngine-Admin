@@ -349,7 +349,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="brotli" version="1.2.1" category="compression" timestamp="2026-10-30T18:45:00Z">
+   <library id="brotli" version="1.2.1" category="compression" timestamp="2026-10-30T19:15:00Z">
       <metadata description="General-purpose lossless compression library providing Brotli encoder and decoder support." licenseSignal="green"/>
       <source>
          <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="brotli-{LibraryVersion}.tar.gz" sha256="98d35d11a78dc453aebb7d10c3748f3f73ff78c8267c0dc697b8631f67bf7e8f"/>
@@ -1916,9 +1916,9 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="openssl" version="3.5.9" category="security" timestamp="2026-10-15T16:15:00Z">
+   <library id="openssl" version="3.5.9" category="security" timestamp="2026-10-30T19:15:00Z">
       <dependency library="zlib" version="1.3.2"/>
-      <dependency library="brotli" version="1.2.0"/>
+      <dependency library="brotli" version="1.2.1"/>
       <dependency library="zstd" version="1.5.7"/>
       <metadata description="Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives." licenseSignal="green"/>
       <source>
@@ -2410,7 +2410,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-15T18:31:00Z">
+   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-30T19:15:00Z">
       <!-- curl/8.23.0 now tests the updated OpenSSL/3.5.9 dependency.
            Keep zlib enabled; Brotli/Zstd remain disabled until independently
            validated for this curl version and BCC64X runtime. -->
@@ -5525,10 +5525,10 @@
       </smoke>
    </library>
 
-<library id="freetype" version="2.14.3" category="text" timestamp="2026-10-21T02:45:00Z">
+<library id="freetype" version="2.14.3" category="text" timestamp="2026-10-30T19:15:00Z">
    <dependency library="zlib" version="1.3.2"/>
    <dependency library="bzip2" version="1.0.8"/>
-   <dependency library="brotli" version="1.2.0"/>
+   <dependency library="brotli" version="1.2.1"/>
    <dependency library="libpng" version="1.6.59"/>
    <dependency library="harfbuzz" version="14.4.0"/>
 
@@ -6046,7 +6046,7 @@
    <library id="skia" version="153" category="graphics" timestamp="2026-10-21T02:45:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.3.2"/>
-      <dependency library="brotli" version="1.2.0"/>
+      <dependency library="brotli" version="1.2.1"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="harfbuzz" version="14.4.0"/>
