@@ -8,7 +8,7 @@ Retain zlib 1.3.2 for reproducibility and supersede it with zlib 1.4.
 Official upstream zip: `zlib14.zip`; SHA-256:
 `38bc7ed1c8ac3c870a159623deacf74a46c393ae1ad23f1dca1ed8e272deb058`.
 
-- The new upstream Windows resource is `win32/zlib-cmake.rc`.
+- The new upstream Windows resource is `win32/zlib-cmake.rc` and includes Windows SDK `winver.h`. Set `CB_WINDOWS_RC={Tool:windows-rc}` in the zlib 1.4 build contract. The shared BCC64X toolchain then selects the registered SDK `rc.exe` and supplies `/I` paths to the matching SDK `Include/<version>/um` and `shared` directories. This addresses the same `RC1015: winver.h` configuration defect documented in an earlier BuildEngine resource build without modifying upstream resource syntax.
 - Use `ZLIB_BUILD_SHARED=ON`, `ZLIB_BUILD_STATIC=OFF`, `ZLIB_PREFIX=OFF`.
 - Keep the exact BCC64X product contract: Release `libz.dll/libz.lib` and Debug `libzd.dll/libzd.lib`. Verify real outputs in installed-artifact gates.
 - No upstream source patch is required. Under BCC64X, upstream CTest does not prepend the DLL location because its test rules select only MSVC, MinGW, MSYS or Cygwin. The BuildEngine `test` action prepends `{InstallRoot}\\packages\\zlib\\1.4\\bin\\win64\\{Configuration}` to `PATH` for CTest and nested tests. This uses the installed Release/Debug DLL and leaves the upstream source unchanged.

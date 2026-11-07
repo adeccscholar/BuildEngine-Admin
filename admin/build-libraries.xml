@@ -242,7 +242,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="zlib" version="1.4" category="compression" timestamp="2026-11-07T16:00:01Z">
+   <library id="zlib" version="1.4" category="compression" timestamp="2026-11-07T16:00:02Z">
       <metadata description="General-purpose DEFLATE compression library used for gzip-compatible data and streams." licenseSignal="green"/>
       <source>
          <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib14.zip" archive="zlib-{LibraryVersion}.zip" sha256="38bc7ed1c8ac3c870a159623deacf74a46c393ae1ad23f1dca1ed8e272deb058"/>
@@ -260,6 +260,7 @@
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <argument value="-G"/>
          <argument value="Ninja"/>
