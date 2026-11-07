@@ -191,7 +191,7 @@
             <require path="jom.exe"/>
          </nativeExtract>
       </managed>
-      <probe contains="jom"><argument value="/?"/></probe>
+      <probe contains="jom version 1.1.7"><argument value="/VERSION"/></probe>
    </tool>
 
    <tool id="llvm-ar" version="20.1.7" required="always"><bds executable="bin64\llvm-ar.exe"/></tool>
