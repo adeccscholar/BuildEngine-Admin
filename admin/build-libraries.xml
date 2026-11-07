@@ -1805,7 +1805,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="libarchive" version="3.8.11" category="archive" timestamp="2026-11-07T17:24:00Z">
+   <library id="libarchive" version="3.8.11" category="archive" timestamp="2026-11-07T17:25:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="xz" version="5.8.4"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -1987,7 +1987,7 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <execute name="bzip2-capability-test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false" outputMode="errors">
                   <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
-                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{DependencyRoot:lz4}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--test-dir"/>
                   <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                   <argument value="-R"/>
@@ -1997,7 +1997,7 @@
                <execute name="test" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
                   <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
-                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <environment name="PATH" value="{DependencyRoot:lz4}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--build"/>
                   <argument value="."/>
                   <argument value="--target"/>

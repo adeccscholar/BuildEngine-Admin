@@ -184,6 +184,8 @@ Libarchive 3.8.11 was published on 2026-10-30 as a security and bugfix release. 
 
 **Upstream patch comparison:** The legacy-Borland/Clang patch has 16 hunks across 13 files; the managed BZip2 patch has one hunk. Every original hunk matches the v3.8.11 Git tag source exactly once; forward and reverse substitutions restore the source. This does not establish that the release ZIP has been patched and built on Windows; the declarative Git check/apply/reverse-check gates must still run.
 
+**LZ4 test runtime:** Both libarchive CTest actions prepend `{DependencyRoot:lz4}\bin\win64\{Configuration}` ahead of all other dependency DLL roots in `PATH`, so the matching managed LZ4 DLL is available for the upstream test executable. The version-scoped smoke sets the same Release DLL directory independently.
+
 **LZ4 verification:** Version-scoped consumer smoke `smokes/libarchive/3.8.11/consumer` requires archive runtime 3.8.11 and in-process LZ4 read/write and zlib/gzip read support. An external compressor fallback returns `ARCHIVE_WARN` instead of the required `ARCHIVE_OK`. The historical libarchive smoke remains unchanged.
 
 **[not verified]** libarchive 3.8.11 Release/Debug builds, test gates, publication and consumer smoke have not yet run on BCC64X. Keep this separate from the verified zlib 1.4 result.
