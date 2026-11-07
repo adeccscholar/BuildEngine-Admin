@@ -2184,7 +2184,7 @@
             Native BCC64X OpenSSL build.  All OpenSSL target knowledge remains in this XML contract.
             The perl target materializes the OpenSSL Configure target file in the variant build tree.
          -->
-         <environment name="PATH" value="{ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:nasm};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
+         <environment name="PATH" value="{ToolDir:jom};{ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:nasm};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
          <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
             <argument value="-E"/>
             <argument value="remove_directory"/>
@@ -2322,8 +2322,7 @@
             <argument value="--openssldir={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ssl"/>
             <argument value="--libdir=lib"/>
          </target>
-         <target name="build" type="gmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
-            <argument value="-N"/>
+         <target name="build" type="jom" executable="{Tool:jom}" parallel="true" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
             <argument value="build_sw"/>
          </target>
          <variant name="Release">
@@ -2346,13 +2345,11 @@
                   First native proof keeps test/install in the existing perVariant sequence.
                   Scheduler-level Release/Debug test parallelism remains a separate generic change.
                -->
-               <target name="test" test="true" type="gmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+               <target name="test" test="true" type="jom" executable="{Tool:jom}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="HARNESS_JOBS" value="{TestJobs}"/>
-                  <argument value="-N"/>
                   <argument value="test"/>
                </target>
-               <target name="install-upstream" type="gmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
-                  <argument value="-N"/>
+               <target name="install-upstream" type="jom" executable="{Tool:jom}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <argument value="install_sw"/>
                </target>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/>
@@ -2544,7 +2541,7 @@
             Native BCC64X OpenSSL build.  All OpenSSL target knowledge remains in this XML contract.
             The perl target materializes the OpenSSL Configure target file in the variant build tree.
          -->
-         <environment name="PATH" value="{ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:nasm};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
+         <environment name="PATH" value="{ToolDir:jom};{ToolDir:embarcadero-make};{ToolDir:bcc64x};{ToolDir:nasm};{ToolDir:llvm-ar};{ToolDir:llvm-ranlib};{ToolDir:bcc64x-windres};{ToolDir:perl};{ENV:PATH}"/>
          <!-- OpenSSL Configure prefers inherited RC/WINDRES over target RC.
               Pin native BCC64X windres so rcoutflag=-o always matches the tool. -->
          <environment name="RC" value="{Tool:bcc64x-windres}"/>
@@ -2685,8 +2682,7 @@
             <argument value="--openssldir={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ssl"/>
             <argument value="--libdir=lib"/>
          </target>
-         <target name="build" type="gmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
-            <argument value="-N"/>
+         <target name="build" type="jom" executable="{Tool:jom}" parallel="true" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
             <argument value="build_sw"/>
          </target>
          <variant name="Release">
@@ -2709,13 +2705,11 @@
                   First native proof keeps test/install in the existing perVariant sequence.
                   Scheduler-level Release/Debug test parallelism remains a separate generic change.
                -->
-               <target name="test" test="true" type="gmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+               <target name="test" test="true" type="jom" executable="{Tool:jom}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="HARNESS_JOBS" value="{TestJobs}"/>
-                  <argument value="-N"/>
                   <argument value="test"/>
                </target>
-               <target name="install-upstream" type="gmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
-                  <argument value="-N"/>
+               <target name="install-upstream" type="jom" executable="{Tool:jom}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <argument value="install_sw"/>
                </target>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/>
