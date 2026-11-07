@@ -72,6 +72,23 @@ The dependency's aggregate `install` scope is the persistent upstream evidence. 
 
 Libraries can declare upstream and license information. This data feeds package metadata, `LICENSE-INFO.txt`, and CycloneDX SBOM evidence.
 
+### SBOM provenance and dependency ownership
+
+The resolved `build-libraries.xml` dependency graph is the single authority for
+external BuildEngine library identities and versions. `MetadataJob.h` uses
+`upstream_metadata::Extract` to obtain available upstream SPDX/CycloneDX,
+license, copyright, supplier and provenance evidence. The resulting CycloneDX
+SBOM is generated from this graph and evidence, not from manually duplicated
+external dependency lists.
+
+The optional installed `sbom/bundled-components.json` manifest is reserved
+for actual bundled third-party components that are not represented as separate
+BuildEngine packages. Historical `externalBuildEngineDependencies` entries
+are ignored; do not add or maintain them. An absent manifest is valid when
+there are no bundled components. Libraries with a declared runtime DLL may
+use `<metadata runtimeDll="example.dll"/>`: this is only a declared runtime
+identity, not independently verified binary import evidence.
+
 ## 5. Source
 
 A source contract consists of generic actions, typically:
