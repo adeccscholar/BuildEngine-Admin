@@ -153,6 +153,32 @@ A typical build contract contains:
 
 Release and Debug use separate build directories. Shared arguments live on the main node; variants contain only their differences.
 
+### Make target parallelism
+
+For Windows NMAKE-compatible producers, use the separately provisioned `jom`
+1.1.7 runner. GNU Make targets remain `gmake`; the two drivers are not
+interchangeable. The target attribute `parallel="true"` enables the build
+job budget from `BuildEngine.xml` (`parameters/@buildJobs`, default 4).
+The target executor inserts `/jN` for `jom` and `-jN` for `gmake`.
+Do not add those arguments a second time in the individual target XML.
+Targets without `parallel="true"`, including OpenSSL install and test,
+retain serial make execution; OpenSSL harness concurrency uses `TestJobs`
+independently.
+
+```xml
+<target name="build" type="jom" executable="{Tool:jom}"
+        parallel="true" workingDirectory="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}">
+   <argument value="build_sw"/>
+</target>
+```
+
+These are per-target limits, not global CPU reservations. Running Release
+and Debug concurrently can consume up to twice the configured number of
+parallel make commands. Keep BMake targets for ACE/TAO unchanged. jom is
+distributed as a separate GPL-licensed build tool, and its license obligations
+apply when redistributing the tool; using it does not impose its license on
+build outputs.
+
 ## 7. CMake
 
 ```xml
