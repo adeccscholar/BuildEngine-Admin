@@ -22,6 +22,16 @@ typedef struct Bcc64xSockaddrIn6 {
    ULONG    sin6_scope_id;
 } Bcc64xSockaddrIn6;
 
+/*
+ * Explicit external declarations prevent missing-variable-declaration and
+ * missing-prototype diagnostics under the strict BCC64X C warning profile.
+ * Keep the definitions' C ABI and signatures unchanged.
+ */
+extern const IN_ADDR in4addr_any;
+BOOLEAN IN6_IS_ADDR_V4TRANSLATED(CONST IN6_ADDR *a);
+BOOLEAN IN6ADDR_ISEQUAL(CONST Bcc64xSockaddrIn6 *a, CONST Bcc64xSockaddrIn6 *b);
+BOOLEAN IN6ADDR_ISUNSPECIFIED(CONST Bcc64xSockaddrIn6 *a);
+
 const IN_ADDR in4addr_any = { 0 };
 
 #if defined(__clang__)
