@@ -10080,7 +10080,7 @@
    </library>
 
    <library id="abseil" version="20260817.0" category="core" timestamp="2026-10-15T19:45:00Z">
-      <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" licenseSignal="yellow">
+      <metadata name="abseil" supplier="Google" homepage="https://github.com/abseil/abseil-cpp" description="Google Abseil C++ utilities and containers" runtimeDll="libabseil_dll.dll" licenseSignal="yellow">
          <license name="Apache-2.0" spdx="Apache-2.0" file="licenses\abseil\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/abseil/abseil-cpp.git" ref="20260817.0"/></security>
@@ -10954,8 +10954,6 @@
                      target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\pdfium\LICENSE"
                      overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\pdfium\LICENSE"/>
-               <copy source="{BuildFileDir}\patches\pdfium\2025.11.19\bundled-components.json" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json" overwrite="true"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\sbom\bundled-components.json"/>
             </common>
          </install>
       </build>
