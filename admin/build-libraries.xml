@@ -1125,8 +1125,8 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="libzip" version="1.11.4" category="archive" timestamp="2026-10-15T21:30:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="libzip" version="1.11.4" category="archive" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <dependency library="xz" version="5.8.4"/>
       <dependency library="zstd" version="1.5.7"/>
       <metadata description="C library for reading, creating, and modifying ZIP archives." licenseSignal="green"/>
@@ -1568,7 +1568,7 @@
       </smoke>
    </library>
 
-<library id="libarchive" version="3.8.10" category="archive" timestamp="2026-10-21T01:10:00Z">
+<library id="libarchive" version="3.8.10" supersededBy="3.8.11" category="archive" timestamp="2026-10-21T01:10:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="xz" version="5.8.4"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -1803,6 +1803,249 @@
       <smoke id="consumer" source="smokes\libarchive\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="libarchive-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+   <library id="libarchive" version="3.8.11" category="archive" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
+      <dependency library="xz" version="5.8.4"/>
+      <dependency library="zstd" version="1.5.7"/>
+      <dependency library="lz4" version="1.10.0"/>
+      <dependency library="bzip2" version="1.0.8"/>
+      <dependency library="openssl" version="3.5.9"/>
+      <metadata description="Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats." licenseSignal="yellow"/>
+      <source>
+         <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip" archive="libarchive-{LibraryVersion}.zip" sha256="647cd02966d99033498955d9f6227cffa6e83899acc11b50afaaea3cbe8861bc"/>
+         <extract format="zip" root="libarchive-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="build\version"/>
+            <require path="libarchive\archive.h"/>
+            <require path="libarchive\archive_entry.h"/>
+            <require path="libarchive\archive_read_support_format_tar.c"/>
+            <require path="tar\bsdtar.c"/>
+         </extract>
+         <copy source="{BuildFileDir}\patches\libarchive\3.8.11\bcc64x-modern-borland-compat.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\libarchive\3.8.11\managed-bzip2-contract.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <!--
+            BCC64X compatibility backpatch for legacy __BORLANDC__ compiler
+            branches. BCC64X also defines __clang__ and must therefore use the
+            modern Clang-compatible paths for inline handling, integer types
+            and literals, Windows lseek/mbstate_t handling, open mode arguments,
+            and the corresponding tests.
+
+            The patch also includes the upstream Windows/Clang fix from commit
+            f75ed3a20526ef4ec2f46ee94216b6efd01eab0a for filter_fork_windows.c.
+            In test_read_data_large.c, an existing ftruncate macro is explicitly
+            undefined before libarchive maps ftruncate to _chsize, avoiding the
+            BCC64X MinGW macro redefinition while keeping Debug -Werror enabled.
+
+            The complete verified upstream source is extracted before the patch
+            is checked and applied.
+         -->
+         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch"/>
+         </execute>
+         <execute name="patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch"/>
+         </execute>
+         <execute name="bzip2-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch"/>
+         </execute>
+         <execute name="bzip2-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch"/>
+         </execute>
+         <execute name="bzip2-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--unidiff-zero"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="--fresh"/>
+         <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DENABLE_INSTALL:BOOL=ON"/>
+         <argument value="-DENABLE_TEST:BOOL={TestsEnabled}"/>
+         <!-- Complete native command line toolset. The product package contains
+              the shared runtime and import library; libarchive's internal static
+              target remains only because upstream tests link against it. -->
+         <argument value="-DENABLE_TAR:BOOL=ON"/>
+         <argument value="-DENABLE_TAR_SHARED:BOOL=ON"/>
+         <argument value="-DENABLE_CPIO:BOOL=ON"/>
+         <argument value="-DENABLE_CPIO_SHARED:BOOL=ON"/>
+         <argument value="-DENABLE_CAT:BOOL=ON"/>
+         <argument value="-DENABLE_CAT_SHARED:BOOL=ON"/>
+         <argument value="-DENABLE_UNZIP:BOOL=ON"/>
+         <argument value="-DENABLE_UNZIP_SHARED:BOOL=ON"/>
+         <!-- Declared compression/Windows backends; no accidental host-library pickup. -->
+         <argument value="-DENABLE_ZLIB:BOOL=ON"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibLibraryName}.lib"/>
+         <argument value="-DENABLE_CNG:BOOL=ON"/>
+         <argument value="-DENABLE_WIN32_XMLLITE:BOOL=ON"/>
+         <argument value="-DENABLE_OPENSSL:BOOL=ON"/>
+         <argument value="-DOPENSSL_ROOT_DIR:PATH={DependencyRoot:openssl}"/>
+         <argument value="-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include"/>
+         <argument value="-DOPENSSL_SSL_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libssl.lib"/>
+         <argument value="-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libcrypto.lib"/>
+         <argument value="-DOPENSSL_USE_STATIC_LIBS:BOOL=FALSE"/>
+         <argument value="-DENABLE_MBEDTLS:BOOL=OFF"/>
+         <argument value="-DENABLE_NETTLE:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBB2:BOOL=OFF"/>
+         <argument value="-DENABLE_LZ4:BOOL=ON"/>
+         <argument value="-DLZ4_INCLUDE_DIR:PATH={DependencyRoot:lz4}\include"/>
+         <argument value="-DLZ4_LIBRARY:FILEPATH={DependencyRoot:lz4}\lib\win64\{Configuration}\{Lz4ImportLibrary}.lib"/>
+         <argument value="-DENABLE_LZO:BOOL=OFF"/>
+         <argument value="-DENABLE_LZMA:BOOL=ON"/>
+         <argument value="-DLIBLZMA_INCLUDE_DIR:PATH={DependencyRoot:xz}\include"/>
+         <argument value="-DLIBLZMA_LIBRARY:FILEPATH={DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib"/>
+         <argument value="-DENABLE_ZSTD:BOOL=ON"/>
+         <argument value="-DZSTD_INCLUDE_DIR:PATH={DependencyRoot:zstd}\include"/>
+         <argument value="-DZSTD_LIBRARY:FILEPATH={DependencyRoot:zstd}\lib\win64\{Configuration}\libzstd.lib"/>
+         <argument value="-DENABLE_BZip2:BOOL=ON"/>
+         <argument value="-DBZIP2_INCLUDE_DIR:PATH={DependencyRoot:bzip2}\include"/>
+         <argument value="-DBZIP2_LIBRARIES:FILEPATH={DependencyRoot:bzip2}\lib\win64\{Configuration}\{Bzip2LibraryName}.lib"/>
+         <argument value="-DENABLE_LIBXML2:BOOL=OFF"/>
+         <argument value="-DENABLE_EXPAT:BOOL=OFF"/>
+         <!--
+            BCC64X on Windows provides no libc POSIX regex implementation.
+            With AUTO, libarchive otherwise enters its PCRE/libgcc fallback
+            even though both optional regex backends are disabled below.
+         -->
+         <argument value="-DPOSIX_REGEX_LIB:STRING=NONE"/>
+         <argument value="-DENABLE_PCREPOSIX:BOOL=OFF"/>
+         <argument value="-DENABLE_PCRE2POSIX:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBGCC:BOOL=OFF"/>
+         <argument value="-DENABLE_ICONV:BOOL=OFF"/>
+         <execute name="remove-build" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="remove_directory"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </execute>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="ArchiveName" value="libarchive"/>
+            <variable name="ZlibLibraryName" value="libz"/>
+            <variable name="Lz4ImportLibrary" value="liblz4"/>
+            <variable name="Bzip2LibraryName" value="libbzip2"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="ArchiveName" value="libarchived"/>
+            <variable name="ZlibLibraryName" value="libzd"/>
+            <variable name="Lz4ImportLibrary" value="liblz4d"/>
+            <variable name="Bzip2LibraryName" value="libbzip2d"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <execute name="bzip2-capability-test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false" outputMode="errors">
+                  <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
+                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <argument value="--test-dir"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+                  <argument value="-R"/>
+                  <argument value="^libarchive_test_write_format_zip_compression_bzip2$"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <execute name="test" test="true" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="CTEST_OUTPUT_ON_FAILURE" value="1"/>
+                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:xz}\bin\win64\{Configuration};{DependencyRoot:zstd}\bin\win64\{Configuration};{DependencyRoot:bzip2}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <argument value="--build"/>
+                  <argument value="."/>
+                  <argument value="--target"/>
+                  <argument value="test"/>
+               </execute>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\{ArchiveName}.lib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{ArchiveName}.lib" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\pkgconfig" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig" recursive="true" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{ArchiveName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdtar.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdcpio.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdcat.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\bsdunzip.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{ArchiveName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\libarchive.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\share" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share" recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\archive_entry.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\man\man1\bsdtar.1"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" source="smokes\libarchive\3.8.11\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="libarchive-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{DependencyRoot:lz4}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xz}\bin\win64\Release;{DependencyRoot:zstd}\bin\win64\Release;{DependencyRoot:bzip2}\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
    <library id="openssl" version="3.5.8" supersededBy="3.5.9" category="security" timestamp="2026-09-18T02:30:00Z">
@@ -2165,8 +2408,8 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="openssl" version="3.5.9" category="security" timestamp="2026-10-30T19:45:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="openssl" version="3.5.9" category="security" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
       <dependency library="zstd" version="1.5.7"/>
       <metadata description="Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives." licenseSignal="green"/>
@@ -2662,12 +2905,12 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="curl" version="8.23.0" category="network" timestamp="2026-10-30T19:15:00Z">
+   <library id="curl" version="8.23.0" category="network" timestamp="2026-11-07T17:24:00Z">
       <!-- curl/8.23.0 now tests the updated OpenSSL/3.5.9 dependency.
            Keep zlib enabled; Brotli/Zstd remain disabled until independently
            validated for this curl version and BCC64X runtime. -->
       <dependency library="openssl" version="3.5.9"/>
-      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="zlib" version="1.4"/>
       <metadata description="URL transfer library and command-line client supporting HTTP(S) and numerous network protocols." licenseSignal="green"/>
       <security>
          <repository url="https://github.com/curl/curl.git" ref="curl-8_23_0"/>
@@ -2814,7 +3057,7 @@
       </smoke>
    </library>
 
-   <library id="boost" version="1.92.0" category="foundation" timestamp="2026-10-26T00:30:00Z">
+   <library id="boost" version="1.92.0" category="foundation" timestamp="2026-11-07T17:24:00Z">
       <!--
          Canonical Boost model from the target-machine evidence:
          - one official upstream CMake source tree;
@@ -2825,7 +3068,7 @@
            merging binaries from separately configured production graphs.
       -->
       <dependency library="openssl" version="3.5.9"/>
-      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="zlib" version="1.4"/>
       <metadata description="Comprehensive collection of portable C++ libraries covering containers, algorithms, networking, concurrency, and more." licenseSignal="green"/>
       <source>
          <download url="https://github.com/boostorg/boost/releases/download/boost-{LibraryVersion}/boost-{LibraryVersion}-cmake.zip" archive="boost-{LibraryVersion}-cmake.zip" sha256="f47ee00d5870f006ef95a7be307be6553a769428d48ee98f20e856b9c3dfd3a2"/>
@@ -3166,10 +3409,10 @@
    deleted after the block has been copied into build-libraries.xml.
 -->
 
-<library id="ace" version="8.0.6" category="middleware" timestamp="2026-10-15T21:00:00Z">
+<library id="ace" version="8.0.6" category="middleware" timestamp="2026-11-07T17:24:00Z">
    <dependency library="openssl" version="3.5.9"/>
    <dependency library="xerces-c" version="3.3.0"/>
-   <dependency library="zlib" version="1.3.2"/>
+   <dependency library="zlib" version="1.4"/>
 
    <metadata name="ACE"
              description="Adaptive Communication Environment providing portable networking, concurrency, IPC, and OS abstraction."
@@ -3406,7 +3649,7 @@
    
 </library>
 
-<library id="tao" version="4.0.6" category="middleware" timestamp="2026-10-15T21:00:00Z">
+<library id="tao" version="4.0.6" category="middleware" timestamp="2026-11-07T17:24:00Z">
    <extension library="ace" version="8.0.6" source="TAO" producer="ACE_wrappers" install=".">
       <shared path="bin"/>
       <shared path="lib"/>
@@ -3428,12 +3671,12 @@
       <environment name="SSL_ROOT" value="{DependencyRoot:openssl}"/>
       <environment name="SSL_INCDIR" value="{DependencyRoot:openssl}\include"/>
       <environment name="SSL_LIBDIR" value="{DependencyRoot:openssl}\lib\win64\{Configuration}"/>
-      <environment name="XERCESC_INCDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\include"/>
-      <environment name="XERCESC_LIBDIR" value="{InstallRoot}\packages\xerces-c\3.3.0\lib\win64\{Configuration}"/>
+      <environment name="XERCESC_INCDIR" value="{DependencyRoot:xerces-c}\include"/>
+      <environment name="XERCESC_LIBDIR" value="{DependencyRoot:xerces-c}\lib\win64\{Configuration}"/>
       <environment name="XERCESLIB" value="{XercesLibrary}"/>
-      <environment name="ZLIB_ROOT" value="{InstallRoot}\packages\zlib\1.3.2"/>
-      <environment name="ZLIB_INCDIR" value="{InstallRoot}\packages\zlib\1.3.2\include"/>
-      <environment name="ZLIB_LIBDIR" value="{InstallRoot}\packages\zlib\1.3.2\lib\win64\{Configuration}"/>
+      <environment name="ZLIB_ROOT" value="{DependencyRoot:zlib}"/>
+      <environment name="ZLIB_INCDIR" value="{DependencyRoot:zlib}\include"/>
+      <environment name="ZLIB_LIBDIR" value="{DependencyRoot:zlib}\lib\win64\{Configuration}"/>
       <environment name="BCC32C" value=""/>
       <environment name="BCC64" value=""/>
       <environment name="BCC64X" value="1"/>
@@ -3441,7 +3684,7 @@
       <environment name="UNICODE" value=""/>
       <environment name="DEBUG" value="{DebugFlag}"/>
       <environment name="RELEASE" value="{ReleaseFlag}"/>
-      <environment name="PATH" value="{ExtensionProducerRoot}\lib;{ExtensionProducerRoot}\bin;{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\xerces-c\3.3.0\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
+      <environment name="PATH" value="{ExtensionProducerRoot}\lib;{ExtensionProducerRoot}\bin;{DependencyRoot:openssl}\bin\win64\{Configuration};{DependencyRoot:xerces-c}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
 
       <target name="generate-workspace" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO" showOutput="false">
          <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/>
@@ -3823,9 +4066,9 @@
       <smoke id="consumer" source="smokes\sqlite\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="sqlite-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-<library id="libpq" version="18.6" category="database" timestamp="2026-10-15T21:00:00Z">
+<library id="libpq" version="18.6" category="database" timestamp="2026-11-07T17:24:00Z">
       <dependency library="openssl" version="3.5.9"/>
-      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="zlib" version="1.4"/>
       <metadata name="PostgreSQL libpq" supplier="PostgreSQL Global Development Group" homepage="https://www.postgresql.org/" description="Official PostgreSQL C client library and wire-protocol access API." licenseSignal="green">
          <license name="PostgreSQL License" file="COPYRIGHT"/>
       </metadata>
@@ -3988,7 +4231,7 @@
       </smoke>
    </library>
 
-   <library id="libpqxx" version="8.0.2" category="database" timestamp="2026-10-15T21:00:00Z">
+   <library id="libpqxx" version="8.0.2" category="database" timestamp="2026-11-07T17:24:00Z">
       <extension type="package" library="libpq" version="18.6"/>
       <metadata name="libpqxx" supplier="libpqxx project" homepage="https://pqxx.org/development/libpqxx/" description="Modern C++ client API for PostgreSQL built on the official libpq C client library." licenseSignal="green">
          <license name="BSD-3-Clause" file="COPYING"/>
@@ -4021,7 +4264,7 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <environment name="PATH" value="{InstallRoot}\packages\libpq\18.6\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{InstallRoot}\packages\zlib\1.3.2\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PATH" value="{DependencyRoot:libpq}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{ENV:PATH}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -4033,8 +4276,8 @@
          <argument value="-DBUILD_TOOLS:BOOL=OFF"/>
          <argument value="-DBUILD_DOC:BOOL=OFF"/>
          <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
-         <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={InstallRoot}\packages\libpq\18.6\include"/>
-         <argument value="-DPostgreSQL_LIBRARY:FILEPATH={InstallRoot}\packages\libpq\18.6\lib\win64\{Configuration}\libpq.lib"/>
+         <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={DependencyRoot:libpq}\include"/>
+         <argument value="-DPostgreSQL_LIBRARY:FILEPATH={DependencyRoot:libpq}\lib\win64\{Configuration}\libpq.lib"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
@@ -4083,10 +4326,10 @@
              executable="libpqxx-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <environment name="PATH" value="{InstallRoot}\packages\libpq\18.6\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{InstallRoot}\packages\zlib\1.3.2\bin\win64\Release;{ENV:PATH}"/>
+         <environment name="PATH" value="{DependencyRoot:libpq}\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{ENV:PATH}"/>
          <argument value="-Dlibpqxx_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libpqxx"/>
-         <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={InstallRoot}\packages\libpq\18.6\include"/>
-         <argument value="-DPostgreSQL_LIBRARY:FILEPATH={InstallRoot}\packages\libpq\18.6\lib\win64\Release\libpq.lib"/>
+         <argument value="-DPostgreSQL_INCLUDE_DIR:PATH={DependencyRoot:libpq}\include"/>
+         <argument value="-DPostgreSQL_LIBRARY:FILEPATH={DependencyRoot:libpq}\lib\win64\Release\libpq.lib"/>
       </smoke>
    </library>
 <library id="xerces-c" version="3.3.0" category="data" timestamp="2026-08-31T01:00:00Z">
@@ -4313,8 +4556,8 @@
       <smoke id="consumer" source="smokes\vtk\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="vtk-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{DependencyRoot:onetbb}\bin\win64\Release;{DependencyRoot:llvm-openmp}\bin\win64\Release;{ENV:PATH}"/></smoke>
    </library>
 
-   <library id="leptonica" version="1.87.0" category="image" timestamp="2026-10-25T21:00:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="leptonica" version="1.87.0" category="image" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libtiff" version="4.7.2"/>
@@ -4440,9 +4683,9 @@
          <argument value="-Dwil_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\cmake\WIL"/>
       </smoke>
    </library>
-   <library id="opencv" version="5.0.0" category="graphics" timestamp="2026-10-25T23:10:00Z">
+   <library id="opencv" version="5.0.0" category="graphics" timestamp="2026-11-07T17:24:00Z">
       <dependency library="onetbb" version="2023.1.0"/><dependency library="llvm-openmp" version="20.1.7"/>
-      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="zlib" version="1.4"/>
       <metadata name="OpenCV" supplier="OpenCV project" homepage="https://opencv.org/" description="Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning, Windows DirectShow camera capture (MSMF COM compatibility pending), and image stitching. Native oneTBB 2023.1 parallel backend confirmed by the Release consumer smoke; LLVM OpenMP 20.1.7 enabled as a build dependency." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source><download url="https://github.com/opencv/opencv/archive/40738fb16ceddb5fb3fea747585f7ce6abb0605b.zip" archive="opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b.zip"/><extract format="zip" root="opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b"><require path="CMakeLists.txt"/><require path="LICENSE"/><require path="modules\core\CMakeLists.txt"/><require path="modules\dnn\CMakeLists.txt"/><require path="modules\highgui\CMakeLists.txt"/><require path="modules\videoio\CMakeLists.txt"/></extract><download url="https://github.com/opencv/opencv_contrib/archive/755e50675d97db9b7d449d8bd6b09888646f6c6e.zip" archive="opencv_contrib-755e50675d97db9b7d449d8bd6b09888646f6c6e.zip"/><extract format="zip" root="opencv_contrib-755e50675d97db9b7d449d8bd6b09888646f6c6e" merge="true" preserveCurrentArtifact="true"><require path="modules\ml\CMakeLists.txt"/><require path="modules\ml\include\opencv2\ml.hpp"/></extract><copy source="{BuildFileDir}\patches\opencv\5.0.0\bcc64x-optional-mlas.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch" overwrite="true" preserveCurrentArtifact="true"/><execute name="patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch"/></execute><execute name="patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch"/></execute></source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/><environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/><environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
@@ -5355,8 +5598,8 @@
    </smoke>
 </library>
 
-<library id="libpng" version="1.6.59" category="image" timestamp="2026-10-21T02:30:00Z">
-   <dependency library="zlib" version="1.3.2"/>
+<library id="libpng" version="1.6.59" category="image" timestamp="2026-11-07T17:24:00Z">
+   <dependency library="zlib" version="1.4"/>
 
    <metadata description="Reference PNG library for reading, writing, and manipulating Portable Network Graphics images." licenseSignal="green"/>
    <source>
@@ -5777,8 +6020,8 @@
       </smoke>
    </library>
 
-<library id="freetype" version="2.14.3" category="text" timestamp="2026-10-30T19:15:00Z">
-   <dependency library="zlib" version="1.3.2"/>
+<library id="freetype" version="2.14.3" category="text" timestamp="2026-11-07T17:24:00Z">
+   <dependency library="zlib" version="1.4"/>
    <dependency library="bzip2" version="1.0.8"/>
    <dependency library="brotli" version="1.2.1"/>
    <dependency library="libpng" version="1.6.59"/>
@@ -5962,8 +6205,8 @@
    </smoke>
 </library>
 
-<library id="libtiff" version="4.7.2" category="image" timestamp="2026-09-06T03:30:00Z">
-   <dependency library="zlib" version="1.3.2"/>
+<library id="libtiff" version="4.7.2" category="image" timestamp="2026-11-07T17:24:00Z">
+   <dependency library="zlib" version="1.4"/>
    <dependency library="libjpeg-turbo" version="3.2.0"/>
 
    <metadata description="TIFF image library for reading, writing, and manipulating Tagged Image File Format images." licenseSignal="green"/>
@@ -6077,8 +6320,8 @@
    </smoke>
 </library>
 
-   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-10-21T02:45:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="freetype" version="2.14.3"/>
@@ -6295,9 +6538,9 @@
 </library>
 
 
-   <library id="skia" version="153" category="graphics" timestamp="2026-10-21T02:45:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-07T17:24:00Z">
       <dependency library="opengl" version="26.2.1"/>
-      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
@@ -6323,7 +6566,7 @@
 
             BuildEngine-provided external dependencies:
                OpenGL 26.2.1
-               zlib 1.3.2
+               managed zlib dependency
                Brotli 1.2.0
                libjpeg-turbo 3.2.0
                libpng 1.6.59
@@ -8471,8 +8714,8 @@
       </smoke>
    </library>
 
-   <library id="teckit" version="2.5.13" category="text" timestamp="2026-10-15T21:30:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="teckit" version="2.5.13" category="text" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <dependency library="expat" version="2.9.0"/>
       <metadata name="TECkit" supplier="SIL Global" homepage="https://software.sil.org/teckit/" description="Text encoding conversion toolkit with runtime engine, mapping compiler, and Unicode conversion utilities." licenseSignal="yellow"/>
       <security>
@@ -8793,8 +9036,8 @@
       </publish>
    </library>
 
-   <library id="libxml2" version="2.15.3" category="data" timestamp="2026-09-23T01:45:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="libxml2" version="2.15.3" category="data" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <metadata name="libxml2" supplier="GNOME / libxml2 contributors" homepage="https://gitlab.gnome.org/GNOME/libxml2" description="C XML toolkit providing parsing, XPath, XML Schema, Relax NG, XInclude and serialization support." licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="Copyright"/>
       </metadata>
@@ -8924,8 +9167,8 @@
          <argument value="-DLibXml2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libxml2"/>
       </smoke>
    </library>
-   <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-09-23T02:30:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <metadata name="QPDF" supplier="QPDF Project" homepage="https://qpdf.sourceforge.io/" description="PDF structural transformation library and command-line toolkit for inspecting, rewriting, encrypting and validating PDF files." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
@@ -9119,8 +9362,8 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-10-21T02:45:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="freetype" version="2.14.3"/>
       <dependency library="libxml2" version="2.15.3"/>
@@ -9378,7 +9621,7 @@
                         workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false" outputMode="errors">
                   <environment name="CTEST_PARALLEL_LEVEL" value="1"/>
                   <environment name="PODOFO_TEST_OUTPUT_PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out"/>
-                  <!-- Keep the tested runtime closure deterministic. In particular, Release libz.dll must come from our zlib 1.3.2 package. -->
+                  <!-- Keep the tested runtime closure deterministic. In particular, Release libz.dll must come from the declared zlib dependency package. -->
                   <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{DependencyRoot:libxml2}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:libtiff}\bin\win64\{Configuration};{ENV:PATH}"/>
                   <argument value="--output-on-failure"/>
                </execute>
@@ -9524,8 +9767,8 @@
          <argument value="-DIconv_LIBRARY:FILEPATH={ConsumerRoot}\lib\win64\{Configuration}\libiconv.lib"/>
       </smoke>
    </library>
-   <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-10-21T02:45:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <dependency library="freetype" version="2.14.3"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
@@ -10264,11 +10507,11 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-10-21T21:00:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-07T17:24:00Z">
       <dependency library="abseil" version="20260817.0"/>
        <dependency library="fast_float" version="8.2.3"/>
       <dependency library="skia" version="144"/>
-      <dependency library="zlib" version="1.3.2"/>
+      <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="freetype" version="2.14.3"/>
@@ -11039,8 +11282,8 @@
       </smoke>
    </library>
 
-   <library id="mariadb-connector-c" version="3.4.11" category="database" timestamp="2026-10-28T17:48:00Z">
-      <dependency library="zlib" version="1.3.2"/>
+   <library id="mariadb-connector-c" version="3.4.11" category="database" timestamp="2026-11-07T17:24:00Z">
+      <dependency library="zlib" version="1.4"/>
       <dependency library="zstd" version="1.5.7"/>
       <metadata name="MariaDB Connector/C" supplier="MariaDB Foundation" homepage="https://mariadb.com/docs/connectors/mariadb-connector-c/" description="MariaDB native C client as a BCC64X-built shared DLL." licenseSignal="green">
          <license name="LGPL-2.1-or-later" spdx="LGPL-2.1-or-later" file="COPYING.LIB"/>

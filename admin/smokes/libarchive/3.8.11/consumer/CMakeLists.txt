@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeLibArchive LANGUAGES CXX)
+find_package(LibArchive REQUIRED)
+add_executable(libarchive-consumer main.cpp)
+target_compile_features(libarchive-consumer PRIVATE cxx_std_23)
+target_link_libraries(libarchive-consumer PRIVATE LibArchive::LibArchive)

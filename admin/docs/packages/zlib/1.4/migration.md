@@ -23,3 +23,15 @@ Source: https://github.com/madler/zlib/releases/tag/v1.4
 The nested RC-flags source patch was committed after the zlib 1.4 library timestamp was last updated. As a result, a normal `--make` run could reuse a completed Source scope and omit the new patch, even though it was present in the administration repository. The empty `Select-String` results from the actual extracted `test/CMakeLists.txt` demonstrate that the additional change was not applied to that working copy.
 
 The zlib 1.4 library coordinate's contract timestamp was advanced from `2026-11-07T17:11:00Z` to `2026-11-07T17:24:00Z`. Under the documented logical FSM current-state contract, this invalidates the stale Source evidence for this library without touching the BuildEngine implementation. For verification, run `BuildEngine --make --lib=zlib --libversion=1.4 --config=Release,Debug` after synchronizing Admin; verify both `CMAKE_RC_FLAGS:STRING` occurrences in the extracted upstream test CMakeLists.txt, then run the full test pipeline.
+
+## Version 1.4 dependency-closure upgrade
+
+The user-provided 2026-11-07 BuildEngine FSM log verifies zlib 1.4 source, Debug/Release build and tests, Debug/Release install, metadata, publish, Doxygen, Release consumer smoke, and Ready as PASS.
+
+The following 20 declared direct zlib consumers now pin `<dependency library="zlib" version="1.4"/>`: `libzip@1.11.4`, `openssl@3.5.9`, `curl@8.23.0`, `boost@1.92.0`, `ace@8.0.6`, `libpq@18.6`, `leptonica@1.87.0`, `opencv@5.0.0`, `libpng@1.6.59`, `freetype@2.14.3`, `libtiff@4.7.2`, `skia@144`, `skia@153`, `teckit@2.5.13`, `libxml2@2.15.3`, `qpdf@12.4.1`, `podofo@1.1.1`, `poppler@26.09.0`, `pdfium@2025.11.19`, `mariadb-connector-c@3.4.11`. The new `libarchive@3.8.11` also pins zlib 1.4 and LZ4 1.10.0.
+
+Two extension consumers (`tao@4.0.6` via ACE and `libpqxx@8.0.2` via libpq) now refer to `{DependencyRoot:zlib}`, not hard-coded package versions. Adjacent existing Xerces-C/libpq hardcoded package roots are likewise resolved through dependency variables. The `skia@144` package is included because `pdfium@2025.11.19` still explicitly consumes it.
+
+Historic library coordinates retained with old zlib 1.3.2 pins: `libarchive@3.8.9`, `libarchive@3.8.10`, `openssl@3.5.8`, `curl@8.21.0`, `libpng@1.6.58`. The 3.8.10 coordinate is now superseded by libarchive 3.8.11; it remains buildable using its original dependency versions.
+
+All changed active coordinates received `timestamp="2026-11-07T17:24:00Z"` to invalidate their stale FSM evidence. **[not verified]** Their rebuilt BCC64X installations and consumer tests, including libarchive 3.8.11, still require execution; zlib 1.4 Ready alone does not establish downstream compatibility.
