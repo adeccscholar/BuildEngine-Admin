@@ -276,6 +276,26 @@
             <argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-rc-version-only.patch"/>
          </execute>
+         <!-- Nested add_subdirectory CMake tests must inherit the registered
+              SDK resource include flags from the outer BCC64X build. -->
+         <copy source="{BuildFileDir}\patches\zlib\1.4\bcc64x-nested-ctest-rc-flags.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-nested-ctest-rc-flags.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="nested-rc-flags-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-nested-ctest-rc-flags.patch"/>
+         </execute>
+         <execute name="nested-rc-flags-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-nested-ctest-rc-flags.patch"/>
+         </execute>
+         <execute name="nested-rc-flags-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-nested-ctest-rc-flags.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
