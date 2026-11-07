@@ -22,7 +22,7 @@
       <xs:restriction base="xs:string">
          <xs:enumeration value="generic"/>
          <xs:enumeration value="gn"/>
-         <xs:enumeration value="cmake"/><xs:enumeration value="meson"/><xs:enumeration value="perl"/><xs:enumeration value="gmake"/>
+         <xs:enumeration value="cmake"/><xs:enumeration value="meson"/><xs:enumeration value="perl"/><xs:enumeration value="gmake"/><xs:enumeration value="jom"/>
          <xs:enumeration value="python"/><xs:enumeration value="bmake"/>
       </xs:restriction>
    </xs:simpleType>
@@ -257,6 +257,7 @@
       </xs:sequence>
       <xs:attribute name="name" type="xs:string" use="required"/>
       <xs:attribute name="type" type="targetDriverType" use="required"/>
+      <xs:attribute name="parallel" type="booleanTextType" use="optional" default="false"/>
       <xs:attribute name="executable" type="xs:string" use="optional"/>
       <xs:attribute name="tool" type="xs:string" use="optional"/>
       <xs:attribute name="workingDirectory" type="xs:string" use="required"/>
