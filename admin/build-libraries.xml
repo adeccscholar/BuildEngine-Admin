@@ -242,7 +242,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="zlib" version="1.4" category="compression" timestamp="2026-11-07T17:11:00Z">
+   <library id="zlib" version="1.4" category="compression" timestamp="2026-11-07T17:24:00Z">
       <metadata description="General-purpose DEFLATE compression library used for gzip-compatible data and streams." licenseSignal="green"/>
       <source>
          <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib14.zip" archive="zlib-{LibraryVersion}.zip" sha256="38bc7ed1c8ac3c870a159623deacf74a46c393ae1ad23f1dca1ed8e272deb058"/>

@@ -17,3 +17,9 @@ Official upstream zip: `zlib14.zip`; SHA-256:
 **Verified from the supplied 2026-11-07 Release log:** zlib's main build and the `zlib_install`, `zlib_example`, `zlib_example64`, and `find_package` CTest checks passed. CTest reported 10 of 14 tests passed; the remaining four results were two nested builds failing due to missing SDK RC include flags and their unrun dependents. **[not verified]** All 14 CTest cases after this patch, the Debug configuration, and the installed consumer smoke remain pending. This XML addition does not update existing downstream dependency version pins.
 
 Source: https://github.com/madler/zlib/releases/tag/v1.4
+
+## Source-state invalidation after the nested CTest fix
+
+The nested RC-flags source patch was committed after the zlib 1.4 library timestamp was last updated. As a result, a normal `--make` run could reuse a completed Source scope and omit the new patch, even though it was present in the administration repository. The empty `Select-String` results from the actual extracted `test/CMakeLists.txt` demonstrate that the additional change was not applied to that working copy.
+
+The zlib 1.4 library coordinate's contract timestamp was advanced from `2026-11-07T17:11:00Z` to `2026-11-07T17:24:00Z`. Under the documented logical FSM current-state contract, this invalidates the stale Source evidence for this library without touching the BuildEngine implementation. For verification, run `BuildEngine --make --lib=zlib --libversion=1.4 --config=Release,Debug` after synchronizing Admin; verify both `CMAKE_RC_FLAGS:STRING` occurrences in the extracted upstream test CMakeLists.txt, then run the full test pipeline.
