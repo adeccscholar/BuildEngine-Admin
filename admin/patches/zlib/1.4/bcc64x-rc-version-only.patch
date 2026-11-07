@@ -1,0 +1,17 @@
+diff --git a/win32/zlib-cmake.rc b/win32/zlib-cmake.rc
+--- a/win32/zlib-cmake.rc
++++ b/win32/zlib-cmake.rc
+@@ -1,5 +1,12 @@
+ #include <winver.h>
+-#include "../zlib.h"
++/* The resource compiler needs only zlib's version constants. Including
++   zlib.h also includes C-only types via zconf.h (notably stddef.h), which
++   the Windows SDK rc.exe cannot parse with the native BCC64X headers.
++   This resource file belongs to the pinned zlib 1.4 source release. */
++#define ZLIB_VERSION "1.4"
++#define ZLIB_VER_MAJOR 1
++#define ZLIB_VER_MINOR 4
++#define ZLIB_VER_REVISION 0
+ 
+ VS_VERSION_INFO		VERSIONINFO
+ 
