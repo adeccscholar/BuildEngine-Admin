@@ -1,0 +1,10 @@
+diff --git a/src/interfaces/libpq/fe-connect.c b/src/interfaces/libpq/fe-connect.c
+--- a/src/interfaces/libpq/fe-connect.c
++++ b/src/interfaces/libpq/fe-connect.c
+@@ -2598,3 +2598,6 @@
+ #ifdef SIO_KEEPALIVE_VALS
++/* SIO_KEEPALIVE_VALS may be defined after libpq-int.h is included. */
++int pqSetKeepalivesWin32(pgsocket sock, int idle, int interval);
++
+ /*
+  * Enable keepalives and set the keepalive values on Win32,
