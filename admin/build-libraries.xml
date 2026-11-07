@@ -242,7 +242,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="zlib" version="1.4" category="compression" timestamp="2026-11-07T16:00:00Z">
+   <library id="zlib" version="1.4" category="compression" timestamp="2026-11-07T16:00:01Z">
       <metadata description="General-purpose DEFLATE compression library used for gzip-compatible data and streams." licenseSignal="green"/>
       <source>
          <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib14.zip" archive="zlib-{LibraryVersion}.zip" sha256="38bc7ed1c8ac3c870a159623deacf74a46c393ae1ad23f1dca1ed8e272deb058"/>
@@ -256,25 +256,6 @@
             <require path="test\minigzip.c"/>
             <require path="test\CMakeLists.txt"/>
          </extract>
-         <!-- Pin the zlib 1.4 upstream CTest fix.  Its DLL PATH setup
-              excludes BCC64X unless WIN32 is explicitly supported. -->
-         <copy source="{BuildFileDir}\patches\zlib\1.4\bcc64x-ctest-runtime-path.patch"
-               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ctest-runtime-path.patch"
-               overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="ctest-runtime-path-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ctest-runtime-path.patch"/>
-         </execute>
-         <execute name="ctest-runtime-path-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ctest-runtime-path.patch"/>
-         </execute>
-         <execute name="ctest-runtime-path-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
-            <argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ctest-runtime-path.patch"/>
-         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -348,7 +329,7 @@
                </execute>
                <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
-                  <environment name="PATH" value="{ToolDir:ninja};{ENV:PATH}"/>
+                  <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration};{ToolDir:ninja};{ENV:PATH}"/>
                   <environment name="CMAKE_PREFIX_PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\test_install\lib\win64\{Configuration}\cmake\zlib"/>
                   <argument value="--output-on-failure"/>
                </execute>
