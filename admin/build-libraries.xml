@@ -3520,6 +3520,8 @@
       <environment name="BCC32C" value=""/>
       <environment name="BCC64" value=""/>
       <environment name="BCC64X" value="1"/>
+      <!-- MPC-generated BMake files default to 0 (all CPU cores), which can exhaust memory in Debug. -->
+      <environment name="MPC_NUMBER_OF_PROCESSORS" value="{BuildJobs}"/>
       <environment name="CODEGUARD" value=""/>
       <environment name="UNICODE" value=""/>
       <environment name="DEBUG" value="{DebugFlag}"/>
@@ -3674,6 +3676,8 @@
       <environment name="BCC32C" value=""/>
       <environment name="BCC64" value=""/>
       <environment name="BCC64X" value="1"/>
+      <!-- MPC-generated BMake files default to 0 (all CPU cores), which can exhaust memory in Debug. -->
+      <environment name="MPC_NUMBER_OF_PROCESSORS" value="{BuildJobs}"/>
       <environment name="CODEGUARD" value=""/>
       <environment name="UNICODE" value=""/>
       <environment name="DEBUG" value="{DebugFlag}"/>
