@@ -118,6 +118,9 @@
       <xs:attribute name="homepage" type="xs:anyURI" use="optional">
          <xs:annotation><xs:documentation>Canonical upstream project or product page.</xs:documentation></xs:annotation>
       </xs:attribute>
+      <xs:attribute name="runtimeDll" type="xs:string" use="optional">
+         <xs:annotation><xs:documentation>Optional declared runtime DLL basename for SBOM metadata. This is not independently verified PE import evidence.</xs:documentation></xs:annotation>
+      </xs:attribute>
       <xs:attribute name="licenseSignal" type="licenseSignalType" use="optional">
          <xs:annotation><xs:documentation>Traffic-light integration marker for proprietary product use: green = normal notice/attribution obligations, yellow = product-specific legal/integration review required, red = do not plan as an in-process proprietary dependency.</xs:documentation></xs:annotation>
       </xs:attribute>
