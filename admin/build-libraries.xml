@@ -102,7 +102,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="zlib" version="1.3.2" category="compression" timestamp="2026-10-16T01:46:00Z">
+   <library id="zlib" version="1.3.2" supersededBy="1.4" category="compression" timestamp="2026-10-16T01:46:00Z">
       <metadata description="General-purpose DEFLATE compression library used for gzip-compatible data and streams." licenseSignal="green"/>
       <source>
          <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib132.zip" archive="zlib-{LibraryVersion}.zip" sha256="e8bf55f3017aa181690990cb58a994e77885da140609fc8f94abe9b65d2cae28"/>
@@ -238,6 +238,233 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
       <smoke id="consumer" source="smokes\zlib\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="zlib-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+   <library id="zlib" version="1.4" category="compression" timestamp="2026-11-07T16:00:00Z">
+      <metadata description="General-purpose DEFLATE compression library used for gzip-compatible data and streams." licenseSignal="green"/>
+      <source>
+         <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib14.zip" archive="zlib-{LibraryVersion}.zip" sha256="38bc7ed1c8ac3c870a159623deacf74a46c393ae1ad23f1dca1ed8e272deb058"/>
+         <extract format="zip" root="zlib-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="zlib.h"/>
+            <require path="zconf.h"/>
+            <require path="LICENSE"/>
+            <require path="win32\zlib-cmake.rc"/>
+            <require path="test\example.c"/>
+            <require path="test\minigzip.c"/>
+            <require path="test\CMakeLists.txt"/>
+         </extract>
+         <!-- Pin the zlib 1.4 upstream CTest fix.  Its DLL PATH setup
+              excludes BCC64X unless WIN32 is explicitly supported. -->
+         <copy source="{BuildFileDir}\patches\zlib\1.4\bcc64x-ctest-runtime-path.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ctest-runtime-path.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="ctest-runtime-path-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ctest-runtime-path.patch"/>
+         </execute>
+         <execute name="ctest-runtime-path-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ctest-runtime-path.patch"/>
+         </execute>
+         <execute name="ctest-runtime-path-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-ctest-runtime-path.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <!-- Clear obsolete static-artifact project include cached by the previous zlib configuration. -->
+         <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH="/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <!-- CMake resolves the resource compiler through its BCC64X platform integration. -->
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <!-- zlib appends /zlib to CMAKE_INSTALL_DOCDIR itself. -->
+         <argument value="-DCMAKE_INSTALL_DOCDIR:STRING=share/doc"/>
+         <!-- Product contract: shared zlib DLL plus its import library. -->
+         <argument value="-DZLIB_BUILD_SHARED:BOOL=ON"/>
+         <argument value="-DZLIB_BUILD_STATIC:BOOL=OFF"/>
+         <argument value="-DZLIB_BUILD_TESTING:BOOL={TestsEnabled}"/>
+         <argument value="-DZLIB_INSTALL:BOOL=ON"/>
+         <argument value="-DZLIB_PREFIX:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="SharedName" value="libz"/>
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="SharedName" value="libzd"/>
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <!-- Remove the configuration-specific product directories so old
+                    static artifacts cannot survive a shared-only rebuild. -->
+               <execute name="remove-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <!--
+                  The production contract is shared-only. Upstream therefore
+                  runs the shared-library and matching package-integration tests;
+                  static-only coverage/tests are not part of this product shape.
+                  Nested CMake integration tests reuse Ninja through PATH.
+                  CMAKE_PREFIX_PATH points at zlib's configuration-specific
+                  test installation so find_package(... COMPONENTS shared)
+                  can locate the generated ZLIBConfig.cmake.
+               -->
+               <execute name="remove-test-install" test="true" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/>
+                  <argument value="remove_directory"/>
+                  <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\test_install"/>
+               </execute>
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="PATH" value="{ToolDir:ninja};{ENV:PATH}"/>
+                  <environment name="CMAKE_PREFIX_PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\test_install\lib\win64\{Configuration}\cmake\zlib"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIBConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIBConfigVersion.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-shared.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zlib\ZLIB-shared-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\zlib.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zlib.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zconf.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\man\man3\zlib.3"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\doc\zlib\algorithm.txt"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" source="smokes\zlib\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="zlib-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+   <library id="lz4" version="1.10.0" category="compression" timestamp="2026-11-07T16:00:00Z">
+      <metadata description="Fast lossless LZ4 block and frame compression with BCC64X shared DLL." licenseSignal="green"/>
+      <source>
+         <!-- Release archive checksum is a required validation gate; no unverified hash is asserted. -->
+         <download url="https://github.com/lz4/lz4/releases/download/v{LibraryVersion}/lz4-{LibraryVersion}.tar.gz" archive="lz4-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="lz4-{LibraryVersion}">
+            <require path="build\cmake\CMakeLists.txt"/>
+            <require path="lib\lz4.h"/>
+            <require path="lib\lz4hc.h"/>
+            <require path="lib\lz4frame.h"/>
+            <require path="lib\lz4.c"/>
+            <require path="lib\lz4frame.c"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\packages\lz4-bcc64x.cmake"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DLZ4_BUILD_CLI:BOOL=OFF"/>
+         <argument value="-DLZ4_BUNDLED_MODE:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\build\cmake" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="BinaryName" value="liblz4"/>
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="BinaryName" value="liblz4d"/>
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BinaryName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BinaryName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lz4\lz4Config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lz4\lz4ConfigVersion.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lz4\lz4Targets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lz4\lz4Targets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\liblz4.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lz4.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lz4hc.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lz4frame.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lz4file.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/>
+      </publish>
+      <smoke id="consumer" source="smokes\lz4\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="lz4-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>

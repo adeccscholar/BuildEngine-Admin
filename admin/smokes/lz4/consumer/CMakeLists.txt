@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeLz4 LANGUAGES CXX)
+find_package(lz4 CONFIG REQUIRED)
+add_executable(lz4-consumer main.cpp)
+target_compile_features(lz4-consumer PRIVATE cxx_std_23)
+target_link_libraries(lz4-consumer PRIVATE LZ4::lz4_shared)
