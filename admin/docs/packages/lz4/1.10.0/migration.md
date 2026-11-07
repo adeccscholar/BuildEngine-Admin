@@ -10,7 +10,7 @@ Build upstream `build/cmake` directly with CMake/Ninja; retain all original upst
 - Export BCC64X import target `LZ4::lz4_shared`, with `LZ4_DLL_IMPORT=1` on consumers.
 - Expected: `liblz4.dll/liblz4.lib` (Release), `liblz4d.dll/liblz4d.lib` (Debug), exported CMake target files, pkg-config, and headers.
 - The consumer smoke checks block compression, decompression, frame compression, and matching runtime/header version.
-- The source release has an upstream `.sha256` sidecar; **pin the verified official digest in the XML before production promotion**. It is deliberately not guessed.
+- The pinned Git tag archive has SHA-256 `537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b`, corroborated by Homebrew and Fossies. The source is immutable by version contract; the hash gates download integrity.
 - The build/test gates must run on the actual BCC64X system before declaring it ready.
 
 **[not verified]** No BCC64X compilation/runtime evidence was available in this environment. libarchive 3.8.11 is intentionally not modified; update it only after both LZ4 and zlib 1.4 complete verification.

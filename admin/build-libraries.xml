@@ -385,8 +385,8 @@
    <library id="lz4" version="1.10.0" category="compression" timestamp="2026-11-07T16:00:00Z">
       <metadata description="Fast lossless LZ4 block and frame compression with BCC64X shared DLL." licenseSignal="green"/>
       <source>
-         <!-- Release archive checksum is a required validation gate; no unverified hash is asserted. -->
-         <download url="https://github.com/lz4/lz4/releases/download/v{LibraryVersion}/lz4-{LibraryVersion}.tar.gz" archive="lz4-{LibraryVersion}.tar.gz"/>
+         <!-- Git tag archive SHA-256 independently published by Homebrew for v1.10.0. -->
+         <download url="https://github.com/lz4/lz4/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="lz4-{LibraryVersion}.tar.gz" sha256="537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b"/>
          <extract format="libarchive" root="lz4-{LibraryVersion}">
             <require path="build\cmake\CMakeLists.txt"/>
             <require path="lib\lz4.h"/>
