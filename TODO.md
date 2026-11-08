@@ -1,3 +1,30 @@
+## Release backlog (2026-11-08)
+
+The following releases are **TODO only**. Do not change their active library contracts, dependency selections or rebuild state until a separate migration is verified. Current versions below are the supplied catalog snapshot, not a claim of successful installed package evidence.
+
+| Library | Catalog | Target | Classification |
+| --- | --- | --- | --- |
+| Poppler | 26.09.0 | 26.11.0 | Malformed-PDF fixes; PDF parser and downstream consumers |
+| OpenCV | 5.0.0 | 5.1.0 | Upstream release; OCR/vision and packaging regression |
+| LZ4 | 1.10.0 | 1.11.0 | Parallel compression; ABI and threading |
+| ICU | 78.3 | 79.1 | New major release line; Unicode data and dependent packages |
+| QPDF | 12.4.1 | 12.4.2 | Maintenance; native Windows test adapter |
+| raylib | 6.0 | 6.2 | Feature/API changes; graphics smoke tests |
+| oneTBB | 2023.1.0 | 2023.2.0 | Upstream release; compiler and runtime |
+| simdutf | 9.3.0 | 9.3.3 | Maintenance |
+| fast_float | 8.2.3 | 8.3.3 | Upstream release; PDFium managed dependency |
+| Catch2 | 3.16.0 | 3.16.1 | Maintenance; test infrastructure |
+| GoogleTest | 1.17.0 | 1.18.0 | Upstream release; test infrastructure |
+
+### Priority upgrades: migration gates
+
+- [ ] PoDoFo 1.1.1 -> 1.1.2: check pinned upstream commit; port each ordered BCC64X patch against the new source snapshot; rerun all upstream tests, XMP DLL consumer, SBOM and publish. Preserve previous version as superseded only after PASS.
+- [ ] FreeType 2.14.3 -> 2.15.0: validate official archive SHA-256, retained dependency versions and exact CMake flags; rebuild Release and Debug plus installed consumer.
+- [ ] HarfBuzz 14.4.0 -> 15.1.0: validate archive SHA-256, source layout and canonical DLL-names patch; verify FreeType integration and installed consumer.
+- [ ] LittleCMS (lcms2) 2.19.1 -> 2.20: validate tag naming and archive root, rebase BCC64X clang-inline patch if necessary, run both variants and consumers.
+- [ ] Review all reverse dependency pins (PoDoFo -> FreeType, FreeType -> HarfBuzz, Skia/PDF tooling -> updated packages); use metadata/dependency variables rather than hard-coded installed paths.
+- [ ] Only after successful source/patch/Release/Debug/test/install/smoke/metadata/SBOM stages mark the old releases superseded and enable new default selections.
+
 ## Current toolchain policy: 25 September 2026
 
 - [x] BCC64X is treated as Clang/LLVM with Embarcadero simulation; MinGW-compatible headers/macros are not compiler identity.
