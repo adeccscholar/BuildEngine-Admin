@@ -8879,7 +8879,7 @@
       </smoke>
    </library>
 
-<library id="expat" version="2.9.0" category="data" timestamp="2026-10-15T21:30:00Z">
+<library id="expat" version="2.9.0" supersededBy="2.10.0" category="data" timestamp="2026-10-15T21:30:00Z">
       <metadata name="Expat" supplier="Expat Project" homepage="https://libexpat.github.io/" description="Streaming XML parser used as a native dependency by TECkit SFconv and other XML-consuming components." licenseSignal="green">
          <license name="MIT" spdx="MIT" file="COPYING"/>
       </metadata>
@@ -8903,6 +8903,135 @@
             can and should be started directly on Windows.
          -->
          <copy source="{BuildFileDir}\patches\expat\2.9.0\native-windows-tests.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="native-windows-tests-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"/>
+         </execute>
+         <execute name="native-windows-tests-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"/>
+         </execute>
+         <execute name="native-windows-tests-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DEXPAT_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DEXPAT_BUILD_TESTS:BOOL={TestsEnabled}"/>
+         <argument value="-DEXPAT_BUILD_TOOLS:BOOL=ON"/>
+         <argument value="-DEXPAT_BUILD_EXAMPLES:BOOL=ON"/>
+         <argument value="-DEXPAT_BUILD_DOCS:BOOL=OFF"/>
+         <argument value="-DEXPAT_BUILD_PKGCONFIG:BOOL=ON"/>
+         <argument value="-DEXPAT_BUILD_FUZZERS:BOOL=OFF"/>
+         <argument value="-DEXPAT_ENABLE_INSTALL:BOOL=ON"/>
+         <argument value="-DEXPAT_WARNINGS_AS_ERRORS:BOOL=OFF"/>
+         <cmake mode="configure"
+                executable="{Tool:cmake}"
+                source="{Workspace}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build"
+                executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="test" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                        showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install"
+                      executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\xmlwf.exe"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\expat-{LibraryVersion}\expat-config.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\COPYING"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\expat.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\expat_external.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib;.a" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe" optional="false"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" source="smokes\expat\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="expat-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+
+   <library id="expat" version="2.10.0" category="data" timestamp="2026-11-08T03:45:00Z">
+      <metadata name="Expat" supplier="Expat Project" homepage="https://libexpat.github.io/" description="Streaming XML parser used as a native dependency by TECkit SFconv and other XML-consuming components." licenseSignal="green">
+         <license name="MIT" spdx="MIT" file="COPYING"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/libexpat/libexpat.git" ref="R_2_10_0"/>
+      </security>
+      <source>
+         <download url="https://github.com/libexpat/libexpat/releases/download/R_2_10_0/expat-{LibraryVersion}.tar.xz"
+                   archive="expat-{LibraryVersion}.tar.xz"
+                   sha256="c624ba2998fc65df1163a49641ff3f9ab73138b11641d92c86bee0fb01b1bc7f"/>
+         <extract format="libarchive" root="expat-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="lib\expat.h"/>
+            <require path="tests\runtests.c"/>
+            <require path="xmlwf\xmlwf.c"/>
+         </extract>
+         <!--
+            Expat assumes that every non-MSVC test build needs a POSIX shell.
+            BCC64X is a native Windows Clang toolchain: the unit-test executable
+            can and should be started directly on Windows.
+         -->
+         <copy source="{BuildFileDir}\patches\expat\2.10.0\native-windows-tests.patch"
                target="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"
                overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="native-windows-tests-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
