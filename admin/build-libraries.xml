@@ -5130,9 +5130,9 @@
       <smoke id="consumer" source="smokes\soil2\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="soil2-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
 
-   <library id="vtk" version="9.6.2" category="graphics" timestamp="2026-10-22T21:40:00Z">
-      <dependency library="onetbb" version="2023.1.0"/><dependency library="llvm-openmp" version="20.1.7"/>
-      <metadata name="VTK" supplier="Kitware / VTK contributors" homepage="https://vtk.org/" description="Visualization Toolkit for 3D computer graphics, image processing, scientific visualization, and data analysis. Native oneTBB 2023.1 and LLVM OpenMP 20.1.7 SMP backends enabled; Release consumer smoke PASS." licenseSignal="green"><license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="Copyright.txt"/></metadata>
+   <library id="vtk" version="9.6.2" category="graphics" timestamp="2026-11-08T19:45:01Z">
+      <dependency library="onetbb" version="2023.2.0"/><dependency library="llvm-openmp" version="20.1.7"/>
+      <metadata name="VTK" supplier="Kitware / VTK contributors" homepage="https://vtk.org/" description="Visualization Toolkit for 3D computer graphics, image processing, scientific visualization, and data analysis. Native oneTBB 2023.2 and LLVM OpenMP 20.1.7 SMP backends configured; consumer regression pending." licenseSignal="green"><license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="Copyright.txt"/></metadata>
       <source>
 	  <download url="https://github.com/Kitware/VTK/archive/f49a1dbafa60b58ef22f6292ec58370453162192.zip" archive="VTK-f49a1dbafa60b58ef22f6292ec58370453162192.zip"/><extract format="zip" root="VTK-f49a1dbafa60b58ef22f6292ec58370453162192">
 	  <require path="CMakeLists.txt"/>
@@ -5325,10 +5325,10 @@
          <argument value="-Dwil_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\cmake\WIL"/>
       </smoke>
    </library>
-   <library id="opencv" version="5.0.0" category="graphics" timestamp="2026-11-07T17:24:00Z">
-      <dependency library="onetbb" version="2023.1.0"/><dependency library="llvm-openmp" version="20.1.7"/>
+   <library id="opencv" version="5.0.0" category="graphics" timestamp="2026-11-08T19:45:01Z">
+      <dependency library="onetbb" version="2023.2.0"/><dependency library="llvm-openmp" version="20.1.7"/>
       <dependency library="zlib" version="1.4"/>
-      <metadata name="OpenCV" supplier="OpenCV project" homepage="https://opencv.org/" description="Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning, Windows DirectShow camera capture (MSMF COM compatibility pending), and image stitching. Native oneTBB 2023.1 parallel backend confirmed by the Release consumer smoke; LLVM OpenMP 20.1.7 enabled as a build dependency." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
+      <metadata name="OpenCV" supplier="OpenCV project" homepage="https://opencv.org/" description="Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning, Windows DirectShow camera capture (MSMF COM compatibility pending), and image stitching. Native oneTBB 2023.2 parallel backend configured; Release consumer smoke regression pending; LLVM OpenMP 20.1.7 enabled as a build dependency." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source><download url="https://github.com/opencv/opencv/archive/40738fb16ceddb5fb3fea747585f7ce6abb0605b.zip" archive="opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b.zip"/><extract format="zip" root="opencv-40738fb16ceddb5fb3fea747585f7ce6abb0605b"><require path="CMakeLists.txt"/><require path="LICENSE"/><require path="modules\core\CMakeLists.txt"/><require path="modules\dnn\CMakeLists.txt"/><require path="modules\highgui\CMakeLists.txt"/><require path="modules\videoio\CMakeLists.txt"/></extract><download url="https://github.com/opencv/opencv_contrib/archive/755e50675d97db9b7d449d8bd6b09888646f6c6e.zip" archive="opencv_contrib-755e50675d97db9b7d449d8bd6b09888646f6c6e.zip"/><extract format="zip" root="opencv_contrib-755e50675d97db9b7d449d8bd6b09888646f6c6e" merge="true" preserveCurrentArtifact="true"><require path="modules\ml\CMakeLists.txt"/><require path="modules\ml\include\opencv2\ml.hpp"/></extract><copy source="{BuildFileDir}\patches\opencv\5.0.0\bcc64x-optional-mlas.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch" overwrite="true" preserveCurrentArtifact="true"/><execute name="patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch"/></execute><execute name="patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch"/></execute></source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/><environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/><environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DOPENCV_INCLUDE_INSTALL_PATH:STRING=include/opencv5"/><argument value="-DOPENCV_LIB_INSTALL_PATH:STRING=lib/win64/{Configuration}"/><argument value="-DOPENCV_BIN_INSTALL_PATH:STRING=bin/win64/{Configuration}"/><argument value="-DOPENCV_CONFIG_INSTALL_PATH:STRING=lib/win64/{Configuration}/cmake/opencv5"/><argument value="-DOPENCV_SKIP_CMAKE_ROOT_CONFIG:BOOL=ON"/>
@@ -5449,7 +5449,7 @@
       </smoke>
    </library>
 
-   <library id="googletest" version="1.17.0" category="testing" timestamp="2026-09-05T02:46:00Z">
+   <library id="googletest" version="1.17.0" supersededBy="1.18.0" category="testing" timestamp="2026-09-05T02:46:00Z">
       <metadata name="GoogleTest" supplier="Google" homepage="https://github.com/google/googletest" description="C++ testing framework providing GoogleTest and GoogleMock for unit tests and mocks." licenseSignal="green"><license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\googletest\LICENSE"/></metadata>
       <security><repository url="https://github.com/google/googletest.git" commit="52eb8108c5bdec04579160ae17225d66034bd723"/></security>
       <source>
@@ -5496,8 +5496,55 @@
          <argument value="-DGTest_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\GTest"/>
       </smoke>
    </library>
+<library id="googletest" version="1.18.0" category="testing" timestamp="2026-11-08T19:45:00Z">
+      <metadata name="GoogleTest" supplier="Google" homepage="https://github.com/google/googletest" description="C++ testing framework providing GoogleTest and GoogleMock for unit tests and mocks." licenseSignal="green"><license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\googletest\LICENSE"/></metadata>
+      <security><repository url="https://github.com/google/googletest.git" commit="063de7e9578f82b369302001269680b4b1553359"/></security>
+      <source>
+         <download url="https://github.com/google/googletest/archive/063de7e9578f82b369302001269680b4b1553359.zip" archive="googletest-063de7e9578f82b369302001269680b4b1553359.zip"/>
+         <extract format="zip" root="googletest-063de7e9578f82b369302001269680b4b1553359"><require path="CMakeLists.txt"/><require path="googletest\include\gtest\gtest.h"/><require path="googlemock\include\gmock\gmock.h"/><require path="LICENSE"/></extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=17"/><argument value="-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"/><argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\googletest\bcc64x-target-fixes.cmake"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/><argument value="-DBUILD_GMOCK:BOOL=ON"/><argument value="-DINSTALL_GTEST:BOOL=ON"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><variable name="CMakeExportConfiguration" value="release"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/></variant>
+         <variant name="Debug"><variable name="CMakeExportConfiguration" value="debug"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\gtest.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\gtest_main.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\gmock.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\gmock_main.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\GTest\GTestConfig.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\googletest\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\gtest\gtest.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\gmock\gmock.h"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\googletest\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="GoogleTestSmoke.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DGTest_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\GTest"/>
+      </smoke>
+   </library>
 
-   <library id="catch2" version="3.16.0" category="testing" timestamp="2026-09-08T01:20:00Z">
+   <library id="catch2" version="3.16.0" supersededBy="3.16.1" category="testing" timestamp="2026-09-08T01:20:00Z">
       <metadata
          name="Catch2"
          supplier="Catch2 Authors"
@@ -5567,6 +5614,321 @@
 
          <!--
             Catch2 3.16 identifies every compiler defining __BORLANDC__
+            as the historic Embarcadero compiler family and therefore enables
+            CATCH_CONFIG_POLYFILL_ISNAN.
+
+            That polyfill calls std::_isnan(), which is not available in the
+            modern BCC64X 20.1.7 standard-library environment.
+
+            Catch2 provides CATCH_CONFIG_NO_POLYFILL_ISNAN as the supported
+            negative override, so no source patch is required.
+
+            Catch2's UTF-8 SelfTests contain real Unicode characters in
+            ordinary narrow string literals and expect UTF-8 bytes.
+
+            Machine-proven with BCC64X 20.1.7:
+
+               default                              -> 9A
+               -fborland-input-code-page=65001      -> 9A
+               -fborland-exec-code-page=65001       -> C5 A1
+
+            Therefore Catch2 uses UTF-8 as BCC64X execution code page.
+            Generic Clang -finput-charset/-fexec-charset options did not
+            change the observed BCC64X behaviour and are intentionally absent.
+         -->
+         <argument
+            value="-DCMAKE_CXX_FLAGS:STRING=-DCATCH_CONFIG_NO_POLYFILL_ISNAN -fborland-exec-code-page=65001"/>
+
+         <argument
+            value="-DCATCH_DEVELOPMENT_BUILD:BOOL={TestsEnabled}"/>
+
+         <argument
+            value="-DCATCH_BUILD_TESTING:BOOL={TestsEnabled}"/>
+
+         <argument
+            value="-DBUILD_TESTING:BOOL={TestsEnabled}"/>
+
+         <argument
+            value="-DCATCH_ENABLE_WERROR:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_BUILD_EXAMPLES:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_BUILD_EXTRA_TESTS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_BUILD_FUZZERS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_BUILD_BENCHMARKS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_ENABLE_CONFIGURE_TESTS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_ENABLE_CMAKE_HELPER_TESTS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_ENABLE_REPRODUCIBLE_BUILD:BOOL=ON"/>
+
+         <argument
+            value="-DCATCH_INSTALL_DOCS:BOOL=OFF"/>
+
+         <argument
+            value="-DCATCH_INSTALL_EXTRAS:BOOL=ON"/>
+
+         <argument
+            value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
+
+         <argument
+            value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+
+         <argument
+            value="-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"/>
+
+         <argument
+            value="-DCMAKE_CXX_EXTENSIONS:BOOL=OFF"/>
+
+         <cmake
+            mode="configure"
+            executable="{Tool:cmake}"
+            source="{Workspace}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <cmake
+            mode="build"
+            executable="{Tool:cmake}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <argument
+               value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+
+            <argument
+               value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+
+            <argument
+               value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+
+            <argument
+               value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+
+         <variant name="Debug">
+            <argument
+               value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+
+            <argument
+               value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+
+            <argument
+               value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+
+            <argument
+               value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <execute
+                  name="upstream-tests"
+                  test="true"
+                  executable="{ToolDir:cmake}\ctest.exe"
+                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+                  showOutput="false">
+
+                  <environment
+                     name="CTEST_PARALLEL_LEVEL"
+                     value="{TestJobs}"/>
+
+                  <environment
+                     name="PATH"
+                     value="{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+
+                  <argument value="--output-on-failure"/>
+               </execute>
+
+               <cmake
+                  mode="install"
+                  executable="{Tool:cmake}"
+                  build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\catch2\catch_all.hpp"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\catch2\catch_test_macros.hpp"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\catch2\catch_template_test_macros.hpp"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                  kind="directory"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\Catch2\Catch2Config.cmake"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\Catch2\Catch2ConfigVersion.cmake"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\Catch2\Catch2Targets.cmake"/>
+            </perVariant>
+
+            <common>
+               <copy
+                  source="{Workspace}\LICENSE.txt"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\catch2\LICENSE.txt"
+                  overwrite="true"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\catch2\LICENSE.txt"/>
+            </common>
+         </install>
+      </build>
+
+      <publish
+         root="Win64x"
+         configuration="Release"
+         consumer="{BuildFileDir}\cmake\consumer">
+
+         <tree
+            source="include"
+            target="include"
+            optional="false"/>
+
+         <files
+            source="lib\win64\{Configuration}"
+            target="lib"
+            extensions=".a;.lib"
+            optional="false"/>
+
+         <cmake
+            source="lib\win64\{Configuration}\cmake"
+            target="lib\cmake"
+            optional="false"/>
+
+         <tree
+            source="licenses"
+            target="licenses"
+            optional="false"/>
+      </publish>
+
+      <smoke
+         id="consumer"
+         scope="package"
+         source="smokes\catch2\consumer"
+         configuration="Release"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="catch2-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+
+         <!--
+            Catch2 installs its CMake package relative to CMAKE_INSTALL_LIBDIR.
+            Our variant layout therefore places it below
+            lib/win64/{Configuration}/cmake/Catch2.
+
+            A package smoke uses the package root as CMAKE_PREFIX_PATH, so the
+            variant-specific config location is supplied explicitly instead of
+            relocating Catch2's generated CMake export files.
+         -->
+         <argument
+            value="-DCatch2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\Catch2"/>
+      </smoke>
+
+      <smoke
+         id="consumer"
+         scope="package"
+         source="smokes\catch2\consumer"
+         configuration="Debug"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="catch2-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+
+         <argument
+            value="-DCatch2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\Catch2"/>
+      </smoke>
+   </library>
+<library id="catch2" version="3.16.1" category="testing" timestamp="2026-11-08T19:45:00Z">
+      <metadata
+         name="Catch2"
+         supplier="Catch2 Authors"
+         homepage="https://github.com/catchorg/Catch2" description="Modern C++ testing framework for unit tests, assertions, and test discovery." licenseSignal="green">
+
+         <license
+            name="Boost Software License 1.0"
+            spdx="BSL-1.0"
+            file="licenses\catch2\LICENSE.txt"/>
+      </metadata>
+
+      <security>
+         <repository
+            url="https://github.com/catchorg/Catch2.git"
+            ref="v3.16.1"
+            commit="08092139210881f01a34e60c5f2fd6afa0ea4024"/>
+      </security>
+
+      <source>
+         <download
+            url="https://github.com/catchorg/Catch2/archive/refs/tags/v3.16.1.zip"
+            archive="catch2-{LibraryVersion}.zip"/>
+
+         <extract
+            format="zip"
+            root="Catch2-{LibraryVersion}">
+
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE.txt"/>
+
+            <require path="src\CMakeLists.txt"/>
+            <require path="src\catch2\catch_all.hpp"/>
+            <require path="src\catch2\catch_session.hpp"/>
+            <require path="src\catch2\catch_test_macros.hpp"/>
+            <require path="src\catch2\catch_template_test_macros.hpp"/>
+
+            <require path="CMake\Catch2Config.cmake.in"/>
+            <require path="extras\Catch.cmake"/>
+
+            <require path="tests\CMakeLists.txt"/>
+            <require path="tests\SelfTest\TestRegistrations.cpp"/>
+         </extract>
+      </source>
+
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+
+         <argument
+            value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+
+         <argument
+            value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+
+         <argument
+            value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+
+         <argument
+            value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+
+         <argument
+            value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+
+         <!--
+            Catch2 3.16.x identifies every compiler defining __BORLANDC__
             as the historic Embarcadero compiler family and therefore enables
             CATCH_CONFIG_POLYFILL_ISNAN.
 
@@ -13265,7 +13627,7 @@
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
-   <library id="onetbb" version="2023.1.0" category="concurrency" timestamp="2026-10-21T17:45:00Z">
+   <library id="onetbb" version="2023.1.0" supersededBy="2023.2.0" category="concurrency" timestamp="2026-10-21T17:45:00Z">
       <metadata name="Intel oneTBB" supplier="UXL Foundation" homepage="https://github.com/uxlfoundation/oneTBB"
          description="Task-based C++ parallelism runtime, parallel algorithms and flow graphs." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
@@ -13318,6 +13680,158 @@
          </execute>
          <!-- Exclude only the non-portable std::terminate/longjmp subcase; keep all other upstream tests. -->
          <copy source="{BuildFileDir}\patches\onetbb\2023.1.0\bcc64x-terminate-conformance.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-terminate-conformance.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="terminate-conformance-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-terminate-conformance.patch"/>
+         </execute>
+         <execute name="terminate-conformance-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-terminate-conformance.patch"/>
+         </execute>
+         <execute name="terminate-conformance-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-terminate-conformance.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DTBB_BUILD:BOOL=ON"/>
+         <argument value="-DTBBMALLOC_BUILD:BOOL=ON"/>
+         <argument value="-DTBBMALLOC_PROXY_BUILD:BOOL=OFF"/>
+         <argument value="-DTBB_TEST:BOOL=ON"/>
+         <argument value="-DTBB_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DTBB4PY_BUILD:BOOL=OFF"/>
+         <argument value="-DTBB_STRICT:BOOL=OFF"/>
+         <argument value="-DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH:BOOL=ON"/>
+         <argument value="-DTBB_ENABLE_IPO:BOOL=OFF"/>
+         <argument value="-DTBB_INSTALL:BOOL=ON"/>
+         <argument value="-DTBB_FILE_TRIM:BOOL=ON"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}"
+                  build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\oneapi\tbb\parallel_for.h"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.txt"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\onetbb\consumer" configuration="Release"
+         cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="onetbb-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-DTBB_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\TBB"/>
+      </smoke>
+         <smoke id="terminate" scope="package" source="smokes\onetbb\terminate" configuration="Release"
+         cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="onetbb-terminate-smoke.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-DTBB_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\TBB"/>
+      </smoke>
+</library>
+<library id="onetbb" version="2023.2.0" category="concurrency" timestamp="2026-11-08T19:45:00Z">
+      <metadata name="Intel oneTBB" supplier="UXL Foundation" homepage="https://github.com/uxlfoundation/oneTBB"
+         description="Task-based C++ parallelism runtime, parallel algorithms and flow graphs." licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/uxlfoundation/oneTBB.git" ref="v2023.2.0"
+            commit="41158a44ab3fb7ac5df7f99ef82626c87607447f"/>
+      </security>
+      <source>
+         <download
+            url="https://github.com/uxlfoundation/oneTBB/archive/41158a44ab3fb7ac5df7f99ef82626c87607447f.zip"
+            archive="onetbb-41158a44ab3fb7ac5df7f99ef82626c87607447f.zip"/>
+         <extract format="zip" root="oneTBB-41158a44ab3fb7ac5df7f99ef82626c87607447f">
+            <require path="CMakeLists.txt"/>
+            <require path="include\oneapi\tbb\parallel_for.h"/>
+            <require path="include\oneapi\tbb\flow_graph.h"/>
+            <require path="LICENSE.txt"/>
+         </extract>
+         <!-- BCC64X exposes __MINGW32__ but uses the Windows wide-character ITT API. -->
+         <copy source="{BuildFileDir}\patches\onetbb\2023.2.0\bcc64x-profiling-widechar.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-profiling-widechar.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="profiling-widechar-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-profiling-widechar.patch"/>
+         </execute>
+         <execute name="profiling-widechar-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-profiling-widechar.patch"/>
+         </execute>
+         <execute name="profiling-widechar-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-profiling-widechar.patch"/>
+         </execute>
+         <!-- Clang/EMBT must not link the MSVC-mangled Windows DEF exports. -->
+         <copy source="{BuildFileDir}\patches\onetbb\2023.2.0\bcc64x-clang-exports.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-exports.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="clang-exports-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-exports.patch"/>
+         </execute>
+         <execute name="clang-exports-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-exports.patch"/>
+         </execute>
+         <execute name="clang-exports-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-exports.patch"/>
+         </execute>
+         <!-- Exclude only the non-portable std::terminate/longjmp subcase; keep all other upstream tests. -->
+         <copy source="{BuildFileDir}\patches\onetbb\2023.2.0\bcc64x-terminate-conformance.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-terminate-conformance.patch"
             overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="terminate-conformance-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
