@@ -11989,7 +11989,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T15:30:00+01:00">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T14:30:00Z">
       <dependency library="abseil" version="20260817.0"/>
        <dependency library="fast_float" version="8.2.3"/>
       <dependency library="skia" version="153"/>
