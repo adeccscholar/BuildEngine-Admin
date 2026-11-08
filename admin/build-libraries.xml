@@ -11989,10 +11989,10 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T04:59:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T15:30:00+01:00">
       <dependency library="abseil" version="20260817.0"/>
        <dependency library="fast_float" version="8.2.3"/>
-      <dependency library="skia" version="144"/>
+      <dependency library="skia" version="153"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
@@ -12051,7 +12051,7 @@
             <argument value="-P"/>
             <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\abseil-installed-includes.cmake"/>
          </execute>
-         <!-- Prepare a GN adapter directory only. Installed Skia 144 owns its
+         <!-- Prepare a GN adapter directory only. Installed Skia 153 owns its
               headers, DLL and import library; never extract another Skia. -->
          <execute name="prepare-skia-source-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/>
@@ -12085,18 +12085,32 @@
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\fast-float-installed-includes.patch"/>
          </execute>
-         <!-- Rewrite pinned PDFium Skia includes to the installed Skia 144 include root. -->
-         <execute name="pdfium-skia144-includes-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+         <!-- Rewrite pinned PDFium Skia includes to the installed Skia 153 include root. -->
+         <execute name="pdfium-skia153-includes-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\skia144-installed-includes.patch"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\skia153-installed-includes.patch"/>
          </execute>
-         <execute name="pdfium-skia144-includes-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+         <execute name="pdfium-skia153-includes-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="apply"/><argument value="--no-index"/>
-            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\skia144-installed-includes.patch"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\skia153-installed-includes.patch"/>
          </execute>
-         <execute name="pdfium-skia144-includes-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+         <execute name="pdfium-skia153-includes-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\skia144-installed-includes.patch"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\skia153-installed-includes.patch"/>
+         </execute>
+         <!-- Skia 153 replaces SkGradientShader with SkGradient/SkShaders. -->
+         <!-- This API patch runs strictly after the installed-header relocation. -->
+         <execute name="pdfium-skia153-gradient-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\bcc64x-skia153-gradient.patch"/>
+         </execute>
+         <execute name="pdfium-skia153-gradient-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\bcc64x-skia153-gradient.patch"/>
+         </execute>
+         <execute name="pdfium-skia153-gradient-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\bcc64x-skia153-gradient.patch"/>
          </execute>
          <execute name="prepare-chromium-tools-win-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\tools\win"/>
@@ -12223,7 +12237,7 @@
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\bcc64x-chromium-clangcl-options.patch"/>
          </execute>
-         <!-- Match Skia 144: the native BCC64X DLL mode owns subsystem selection. -->
+         <!-- Match Skia 153: the native BCC64X DLL mode owns subsystem selection. -->
          <execute name="pdfium-bcc64x-dll-subsystem-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-dll-subsystem.patch"/>
@@ -12252,7 +12266,7 @@
          <require path="{CurrentArtifact}\build\toolchain\bcc64x\BUILD.gn"/>
          <require path="{CurrentArtifact}\build\config\freetype\BUILD.gn"/>
 
-         <!-- PDFium must consume Skia 144 headers and dynamic import libraries
+         <!-- PDFium must consume Skia 153 headers and dynamic import libraries
               from the same installed BuildEngine package. No second Skia
               checkout, private headers or Skia source compilation is allowed.
               GN target compatibility remains a build-time gate. -->
@@ -12263,9 +12277,9 @@
          <!-- Validate the exact imported CMake library artifacts before GN/Ninja. -->
          <require path="{DependencyRoot:lcms2}\lib\win64\{Configuration}\liblcms2.lib"/>
          <require path="{DependencyRoot:openjpeg}\lib\win64\{Configuration}\libopenjp2.lib"/>
-         <!-- No header staging: Skia 144 is consumed directly from its installation. -->
+         <!-- No header staging: Skia 153 is consumed directly from its installation. -->
          <require path="{DependencyRoot:skia}\include\include\core\SkSurface.h"/>
-         <require path="{DependencyRoot:skia}\lib\win64\{Configuration}\skia144.lib"/>
+         <require path="{DependencyRoot:skia}\lib\win64\{Configuration}\skia.lib"/>
          <!-- Validate source evidence on resumed builds before generating GN targets. -->
 
 <require path="{Workspace}\tools\win\DebugVisualizers\BUILD.gn"/>
@@ -12284,7 +12298,7 @@
          <require path="{DependencyRoot:abseil}\lib\win64\{Configuration}\libabseil_dll.lib"/>
          <environment name="CB_PDFIUM_ABSEIL_LIBDIR" value="{DependencyRoot:abseil}\lib\win64\{Configuration}"/>
          <environment name="CB_PDFIUM_SKIA_INCLUDE" value="{DependencyRoot:skia}\include"/>
-         <environment name="CB_PDFIUM_SKIA_LIB" value="{DependencyRoot:skia}\lib\win64\{Configuration}\skia144.lib"/>
+         <environment name="CB_PDFIUM_SKIA_LIB" value="{DependencyRoot:skia}\lib\win64\{Configuration}\skia.lib"/>
          <environment name="CB_PDFIUM_LCMS_INCLUDE" value="{DependencyRoot:lcms2}\include"/>
          <environment name="CB_PDFIUM_LCMS_LIB" value="{DependencyRoot:lcms2}\lib\win64\{Configuration}\liblcms2.lib"/>
          <environment name="CB_PDFIUM_OPENJPEG_INCLUDE" value="{DependencyRoot:openjpeg}\include\openjpeg-2.5"/>
@@ -12453,7 +12467,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\pdfium\consumer" configuration="Debug"
@@ -12463,7 +12477,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2d.dll;libpng16d.dll;libharfbuzzd.dll;libicuuc78d.dll;libfreetyped.dll;skia144.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2d.dll;libpng16d.dll;libharfbuzzd.dll;libicuuc78d.dll;libfreetyped.dll;skia.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
