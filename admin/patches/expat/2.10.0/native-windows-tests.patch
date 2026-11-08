@@ -1,7 +1,7 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -712,15 +712,15 @@ if(EXPAT_BUILD_TESTS)
+@@ -704,15 +704,15 @@ if(EXPAT_BUILD_TESTS)
      ## these are unittests that can be run on any platform
      enable_testing()
  
