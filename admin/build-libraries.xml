@@ -12102,15 +12102,15 @@
          <!-- This API patch runs strictly after the installed-header relocation. -->
          <execute name="pdfium-skia153-gradient-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\bcc64x-skia153-gradient.patch"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-skia153-gradient.patch"/>
          </execute>
          <execute name="pdfium-skia153-gradient-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="apply"/><argument value="--no-index"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\bcc64x-skia153-gradient.patch"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-skia153-gradient.patch"/>
          </execute>
          <execute name="pdfium-skia153-gradient-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="{BuildFileDir}\\patches\\pdfium\\2025.11.19\\bcc64x-skia153-gradient.patch"/>
+            <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\bcc64x-skia153-gradient.patch"/>
          </execute>
          <execute name="prepare-chromium-tools-win-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/><argument value="{CurrentArtifact}\tools\win"/>
