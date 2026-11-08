@@ -6988,7 +6988,7 @@
       <environment name="CB_BDS" value="{BDS}"/>
    </smoke>
 </library>
-   <library id="freetype" version="2.15.0" category="text" timestamp="2026-11-08T04:59:00Z">
+   <library id="freetype" version="2.15.0" category="text" timestamp="2026-11-08T05:30:00Z">
    <dependency library="zlib" version="1.4"/>
    <dependency library="bzip2" version="1.0.8"/>
    <dependency library="brotli" version="1.2.1"/>
@@ -7013,6 +7013,8 @@
    <build>
       <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
       <environment name="CB_BDS" value="{BDS}"/>
+      <!-- The BCC64X toolchain derives the SDK rc.exe and its include roots from this managed tool. -->
+      <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
 
       <argument value="-G"/>
       <argument value="Ninja"/>
