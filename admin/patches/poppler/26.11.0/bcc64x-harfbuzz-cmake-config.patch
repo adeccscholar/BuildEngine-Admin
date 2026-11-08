@@ -1,7 +1,7 @@
 diff --git a/cmake/modules/Findharfbuzz.cmake b/cmake/modules/Findharfbuzz.cmake
 --- a/cmake/modules/Findharfbuzz.cmake
 +++ b/cmake/modules/Findharfbuzz.cmake
-@@ -9,7 +9,24 @@
+@@ -9,7 +9,30 @@
  # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
  
  include(FindPackageHandleStandardArgs)
@@ -15,6 +15,12 @@ diff --git a/cmake/modules/Findharfbuzz.cmake b/cmake/modules/Findharfbuzz.cmake
 +  if(NOT TARGET harfbuzz::harfbuzz OR NOT TARGET harfbuzz::harfbuzz-subset)
 +    message(FATAL_ERROR "BuildEngine HarfBuzz package lacks required core/subset targets")
 +  endif()
++  if(NOT DEFINED BUILDENGINE_HARFBUZZ_INCLUDE_DIR OR
++     NOT EXISTS "${BUILDENGINE_HARFBUZZ_INCLUDE_DIR}/harfbuzz/hb.h")
++    message(FATAL_ERROR "BuildEngine HarfBuzz public header root missing: ${BUILDENGINE_HARFBUZZ_INCLUDE_DIR}")
++  endif()
++  target_include_directories(harfbuzz::harfbuzz INTERFACE
++    "${BUILDENGINE_HARFBUZZ_INCLUDE_DIR}")
 +  if(NOT TARGET harfbuzz::subset)
 +    add_library(harfbuzz::subset INTERFACE IMPORTED)
 +    target_link_libraries(harfbuzz::subset INTERFACE harfbuzz::harfbuzz-subset)

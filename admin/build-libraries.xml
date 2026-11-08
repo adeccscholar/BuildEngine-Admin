@@ -11823,7 +11823,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
       </publish>
    </library>
-<library id="poppler" version="26.11.0" category="documentation" timestamp="2026-11-08T16:12:00Z">
+<library id="poppler" version="26.11.0" category="documentation" timestamp="2026-11-08T19:29:30Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="freetype" version="2.15.0"/>
       <dependency library="harfbuzz" version="15.1.0"/>
@@ -11897,6 +11897,7 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin"/>
          <argument value="-DBUILDENGINE_HARFBUZZ_CONFIG_DIR:PATH={DependencyRoot:harfbuzz}\lib\win64\{Configuration}\cmake\harfbuzz"/>
+         <argument value="-DBUILDENGINE_HARFBUZZ_INCLUDE_DIR:PATH={DependencyRoot:harfbuzz}\include"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <argument value="-DFONT_CONFIGURATION:STRING=win32"/>
