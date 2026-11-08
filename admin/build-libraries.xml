@@ -2805,6 +2805,8 @@
          <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
+         <!-- Keep the established BuildEngine import library names; upstream CMake otherwise adds _imp on Windows. -->
+         <argument value="-DIMPORT_LIB_SUFFIX:STRING="/>
          <argument value="-DBUILD_CURL_EXE:BOOL=OFF"/>
          <argument value="-DBUILD_EXAMPLES:BOOL=OFF"/>
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
@@ -2836,7 +2838,7 @@
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="CurlDll" value="libcurl.dll"/>
-            <variable name="CurlImportLibrary" value="libcurl_imp.lib"/>
+            <variable name="CurlImportLibrary" value="libcurl.lib"/>
             <variable name="CMakeExportConfiguration" value="release"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -2857,7 +2859,7 @@
          </variant>
          <variant name="Debug">
             <variable name="CurlDll" value="libcurld.dll"/>
-            <variable name="CurlImportLibrary" value="libcurld_imp.lib"/>
+            <variable name="CurlImportLibrary" value="libcurld.lib"/>
             <variable name="CMakeExportConfiguration" value="debug"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
@@ -2956,6 +2958,8 @@
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DBUILDENGINE_BCC64X_WINSDK_INLINE:BOOL=ON"/>
          <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
+         <!-- Keep the established BuildEngine import library names; upstream CMake otherwise adds _imp on Windows. -->
+         <argument value="-DIMPORT_LIB_SUFFIX:STRING="/>
          <argument value="-DBUILD_CURL_EXE:BOOL=OFF"/>
          <argument value="-DBUILD_EXAMPLES:BOOL=OFF"/>
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
@@ -2987,7 +2991,7 @@
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="CurlDll" value="libcurl.dll"/>
-            <variable name="CurlImportLibrary" value="libcurl_imp.lib"/>
+            <variable name="CurlImportLibrary" value="libcurl.lib"/>
             <variable name="CMakeExportConfiguration" value="release"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -3008,7 +3012,7 @@
          </variant>
          <variant name="Debug">
             <variable name="CurlDll" value="libcurld.dll"/>
-            <variable name="CurlImportLibrary" value="libcurld_imp.lib"/>
+            <variable name="CurlImportLibrary" value="libcurld.lib"/>
             <variable name="CMakeExportConfiguration" value="debug"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
