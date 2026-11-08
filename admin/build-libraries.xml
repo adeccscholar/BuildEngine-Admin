@@ -10754,7 +10754,7 @@
          <argument value="-DPoDoFo_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.2" category="documentation" timestamp="2026-11-08T06:00:00Z">
+   <library id="podofo" version="1.1.2" category="documentation" timestamp="2026-11-08T15:04:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="freetype" version="2.15.0"/>
@@ -11989,7 +11989,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T14:30:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T15:04:00Z">
       <dependency library="abseil" version="20260817.0"/>
        <dependency library="fast_float" version="8.2.3"/>
       <dependency library="skia" version="153"/>
