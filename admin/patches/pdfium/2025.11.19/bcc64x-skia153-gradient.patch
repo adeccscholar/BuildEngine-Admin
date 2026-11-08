@@ -43,7 +43,7 @@ diff --git a/core/fxge/skia/fx_skia_device.cpp b/core/fxge/skia/fx_skia_device.c
    bool clipStart = !pArray || !pArray->GetIntegerAt(0);
    bool clipEnd = !pArray || !pArray->GetIntegerAt(1);
    SkPaint paint;
-@@ -1253,9 +1265,7 @@
+@@ -1253,9 +1267,7 @@
      float end_y = pCoords->GetFloatAt(3);
      SkPoint pts[] = {{start_x, start_y}, {end_x, end_y}};
      skMatrix.mapPoints(pts);
@@ -54,7 +54,7 @@ diff --git a/core/fxge/skia/fx_skia_device.cpp b/core/fxge/skia/fx_skia_device.c
      if (clipStart || clipEnd) {
        // if the gradient is horizontal or vertical, modify the draw rectangle
        if (pts[0].fX == pts[1].fX) {  // vertical
-@@ -1300,9 +1310,8 @@
+@@ -1300,9 +1312,8 @@
      float end_r = pCoords->GetFloatAt(5);
      SkPoint pts[] = {{start_x, start_y}, {end_x, end_y}};
  
