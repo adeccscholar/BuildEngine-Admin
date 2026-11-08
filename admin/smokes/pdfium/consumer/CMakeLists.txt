@@ -12,7 +12,32 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/consumer/BuildEngineRuntime.cm
 if(NOT DEFINED ADECC_RUNTIME_PACKAGE_ROOTS OR ADECC_RUNTIME_PACKAGE_ROOTS STREQUAL "")
    message(FATAL_ERROR "PDFium smoke requires ADECC_RUNTIME_PACKAGE_ROOTS")
 endif()
-adecc_stage_runtime(pdfium-consumer PACKAGE_ROOTS ${ADECC_RUNTIME_PACKAGE_ROOTS})
+# The retired Skia 144 DLL may remain from a previous smoke run: purge only
+# that exact filename. Runtime staging still rejects genuine DLL collisions.
+adecc_stage_runtime(pdfium-consumer
+   PACKAGE_ROOTS ${ADECC_RUNTIME_PACKAGE_ROOTS}
+   EXCLUDE_DLLS skia144.dll)
+
+# Skia 153's ICU data is a runtime resource, not a DLL. Stage the exact
+# declared Skia package asset, without PATH or latest-version discovery.
+set(theSkia153Root "")
+foreach(thePackage IN LISTS ADECC_RUNTIME_PACKAGE_ROOTS)
+   file(TO_CMAKE_PATH "${thePackage}" strPackagePath)
+   if(strPackagePath MATCHES "/skia/153/?$")
+      set(theSkia153Root "${thePackage}")
+      break()
+   endif()
+endforeach()
+if(theSkia153Root STREQUAL "")
+   message(FATAL_ERROR "PDFium runtime closure does not contain skia@153")
+endif()
+add_custom_command(TARGET pdfium-consumer POST_BUILD
+   COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+      "${theSkia153Root}/bin/win64/$<CONFIG>/icudtl.dat"
+      "$<TARGET_FILE_DIR:pdfium-consumer>/icudtl.dat"
+   COMMENT "Stage installed Skia 153 ICU data"
+   VERBATIM)
+
 
 # Explicit loader preflight: this executable intentionally does not import
 # PDFium, so a Windows loader failure can be distinguished from the smoke
