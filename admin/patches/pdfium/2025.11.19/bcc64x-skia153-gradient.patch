@@ -5,8 +5,8 @@ diff --git a/core/fxge/skia/fx_skia_device.cpp b/core/fxge/skia/fx_skia_device.c
  #include "third_party/skia/include/core/SkTileMode.h"
  #include "third_party/skia/include/core/SkTypeface.h"
  #include "third_party/skia/include/effects/SkDashPathEffect.h"
--#include "third_party/skia/include/effects/SkGradientShader.h"
-+#include "third_party/skia/include/effects/SkGradient.h"
+-#include "include/effects/SkGradientShader.h"
++#include "include/effects/SkGradient.h"
  #include "third_party/skia/include/pathops/SkPathOps.h"
  
  namespace {
