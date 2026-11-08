@@ -1,0 +1,109 @@
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -1,10 +1,10 @@
+-set(PDF_TEST_RESOURCE_PATH "${PROJECT_SOURCE_DIR}/extern/resources")
+-if(NOT EXISTS "${PDF_TEST_RESOURCE_PATH}")
+-    message(WARNING "Test resources path doesn't exists, tests disabled. Try fetch git submodules if you want tests to be enabled")
+-    return()
+-endif()
+-
+-set(PDF_TEST_OUTPUT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/out")
++set(PDF_TEST_RESOURCE_PATH "${PROJECT_SOURCE_DIR}/extern/resources" CACHE PATH "PoDoFo test input resources")
++if(NOT EXISTS "${PDF_TEST_RESOURCE_PATH}")
++    message(WARNING "Test resources path doesn't exists, tests disabled. Try fetch git submodules if you want tests to be enabled")
++    return()
++endif()
++
++set(PDF_TEST_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/out" CACHE PATH "PoDoFo test output directory")
+ make_directory(${PDF_TEST_OUTPUT_PATH})
+ 
+ file(TO_NATIVE_PATH "${PDF_TEST_RESOURCE_PATH}" PDF_TEST_RESOURCE_PATH)
+diff --git a/test/unit/XMPTest.cpp b/test/unit/XMPTest.cpp
+--- a/test/unit/XMPTest.cpp
++++ b/test/unit/XMPTest.cpp
+@@ -162,43 +162,47 @@
+     charbuff buff2;
+     auto srcPath = TestUtils::GetTestInputPath() / "XMP";
+     auto refPath = TestUtils::GetTestOutputPath() / "XMP" / "Ref";
+-    fs::create_directories(refPath);
+-    for (const auto& entry : fs::directory_iterator(TestUtils::GetTestInputFilePath("XMP")))
+-    {
+-        testPruneInvalid(entry.path(), PdfALevel::L1B, refPath, buff1, buff2);
+-        testPruneInvalid(entry.path(), PdfALevel::L2B, refPath, buff1, buff2);
+-    }
+-}
+-
+-void testPruneInvalid(const fs::path& path, PdfALevel level, const fs::path& refFolder, charbuff& buff1, charbuff& buff2)
+-{
+-    if (path.filename() == "Ref")
+-        return;
+-
+-    ReadXMPFile(buff1, path);
+-    auto packet = PdfXMPPacket::Create(buff1);
+-    constexpr bool WriteNormalized = false;
+-    if (WriteNormalized)
+-    {
+-        auto normalizedPath = refFolder / path.stem().u8string().append("_Normalized").append(".xmp");
+-        buff1.clear();
+-        packet->ToString(buff1);
+-        WriteXMPFile(normalizedPath, buff1);
+-    }
+-
+-    packet->PruneAndValidate(level);
+-    buff1.clear();
+-    packet->ToString(buff1);
+-
+-    auto refPath = refFolder / path.stem().u8string().append("_").append(PoDoFo::ToString(level)).append(".xmp");
+-    if (fs::exists(refPath))
+-    {
+-        ReadXMPFile(buff2, refPath);
+-        REQUIRE(buff1 == buff2);
+-    }
+-    else
+-    {
+-        WriteXMPFile(refPath, buff1);
++    // Reference data is immutable input, never a test-generated output.
++    if (!fs::is_directory(refPath))
++        throw runtime_error("Missing XMP reference directory: " + refPath.u8string());
++    for (const auto& entry : fs::directory_iterator(TestUtils::GetTestInputFilePath("XMP")))
++    {
++        testPruneInvalid(entry.path(), PdfALevel::L1B, refPath, buff1, buff2);
++        testPruneInvalid(entry.path(), PdfALevel::L2B, refPath, buff1, buff2);
++    }
++}
++
++void testPruneInvalid(const fs::path& path, PdfALevel level, const fs::path& refFolder, charbuff& buff1, charbuff& buff2)
++{
++    if (path.filename() == "Ref")
++        return;
++
++    ReadXMPFile(buff1, path);
++    auto packet = PdfXMPPacket::Create(buff1);
++    constexpr bool WriteNormalized = false;
++    if (WriteNormalized)
++    {
++        auto normalizedPath = TestUtils::GetTestOutputPath() / "XMP"
++            / path.stem().u8string().append("_Normalized").append(".xmp");
++        fs::create_directories(normalizedPath.parent_path());
++        buff1.clear();
++        packet->ToString(buff1);
++        WriteXMPFile(normalizedPath, buff1);
++    }
++
++    packet->PruneAndValidate(level);
++    buff1.clear();
++    packet->ToString(buff1);
++
++    auto refPath = refFolder / path.stem().u8string().append("_").append(PoDoFo::ToString(level)).append(".xmp");
++    if (fs::exists(refPath))
++    {
++        ReadXMPFile(buff2, refPath);
++        REQUIRE(buff1 == buff2);
++    }
++    else
++    {
++        throw runtime_error("Missing immutable XMP reference: " + refPath.u8string());
+     }
+ }
+ 
