@@ -10754,7 +10754,7 @@
          <argument value="-DPoDoFo_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.2" category="documentation" timestamp="2026-11-08T04:59:00Z">
+   <library id="podofo" version="1.1.2" category="documentation" timestamp="2026-11-08T06:00:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="freetype" version="2.15.0"/>
@@ -10954,6 +10954,7 @@
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
          <argument value="-G"/>
