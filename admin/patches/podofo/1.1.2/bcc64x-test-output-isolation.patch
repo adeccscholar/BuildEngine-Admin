@@ -1,0 +1,54 @@
+diff --git a/test/common/PdfTest.cpp b/test/common/PdfTest.cpp
+--- a/test/common/PdfTest.cpp
++++ b/test/common/PdfTest.cpp
+@@ -8,17 +8,27 @@
+ 
+ #include "PdfTest.h"
+ 
+-#include <utf8cpp/utf8.h>
+-
+-using namespace std;
+-using namespace PoDoFo;
+-
+-static void writeTestOutputFile(const string_view& filepath, const string_view& view);
+-
+-static struct TestPaths
+-{
+-    TestPaths() :
+-        Input(PDF_TEST_RESOURCE_PATH), Output(PDF_TEST_OUTPUT_PATH) { }
++#include <cstdlib>
++#include <utf8cpp/utf8.h>
++
++using namespace std;
++using namespace PoDoFo;
++
++static void writeTestOutputFile(const string_view& filepath, const string_view& view);
++
++static fs::path getTestOutputPath()
++{
++    auto pszPath = std::getenv("PODOFO_TEST_OUTPUT_PATH");
++    if (pszPath != nullptr && *pszPath != '\0')
++        return fs::u8path(pszPath);
++
++    return fs::u8path(PDF_TEST_OUTPUT_PATH);
++}
++
++static struct TestPaths
++{
++    TestPaths() :
++        Input(PDF_TEST_RESOURCE_PATH), Output(getTestOutputPath()) { }
+     fs::path Input;
+     fs::path Output;
+ } s_paths;
+diff --git a/test/unit/XMPTest.cpp b/test/unit/XMPTest.cpp
+--- a/test/unit/XMPTest.cpp
++++ b/test/unit/XMPTest.cpp
+@@ -136,7 +136,7 @@
+     charbuff buff1;
+     charbuff buff2;
+     auto srcPath = TestUtils::GetTestInputPath() / "XMP";
+-    auto refPath = srcPath / "Ref";
++    auto refPath = TestUtils::GetTestOutputPath() / "XMP" / "Ref";
+     fs::create_directories(refPath);
+     for (const auto& entry : fs::directory_iterator(TestUtils::GetTestInputFilePath("XMP")))
+     {
