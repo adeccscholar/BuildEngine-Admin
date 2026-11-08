@@ -3613,7 +3613,7 @@
    deleted after the block has been copied into build-libraries.xml.
 -->
 
-<library id="ace" version="8.0.6" category="middleware" timestamp="2026-11-07T17:24:00Z">
+<library id="ace" version="8.0.6" supersededBy="8.0.8" category="middleware" timestamp="2026-11-07T17:24:00Z">
    <dependency library="openssl" version="3.5.9"/>
    <dependency library="xerces-c" version="3.3.0"/>
    <dependency library="zlib" version="1.4"/>
@@ -3854,8 +3854,217 @@
    </publish>
    
 </library>
+<library id="ace" version="8.0.8" category="middleware" timestamp="2026-11-08T15:43:00Z">
+   <dependency library="openssl" version="3.5.9"/>
+   <dependency library="xerces-c" version="3.3.0"/>
+   <dependency library="zlib" version="1.4"/>
 
-<library id="tao" version="4.0.6" category="middleware" timestamp="2026-11-07T17:24:00Z">
+   <metadata name="ACE"
+             description="Adaptive Communication Environment providing portable networking, concurrency, IPC, and OS abstraction."
+             supplier="DOC Group"
+             homepage="https://www.dre.vanderbilt.edu/~schmidt/ACE.html" licenseSignal="green"/>
+   <security>
+      <repository url="https://github.com/DOCGroup/ACE_TAO.git" ref="ACE+TAO-8_0_8"/>
+   </security>
+
+   <source>
+      <download url="https://github.com/DOCGroup/ACE_TAO/releases/download/ACE%2BTAO-8_0_8/ACE%2BTAO-{LibraryVersion}.zip"
+                archive="ACE+TAO-{LibraryVersion}.zip"
+                sha256="de45b9e50c29b378d3074f4dc0a5d24e0eaa445b44f39461c447aa83f1cc833a"/>
+      <extract format="zip" root="ACE_wrappers">
+         <require path="COPYING"/>
+         <require path="VERSION.txt"/>
+         <require path="ACE.mwc"/>
+         <require path="ace\config-win32.h"/>
+         <require path="bin\mwc.pl"/>
+         <require path="MPC\config\zlib.mpb"/>
+         <require path="TAO\VERSION.txt"/>
+         <require path="TAO\TAO.mwc"/>
+         <require path="TAO\tao\Compression\zlib\ZlibCompressor.mpc"/>
+         <require path="TAO\orbsvcs\Naming_Service\Naming_Service.mpc"/>
+         <require path="TAO\orbsvcs\CosEvent_Service\CosEvent_Service.mpc"/>
+         <require path="TAO\orbsvcs\Event_Service\Event_Service.mpc"/>
+      </extract>
+
+      <!-- Win64 SSL/Select fixes are already in ACE 8.0.8 upstream. -->
+      <copy source="{BuildFileDir}\patches\ace-tao\8.0.8\bcc64x-xerces-modern-borland.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+      <execute name="xerces-modern-borland-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <argument value="apply"/>
+         <argument value="--check"/>
+         <argument value="--no-index"/>
+         <argument value="--whitespace=nowarn"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch"/>
+      </execute>
+      <execute name="xerces-modern-borland-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <argument value="apply"/>
+         <argument value="--no-index"/>
+         <argument value="--whitespace=nowarn"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch"/>
+      </execute>
+
+      <copy source="{BuildFileDir}\patches\ace-tao\8.0.8\bcc64x-zlib-library-names.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+      <execute name="zlib-library-names-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <argument value="apply"/>
+         <argument value="--check"/>
+         <argument value="--no-index"/>
+         <argument value="--whitespace=nowarn"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch"/>
+      </execute>
+      <execute name="zlib-library-names-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <argument value="apply"/>
+         <argument value="--no-index"/>
+         <argument value="--whitespace=nowarn"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch"/>
+      </execute>
+
+
+      <!-- SSLIOP params_dup.cpp migration is also in upstream 8.0.8. -->
+   </source>
+
+   <build>
+      <environment name="ACE_ROOT" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"/>
+      <environment name="SSL_ROOT" value="{DependencyRoot:openssl}"/>
+      <environment name="SSL_INCDIR" value="{DependencyRoot:openssl}\include"/>
+      <environment name="SSL_LIBDIR" value="{DependencyRoot:openssl}\lib\win64\{Configuration}"/>
+      <environment name="XERCESC_INCDIR" value="{DependencyRoot:xerces-c}\include"/>
+      <environment name="XERCESC_LIBDIR" value="{DependencyRoot:xerces-c}\lib\win64\{Configuration}"/>
+      <environment name="XERCESLIB" value="{XercesLibrary}"/>
+      <environment name="ZLIB_ROOT" value="{DependencyRoot:zlib}"/>
+      <environment name="ZLIB_INCDIR" value="{DependencyRoot:zlib}\include"/>
+      <environment name="ZLIB_LIBDIR" value="{DependencyRoot:zlib}\lib\win64\{Configuration}"/>
+      <environment name="BCC32C" value=""/>
+      <environment name="BCC64" value=""/>
+      <environment name="BCC64X" value="1"/>
+      <!-- MPC-generated BMake files default to 0 (all CPU cores), which can exhaust memory in Debug. -->
+      <environment name="MPC_NUMBER_OF_PROCESSORS" value="{BuildJobs}"/>
+      <environment name="CODEGUARD" value=""/>
+      <environment name="UNICODE" value=""/>
+      <environment name="DEBUG" value="{DebugFlag}"/>
+      <environment name="RELEASE" value="{ReleaseFlag}"/>
+      <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\lib;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin;{DependencyRoot:openssl}\bin\win64\{Configuration};{DependencyRoot:xerces-c}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
+
+      <execute name="remove-build-tree" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+         <argument value="-E"/>
+         <argument value="remove_directory"/>
+         <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+      </execute>
+      <execute name="copy-build-tree" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+         <argument value="-E"/>
+         <argument value="copy_directory"/>
+         <argument value="{Workspace}"/>
+         <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers"/>
+      </execute>
+
+      <!--
+         Keep the ACE half of the previously proven TAO_ACE.mwc contract.
+         TAO is added later as an extension in this same variant producer tree.
+      -->
+      <target name="generate-workspace" type="perl" executable="{Tool:perl}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers" showOutput="false">
+         <temporaryFile id="config-h" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\ace\config.h">
+            <line value="#include &quot;ace/config-win32.h&quot;"/>
+         </temporaryFile>
+         <temporaryFile id="default-features" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\MakeProjectCreator\config\default.features">
+            <line value="ssl=1"/>
+            <line value="openssl11=1"/>
+            <line value="xerces3=1"/>
+            <line value="zlib=1"/>
+         </temporaryFile>
+         <temporaryFile id="ACEWorkspace" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\BuildEngine_ACE.mwc">
+            <line value="workspace {{"/>
+            <line value="  $(ACE_ROOT)/ace"/>
+            <line value="  $(ACE_ROOT)/apps/gperf/src"/>
+            <line value="  $(ACE_ROOT)/ACEXML/common"/>
+            <line value="  $(ACE_ROOT)/ACEXML/parser/parser"/>
+            <line value="  $(ACE_ROOT)/ACEXML/apps/svcconf"/>
+            <line value="  $(ACE_ROOT)/Kokyu/Kokyu.mpc"/>
+            <line value="  $(ACE_ROOT)/protocols"/>
+            <line value="}}"/>
+         </temporaryFile>
+         <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin\mwc.pl"/>
+         <argument value="{TargetFile:ACEWorkspace}"/>
+         <argument value="-type"/>
+         <argument value="bmake"/>
+         <argument value="-value_template"/>
+         <argument value="xerceslib={XercesLibrary}"/>
+         <argument value="-value_template"/>
+         <argument value="zliblib={ZlibLibrary}"/>
+      </target>
+      <target name="build-workspace" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers" showOutput="false">
+         <argument value="-m"/>
+         <argument value="-D{BMakeConfiguration}"/>
+         <argument value="-f"/>
+         <argument value="Makefile.bmak"/>
+         <argument value="MAKE={ToolShort:embarcadero-make}"/>
+         <argument value="all"/>
+      </target>
+
+      <variant name="Release">
+         <variable name="BMakeConfiguration" value="RELEASE"/>
+         <variable name="DebugFlag" value=""/>
+         <variable name="ReleaseFlag" value="1"/>
+         <variable name="XercesLibrary" value="libxerces-c"/>
+         <variable name="ZlibLibrary" value="libz"/>
+      </variant>
+      <variant name="Debug">
+         <variable name="BMakeConfiguration" value="DEBUG"/>
+         <variable name="DebugFlag" value="1"/>
+         <variable name="ReleaseFlag" value=""/>
+         <variable name="XercesLibrary" value="libxerces-c"/>
+         <variable name="ZlibLibrary" value="libzd"/>
+      </variant>
+
+      <install>
+         <perVariant>
+            <!-- TAO has not overlaid the payload yet: this is the ACE baseline. -->
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true" flatten="true" cleanTarget="true">
+               <include pattern="lib/**/*.lib"/>
+            </copy>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true" flatten="true" cleanTarget="true">
+               <include pattern="lib/**/*.dll"/>
+               <include pattern="lib/**/*.pdb"/>
+               <include pattern="bin/*.dll"/>
+               <include pattern="bin/*.pdb"/>
+            </copy>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\ACE_wrappers\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}" overwrite="true" cleanTarget="true">
+               <include pattern="ace_gperf.exe"/>
+            </copy>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\tools\bin\win64\{Configuration}\ace_gperf.exe"/>
+         </perVariant>
+         <common>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\ace" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" recursive="true" overwrite="true" cleanTarget="true">
+               <include pattern="**/*.h"/>
+               <include pattern="**/*.hpp"/>
+               <include pattern="**/*.inl"/>
+               <include pattern="**/*.ipp"/>
+               <include pattern="**/*.tpp"/>
+               <include pattern="**/*.idl"/>
+               <include pattern="**/*.pidl"/>
+               <include pattern="**/*.cpp"/>
+            </copy>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+            <copy source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\Release\ACE_wrappers\VERSION.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt" overwrite="true"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace" kind="directory"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ace\ACE.h"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt"/>
+         </common>
+      </install>
+   </build>
+
+   <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+      <tree source="include\ace" target="include\ace" optional="true"/>
+      <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+      <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="true"/>
+      <tree source="tools\bin\win64\{Configuration}" target="tools\bin" optional="true"/>
+   </publish>
+   
+</library>
+
+<library id="tao" version="4.0.6" supersededBy="4.0.8" category="middleware" timestamp="2026-11-07T17:24:00Z">
    <extension library="ace" version="8.0.6" source="TAO" producer="ACE_wrappers" install=".">
       <shared path="bin"/>
       <shared path="lib"/>
@@ -3867,6 +4076,145 @@
              homepage="https://www.dre.vanderbilt.edu/~schmidt/TAO.html" licenseSignal="green"/>
    <security>
       <repository url="https://github.com/DOCGroup/ACE_TAO.git" ref="ACE+TAO-8_0_6"/>
+   </security>
+
+   <!-- No TAO download/extract or patching here: ACE owns and prepares the complete
+        ACE_wrappers source tree, including TAO source repairs, in Source. -->
+   <build>
+      <environment name="ACE_ROOT" value="{ExtensionProducerRoot}"/>
+      <environment name="TAO_ROOT" value="{ExtensionProducerRoot}\TAO"/>
+      <environment name="SSL_ROOT" value="{DependencyRoot:openssl}"/>
+      <environment name="SSL_INCDIR" value="{DependencyRoot:openssl}\include"/>
+      <environment name="SSL_LIBDIR" value="{DependencyRoot:openssl}\lib\win64\{Configuration}"/>
+      <environment name="XERCESC_INCDIR" value="{DependencyRoot:xerces-c}\include"/>
+      <environment name="XERCESC_LIBDIR" value="{DependencyRoot:xerces-c}\lib\win64\{Configuration}"/>
+      <environment name="XERCESLIB" value="{XercesLibrary}"/>
+      <environment name="ZLIB_ROOT" value="{DependencyRoot:zlib}"/>
+      <environment name="ZLIB_INCDIR" value="{DependencyRoot:zlib}\include"/>
+      <environment name="ZLIB_LIBDIR" value="{DependencyRoot:zlib}\lib\win64\{Configuration}"/>
+      <environment name="BCC32C" value=""/>
+      <environment name="BCC64" value=""/>
+      <environment name="BCC64X" value="1"/>
+      <!-- MPC-generated BMake files default to 0 (all CPU cores), which can exhaust memory in Debug. -->
+      <environment name="MPC_NUMBER_OF_PROCESSORS" value="{BuildJobs}"/>
+      <environment name="CODEGUARD" value=""/>
+      <environment name="UNICODE" value=""/>
+      <environment name="DEBUG" value="{DebugFlag}"/>
+      <environment name="RELEASE" value="{ReleaseFlag}"/>
+      <environment name="PATH" value="{ExtensionProducerRoot}\lib;{ExtensionProducerRoot}\bin;{DependencyRoot:openssl}\bin\win64\{Configuration};{DependencyRoot:xerces-c}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{ToolDir:perl};{ToolDir:bcc64x};{ToolDir:embarcadero-make};{ENV:PATH}"/>
+
+      <target name="generate-workspace" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO" showOutput="false">
+         <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/>
+         <argument value="TAO.mwc"/>
+         <argument value="-type"/>
+         <argument value="bmake"/>
+         <argument value="-value_template"/>
+         <argument value="xerceslib={XercesLibrary}"/>
+         <argument value="-value_template"/>
+         <argument value="zliblib={ZlibLibrary}"/>
+      </target>
+      <target name="build-workspace" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{ExtensionProducerRoot}\TAO" showOutput="false">
+         <argument value="-m"/>
+         <argument value="-D{BMakeConfiguration}"/>
+         <argument value="-f"/>
+         <argument value="Makefile.bmak"/>
+         <argument value="MAKE={ToolShort:embarcadero-make}"/>
+         <argument value="all"/>
+      </target>
+
+      <target name="generate-naming-service" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Naming_Service" showOutput="false">
+         <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/><argument value="-type"/><argument value="bmake"/><argument value="-value_template"/><argument value="xerceslib={XercesLibrary}"/><argument value="-value_template"/><argument value="zliblib={ZlibLibrary}"/>
+      </target>
+      <target name="build-naming-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Naming_Service" showOutput="false">
+         <argument value="-m"/><argument value="-D{BMakeConfiguration}"/><argument value="-f"/><argument value="Makefile.bmak"/><argument value="MAKE={ToolShort:embarcadero-make}"/><argument value="all"/>
+      </target>
+      <target name="generate-cos-event-service" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\CosEvent_Service" showOutput="false">
+         <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/><argument value="-type"/><argument value="bmake"/><argument value="-value_template"/><argument value="xerceslib={XercesLibrary}"/><argument value="-value_template"/><argument value="zliblib={ZlibLibrary}"/>
+      </target>
+      <target name="build-cos-event-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\CosEvent_Service" showOutput="false">
+         <argument value="-m"/><argument value="-D{BMakeConfiguration}"/><argument value="-f"/><argument value="Makefile.bmak"/><argument value="MAKE={ToolShort:embarcadero-make}"/><argument value="all"/>
+      </target>
+      <target name="generate-rt-event-service" type="perl" executable="{Tool:perl}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Event_Service" showOutput="false">
+         <argument value="{ExtensionProducerRoot}\bin\mwc.pl"/><argument value="-type"/><argument value="bmake"/><argument value="-value_template"/><argument value="xerceslib={XercesLibrary}"/><argument value="-value_template"/><argument value="zliblib={ZlibLibrary}"/>
+      </target>
+      <target name="build-rt-event-service" type="bmake" executable="{Tool:embarcadero-make}" workingDirectory="{ExtensionProducerRoot}\TAO\orbsvcs\Event_Service" showOutput="false">
+         <argument value="-m"/><argument value="-D{BMakeConfiguration}"/><argument value="-f"/><argument value="Makefile.bmak"/><argument value="MAKE={ToolShort:embarcadero-make}"/><argument value="all"/>
+      </target>
+
+      <variant name="Release">
+         <variable name="BMakeConfiguration" value="RELEASE"/>
+         <variable name="DebugFlag" value=""/>
+         <variable name="ReleaseFlag" value="1"/>
+         <variable name="XercesLibrary" value="libxerces-c"/>
+         <variable name="ZlibLibrary" value="libz"/>
+      </variant>
+      <variant name="Debug">
+         <variable name="BMakeConfiguration" value="DEBUG"/>
+         <variable name="DebugFlag" value="1"/>
+         <variable name="ReleaseFlag" value=""/>
+         <variable name="XercesLibrary" value="libxerces-c"/>
+         <variable name="ZlibLibrary" value="libzd"/>
+      </variant>
+
+      <install>
+         <perVariant>
+            <!-- Overlay the shared ACE payload; never clean shared target directories. -->
+            <copy source="{ExtensionProducerRoot}" target="{ExtensionInstallRoot}\lib\win64\{Configuration}" recursive="true" overwrite="true" flatten="true" cleanTarget="false"><include pattern="lib/**/*.lib"/></copy>
+            <copy source="{ExtensionProducerRoot}" target="{ExtensionInstallRoot}\bin\win64\{Configuration}" recursive="true" overwrite="true" flatten="true" cleanTarget="false"><include pattern="lib/**/*.dll"/><include pattern="lib/**/*.pdb"/><include pattern="bin/*.dll"/><include pattern="bin/*.pdb"/></copy>
+            <copy source="{ExtensionProducerRoot}\bin" target="{ExtensionInstallRoot}\tools\bin\win64\{Configuration}" overwrite="true" cleanTarget="false"><include pattern="tao_idl.exe"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\Naming_Service" target="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosnaming.exe" recursive="true" overwrite="true" singleFile="true"><include pattern="**/tao_cosnaming.exe"/><include pattern="**/tao_cosnamingd.exe"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\CosEvent_Service" target="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosevent.exe" recursive="true" overwrite="true" singleFile="true"><include pattern="**/tao_cosevent.exe"/><include pattern="**/tao_coseventd.exe"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\Event_Service" target="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_rtevent.exe" recursive="true" overwrite="true" singleFile="true"><include pattern="**/tao_rtevent.exe"/><include pattern="**/tao_rteventd.exe"/></copy>
+            <require path="{ExtensionInstallRoot}\tools\bin\win64\{Configuration}\tao_idl.exe"/>
+            <require path="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosnaming.exe"/>
+            <require path="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_cosevent.exe"/>
+            <require path="{ExtensionInstallRoot}\services\bin\win64\{Configuration}\tao_rtevent.exe"/>
+         </perVariant>
+         <common>
+            <copy source="{ExtensionProducerRoot}\TAO\tao" target="{ExtensionInstallRoot}\include\tao" recursive="true" overwrite="true" cleanTarget="false"><include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/><include pattern="**/*.cpp"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\orbsvcs\orbsvcs" target="{ExtensionInstallRoot}\include\orbsvcs" recursive="true" overwrite="true" cleanTarget="false"><include pattern="**/*.h"/><include pattern="**/*.hpp"/><include pattern="**/*.inl"/><include pattern="**/*.ipp"/><include pattern="**/*.tpp"/><include pattern="**/*.idl"/><include pattern="**/*.pidl"/><include pattern="**/*.cpp"/></copy>
+            <copy source="{ExtensionProducerRoot}\TAO\VERSION.txt" target="{ExtensionInstallRoot}\TAO_VERSION.txt" overwrite="true"/>
+            <copy source="{ExtensionProducerRoot}\COPYING" target="{ExtensionInstallRoot}\.buildengine\extensions\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+            <require path="{ExtensionInstallRoot}\include\tao" kind="directory"/>
+            <require path="{ExtensionInstallRoot}\include\orbsvcs" kind="directory"/>
+            <require path="{ExtensionInstallRoot}\include\tao\corba.h"/>
+            <require path="{ExtensionInstallRoot}\include\orbsvcs\CosNamingC.h"/>
+            <require path="{ExtensionInstallRoot}\TAO_VERSION.txt"/>
+            <require path="{ExtensionInstallRoot}\.buildengine\extensions\{LibraryId}\{LibraryVersion}\COPYING"/>
+         </common>
+      </install>
+   </build>
+
+   <!-- TAO publication is a consumable closure, not an ownership claim. -->
+   <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+      <tree source="include\ace" target="include\ace" optional="true"/>
+      <tree source="include\tao" target="include\tao" optional="true"/>
+      <tree source="include\orbsvcs" target="include\orbsvcs" optional="true"/>
+      <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+      <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.pdb" optional="true"/>
+      <tree source="services\bin\win64\{Configuration}" target="services\bin" optional="true"/>
+      <tree source="tools\bin\win64\{Configuration}" target="tools\bin" optional="true"/>
+   </publish>
+
+   <smoke id="consumer" source="smokes\ace-tao\consumer" configuration="Release" scope="package" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="ace-tao-consumer.exe">
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+      <environment name="PATH" value="{ExtensionInstallRoot}\tools\bin\win64\Release;{ExtensionInstallRoot}\services\bin\win64\Release;{ExtensionInstallRoot}\bin\win64\Release;{ENV:PATH}"/>
+   </smoke>
+   
+</library>
+<library id="tao" version="4.0.8" category="middleware" timestamp="2026-11-08T15:43:00Z">
+   <extension library="ace" version="8.0.8" source="TAO" producer="ACE_wrappers" install=".">
+      <shared path="bin"/>
+      <shared path="lib"/>
+   </extension>
+
+   <metadata name="TAO"
+             description="CORBA object request broker and middleware services built on top of ACE."
+             supplier="DOC Group"
+             homepage="https://www.dre.vanderbilt.edu/~schmidt/TAO.html" licenseSignal="green"/>
+   <security>
+      <repository url="https://github.com/DOCGroup/ACE_TAO.git" ref="ACE+TAO-8_0_8"/>
    </security>
 
    <!-- No TAO download/extract or patching here: ACE owns and prepares the complete
@@ -10266,7 +10614,7 @@
          <argument value="-DLibXml2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libxml2"/>
       </smoke>
    </library>
-   <library id="qpdf" version="12.4.1" category="documentation" timestamp="2026-11-07T17:24:00Z">
+   <library id="qpdf" version="12.4.1" supersededBy="12.4.2" category="documentation" timestamp="2026-11-07T17:24:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <metadata name="QPDF" supplier="QPDF Project" homepage="https://qpdf.sourceforge.io/" description="PDF structural transformation library and command-line toolkit for inspecting, rewriting, encrypting and validating PDF files." licenseSignal="green">
@@ -10310,6 +10658,201 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-qtest.patch"/>
          </execute>
          <copy source="{BuildFileDir}\patches\qpdf\12.4.1\prefer-explicit-managed-dependencies.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\prefer-explicit-managed-dependencies.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="managed-deps-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\prefer-explicit-managed-dependencies.patch"/>
+         </execute>
+         <execute name="managed-deps-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\prefer-explicit-managed-dependencies.patch"/>
+         </execute>
+         <execute name="managed-deps-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\prefer-explicit-managed-dependencies.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <environment name="QPDF_BCC64X" value="1"/>
+         <environment name="QPDF_PERL" value="{Tool:perl}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DBUILD_DOC:BOOL=OFF"/>
+         <argument value="-DINSTALL_MANUAL:BOOL=OFF"/>
+         <argument value="-DINSTALL_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DINSTALL_PKGCONFIG:BOOL=ON"/>
+         <argument value="-DINSTALL_CMAKE_PACKAGE:BOOL=ON"/>
+         <argument value="-DMAINTAINER_MODE:BOOL=OFF"/>
+         <argument value="-DCI_MODE:BOOL=OFF"/>
+         <argument value="-DWERROR:BOOL=OFF"/>
+         <argument value="-DGENERATE_AUTO_JOB:BOOL=OFF"/>
+         <argument value="-DENABLE_QTC:BOOL=OFF"/>
+         <argument value="-DREQUIRE_SHELLS:BOOL=OFF"/>
+         <argument value="-DUSE_IMPLICIT_CRYPTO:BOOL=OFF"/>
+         <argument value="-DREQUIRE_CRYPTO_OPENSSL:BOOL=OFF"/>
+         <argument value="-DREQUIRE_CRYPTO_GNUTLS:BOOL=OFF"/>
+         <argument value="-DREQUIRE_CRYPTO_NATIVE:BOOL=ON"/>
+         <argument value="-DUSE_INSECURE_RANDOM:BOOL=OFF"/>
+         <argument value="-DSKIP_OS_SECURE_RANDOM:BOOL=OFF"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib};{DependencyRoot:libjpeg-turbo}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DZLIB_H_PATH:PATH={DependencyRoot:zlib}\include"/>
+            <argument value="-DZLIB_LIB_PATH:FILEPATH={DependencyRoot:zlib}\lib\win64\Release\libz.lib"/>
+            <argument value="-DLIBJPEG_H_PATH:PATH={DependencyRoot:libjpeg-turbo}\include"/>
+            <argument value="-DLIBJPEG_LIB_PATH:FILEPATH={DependencyRoot:libjpeg-turbo}\lib\win64\Release\libjpeg.lib"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DZLIB_H_PATH:PATH={DependencyRoot:zlib}\include"/>
+            <argument value="-DZLIB_LIB_PATH:FILEPATH={DependencyRoot:zlib}\lib\win64\Debug\libzd.lib"/>
+            <argument value="-DLIBJPEG_H_PATH:PATH={DependencyRoot:libjpeg-turbo}\include"/>
+            <argument value="-DLIBJPEG_LIB_PATH:FILEPATH={DependencyRoot:libjpeg-turbo}\lib\win64\Debug\libjpegd.lib"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="QPDF_NATIVE_WINDOWS_PERL" value="1"/>
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\qpdf;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compare-for-test;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\zlib-flate;{ToolDir:perl};{ToolDir:bash};{ToolDir:bash}\..\usr\bin;{ENV:PATH}"/>
+                  <argument value="--output-on-failure"/>
+                  <argument value="-E"/>
+                  <argument value="^(compare-for-test|libtests|qpdf|zlib-flate|examples|fuzz)$"/>
+               </execute>
+               <execute name="compare-native-smoke" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compare-for-test\qpdf-test-compare.exe"
+                        workingDirectory="{Workspace}\compare-for-test\qtest\compare"
+                        showOutput="false">
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{ENV:PATH}"/>
+                  <argument value="zlib.pdf"/>
+                  <argument value="zlib-9.pdf"/>
+               </execute>
+               <execute name="qpdf-native-smoke" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\qpdf\qpdf.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\qpdf"
+                        showOutput="false">
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{ENV:PATH}"/>
+                  <argument value="--version"/>
+               </execute>
+               <execute name="zlib-flate-native-smoke" test="true"
+                        executable="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\zlib-flate\zlib-flate.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\zlib-flate"
+                        showOutput="false">
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\libqpdf;{ENV:PATH}"/>
+                  <argument value="--_zopfli"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\qpdf\QPDF.hh"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\qpdf\QPDFWriter.hh"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.txt"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt"
+                     overwrite="true"/>
+               <copy source="{Workspace}\NOTICE.md"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE.md"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE.md"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\qpdf\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="qpdf-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{ConsumerRoot}\bin;{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{ENV:PATH}"/>
+         <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
+      </smoke>
+   </library>
+<library id="qpdf" version="12.4.2" category="documentation" timestamp="2026-11-08T15:43:00Z">
+      <dependency library="zlib" version="1.4"/>
+      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <metadata name="QPDF" supplier="QPDF Project" homepage="https://qpdf.sourceforge.io/" description="PDF structural transformation library and command-line toolkit for inspecting, rewriting, encrypting and validating PDF files." licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/qpdf/qpdf.git" ref="v{LibraryVersion}" commit="4eba95899886e851cc41d76886483b347612f2a8"/>
+      </security>
+      <source>
+         <download url="https://github.com/qpdf/qpdf/archive/refs/tags/v{LibraryVersion}.tar.gz"
+                   archive="qpdf-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="qpdf-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE.txt"/>
+            <require path="NOTICE.md"/>
+            <require path="include\qpdf\QPDF.hh"/>
+            <require path="include\qpdf\QPDFWriter.hh"/>
+         </extract>
+         <copy source="{BuildFileDir}\patches\qpdf\12.4.2\native-windows-qtest.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-qtest.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="qtest-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-qtest.patch"/>
+         </execute>
+         <execute name="qtest-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-qtest.patch"/>
+         </execute>
+         <execute name="qtest-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-qtest.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\qpdf\12.4.2\prefer-explicit-managed-dependencies.patch"
                target="{Workspace}\.buildengine\patches\{LibraryVersion}\prefer-explicit-managed-dependencies.patch"
                overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="managed-deps-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
@@ -11160,7 +11703,7 @@
          <argument value="-DIconv_LIBRARY:FILEPATH={ConsumerRoot}\lib\win64\{Configuration}\libiconv.lib"/>
       </smoke>
    </library>
-   <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-11-08T04:59:00Z">
+   <library id="poppler" version="26.09.0" supersededBy="26.11.0" category="documentation" timestamp="2026-11-08T04:59:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="freetype" version="2.15.0"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
@@ -11175,6 +11718,127 @@
          <download url="https://poppler.freedesktop.org/poppler-{LibraryVersion}.tar.xz"
                    archive="poppler-{LibraryVersion}.tar.xz"
                    sha256="8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e"/>
+         <extract format="libarchive" root="poppler-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="COPYING"/>
+            <require path="COPYING3"/>
+            <require path="poppler\PDFDoc.h"/>
+            <require path="poppler\GlobalParams.h"/>
+            <require path="splash\Splash.h"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <!--
+            Poppler's Win32 backend includes the Microsoft-style Windows SDK headers.
+            BCC64X identifies the target with _WIN64/__MINGW64__, while winnt.h
+            requires the SDK architecture selector _AMD64_ on x64.
+            Keep this bridge local to Poppler; the proven generic BCC64X toolchain
+            remains unchanged.
+         -->
+         <environment name="CXXFLAGS" value="-D_AMD64_ -DNOMINMAX"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DFONT_CONFIGURATION:STRING=win32"/>
+         <argument value="-DENABLE_CPP:BOOL=ON"/>
+         <argument value="-DENABLE_UNSTABLE_API_ABI_HEADERS:BOOL=ON"/>
+         <argument value="-DENABLE_UTILS:BOOL=OFF"/>
+         <argument value="-DENABLE_GLIB:BOOL=OFF"/>
+         <argument value="-DENABLE_QT5:BOOL=OFF"/>
+         <argument value="-DENABLE_QT6:BOOL=OFF"/>
+         <argument value="-DENABLE_BOOST:BOOL=OFF"/>
+         <argument value="-DENABLE_BROTLI:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBOPENJPEG:BOOL=OFF"/>
+         <argument value="-DENABLE_LCMS:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBCURL:BOOL=OFF"/>
+         <argument value="-DENABLE_NSS3:BOOL=OFF"/>
+         <argument value="-DENABLE_GPGME:BOOL=OFF"/>
+         <argument value="-DENABLE_LIBJPEG:BOOL=ON"/>
+         <argument value="-DENABLE_LIBTIFF:BOOL=ON"/>
+         <argument value="-DBUILD_GTK_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_QT5_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_QT6_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_CPP_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_MANUAL_TESTS:BOOL=OFF"/>
+         <argument value="-DRUN_GPERF_IF_PRESENT:BOOL=OFF"/>
+         <argument value="-DENABLE_RELOCATABLE:BOOL=ON"/>
+         <!--
+            Upstream release tarballs do not contain poppler/test-data.
+            Test integration stays explicit and will be added when that separate
+            upstream data repository becomes a pinned BuildEngine participant.
+         -->
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DIconv_INCLUDE_DIR:PATH={DependencyRoot:win-iconv}\include"/>
+            <argument value="-DIconv_LIBRARY:FILEPATH={DependencyRoot:win-iconv}\lib\win64\Release\libiconv.lib"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DIconv_INCLUDE_DIR:PATH={DependencyRoot:win-iconv}\include"/>
+            <argument value="-DIconv_LIBRARY:FILEPATH={DependencyRoot:win-iconv}\lib\win64\Debug\libiconv.lib"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\COPYING"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
+      </publish>
+   </library>
+<library id="poppler" version="26.11.0" category="documentation" timestamp="2026-11-08T15:43:00Z">
+      <dependency library="zlib" version="1.4"/>
+      <dependency library="freetype" version="2.15.0"/>
+      <dependency library="harfbuzz" version="15.1.0"/>
+      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libpng" version="1.6.59"/>
+      <dependency library="libtiff" version="4.7.2"/>
+      <dependency library="win-iconv" version="0.0.8"/>
+      <metadata name="Poppler" supplier="Poppler project" homepage="https://poppler.freedesktop.org/" description="PDF rendering and parsing library derived from Xpdf and used by document-processing toolchains." licenseSignal="red"/>
+      <security>
+         <repository url="https://gitlab.freedesktop.org/poppler/poppler.git" ref="poppler-{LibraryVersion}"/>
+      </security>
+      <source>
+         <download url="https://poppler.freedesktop.org/poppler-{LibraryVersion}.tar.xz"
+                   archive="poppler-{LibraryVersion}.tar.xz"
+                   sha256="41c32680160addf5a8dd7a830e4869c01e9f6bee1abb91e44fabd1ba9d7828fb"/>
          <extract format="libarchive" root="poppler-{LibraryVersion}">
             <require path="CMakeLists.txt"/>
             <require path="COPYING"/>
@@ -11405,7 +12069,7 @@
          <argument value="-Dpugixml_DIR:PATH={DependencyRoot:pugixml}\lib\win64\Release\cmake\pugixml"/>
       </smoke>
    </library>
-   <library id="fast_float" version="8.2.3" category="data" timestamp="2026-10-15T12:53:00Z">
+   <library id="fast_float" version="8.2.3" supersededBy="8.3.3" category="data" timestamp="2026-10-15T12:53:00Z">
       <metadata name="fast_float" supplier="fast_float authors" homepage="https://github.com/fastfloat/fast_float" description="High-performance C++ floating-point parser" licenseSignal="yellow">
          <license name="MIT" spdx="MIT" file="licenses\fast_float\LICENSE-MIT"/>
       </metadata>
@@ -11413,6 +12077,72 @@
       <source>
          <download url="https://github.com/fastfloat/fast_float/archive/refs/tags/v8.2.3.tar.gz" archive="fast_float-8.2.3.tar.gz"/>
          <extract format="libarchive" root="fast_float-8.2.3">
+            <require path="CMakeLists.txt"/>
+            <require path="include\fast_float\fast_float.h"/>
+            <require path="LICENSE-MIT"/>
+         </extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DFASTFLOAT_TEST:BOOL=OFF"/>
+         <argument value="-DFASTFLOAT_BENCHMARKS:BOOL=OFF"/>
+         <argument value="-DFASTFLOAT_INSTALL:BOOL=ON"/>
+         <argument value="-DFASTFLOAT_SANITIZE:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\fast_float\fast_float.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\FastFloat\FastFloatConfig.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE-MIT"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\fast_float\LICENSE-MIT" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\fast_float\LICENSE-MIT"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\fast_float\consumer"
+             configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="fast_float-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DFastFloat_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\FastFloat"/>
+      </smoke>
+   </library>
+<library id="fast_float" version="8.3.3" category="data" timestamp="2026-11-08T15:43:00Z">
+      <metadata name="fast_float" supplier="fast_float authors" homepage="https://github.com/fastfloat/fast_float" description="High-performance C++ floating-point parser" licenseSignal="yellow">
+         <license name="MIT" spdx="MIT" file="licenses\fast_float\LICENSE-MIT"/>
+      </metadata>
+      <security><repository url="https://github.com/fastfloat/fast_float.git" ref="v8.3.3" commit="dbeabeeb3e6791cb96994c2a7a084c36e62ccfb2"/></security>
+      <source>
+         <download url="https://github.com/fastfloat/fast_float/archive/refs/tags/v8.3.3.tar.gz" archive="fast_float-8.3.3.tar.gz"/>
+         <extract format="libarchive" root="fast_float-8.3.3">
             <require path="CMakeLists.txt"/>
             <require path="include\fast_float\fast_float.h"/>
             <require path="LICENSE-MIT"/>
@@ -11989,9 +12719,9 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T15:04:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T15:43:01Z">
       <dependency library="abseil" version="20260817.0"/>
-       <dependency library="fast_float" version="8.2.3"/>
+       <dependency library="fast_float" version="8.3.3"/>
       <dependency library="skia" version="153"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
@@ -12061,7 +12791,7 @@
                target="{CurrentArtifact}\skia\BUILD.gn"
                overwrite="true" preserveCurrentArtifact="true"/>
          <require path="{CurrentArtifact}\skia\BUILD.gn"/>
-         <!-- Replace Chromium's fast_float target with installed BuildEngine 8.2.3. -->
+         <!-- Replace Chromium's fast_float target with the installed BuildEngine dependency. -->
          <!-- Remove stale old DEPS source on resumed/local builds; never touch installed package. -->
          <execute name="remove-retired-pdfium-fast-float-source" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="rm"/><argument value="-rf"/>

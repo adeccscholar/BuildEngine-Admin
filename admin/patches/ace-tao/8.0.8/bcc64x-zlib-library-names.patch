@@ -1,0 +1,18 @@
+diff --git a/MPC/config/zlib.mpb b/MPC/config/zlib.mpb
+--- a/MPC/config/zlib.mpb
++++ b/MPC/config/zlib.mpb
+@@ -14,9 +14,11 @@
+   macros   += ZLIB
+ 
+   specific(prop:windows) {
+-    Debug::lit_libs += zd
+-    Release::lit_libs += z
++    zliblib = z
++    Debug::zliblib = zd
+   } else {
+-    lit_libs += z
++    zliblib = z
+   }
++
++  lit_libs += $(ZLIBLIB)
+ }
