@@ -1,3 +1,39 @@
+## 8 November 2026: Migrate the installed Skia dependency from 144 to 153
+
+The active `pdfium@2025.11.19` GN producer now depends on **`skia@153`** rather than
+`skia@144`. PDFium's pinned upstream revision and public C API are unchanged.
+The package is consumed as an external dynamic Skia package through the existing
+`CB_PDFIUM_SKIA_INCLUDE` and `CB_PDFIUM_SKIA_LIB` GN interface, selecting
+`skia.lib` and `skia.dll`. No bundled Skia source is rebuilt inside PDFium.
+
+The version-specific installed-include patch and the subsequent
+`bcc64x-skia153-gradient.patch` remain separate. The latter replaces
+`SkGradientShader::MakeLinear/MakeTwoPointConical` with Skia 153's
+`SkShaders::LinearGradient/TwoPointConicalGradient`, converting the source
+`SkColor` array to `SkColor4f` and supplying `SkGradient`/position spans.
+The two source patches were applied in sequence against the selected upstream
+`core/fxge/skia/fx_skia_device.cpp` during static review; the five checked
+hunks matched and all affected retired gradient tokens were eliminated.
+
+The reported PDFium smoke failure was **not** a PDFium C++ compilation error.
+Its runtime-stager rejected conflicting `libfreetype.dll` binaries from
+`freetype@2.14.3` (transitively selected by Skia 144) and
+`freetype@2.15.0` (selected directly by PDFium). The updated dependency
+closure contains only FreeType 2.15.0 and HarfBuzz 15.1.0. The existing
+collision guard is not relaxed.
+
+The consumer now removes only the retired `skia144.dll` from its output
+and stages `icudtl.dat` from the **exact dependency-resolved Skia root** on
+every build. Loader probes use `skia.dll`, not `skia144.dll`. Skia's
+own runtime component DLLs are gathered through the versioned dependency
+closure. This avoids version search or hard-coded installation paths.
+
+**[nicht verifiziert]** The native Windows BCC64X Debug/Release compilation,
+Skia 153 export closure, PDFium DLL link, loader probe, rendered output,
+and regenerated SBOM still require a full FSM run. Keep the old Skia 144
+package untouched for reproducible comparison, but do not mix its DLLs
+into the PDFium 153 consumer output.
+
 # PDFium 2025.11.19: BCC64X migration and integration record
 
 > **Shared translation inventory:** [General BCC64X/GN translation rules](../../../../server-docs/translation-rules.md) records the implemented compiler flags, linker response rewriting, library-specific GN/Skia decisions, and verification limits. This migration records package-specific evidence rather than duplicating the generic adapter table.
