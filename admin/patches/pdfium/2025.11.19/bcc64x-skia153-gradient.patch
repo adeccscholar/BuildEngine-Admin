@@ -10,6 +10,18 @@ diff --git a/core/fxge/skia/fx_skia_device.cpp b/core/fxge/skia/fx_skia_device.c
  #include "include/pathops/SkPathOps.h"
  
  namespace {
+@@ -1135,8 +1135,10 @@
+     SkPath strokePath;
+     const SkPath* fillPath = &skia_path;
+     if (stroke_alpha) {
+       if (group_knockout_) {
+-        skpathutils::FillPathWithPaint(skia_path, skPaint, &strokePath);
++        SkPathBuilder stroke_builder;
++        skpathutils::FillPathWithPaint(skia_path, skPaint, &stroke_builder);
++        strokePath = stroke_builder.detach();
+         if (stroke_color == fill_color &&
+             Op(skia_path, strokePath, SkPathOp::kUnion_SkPathOp, &strokePath)) {
+           fillPath = &strokePath;
 @@ -1235,7 +1235,19 @@
        return false;
      }
