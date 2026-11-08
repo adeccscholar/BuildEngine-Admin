@@ -25,7 +25,7 @@ diff --git a/test/unit/XMPTest.cpp b/test/unit/XMPTest.cpp
 @@ -162,43 +162,47 @@
      charbuff buff2;
      auto srcPath = TestUtils::GetTestInputPath() / "XMP";
-     auto refPath = TestUtils::GetTestOutputPath() / "XMP" / "Ref";
+     auto refPath = srcPath / "Ref";
 -    fs::create_directories(refPath);
 -    for (const auto& entry : fs::directory_iterator(TestUtils::GetTestInputFilePath("XMP")))
 -    {
