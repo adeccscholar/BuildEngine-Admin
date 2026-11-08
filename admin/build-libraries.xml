@@ -5603,7 +5603,7 @@
       </smoke>
    </library>
    
-<library id="libjpeg-turbo" version="3.2.0" category="image" timestamp="2026-10-15T23:00:00Z">
+<library id="libjpeg-turbo" version="3.2.0" supersededBy="3.2.1" category="image" timestamp="2026-10-15T23:00:00Z">
    <metadata description="High-performance JPEG codec using SIMD acceleration while remaining API-compatible with libjpeg." licenseSignal="yellow"/>
    <source>
       <download
@@ -5626,6 +5626,185 @@
            attempts to read win/projectTargets-release.cmake.in.  Suppress
            only that unsupported installer; upstream install(EXPORT) stays. -->
       <copy source="{BuildFileDir}\patches\libjpeg-turbo\3.2.0\bcc64x-skip-unsupported-installer.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-skip-unsupported-installer.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+      <execute name="bcc64x-installer-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+         <argument value="--whitespace=nowarn"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-skip-unsupported-installer.patch"/>
+      </execute>
+      <execute name="bcc64x-installer-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-skip-unsupported-installer.patch"/>
+      </execute>
+      <execute name="bcc64x-installer-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+         <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+         <argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+         <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-skip-unsupported-installer.patch"/>
+      </execute>
+   </source>
+
+   <build testsAffectBuild="true">
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+
+      <argument value="-G"/>
+      <argument value="Ninja"/>
+      <argument value="-Wno-dev"/>
+      <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+      <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+
+      <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+
+      <argument value="-DENABLE_SHARED:BOOL=ON"/>
+      <argument value="-DENABLE_STATIC:BOOL=OFF"/>
+
+      <!--
+         SIMD remains deliberately separate from the first BCC64X proof.
+         NASM is available in the tool contract and can be enabled as the
+         next controlled extension after the baseline has passed.
+      -->
+      <argument value="-DWITH_SIMD:BOOL=OFF"/>
+
+      <argument value="-DWITH_TURBOJPEG:BOOL=ON"/>
+
+      <!-- Upstream regression tests depend on the command line tools. -->
+      <argument value="-DWITH_TOOLS:BOOL={TestsEnabled}"/>
+      <argument value="-DWITH_TESTS:BOOL={TestsEnabled}"/>
+
+      <cmake
+         mode="configure"
+         executable="{Tool:cmake}"
+         source="{Workspace}"
+         build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+      <cmake
+         mode="build"
+         executable="{Tool:cmake}"
+         build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+      <variant name="Release">
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+         <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+      </variant>
+
+      <variant name="Debug">
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+         <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+         <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+      </variant>
+
+      <install>
+         <perVariant>
+            <cmake
+               mode="install"
+               executable="{Tool:cmake}"
+               build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+            <execute
+               name="test"
+               test="true"
+               executable="{ToolDir:cmake}\ctest.exe"
+               workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"
+               showOutput="false">
+               <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+               <argument value="--output-on-failure"/>
+            </execute>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+               kind="directory"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+               kind="directory"/>
+         </perVariant>
+
+         <common>
+            <copy
+               source="{Workspace}\LICENSE.md"
+               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"
+               overwrite="true"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\jpeglib.h"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\turbojpeg.h"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"/>
+         </common>
+      </install>
+   </build>
+
+   <publish
+      root="Win64x"
+      configuration="Release"
+      consumer="{BuildFileDir}\cmake\consumer">
+
+      <tree source="include" target="include" optional="true"/>
+
+      <files
+         source="lib\win64\{Configuration}"
+         target="lib"
+         extensions=".lib"
+         optional="true"/>
+
+      <files
+         source="bin\win64\{Configuration}"
+         target="bin"
+         extensions=".dll;.exe;.pdb"
+         optional="true"/>
+
+      <cmake
+         source="lib\win64\{Configuration}\cmake"
+         target="lib\cmake"
+         optional="true"/>
+   </publish>
+
+   <smoke
+      id="consumer"
+      source="smokes\libjpeg-turbo\consumer"
+      configuration="Release"
+      cmake="{Tool:cmake}"
+      ninja="{Tool:ninja}"
+      toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+      executable="libjpeg-turbo-consumer.exe">
+
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+   </smoke>
+</library>
+
+   <library id="libjpeg-turbo" version="3.2.1" category="image" timestamp="2026-11-08T03:45:00Z">
+   <metadata description="High-performance JPEG codec using SIMD acceleration while remaining API-compatible with libjpeg." licenseSignal="yellow"/>
+   <source>
+      <download
+         url="https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/{LibraryVersion}/libjpeg-turbo-{LibraryVersion}.tar.gz"
+         archive="libjpeg-turbo-{LibraryVersion}.tar.gz"
+         sha256="c27ad72a68da151177929aa969ae773a2da5ac2af9ce946079314fdac8cece7f"/>
+
+      <extract format="libarchive" root="libjpeg-turbo-{LibraryVersion}">
+         <require path="CMakeLists.txt"/>
+         <require path="src\jpeglib.h"/>
+         <require path="src\turbojpeg.h"/>
+         <require path="LICENSE.md"/>
+         <require path="cmakescripts\BuildPackages.cmake"/>
+         <require path="win\vc\projectTargets-release.cmake.in"/>
+         <require path="win\gcc\projectTargets-release.cmake.in"/>
+      </extract>
+
+      <!-- libjpeg-turbo 3.2.0 selects NSIS templates only for MSVC or MinGW.
+           BCC64X is neither, so the Windows installer section otherwise
+           attempts to read win/projectTargets-release.cmake.in.  Suppress
+           only that unsupported installer; upstream install(EXPORT) stays. -->
+      <copy source="{BuildFileDir}\patches\libjpeg-turbo\3.2.1\bcc64x-skip-unsupported-installer.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-skip-unsupported-installer.patch"
             overwrite="true" preserveCurrentArtifact="true"/>
       <execute name="bcc64x-installer-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
