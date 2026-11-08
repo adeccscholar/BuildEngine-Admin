@@ -6181,7 +6181,7 @@
    </smoke>
 </library>
 
-   <library id="harfbuzz" version="14.4.0" category="text" timestamp="2026-10-20T20:30:00Z">
+   <library id="harfbuzz" version="14.4.0" supersededBy="15.1.0" category="text" timestamp="2026-10-20T20:30:00Z">
 
       <metadata
          name="HarfBuzz"
@@ -6492,8 +6492,319 @@
          <argument value="-Dharfbuzz_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\harfbuzz"/>
       </smoke>
    </library>
+   <library id="harfbuzz" version="15.1.0" category="text" timestamp="2026-11-08T04:59:00Z">
 
-<library id="freetype" version="2.14.3" category="text" timestamp="2026-11-07T17:24:00Z">
+      <metadata
+         name="HarfBuzz"
+         supplier="HarfBuzz Project"
+         homepage="https://harfbuzz.github.io/" description="Text shaping engine that converts Unicode text into positioned glyph sequences for complex scripts." licenseSignal="yellow">
+         <license
+            name="Old MIT"
+            spdx="MIT"
+            file="COPYING"/>
+      </metadata>
+
+      <security>
+         <repository
+            url="https://github.com/harfbuzz/harfbuzz.git"
+            ref="15.1.0" commit="3df40d9b98d6b32f0e4288d4ecfbb158ddb3a372"/>
+      </security>
+
+      <source>
+         <download
+            url="https://github.com/harfbuzz/harfbuzz/releases/download/{LibraryVersion}/harfbuzz-{LibraryVersion}.tar.xz"
+            archive="harfbuzz-{LibraryVersion}.tar.xz"
+            sha256="0fc7c565443a5f4be7da65ac5ee5bd737d9b158dc908708b7689a0a5796b0c8d"/>
+
+         <extract
+            format="libarchive"
+            root="harfbuzz-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="meson.build"/>
+            <require path="src\hb.h"/>
+            <require path="src\hb-subset.h"/>
+            <require path="src\hb-subset-serialize.h"/>
+            <require path="src\hb-subset-depend.h"/>
+            <require path="src\harfbuzz-config.cmake.in"/>
+            <require path="COPYING"/>
+         </extract>
+
+         <!-- Verified against HarfBuzz 15.1.0 CMakeLists.txt. -->
+         <copy source="{BuildFileDir}\patches\harfbuzz\15.1.0\bcc64x-canonical-dll-names.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-canonical-dll-names.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="dll-names-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-canonical-dll-names.patch"/>
+         </execute>
+         <execute name="dll-names-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-canonical-dll-names.patch"/>
+         </execute>
+         <execute name="dll-names-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-canonical-dll-names.patch"/>
+         </execute>
+      </source>
+
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+
+         <!--
+            Explicit dependency policy:
+            HarfBuzz is the producer below FreeType and therefore must not
+            discover FreeType or optional platform frameworks automatically.
+         -->
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+
+         <argument value="-DHB_HAVE_FREETYPE:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_CAIRO:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_GRAPHITE2:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_GLIB:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_ICU:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_GOBJECT:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_INTROSPECTION:BOOL=OFF"/>
+
+         <argument value="-DHB_HAVE_UNISCRIBE:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_GDI:BOOL=OFF"/>
+         <argument value="-DHB_HAVE_DIRECTWRITE:BOOL=OFF"/>
+
+         <!-- Core shaping + subset required by Skia. -->
+         <argument value="-DHB_BUILD_SUBSET:BOOL=ON"/>
+
+         <!--
+            Keep the first package contract narrow and deterministic.
+            Raster/vector/GPU are independent newer HarfBuzz modules and are
+            not required by Skia's shaping/subsetting dependency.
+         -->
+         <argument value="-DHB_BUILD_RASTER:BOOL=OFF"/>
+         <argument value="-DHB_BUILD_VECTOR:BOOL=OFF"/>
+         <argument value="-DHB_BUILD_GPU:BOOL=OFF"/>
+         <argument value="-DHB_BUILD_GPU_DEMO:STRING=OFF"/>
+
+         <!-- Utilities require additional optional dependencies. -->
+         <argument value="-DHB_BUILD_UTILS:BOOL=OFF"/>
+
+         <cmake
+            mode="configure"
+            executable="{Tool:cmake}"
+            source="{Workspace}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <cmake
+            mode="build"
+            executable="{Tool:cmake}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <variable name="DebugPostfix" value=""/>
+
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+
+         <variant name="Debug">
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <variable name="DebugPostfix" value="d"/>
+
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <!-- Do not retain DLLs/import libraries from an earlier naming contract. -->
+               <execute name="clean-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="clean-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <cmake
+                  mode="install"
+                  executable="{Tool:cmake}"
+                  build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+               <!--
+                  HarfBuzz' CMake export contains Threads::Threads in the
+                  public link interface when CMake detects pthread support.
+
+                  The upstream generated package file does not call
+                  find_dependency(Threads), so preserve the generated export
+                  as harfbuzzTargets.cmake and install a small package wrapper
+                  as harfbuzzConfig.cmake.
+               -->
+               <copy
+                  source="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzTargets.cmake"
+                  overwrite="true"/>
+
+               <copy
+                  source="{BuildFileDir}\cmake\harfbuzz\harfbuzzConfig.cmake"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"
+                  overwrite="true"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                  kind="directory"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                  kind="directory"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz"
+                  kind="directory"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig.cmake"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzTargets.cmake"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\harfbuzz\harfbuzzConfig-{CMakeExportConfiguration}.cmake"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig"
+                  kind="directory"/>
+
+               <!-- Check the actual producer ABI filenames, not only directories. -->
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libharfbuzz{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libharfbuzz-subset{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libharfbuzz-subset{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\harfbuzz.pc"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\harfbuzz-subset.pc"/>
+            </perVariant>
+
+            <common>
+               <!--
+                  HarfBuzz 15.1.0's community-maintained CMake installation
+                  installs hb-subset.h and hb-subset-serialize.h but omits
+                  hb-subset-depend.h even though hb-subset.h includes it.
+
+                  Meson's public subset-header list contains all three.
+                  Complete the installed CMake package here rather than
+                  weakening the consumer smoke test.
+               -->
+               <copy
+                  source="{Workspace}\src\hb-subset-depend.h"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset-depend.h"
+                  overwrite="true"/>
+
+               <copy
+                  source="{Workspace}\COPYING"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"
+                  overwrite="true"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz"
+                  kind="directory"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb.h"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset.h"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset-serialize.h"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\harfbuzz\hb-subset-depend.h"/>
+
+               <require
+                  path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+
+      </build>
+
+      <publish
+         root="Win64x"
+         configuration="Release"
+         consumer="{BuildFileDir}\cmake\consumer">
+
+         <tree
+            source="include"
+            target="include"
+            optional="true"/>
+
+         <files
+            source="lib\win64\{Configuration}"
+            target="lib"
+            extensions=".lib"
+            optional="true"/>
+
+         <files
+            source="bin\win64\{Configuration}"
+            target="bin"
+            extensions=".dll;.exe;.pdb"
+            optional="true"/>
+
+         <tree
+            source="lib\win64\{Configuration}\pkgconfig"
+            target="lib\pkgconfig"
+            optional="true"/>
+
+         <cmake
+            source="lib\win64\{Configuration}\cmake"
+            target="lib\cmake"
+            optional="true"/>
+      </publish>
+
+      <smoke
+         id="consumer"
+         source="smokes\harfbuzz\consumer"
+         configuration="Release"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="harfbuzz-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+
+      <smoke scope="package"
+         id="consumer"
+         source="smokes\harfbuzz\consumer"
+         configuration="Debug"
+         cmake="{Tool:cmake}"
+         ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="harfbuzz-consumer.exe">
+
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Dharfbuzz_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\harfbuzz"/>
+      </smoke>
+   </library>
+
+<library id="freetype" version="2.14.3" supersededBy="2.15.0" category="text" timestamp="2026-11-07T17:24:00Z">
    <dependency library="zlib" version="1.4"/>
    <dependency library="bzip2" version="1.0.8"/>
    <dependency library="brotli" version="1.2.1"/>
@@ -6506,6 +6817,190 @@
          url="https://sourceforge.net/projects/freetype/files/freetype2/{LibraryVersion}/freetype-{LibraryVersion}.tar.xz/download"
          archive="freetype-{LibraryVersion}.tar.xz"
          sha256="36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f"/>
+
+      <extract format="libarchive" root="freetype-{LibraryVersion}">
+         <require path="CMakeLists.txt"/>
+         <require path="include\freetype\freetype.h"/>
+         <require path="include\ft2build.h"/>
+         <require path="LICENSE.TXT"/>
+      </extract>
+   </source>
+
+   <build>
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+
+      <argument value="-G"/>
+      <argument value="Ninja"/>
+      <argument value="-Wno-dev"/>
+      <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+      <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+
+      <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+
+      <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+
+      <argument value="-DFT_DISABLE_ZLIB:BOOL=OFF"/>
+      <argument value="-DFT_REQUIRE_ZLIB:BOOL=ON"/>
+
+      <argument value="-DFT_DISABLE_BZIP2:BOOL=OFF"/>
+      <argument value="-DFT_REQUIRE_BZIP2:BOOL=ON"/>
+
+      <argument value="-DFT_DISABLE_PNG:BOOL=OFF"/>
+      <argument value="-DFT_REQUIRE_PNG:BOOL=ON"/>
+
+      <argument value="-DFT_DISABLE_BROTLI:BOOL=OFF"/>
+      <argument value="-DFT_REQUIRE_BROTLI:BOOL=ON"/>
+
+      <argument value="-DFT_DISABLE_HARFBUZZ:BOOL=OFF"/>
+      <argument value="-DFT_DYNAMIC_HARFBUZZ:BOOL=OFF"/>
+      <argument value="-DFT_REQUIRE_HARFBUZZ:BOOL=ON"/>
+
+      <argument
+         value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib};{DependencyRoot:bzip2};{DependencyRoot:brotli};{DependencyRoot:libpng};{DependencyRoot:harfbuzz}"/>
+
+      <!-- Bind the exact variant's import libraries, not host/system search results. -->
+      <argument value="-DHarfBuzz_LIBRARY:FILEPATH={DependencyRoot:harfbuzz}\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
+      <argument value="-DHarfBuzz_INCLUDE_DIR:PATH={DependencyRoot:harfbuzz}\include\harfbuzz"/>
+      <argument value="-DBZIP2_LIBRARY_RELEASE:FILEPATH={DependencyRoot:bzip2}\lib\win64\Release\libbzip2.lib"/>
+      <argument value="-DBZIP2_LIBRARY_DEBUG:FILEPATH={DependencyRoot:bzip2}\lib\win64\Debug\libbzip2d.lib"/>
+      <argument value="-DBZIP2_INCLUDE_DIR:PATH={DependencyRoot:bzip2}\include"/>
+      <require path="{DependencyRoot:harfbuzz}\lib\win64\{Configuration}\libharfbuzz{DebugPostfix}.lib"/>
+      <require path="{DependencyRoot:harfbuzz}\bin\win64\{Configuration}\libharfbuzz{DebugPostfix}.dll"/>
+      <require path="{DependencyRoot:bzip2}\lib\win64\{Configuration}\libbzip2{DebugPostfix}.lib"/>
+      <require path="{DependencyRoot:bzip2}\bin\win64\{Configuration}\libbzip2{DebugPostfix}.dll"/>
+
+      <cmake
+         mode="configure"
+         executable="{Tool:cmake}"
+         source="{Workspace}"
+         build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+      <cmake
+         mode="build"
+         executable="{Tool:cmake}"
+         build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+      <variant name="Release">
+         <variable name="DebugPostfix" value=""/>
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+         <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+      </variant>
+
+      <variant name="Debug">
+         <variable name="DebugPostfix" value="d"/>
+         <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+         <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+         <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+      </variant>
+
+      <install>
+         <perVariant>
+            <cmake
+               mode="install"
+               executable="{Tool:cmake}"
+               build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+               kind="directory"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libfreetype{DebugPostfix}.dll"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libfreetype{DebugPostfix}.lib"/>
+         </perVariant>
+
+         <common>
+            <copy
+               source="{Workspace}\LICENSE.TXT"
+               target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"
+               overwrite="true"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\freetype2\ft2build.h"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\freetype2\freetype"
+               kind="directory"/>
+
+            <require
+               path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"/>
+         </common>
+      </install>
+   </build>
+
+   <publish
+      root="Win64x"
+      configuration="Release"
+      consumer="{BuildFileDir}\cmake\consumer">
+
+      <tree source="include" target="include" optional="true"/>
+
+      <files
+         source="lib\win64\{Configuration}"
+         target="lib"
+         extensions=".lib"
+         optional="true"/>
+
+      <files
+         source="bin\win64\{Configuration}"
+         target="bin"
+         extensions=".dll;.exe;.pdb"
+         optional="true"/>
+
+      <tree
+         source="lib\win64\{Configuration}\pkgconfig"
+         target="lib\pkgconfig"
+         optional="true"/>
+
+      <cmake
+         source="lib\win64\{Configuration}\cmake"
+         target="lib\cmake"
+         optional="true"/>
+   </publish>
+
+   <smoke
+      id="consumer"
+      source="smokes\freetype\consumer"
+      configuration="Release"
+      cmake="{Tool:cmake}"
+      ninja="{Tool:ninja}"
+      toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+      executable="freetype-consumer.exe">
+
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+   </smoke>
+
+   <smoke scope="package"
+      id="consumer"
+      source="smokes\freetype\consumer"
+      configuration="Debug"
+      cmake="{Tool:cmake}"
+      ninja="{Tool:ninja}"
+      toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+      executable="freetype-consumer.exe">
+
+      <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+      <environment name="CB_BDS" value="{BDS}"/>
+   </smoke>
+</library>
+   <library id="freetype" version="2.15.0" category="text" timestamp="2026-11-08T04:59:00Z">
+   <dependency library="zlib" version="1.4"/>
+   <dependency library="bzip2" version="1.0.8"/>
+   <dependency library="brotli" version="1.2.1"/>
+   <dependency library="libpng" version="1.6.59"/>
+   <dependency library="harfbuzz" version="15.1.0"/>
+
+   <metadata description="Font rendering library for loading, rasterizing, and querying scalable and bitmap font formats." licenseSignal="yellow"/>
+   <source>
+      <download
+         url="https://sourceforge.net/projects/freetype/files/freetype2/{LibraryVersion}/freetype-{LibraryVersion}.tar.xz/download"
+         archive="freetype-{LibraryVersion}.tar.xz"
+         sha256="93cd47eb719c325107f2d3cf087d06299e944c3b48a40b55537302304dea1dd5"/>
 
       <extract format="libarchive" root="freetype-{LibraryVersion}">
          <require path="CMakeLists.txt"/>
@@ -7011,14 +7506,14 @@
 </library>
 
 
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-07T17:24:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-08T04:59:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
-      <dependency library="harfbuzz" version="14.4.0"/>
-      <dependency library="freetype" version="2.14.3"/>
+      <dependency library="harfbuzz" version="15.1.0"/>
+      <dependency library="freetype" version="2.15.0"/>
 
       <metadata name="Skia" supplier="Google" homepage="https://skia.org/" description="2D graphics engine providing raster, vector, text, image, and GPU-accelerated rendering capabilities." licenseSignal="yellow">
          <license name="BSD 3-Clause"
@@ -7043,8 +7538,8 @@
                Brotli 1.2.0
                libjpeg-turbo 3.2.0
                libpng 1.6.59
-               HarfBuzz 14.4.0
-               FreeType 2.14.3
+               HarfBuzz 15.1.0
+               FreeType 2.15.0
 
             These components are NOT downloaded or rebuilt inside Skia.
             Their exact package versions are represented by BuildEngine
@@ -8278,7 +8773,7 @@
 
                <!--
                   WOFF2/SVG/zlib support is already configured in the
-                  BuildEngine FreeType 2.14.3 package.
+                  BuildEngine FreeType 2.15.0 package.
                -->
                <line value="skia_use_freetype_woff2 = true"/>
                <line value="skia_use_freetype_svg = true"/>
@@ -9964,7 +10459,7 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.1" category="documentation" timestamp="2026-11-07T17:24:00Z">
+   <library id="podofo" version="1.1.1" supersededBy="1.1.2" category="documentation" timestamp="2026-11-07T17:24:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="freetype" version="2.14.3"/>
@@ -10257,6 +10752,299 @@
          <argument value="-DPoDoFo_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo"/>
       </smoke>
    </library>
+   <library id="podofo" version="1.1.2" category="documentation" timestamp="2026-11-08T04:59:00Z">
+      <dependency library="zlib" version="1.4"/>
+      <dependency library="openssl" version="3.5.9"/>
+      <dependency library="freetype" version="2.15.0"/>
+      <dependency library="libxml2" version="2.15.3"/>
+      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libpng" version="1.6.59"/>
+      <dependency library="libtiff" version="4.7.2"/>
+      <metadata name="PoDoFo" supplier="PoDoFo Project" homepage="https://github.com/podofo/podofo" description="C++ PDF parsing, creation and modification library with forms, annotations, signing and incremental-update support." licenseSignal="yellow">
+         <license name="Mozilla Public License 2.0 or LGPL-2.0-or-later" file="NOTICE"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/podofo/podofo.git" ref="{LibraryVersion}" commit="e91d8b727763724f3efd96c589c8033f4333c68c"/>
+      </security>
+      <source>
+         <download url="https://github.com/podofo/podofo/archive/refs/tags/{LibraryVersion}.tar.gz"
+                   archive="podofo-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="podofo-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="NOTICE"/>
+            <require path="src\podofo\podofo.h"/>
+            <require path="src\podofo\main\PdfMemDocument.h"/>
+         </extract>
+         <copy source="{BuildFileDir}\patches\podofo\1.1.2\bcc64x-charconv-route.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-route.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="charconv-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-route.patch"/>
+         </execute>
+         <execute name="charconv-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-route.patch"/>
+         </execute>
+         <execute name="charconv-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-charconv-route.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\podofo\1.1.2\bcc64x-catch-isnan-route.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-catch-isnan-route.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="catch-isnan-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-catch-isnan-route.patch"/>
+         </execute>
+         <execute name="catch-isnan-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-catch-isnan-route.patch"/>
+         </execute>
+         <execute name="catch-isnan-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-catch-isnan-route.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\podofo\1.1.2\bcc64x-cid-order.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cid-order.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="cid-order-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cid-order.patch"/>
+         </execute>
+         <execute name="cid-order-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-cid-order.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\podofo\1.1.2\bcc64x-test-output-isolation.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-output-isolation.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="test-output-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-output-isolation.patch"/>
+         </execute>
+         <execute name="test-output-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-output-isolation.patch"/>
+         </execute>
+         <!-- In shared builds, XMP tests use the DLL without re-linking internal archives.
+              The existing upstream tests retain their original private-library access. -->
+         <copy source="{BuildFileDir}\patches\podofo\1.1.2\bcc64x-xmp-dll-boundary.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-boundary.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="xmp-dll-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-boundary.patch"/>
+         </execute>
+         <execute name="xmp-dll-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-boundary.patch"/>
+         </execute>
+         <execute name="xmp-dll-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-boundary.patch"/>
+         </execute>
+         <!-- Repair the DLL-only test target without adding private static archives. -->
+         <copy source="{BuildFileDir}\patches\podofo\1.1.2\bcc64x-xmp-dll-link-fix.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-link-fix.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="xmp-dll-link-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-link-fix.patch"/>
+         </execute>
+         <execute name="xmp-dll-link-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-link-fix.patch"/>
+         </execute>
+         <execute name="xmp-dll-link-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-dll-link-fix.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\podofo\1.1.2\bcc64x-dll-export.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="dll-export-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export.patch"/>
+         </execute>
+         <execute name="dll-export-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-dll-export.patch"/>
+         </execute>
+         <!-- PoDoFo 1.1.2 gitlink extern/resources -> podofo-resources@f3e6e289db3cb7fe0a1a21e65430f221fe598882.
+              Keep Git metadata outside the materialized PoDoFo source tree. -->
+         <execute name="resources-clone" executable="{Tool:git}"
+                  workingDirectory="{Workspace}" showOutput="false">
+            <argument value="clone"/>
+            <argument value="--bare"/>
+            <argument value="--no-tags"/>
+            <argument value="https://github.com/podofo/podofo-resources.git"/>
+            <argument value=".buildengine/podofo-resources.git"/>
+         </execute>
+         <execute name="resources-archive" executable="{Tool:git}"
+                  workingDirectory="{Workspace}" showOutput="false">
+            <argument value="--git-dir={Workspace}\.buildengine\podofo-resources.git"/>
+            <argument value="archive"/>
+            <argument value="--format=tar"/>
+            <argument value="--output={Workspace}\.buildengine\podofo-resources.tar"/>
+            <argument value="f3e6e289db3cb7fe0a1a21e65430f221fe598882"/>
+         </execute>
+         <execute name="resources-directory" executable="{Tool:cmake}"
+                  workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-E"/>
+            <argument value="make_directory"/>
+            <argument value="{Workspace}\extern\resources"/>
+         </execute>
+         <execute name="resources-extract" executable="{Tool:cmake}"
+                  workingDirectory="{Workspace}\extern\resources" showOutput="false">
+            <argument value="-E"/>
+            <argument value="tar"/>
+            <argument value="xf"/>
+            <argument value="{Workspace}\.buildengine\podofo-resources.tar"/>
+         </execute>
+         <require path="{Workspace}\extern\resources\Fonts\LiberationSans-Regular.ttf"/>
+         <require path="{Workspace}\extern\resources\TextExtractionPredefinedCmap.pdf"/>
+         <require path="{Workspace}\extern\resources\README.md"/>
+         <copy source="{BuildFileDir}\patches\podofo\1.1.2\bcc64x-test-resource-isolation.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-resource-isolation.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="test-resource-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-resource-isolation.patch"/>
+         </execute>
+         <execute name="test-resource-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-resource-isolation.patch"/>
+         </execute>
+         <execute name="test-resource-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-test-resource-isolation.patch"/>
+         </execute>
+
+         <!-- Keep RELAX-NG schemas scoped to each validation, not DLL teardown. -->
+         <copy source="{BuildFileDir}\patches\podofo\1.1.2\bcc64x-xmp-schema-lifetime.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-schema-lifetime.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="xmp-lifetime-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-schema-lifetime.patch"/>
+         </execute>
+         <execute name="xmp-lifetime-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-schema-lifetime.patch"/>
+         </execute>
+         <execute name="xmp-lifetime-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xmp-schema-lifetime.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <!--
+            PoDoFo sources and upstream tests contain UTF-8 characters in
+            ordinary narrow string literals. BCC64X 20.1.7 requires the
+            Embarcadero execution-code-page switch for UTF-8 literal bytes.
+            This was machine-verified previously for Catch2; generic Clang
+            -finput-charset/-fexec-charset did not change BCC64X behaviour.
+         -->
+         <argument value="-DCMAKE_CXX_FLAGS:STRING=-fborland-exec-code-page=65001"/>
+         <argument value="-DPODOFO_BUILD_STATIC:BOOL=OFF"/>
+         <argument value="-DPODOFO_BUILD_TEST:BOOL={TestsEnabled}"/>
+         <argument value="-DPODOFO_BUILD_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DPODOFO_BUILD_UNSUPPORTED_TOOLS:BOOL=OFF"/>
+         <argument value="-DPODOFO_WITH_AFDKO:BOOL=OFF"/>
+         <argument value="-DPODOFO_WITH_FONTMANAGER:BOOL=ON"/>
+         <argument value="-DPODOFO_WITH_WIN32GDI_FONT_SEARCH:BOOL=ON"/>
+         <argument value="-DPODOFO_WITH_LCMS2:BOOL=OFF"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib};{DependencyRoot:openssl};{DependencyRoot:freetype};{DependencyRoot:libxml2};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libpng};{DependencyRoot:libtiff}"/>
+         <execute name="isolate-test-resources" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+            <argument value="-E"/><argument value="copy_directory"/>
+            <argument value="{Workspace}\extern\resources"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\resources"/>
+         </execute>
+         <argument value="-DPDF_TEST_RESOURCE_PATH:PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\resources"/>
+         <argument value="-DPDF_TEST_OUTPUT_PATH:PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DLIBXML2_LIBRARY:FILEPATH={DependencyRoot:libxml2}\lib\win64\Release\libxml2.lib"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DLIBXML2_LIBRARY:FILEPATH={DependencyRoot:libxml2}\lib\win64\Debug\libxml2d.lib"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="test-output-directory" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="make_directory"/><argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out"/>
+               </execute>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false" outputMode="errors">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="1"/>
+                  <environment name="PODOFO_TEST_OUTPUT_PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\test\out"/>
+                  <!-- Keep the tested runtime closure deterministic. In particular, Release libz.dll must come from the declared zlib dependency package. -->
+                  <environment name="PATH" value="{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:openssl}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{DependencyRoot:libxml2}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:libtiff}\bin\win64\{Configuration};{ENV:PATH}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\podofo\podofo.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\podofo\main\PdfMemDocument.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\NOTICE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\NOTICE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\podofo\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="podofo-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DPoDoFo_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo"/>
+      </smoke>
+   </library>
    <library id="win-iconv" version="0.0.8" category="text" timestamp="2026-09-22T22:58:00Z">
       <metadata name="win-iconv" supplier="Yukihiro Nakadaira / win-iconv contributors" homepage="https://github.com/win-iconv/win-iconv" description="Small Windows iconv implementation using the Win32 character conversion APIs." licenseSignal="green">
          <license name="Public Domain" file="readme.txt"/>
@@ -10369,9 +11157,9 @@
          <argument value="-DIconv_LIBRARY:FILEPATH={ConsumerRoot}\lib\win64\{Configuration}\libiconv.lib"/>
       </smoke>
    </library>
-   <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-11-07T17:24:00Z">
+   <library id="poppler" version="26.09.0" category="documentation" timestamp="2026-11-08T04:59:00Z">
       <dependency library="zlib" version="1.4"/>
-      <dependency library="freetype" version="2.14.3"/>
+      <dependency library="freetype" version="2.15.0"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="libtiff" version="4.7.2"/>
@@ -10818,7 +11606,7 @@
       </smoke>
    </library>
 
-   <library id="lcms2" version="2.19.1" category="graphics" timestamp="2026-10-15T15:20:00Z">
+   <library id="lcms2" version="2.19.1" supersededBy="2.20" category="graphics" timestamp="2026-10-15T15:20:00Z">
       <metadata name="lcms2" supplier="LittleCMS" homepage="https://github.com/mm2/Little-CMS" description="LittleCMS 2 ICC color-management engine (GPL plugins excluded)" licenseSignal="yellow">
          <license name="MIT" spdx="MIT" file="licenses\lcms2\LICENSE"/>
       </metadata>
@@ -10831,6 +11619,95 @@
             <require path="LICENSE"/>
          </extract>
          <copy source="{BuildFileDir}\patches\lcms2\2.19.1\bcc64x-clang-inline.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-inline.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-inline.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-inline.patch"/>
+         </execute>
+         <execute name="patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-inline.patch"/>
+         </execute>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DLCMS2_BUILD_SHARED:BOOL=ON"/>
+         <argument value="-DLCMS2_BUILD_STATIC:BOOL=OFF"/>
+         <argument value="-DLCMS2_BUILD_TOOLS:BOOL=OFF"/>
+         <argument value="-DLCMS2_BUILD_TESTS:BOOL=OFF"/>
+         <!-- Two upstream GPL-3.0 plugins MUST remain disabled. -->
+         <argument value="-DLCMS2_WITH_FASTFLOAT:BOOL=OFF"/>
+         <argument value="-DLCMS2_WITH_THREADED_PLUGIN:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lcms2.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lcms2\lcms2-config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\liblcms2.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\lcms2\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\lcms2\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\lcms2\consumer"
+             configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="lcms2-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ENV:PATH}"/>
+         <argument value="-Dlcms2_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\lcms2"/>
+      </smoke>
+   </library>
+   <library id="lcms2" version="2.20" category="graphics" timestamp="2026-11-08T04:59:00Z">
+      <metadata name="lcms2" supplier="LittleCMS" homepage="https://github.com/mm2/Little-CMS" description="LittleCMS 2 ICC color-management engine (GPL plugins excluded)" licenseSignal="yellow">
+         <license name="MIT" spdx="MIT" file="licenses\lcms2\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/mm2/Little-CMS.git" ref="lcms2.20" commit="7717fce0d85447ef3b2df0cca2e99207c15eeecd"/></security>
+      <source>
+         <download url="https://github.com/mm2/Little-CMS/archive/refs/tags/lcms2.20.tar.gz" archive="Little-CMS-lcms2.20.tar.gz"/>
+         <extract format="libarchive" root="Little-CMS-lcms2.20">
+            <require path="CMakeLists.txt"/>
+            <require path="include\lcms2.h"/>
+            <require path="LICENSE"/>
+         </extract>
+         <copy source="{BuildFileDir}\patches\lcms2\2.20\bcc64x-clang-inline.patch"
                target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-inline.patch"
                overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
@@ -11109,16 +11986,16 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-07T17:24:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T04:59:00Z">
       <dependency library="abseil" version="20260817.0"/>
        <dependency library="fast_float" version="8.2.3"/>
       <dependency library="skia" version="144"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
-      <dependency library="freetype" version="2.14.3"/>
+      <dependency library="freetype" version="2.15.0"/>
       <dependency library="icu" version="78.3"/>
-      <dependency library="lcms2" version="2.19.1"/>
+      <dependency library="lcms2" version="2.20"/>
       <dependency library="openjpeg" version="2.5.4"/>
       <metadata name="PDFium" supplier="PDFium Authors" homepage="https://pdfium.googlesource.com/pdfium/" description="Pinned PDFium GN/BCC64X integration; validation pending" licenseSignal="yellow"/>
       <security>
