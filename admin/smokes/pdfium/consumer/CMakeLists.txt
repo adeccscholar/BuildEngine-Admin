@@ -20,16 +20,27 @@ adecc_stage_runtime(pdfium-consumer
 
 # Skia 153's ICU data is a runtime resource, not a DLL. Stage the exact
 # declared Skia package asset, without PATH or latest-version discovery.
-set(theSkia153Root "")
+# The XML dependency resolver supplies the exact selected Skia package root.
+# Do not guess a version or search PATH / newest installed packages.
+if(NOT DEFINED ENV{ADECC_PDFIUM_SKIA_ROOT} OR
+   "$ENV{ADECC_PDFIUM_SKIA_ROOT}" STREQUAL "")
+   message(FATAL_ERROR "PDFium smoke requires the resolved Skia package root")
+endif()
+set(theSkia153Root "$ENV{ADECC_PDFIUM_SKIA_ROOT}")
+if(NOT IS_DIRECTORY "${theSkia153Root}")
+   message(FATAL_ERROR "Selected Skia package root is missing: ${theSkia153Root}")
+endif()
+file(TO_CMAKE_PATH "${theSkia153Root}" strSelectedSkiaRoot)
+set(bFoundSelectedSkiaRoot FALSE)
 foreach(thePackage IN LISTS ADECC_RUNTIME_PACKAGE_ROOTS)
    file(TO_CMAKE_PATH "${thePackage}" strPackagePath)
-   if(strPackagePath MATCHES "/skia/153/?$")
-      set(theSkia153Root "${thePackage}")
+   if(strPackagePath STREQUAL strSelectedSkiaRoot)
+      set(bFoundSelectedSkiaRoot TRUE)
       break()
    endif()
 endforeach()
-if(theSkia153Root STREQUAL "")
-   message(FATAL_ERROR "PDFium runtime closure does not contain skia@153")
+if(NOT bFoundSelectedSkiaRoot)
+   message(FATAL_ERROR "Selected Skia package root is absent from PDFium's runtime closure")
 endif()
 # Stage on every build, not only when the consumer executable is relinked.
 add_custom_target(pdfium-skia153-data ALL
