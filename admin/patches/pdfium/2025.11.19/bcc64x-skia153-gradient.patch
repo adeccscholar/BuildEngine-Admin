@@ -2,12 +2,12 @@ diff --git a/core/fxge/skia/fx_skia_device.cpp b/core/fxge/skia/fx_skia_device.c
 --- a/core/fxge/skia/fx_skia_device.cpp
 +++ b/core/fxge/skia/fx_skia_device.cpp
 @@ -77,7 +77,7 @@
- #include "third_party/skia/include/core/SkTileMode.h"
- #include "third_party/skia/include/core/SkTypeface.h"
- #include "third_party/skia/include/effects/SkDashPathEffect.h"
+ #include "include/core/SkTileMode.h"
+ #include "include/core/SkTypeface.h"
+ #include "include/effects/SkDashPathEffect.h"
 -#include "include/effects/SkGradientShader.h"
 +#include "include/effects/SkGradient.h"
- #include "third_party/skia/include/pathops/SkPathOps.h"
+ #include "include/pathops/SkPathOps.h"
  
  namespace {
 @@ -1235,7 +1235,19 @@
