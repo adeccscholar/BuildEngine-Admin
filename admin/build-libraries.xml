@@ -11823,7 +11823,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
       </publish>
    </library>
-<library id="poppler" version="26.11.0" category="documentation" timestamp="2026-11-08T15:44:15Z">
+<library id="poppler" version="26.11.0" category="documentation" timestamp="2026-11-08T16:12:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="freetype" version="2.15.0"/>
       <dependency library="harfbuzz" version="15.1.0"/>
@@ -11847,6 +11847,31 @@
             <require path="poppler\GlobalParams.h"/>
             <require path="splash\Splash.h"/>
          </extract>
+         <!-- Prefer the exact installed HarfBuzz CMake targets to pkg-config. -->
+         <copy source="{BuildFileDir}\patches\poppler\26.11.0\bcc64x-harfbuzz-cmake-config.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-cmake-config.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="harfbuzz-config-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-cmake-config.patch"/>
+         </execute>
+         <execute name="harfbuzz-config-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-cmake-config.patch"/>
+         </execute>
+         <execute name="harfbuzz-config-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-cmake-config.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -11871,13 +11896,7 @@
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin"/>
-         <!-- Version-pinned BuildEngine dependency lookup, independent of ambient PATH. -->
-         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:freetype};{DependencyRoot:zlib};{DependencyRoot:libpng};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libtiff};{DependencyRoot:win-iconv};{DependencyRoot:harfbuzz}"/>
-         <argument value="-DCMAKE_LIBRARY_PATH:PATH={DependencyRoot:freetype}\lib\win64\{Configuration};{DependencyRoot:zlib}\lib\win64\{Configuration};{DependencyRoot:libpng}\lib\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\lib\win64\{Configuration};{DependencyRoot:libtiff}\lib\win64\{Configuration};{DependencyRoot:win-iconv}\lib\win64\{Configuration};{DependencyRoot:harfbuzz}\lib\win64\{Configuration}"/>
-         <argument value="-DCMAKE_INCLUDE_PATH:PATH={DependencyRoot:freetype}\include\freetype2;{DependencyRoot:zlib}\include;{DependencyRoot:libpng}\include;{DependencyRoot:libjpeg-turbo}\include;{DependencyRoot:libtiff}\include;{DependencyRoot:win-iconv}\include;{DependencyRoot:harfbuzz}\include\harfbuzz"/>
-         <!-- FindFreetype: exact installed header layout and per-variant import library. -->
-         <argument value="-DFREETYPE_INCLUDE_DIR_ft2build:PATH={DependencyRoot:freetype}\include\freetype2"/>
-         <argument value="-DFREETYPE_INCLUDE_DIR_freetype2:PATH={DependencyRoot:freetype}\include\freetype2"/>
+         <argument value="-DBUILDENGINE_HARFBUZZ_CONFIG_DIR:PATH={DependencyRoot:harfbuzz}\lib\win64\{Configuration}\cmake\harfbuzz"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <argument value="-DFONT_CONFIGURATION:STRING=win32"/>
@@ -11912,8 +11931,6 @@
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
-            <argument value="-DFREETYPE_LIBRARY:FILEPATH={DependencyRoot:freetype}\lib\win64\Release\libfreetype.lib"/>
-            <argument value="-DFREETYPE_LIBRARY_RELEASE:FILEPATH={DependencyRoot:freetype}\lib\win64\Release\libfreetype.lib"/>
             <argument value="-DIconv_INCLUDE_DIR:PATH={DependencyRoot:win-iconv}\include"/>
             <argument value="-DIconv_LIBRARY:FILEPATH={DependencyRoot:win-iconv}\lib\win64\Release\libiconv.lib"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
@@ -11921,8 +11938,6 @@
          </variant>
          <variant name="Debug">
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
-            <argument value="-DFREETYPE_LIBRARY:FILEPATH={DependencyRoot:freetype}\lib\win64\Debug\libfreetyped.lib"/>
-            <argument value="-DFREETYPE_LIBRARY_DEBUG:FILEPATH={DependencyRoot:freetype}\lib\win64\Debug\libfreetyped.lib"/>
             <argument value="-DIconv_INCLUDE_DIR:PATH={DependencyRoot:win-iconv}\include"/>
             <argument value="-DIconv_LIBRARY:FILEPATH={DependencyRoot:win-iconv}\lib\win64\Debug\libiconv.lib"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>

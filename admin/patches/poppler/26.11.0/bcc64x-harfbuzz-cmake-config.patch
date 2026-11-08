@@ -1,0 +1,28 @@
+diff --git a/cmake/modules/Findharfbuzz.cmake b/cmake/modules/Findharfbuzz.cmake
+--- a/cmake/modules/Findharfbuzz.cmake
++++ b/cmake/modules/Findharfbuzz.cmake
+@@ -9,7 +9,24 @@
+ # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+ 
+ include(FindPackageHandleStandardArgs)
+ 
++# BuildEngine: use the pinned, installed HarfBuzz CMake package when provided.
++# Avoid an unrelated pkg-config executable in the native BCC64X build.
++if(DEFINED BUILDENGINE_HARFBUZZ_CONFIG_DIR AND
++   NOT "${BUILDENGINE_HARFBUZZ_CONFIG_DIR}" STREQUAL "")
++  find_package(harfbuzz CONFIG REQUIRED
++    PATHS "${BUILDENGINE_HARFBUZZ_CONFIG_DIR}" NO_DEFAULT_PATH)
++  if(NOT TARGET harfbuzz::harfbuzz OR NOT TARGET harfbuzz::harfbuzz-subset)
++    message(FATAL_ERROR "BuildEngine HarfBuzz package lacks required core/subset targets")
++  endif()
++  if(NOT TARGET harfbuzz::subset)
++    add_library(harfbuzz::subset INTERFACE IMPORTED)
++    target_link_libraries(harfbuzz::subset INTERFACE harfbuzz::harfbuzz-subset)
++  endif()
++  set(harfbuzz_FOUND TRUE)
++  return()
++endif()
++
+ find_package(PkgConfig REQUIRED)
+ 
+ pkg_check_modules(harfbuzz IMPORTED_TARGET harfbuzz)
