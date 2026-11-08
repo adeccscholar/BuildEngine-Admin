@@ -1,0 +1,19 @@
+diff --git a/poppler/poppler-config.h.cmake b/poppler/poppler-config.h.cmake
+--- a/poppler/poppler-config.h.cmake
++++ b/poppler/poppler-config.h.cmake
+@@ -75,12 +75,14 @@
+ // Compiler
+ //------------------------------------------------------------------------
+ 
+ #ifdef __GNUC__
+-#    ifdef __MINGW32__
++#    if defined(__BORLANDC__) && defined(__clang__) && defined(__MINGW64__)
++#        define GCC_PRINTF_FORMAT(fmt_index, va_index) __attribute__((__format__(printf, fmt_index, va_index)))
++#    elif defined(__MINGW32__)
+ #        define GCC_PRINTF_FORMAT(fmt_index, va_index) __attribute__((__format__(gnu_printf, fmt_index, va_index)))
+ #    else
+ #        define GCC_PRINTF_FORMAT(fmt_index, va_index) __attribute__((__format__(printf, fmt_index, va_index)))
+ #    endif
+ #else
+ #    define GCC_PRINTF_FORMAT(fmt_index, va_index)
+ #endif

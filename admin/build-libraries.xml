@@ -11823,7 +11823,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
       </publish>
    </library>
-<library id="poppler" version="26.11.0" category="documentation" timestamp="2026-11-08T19:29:30Z">
+<library id="poppler" version="26.11.0" category="documentation" timestamp="2026-11-08T19:33:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="freetype" version="2.15.0"/>
       <dependency library="harfbuzz" version="15.1.0"/>
@@ -11871,6 +11871,31 @@
             <argument value="--no-index"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-cmake-config.patch"/>
+         </execute>
+         <!-- Embarcadero Clang must not select MinGW's gnu_printf attribute. -->
+         <copy source="{BuildFileDir}\patches\poppler\26.11.0\bcc64x-clang-printf-attribute.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-printf-attribute.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="clang-format-attribute-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-printf-attribute.patch"/>
+         </execute>
+         <execute name="clang-format-attribute-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-printf-attribute.patch"/>
+         </execute>
+         <execute name="clang-format-attribute-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-clang-printf-attribute.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="false">
