@@ -1,3 +1,12 @@
+## 8 November 2026: Four new BCC64X build contracts
+
+- [x] Added `podofo@1.1.2`, `freetype@2.15.0`, `harfbuzz@15.1.0` and `lcms2@2.20` as buildable version coordinates; prior versions are retained with `supersededBy`.
+- [x] Created the new version-specific HarfBuzz, LittleCMS and PoDoFo patches. Sequential PoDoFo 1.1.2 dry-run: all nine patches and fourteen hunks applied to upstream tagged sources.
+- [x] Updated dependencies in active Skia 153, Poppler 26.09.0, PDFium 2025.11.19 and PoDoFo 1.1.2; direct consumer remains pinned to current managed library version.
+- [x] Updated PoDoFo resources gitlink to `f3e6e289db3cb7fe0a1a21e65430f221fe598882`; FreeType and HarfBuzz release archive checksums have been pinned.
+- [ ] Run native Windows BCC64X Release and Debug builds for all four libraries and affected consumers, including upstream test suites, installed smoke, metadata/SBOM, publication and Doxygen. **[not verified]** until machine evidence is available.
+- [ ] Re-run the full FSM to verify CURRENT state and absence of stale published dependencies.
+
 ## Release backlog (2026-11-08)
 
 The following releases are **TODO only**. Do not change their active library contracts, dependency selections or rebuild state until a separate migration is verified. Current versions below are the supplied catalog snapshot, not a claim of successful installed package evidence.
