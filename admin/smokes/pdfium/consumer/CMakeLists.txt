@@ -31,11 +31,13 @@ endforeach()
 if(theSkia153Root STREQUAL "")
    message(FATAL_ERROR "PDFium runtime closure does not contain skia@153")
 endif()
-add_custom_command(TARGET pdfium-consumer POST_BUILD
+# Stage on every build, not only when the consumer executable is relinked.
+add_custom_target(pdfium-skia153-data ALL
    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
       "${theSkia153Root}/bin/win64/$<CONFIG>/icudtl.dat"
       "$<TARGET_FILE_DIR:pdfium-consumer>/icudtl.dat"
-   COMMENT "Stage installed Skia 153 ICU data"
+   DEPENDS pdfium-consumer
+   COMMENT "Refresh installed Skia 153 ICU data"
    VERBATIM)
 
 
@@ -47,5 +49,5 @@ add_executable(pdfium-loader-probe
 set_property(TARGET pdfium-loader-probe PROPERTY CXX_SCAN_FOR_MODULES OFF)
 target_compile_features(pdfium-loader-probe PRIVATE cxx_std_23)
 # A loader probe is meaningful only after the PDFium dependency runtime closure is staged.
-add_dependencies(pdfium-loader-probe buildengine-stage-pdfium-consumer)
+add_dependencies(pdfium-loader-probe buildengine-stage-pdfium-consumer pdfium-skia153-data)
 
