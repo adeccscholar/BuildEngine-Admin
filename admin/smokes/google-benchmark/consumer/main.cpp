@@ -1,6 +1,8 @@
 #include <benchmark/benchmark.h>
 #include <atomic>
+#include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <print>
 
 namespace {
@@ -30,9 +32,15 @@ int main(int iArgc, char** pszArgv) {
       return 1;
    }
 
-   benchmark::RunSpecifiedBenchmarks();
+   // Google Benchmark's default ConsoleReporter writes context diagnostics to
+   // stderr. The BuildEngine smoke validator requires strict stdout-only output.
+   benchmark::ConsoleReporter aReporter {benchmark::ConsoleReporter::OO_None};
+   aReporter.SetOutputStream(&std::cout);
+   aReporter.SetErrorStream(&std::cout);
+   std::size_t const uRegisteredBenchmarks = benchmark::RunSpecifiedBenchmarks(&aReporter);
    std::uint64_t const uIterations = uExecutedIterations.load(std::memory_order_relaxed);
-   bool const bBenchmarkExecuted = uIterations >= uExpectedIterations;
+   bool const bBenchmarkExecuted = uRegisteredBenchmarks == 1 &&
+      uIterations >= uExpectedIterations;
    std::println("SMOKE|CHECK|execution|{}|benchmark executed {} of at least {} iterations",
       bBenchmarkExecuted ? "PASS" : "FAIL", uIterations, uExpectedIterations);
 
