@@ -404,11 +404,98 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="lz4" version="1.10.0" category="compression" timestamp="2026-11-07T16:00:00Z">
+   <library id="lz4" version="1.10.0" supersededBy="1.11.0" category="compression" timestamp="2026-11-07T16:00:00Z">
       <metadata description="Fast lossless LZ4 block and frame compression with BCC64X shared DLL." licenseSignal="green"/>
       <source>
          <!-- Git tag archive SHA-256 independently published by Homebrew for v1.10.0. -->
          <download url="https://github.com/lz4/lz4/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="lz4-{LibraryVersion}.tar.gz" sha256="537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b"/>
+         <extract format="libarchive" root="lz4-{LibraryVersion}">
+            <require path="build\cmake\CMakeLists.txt"/>
+            <require path="lib\lz4.h"/>
+            <require path="lib\lz4hc.h"/>
+            <require path="lib\lz4frame.h"/>
+            <require path="lib\lz4.c"/>
+            <require path="lib\lz4frame.c"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\packages\lz4-bcc64x.cmake"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
+         <argument value="-DLZ4_BUILD_CLI:BOOL=OFF"/>
+         <argument value="-DLZ4_BUNDLED_MODE:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\build\cmake" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="BinaryName" value="liblz4"/>
+            <variable name="CMakeExportConfiguration" value="release"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="BinaryName" value="liblz4d"/>
+            <variable name="CMakeExportConfiguration" value="debug"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="remove-installed-bin" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"/>
+               </execute>
+               <execute name="remove-installed-lib" executable="{Tool:cmake}" workingDirectory="{ProductionRoot}" showOutput="false">
+                  <argument value="-E"/><argument value="remove_directory"/>
+                  <argument value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BinaryName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BinaryName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lz4\lz4Config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lz4\lz4ConfigVersion.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lz4\lz4Targets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\lz4\lz4Targets-{CMakeExportConfiguration}.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\liblz4.pc"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lz4.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lz4hc.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lz4frame.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\lz4file.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/>
+      </publish>
+      <smoke id="consumer" source="smokes\lz4\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="lz4-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+   <library id="lz4" version="1.11.0" category="compression" timestamp="2026-11-09T12:48:00Z">
+      <metadata description="Fast lossless LZ4 block and frame compression with BCC64X shared DLL." licenseSignal="green"/>
+      <source>
+         <!-- Official upstream release tarball SHA-256 for v1.11.0. -->
+         <download url="https://github.com/lz4/lz4/releases/download/v{LibraryVersion}/lz4-{LibraryVersion}.tar.gz" archive="lz4-{LibraryVersion}.tar.gz" sha256="247e5fa64da5f7b75ee3dd3bed484076396c9ebe8254d9ccf693eb62800c5e26"/>
          <extract format="libarchive" root="lz4-{LibraryVersion}">
             <require path="build\cmake\CMakeLists.txt"/>
             <require path="lib\lz4.h"/>
@@ -4570,10 +4657,22 @@
          <environment name="PATH" value="{InstallRoot}\Win64x\bin;{ENV:PATH}"/>
       </smoke>
    </library>
-<library id="raylib" version="6.0" category="graphics" timestamp="2026-10-20T00:55:00Z">
+<library id="raylib" version="6.0" supersededBy="6.2" category="graphics" timestamp="2026-10-20T00:55:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <metadata name="raylib" supplier="raylib project" homepage="https://www.raylib.com/" description="Simple cross-platform C library for graphics, audio, input, and game and application development." licenseSignal="green"><license name="zlib License" spdx="Zlib" file="LICENSE"/></metadata>
       <source><download url="https://github.com/raysan5/raylib/archive/dbc56a87da87d973a9c5baa4e7438a9d20121d28.zip" archive="raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28.zip"/><extract format="zip" root="raylib-dbc56a87da87d973a9c5baa4e7438a9d20121d28"><require path="LICENSE"/><require path="src\raylib.h"/><require path="src\raymath.h"/><require path="src\rcamera.h"/><require path="src\rlgl.h"/><require path="src\rcore.c"/><require path="src\rshapes.c"/><require path="src\rtextures.c"/><require path="src\rtext.c"/><require path="src\rmodels.c"/><require path="src\raudio.c"/></extract></source>
+      <build testsAffectBuild="false"><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DRAYLIB_SOURCE_DIR:PATH={Workspace}"/><argument value="-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={DependencyRoot:opengl}\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\raylib" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><variable name="BaseName" value="raylib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant><variant name="Debug"><variable name="BaseName" value="raylibd"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BaseName}.dll"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BaseName}.lib"/></perVariant><common><copy source="{Workspace}\src\raylib.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raylib.h" overwrite="true"/><copy source="{Workspace}\src\raymath.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raymath.h" overwrite="true"/><copy source="{Workspace}\src\rcamera.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\rcamera.h" overwrite="true"/><copy source="{Workspace}\src\rlgl.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\rlgl.h" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/></common></install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
+      <smoke id="consumer" source="smokes\raylib\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="raylib-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
+   </library>
+   <library id="raylib" version="6.2" category="graphics" timestamp="2026-11-09T12:48:00Z">
+      <dependency library="opengl" version="26.2.1"/>
+      <metadata name="raylib" supplier="raylib project" homepage="https://www.raylib.com/" description="Simple cross-platform C library for graphics, audio, input, and game and application development." licenseSignal="green"><license name="zlib License" spdx="Zlib" file="LICENSE"/></metadata>
+      <source><download url="https://github.com/raysan5/raylib/archive/02566453880e06bec97f5b8160fa6fe1e98397ca.zip" archive="raylib-02566453880e06bec97f5b8160fa6fe1e98397ca.zip"/><extract format="zip" root="raylib-02566453880e06bec97f5b8160fa6fe1e98397ca"><require path="LICENSE"/><require path="src\raylib.h"/><require path="src\raymath.h"/><require path="src\rcamera.h"/><require path="src\rlgl.h"/><require path="src\rcore.c"/><require path="src\rshapes.c"/><require path="src\rtextures.c"/><require path="src\rtext.c"/><require path="src\rmodels.c"/><require path="src\raudio.c"/></extract></source>
       <build testsAffectBuild="false"><argument value="-G"/><argument value="Ninja"/><argument value="--fresh"/><argument value="-DRAYLIB_SOURCE_DIR:PATH={Workspace}"/><argument value="-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}"/><argument value="-DOPENGL_LIBRARY:FILEPATH={DependencyRoot:opengl}\lib\win64\{Configuration}\opengl32.lib"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\raylib" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="BaseName" value="raylib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant><variant name="Debug"><variable name="BaseName" value="raylibd"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
@@ -5325,7 +5424,7 @@
          <argument value="-Dwil_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\cmake\WIL"/>
       </smoke>
    </library>
-   <library id="opencv" version="5.0.0" category="graphics" timestamp="2026-11-08T19:45:01Z">
+   <library id="opencv" version="5.0.0" supersededBy="5.1.0" category="graphics" timestamp="2026-11-08T19:45:01Z">
       <dependency library="onetbb" version="2023.2.0"/><dependency library="llvm-openmp" version="20.1.7"/>
       <dependency library="zlib" version="1.4"/>
       <metadata name="OpenCV" supplier="OpenCV project" homepage="https://opencv.org/" description="Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning, Windows DirectShow camera capture (MSMF COM compatibility pending), and image stitching. Native oneTBB 2023.2 parallel backend configured; Release consumer smoke regression pending; LLVM OpenMP 20.1.7 enabled as a build dependency." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
@@ -5374,6 +5473,61 @@
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_highgui500{DebugPostfix}.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_stitching500{DebugPostfix}.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_stitching500{DebugPostfix}.lib"/>
+            </perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\etc\licenses" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses" recursive="true" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\core.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\dnn.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\ml.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\stitching.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\protobuf-LICENSE"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\SoftFloat-COPYING.txt"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/></common></install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
+      <smoke id="consumer" source="smokes\opencv\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="opencv-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{DependencyRoot:onetbb}\bin\win64\Release;{DependencyRoot:llvm-openmp}\bin\win64\Release;{ENV:PATH}"/></smoke>
+	  
+   </library>
+   <library id="opencv" version="5.1.0" category="graphics" timestamp="2026-11-09T12:48:00Z">
+      <dependency library="onetbb" version="2023.2.0"/><dependency library="llvm-openmp" version="20.1.7"/>
+      <dependency library="zlib" version="1.4"/>
+      <metadata name="OpenCV" supplier="OpenCV project" homepage="https://opencv.org/" description="Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning, Windows DirectShow camera capture (MSMF COM compatibility pending), and image stitching. Native oneTBB 2023.2 parallel backend configured; Release consumer smoke regression pending; LLVM OpenMP 20.1.7 enabled as a build dependency." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
+      <source><download url="https://github.com/opencv/opencv/archive/e4f78fbcf1a773fbed69e14500e8b734963eb585.zip" archive="opencv-e4f78fbcf1a773fbed69e14500e8b734963eb585.zip"/><extract format="zip" root="opencv-e4f78fbcf1a773fbed69e14500e8b734963eb585"><require path="CMakeLists.txt"/><require path="LICENSE"/><require path="modules\core\CMakeLists.txt"/><require path="modules\dnn\CMakeLists.txt"/><require path="modules\highgui\CMakeLists.txt"/><require path="modules\videoio\CMakeLists.txt"/></extract><download url="https://github.com/opencv/opencv_contrib/archive/b67a855188a3d683813731010f6d39ac614733a4.zip" archive="opencv_contrib-b67a855188a3d683813731010f6d39ac614733a4.zip"/><extract format="zip" root="opencv_contrib-b67a855188a3d683813731010f6d39ac614733a4" merge="true" preserveCurrentArtifact="true"><require path="modules\ml\CMakeLists.txt"/><require path="modules\ml\include\opencv2\ml.hpp"/></extract><copy source="{BuildFileDir}\patches\opencv\5.1.0\bcc64x-optional-mlas.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch" overwrite="true" preserveCurrentArtifact="true"/><execute name="patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch"/></execute><execute name="patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-optional-mlas.patch"/></execute></source>
+      <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/><environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/><environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DOPENCV_INCLUDE_INSTALL_PATH:STRING=include/opencv5"/><argument value="-DOPENCV_LIB_INSTALL_PATH:STRING=lib/win64/{Configuration}"/><argument value="-DOPENCV_BIN_INSTALL_PATH:STRING=bin/win64/{Configuration}"/><argument value="-DOPENCV_CONFIG_INSTALL_PATH:STRING=lib/win64/{Configuration}/cmake/opencv5"/><argument value="-DOPENCV_SKIP_CMAKE_ROOT_CONFIG:BOOL=ON"/>
+         <argument value="-DOPENCV_EXTRA_MODULES_PATH:PATH={Workspace}\opencv_contrib-b67a855188a3d683813731010f6d39ac614733a4\modules"/><argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/><argument value="-DBUILD_LIST:STRING=core,imgproc,geometry,flann,features,video,photo,stereo,ptcloud,calib,ml,dnn,objdetect,imgcodecs,videoio,highgui,stitching"/><argument value="-DBUILD_opencv_world:BOOL=OFF"/><argument value="-DBUILD_TESTS:BOOL=OFF"/><argument value="-DBUILD_PERF_TESTS:BOOL=OFF"/><argument value="-DBUILD_EXAMPLES:BOOL=OFF"/><argument value="-DBUILD_DOCS:BOOL=OFF"/><argument value="-DBUILD_opencv_apps:BOOL=OFF"/><argument value="-DBUILD_JAVA:BOOL=OFF"/><argument value="-DBUILD_opencv_python3:BOOL=OFF"/>
+         <!-- Temporary toolchain baseline: IPPICV MSVC /GS symbols need a verified BCC64X runtime provider. -->
+         <argument value="-DWITH_IPP:BOOL=OFF"/><argument value="-DOPENCV_DNN_MLAS:BOOL=OFF"/><argument value="-DWITH_ONNXRUNTIME:BOOL=OFF"/><argument value="-DWITH_PROTOBUF:BOOL=ON"/><argument value="-DBUILD_PROTOBUF:BOOL=ON"/><argument value="-DPROTOBUF_UPDATE_FILES:BOOL=OFF"/><argument value="-DOPENCV_DISABLE_THREAD_SUPPORT:BOOL=OFF"/><argument value="-DWITH_OPENCL:BOOL=OFF"/><argument value="-DWITH_CUDA:BOOL=OFF"/><argument value="-DWITH_DIRECTML:BOOL=OFF"/><argument value="-DWITH_TBB:BOOL=ON"/><argument value="-DWITH_OPENMP:BOOL=ON"/><argument value="-DTBB_DIR:PATH={DependencyRoot:onetbb}\lib\win64\{Configuration}\cmake\TBB"/><argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:onetbb}"/><argument value="-DOpenMP_CXX_FLAGS:STRING=-fopenmp"/><argument value="-DOpenMP_CXX_LIB_NAMES:STRING=omp"/><argument value="-DOpenMP_omp_LIBRARY:FILEPATH={DependencyRoot:llvm-openmp}\lib\win64\{Configuration}\libomp.lib"/><argument value="-DBUILD_TBB:BOOL=OFF"/>
+         <argument value="-DWITH_FFMPEG:BOOL=OFF"/><argument value="-DWITH_GSTREAMER:BOOL=OFF"/><argument value="-DWITH_DSHOW:BOOL=ON"/><argument value="-DWITH_MSMF:BOOL=OFF"/><argument value="-DWITH_MSMF_DXVA:BOOL=OFF"/><argument value="-DVIDEOIO_ENABLE_PLUGINS:BOOL=OFF"/><argument value="-DWITH_OBSENSOR:BOOL=OFF"/><argument value="-DWITH_QT:BOOL=OFF"/><argument value="-DWITH_GTK:BOOL=OFF"/><argument value="-DWITH_OPENGL:BOOL=OFF"/><argument value="-DWITH_UNIFONT:BOOL=OFF"/>
+         <argument value="-DWITH_JPEG:BOOL=ON"/><argument value="-DBUILD_JPEG:BOOL=ON"/><argument value="-DWITH_PNG:BOOL=ON"/><argument value="-DBUILD_PNG:BOOL=ON"/><argument value="-DWITH_TIFF:BOOL=ON"/><argument value="-DBUILD_TIFF:BOOL=ON"/><argument value="-DWITH_WEBP:BOOL=ON"/><argument value="-DBUILD_WEBP:BOOL=ON"/><argument value="-DWITH_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_OPENJPEG:BOOL=ON"/><argument value="-DBUILD_ZLIB:BOOL=OFF"/><argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/><argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibLibrary}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><variable name="DebugPostfix" value=""/><variable name="ZlibLibrary" value="libz.lib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/><argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/><argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/></variant><variant name="Debug"><variable name="DebugPostfix" value="d"/><variable name="ZlibLibrary" value="libzd.lib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/><argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/><argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/></variant>
+         <install><perVariant><cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib\win64\{Configuration}" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" recursive="true" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_core510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_core510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_imgproc510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_imgproc510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_geometry510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_geometry510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_flann510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_flann510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_features510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_features510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_video510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_video510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_photo510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_photo510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_stereo510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_stereo510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_ptcloud510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_ptcloud510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_calib510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_calib510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_ml510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_ml510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_dnn510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_dnn510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_objdetect510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_objdetect510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_imgcodecs510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_imgcodecs510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_videoio510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_videoio510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_highgui510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_highgui510{DebugPostfix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_stitching510{DebugPostfix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_stitching510{DebugPostfix}.lib"/>
             </perVariant><common><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\include" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/><copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\Release\etc\licenses" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses" recursive="true" overwrite="true"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\core.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\dnn.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\ml.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\opencv5\opencv2\stitching.hpp"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\protobuf-LICENSE"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\SoftFloat-COPYING.txt"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/></common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
@@ -10649,7 +10803,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" category="text" timestamp="2026-09-20T16:15:00Z">
+   <library id="icu" version="78.3" supersededBy="79.1" category="text" timestamp="2026-09-20T16:15:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services." licenseSignal="yellow"/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -10791,6 +10945,201 @@
             <variable name="IcuCommonRuntime" value="libicuuc78d"/>
             <variable name="IcuCommonImport" value="libicuucd"/>
             <variable name="IcuI18nRuntime" value="libicuin78d"/>
+            <variable name="IcuI18nImport" value="libicuind"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0 -D_DEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0 -D_DEBUG"/>
+         </variant>
+
+         <install>
+            <perVariant>
+               <cmake mode="install"
+                      executable="{Tool:cmake}"
+                      build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+               <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\lib"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"
+                     recursive="true" overwrite="true"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{IcuDataRuntime}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{IcuDataImport}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{IcuCommonRuntime}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{IcuCommonImport}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{IcuI18nRuntime}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{IcuI18nImport}.lib"/>
+            </perVariant>
+
+            <common>
+               <!-- ICU public headers are split between common/unicode and i18n/unicode. -->
+               <copy source="{Workspace}\source\common\unicode"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\source\i18n\unicode"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode"
+                     recursive="true" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"
+                     overwrite="true"/>
+
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode\utypes.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode\ustring.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\unicode\calendar.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+      </publish>
+   </library>
+   <library id="icu" version="79.1" category="text" timestamp="2026-11-09T12:48:00Z">
+      <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services." licenseSignal="yellow"/>
+      <security>
+         <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
+      </security>
+      <source>
+         <download url="https://github.com/unicode-org/icu/releases/download/release-{LibraryVersion}/icu4c-{LibraryVersion}-sources.tgz"
+                   archive="icu4c-{LibraryVersion}-sources.tgz"
+                   sha256="06fa63ecb521048f8082f12ad988f6b678d90cbd88aafce24cbc94902b191d99"/>
+         <extract format="libarchive" root="icu">
+            <require path="LICENSE"/>
+            <require path="source\stubdata\stubdata.vcxproj"/>
+            <require path="source\common\common.vcxproj"/>
+            <require path="source\i18n\i18n.vcxproj"/>
+            <require path="source\common\unicode\utypes.h"/>
+            <require path="source\common\unicode\uchar.h"/>
+            <require path="source\common\unicode\ustring.h"/>
+            <require path="source\i18n\unicode\calendar.h"/>
+         </extract>
+      </source>
+      <!--
+         Native Windows/BCC64X bootstrap path.
+
+         ICU's VCXPROJ files are used only as read-only source/resource inventory.
+         BuildEngine owns compiler, platform, variants, output layout and dependencies.
+         No MSBuild, Visual Studio, NMAKE, MSYS, cygpath or runConfigureICU is involved.
+
+         This first native stage builds the bootstrap data DLL plus common and i18n:
+            icudt -> icuuc -> icuin
+
+         The real ICU data generators and upstream test suites are added after this
+         bootstrap graph is proven. Full ICU tests require replacing stubdata with
+         the generated data package and are therefore not meaningful in this stage.
+      -->
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="--fresh"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin"/>
+         <argument value="-DCMAKE_C_STANDARD:STRING=11"/>
+         <argument value="-DCMAKE_C_STANDARD_REQUIRED:BOOL=ON"/>
+         <argument value="-DCMAKE_C_EXTENSIONS:BOOL=OFF"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=17"/>
+         <argument value="-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON"/>
+         <argument value="-DCMAKE_CXX_EXTENSIONS:BOOL=OFF"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+
+         <cmake mode="configure"
+                executable="{Tool:cmake}"
+                source="{BuildRoot}\generated\cmake\{LibraryId}\{Configuration}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}">
+            <import format="vcxproj"
+                    source="{Workspace}\source\stubdata\stubdata.vcxproj"
+                    target="icudt"
+                    type="shared"
+                    runtimeOutput="icudt79"
+                    archiveOutput="icudt">
+               <include path="{Workspace}\source\common"/>
+               <define value="WIN32"/>
+               <define value="WIN64"/>
+               <define value="WINVER=0x0601"/>
+               <define value="_WIN32_WINNT=0x0601"/>
+               <define value="_CRT_SECURE_NO_DEPRECATE"/>
+               <define value="_HAS_EXCEPTIONS=0"/>
+               <define value="STUBDATA_BUILD"/>
+            </import>
+
+            <import format="vcxproj"
+                    source="{Workspace}\source\common\common.vcxproj"
+                    target="icuuc"
+                    type="shared"
+                    runtimeOutput="icuuc79"
+                    archiveOutput="icuuc"
+                    debugPostfix="d">
+               <include path="{Workspace}\source\common"/>
+               <define value="WIN32"/>
+               <define value="WIN64"/>
+               <define value="WINVER=0x0601"/>
+               <define value="_WIN32_WINNT=0x0601"/>
+               <define value="_CRT_SECURE_NO_DEPRECATE"/>
+               <define value="_HAS_EXCEPTIONS=0"/>
+               <define value="U_ATTRIBUTE_DEPRECATED="/>
+               <define value="U_COMMON_IMPLEMENTATION"/>
+               <define value="U_PLATFORM_USES_ONLY_WIN32_API=1"/>
+               <link value="icudt"/>
+            </import>
+
+            <import format="vcxproj"
+                    source="{Workspace}\source\i18n\i18n.vcxproj"
+                    target="icuin"
+                    type="shared"
+                    runtimeOutput="icuin79"
+                    archiveOutput="icuin"
+                    debugPostfix="d">
+               <include path="{Workspace}\source\common"/>
+               <include path="{Workspace}\source\i18n"/>
+               <define value="WIN32"/>
+               <define value="WIN64"/>
+               <define value="WINVER=0x0601"/>
+               <define value="_WIN32_WINNT=0x0601"/>
+               <define value="_CRT_SECURE_NO_DEPRECATE"/>
+               <define value="_HAS_EXCEPTIONS=0"/>
+               <define value="U_ATTRIBUTE_DEPRECATED="/>
+               <define value="U_I18N_IMPLEMENTATION"/>
+               <link value="icuuc"/>
+            </import>
+         </cmake>
+
+         <cmake mode="build"
+                executable="{Tool:cmake}"
+                build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+
+         <variant name="Release">
+            <variable name="IcuDataRuntime" value="libicudt79"/>
+            <variable name="IcuDataImport" value="libicudt"/>
+            <variable name="IcuCommonRuntime" value="libicuuc79"/>
+            <variable name="IcuCommonImport" value="libicuuc"/>
+            <variable name="IcuI18nRuntime" value="libicuin79"/>
+            <variable name="IcuI18nImport" value="libicuin"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+
+         <variant name="Debug">
+            <!-- Upstream stubdata deliberately has no Debug postfix. -->
+            <variable name="IcuDataRuntime" value="libicudt79"/>
+            <variable name="IcuDataImport" value="libicudt"/>
+            <variable name="IcuCommonRuntime" value="libicuuc79d"/>
+            <variable name="IcuCommonImport" value="libicuucd"/>
+            <variable name="IcuI18nRuntime" value="libicuin79d"/>
             <variable name="IcuI18nImport" value="libicuind"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0 -D_DEBUG"/>
@@ -13007,11 +13356,74 @@
          <argument value="-DOpenJPEG_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\openjpeg-2.5"/>
       </smoke>
    </library>
-   <library id="simdutf" version="9.3.0" category="text" timestamp="2026-10-16T16:34:00Z">
+   <library id="simdutf" version="9.3.0" supersededBy="9.3.3" category="text" timestamp="2026-10-16T16:34:00Z">
       <metadata name="simdutf" supplier="simdutf contributors" homepage="https://github.com/simdutf/simdutf" description="SIMD accelerated Unicode and Base64 processing" licenseSignal="yellow"/>
       <source>
          <download url="https://github.com/simdutf/simdutf/archive/refs/tags/v9.3.0.tar.gz" archive="simdutf-9.3.0.tar.gz"/>
          <extract format="libarchive" root="simdutf-9.3.0">
+            <require path="CMakeLists.txt"/>
+            <require path="include\simdutf.h"/>
+            <require path="LICENSE-MIT"/>
+         </extract>
+      </source>
+      <build>
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_TESTS:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_TOOLS:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_BENCHMARKS:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_ICONV:BOOL=OFF"/>
+         <argument value="-DSIMDUTF_INSTALL_CMAKEDIR:STRING=lib/win64/{Configuration}/cmake/simdutf"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\simdutf.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\simdutf\simdutf-config.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE-MIT" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\simdutf\LICENSE-MIT" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\simdutf\LICENSE-MIT"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\simdutf\consumer"
+             configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="simdutf-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Dsimdutf_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\simdutf"/>
+      </smoke>
+   </library>
+   <library id="simdutf" version="9.3.3" category="text" timestamp="2026-11-09T12:48:00Z">
+      <metadata name="simdutf" supplier="simdutf contributors" homepage="https://github.com/simdutf/simdutf" description="SIMD accelerated Unicode and Base64 processing" licenseSignal="yellow"/>
+      <source>
+         <download url="https://github.com/simdutf/simdutf/archive/refs/tags/v9.3.3.tar.gz" archive="simdutf-9.3.3.tar.gz"/>
+         <extract format="libarchive" root="simdutf-9.3.3">
             <require path="CMakeLists.txt"/>
             <require path="include\simdutf.h"/>
             <require path="LICENSE-MIT"/>
