@@ -404,7 +404,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="libdeflate" version="1.26" category="compression" timestamp="2026-11-09T13:00:00Z">
+   <library id="libdeflate" version="1.26" category="compression" timestamp="2026-11-09T14:29:00Z">
       <dependency library="zlib" version="1.4"/>
       <metadata name="libdeflate" supplier="Eric Biggers and contributors" homepage="https://github.com/ebiggers/libdeflate"
                 description="Fast native DEFLATE, zlib and gzip compression/decompression; distinct from zlib streaming interfaces." licenseSignal="green">
@@ -418,6 +418,22 @@
             <require path="libdeflate.h"/>
             <require path="COPYING"/>
          </extract>
+         <!-- Upstream Windows test programs use wmain; BCC64X uses console main. -->
+         <copy source="{BuildFileDir}\patches\libdeflate\1.26\bcc64x-wmain-bridge.c"
+               target="{Workspace}\programs\bcc64x-wmain-bridge.c" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\libdeflate\1.26\bcc64x-wmain-tests.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-wmain-tests.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="wmain-tests-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-wmain-tests.patch"/>
+         </execute>
+         <execute name="wmain-tests-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-wmain-tests.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
