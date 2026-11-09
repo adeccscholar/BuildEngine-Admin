@@ -1,7 +1,7 @@
 # BuildEngine-Admin – Technical Administration Data
 
-**Status date:** September 25, 2026  
-**Status:** active Schema-16 declarative contract for the Library-FSM architecture and 44-library integration catalog
+**Status date:** November 9, 2026  
+**Status:** active Schema-17 declarative contract for the Library-FSM architecture and 62 logical libraries
 
 This directory contains the administration contracts that BuildEngine synchronizes and uses at runtime for tool provisioning, library builds, packaging, publishing, and small consumer smokes.
 
@@ -16,11 +16,11 @@ Active libraries are not distributed across XML fragments.
 ## Current contract state
 
 ```text
-build-libraries.xml : Schema 16
+build-libraries.xml : Schema 17
 Library contracts   : current synchronized logical catalog
 ```
 
-Included (44 logical libraries):
+Included (62 logical libraries, with previous versions retained):
 
 ```text
 pugixml, zlib, brotli, zstd, xz, libzip, libarchive, openssl, curl,
@@ -28,7 +28,10 @@ boost, nlohmann-json, ace, tao, bzip2, glew, opengl, raylib, sdl2,
 sqlite, libpq, libpqxx, xerces-c, soil2, vtk, opencv, cmark-gfm,
 googletest, catch2, bitmapplusplus, libjpeg-turbo, libpng, harfbuzz,
 freetype, libtiff, skia, graphite2, expat, teckit, icu, libxml2,
-qpdf, podofo, win-iconv, poppler
+qpdf, podofo, win-iconv, poppler, lz4, libdeflate, leptonica,
+tesseract, wil, openxlsx, fast_float, abseil, lcms2, openjpeg,
+simdutf, agg, pdfium, onetbb, llvm-openmp, eigen,
+mariadb-connector-c, google-benchmark
 ```
 
 Other central content:
