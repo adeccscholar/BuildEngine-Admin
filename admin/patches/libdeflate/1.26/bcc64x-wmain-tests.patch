@@ -7,7 +7,7 @@ diff --git a/programs/CMakeLists.txt b/programs/CMakeLists.txt
 +    # BCC64X uses the standard console main startup. Upstream's Windows
 +    # programs use wmain for Unicode filenames; bridge the entry point
 +    # without changing the common BCC64X runtime or compiler rules.
-+    if(WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "Clang")
++    if(WIN32 AND DEFINED ENV{CB_BCC64X})
 +        foreach(PROG benchmark checksum ${UNIT_TEST_PROGS})
 +            target_sources(${PROG} PRIVATE
 +                "${CMAKE_CURRENT_LIST_DIR}/bcc64x-wmain-bridge.c")
