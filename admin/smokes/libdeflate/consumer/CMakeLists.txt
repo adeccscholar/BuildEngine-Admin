@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeLibdeflate LANGUAGES CXX)
+find_package(libdeflate CONFIG REQUIRED)
+add_executable(libdeflate-consumer main.cpp)
+set_property(TARGET libdeflate-consumer PROPERTY CXX_SCAN_FOR_MODULES OFF)
+target_compile_features(libdeflate-consumer PRIVATE cxx_std_23)
+target_link_libraries(libdeflate-consumer PRIVATE libdeflate::libdeflate_shared)
