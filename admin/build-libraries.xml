@@ -2225,6 +2225,7 @@
          </extract>
          <copy source="{BuildFileDir}\patches\libarchive\3.8.11\bcc64x-modern-borland-compat.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\patches\libarchive\3.8.11\managed-bzip2-contract.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\libarchive\3.8.11\lz4-1.11-api.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\lz4-1.11-api.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <!--
             BCC64X compatibility backpatch for legacy __BORLANDC__ compiler
             branches. BCC64X also defines __clang__ and must therefore use the
@@ -2264,6 +2265,18 @@
             <argument value="--unidiff-zero"/>
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch"/>
+         </execute>
+         <execute name="lz4-api-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\lz4-1.11-api.patch"/>
+         </execute>
+         <execute name="lz4-api-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\lz4-1.11-api.patch"/>
+         </execute>
+         <execute name="lz4-api-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\lz4-1.11-api.patch"/>
          </execute>
          <execute name="bzip2-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/>
@@ -14254,7 +14267,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_PDFIUM_SKIA_ROOT" value="{DependencyRoot:skia}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt78.dll;libicuuc78.dll;libfreetype.dll;skia.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libz.dll;libjpeg.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2.dll;libpng16.dll;libharfbuzz.dll;libicudt79.dll;libicuuc79.dll;libfreetype.dll;skia.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\pdfium\consumer" configuration="Debug"
@@ -14265,7 +14278,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="ADECC_PDFIUM_SKIA_ROOT" value="{DependencyRoot:skia}"/>
          <environment name="ADECC_RUNTIME_TOOLCHAIN_DLLS" value="libwinpthread-1-370.dll"/>
-         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2d.dll;libpng16d.dll;libharfbuzzd.dll;libicuuc78d.dll;libfreetyped.dll;skia.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
+         <environment name="ADECC_RUNTIME_PROBE_DLLS" value="libc++-370.dll;libunwind-370.dll;libwinpthread-1-370.dll;libzd.dll;libjpegd.dll;libbrotlicommon.dll;libbrotlidec.dll;libbzip2d.dll;libpng16d.dll;libharfbuzzd.dll;libicuuc79d.dll;libfreetyped.dll;skia.dll;liblcms2.dll;libopenjp2.dll;libabseil_dll.dll;pdfium.dll"/>
          <run executable="pdfium-loader-probe.exe"/>
       </smoke>
    </library>
