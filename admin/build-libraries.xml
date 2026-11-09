@@ -8250,7 +8250,7 @@
    </smoke>
 </library>
 
-<library id="libtiff" version="4.7.2" category="image" timestamp="2026-11-09T14:30:00Z">
+<library id="libtiff" version="4.7.2" category="image" timestamp="2026-11-09T16:49:00Z">
    <dependency library="zlib" version="1.4"/>
    <dependency library="libjpeg-turbo" version="3.2.1"/>
 
@@ -8275,6 +8275,8 @@
       <argument value="-G"/>
       <argument value="Ninja"/>
       <argument value="-Wno-dev"/>
+      <!-- Discard stale RC compiler/cache settings and regenerate Ninja compile rules. -->
+      <argument value="--fresh"/>
       <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
       <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
       <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
