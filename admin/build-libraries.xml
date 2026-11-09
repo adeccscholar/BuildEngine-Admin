@@ -2375,6 +2375,14 @@
             <argument value="remove_directory"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          </execute>
+         <!-- Keep the source patch effective when Source FSM evidence is already completed. -->
+         <execute name="ensure-lz4-api-source-patch" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="true">
+            <argument value="-DBUILDENGINE_PATCH_WORKSPACE:PATH={Workspace}"/>
+            <argument value="-DBUILDENGINE_PATCH_FILE:FILEPATH={BuildFileDir}\\patches\\libarchive\\3.8.11\\lz4-1.11-api.patch"/>
+            <argument value="-DBUILDENGINE_GIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\\cmake\\patches\\ensure-source-patch.cmake"/>
+         </execute>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
@@ -8262,6 +8270,7 @@
    <build>
       <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
       <environment name="CB_BDS" value="{BDS}"/>
+      <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
 
       <argument value="-G"/>
       <argument value="Ninja"/>
