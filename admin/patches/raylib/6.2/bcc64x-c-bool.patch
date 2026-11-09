@@ -10,3 +10,17 @@ diff --git a/src/rlgl.h b/src/rlgl.h
      #include <stdbool.h>
  #elif !defined(bool)
      typedef enum bool { false = 0, true = !false } bool;
+diff --git a/src/raylib.h b/src/raylib.h
+--- a/src/raylib.h
++++ b/src/raylib.h
+@@ -204,9 +204,9 @@
+ // Types and Structures Definition
+ //----------------------------------------------------------------------------------
+ // Boolean type
+ #if !defined(__cplusplus)
+-#if (defined(__STDC__) && __STDC_VERSION__ >= 199901L) || (defined(_MSC_VER) && _MSC_VER >= 1800)
++#if defined(__clang__) || (defined(__STDC__) && __STDC_VERSION__ >= 199901L) || (defined(_MSC_VER) && _MSC_VER >= 1800)
+     #include <stdbool.h>
+ #elif !defined(bool)
+     typedef enum bool { false = 0, true = !false } bool;
+     #define RL_BOOL_TYPE
