@@ -12920,7 +12920,7 @@
    </library>
 
 
-   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-11-09T14:30:00Z">
+   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-11-09T15:43:00Z">
       <dependency library="pugixml" version="1.16"/>
       <dependency library="libzip" version="1.12.1"/>
       <dependency library="boost" version="1.92.0"/>
@@ -12952,6 +12952,25 @@
          <execute name="boost-dirs-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\forward-managed-boost-dirs.patch"/>
+         </execute>
+         <!-- Nested CMake package probes must inherit registered BuildEngine Ninja. -->
+         <copy source="{BuildFileDir}\patches\openxlsx\0.5.1\forward-nested-cmake-make-program.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\forward-nested-cmake-make-program.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="ninja-probe-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\forward-nested-cmake-make-program.patch"/>
+         </execute>
+         <execute name="ninja-probe-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\forward-nested-cmake-make-program.patch"/>
+         </execute>
+         <execute name="ninja-probe-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\forward-nested-cmake-make-program.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="false">
