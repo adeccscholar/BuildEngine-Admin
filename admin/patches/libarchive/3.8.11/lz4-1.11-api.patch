@@ -1,0 +1,22 @@
+diff --git a/libarchive/archive_write_add_filter_lz4.c b/libarchive/archive_write_add_filter_lz4.c
+--- a/libarchive/archive_write_add_filter_lz4.c
++++ b/libarchive/archive_write_add_filter_lz4.c
+@@ -524,10 +524,16 @@
+ #ifdef HAVE_LZ4HC_H
+ 	if (lz4->compression_level >= 3) {
+ 		if (lz4->lz4_stream == NULL) {
+ #if LZ4_VERSION_MAJOR >= 1 && LZ4_VERSION_MINOR >= 7
+-			lz4->lz4_stream = LZ4_createStreamHC();
+-			LZ4_resetStreamHC(lz4->lz4_stream, lz4->compression_level);
++			lz4->lz4_stream = LZ4_createStreamHC();
++			if (lz4->lz4_stream != NULL) {
++#if LZ4_VERSION_NUMBER >= 10900
++				LZ4_resetStreamHC_fast(lz4->lz4_stream, lz4->compression_level);
++#else
++				LZ4_resetStreamHC(lz4->lz4_stream, lz4->compression_level);
++#endif
++			}
+ #else
+ 			lz4->lz4_stream =
+ 			    LZ4_createHC(lz4->in_buffer_allocated);
+ #endif
