@@ -66,11 +66,21 @@ if(DEFINED ENV{CB_WINDOWS_RC} AND NOT "$ENV{CB_WINDOWS_RC}" STREQUAL "")
    get_filename_component(_CB_RC_BIN_ROOT "${_CB_RC_VERSION_DIR}" DIRECTORY)
    get_filename_component(_CB_RC_SDK_ROOT "${_CB_RC_BIN_ROOT}" DIRECTORY)
    set(_CB_RC_INCLUDE_ROOT "${_CB_RC_SDK_ROOT}/Include/${_CB_RC_VERSION}")
-   foreach(_CB_RC_INCLUDE um shared)
-      if(NOT EXISTS "${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
+   foreach(_CB_RC_INCLUDE um shared ucrt)
+      if(NOT IS_DIRECTORY "${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
          message(FATAL_ERROR "Registered Windows RC SDK include path missing: ${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
       endif()
    endforeach()
+   if(NOT EXISTS "${_CB_RC_INCLUDE_ROOT}/um/windows.h")
+      message(FATAL_ERROR "Registered Windows RC SDK windows.h is missing: ${_CB_RC_INCLUDE_ROOT}/um/windows.h")
+   endif()
+   # CMake's RC language does not inherit C/C++ or find_* include paths.
+   # These directories are emitted in Ninja's RC INCLUDES for every .rc source.
+   set(CMAKE_RC_STANDARD_INCLUDE_DIRECTORIES
+      "${_CB_RC_INCLUDE_ROOT}/um"
+      "${_CB_RC_INCLUDE_ROOT}/shared"
+      "${_CB_RC_INCLUDE_ROOT}/ucrt"
+      CACHE STRING "Registered Windows SDK standard RC include directories" FORCE)
    # RC cache values survive CMake reconfiguration: keep registered SDK includes authoritative.
    set(CMAKE_RC_FLAGS_INIT "/I\"${_CB_RC_INCLUDE_ROOT}/um\" /I\"${_CB_RC_INCLUDE_ROOT}/shared\"")
    set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS_INIT}"
