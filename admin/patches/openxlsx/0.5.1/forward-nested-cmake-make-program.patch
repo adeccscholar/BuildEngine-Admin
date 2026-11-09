@@ -1,0 +1,20 @@
+diff --git a/cmake/manage_dependency.cmake b/cmake/manage_dependency.cmake
+--- a/cmake/manage_dependency.cmake
++++ b/cmake/manage_dependency.cmake
+@@ -407,6 +407,7 @@
+                 -B \"${TEMP_BUILD_DIR}\" \\
+                 -C \"${_test_package_init}\" \\
+                 -G \"${CMAKE_GENERATOR}\" \\
++                -D CMAKE_MAKE_PROGRAM:FILEPATH=\"${CMAKE_MAKE_PROGRAM}\" \\
+                 -D TEST_PACKAGE_NAME=${ARG_PACKAGE_NAME} \\
+                 -D TEST_VERSION=${ARG_VERSION} \\
+                 -D TEST_EXTRA_ARGS=${ARG_EXTRA_ARGS_ESCAPED} \\
+@@ -423,7 +424,8 @@
+         COMMAND ${CMAKE_COMMAND} --no-warn-unused-cli -L -S "${TEMP_SRC_DIR}"
+                 -B "${TEMP_BUILD_DIR}"
+                 -C "${_test_package_init}"
+                 -G "${CMAKE_GENERATOR}"
++                "-DCMAKE_MAKE_PROGRAM:FILEPATH=${CMAKE_MAKE_PROGRAM}"
+                 -D TEST_PACKAGE_NAME=${ARG_PACKAGE_NAME}
+                 -D TEST_VERSION=${ARG_VERSION}
+                 -D TEST_EXTRA_ARGS=${ARG_EXTRA_ARGS_ESCAPED}
