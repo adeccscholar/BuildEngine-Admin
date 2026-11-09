@@ -404,6 +404,90 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
+   <library id="libdeflate" version="1.26" category="compression" timestamp="2026-11-09T12:48:00Z">
+      <metadata name="libdeflate" supplier="Eric Biggers and contributors" homepage="https://github.com/ebiggers/libdeflate"
+                description="Fast native DEFLATE, zlib and gzip compression/decompression; distinct from zlib streaming interfaces." licenseSignal="green">
+         <license name="MIT License" spdx="MIT" file="COPYING"/>
+      </metadata>
+      <security><repository url="https://github.com/ebiggers/libdeflate.git" commit="92e6a0db9fa848d742f9eb286c92afc60f2c3dda"/></security>
+      <source>
+         <download url="https://github.com/ebiggers/libdeflate/releases/download/v{LibraryVersion}/libdeflate-{LibraryVersion}.tar.gz" archive="libdeflate-{LibraryVersion}.tar.gz" sha256="125856d4656e0feab660f94842f835923410c9281fedbcee64598c918da42b5a"/>
+         <extract format="libarchive" root="libdeflate-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="libdeflate.h"/>
+            <require path="COPYING"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DLIBDEFLATE_BUILD_STATIC_LIB:BOOL=OFF"/>
+         <argument value="-DLIBDEFLATE_BUILD_SHARED_LIB:BOOL=ON"/>
+         <argument value="-DLIBDEFLATE_COMPRESSION_SUPPORT:BOOL=ON"/>
+         <argument value="-DLIBDEFLATE_DECOMPRESSION_SUPPORT:BOOL=ON"/>
+         <argument value="-DLIBDEFLATE_ZLIB_SUPPORT:BOOL=ON"/>
+         <argument value="-DLIBDEFLATE_GZIP_SUPPORT:BOOL=ON"/>
+         <argument value="-DLIBDEFLATE_BUILD_GZIP:BOOL=OFF"/>
+         <argument value="-DLIBDEFLATE_BUILD_TESTS:BOOL=ON"/>
+         <argument value="-DLIBDEFLATE_USE_SHARED_LIB:BOOL=ON"/>
+         <argument value="-DLIBDEFLATE_INSTALL:BOOL=ON"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="SharedName" value="libdeflate"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING="/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="SharedName" value="libdeflated"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-test" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration};{ENV:PATH}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libdeflate\libdeflate-config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\libdeflate\libdeflate-targets.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libdeflate.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\libdeflate\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="libdeflate-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Dlibdeflate_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\libdeflate"/>
+      </smoke>
+   </library>
    <library id="lz4" version="1.10.0" supersededBy="1.11.0" category="compression" timestamp="2026-11-07T16:00:00Z">
       <metadata description="Fast lossless LZ4 block and frame compression with BCC64X shared DLL." licenseSignal="green"/>
       <source>
@@ -5695,6 +5779,90 @@
       <smoke id="consumer" scope="package" source="smokes\googletest\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="GoogleTestSmoke.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DGTest_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\GTest"/>
+      </smoke>
+   </library>
+   <library id="google-benchmark" version="1.10.0" category="testing" timestamp="2026-11-09T12:48:00Z">
+      <metadata name="Google Benchmark" supplier="Google" homepage="https://github.com/google/benchmark"
+                description="C++ microbenchmark framework for reproducible performance measurements and JSON reports in BuildEngine-Tests." licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/google/benchmark.git" commit="a6b4a9f00b36c19af9997d68a1cf6e0b5b3d032c"/></security>
+      <source>
+         <download url="https://github.com/google/benchmark/archive/a6b4a9f00b36c19af9997d68a1cf6e0b5b3d032c.zip" archive="benchmark-a6b4a9f00b36c19af9997d68a1cf6e0b5b3d032c.zip"/>
+         <extract format="zip" root="benchmark-a6b4a9f00b36c19af9997d68a1cf6e0b5b3d032c">
+            <require path="CMakeLists.txt"/>
+            <require path="include\benchmark\benchmark.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=17"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBENCHMARK_ENABLE_TESTING:BOOL=ON"/>
+         <argument value="-DBENCHMARK_ENABLE_GTEST_TESTS:BOOL=OFF"/>
+         <argument value="-DBENCHMARK_USE_BUNDLED_GTEST:BOOL=OFF"/>
+         <argument value="-DBENCHMARK_DOWNLOAD_DEPENDENCIES:BOOL=OFF"/>
+         <argument value="-DBENCHMARK_ENABLE_INSTALL:BOOL=ON"/>
+         <argument value="-DBENCHMARK_ENABLE_WERROR:BOOL=OFF"/>
+         <argument value="-DBENCHMARK_INSTALL_DOCS:BOOL=OFF"/>
+         <argument value="-DBENCHMARK_INSTALL_TOOLS:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <variable name="SharedName" value="libbenchmark"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING="/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <variable name="SharedName" value="libbenchmarkd"/>
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-test" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <environment name="PATH" value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\src;{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration};{ENV:PATH}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SharedName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SharedName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\benchmark\benchmarkConfig.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\benchmark\benchmark.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\google-benchmark\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="google-benchmark-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Dbenchmark_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\benchmark"/>
       </smoke>
    </library>
 
