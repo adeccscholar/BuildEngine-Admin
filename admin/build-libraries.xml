@@ -4775,7 +4775,7 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\raylib\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="raylib-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
-   <library id="raylib" version="6.2" category="graphics" timestamp="2026-11-09T13:10:00Z">
+   <library id="raylib" version="6.2" category="graphics" timestamp="2026-11-09T15:36:01Z">
       <dependency library="opengl" version="26.2.1"/>
       <metadata name="raylib" supplier="raylib project" homepage="https://www.raylib.com/" description="Simple cross-platform C library for graphics, audio, input, and game and application development." licenseSignal="green"><license name="zlib License" spdx="Zlib" file="LICENSE"/></metadata>
       <source><download url="https://github.com/raysan5/raylib/archive/02566453880e06bec97f5b8160fa6fe1e98397ca.zip" archive="raylib-02566453880e06bec97f5b8160fa6fe1e98397ca.zip"/><extract format="zip" root="raylib-02566453880e06bec97f5b8160fa6fe1e98397ca"><require path="LICENSE"/><require path="src\raylib.h"/><require path="src\raymath.h"/><require path="src\rcamera.h"/><require path="src\rlgl.h"/><require path="src\rcore.c"/><require path="src\rshapes.c"/><require path="src\rtextures.c"/><require path="src\rtext.c"/><require path="src\rmodels.c"/><require path="src\raudio.c"/></extract><copy source="{BuildFileDir}\patches\raylib\6.2\bcc64x-c-bool.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-c-bool.patch" overwrite="true" preserveCurrentArtifact="true"/><execute name="bool-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-c-bool.patch"/></execute><execute name="bool-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-c-bool.patch"/></execute></source>
@@ -11188,7 +11188,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
       </publish>
    </library>
-   <library id="icu" version="79.1" category="text" timestamp="2026-11-09T13:10:01Z">
+   <library id="icu" version="79.1" category="text" timestamp="2026-11-09T15:36:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services." licenseSignal="yellow"/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -11207,6 +11207,25 @@
             <require path="source\common\unicode\ustring.h"/>
             <require path="source\i18n\unicode\calendar.h"/>
          </extract>
+         <!-- Resource compiler must not traverse ICU's C runtime headers. -->
+         <copy source="{BuildFileDir}\patches\icu\79.1\bcc64x-rc-version-header.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-rc-version-header.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="rc-version-header-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-rc-version-header.patch"/>
+         </execute>
+         <execute name="rc-version-header-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-rc-version-header.patch"/>
+         </execute>
+         <execute name="rc-version-header-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-rc-version-header.patch"/>
+         </execute>
       </source>
       <!--
          Native Windows/BCC64X bootstrap path.
