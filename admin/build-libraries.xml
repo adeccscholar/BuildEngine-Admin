@@ -404,7 +404,8 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="libdeflate" version="1.26" category="compression" timestamp="2026-11-09T12:48:00Z">
+   <library id="libdeflate" version="1.26" category="compression" timestamp="2026-11-09T13:00:00Z">
+      <dependency library="zlib" version="1.4"/>
       <metadata name="libdeflate" supplier="Eric Biggers and contributors" homepage="https://github.com/ebiggers/libdeflate"
                 description="Fast native DEFLATE, zlib and gzip compression/decompression; distinct from zlib streaming interfaces." licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="COPYING"/>
@@ -426,6 +427,9 @@
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <!-- Upstream libdeflate test_util.c uses find_package(ZLIB REQUIRED). -->
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
          <argument value="-DLIBDEFLATE_BUILD_STATIC_LIB:BOOL=OFF"/>
          <argument value="-DLIBDEFLATE_BUILD_SHARED_LIB:BOOL=ON"/>
          <argument value="-DLIBDEFLATE_COMPRESSION_SUPPORT:BOOL=ON"/>
@@ -440,6 +444,7 @@
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
             <variable name="SharedName" value="libdeflate"/>
+            <variable name="ZlibImportLibrary" value="libz.lib"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_DEBUG_POSTFIX:STRING="/>
@@ -448,6 +453,7 @@
          </variant>
          <variant name="Debug">
             <variable name="SharedName" value="libdeflated"/>
+            <variable name="ZlibImportLibrary" value="libzd.lib"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
