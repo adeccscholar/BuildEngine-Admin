@@ -1,3 +1,16 @@
+## 9 November 2026: Seven library coordinates prepared
+
+- [x] Register OpenCV 5.1.0, LZ4 1.11.0, simdutf 9.3.3, raylib 6.2 and ICU 79.1 in the declarative BuildEngine library inventory. Previous versions remain available and are marked with supersededBy.
+- [x] Register libdeflate 1.26 (MIT) as an upstream CMake/Ninja project with DLL/import library, Release/Debug, upstream CTest, installed consumer smoke, source integrity and license/SBOM inputs.
+- [x] Register Google Benchmark 1.10.0 (Apache-2.0) as an upstream CMake/Ninja project with DLL/import library, Release/Debug, upstream CTest, installed consumer smoke and license/SBOM inputs; no automatic dependency downloads.
+- [x] Rebase OpenCV 5.1 optional MLAS patch against the upstream source and update expected DLL/import library version suffix to 510.
+- [ ] Confirm source downloads, OpenCV patch application and all seven BCC64X native Release/Debug builds on the Windows build host. **[nicht verifiziert]**
+- [ ] Validate CTest, package consumer smokes, install requirements, metadata, license/SBOM, publish and Doxygen. **[nicht verifiziert]**
+- [ ] Verify the precise native output artifact filenames for libdeflate and Google Benchmark on BCC64X; amend the contracts based on real install evidence.
+- [ ] Investigate unexpectedly long OpenCV compilation independently, using per-step logs and build progress.
+- [ ] Review explicit reverse-dependency pins: libarchive 3.8.11 remains on LZ4 1.10.0; PDFium 2025.11.19 remains on ICU 78.3. Upgrade those consumers only after their own validation.
+- [ ] In BuildEngine-Tests: introduce reproducible PostgreSQL vs MSSQL and zlib vs libdeflate performance suites with controlled data, connection handling, wall-clock measurements and JSON output.
+
 ## 8 November 2026: Four new BCC64X build contracts
 
 - [x] Added `podofo@1.1.2`, `freetype@2.15.0`, `harfbuzz@15.1.0` and `lcms2@2.20` as buildable version coordinates; prior versions are retained with `supersededBy`.
