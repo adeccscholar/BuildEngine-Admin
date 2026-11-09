@@ -2204,11 +2204,11 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="libarchive" version="3.8.11" category="archive" timestamp="2026-11-07T17:25:00Z">
+   <library id="libarchive" version="3.8.11" category="archive" timestamp="2026-11-09T14:30:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="xz" version="5.8.4"/>
       <dependency library="zstd" version="1.5.7"/>
-      <dependency library="lz4" version="1.10.0"/>
+      <dependency library="lz4" version="1.11.0"/>
       <dependency library="bzip2" version="1.0.8"/>
       <dependency library="openssl" version="3.5.9"/>
       <metadata description="Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats." licenseSignal="yellow"/>
@@ -5358,10 +5358,10 @@
       <smoke id="consumer" source="smokes\vtk\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="vtk-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{DependencyRoot:onetbb}\bin\win64\Release;{DependencyRoot:llvm-openmp}\bin\win64\Release;{ENV:PATH}"/></smoke>
    </library>
 
-   <library id="leptonica" version="1.87.0" category="image" timestamp="2026-11-07T17:24:00Z">
+   <library id="leptonica" version="1.87.0" category="image" timestamp="2026-11-09T14:30:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="libpng" version="1.6.59"/>
-      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libtiff" version="4.7.2"/>
       <metadata name="Leptonica" supplier="Leptonica Project" homepage="https://github.com/DanBloomberg/leptonica" description="Image normalization, binarization, morphology and OCR preprocessing for Tesseract." licenseSignal="yellow"><license name="Leptonica license" spdx="BSD-2-Clause" file="LICENSE"/></metadata>
       <source>
@@ -8229,9 +8229,9 @@
    </smoke>
 </library>
 
-<library id="libtiff" version="4.7.2" category="image" timestamp="2026-11-07T17:24:00Z">
+<library id="libtiff" version="4.7.2" category="image" timestamp="2026-11-09T14:30:00Z">
    <dependency library="zlib" version="1.4"/>
-   <dependency library="libjpeg-turbo" version="3.2.0"/>
+   <dependency library="libjpeg-turbo" version="3.2.1"/>
 
    <metadata description="TIFF image library for reading, writing, and manipulating Tagged Image File Format images." licenseSignal="green"/>
    <source>
@@ -8562,11 +8562,11 @@
 </library>
 
 
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-08T04:59:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-09T14:30:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
-      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="harfbuzz" version="15.1.0"/>
       <dependency library="freetype" version="2.15.0"/>
@@ -8591,8 +8591,8 @@
             BuildEngine-provided external dependencies:
                OpenGL 26.2.1
                managed zlib dependency
-               Brotli 1.2.0
-               libjpeg-turbo 3.2.0
+               Brotli 1.2.1
+               libjpeg-turbo 3.2.1
                libpng 1.6.59
                HarfBuzz 15.1.0
                FreeType 2.15.0
@@ -10867,9 +10867,9 @@
       </smoke>
    </library>
 
-   <library id="teckit" version="2.5.13" category="text" timestamp="2026-11-07T17:24:00Z">
+   <library id="teckit" version="2.5.13" category="text" timestamp="2026-11-09T14:30:00Z">
       <dependency library="zlib" version="1.4"/>
-      <dependency library="expat" version="2.9.0"/>
+      <dependency library="expat" version="2.10.0"/>
       <metadata name="TECkit" supplier="SIL Global" homepage="https://software.sil.org/teckit/" description="Text encoding conversion toolkit with runtime engine, mapping compiler, and Unicode conversion utilities." licenseSignal="yellow"/>
       <security>
          <repository url="https://github.com/silnrsi/teckit.git" ref="v{LibraryVersion}"/>
@@ -11731,9 +11731,9 @@
          <argument value="-Dqpdf_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\qpdf"/>
       </smoke>
    </library>
-<library id="qpdf" version="12.4.2" category="documentation" timestamp="2026-11-08T15:43:00Z">
+<library id="qpdf" version="12.4.2" category="documentation" timestamp="2026-11-09T14:30:00Z">
       <dependency library="zlib" version="1.4"/>
-      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libjpeg-turbo" version="3.2.1"/>
       <metadata name="QPDF" supplier="QPDF Project" homepage="https://qpdf.sourceforge.io/" description="PDF structural transformation library and command-line toolkit for inspecting, rewriting, encrypting and validating PDF files." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE.txt"/>
       </metadata>
@@ -12219,12 +12219,12 @@
          <argument value="-DPoDoFo_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\podofo"/>
       </smoke>
    </library>
-   <library id="podofo" version="1.1.2" category="documentation" timestamp="2026-11-08T15:08:00Z">
+   <library id="podofo" version="1.1.2" category="documentation" timestamp="2026-11-09T14:30:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="freetype" version="2.15.0"/>
       <dependency library="libxml2" version="2.15.3"/>
-      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="libtiff" version="4.7.2"/>
       <metadata name="PoDoFo" supplier="PoDoFo Project" homepage="https://github.com/podofo/podofo" description="C++ PDF parsing, creation and modification library with forms, annotations, signing and incremental-update support." licenseSignal="yellow">
@@ -12745,11 +12745,11 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
       </publish>
    </library>
-<library id="poppler" version="26.11.0" category="documentation" timestamp="2026-11-08T19:33:00Z">
+<library id="poppler" version="26.11.0" category="documentation" timestamp="2026-11-09T14:30:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="freetype" version="2.15.0"/>
       <dependency library="harfbuzz" version="15.1.0"/>
-      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="libtiff" version="4.7.2"/>
       <dependency library="win-iconv" version="0.0.8"/>
@@ -12920,9 +12920,9 @@
    </library>
 
 
-   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-10-14T04:00:01Z">
+   <library id="openxlsx" version="0.5.1" category="data" timestamp="2026-11-09T14:30:00Z">
       <dependency library="pugixml" version="1.16"/>
-      <dependency library="libzip" version="1.11.4"/>
+      <dependency library="libzip" version="1.12.1"/>
       <dependency library="boost" version="1.92.0"/>
       <metadata name="OpenXLSX" supplier="OpenXLSX project"
                 homepage="https://codeberg.org/lars_uffmann/OpenXLSX"
@@ -13756,15 +13756,15 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-08T15:43:01Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-09T14:30:00Z">
       <dependency library="abseil" version="20260817.0"/>
        <dependency library="fast_float" version="8.3.3"/>
       <dependency library="skia" version="153"/>
       <dependency library="zlib" version="1.4"/>
-      <dependency library="libjpeg-turbo" version="3.2.0"/>
+      <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="freetype" version="2.15.0"/>
-      <dependency library="icu" version="78.3"/>
+      <dependency library="icu" version="79.1"/>
       <dependency library="lcms2" version="2.20"/>
       <dependency library="openjpeg" version="2.5.4"/>
       <metadata name="PDFium" supplier="PDFium Authors" homepage="https://pdfium.googlesource.com/pdfium/" description="Pinned PDFium GN/BCC64X integration; validation pending" licenseSignal="yellow"/>
@@ -14070,8 +14070,8 @@
          <environment name="CB_PDFIUM_LCMS_LIB" value="{DependencyRoot:lcms2}\lib\win64\{Configuration}\liblcms2.lib"/>
          <environment name="CB_PDFIUM_OPENJPEG_INCLUDE" value="{DependencyRoot:openjpeg}\include\openjpeg-2.5"/>
          <environment name="CB_PDFIUM_OPENJPEG_LIB" value="{DependencyRoot:openjpeg}\lib\win64\{Configuration}\libopenjp2.lib"/>
-         <environment name="CB_PDFIUM_ICU_INCLUDE" value="{InstallRoot}\\packages\\icu\\78.3\\include"/>
-         <environment name="CB_PDFIUM_ICU_LIB" value="{InstallRoot}\\packages\\icu\\78.3\\lib\\win64\\{Configuration}\\{PdfiumIcuImport}.lib"/>
+         <environment name="CB_PDFIUM_ICU_INCLUDE" value="{DependencyRoot:icu}\include"/>
+         <environment name="CB_PDFIUM_ICU_LIB" value="{DependencyRoot:icu}\lib\win64\{Configuration}\{PdfiumIcuImport}.lib"/>
          <environment name="CB_PDFIUM_FREETYPE_INCLUDE" value="{DependencyRoot:freetype}\include\freetype2"/>
          <environment name="CB_PDFIUM_FREETYPE_LIB" value="{DependencyRoot:freetype}\lib\win64\{Configuration}\{PdfiumFreeTypeImport}.lib"/>
          <environment name="CB_PDFIUM_ZLIB_INCLUDE" value="{DependencyRoot:zlib}\include"/>
