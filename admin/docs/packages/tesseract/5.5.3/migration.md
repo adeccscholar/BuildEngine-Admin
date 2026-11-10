@@ -68,7 +68,7 @@ Direkt: `leptonica@1.87.0`
 
 Dynamically linked C++ OCR engine; language traineddata is provisioned and licensed separately.
 
-**Coordinate:** `tesseract@5.5.3` · **Category:** `text` · **License indicator:** `yellow` · **Abgelöst durch:** `tesseract@5.5.4`
+**Coordinate:** `tesseract@5.5.3` · **Category:** `text` · **License indicator:** `yellow` · **Superseded by:** `tesseract@5.5.4`
 
 ### Declared dependencies (full transitive closure)
 
