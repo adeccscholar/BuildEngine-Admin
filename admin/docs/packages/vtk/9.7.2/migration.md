@@ -72,6 +72,16 @@ For both Debug and Release, installation now requires the OpenGL2, volume, inter
 
 The library revision timestamp advanced from `2026-11-10T02:11:05Z` to `2026-11-10T02:45:00Z` so the FSM rebuilds both variants with new module targets. All native BCC64X rendering/link/runtime results remain **[not verified]** until a Windows run and actual GPU screenshots are obtained.
 
+## 10 November 2026 — Bundled Verdict and implicit-array template exports
+
+Debug failed linking `FiltersVerdict` with the missing `vtkverdict::tri_area(int, double const (*)[3])` symbol; Release failed linking `IOXML` with the missing `vtkAffineArray<long long>::NewInstance() const` symbol. Both failures arise at DLL/module boundaries after enabling additional VTK rendering dependencies.
+
+The bundled Verdict header selects `dllexport` based on `verdict_EXPORTS`, while its CMake target is named `vtkverdict`. The version-bound patch adds `vtk_module_compile_definitions(VTK::verdict PRIVATE verdict_EXPORTS)` only for Windows shared builds so the Verdict producer exports its complete public API rather than individual patched functions.
+
+`vtkImplicitArrayTypeMacro` creates an inline `NewInstance()` accessor returning `vtkAOSDataArrayTemplate<ValueType>*`. The patch introduces dedicated out-of-line macro variants in `vtkSetGet.h` and `vtkImplicitArray.h` and selects them only for `vtkAffineArray`, `vtkConstantArray`, and `vtkStructuredPointArray`. These classes define the member outside the class, retaining the same AOS-array semantics while allowing the CommonCore explicit template instantiation to export its symbol. Other VTK classes and type macros remain unchanged. This is applied after the existing FastDownCast patch.
+
+Source checks: six source files are structurally checked against upstream VTK v9.7.2 and the prior FastDownCast patch. The VTK source revision advances from `2026-11-10T02:45:00Z` to `2026-11-10T04:55:00Z` so the FSM re-extracts before rebuilding Debug and Release. No global warning flags or alternate toolchains are added. Native BCC64X compilation, DLL exports, and downstream links remain **[not verified]**.
+
 ## Historical integration notes
 
 # vtk 9.7.2: BCC64X migration and integration record

@@ -1,0 +1,178 @@
+diff --git a/Common/Core/vtkSetGet.h b/Common/Core/vtkSetGet.h
+--- a/Common/Core/vtkSetGet.h
++++ b/Common/Core/vtkSetGet.h
+@@ -1128,7 +1128,52 @@
+     return this->thisClass::GetNumberOfGenerationsFromBaseType(type);                              \
+   }
+ 
+-// Same as vtkTypeMacro, but adapted for cases where thisClass is abstract.
++// BCC64X export producer: non-inline variant of the NewInstance declaration.
++#define vtkAbstractTypeMacroWithNewInstanceTypeOutOfLine(                                                   \
++  thisClass, superclass, instanceType, thisClassName)                                              \
++protected:                                                                                         \
++  const char* GetClassNameInternal() const override                                                \
++  {                                                                                                \
++    return thisClassName;                                                                          \
++  }                                                                                                \
++                                                                                                   \
++public:                                                                                            \
++  typedef superclass Superclass;                                                                   \
++  static vtkTypeBool IsTypeOf(const char* type)                                                    \
++  {                                                                                                \
++    if (!strcmp(thisClassName, type))                                                              \
++    {                                                                                              \
++      return 1;                                                                                    \
++    }                                                                                              \
++    return superclass::IsTypeOf(type);                                                             \
++  }                                                                                                \
++  vtkTypeBool IsA(const char* type) override                                                       \
++  {                                                                                                \
++    return this->thisClass::IsTypeOf(type);                                                        \
++  }                                                                                                \
++  static thisClass* SafeDownCast(vtkObjectBase* o)                                                 \
++  {                                                                                                \
++    if (o && o->IsA(thisClassName))                                                                \
++    {                                                                                              \
++      return static_cast<thisClass*>(o);                                                           \
++    }                                                                                              \
++    return nullptr;                                                                                \
++  }                                                                                                \
++  VTK_NEWINSTANCE instanceType* NewInstance() const;                                                \
++  static vtkIdType GetNumberOfGenerationsFromBaseType(const char* type)                            \
++  {                                                                                                \
++    if (!strcmp(thisClassName, type))                                                              \
++    {                                                                                              \
++      return 0;                                                                                    \
++    }                                                                                              \
++    return 1 + superclass::GetNumberOfGenerationsFromBaseType(type);                               \
++  }                                                                                                \
++  vtkIdType GetNumberOfGenerationsFromBase(const char* type) override                              \
++  {                                                                                                \
++    return this->thisClass::GetNumberOfGenerationsFromBaseType(type);                              \
++  }
++
++// Same as vtkTypeMacro, but adapted for cases where thisClass is abstract.
+ #define vtkAbstractTypeMacro(thisClass, superclass)                                                \
+   vtkAbstractTypeMacroWithNewInstanceType(thisClass, superclass, thisClass, #thisClass)            \
+                                                                                                    \
+diff --git a/Common/Core/vtkImplicitArray.h b/Common/Core/vtkImplicitArray.h
+--- a/Common/Core/vtkImplicitArray.h
++++ b/Common/Core/vtkImplicitArray.h
+@@ -153,8 +153,19 @@
+ public:
+ //-------------------------------------------------------------------------------------------------
+ 
+-VTK_ABI_NAMESPACE_BEGIN
+-template <class BackendT, int ArrayType = vtkArrayTypes::VTK_IMPLICIT_ARRAY>
++#define vtkImplicitArrayTypeMacroOutOfLine(thisClass, superclass)                                           \
++  vtkAbstractTypeMacroWithNewInstanceTypeOutOfLine(thisClass, superclass,                                   \
++    vtkAOSDataArrayTemplate<typename thisClass::ValueType>, typeid(thisClass).name());             \
++                                                                                                   \
++protected:                                                                                         \
++  vtkObjectBase* NewInstanceInternal() const override                                              \
++  {                                                                                                \
++    return vtkAOSDataArrayTemplate<typename thisClass::ValueType>::New();                          \
++  }                                                                                                \
++                                                                                                   \
++public:
++VTK_ABI_NAMESPACE_BEGIN
++template <class BackendT, int ArrayType = vtkArrayTypes::VTK_IMPLICIT_ARRAY>
+ class vtkImplicitArray
+   : public vtkGenericDataArray<vtkImplicitArray<BackendT, ArrayType>,
+       typename vtk::detail::implicit_array_traits<BackendT>::rtype, ArrayType>
+diff --git a/Common/Core/vtkAffineArray.h b/Common/Core/vtkAffineArray.h
+--- a/Common/Core/vtkAffineArray.h
++++ b/Common/Core/vtkAffineArray.h
+@@ -34,7 +34,7 @@
+ #endif
+ public:
+   using SelfType = vtkAffineArray<ValueTypeT>;
+-  vtkImplicitArrayTypeMacro(SelfType, ImplicitArrayType);
++  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType);
+ #ifndef __VTK_WRAP__
+   using typename Superclass::ArrayTypeTag;
+   using typename Superclass::DataTypeTag;
+@@ -98,7 +98,13 @@
+   void operator=(const vtkAffineArray&) = delete;
+ };
+ 
+-// Declare vtkArrayDownCast implementations for Affine arrays:
++template <class ValueTypeT>
++auto vtkAffineArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueType>*
++{
++  return vtkAOSDataArrayTemplate<ValueType>::SafeDownCast(this->NewInstanceInternal());
++}
++
++// Declare vtkArrayDownCast implementations for Affine arrays:
+ template <class ValueTypeT>
+ auto vtkAffineArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source) -> vtkAffineArray<ValueType>*
+ {
+diff --git a/Common/Core/vtkConstantArray.h b/Common/Core/vtkConstantArray.h
+--- a/Common/Core/vtkConstantArray.h
++++ b/Common/Core/vtkConstantArray.h
+@@ -36,7 +36,7 @@
+ #endif
+ public:
+   using SelfType = vtkConstantArray<ValueTypeT>;
+-  vtkImplicitArrayTypeMacro(SelfType, ImplicitArrayType);
++  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType);
+ #ifndef __VTK_WRAP__
+   using typename Superclass::ArrayTypeTag;
+   using typename Superclass::DataTypeTag;
+@@ -89,7 +89,13 @@
+   void operator=(const vtkConstantArray&) = delete;
+ };
+ 
+-// Declare vtkArrayDownCast implementations for Constant arrays:
++template <class ValueTypeT>
++auto vtkConstantArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueType>*
++{
++  return vtkAOSDataArrayTemplate<ValueType>::SafeDownCast(this->NewInstanceInternal());
++}
++
++// Declare vtkArrayDownCast implementations for Constant arrays:
+ template <class ValueTypeT>
+ auto vtkConstantArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source) -> vtkConstantArray<ValueType>*
+ {
+diff --git a/Common/Core/vtkStructuredPointArray.h b/Common/Core/vtkStructuredPointArray.h
+--- a/Common/Core/vtkStructuredPointArray.h
++++ b/Common/Core/vtkStructuredPointArray.h
+@@ -37,7 +37,7 @@
+ #endif
+ public:
+   using SelfType = vtkStructuredPointArray<ValueTypeT>;
+-  vtkImplicitArrayTypeMacro(SelfType, ImplicitArrayType);
++  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType);
+ #ifndef __VTK_WRAP__
+   using typename Superclass::ArrayTypeTag;
+   using typename Superclass::DataTypeTag;
+@@ -93,7 +93,13 @@
+   void operator=(const vtkStructuredPointArray&) = delete;
+ };
+ 
+-// Declare vtkArrayDownCast implementations for StructuredPoint arrays:
++template <class ValueTypeT>
++auto vtkStructuredPointArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueType>*
++{
++  return vtkAOSDataArrayTemplate<ValueType>::SafeDownCast(this->NewInstanceInternal());
++}
++
++// Declare vtkArrayDownCast implementations for StructuredPoint arrays:
+ template <class ValueTypeT>
+ auto vtkStructuredPointArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source) -> vtkStructuredPointArray<ValueType>*
+ {
+diff --git a/ThirdParty/verdict/vtkverdict/CMakeLists.txt b/ThirdParty/verdict/vtkverdict/CMakeLists.txt
+--- a/ThirdParty/verdict/vtkverdict/CMakeLists.txt
++++ b/ThirdParty/verdict/vtkverdict/CMakeLists.txt
+@@ -25,5 +25,10 @@
+ vtk_module_add_module(VTK::verdict
+   HEADERS ${headers}
+   SOURCES ${sources}
+-  HEADERS_SUBDIR "vtkverdict")
++  HEADERS_SUBDIR "vtkverdict")
++
++# vtkverdict has a VTK target name; verdict.h requires verdict_EXPORTS.
++if (WIN32 AND BUILD_SHARED_LIBS)
++  vtk_module_compile_definitions(VTK::verdict PRIVATE verdict_EXPORTS)
++endif ()
+ 
