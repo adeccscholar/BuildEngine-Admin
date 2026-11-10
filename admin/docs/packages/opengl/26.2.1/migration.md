@@ -1,3 +1,41 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["opengl 26.2.1"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-Dplatforms=windows`
+- `-Dgallium-drivers=softpipe`
+- `-Dgallium-wgl-dll-name=libgallium_wgl`
+- `-Dopengl=true`
+- `-Dgles1=disabled`
+- `-Dgles2=disabled`
+- `-Degl=disabled`
+- `-Dglx=disabled`
+- `-Dgbm=disabled`
+- `-Dvulkan-drivers=`
+- `-Dvulkan-layers=`
+- `-Dllvm=disabled`
+- `-Dzlib=disabled`
+- `-Dzstd=disabled`
+- `-Dxmlconfig=disabled`
+- `-Dbuild-tests=true`
+- `-Dtools=`
+- `-Dgallium-rusticl=false`
+
+---
+
+## Historische Integrationsnotizen
+
 # opengl 26.2.1: BCC64X migration and integration record
 
 [TOC|Content]
