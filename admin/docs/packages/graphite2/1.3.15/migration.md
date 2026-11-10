@@ -1,3 +1,37 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["graphite2 1.3.15"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DLIB_SUFFIX:STRING=/win64/{Configuration}`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DBUILD_TESTING:BOOL={TestsEnabled}`
+- `-DPython3_EXECUTABLE:FILEPATH={Tool:python}`
+- `-DGRAPHITE2_VM_TYPE:STRING=auto`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
+
+---
+
+## Historische Integrationsnotizen
+
 # Graphite2 1.3.15: BCC64X migration and integration record
 
 [TOC|Content]
