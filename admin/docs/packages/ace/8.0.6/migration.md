@@ -1,8 +1,8 @@
 ## Aktualisierter BuildEngine-Vertrag (10. November 2026)
 
-**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die bisherigen Migrationsnotizen folgen unverändert.
+**Current XML contract; no new PASS evidence.** The previous migration notes below remain unchanged.
 
-### Vollständiger transitiver Abhängigkeitsgraph
+### Complete transitive dependency graph
 
 ```mermaid
 flowchart LR
@@ -20,9 +20,9 @@ flowchart LR
    N1 --> N5
 ```
 
-**Direkte Abhängigkeiten:** `openssl@3.5.9`, `xerces-c@3.3.0`, `zlib@1.4`
+**Direct dependencies:** `openssl@3.5.9`, `xerces-c@3.3.0`, `zlib@1.4`
 
-### Konfiguration und Patches
+### Configuration and patches
 
 - `-D{BMakeConfiguration}`
 - Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-win64-upstream-backports.patch`

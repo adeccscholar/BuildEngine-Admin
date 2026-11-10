@@ -1,8 +1,8 @@
 ## Aktualisierter BuildEngine-Vertrag (10. November 2026)
 
-**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die bisherigen Migrationsnotizen folgen unverändert.
+**Current XML contract; no new PASS evidence.** The previous migration notes below remain unchanged.
 
-### Vollständiger transitiver Abhängigkeitsgraph
+### Complete transitive dependency graph
 
 ```mermaid
 flowchart LR
@@ -20,9 +20,9 @@ flowchart LR
    N1 --> N5
 ```
 
-**Direkte Abhängigkeiten:** `openssl@3.5.9`, `xerces-c@3.3.0`, `zlib@1.4`
+**Direct dependencies:** `openssl@3.5.9`, `xerces-c@3.3.0`, `zlib@1.4`
 
-### Konfiguration und Patches
+### Configuration and patches
 
 - `-D{BMakeConfiguration}`
 - Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch`
@@ -38,15 +38,15 @@ flowchart LR
 
 ## Aktueller BuildEngine-Vertrag (10. November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data, not confirmed build execution.** Earlier test results are tied to specific versions and builds; new runs remain **[not verified]**.
 
 Adaptive Communication Environment providing portable networking, concurrency, IPC, and OS abstraction.
 
-**Koordinate:** `ace@8.0.8` · **Kategorie:** `middleware` · **Lizenzampel:** `green`
+**Coordinate:** `ace@8.0.8` · **Category:** `middleware` · **License signal:** `green`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (complete transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Diagram edges come from the exact pinned XML dependencies. Dashed edges identify extensions, solid edges identify package dependencies. Upstream-bundled components are not additional BuildEngine coordinates.
 
 ```mermaid
 flowchart LR
@@ -64,9 +64,9 @@ flowchart LR
    N2 --> N5
 ```
 
-**Direkte Abhängigkeiten:** `openssl@3.5.9`, `xerces-c@3.3.0`, `zlib@1.4`
+**Direct dependencies:** `openssl@3.5.9`, `xerces-c@3.3.0`, `zlib@1.4`
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
 **CMake-Argumente:**
 
@@ -113,4 +113,4 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ACE_VERSION.txt`
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Authoritative sources:** `admin/build-libraries.xml` for configuration and version pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).

@@ -1,17 +1,17 @@
 ## Aktualisierter BuildEngine-Vertrag (10. November 2026)
 
-**Aktuelle Deklaration; keine neue PASS-Aussage.** Historische Befunde folgen unverändert unterhalb dieses Abschnitts.
+**Current declaration; no new PASS claim.** Historical findings remain unchanged below this section.
 
-### Vollständiger transitiver Abhängigkeitsgraph
+### Complete transitive dependency graph
 
 ```mermaid
 flowchart LR
    N0["brotli 1.2.0"]
 ```
 
-**Direkte Versionen:** keine
+**Direct versions:** none
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -33,7 +33,7 @@ flowchart LR
 
 ---
 
-## Bisherige Migrations- und Integrationsnotizen
+## Previous migration and integration notes
 
 # brotli 1.2.0: BCC64X migration and integration record
 

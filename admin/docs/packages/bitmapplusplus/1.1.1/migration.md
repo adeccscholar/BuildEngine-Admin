@@ -1,15 +1,15 @@
 ## Aktualisierter BuildEngine-Vertrag (10. November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS is asserted.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["bitmapplusplus 1.1.1"]
 ```
 
-Direkt: keine
+Direct: none
 
 ### Aktuelle Konfiguration
 
