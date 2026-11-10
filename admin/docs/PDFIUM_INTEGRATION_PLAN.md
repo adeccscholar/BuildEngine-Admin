@@ -1,108 +1,108 @@
-# PDFium in die BuildEngine integrieren
-## Nativer C++23-/BCC64X-Build mit vorhandener Skia-153-Bibliothek
+# Integrating PDFium into BuildEngine
+## Native C++23/BCC64X Build Using the Existing Skia 153 Package
 
-Stand: 2026-10-15  
-Status: **Entwurfs- und Umsetzungsplan, kein erfolgreich verifizierter PDFium-Build**
+**Historical plan dated:** 15 October 2026  
+**Status at the time:** Design and implementation plan, **not** a verified successful PDFium build. Later decisions may supersede the historical version pins and options recorded here. In particular, this is not a current declaration that every external component passed.
 
-### 0. Ziel, Grenzen und verbindliche Entscheidungen
+### 0. Objectives, boundaries and binding decisions
 
-PDFium wird als eigenständiges Third-Party-Paket in die bestehende BuildEngine-FSM integriert (Source/Verify/Patch/Build/Test/Install/License/Package/Bootstrap). Vorrangiges Ziel ist **ein nativer BCC64X-Build des C++-Kerns**, keine fremde C-ABI-DLL als Primärweg. Ein eigener moderner C++23-Adapter kapselt instabile PDFium-interne Typen; PoDoFo bleibt für die bereits vorhandene Formular- und PDF-Bearbeitung erhalten.
+Integrate PDFium as an independent third-party package in the existing BuildEngine FSM (Source/Verify/Patch/Build/Test/Install/License/Package/Bootstrap). The primary objective is **a native BCC64X build of the C++ core**, not consumption of a prebuilt foreign C ABI DLL. A separate C++23 facade shall isolate unstable internal PDFium types. PoDoFo remains available for its existing PDF forms and editing functionality.
 
-**Nicht verhandelbar:**
+**Non-negotiable constraints at the time of this plan:**
 
-1. PDFium nutzt **genau das vorhandene BuildEngine-Paket Skia 153** (Git-Commit \`2eed75b956045eb8603d3690a1e84bc582a2135d\`), keine zweite, implizit heruntergeladene oder separat kompilierte Skia-Bibliothek.
-2. Andere vorhandene Pakete (zlib, FreeType, ICU, JPEG, PNG usw.) werden bevorzugt wiederverwendet. Unvereinbarkeiten sind als Testbefund zu dokumentieren, nicht durch heimliches Bundling zu kaschieren.
-3. Fehlende, eigenständig nützliche und permissiv lizenzierte Bibliotheken werden **vor PDFium** als reguläre BuildEngine-Pakete bereitgestellt.
-4. Keine automatische Änderung von Skia-153-Pins. Eine passende PDFium-Revision wird gewählt oder ein minimaler, versionierter Kompatibilitätspatch ausgearbeitet. Ist beides nicht möglich, bleibt die Integration **blockiert**.
-5. Keine stillen Netzwerkzugriffe im Build. Alle Downloads im Source-Schritt mit erwarteten SHA-256-Werten, vollständigen Revisionen, Lock-Einträgen, nachweisbaren Lizenzdateien.
-6. Keine PowerShell-, .NET-, Cygwin-/cygpath- oder systemweiten Paketmanager-Abhängigkeiten. GN/Ninja, bcc64x, llvm-ar und Python entsprechend den bestehenden BuildEngine-Tools.
-7. GPL/AGPL-Bestandteile nicht versehentlich in die neue PDFium-Laufzeitabhängigkeit aufnehmen. Lizenzstatus pro **tatsächlich verwendeter Variante** ermitteln, nicht allein nach dem Namen der Hauptbibliothek.
-8. Eingebundene C++-Bibliotheken dürfen keine inkompatiblen CRT-, STL-, Exception-, RTTI- oder Exportkonfigurationen mischen.
+1. Use exactly the existing BuildEngine **Skia 153** package, source commit `2eed75b956045eb8603d3690a1e84bc582a2135d`; do not silently download or build a second Skia.
+2. Prefer existing packages (zlib, FreeType, ICU, JPEG, PNG, etc.). Document incompatibilities as test findings rather than silently bundling another copy.
+3. Introduce missing, independently useful permissively licensed libraries as normal BuildEngine packages **before** PDFium.
+4. Do not automatically change Skia 153 pins. Select a compatible PDFium revision or design a minimal versioned compatibility patch. If neither is possible, **block** integration.
+5. No hidden networking during the build. Source downloads must be controlled by expected SHA-256 checksums, full revisions, lock entries and verifiable licenses.
+6. No dependencies on PowerShell, .NET, Cygwin/cygpath or global package managers. Resolve GN, Ninja, BCC64X, llvm-ar and Python using managed BuildEngine tools.
+7. Do not accidentally introduce GPL/AGPL components into the runtime dependency graph. Assess the **actual selected build variant**, not merely the root library name.
+8. Avoid mixing incompatible CRT, STL, exception, RTTI and exported-symbol configurations across C++ library boundaries.
 
-### 1. Gesicherter BuildEngine-Bestand
+### 1. Existing BuildEngine baseline at planning time
 
-Grundlage: \`BuildEngine-Admin/admin/build-libraries.xml\`, Bibliothek \`skia/153\`.
+Source: `BuildEngine-Admin/admin/build-libraries.xml`, coordinate `skia/153`.
 
-| Paket | Vorhanden | Rolle / Handlungsbedarf |
+| Package | Present | Role and verification need |
 |---|---|---|
-| Skia 153 | Ja | **Pflicht**, exakt bestehendes Paket; vorhandene BCC64X-GN-Portierung, geteilter/component-Build prüfen |
-| zlib 1.3.2 | Ja | GN-External-Target, kein zweites zlib |
-| libjpeg-turbo 3.2.0 | Ja | JPEG-Decoding; GN-External-Target/Definitionsprüfung |
-| libpng 1.6.58 | Ja | Skia-Codec-/optional PDFium-Pfade, kein zweites libpng |
-| FreeType 2.14.3 | Ja | PDF-Fonts; Unterschied zu PDFiums modifizierter FreeType-Konfiguration prüfen |
-| ICU | Ja | fxcrt/Unicode; ABI-, Daten- und Versionstest |
-| HarfBuzz 14.4.0 | Ja | Skia-Abhängigkeit; keine ungeprüfte neue Kopie |
-| Brotli 1.2.0 | Ja | Optional; PDFiums experimentelle Brotli-PDF-Funktion zunächst aus |
-| libtiff | Ja | XFA-TIFF vorläufig ausgeschaltet |
-| googletest | Ja | Smoke-/Unit-Tests mit vorhandener Bibliothek, nicht doppelt bauen |
-| GN, Ninja, llvm-ar, Python | In BuildEngine/Skia-Workflow etabliert | Version und Hosttools im Lock erfassen |
+| Skia 153 | Yes | Mandatory existing package; verify native BCC64X GN port and shared/component build |
+| zlib 1.3.2 | Yes | External GN target; no second zlib |
+| libjpeg-turbo 3.2.0 | Yes | JPEG decoding; verify external target and definitions |
+| libpng 1.6.58 | Yes | Skia codecs/optional PDFium paths; no second copy |
+| FreeType 2.14.3 | Yes | PDF fonts; compare PDFium's modified FreeType configuration |
+| ICU | Yes | fxcrt/Unicode; verify ABI, data and version |
+| HarfBuzz 14.4.0 | Yes | Skia dependency; no unchecked duplicate |
+| Brotli 1.2.0 | Yes | Optional; experimental PDFium Brotli feature disabled initially |
+| libtiff | Yes | XFA TIFF disabled initially |
+| GoogleTest | Yes | Consume the existing package for smoke/unit tests |
+| GN, Ninja, llvm-ar, Python | Existing tool workflow | Lock revisions and host-tool identities |
 
-PDFium erwartet zurzeit eine eigene Chromium-GN-Struktur. Das schon portierte GN-Erzeugungssystem von Skia wird **als Implementierungsvorbild** genutzt, nicht automatisch als drop-in-kompatibel angenommen.
+PDFium expects a Chromium-specific GN structure. The Skia GN integration is an **implementation reference**, not a proven drop-in replacement.
 
-### 2. Fehlende Bibliotheken: zuerst regulär aufnehmen
+### 2. Missing libraries: package them before PDFium
 
-**Priorität A – vor PDFium separat in BuildEngine aufnehmen:**
+**Priority A, separate normal BuildEngine packages:**
 
-| Paket-ID (Vorschlag) | Upstream / Lizenzsignal | Funktion | Paketstrategie |
+| Proposed package ID | Upstream / license | Role | Packaging strategy |
 |---|---|---|---|
-| \`abseil\` / \`abseil-cpp\` | Google Abseil, Apache-2.0 | direkte Core-Abhängigkeit (\`fxcrt\`) | gepinnter kompatibler Stand, CMake, bcc64x, Tests, CMake-Targets und Lizenz |
-| \`fast_float\` | fastfloat/fast_float, MIT / Apache-2.0 / BSL-1.0 optionale Lizenzvarianten | \`fxcrt\`-Zahlenparser | Header-only/Interface-Paket, Compile-Tests und Lizenztext |
-| \`lcms2\` | LittleCMS 2, MIT | ICC-Farbmanagement | unabhängiges C-Paket mit Export, Smoke-Tests, Windows-GN-External-Adapter |
-| \`openjpeg\` | OpenJPEG, BSD-2-Clause | JPEG 2000 / JPX | eigenständiges Paket, JPEG2000-Smoke und Kompatibilität mit PDFiums forked sources prüfen |
+| `abseil` / `abseil-cpp` | Google Abseil, Apache-2.0 | Direct `fxcrt` core dependency | Pinned compatible revision, CMake, BCC64X, tests, exported targets and license |
+| `fast_float` | fastfloat/fast_float, MIT / Apache-2.0 / BSL-1.0 options | `fxcrt` numeric parser | Header-only/interface package, compiler tests, original license |
+| `lcms2` | LittleCMS 2, MIT | ICC color management | Separate C package, exports, smoke and Windows GN external adapter |
+| `openjpeg` | OpenJPEG, BSD-2-Clause | JPEG 2000 / JPX | Independent package, JPEG2000 smoke and comparison with PDFium fork |
 
-**Priorität B – prüfen, nur bei echter Abhängigkeit vorziehen:**
+**Priority B, only if actually reachable:**
 
-- \`simdutf\`: MIT **oder** Apache-2.0; in PDFiums \`DEPS\` vorhanden, aber zunächst die produktive, mit den gewählten GN-Flags erreichbare Target-Closure ermitteln. Wenn benötigt, eigenständiges Paket mit UTF-8/UTF-16-Tests.
-- \`fp16\`: MIT; in \`DEPS\` vorhanden, noch keine bestätigte zwingende Laufzeitabhängigkeit unseres konkreten Profils. Bei Bedarf Header-only-Paket.
-- Sonstige Chromium-Hilfsbausteine: nach \`gn desc\`/Abhängigkeitsauflösung bewerten. Allgemein wiederverwendbare permissive Libraries separat paketieren; GN-Buildskripte und PDFium-spezifische Shader-/Konfigurationshilfen bleiben **reproduzierbare Build-Inputs**, keine künstlich verselbstständigten Runtime-Pakete.
+- `simdutf`: MIT or Apache-2.0; appears in PDFium DEPS but must be shown reachable under the selected production GN flags. If required, package separately with UTF-8/UTF-16 tests.
+- `fp16`: MIT; DEPS presence alone does not prove it is a runtime requirement. Provide a header-only package if necessary.
+- Other Chromium helpers: inspect with `gn desc` and dependency resolution. Package generally reusable permissive libraries separately. GN scripts and PDFium-specific shader/configuration helpers are **reproducible build inputs**, not artificial runtime packages.
 
-**Nicht pauschal integrieren:** V8, XFA-Unterbau, PartitionAlloc, Rust/Fontations, Chromium-Codecs, Android-Werkzeuge, CIPD-Compiler-Downloads, Fuzz-Corpora. Diese sind im Minimalprofil abgeschaltet oder gehören zu späteren optionalen Profilen. Ihre bloße Nennung in \`DEPS\` macht sie nicht automatisch zur Laufzeitabhängigkeit.
+Do not indiscriminately enable V8, XFA, PartitionAlloc, Rust/Fontations, Chromium codecs, Android tooling, CIPD compiler downloads or fuzz corpora. They are disabled in the minimum profile or belong to optional later profiles. Their presence in DEPS alone does not make them shipped runtime dependencies.
 
-**Aufnahmeregel für jedes neue Paket:** Versionspin + Download-Hash + Lizenz(en) + Patches + Debug/Release oder Interface-Vertrag + Consumer-Smoke mit BCC64X + Install/Package + Lock/Bootstrap + Dependency-Closure + SBOM. Erst danach darf \`pdfium\` darauf verweisen.
+For every new package require a version pin, download hash, license, patches, Debug/Release or interface contract, BCC64X consumer smoke, installation/package, lock/bootstrap, dependency closure and SBOM before PDFium can reference it.
 
-### 3. PDFium-Revision und Skia-Kompatibilität: Gate 0
+### 3. PDFium revision and Skia compatibility: Gate 0
 
-Offizielle PDFium-Dateien: \`DEPS\`, \`pdfium.gni\`, \`BUILD.gn\`, \`skia/BUILD.gn\`, \`core/fxge/BUILD.gn\`.
+Relevant upstream files: `DEPS`, `pdfium.gni`, `BUILD.gn`, `skia/BUILD.gn`, `core/fxge/BUILD.gn`.
 
-- Der zum untersuchten PDFium-\`DEPS\`-Stand gehörende Skia-Pin (\`7ef86a5b0eb91db85580bd71ebed3c4ba489d5ba\`) weicht von unserem installierten Skia 153 (\`2eed75b956045eb8603d3690a1e84bc582a2135d\`) ab. Keine API- oder ABI-Kompatibilität aus dem gemeinsamen Google-Ursprung ableiten.
-- Drei PDFium-Revisionskandidaten aus dem zeitlichen Umfeld von Skia/153 auswählen: möglichst dieselbe Chromium/Skia-Milestone-Familie, dann neuere stabile PDFium-Revisionen. **Jeden** Kandidaten mit Commit-SHA und kompletter \`DEPS\`-Map dokumentieren; eine ungeprüfte „aktuelle“ Revision wird nicht festgelegt.
-- Skia-Abgleich: \`git merge-base\`/Commit-Abstand sowie API-Signaturen der von \`core/fxge/skia/*\` und \`skia/config/SkPdfiumUserConfig.h\` benötigten Typen; Build-Flags, Header, Exportmakros, Inline-Funktionen und Linksymbole.
-- PDFium verwendet in seinem GN-Projekt \`//skia\` mit Quellimporten aus \`//third_party/skia/gn/*.gni\`, \`skcms\` usw. **Der externe Paketmodus ist keine vorhandene Standard-GN-Option.** Er wird durch einen BuildEngine-spezifischen, versionsgebundenen GN-Adapter/Patch bereitgestellt.
-- Die Skia-153-BuildEngine-Variante hat im GN-Vertrag \`is_component_build = true\`; PDFium soll unabhängig davon (zunächst \`is_component_build = false\`) aufgebaut werden. Die externe Skia-Importkonfiguration muss daher die tatsächlich exportierten Symbole und die passende \`SKIA_DLL\`-/Builddefinition abbilden.
-- Eine separate Skia-Kompilation im PDFium-Arbeitsbaum **ist verboten**; auch \`gn desc\` muss zeigen, dass kein \`skia\`-Quellziel aktiv ist.
+- The studied PDFium DEPS pins Skia `7ef86a5b0eb91db85580bd71ebed3c4ba489d5ba`, different from the installed Skia 153 commit `2eed75b956045eb8603d3690a1e84bc582a2135d`. A shared Google origin proves neither API nor ABI compatibility.
+- Evaluate three PDFium revisions near the Skia 153 timeframe: prefer the same Chromium/Skia milestone family, then newer stable revisions. Record every candidate's commit SHA and full DEPS map; do not choose an unverified floating “latest.”
+- Inspect `git merge-base` and revision distance, signatures used by `core/fxge/skia/*` and `skia/config/SkPdfiumUserConfig.h`, flags, headers, exports, inline functions and linker symbols.
+- PDFium's GN project uses `//skia` and imports `//third_party/skia/gn/*.gni`, `skcms`, etc. An external installed Skia mode is **not** an upstream GN option; supply it through a BuildEngine-specific, version-bound GN adapter/patch.
+- Skia 153 declares `is_component_build = true`; PDFium should initially use `is_component_build = false` independently. External Skia imports must match actual exports, `SKIA_DLL` and build definitions.
+- Compiling Skia source again within PDFium is **prohibited**. `gn desc` must confirm no internal Skia source target is active.
 
-**Gate-0-Abnahme:** exakt gepinnte PDFium-Revision, geprüfte externe Skia-Header/Exports/ABI, begrenzte Patchliste, vollständiges Lizenz-/Dependency-Manifest. Unaufgelöste Skia-Version = STOP statt zweiter Skia-Kopie.
+**Gate 0 acceptance:** precisely pinned PDFium revision, verified external Skia headers/exports/ABI, a bounded patch list and complete dependency/license manifest. An unresolved Skia mismatch means STOP, not a second Skia copy.
 
-### 4. Build-Inputs reproduzierbar bereitstellen
+### 4. Reproducible build inputs
 
-BuildEngine-\`source\` stellt ein isoliertes PDFium-Arbeitsverzeichnis aus verifizierten Archiven/Commits her. Die Chromium-\`DEPS\`-Datei ist die **Referenzliste**, nicht die Anweisung zu unkontrolliertem \`gclient sync\`.
+The BuildEngine `source` phase prepares an isolated PDFium workspace from verified archives and commits. Chromium DEPS is a **reference inventory**, not permission to run uncontrolled `gclient sync`.
 
-Zu beschaffende Inputs nach tatsächlich benötigter GN-Import-Closure:
+Provision only the required GN import closure:
 
-- PDFium-Quellen und Unterordner, \`pdfium.gni\`, \`build_overrides/*\`, \`skia/*\`-Adapterdateien.
-- Chromium \`build\`, \`buildtools\`, benötigte \`testing\`-GN-Definitionen und Python-GN-Hilfen, exakt aus der gepinnten PDFium-\`DEPS\`-Revision.
-- Abseil/fast_float/etc. **als BuildEngine-Pakete**, nicht als zusätzliche Kopien unter PDFium.
-- GN, Ninja, Python und BCC64X aus BuildEngine-Toolauflösung; \`gn gen\` darf keine automatische Toolchaininstallation starten.
-- Prüfen, ob GN-Generierung ohne \`depot_tools\`/\`gclient\`-Hooks möglich ist. Falls minimale Hook-Outputs fehlen: diese deterministisch im Source-/Prepare-Schritt erzeugen, statt komplette Depot-Tool-Updates auszuführen.
+- PDFium sources, `pdfium.gni`, `build_overrides/*` and Skia adapter inputs.
+- Chromium `build`, `buildtools`, required `testing` GN definitions and Python helpers, all pinned to PDFium's selected DEPS revision.
+- Abseil, fast_float and other reusable components as BuildEngine packages, not extra PDFium source copies.
+- GN, Ninja, Python and BCC64X through managed tool resolution; `gn gen` must not install a toolchain.
+- Test whether GN generation can run without `depot_tools`/`gclient` hooks. Create missing minimal hook outputs deterministically in source/prepare, not through depot-tool upgrades.
 
-Jedes Artefakt besitzt Provenance: URL, Commit/Version, SHA-256, erwartete Extraktionswurzel, Patch-SHA, Lizenz- und NOTICE-Dateien. Erzeugte Source-Bäume sind rebuildbar; keine unversionierte Source-Kopie als Voraussetzung.
+For every artifact record URL, commit/version, SHA-256, expected extraction root, patch SHA, licenses and NOTICE files. Generated source trees must be rebuildable without unversioned checkout assumptions.
 
-### 5. Eigene GN/BCC64X-Portierung
+### 5. Dedicated GN/BCC64X port
 
-Anknüpfen an \`skia/153\` im bestehenden BuildEngine-XML und dessen \`bcc64x-gn.patch\`-Modell:
+Use the existing Skia 153 XML and `bcc64x-gn.patch` design as an integration reference:
 
-1. Eigene, gekapselte \`pdfium_use_bcc64x = true\`-Konfiguration im PDFium-Build (Name vorgeschlagen). Ziel CPU x64, C-/C++-Compiler und Linker \`bcc64x\`, Archiver \`llvm-ar\`, Host GN/Ninja.
-2. BCC64X-spezifische MSVC-/Clang-Flagübersetzung und Windows-SDK-/RAD-Library-Pfade. \`clang_use_chrome_plugins = false\`; keine stillschweigende Verwechslung mit MSVC oder GNU-Clang.
-3. UTF-8, C++-Standard, exceptions/RTTI, CRT, \`_ITERATOR_DEBUG_LEVEL\`-Äquivalente, Visibility, Exportmakros, Debug/Release pro Variante explizit dokumentieren. Kein undefinierter Mix mit Skia.
-4. GN-Target-Umleitung \`//skia\` auf **BuildEngine-Paket-Skia**, einschließlich Includes, öffentlichen Konfigurationen, Importbibliothek, DLL-Suchpfad und transitiven Abhängigkeiten. Kein „source_set“, das Skia-Implementierungsdateien erneut kompiliert.
-5. Windows-GN-External-Targets für zlib, JPEG, PNG, FreeType, ICU, LittleCMS, OpenJPEG, Abseil, fast_float statt systemweitem \`pkg-config\`. Externe Pakete nur dann einschalten, wenn PDFium-ABI/API und CMake-/GN-Publikation zusammenpassen.
-6. Für FreeType/LCMS2/OpenJPEG die PDFium-spezifischen Anpassungen gegenüber Upstream klären. Externes Paket kann erst nach passenden funktionalen Tests Standard werden; die Sicherheitsregeln und Testfälle des PDFium-Forks dürfen nicht verloren gehen.
-7. Patches nach Funktion trennen: \`bcc64x-gn\`, \`buildengine-external-skia\`, \`buildengine-external-deps\`, \`bcc64x-source-compat\`. Jeder Patch erst \`git apply --check\`, danach \`git apply\`; Upstream-Patches nachvollziehbar.
-8. Auf leere/duplizierte Archive achten: BCC64X-\`llvm-ar\`-Archiv-Neuaufbau und identische Objektlisten testen, keine inkrementelle Mehrfachaufnahme von Symbolen.
+1. Introduce an encapsulated PDFium BCC64X target configuration, provisionally named `pdfium_use_bcc64x = true`, for x64, BCC64X C/C++ compile and link, `llvm-ar` archiving, host GN/Ninja.
+2. Translate MSVC/Clang flags explicitly and use Windows SDK/RAD library paths. Set `clang_use_chrome_plugins = false`; never misidentify BCC64X as MSVC or generic GNU Clang.
+3. Specify UTF-8, C++ standard, exception/RTTI/CRT policy, iterator-debug compatibility, visibility, exports, Debug and Release. Do not mix incompatible configurations with Skia.
+4. Redirect GN `//skia` to the **installed BuildEngine Skia package**, including includes, public defines, import library, DLL lookup and transitive dependencies. Do not use a `source_set` that recompiles Skia implementation sources.
+5. Create Windows GN external targets for zlib, JPEG, PNG, FreeType, ICU, LittleCMS, OpenJPEG, Abseil and fast_float rather than relying on global `pkg-config`. Enable only when API/ABI and CMake/GN publication contracts match.
+6. Investigate PDFium-specific FreeType, lcms2 and OpenJPEG fork changes. Externalize only after functional regression tests prove the required PDFium behavior and security changes are retained.
+7. Keep functional patches separate: `bcc64x-gn`, `buildengine-external-skia`, `buildengine-external-deps`, `bcc64x-source-compat`. Verify with `git apply --check` before applying, and retain provenance.
+8. Test BCC64X `llvm-ar` archive reconstruction and object inventories; prevent duplicate objects and symbols in incremental archives.
 
-**Schematische GN-Zielkonfiguration (erst nach Target- und Revisionstest als produktive \`args.gn\` verwenden):**
+**Illustrative GN profile only; validate the target revision before treating it as production `args.gn`:**
 
-\`\`\`gn
+```gn
 target_cpu = "x64"
 is_debug = false
 is_component_build = false
@@ -125,126 +125,116 @@ use_system_lcms2 = true
 use_system_libopenjpeg2 = true
 pdf_bundle_freetype = false
 
-# BuildEngine-spezifischer GN-Patch/Adapter, kein Upstream-Flag:
+# BuildEngine-specific GN patch/adapter, not an upstream flag:
 pdfium_use_bcc64x = true
-\`\`\`
+```
 
-Weitere externe Paketflags, insbesondere JPEG, ICU und Skia, sind revisionsabhängig. \`pdf_is_complete_lib\` **anfangs nicht erzwingen**; zunächst modulare C++-Linkfähigkeit und externes Skia nachweisen. Später vollständige Archive nur ohne eingebettete Duplikate externer Pakete testen.
+Other package options, especially JPEG, ICU and Skia, depend on the exact revision. Do **not** initially force `pdf_is_complete_lib`; demonstrate modular native C++ linking and external Skia first. Test complete archives later only without duplicating external libraries.
 
-### 6. Profile und optionaler Funktionsumfang
+### 6. Profiles and optional functionality
 
-**P0 / Minimal-Viewer und Druck (verbindlich):** BCC64X, Skia-Renderer, AGG als Vergleichs-Backend (mitgebaut, nicht primär), AcroForms, Text, Bilder, ICC, JPEG2000, Druckbitmap, keine V8-Skripte/XFA/Rust/Fontations, keine Netzwerkanbindung.
+**P0 / minimum viewer and printing (required):** BCC64X, Skia renderer, AGG as a built comparison backend (not primary), AcroForms, text, images, ICC, JPEG2000 and print bitmaps; no V8 scripts/XFA/Rust/Fontations or network access.
 
-**P1 / Nutzung im Produkt:** C++23-RAII-Fassade, VCL-Viewer, Zoom/Rotation, Textsuche/Markierungen, Formular-Widgetdarstellung, PoDoFo-Integration, GDI-Druck und Testdrucker.
+**P1 / product integration:** C++23 RAII facade, VCL viewer, zoom/rotation, text search/highlighting, form widgets, PoDoFo integration, GDI printing and a test printer.
 
-**P2 / Erweiterungen nur nach gesonderter Entscheidung:** V8/JavaScript, XFA, Fontations/Rust, zusätzliche Bildformate, Linux-Backend, erweiterte GPU-Pfade. Jeder zusätzliche Funktionsblock braucht eigenes Lizenz- und Dependency-Gate.
+**P2 / only by separate decision:** V8/JavaScript, XFA, Fontations/Rust, additional image types, Linux backend and extended GPU paths. Every extension requires separate licensing and dependency approval.
 
-Für Formulare gilt: ausgefüllter Feldwert und sichtbarer Appearance-Stream sind verschiedene Dinge. Der Viewer muss echte gerenderte AcroForms und ggf. Widget-Overlays prüfen; PoDoFo speichert, PDFium rendert, Druck ist ein eigener Auftragsprozess.
+For forms, a saved field value and its visible appearance stream are different. Verify rendered AcroForms and any widget overlays. PoDoFo saves, PDFium renders, and printing is an independent job process.
 
-### 7. Native C++23-Nutzung statt C-API-first
+### 7. Native C++23 rather than C-API-first
 
-- PDFium-intern nutzen, soweit realistisch, \`CPDF_Document\`, \`CPDF_Page\`, Render-/Bitmap-Helfer und ihre native Besitzsemantik.
-- Keine unkontrollierte Veröffentlichung dieser instabilen internen Klassen an alle Verbraucher.
-- Eigenes API-Paket: \`adecc::pdf::document\`, \`page\`, \`render_surface\`, \`text_search\`, \`form_view\`; move-only und RAII, präzise Fehler-/Resultattypen, kontrollierte Lifetimes.
-- Die C-API bleibt **optional** als Referenz-/Differenztest oder Compatibility-Fallback; sie ist **nicht** der primäre Implementierungsweg.
-- Für Anzeige: PDFium → Skia-\`SkBitmap\`/\`SkImage\`/Surface nach nachgewiesener API-Kompatibilität → VCL. Für Druck: PDFium/Skia gerendertes Pixel-/DC-Ziel → Windows-Druckspooler; Ausgabe/Spoolerstatus getrennt erfassen.
+- Use internal `CPDF_Document`, `CPDF_Page`, bitmap/render helpers and their native ownership semantics where practical.
+- Do not expose unstable internal PDFium classes uncontrolled to every consumer.
+- Provide facade types such as `adecc::pdf::document`, `page`, `render_surface`, `text_search`, `form_view`, with move-only RAII semantics, precise result/error types and controlled lifetimes.
+- Keep the PDFium C API optional for comparative/differential testing or a compatibility fallback; it is not the primary route.
+- For display, connect PDFium to compatible Skia `SkBitmap`/`SkImage`/Surface and then VCL. For printing, render into an appropriate Skia/PDFium pixel or DC target and pass it to Windows printing. Distinguish spooler acceptance from successful physical printing.
 
-### 8. BuildEngine-FSM und Paketvertrag
+### 8. BuildEngine FSM and packaging contract
 
-Neue \`<library id="pdfium" ...>\`-Definition in \`BuildEngine-Admin/admin/build-libraries.xml\` mit expliziten \`<dependency>\`-Einträgen einschließlich \`skia/153\`.
+Add a versioned `<library id="pdfium" ...>` entry with explicit `<dependency>` coordinates, including `skia/153` in this historical plan.
 
-**Stages / erwartete Artefakte:**
-
-| Stage | Aktionen | Nachweis |
+| Stage | Actions | Required evidence |
 |---|---|---|
-| Source | verifizierte PDFium-/Chromium-GN-Inputs materialisieren | Hashes, Commit-Lock, keine verborgenen Downloads |
-| Patch | getrennte GN-/Port-/External-Dependency-Patches prüfen/anwenden | Patch-SHA und \`git apply --check\` |
-| Build | \`gn gen\`, Target-Closure validieren, \`ninja\` für Debug und Release | Buildlogs, Linkmap, exakt ein Skia-Paket |
-| Test | eigene Smoke-Tests + passende PDFium-Unit-/Embeddertests | CTest/Logzusammenfassung, keine ungeprüften Tests |
-| Install | Includes, C++-/Importlibs, notwendige Laufzeit-DLLs, Lizenzinfos, CMake-Paket | install/package-Pfade vollständig |
-| Publish | \`install/Win64x\` als Consumer-SDK mit \`find_package(PDFium CONFIG REQUIRED)\` | Targets / transitive Dependencies / Konsumenten-Smoke |
-| StackBuilder | versioniertes Paket mit Binärdateien, Patch-/Dependency-Lock, Lizenzmetadaten | Archiv reproduzierbar |
-| Bootstrap | Paket- und transitive Abhängigkeiten prüfen, laden, nach ThirdParty integrieren | Auflösung über vorhandenes XML-/Lock-System |
+| Source | Materialize verified PDFium/Chromium GN inputs | Hashes, commit lock, no hidden downloads |
+| Patch | Validate/apply isolated GN, port and external-dependency patches | Patch SHA and `git apply --check` |
+| Build | `gn gen`, verify target closure, `ninja` Debug/Release | Build logs, linker map, exactly one Skia package |
+| Test | Own smokes and compatible PDFium unit/embedder tests | CTest/log summary, no silently skipped tests |
+| Install | Includes, C++/import libraries, runtime DLLs, license data, CMake package | Complete installed paths |
+| Publish | Publish consumer SDK under `install/Win64x` with `find_package(PDFium CONFIG REQUIRED)` | Targets, transitive dependencies, independent consumer smoke |
+| StackBuilder | Versioned package with binaries, patch/dependency locks, licensing | Reproducible archive |
+| Bootstrap | Validate and integrate package and transitive dependencies into ThirdParty | Existing XML/lock-based resolution |
 
-Vorgeschlagener Paketname: \`pdfium/<revision-or-version>\` gemäß bestehender BuildEngine-Namensregeln. Der \`PDFium::PDFium\`-Targetname ist ein **Vorschlag** und wird mit dem bestehenden CMake-Publish-Modell abgeglichen. Ein Debug-/Release-Paket darf niemals eine Skia-DLL der falschen Variante beziehen.
+Proposed coordinate: `pdfium/<revision-or-version>` under current BuildEngine conventions. `PDFium::PDFium` is a **proposed** CMake target and must be reconciled with the actual publish model. Never load a Skia DLL from the wrong Debug/Release variant.
 
-### 9. Tests und Abnahmekriterien
+### 9. Tests and acceptance criteria
 
-**T0 – isolierte neue Bibliotheken:** jede fehlende Bibliothek mit BCC64X bauen bzw. Header-Smoke; reale Paket-Dependencies, Tests, Lizenzen, Paket und Bootstrap nachweisen.
+**T0 — independent new libraries:** Native BCC64X build or header smoke, installed dependencies, tests, licenses, package and bootstrap.
 
-**T1 – GN-Erzeugung:** PDFium \`gn gen\` reproduzierbar, absolut keine impliziten Source- oder Tooldownloads, keine unaufgelösten Chromium-GN-Imports. \`gn desc\` liefert erwartete Closure und **keine gebaute interne Skia-Bibliothek**.
+**T1 — GN generation:** Reproducible `gn gen`, no implicit tool/source downloads or unresolved Chromium imports. `gn desc` confirms the expected closure and **no compiled internal Skia library**.
 
-**T2 – nativer C++-Link:** Consumer inkludiert native PDFium-C++-Header, instanziiert/lädt ein Dokument und linkt ausschließlich gegen veröffentlichte BCC64X-BuildEngine-Pakete; Skia-Version und Buildtyp nachweisbar.
+**T2 — native C++ linking:** An independent consumer includes native PDFium C++ headers, creates/loads a document and links only against published BCC64X packages, with verifiable Skia revision and build variant.
 
-**T3 – Rendering:** synthetische PDF mit Text/Unicode/Umlauten, Rotation, Transparenz, Bildern, Font-Subsets, ICC- und JPEG2000-Beispielen; 72/150/300 dpi und gerenderte Bildabmessungen, visuelle Goldens und Pixel-Diffs Skia gegen AGG bei definierten Toleranzen. PDFium AGG dient **nur als Vergleich**; eine separate AGG-Installation ist nicht nötig.
+**T3 — rendering:** Synthetic PDF samples with Unicode text (including diacritics), rotation, transparency, images, font subsets, ICC, JPEG2000, and 72/150/300 dpi. Verify image dimensions, visual goldens, and pixel diffs between Skia and AGG within defined tolerances. AGG is only a comparison backend; no separate AGG installation is needed.
 
-**T4 – AcroForm:** Textfelder, mehrzeilige Felder, Unicode, Checkboxen, Radio-/Choice-Felder mit PoDoFo füllen; gespeicherte Werte **und** sichtbare Darstellung mit PDFium validieren; gefülltes Formular drucken. XFA ohne V8 muss eindeutig als nicht unterstützt erkannt werden.
+**T4 — AcroForm:** Populate text, multiline, Unicode, checkbox, radio and choice widgets using PoDoFo. Validate saved values **and rendered appearance** using PDFium, then print a filled form. Detect XFA without V8 explicitly as unsupported.
 
-**T5 – Druck und GUI:** VCL-Viewer mit Dokument-/Seiten-RAII, Zoom, Scrollen und Seitenrotation; Testdrucker/PDF-Ausgabedrucker und Seitengeometrie inklusive Rand, Duplex/Skalierung; Spooler-Übergabe nicht mit physisch erfolgreichem Ausdruck verwechseln.
+**T5 — printing and GUI:** VCL viewer with document/page RAII, zoom/scroll/rotation, test/PDF printer and accurate page geometry (margins, duplex, scaling). Do not mistake successful spooler submission for physical print completion.
 
-**T6 – Robustheit/Sicherheit:** kaputte PDFs, Passwort/geschützte Dokumente, leere Seiten, Extremgrößen, große Dateien, Ressourcenlimits, ungültige Fonts; kontrollierte Fehler, keine Leaks/Use-after-free. Fuzzing optional auf verfügbarer kompatibler Hosttoolchain als zusätzliche Sicherheitsprüfung.
+**T6 — robustness/security:** Damaged PDFs, passwords/protection, blank pages, extreme dimensions, large files, resource limits and invalid fonts. Require controlled errors and no leaks/use-after-free. Optional fuzzing using a compatible host toolchain is additional security evidence.
 
-**T7 – Reproduzierbarkeit:** Clean-Build zweimal mit denselben Inputs, Hash-Vergleich der normalisierbaren Artefakte, Byteidentität soweit BuildEngine-Policy verlangt; Debug/Release-CI auf Windows, Linux später gesondert. Lizenz-SBOM deckt tatsächlich gelinkte/runtime-beladene Pakete ab.
+**T7 — reproducibility:** Two clean builds with identical inputs, compare normalized artifact hashes and byte identity when required, Windows Debug/Release CI, later separate Linux evidence. SBOM must describe actually linked and runtime-loaded components.
 
-**Gate-Auswertung:** Roter Test oder nicht geklärte Lizenz = kein Publish. Testumfang nicht stillschweigend auf „kompiliert“ verkürzen.
+**Gate rule:** A failing test or unresolved license means no publication. Do not silently narrow acceptance to “compiles.”
 
-### 10. Lizenzmanagement
+### 10. License management
 
-- PDFium: Upstream-\`LICENSE\` enthält BSD-artige und Apache-2.0-Texte; konkrete Datei-/Komponentenlizenzen im finalen Source-Snapshot prüfen. Alle Notices mitliefern.
-- Skia 153: bestehende BuildEngine-\`licenseSignal="yellow"\` respektieren; gelinkte Skia-Komponenten samt Unterlizenzdateien erneut bewerten.
-- Abseil: Apache-2.0; fast_float: mehrere permissive Lizenzoptionen, konkreten Paket-Lizenzpfad dokumentieren; LittleCMS: MIT; OpenJPEG: BSD-2-Clause; simdutf: MIT/Apache-2.0; FP16: MIT.
-- FreeType-Lizenzoption dokumentieren; ICU-/Unicode-Notices, libjpeg-turbo- und übrige Bildcodec-Notices nicht übersehen.
-- Getrennte Betrachtung von **Host-Buildtools** und **ausgelieferten Runtime-Binärkomponenten**. Bei Apache 2.0 NOTICE-/Patenthinsweise prüfen; Downloadberechtigung allein ist keine Lizenzfreigabe.
-- Revisionsabhängige Lizenzübersicht und SBOM aus dem tatsächlich verwendeten GN-Graph generieren und mit BuildEngine-Ampel abgleichen. Keine GPL-/AGPL-Verschleppung.
+- Verify PDFium's BSD-style and Apache-2.0 texts against actual files/components of the final pinned snapshot; include notices.
+- Respect the historical `licenseSignal="yellow"` for Skia 153 and reassess linked Skia subcomponent licenses.
+- Abseil: Apache-2.0; fast_float: permissive alternatives requiring a specific package license selection; LittleCMS: MIT; OpenJPEG: BSD-2-Clause; simdutf: MIT/Apache-2.0; FP16: MIT.
+- Record FreeType's license choice and ICU/Unicode, libjpeg-turbo and other image-codec notices.
+- Distinguish **host build tools** from **distributed runtime binaries**. Check Apache-2.0 NOTICE and patent provisions; download permission alone does not constitute license approval.
+- Generate revision-specific license/SBOM evidence from the actual GN graph and reconcile it with BuildEngine's license status. Do not introduce GPL/AGPL dependencies accidentally.
 
-### 11. Umsetzungspakete in Reihenfolge
+### 11. Implementation work packages in order
 
-1. **Inventur & Revisionen (Gate 0):** PDFium-Kandidaten, kompatibler Skia-153-Pin, exakt benötigte GN- und C++-Dependencies, Lizenz-Closure.
-2. **Zuerst fehlende Pakete:** \`fast_float\`, \`abseil\`, \`lcms2\`, \`openjpeg\`; \`simdutf\`/\`fp16\` nach Reachability-Prüfung; jeweils vollständige BuildEngine-FSM einschließlich Smoke.
-3. **PDFium Source/Prepare:** deterministische, verifizierte PDFium-/Chromium-GN-Inputs; keine gclient-Hooks oder nachgeladenen Compiler.
-4. **BCC64X GN-Toolchain:** vorhandene Skia-Erfahrungen übertragen, Warn-/Flag-Probleme separat beheben.
-5. **External-Dependencies-GN:** Paket-Mapping für vorhandene und neu integrierte Bibliotheken, Windows ohne \`pkg-config\`.
-6. **External-Skia-GN:** Skia 153 SDK, DLL-/Export-/ABI-Konfiguration, nachweislich keine erneute Skia-Kompilation.
-7. **Nativer PDFium-Compile/Link:** erst Basis-C++-Targets, dann kompletter PDFium-Kern mit Skia+AGG, Debug/Release.
-8. **C++23-Consumer & Visual-Test:** Render, Form, Viewer, Druck; erst synthetische Dokumente; keine vertraulichen Kunden-PDFs im Repository.
-9. **Publish/Bootstrap/StackBuilder:** CMake-Targets, Lizenzdashboard, Lock, SBOM, Paketarchive, reproduzierbare CI.
-10. **Optionalprofile:** Linux, V8/XFA, Rust/Fontations nur nach separatem Genehmigungs- und Lizenzprozess.
+1. **Inventory and revisions / Gate 0:** PDFium candidates, Skia 153 compatibility, required GN/C++ dependency closure and licenses.
+2. **Missing packages first:** fast_float, Abseil, lcms2, OpenJPEG; simdutf/fp16 only if reachable, with complete FSM and smokes.
+3. **PDFium source/prepare:** deterministic verified PDFium/Chromium GN inputs; no gclient hooks or downloaded compilers.
+4. **BCC64X GN toolchain:** adapt Skia lessons; handle warnings and flags separately.
+5. **External-dependency GN:** map installed packages, Windows without global pkg-config.
+6. **External-Skia GN:** Skia 153 headers, DLL/imports/ABI, demonstrate no recompilation.
+7. **Native PDFium compile/link:** core C++ targets first, then complete Skia+AGG core, Debug/Release.
+8. **C++23 consumer and visual tests:** rendering, forms, viewer and printing using synthetic files; never commit confidential customer PDFs.
+9. **Publish/bootstrap/StackBuilder:** CMake targets, licensing, locks, SBOM, package archives and reproducible CI.
+10. **Optional profiles:** Linux, V8/XFA, Rust/Fontations only after separate approval and license review.
 
-### 12. Risiken und klare Stop-Kriterien
+### 12. Risks and stop criteria
 
-| Risiko | Vorbeugung / Stop |
+| Risk | Mitigation / stop |
 |---|---|
-| Skia-153-API weicht von PDFiums Pin ab | passende PDFium-Revision oder versionierter Kompatibilitätspatch; kein zweiter Skia-Build |
-| PDFium bindet Skia-Implementierung intern ein | GN-Closure/GN-Adapter prüfen; Skia-Sources im PDFium-Build = Stop |
-| Chromium-GN erwartet MSVC/Chromium-Clang-Flags | BCC64X-GN-Patch wie bei Skia; keine ungeprüfte Toolchain-Substitution |
-| Externe lcms2-/OpenJPEG-Version weicht vom PDFium-Fork ab | PDF-ICC-/JPX-Regressionstests; nur nach API/Funktionsgleichheit freigeben |
-| Skia-DLL-/CRT-/Exportkonflikt | native C++-Link-/Runtime-Tests, Symbolkontrolle und gleicher Compiler/ABI |
-| Build zieht verborgene Pakete nach | isolierte Offline-Buildtests, Source-/Hash-Lock |
-| Natives PDFium-C++ ist intern instabil | eigene versionierte adecc-C++23-Fassade, Consumer-Smoke pro Revision |
-| PDF-Formularwerte werden nicht sichtbar | Appearance-/Widgettest und Testdruck vor produktiver Freigabe |
-| Lizenz-Widerspruch | Lizenzampel rot, Build/Publish blockiert |
+| Skia 153 API differs from PDFium pin | Compatible PDFium revision or versioned patch; never a second Skia build |
+| PDFium compiles Skia internally | Inspect GN closure and adapter; Skia sources in PDFium build mean STOP |
+| Chromium GN expects MSVC/Chromium Clang switches | BCC64X GN patch as with Skia; no hidden compiler substitution |
+| External lcms2/OpenJPEG differs from PDFium fork | ICC/JPX regression tests; require functional and API compatibility |
+| Skia DLL/CRT/export mismatch | Native C++ link/runtime smokes, symbol checks and matching ABI |
+| Build fetches undeclared packages | Isolated offline rebuild, complete source/hash lock |
+| Native PDFium C++ internals are unstable | Versioned adecc C++23 facade, independent consumer smoke per revision |
+| PDF forms save values but not appearances | Widget/appearance tests and printing before production |
+| License conflict | Red license indicator; block build/publish |
 
-### 13. Erfüllungsnachweis / Definition of Done
+### 13. Definition of Done
 
-PDFium gilt erst als **in BuildEngine integriert**, wenn:
+PDFium is considered integrated only when: source/Skia/third-party pins are revision-secure; independently useful missing packages have complete contracts; native BCC64X Debug and Release build from reproducible inputs; exactly **one** Skia 153 package is consumed without recompiling Skia; C++23 consumer and Skia rendering, AcroForm and printing tests pass; GN/build/consumer tests, licensing, notices, SBOM, install/publish, bootstrap and StackBuilder succeed; error cases, limitations including XFA without V8, and all port patches are documented.
 
-- der PDFium-/Skia-/Drittbibliotheks-Pin revisionssicher dokumentiert ist;
-- fehlende allgemein nützliche Libraries als vollständige eigenständige Pakete eingebunden sind;
-- PDFium Debug/Release aus reproduzierbaren Inputs **mit BCC64X** gebaut wurde;
-- exakt **eine** Skia-153-Installation benutzt und nachweislich nicht neu kompiliert wurde;
-- nativer C++23-Consumer, Rendering mit Skia, kontrollierte AcroForm-/Drucktests laufen;
-- GN-/Build-/Consumer-Tests, Lizenzdashboard, Notices, SBOM, Install/Publish, Bootstrap und StackBuilder bestanden sind;
-- Fehlerfälle, Einschränkungen (v.a. XFA ohne V8) und alle Port-Patches dokumentiert sind.
-
-### 14. Quellen / am Umsetzungsstart erneut pinnen
+### 14. Research sources to pin again at implementation time
 
 - PDFium upstream: https://pdfium.googlesource.com/pdfium/
 - PDFium DEPS: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/DEPS
-- PDFium GN-Optionen: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/pdfium.gni
-- PDFium Haupt-Targets: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/BUILD.gn
-- PDFium Skia-GN: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/skia/BUILD.gn
-- PDFium externe Bibliotheken: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/third_party/BUILD.gn
-- PDFium Lizenz: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/LICENSE
+- PDFium GN options: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/pdfium.gni
+- PDFium main targets: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/BUILD.gn
+- PDFium Skia GN: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/skia/BUILD.gn
+- PDFium third-party targets: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/third_party/BUILD.gn
+- PDFium license: https://pdfium.googlesource.com/pdfium/+/refs/heads/main/LICENSE
 - Abseil: https://github.com/abseil/abseil-cpp
 - fast_float: https://github.com/fastfloat/fast_float
 - LittleCMS 2: https://pdfium.googlesource.com/pdfium/+/HEAD/third_party/lcms/LICENSE
@@ -252,50 +242,18 @@ PDFium gilt erst als **in BuildEngine integriert**, wenn:
 - simdutf: https://github.com/simdutf/simdutf
 - FP16: https://github.com/Maratyszcza/FP16
 
-**Wichtig:** \`refs/heads/main\`-URLs sind Recherchebelege, aber **keine reproduzierbaren Build-Pins**. Vor der ersten Implementierung Commit-SHA, DEPS-Closure, Versions-/Lizenzstatus und Upstream-Quellen auf einen einheitlichen Snapshot festlegen.
+**Important:** `refs/heads/main` references are research links, **not reproducible build pins**. Fix commit SHA, DEPS closure, exact licenses and sources to one immutable snapshot before implementation.
 
+### 15. Binding clarification: external DLLs and immutable source snapshot (16 October 2026)
 
-### 15. Verbindliche Präzisierung: externe DLLs und eingefrorener Source-Snapshot (2026-10-16)
+This clarification overrides older plan sections where they proposed source inclusion rather than existing managed library packages.
 
-Diese Festlegung hat Vorrang vor älteren Passagen dieses Entwurfs, soweit diese
-für bereits verfügbare Bibliotheken nur eine Quellcode-Einbindung vorsehen.
+**BuildEngine packages first:** When an installed package is provided as a BCC64X DLL and PDFium's GN targets can be adapted compatibly, consume the installed DLL, import library and public headers. Do not silently make another copy of the same upstream source in PDFium. Verify exports, compiler/CRT compatibility, threading, Debug/Release and behavior first. Document any incompatible PDFium-specific source fork and decide separately. Not all installed packages are DLLs; a static or header-only product must not be misrepresented as a DLL.
 
-**BuildEngine-Pakete zuerst:** Sofern ein vorhandenes Paket für BCC64X als DLL
-bereitgestellt ist und die PDFium-GN-Targets dafür kompatibel angepasst werden
-können, wird dessen installierte DLL mit Importbibliothek und öffentlichen
-Headern verwendet. Eine weitere Kopie desselben Upstream-Quellcodes unter
-PDFium ist keine automatische Ausweichlösung. Zunächst sind exportierte Symbole,
-Compiler-/CRT-Kompatibilität, Threading, Debug/Release-Konfiguration und
-Funktionalität nachzuweisen. Bei einer unvereinbaren PDFium-spezifischen
-Quellvariante wird diese Abweichung dokumentiert und separat entschieden.
-Nicht jedes vorhandene Paket besitzt eine DLL; ein statisches oder header-only
-Paket darf nicht als DLL ausgegeben werden.
+**Immutable DEPS resolution:** Pin one PDFium commit and all required internal DEPS revisions before source acquisition. Only the BuildEngine Source phase may acquire these sources, verifying SHA-256 and expected directory structure and assembling the entire GN input tree. Use the already established Skia-style Python/GN/Ninja orchestration without modifying Skia.
 
-**Unveränderliche DEPS-Auflösung:** Ein konkreter PDFium-Commit und sämtliche
-benötigten internen DEPS-Revisionspins werden vor dem Source-Schritt festgelegt.
-Die Source-Phase lädt ausschließlich diese vorab identifizierten Quellen über
-BuildEngine, prüft SHA-256 und erwartete Verzeichnisstruktur und legt das
-vollständige GN-Eingabeverzeichnis an. Die Python/GN/Ninja-Orchestrierung folgt
-dem bereits erfolgreich eingesetzten Skia-Verfahren, ohne Skia selbst zu ändern.
+**No network after source:** Once source provisioning has completed, `gn gen`, Ninja, Python helpers, tests, install, Doxygen and publish may not download or synchronize source, tools or modules. No `gclient sync`, `git-sync-deps`, automatic Git/CIPD/FetchContent or update hooks in these phases. Missing inputs must cause a concrete missing-pin or missing-artifact error rather than a background download. Repeating these phases offline is a mandatory acceptance test.
 
-**Netzwerksperre nach Source:** Ab Abschluss der Source-Bereitstellung dürfen
-`gn gen`, Ninja, Python-Hilfsskripte, Tests, Install, Doxygen und Publish
-keine Quellen, Tools oder Module nachladen oder synchronisieren. Kein
-`gclient sync`, kein `git-sync-deps`, keine automatischen Git-, CIPD-,
-FetchContent- oder Update-Hooks in diesen Phasen. Fehlt eine Komponente,
-muss der Lauf mit einem konkreten fehlenden Pin/Artefakt fehlschlagen,
-statt sie im Hintergrund herunterzuladen. Ein Offline-Wiederholungstest
-dieser Phasen ist ein verpflichtender Akzeptanztest.
+**Mapping and SBOM:** Each actually used component is either an external versioned BuildEngine package with DLL/import library or an internally pinned PDFium DEPS source. Bundled parts such as PDFium AGG 2.3 or optionally PartitionAlloc belong in `sbom/bundled-components.json` and CycloneDX licensing evidence, as with Skia. A downloaded but disabled component must not be described as a distributed runtime dependency. Verify classifications against real GN targets.
 
-**Zuordnung und SBOM:** Zu jeder tatsächlich verwendeten Komponente dokumentieren
-wir entweder den externen BuildEngine-Paketkoordinaten samt DLL/Importlib
-oder den intern gepinnten PDFium-DEPS-Quellstand. Intern eingebundene
-Komponenten (z. B. PDFiums AGG 2.3, gegebenenfalls PartitionAlloc) werden
-wie bei Skia über `sbom/bundled-components.json` in die CycloneDX-SBOM
-und die Lizenznachweise integriert. Eine heruntergeladene, deaktivierte
-Komponente darf nicht als ausgelieferte Runtime-Abhängigkeit erscheinen.
-Die tatsächlichen GN-Targets müssen diese Klassifikation bestätigen.
-
-**Keine Bestandsinvalidierung:** Die neu anzulegende PDFium-Konfiguration
-darf keine Zeitstempel, Definitionen oder FSM-Nachweise der bisher
-erfolgreich gebauten 56 Pakete verändern.
+**Preserve existing evidence:** Creating the PDFium integration must not change timestamps, definitions or FSM evidence of the **56 packages successfully built at that historical point**.
