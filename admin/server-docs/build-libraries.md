@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Aktueller Katalogstand, 10. November 2026:** Schema 17 enthält **95 versionierte Bibliothekseinträge / 62 logische IDs** und **32 Einträge mit `supersededBy`**. Ausführungsnachweise gelten ausschließlich für den jeweiligen FSM-Binärstand. [Vollständiger Katalog](/manual/libraries.md) · [Änderungshistorie](/news/).
+**Catalog snapshot, 10 November 2026:** Schema 17 declares **95 versioned library records across 62 logical IDs** and **32 `supersededBy` entries**. Execution evidence applies only to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
 
 **Status:** current declarative contract reviewed **21 October 2026**. The active `admin/build-libraries.xml` uses **schemaVersion 17** and `schemas/build-libraries.xsd`.
 
@@ -463,7 +463,7 @@ For the current BZip2/libarchive transition:
 
 ## CMake-Projektimport ab Schema 16
 
-Schema 16 erweitert den bestehenden `cmake`-Knoten um optionale `import`-Elemente. Der Import läuft ausschließlich vor `mode="configure"` und erzeugt das CMake-Source-Verzeichnis, das anschließend vom normalen Configure-Schritt verwendet wird.
+Schema 16 extends the existing `cmake` node with optional `import` elements. Import runs only before `mode="configure"` and creates the CMake source directory subsequently consumed by the normal configure action.
 
 Beispiel:
 
@@ -483,12 +483,12 @@ Beispiel:
 </cmake>
 ```
 
-Unterstützte Importformate:
+Supported import formats:
 
 - `vcxproj`
 - `cbproj`
 
-Unterstützte Zielarten:
+Supported target types:
 
 - `auto`
 - `shared`
@@ -502,38 +502,38 @@ Optionale Zielattribute:
 - `debugPostfix`
 - `install`
 
-Optionale Ergänzungen innerhalb eines Imports:
+Optional elements within an import:
 
 - `include/@path`
 - `define/@value`
 - `link/@value`
 
-Die importierte Projektdatei ist **keine zweite Buildautorität**. Compiler, Toolchain, Konfiguration, CMake-Argumente, Installationspfade und Library-Dependencies bleiben Teil des umgebenden BuildEngine-Vertrags.
+The imported project file is **not a second build authority**. The compiler, toolchain, configuration, CMake arguments, installation paths and library dependencies remain governed by the enclosing BuildEngine contract.
 
-Der Importer übernimmt derzeit:
+The importer currently recognizes:
 
 `vcxproj`:
 
 - `ClCompile`
 - `ResourceCompile`
-- `ConfigurationType` für die optionale automatische Zielarterkennung
+- `ConfigurationType` for optional automatic target-type detection
 
 `cbproj`:
 
 - `CppCompile`
 - `ResourceCompile`
 - `RcCompile`
-- `ProjectType` bzw. `Borland.ProjectType` für die optionale automatische Zielarterkennung
+- `ProjectType` bzw. `Borland.ProjectType` for optional automatic target-type detection
 
-Nicht automatisch ausgewertet werden insbesondere komplexe MSBuild-/C++Builder-Conditions, importierte Property-Dateien und projektspezifische Tool-Tasks. Wenn einzelne Source-Einträge bedingte Buildsemantik besitzen, bricht der Import absichtlich ab. Solche Unterschiede müssen explizit im BuildEngine-Vertrag modelliert werden.
+Complex MSBuild/C++Builder conditions, imported property files and project-specific tool tasks are not automatically evaluated. If individual source entries have conditional build semantics, import deliberately fails. Such differences must be modeled explicitly in the BuildEngine contract.
 
-Das generierte `CMakeLists.txt` ist ein Buildartefakt. Die ursprüngliche `.vcxproj`- oder `.cbproj`-Datei wird nicht verändert.
+The generated `CMakeLists.txt` is a build artifact. The original `.vcxproj` or `.cbproj` file is not modified.
 
 
 
 ### Aktueller ICU-Anwendungsfall
 
-ICU 78.3 ist der erste produktive Einsatz des Schema-16-Imports. Der aktive Vertrag verwendet drei Upstream-VCXPROJ-Dateien ausschließlich als Inventarquelle:
+ICU 78.3 is the first production use of schema 16 imports. The active contract uses three upstream VCXPROJ files solely as an inventory source:
 
 ```text
 stubdata.vcxproj -> icudt78
@@ -541,12 +541,12 @@ common.vcxproj   -> icuuc78 / icuuc78d
 i18n.vcxproj     -> icuin78 / icuin78d
 ```
 
-Die logische Buildreihenfolge wird über die generierten CMake-Targets hergestellt:
+The logical build order is established through the generated CMake targets:
 
 ```text
 icudt -> icuuc -> icuin
 ```
 
-Die Toolchain bleibt BCC64X/CMake/Ninja. Der frühere ICU-Pfad über `runConfigureICU MinGW`, Bash, `cygpath`, GNU Make und den nachträglichen MSYS-Pfadnormalisierer ist aus dem aktiven Vertrag entfernt.
+The toolchain remains BCC64X/CMake/Ninja. The earlier ICU route through `runConfigureICU MinGW`, Bash, `cygpath`, GNU Make and subsequent MSYS path normalization has been removed from the active contract.
 
-Dieser erste Schritt ist bewusst ein Bootstrap-Build mit ICU-`stubdata`. Die echten ICU-Datengeneratoren und die vollständige Upstream-Teststrecke folgen erst nach erfolgreichem Nachweis dieses Core-Graphs.
+This first stage deliberately uses ICU `stubdata` as a bootstrap build. The real ICU data generators and the complete upstream test suite require separate verification of the core graph first.
