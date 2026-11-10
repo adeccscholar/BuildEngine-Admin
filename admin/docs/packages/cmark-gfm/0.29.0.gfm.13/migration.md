@@ -1,3 +1,34 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["cmark-gfm 0.29.0.gfm.13"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_POLICY_VERSION_MINIMUM:STRING=3.5`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\cmark-gfm\bcc64x-target-fixes.cmake`
+- `-DCMARK_TESTS:BOOL=OFF`
+- `-DCMARK_STATIC:BOOL=OFF`
+- `-DCMARK_SHARED:BOOL=ON`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+
+---
+
+## Historische Integrationsnotizen
+
 # cmark-gfm 0.29.0.gfm.13: BCC64X migration and integration record
 
 [TOC|Content]
