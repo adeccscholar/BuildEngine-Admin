@@ -1,55 +1,55 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration, not a new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["eigen 5.0.1"]
 ```
 
-Direkt: keine
+Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DEIGEN_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # Eigen 5.0.1
 
 [TOC|Content]
 
-## Aufgabe und Integration
+## Purpose and integration
 
 Header-only C++ matrix, geometry and sparse linear algebra templates. No DLL or import archive.
 
-**Stand:** BuildEngine-XML-Vertrag vom 10. November 2026; native Builds und Smoke-Ergebnisse **[nicht verifiziert]**.
+**Status:** BuildEngine XML contract dated 10 November 2026; native builds and smoke results **[not verified]**.
 
-## Abhängigkeiten einschließlich transitiver Stufen
+## Dependencies including transitive levels
 
 ```mermaid
 flowchart LR
    N0["eigen 5.0.1"]
 ```
 
-**Direkte Abhängigkeiten:** keine
+**Direct dependencies:** keine
 
-## Konfiguration
+## Configuration
 
 ### CMake
 
 - `-DEIGEN_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 
-### Build-Umgebung
+### Build environment
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
 
-### Quellen
+### Sources
 
 - `https://gitlab.com/libeigen/eigen/-/archive/5.0.1/eigen-5.0.1.tar.gz`
 
@@ -57,8 +57,8 @@ flowchart LR
 
 - `consumer / Release / package`
 
-## Besonderheiten
+## Special considerations
 
-Versionierte Quell- und Build-Aktionen sowie eventuell erforderliche BCC64X-Patches sind im ausführbaren `admin/build-libraries.xml` dokumentiert. Eingetragene Fixes sind ohne FSM-Nachweis kein Test-PASS.
+Versioned source/build actions and required BCC64X patches are defined in executable `admin/build-libraries.xml`. A registered fix is not a test PASS without matching FSM evidence.
 
-[Bibliotheksübersicht](/manual/libraries.md)
+[Library overview](/manual/libraries.md)
