@@ -1,4 +1,4 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
 **Declared configuration; no new test PASS is asserted.**
 
@@ -11,12 +11,12 @@ flowchart LR
 
 Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # bitmapplusplus 1.1.1: BCC64X migration and integration record
 
