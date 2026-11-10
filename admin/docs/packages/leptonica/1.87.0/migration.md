@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -22,7 +22,7 @@ flowchart LR
 
 Direkt: `zlib@1.4`, `libpng@1.6.59`, `libjpeg-turbo@3.2.1`, `libtiff@4.7.2`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -51,23 +51,23 @@ Direkt: `zlib@1.4`, `libpng@1.6.59`, `libjpeg-turbo@3.2.1`, `libtiff@4.7.2`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # Leptonica 1.87.0
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data; not a verified build execution.** Earlier tests belong to their exact versions and binaries; new executions remain **[not verified]**.
 
 Image normalization, binarization, morphology and OCR preprocessing for Tesseract.
 
-**Koordinate:** `leptonica@1.87.0` · **Kategorie:** `image` · **Lizenzampel:** `yellow`
+**Coordinate:** `leptonica@1.87.0` · **Category:** `image` · **License indicator:** `yellow`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (full transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Edges follow exact XML pins. Dashed lines indicate extensions and solid lines indicate package dependencies. Bundled upstream components are not separate BuildEngine packages.
 
 ```mermaid
 flowchart LR
@@ -85,11 +85,11 @@ flowchart LR
    N3 --> N1
 ```
 
-**Direkte Abhängigkeiten:** `zlib@1.4`, `libpng@1.6.59`, `libjpeg-turbo@3.2.1`, `libtiff@4.7.2`
+**Direct dependencies:** `zlib@1.4`, `libpng@1.6.59`, `libjpeg-turbo@3.2.1`, `libtiff@4.7.2`
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -115,7 +115,7 @@ flowchart LR
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
 
-**Build-Umgebung:**
+**Build environment:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -137,4 +137,4 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\leptonica-license.txt`
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
