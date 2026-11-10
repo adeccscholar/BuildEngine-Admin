@@ -2,6 +2,8 @@
 
 [TOC|Content]
 
+**Aktueller Katalogstand, 10. November 2026:** Schema 17 enthält **95 versionierte Bibliothekseinträge / 62 logische IDs** und **32 Einträge mit `supersededBy`**. Ausführungsnachweise gelten ausschließlich für den jeweiligen FSM-Binärstand. [Vollständiger Katalog](/manual/libraries.md) · [Änderungshistorie](/news/).
+
 **Status:** configuration reviewed **21 October 2026**. The Library-FSM is active and `admin/build-libraries.xml` now declares schema version **17**.
 
 BuildEngine combines one local machine/deployment configuration with synchronized administration contracts.
@@ -23,7 +25,7 @@ Related documents:
 
 ## October 2026 local configuration checklist
 
-For the current catalog (**58 library versions / 52 IDs**), keep the
+For the current catalog (**95 library versions / 62 IDs**), keep the
 following boundaries separate:
 
 | Area | Authoritative input | Not a replacement |
