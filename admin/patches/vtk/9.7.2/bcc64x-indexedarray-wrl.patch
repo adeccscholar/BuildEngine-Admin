@@ -167,7 +167,7 @@ diff --git a/Rendering/OpenGL2/CMakeLists.txt b/Rendering/OpenGL2/CMakeLists.txt
 +  PRIVATE_HEADERS ${private_headers} ${vtk_object_factory_header})
 +
 +# Resolve WinRT WRL headers through BuildEngine's registered Windows SDK.
-+if (VTK_USE_WIN32_OPENGL)
++if (VTK_USE_WIN32_OPENGL AND VTK_USE_WIN32_OPENGL_DX_INTEROP)
 +  if (NOT DEFINED ENV{CB_WINDOWS_RC} OR "$ENV{CB_WINDOWS_RC}" STREQUAL "")
 +    message(FATAL_ERROR "VTK OpenGL2 requires a registered Windows SDK RC tool")
 +  endif ()
