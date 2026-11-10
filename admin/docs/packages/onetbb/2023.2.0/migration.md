@@ -1,3 +1,51 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["onetbb 2023.2.0"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DTBB_BUILD:BOOL=ON`
+- `-DTBBMALLOC_BUILD:BOOL=ON`
+- `-DTBBMALLOC_PROXY_BUILD:BOOL=OFF`
+- `-DTBB_TEST:BOOL=ON`
+- `-DTBB_EXAMPLES:BOOL=OFF`
+- `-DTBB4PY_BUILD:BOOL=OFF`
+- `-DTBB_STRICT:BOOL=OFF`
+- `-DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH:BOOL=ON`
+- `-DTBB_ENABLE_IPO:BOOL=OFF`
+- `-DTBB_INSTALL:BOOL=ON`
+- `-DTBB_FILE_TRIM:BOOL=ON`
+- `-DCMAKE_CXX_STANDARD:STRING=23`
+- `-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-DTBB_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\TBB`
+- `-DTBB_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\TBB`
+
+---
+
+## Historische Integrationsnotizen
+
 # Intel oneTBB 2023.2.0
 
 [TOC|Content]
