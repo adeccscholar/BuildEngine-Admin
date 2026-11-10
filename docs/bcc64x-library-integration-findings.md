@@ -1,355 +1,201 @@
-# BCC64X-Integrationsbefunde aktueller Third-Party-Bibliotheken
+# BCC64X Integration Findings for Modern Third-Party Libraries
 
-Stand: 20. September 2026  
-Zielplattform: RAD Studio 13 Florence / C++Builder 13 / BCC64X 20.1.7 / Embarcadero C++ 7.80 / Win64 Modern
+**Historical snapshot:** 20 September 2026  
+**Target platform:** RAD Studio 13 Florence / C++Builder 13 / BCC64X 20.1.7 / Embarcadero C++ 7.80 / Win64 Modern
 
-## Zweck
+## Purpose
 
-Dieses Dokument bündelt technische Erkenntnisse aus den zuletzt integrierten Bibliotheken und aus der Skia-Integration. Es ergänzt den autoritativen Vertrag in `admin/build-libraries.xml`, ersetzt ihn aber nicht.
+This document collects reproducible technical findings from recent third-party library integration and Skia. It supplements the authoritative `admin/build-libraries.xml` contract without replacing it.
 
-Der Schwerpunkt liegt auf reproduzierbaren Befunden:
+The investigation asks which upstream libraries compile unchanged with BCC64X; which package, build-system or compiler adaptations are necessary; whether a correction belongs in the library contract, a versioned patch or a generic toolchain layer; and which problems are general upstream packaging failures rather than BCC64X-specific defects.
 
-- Was ließ sich mit BCC64X unverändert bauen?
-- Wo waren paket-, Buildsystem- oder Compiler-spezifische Anpassungen notwendig?
-- Welche Anpassungen gehören in den Bibliotheksvertrag, welche in einen versionsgebundenen Patch und welche in eine generische BuildEngine-/Toolchain-Lösung?
-- Welche Probleme sind echte Upstream-/Packaging-Probleme und welche sind BCC64X-spezifisch?
+The project does **not** silently switch to MSVC, clang-cl, MinGW or another compiler. The subject of the investigation is the actual BCC64X compilation path.
 
-Grundregel des Projekts bleibt: kein stiller Wechsel auf MSVC, clang-cl, MinGW oder eine andere Toolchain. BCC64X ist der zu untersuchende Compilerpfad.
+## Summary
 
-## Zusammenfassung
+The packages exhibited three different categories of integration problems:
 
-Die aktuellen Bibliotheken zeigen drei verschiedene Klassen von Integrationsproblemen:
+1. **Normal packaging:** source compiles with BCC64X but requires reliable install, publish and smoke contracts.
+2. **Upstream build/packaging defects:** C++ source is compatible, but exported targets, installed headers or dependency metadata are incomplete.
+3. **BCC64X-specific semantics:** source or build logic assumes an older compiler family, linker, runtime or character encoding behavior that does not hold for modern BCC64X.
 
-1. **normale Paketierung:** Bibliothek baut mit BCC64X, benötigt aber einen sauberen Install-/Publish-/Smoke-Vertrag;
-2. **Upstream-Buildsystem- oder Paketierungsdefizit:** Quellcode ist kompatibel, aber Export-, Install- oder Dependency-Metadaten sind unvollständig;
-3. **BCC64X-spezifische Semantik:** Buildsystem oder Quellcode trifft Annahmen über Compilerfamilie, Linker oder Zeichensatz, die für den modernen BCC64X-Pfad nicht gelten.
-
-Die wichtigste architektonische Konsequenz ist, diese Ebenen nicht zu vermischen. Bibliotheksspezifische Workarounds bleiben lokal; generische Compiler-/Linkerprobleme werden einmal zentral gelöst.
+These layers must remain distinct. Local library workarounds stay local; generic compiler/linker defects are fixed centrally once.
 
 ---
 
 ## libjpeg-turbo 3.2.0
 
-Der aktuelle Vertrag baut libjpeg-turbo als Shared Library mit dem originalen CMake-Buildsystem.
+The historical contract uses the upstream CMake project to build a **shared** libjpeg-turbo 3.2.0. Static libraries, SIMD, upstream tools and tests were disabled for this profile; TurboJPEG was enabled; Debug and Release were installed separately with an independent package-consumer smoke.
 
-Wesentliche Einstellungen:
+Skia consumes the explicit BuildEngine libjpeg-turbo 3.2.0 dependency rather than recompiling an embedded Skia copy.
 
-- Version `3.2.0`;
-- Shared Build aktiv;
-- statische Bibliotheken deaktiviert;
-- TurboJPEG aktiv;
-- SIMD im derzeitigen Vertrag deaktiviert;
-- Upstream-Tools und Upstream-Tests im derzeitigen Vertrag deaktiviert;
-- Release und Debug werden getrennt installiert;
-- ein paketbezogener Consumer-Smoke existiert.
+### GN/BCC64X finding
 
-Für Skia wird nicht die mit Skia gebündelte libjpeg-turbo-Kopie verwendet. Skia erhält die von BuildEngine bereitgestellte Version `3.2.0` als explizite Abhängigkeit.
-
-### GN/BCC64X-Erkenntnis
-
-Skias GN-Integration kann absolute BCC64X-Importbibliotheken nicht in jedem Fall sinnvoll über GN `libs` transportieren. Für den BCC64X-Systempfad wird die konkrete Importbibliothek deshalb als roher Linkerparameter über `ldflags` weitergegeben.
-
-Das ist kein libjpeg-Quellcodepatch, sondern eine Anpassung von Skias Third-Party-GN-Vertrag an den BCC64X-Linkerpfad.
+Skia's GN `libs` mechanism did not always preserve absolute paths to BCC64X import libraries correctly. The specific installed import library is therefore propagated as a raw linker option through `ldflags`. This adapts the Skia third-party GN contract, **not** libjpeg source code.
 
 ---
 
 ## libpng 1.6.58
 
-Der aktuelle Vertrag verwendet:
+The historical profile uses libpng 1.6.58 with pinned SHA-256 source, explicit zlib 1.3.2 dependency, shared library output, static output disabled, separate Release/Debug and an installed-consumer smoke.
 
-- libpng `1.6.58`;
-- zlib `1.3.2` als explizite BuildEngine-Abhängigkeit;
-- Shared Build;
-- statische Bibliothek deaktiviert;
-- Release/Debug getrennt;
-- paketbezogenen Consumer-Smoke.
+### Upstream test status
 
-Der Source-Download ist mit SHA-256 gepinnt.
+`PNG_TESTS` was disabled in this contract. This documents an actual configuration choice, **not** a general policy allowing upstream tests to be disabled. The inspected repository evidence did not contain a final independent technical explanation for that choice.
 
-### Aktueller Teststatus im Vertrag
+### Skia system integration
 
-`PNG_TESTS` ist im derzeitigen Bibliotheksvertrag deaktiviert. Das ist als aktueller Vertragszustand dokumentiert, nicht als generelle Projektregel. Die Projektregel bleibt, Upstream-Tests nicht ohne technische Begründung zu deaktivieren. In der für dieses Dokument ausgewerteten Repository-Evidenz ist keine separate abschließende Begründung für die Deaktivierung festgehalten.
-
-### Skia-Systemintegration
-
-Skia verwendet die BuildEngine-libpng und baut nicht zusätzlich seine eigene libpng-Kopie.
-
-Für BCC64X wurde in Skias `third_party/libpng/BUILD.gn` der Pfad zur konkreten BuildEngine-Importbibliothek von GN `libs` auf `ldflags` umgestellt. Dadurch bleibt der vollständige Importbibliothekspfad erhalten und wird nicht von GN in eine für diesen Fall ungeeignete `-l...`-Form überführt.
-
-Diese Erkenntnis wiederholt sich bei weiteren Systembibliotheken und ist daher ein wichtiger GN/BCC64X-Integrationsbefund.
+Skia consumes BuildEngine libpng rather than a second built copy. For BCC64X, `third_party/libpng/BUILD.gn` was changed from GN `libs` to `ldflags` to preserve the complete absolute import-library path and avoid an unsuitable `-l...` transformation. This pattern recurred with other external libraries.
 
 ---
 
 ## libtiff 4.7.2
 
-Der aktuelle Vertrag verwendet:
+The historical configuration uses libtiff 4.7.2, zlib 1.3.2 and libjpeg-turbo 3.2.0; shared build with static output disabled, separate variants and a package smoke. Tools, contrib, documentation and upstream tests were disabled in that profile. Installed `tiffio.h` and `tiff.h` are explicit require gates.
 
-- libtiff `4.7.2`;
-- zlib `1.3.2`;
-- libjpeg-turbo `3.2.0`;
-- Shared Build;
-- statische Bibliothek deaktiviert;
-- Tools, Contrib, Dokumentation und Upstream-Tests im aktuellen Vertrag deaktiviert;
-- Release/Debug getrennt;
-- paketbezogenen Consumer-Smoke.
+### Assessment
 
-Die installierten Public Header `tiffio.h` und `tiff.h` sind explizite Require-Gates.
-
-### Einordnung
-
-libtiff selbst benötigte in dem aktuellen Vertrag keinen vergleichbaren tiefen Compilerpatch wie Skia. Der wesentliche Integrationswert liegt hier im reproduzierbaren Abhängigkeits- und Paketvertrag und in der Consumer-Verifikation.
-
-Wie bei libpng gilt: Die deaktivierten Upstream-Tests sind der dokumentierte aktuelle Vertragszustand. Eine gesonderte technische Begründung ist in der hier ausgewerteten Repository-Evidenz nicht abschließend festgehalten und sollte bei der nächsten Test-Policy-Bereinigung erneut bewertet werden.
+libtiff did not require a deep compiler patch comparable to Skia. Its primary integration value was a reproducible dependency, packaging and consumer-validation contract. As with libpng, the disabled upstream tests were a recorded configuration choice without a conclusive independent justification in the examined evidence; they required reconsideration under test-policy review.
 
 ---
 
 ## HarfBuzz 14.4.0
 
-HarfBuzz ist für Skia eine echte externe BuildEngine-Abhängigkeit und wird nicht innerhalb des Skia-Builds neu heruntergeladen oder gebaut.
+HarfBuzz is an external BuildEngine dependency of Skia, not source fetched or compiled inside Skia. To avoid a cycle with FreeType, the HarfBuzz package builds **without FreeType**. Optional Cairo, Graphite2, GLib, ICU, GObject, GDI, Uniscribe and DirectWrite paths are disabled; core shaping and subsetting remain enabled; raster/vector/GPU/utilities are disabled in this profile.
 
-Der Vertrag ist bewusst so geschnitten, dass keine zyklische Abhängigkeit zu FreeType entsteht:
+### Missing Threads dependency in upstream CMake package
 
-- HarfBuzz baut ohne FreeType;
-- optionale Cairo-, Graphite2-, GLib-, ICU-, GObject-, GDI-, Uniscribe- und DirectWrite-Pfade sind für dieses Paket deaktiviert;
-- Core Shaping und Subset sind aktiv;
-- Raster/Vector/GPU/Utilities sind für diesen Vertrag deaktiviert.
+The generated CMake export may expose `Threads::Threads` without the generated package configuration calling `find_dependency(Threads)`. Rather than altering HarfBuzz source, BuildEngine preserves the upstream export as `harfbuzzTargets.cmake` and adds a small `harfbuzzConfig.cmake` wrapper that resolves the required dependency.
 
-### Upstream-CMake-Paketproblem: Threads
+This is a **package configuration** repair, not a language-compatibility patch.
 
-Der von HarfBuzz erzeugte CMake-Export kann `Threads::Threads` in seiner öffentlichen Link-Schnittstelle enthalten, ohne dass der generierte Package-Config-Vertrag selbst `find_dependency(Threads)` ausführt.
+### Missing public subset header
 
-Die Lösung im Admin-Repository verändert nicht den HarfBuzz-Quellcode:
+The community CMake packaging of HarfBuzz 14.4.0 installs `hb-subset.h` and `hb-subset-serialize.h` but omits `hb-subset-depend.h`, which `hb-subset.h` includes. Meson's upstream public subset-header list already contains that header. BuildEngine installs the missing file explicitly without weakening consumer tests.
 
-1. der generierte Upstream-Export bleibt erhalten;
-2. er wird als `harfbuzzTargets.cmake` installiert;
-3. ein kleiner BuildEngine-Admin-Package-Wrapper wird als `harfbuzzConfig.cmake` davor gesetzt und stellt die notwendige Dependency-Auflösung her.
+### Skia system integration
 
-Das ist ein Packaging-Fix, kein BCC64X-Sprachkompatibilitätspatch.
-
-### Fehlender öffentlicher Subset-Header
-
-HarfBuzz 14.4.0 installiert über den community-maintained CMake-Pfad `hb-subset.h` und `hb-subset-serialize.h`, lässt aber `hb-subset-depend.h` aus, obwohl `hb-subset.h` diesen Header benötigt.
-
-Der Meson-Vertrag enthält den Header in der öffentlichen Subset-Headerliste. BuildEngine ergänzt deshalb beim Installieren genau diesen fehlenden Header. Der Consumer-Smoke wird nicht abgeschwächt.
-
-### Skia-Systemintegration
-
-Analog zu libpng werden die HarfBuzz-Importbibliotheken im BCC64X-Skia-Pfad als rohe `ldflags` übergeben. Das gilt auch für die Subset-Bibliothek, wenn PDF-Subsetting aktiv ist.
+As with libpng, the Skia BCC64X GN path passes HarfBuzz import libraries as raw `ldflags`, including the subset library where PDF subsetting is enabled.
 
 ---
 
 ## FreeType 2.14.3
 
-FreeType wird als Shared Library mit einer bewusst vollständigen externen Dependency-Kette gebaut:
+FreeType is built as a shared library with explicit dependencies: **zlib 1.3.2, bzip2 1.0.8, Brotli 1.2.0, libpng 1.6.58 and HarfBuzz 14.4.0**. These are required through the BuildEngine contract rather than opportunistic CMake discovery.
 
-- zlib `1.3.2`;
-- bzip2 `1.0.8`;
-- Brotli `1.2.0`;
-- libpng `1.6.58`;
-- HarfBuzz `14.4.0`.
+Dependency direction is important: build HarfBuzz **without** FreeType first, then FreeType **with** HarfBuzz. This keeps the graph acyclic. The FreeType consumer smoke was extended to verify actual HarfBuzz integration rather than loading an isolated FreeType binary.
 
-Die Abhängigkeiten werden nicht nur über CMake-Suche opportunistisch gefunden, sondern im Buildvertrag explizit aktiviert und gefordert.
+### Transitive runtime DLLs
 
-Wichtig ist insbesondere die Richtung der HarfBuzz-/FreeType-Abhängigkeit:
-
-- HarfBuzz wird zunächst ohne FreeType erzeugt;
-- FreeType wird anschließend mit HarfBuzz erzeugt.
-
-Damit bleibt der Buildgraph azyklisch.
-
-Der FreeType-Consumer-Smoke wurde außerdem so erweitert, dass die HarfBuzz-Integration tatsächlich nachgewiesen wird und nicht nur ein isoliertes FreeType-Binary geladen wird.
-
-### Runtime-Kette
-
-FreeType zieht insbesondere bzip2 als Runtime-Abhängigkeit nach. Für Package-Smokes darf deshalb nicht nur der direkte Dependency-Pfad berücksichtigt werden. BuildEngine löst inzwischen die transitive Runtime-Dependency-Kette rekursiv auf und stellt die benötigten DLL-Verzeichnisse im Smoke-PATH bereit.
+FreeType brings bzip2 into its runtime dependency chain. Consumer smokes must therefore include more than immediate DLL directories. BuildEngine resolves the transitive runtime closure recursively and makes required directories available on the smoke `PATH`.
 
 ---
 
-## Skia 153 / Source-Pin `2eed75b956045eb8603d3690a1e84bc582a2135d`
+## Skia 153 / pinned source `2eed75b956045eb8603d3690a1e84bc582a2135d`
 
-Skia ist die bisher komplexeste Integrationsprobe dieses Abschnitts.
+Skia was the most complex integration experiment in this historical set. Logical version 153 refers to the exact source commit `2eed75b956045eb8603d3690a1e84bc582a2135d`; source and patches were pinned to that commit.
 
-Der sichtbare Paketstand verwendet die logische Version `153`; der reproduzierbare Source-Pin bleibt der konkrete Commit
+### External BuildEngine dependencies
 
-`2eed75b956045eb8603d3690a1e84bc582a2135d`.
+The historical Skia integration declares OpenGL 26.2.1, zlib 1.3.2, Brotli 1.2.0, libjpeg-turbo 3.2.0, libpng 1.6.58, HarfBuzz 14.4.0 and FreeType 2.14.3. It does not rebuild these libraries internally; version, licensing and SBOM relationships stay in the BuildEngine graph. Transitive dependencies, for example FreeType → bzip2, are also resolved by that graph rather than copied into Skia.
 
-Der Source-Download und die Patchpfade sind weiterhin an diesen Commit gebunden.
+### Internally bundled Skia components
 
-### Externe BuildEngine-Abhängigkeiten
+Other upstream components intentionally remain pinned to the selected Skia revision, including ICU, WebP, libavif, libgav1, JPEG XL, Wuffs, DNG SDK, Expat, SPIRV-Cross, SPIRV-Tools, glslang, Vulkan headers, and Vulkan/D3D memory allocators.
 
-Skia verwendet explizit:
+They are inventoried separately from external BuildEngine dependencies and fed into CycloneDX. One verified Skia metadata run reported **27 components**, including the root, external dependency closure and bundled components.
 
-- OpenGL `26.2.1`;
-- zlib `1.3.2`;
-- Brotli `1.2.0`;
-- libjpeg-turbo `3.2.0`;
-- libpng `1.6.58`;
-- HarfBuzz `14.4.0`;
-- FreeType `2.14.3`.
+### Windows desktop profile
 
-Diese Bibliotheken werden nicht noch einmal innerhalb von Skia gebaut. Dadurch bleiben Version, Lizenz- und SBOM-Beziehung im BuildEngine-Graph sichtbar.
+This historical profile enabled CPU raster/skcms, DirectWrite and Windows GDI, FreeType, ICU/HarfBuzz/SkUnicode/SkShaper, PNG/JPEG/WebP/Wuffs, AVIF/JPEG XL/DNG, SVG/Expat, PDF and XPS, Skottie/Lottie, Ganesh, Graphite, OpenGL, Direct3D 12, Vulkan/Vulkan Memory Allocator, SPIR-V validation and SPIRV-Cross.
 
-Transitive Abhängigkeiten, z. B. bzip2 über FreeType, werden ebenfalls über den BuildEngine-Dependency-Graph behandelt und nicht in das Skia-Paket kopiert.
+It deliberately excluded Android/iOS/macOS integrations, WebGL/WebGPU/CanvasKit/Emscripten, Dawn, ANGLE, Rust codecs/Fontations/ICU4X, FFmpeg, Lua, Perfetto/pprof and development viewers/fuzzers.
 
-### Gebündelte Skia-Komponenten
+### GN toolchain for BCC64X
 
-Andere Skia-Third-Party-Komponenten bleiben bewusst an die von diesem Skia-Commit gewählten Revisionen gebunden. Dazu gehören unter anderem ICU, WebP, libavif, libgav1, JPEG XL, Wuffs, DNG SDK, Expat, SPIRV-Cross, SPIRV-Tools, glslang, Vulkan-Headers sowie die Vulkan-/D3D-Memory-Allocatoren.
+Upstream Skia GN has no native BCC64X model. The version-specific `bcc64x-gn.patch` supplies a Win64 Modern toolchain route with the actual BCC64X compiler and linker, RAD and Windows SDK library directories passed as GN arguments, a BCC64X driver-based `solink` rule producing DLL and import library, and raw linker-option propagation for absolute external import libraries.
 
-Diese gebündelten Komponenten werden getrennt von den BuildEngine-Abhängigkeiten erfasst. Die Metadatenpipeline übernimmt die ermittelten gebündelten Komponenten in die erzeugte CycloneDX-SBOM. Ein verifizierter Skia-Metadatenlauf ergab insgesamt 27 Komponenten einschließlich Wurzel, BuildEngine-Abhängigkeitsgraph und gebündelten Komponenten.
+### Reusing system packages without duplication
 
-### Windows-Desktop-Profil
+The GN contracts for zlib, Brotli, libjpeg-turbo, libpng, HarfBuzz and FreeType were adapted to use BuildEngine packages. The common BCC64X issue for libpng, libjpeg-turbo and HarfBuzz was forwarding actual absolute import-library paths via `ldflags` rather than GN `libs`.
 
-Der aktuelle Vertrag aktiviert ein breites Windows-Desktop-Profil, darunter:
+### Component output and export boundaries
 
-- CPU Raster / skcms;
-- DirectWrite und Windows GDI;
-- FreeType;
-- ICU, HarfBuzz, SkUnicode und SkShaper;
-- PNG, JPEG, WebP, Wuffs;
-- AVIF, JPEG XL und DNG;
-- SVG/Expat;
-- PDF und XPS;
-- Skottie/Lottie;
-- Ganesh;
-- Graphite;
-- OpenGL;
-- Direct3D 12;
-- Vulkan und Vulkan Memory Allocator;
-- SPIR-V-Validierung und SPIRV-Cross.
+Applying blanket `--export-all-symbols` to Skia produced an impractically large PE/COFF export surface. The solution was a **hybrid component model** with shared libraries deliberately limited to public interfaces:
 
-Nicht zum Zielprofil gehören insbesondere Android/iOS/macOS-Integrationen, WebGL/WebGPU/CanvasKit/Emscripten, Dawn, ANGLE, Rust-Codecs/Fontations/ICU4X, FFmpeg, Lua, Perfetto/pprof sowie Entwickler-Viewer/Fuzzer.
+- `skia`
+- `skunicode_core`
+- `skunicode_icu`
+- `skunicode_client_icu`
+- `skunicode_bidi`
+- `skunicode_libgrapheme`
+- `skunicode_icu4x`
+- `skshaper`
+- `svg`
+- `skottie`
 
-### BCC64X-GN-Toolchain
+Other internal `skia_component` targets remain static under BCC64X. `jsonreader` and `sksg` are linked into consumers as static implementation parts rather than independently exported DLLs. Default visibility is applied selectively to Skia's own library code; foreign/internal code is not exported wholesale.
 
-Skias GN-Buildsystem kennt BCC64X nicht nativ. Der versionsgebundene `bcc64x-gn.patch` ergänzt den Win64-Modern-Toolchainpfad.
+### Individual compatibility corrections
 
-Wichtige Punkte:
+The version-bound patch set addressed Direct3D `GetDesc`, Debug SPIR-V validator paths, libgav1 Windows threading, SkArenaAlloc exports, skcms DLL boundaries, centralized visibility and component logic, external dependency propagation, and HarfBuzz/libpng/libjpeg/Brotli paths.
 
-- BCC64X wird als echter Compiler/Linkerpfad verwendet;
-- RAD- und Platform-SDK-Library-Verzeichnisse werden als GN-Argumente eingespeist;
-- die BCC64X-Solink-Regel erzeugt DLL und Importbibliothek über den BCC64X-Treiber;
-- absolute BuildEngine-Importbibliotheken werden, wo notwendig, als rohe Linkerflags propagiert.
+These corrections apply to the **exact Skia source pin**, not arbitrary future revisions.
 
-### Systembibliotheken statt Skia-Duplikate
+### Generic UCRT issue: `fabsf` and related functions
 
-Für zlib, Brotli, libjpeg-turbo, libpng, HarfBuzz und FreeType wurden Skias GN-Third-Party-Verträge so erweitert, dass die BuildEngine-Pakete genutzt werden können.
+Skia Debug revealed a generic BCC64X 20.1.7 linking issue. Certain addressable C math functions imported from `api-ms-win-crt-math-l1-1-0.dll`; the binary linked successfully but failed to load with Windows error **127**.
 
-Bei libpng, libjpeg-turbo und HarfBuzz zeigte sich dabei ein gemeinsames Muster: konkrete absolute BCC64X-Importbibliothekspfade müssen als `ldflags` transportiert werden, nicht als normale GN-`libs`-Einträge.
+Minimal reproducers isolated the problem from Skia. Five symbols were affected: `fabsf`, `nextafterl`, `nexttoward`, `nexttowardf` and `nexttowardl`. RAD Studio's `libucrt.a` contains local implementations in exactly four `libucrt_extra` object members. Extracting them into `libbcc64x-ucrt-compat.a` and linking that archive before the ordinary runtime resolved the loader problem.
 
-### Component Build und Exportgrenzen
+See `docs/bcc64x-ucrt-runtime-link-bug.md` for complete evidence. This is **not** a Skia source patch: BuildEngine generates the compatibility archive from the locally installed Embarcadero runtime through the managed `bcc64x-ucrt-compat` tool contract, distributing no vendor object files. Skia adds it ahead of the runtime through upstream `extra_ldflags`.
 
-Ein pauschales `--export-all-symbols` war für Skia keine tragfähige Lösung. Der Exportumfang wurde zu groß und überschritt bei breiten Komponenten den sinnvollen PE/COFF-Rahmen.
+### Smoke and runtime outcomes
 
-Die Lösung ist ein hybrides Component-Modell:
-
-Shared BCC64X-Komponenten sind gezielt auf die öffentliche Nutzungsoberfläche begrenzt, insbesondere:
-
-- `skia`;
-- `skunicode_core`;
-- `skunicode_icu`;
-- `skunicode_client_icu`;
-- `skunicode_bidi`;
-- `skunicode_libgrapheme`;
-- `skunicode_icu4x`;
-- `skshaper`;
-- `svg`;
-- `skottie`.
-
-Andere interne `skia_component`-Targets bleiben im BCC64X-Component-Build statisch. `jsonreader` und `sksg` werden als statische Implementierungskomponenten in ihre Consumer eingebunden; eigene DLLs dafür werden nicht erzeugt.
-
-Zusätzlich wird für Skia-eigenen Bibliothekscode gezielt Default Visibility verwendet, während fremder/interner Code nicht pauschal exportiert wird.
-
-### Einzelne Kompatibilitätsstellen
-
-Im Verlauf wurden mehrere konkrete BCC64X-/Windows-Stellen identifiziert und versionsgebunden gelöst, darunter:
-
-- Direct3D-`GetDesc`-Kompatibilität;
-- Debug-SPIR-V-Validator-Pfad;
-- Windows-Threading in libgav1;
-- SkArenaAlloc-Export;
-- skcms-DLL-Grenzen;
-- zentrale Sichtbarkeits-/Komponentenlogik;
-- Systemdependency- und Link-Propagation;
-- HarfBuzz-, libpng-, libjpeg-, Brotli- und weitere Systembibliothekspfade.
-
-Die Patchdateien liegen ausschließlich unter dem konkreten Skia-Source-Pin. Sie sind damit nicht als allgemeingültige Patches für beliebige Skia-Versionen zu verstehen.
-
-### UCRT-Problem: `fabsf` und verwandte Symbole
-
-Skia Debug machte einen generischen BCC64X-20.1.7-Runtime-Linkfehler sichtbar. Bestimmte adressierbare C-Math-Symbole wurden aus `api-ms-win-crt-math-l1-1-0.dll` importiert; das Binary linkte, konnte aber mit Windows-Fehler 127 nicht geladen werden.
-
-Der Befund wurde außerhalb von Skia mit Minimalproben reproduziert. Betroffen sind:
-
-- `fabsf`;
-- `nextafterl`;
-- `nexttoward`;
-- `nexttowardf`;
-- `nexttowardl`.
-
-Die mit RAD Studio ausgelieferte `libucrt.a` enthält gleichzeitig lokale `libucrt_extra`-Implementierungen. Ein aus genau vier verifizierten Members erzeugtes `libbcc64x-ucrt-compat.a` behebt den Laufzeitfehler, wenn es vor der normalen Runtime aufgelöst wird.
-
-Die vollständige Evidenz steht in `docs/bcc64x-ucrt-runtime-link-bug.md`.
-
-Wichtig: Die Lösung ist **kein Skia-Source-Patch**. BuildEngine erzeugt das Compatibility-Archiv aus der lokal installierten Embarcadero-Runtime über den generierten Toolvertrag `bcc64x-ucrt-compat`. Es werden keine Embarcadero-Objektdateien im Repository verteilt.
-
-Skia nutzt dafür seinen vorhandenen Upstream-Mechanismus `extra_ldflags`, so dass das Compatibility-Archiv vor der normalen Runtime erscheint.
-
-### Smoke- und Runtime-Erkenntnisse
-
-Ein Release-Package-Smoke für Skia wurde mit 17/17 Checks erfolgreich nachgewiesen. Dabei war zusätzlich die rekursive Runtime-Dependency-Auflösung notwendig, damit nicht nur direkte Skia-DLLs, sondern auch transitive Dependency-DLLs gefunden werden.
-
-Der endgültige Debug-Package-Smoke nach allen UCRT-Arbeiten ist in der für dieses Dokument ausgewerteten Evidenz **[nicht verifiziert]**. Diese Aussage soll bei einem späteren vollständigen Lauf durch das reale Log ersetzt werden.
+The Release Skia package smoke passed **17/17 checks**. Recursive runtime DLL resolution was required to find transitive dependencies, not only immediate Skia DLLs. The final Debug smoke after UCRT corrections was **[not verified]** in the evidence used for this historical report.
 
 ---
 
 ## Catch2 3.16.0
 
-Catch2 wurde bewusst als aktuelles Gegenbeispiel zu veralteten Paketständen aufgenommen. Version `3.16.0` ist eine kompilierte Testbibliothek und wird im BuildEngine-Vertrag statisch gebaut. Für ein Testframework ist diese statische Bereitstellung eine bewusst akzeptierte Ausnahme vom üblichen Shared-Library-Default.
+Catch2 was introduced as a current test framework rather than relying on historical test packages. It is intentionally built as a **static** C++23 test library, an accepted exception to the general shared-library preference.
 
-Der Upstream-Source-Pin ist Commit
+Source revision: `317ac1ed4c0bb6e6b91eafc817e05c488feffcb3`. Upstream SelfTests stay enabled.
 
-`317ac1ed4c0bb6e6b91eafc817e05c488feffcb3`.
+### BCC64X finding 1: obsolete `__BORLANDC__` detection
 
-Der Build verwendet C++23 und behält die Upstream-SelfTests aktiv.
+Catch2 enables the legacy `CATCH_CONFIG_POLYFILL_ISNAN` whenever `__BORLANDC__` is set, causing an invalid `std::_isnan()` reference in `catch_polyfills.cpp` on BCC64X 20.1.7.
 
-### BCC64X-Sonderfall 1: veraltete `__BORLANDC__`-Erkennung
-
-Catch2 3.16.0 behandelt jedes definierte `__BORLANDC__` als historischen Embarcadero-Compilerpfad und aktiviert dadurch `CATCH_CONFIG_POLYFILL_ISNAN`.
-
-Dieser Pfad ruft `std::_isnan()` auf. BCC64X 20.1.7 stellt `std::_isnan` nicht bereit; der Build scheitert in `catch_polyfills.cpp`.
-
-Catch2 selbst stellt den negativen Konfigurationsschalter `CATCH_CONFIG_NO_POLYFILL_ISNAN` bereit. Deshalb wird kein Source-Patch verwendet, sondern der Buildvertrag setzt:
+Catch2 itself supports a negative configuration override, so no source patch is necessary:
 
 ```text
 -DCATCH_CONFIG_NO_POLYFILL_ISNAN
 ```
 
-Damit bauen Release und Debug erfolgreich.
+Release and Debug then compiled successfully.
 
-### BCC64X-Sonderfall 2: Execution Code Page für Narrow Strings
+### BCC64X finding 2: execution code page for narrow string literals
 
-Nach dem erfolgreichen Build blieb der Upstream-SelfTest `RunTests` rot. Der eigentliche nicht erwartete Fehler lag ausschließlich im Test `XmlEncode: UTF-8`.
+The `RunTests` upstream SelfTest still failed in `XmlEncode: UTF-8` because Catch2 places real Unicode characters such as `š` and `👾` directly in narrow `char` string literals and expects UTF-8 bytes.
 
-Catch2 enthält echte UTF-8-Zeichen direkt in normalen `char`-Stringliteralen, z. B. `š` und `👾`, und erwartet deren UTF-8-Bytefolge.
-
-Maschinelle Minimalproben ergaben für `š`:
+For `š`, native minimal tests reported:
 
 ```text
 BCC64X default                              -> 9A
 -finput-charset=UTF-8                       -> 9A
 -finput-charset=UTF-8 -fexec-charset=UTF-8  -> 9A
-UTF-8-Quelldatei mit BOM                    -> 9A
-\u0161 im ASCII-Quelltext                   -> C5 A1
+UTF-8 source with BOM                       -> 9A
+\u0161 in ASCII source                      -> C5 A1
 ```
 
-Die vom real installierten BCC64X 20.1.7 selbst ausgewiesenen Embarcadero-spezifischen Optionen sind:
+The installed BCC64X 20.1.7 exposes these Embarcadero-specific switches:
 
 ```text
 -fborland-input-code-page=<code page>
 -fborland-exec-code-page=<code page>
 ```
 
-Die Gegenproben ergaben:
+Control tests produced:
 
 ```text
 -fborland-input-code-page=65001                           -> 9A
@@ -357,250 +203,202 @@ Die Gegenproben ergaben:
 -fborland-input-code-page=65001 -fborland-exec-code-page=65001 -> C5 A1
 ```
 
-Damit ist die Ursache klar: Für Catch2 ist nicht die Source-Codepage, sondern die **Execution Code Page normaler Narrow-String-Literale** entscheidend.
-
-Der Catch2-Vertrag setzt deshalb zusätzlich:
+The relevant setting is the **execution code page**, not input code page. The Catch2 contract adds:
 
 ```text
 -fborland-exec-code-page=65001
 ```
 
-Die zuvor untersuchten generischen Clang-Optionen `-finput-charset=UTF-8` und `-fexec-charset=UTF-8` gehören nicht in den Catch2-Vertrag.
+The generic Clang `-finput-charset=UTF-8` and `-fexec-charset=UTF-8` switches were ineffective for this case and were not adopted into the Catch2 contract.
 
-### Verifikation
+### Verification
 
-Mit den beiden BCC64X-spezifisch notwendigen Einstellungen
+With both required options:
 
 ```text
 -DCATCH_CONFIG_NO_POLYFILL_ISNAN
 -fborland-exec-code-page=65001
 ```
 
-lief der gezielt wiederholte Upstream-Test erfolgreich:
+the isolated upstream test passed:
 
 ```text
 1/1 Test #1: RunTests ... Passed
 100% tests passed, 0 tests failed out of 1
 ```
 
-Vor der Codepage-Korrektur hatte derselbe SelfTest 531 Testfälle; 507 waren regulär erfolgreich, 16 schlugen erwartungsgemäß fehl, 7 wurden übersprungen und genau ein echter Testfall mit drei echten Assertions schlug fehl. Das half, die absichtlichen Catch2-`[!shouldfail]`-/`[!mayfail]`-Ausgaben von dem realen UTF-8-Problem zu trennen.
+Before correcting the code page, the same SelfTest contained **531 cases**: 507 normal successes, 16 expected failures, seven skips and exactly one genuine failing case with three assertions. Distinguishing the deliberate Catch2 `[!shouldfail]` and `[!mayfail]` output from the genuine UTF-8 failure was essential.
 
-Die Anpassung benötigt keinen Catch2-Source-Patch.
+No Catch2 source patch was required.
 
-### Architekturfolgerung
+### Architectural implication
 
-`-fborland-exec-code-page=65001` wird zunächst **nur für Catch2** gesetzt. Eine globale Änderung der BCC64X-Toolchain würde die Semantik normaler Narrow-String-Literale sämtlicher Bibliotheken verändern und ist daher eine eigene Toolchain-Policy-Entscheidung.
+`-fborland-exec-code-page=65001` remains **Catch2-local**. Globally changing the semantics of ordinary narrow string literals would require a separate explicit BCC64X toolchain policy decision.
 
 ---
 
 ## BitmapPlusPlus 1.1.1
 
-BitmapPlusPlus wurde als moderne, kleine C++-BMP-Bibliothek aufgenommen, statt einen historischen EasyBMP-Stand zu reproduzieren.
+A small modern C++ BMP library was introduced rather than recreating an older EasyBMP integration.
 
-Wesentliche Eigenschaften:
+- Version 1.1.1, MIT licensed and header-only
+- Upstream CMake offers only an INTERFACE target and no install or package config
+- BuildEngine creates **no artificial binary build**
+- Install headers and license and provide a small Admin CMake package configuration
+- Run native BCC64X/C++23 Release and Debug consumer smokes
 
-- Version `1.1.1`;
-- MIT-Lizenz;
-- Header-only;
-- Upstream definiert nur ein CMake-INTERFACE-Target;
-- Upstream besitzt keine `install()`-/Package-Config-Regeln.
-
-BuildEngine erfindet deshalb keinen künstlichen Build. Der Vertrag verwendet einen direkten Install-Pfad:
-
-- Header kopieren;
-- Lizenz kopieren;
-- kleinen BuildEngine-Admin-CMake-Package-Config bereitstellen;
-- Release- und Debug-Consumer-Smokes mit BCC64X/C++23.
-
-Der Consumer-Smoke schreibt ein BMP, lädt es erneut und prüft Geometrie und Pixelwerte. Damit wird echte Header-/Compile-/Runtime-Nutzbarkeit geprüft und nicht nur `#include`.
+The consumer saves a BMP, reloads it and validates geometry and pixel values: actual compile and runtime usability, not merely an `#include`.
 
 ---
 
 ## Graphite2 1.3.15
 
-Graphite2 wurde mit dem Upstream-CMake-Projekt gebaut; ein eigener Buildadapter war nicht notwendig. Die wesentliche Arbeit lag in der Testevidence.
+Graphite2 used upstream CMake without a custom build adapter. The primary work concerned test portability and evidence. The historical `admin/patches/graphite2/1.3.15` set includes:
 
-Der aktuelle Patchsatz unter `admin/patches/graphite2/1.3.15` enthält:
+- `fix-nametabletest-langtags.patch`
+- `fix-fnttxtrender-advance.patch`
+- `diagnose-fnttxtrender-mismatch.patch`
+- `fix-gr2fonttest-log-line-endings.patch`
+- `fix-nametabletest-utf8-literals.patch`
+- `add-managed-fonttools-path.patch`
+- `fix-jsontest-log-line-endings.patch`
+- `fix-bcc64x-padauk3-reference.patch`
 
-- `fix-nametabletest-langtags.patch`;
-- `fix-fnttxtrender-advance.patch`;
-- `diagnose-fnttxtrender-mismatch.patch`;
-- `fix-gr2fonttest-log-line-endings.patch`;
-- `fix-nametabletest-utf8-literals.patch`;
-- `add-managed-fonttools-path.patch`;
-- `fix-jsontest-log-line-endings.patch`;
-- `fix-bcc64x-padauk3-reference.patch`.
-
-Die Korrekturen betreffen Testportabilität, Referenz-/Diagnoseverhalten, Encoding/Zeilenenden und managed Tool-Auflösung. Sie sind versionsgebunden und werden nicht als allgemeingültige Graphite2-Patches dargestellt.
-
-Nach der aktuellen Korrekturrunde liefen Release und Debug jeweils mit 91/91 Tests erfolgreich.
+The patches address test portability, references and diagnostics, encoding/line endings, and managed tool resolution. They are version-bound. After that correction round, **91/91 tests passed in each of Release and Debug**.
 
 ---
 
 ## Expat 2.8.4
 
-Expat ist fachlich der Kategorie **data** zugeordnet: Es ist ein Streaming-XML-Parser. Die Verwendung durch TECkit/SFconv ist eine Abhängigkeitsbeziehung und keine Kategorienzuordnung.
+Expat belongs in the **data** category as a streaming XML parser. Its use by TECkit/SFconv is a dependency relationship, not an alternative category.
 
-Expat wird mit Upstream-CMake als Shared Package gebaut und installiert inklusive `xmlwf`, Headern und CMake-Paketmetadaten.
+Expat uses upstream CMake to build a shared package including `xmlwf`, headers and package metadata.
 
-Der Patch `native-windows-tests.patch` korrigiert eine Buildsystemannahme: Upstream unterscheidet bei den Tests im Wesentlichen MSVC gegen Nicht-MSVC und leitet Nicht-MSVC über `bash run.sh`. Für BCC64X ist diese Klassifikation falsch, weil BCC64X ein nativer Windows-Clang-Compiler ist.
-
-Der Patch entscheidet daher Windows gegen Nicht-Windows. Auf Windows wird das Testbinary direkt gestartet. Parserquellcode wird dabei nicht angepasst.
+The `native-windows-tests.patch` corrects an incorrect upstream build-system assumption: classifying all non-MSVC compilers as POSIX and invoking `bash run.sh`. BCC64X is native Windows Clang; the correct test decision is **Windows versus non-Windows**, with direct test-executable launch on Windows. Parser source is unchanged.
 
 ---
 
 ## TECkit 2.5.13
 
-TECkit hat keinen geeigneten upstream-nativen Windows-Buildvertrag für den BCC64X-Nachweis. Upstream verwendet Autotools; die aktuelle Windows-Binary-Strecke ist ein MinGW-Crossbuild. Beides beantwortet nicht die Projektfrage nach einem nativen BCC64X-Windows-Pfad.
+TECkit lacked a suitable native upstream Windows/BCC64X build contract. Autotools and the upstream MinGW cross-build did not answer the project's native compilation question.
 
-Der Admin-CMake-Adapter übernimmt deshalb ausschließlich das explizite Targetinventar aus den Upstream-`Makefile.am`-Dateien:
+The Admin CMake adapter therefore imports only explicit target inventory from upstream `Makefile.am`:
 
-- `source/Engine.cpp` -> TECkit Engine;
-- `source/Compiler.cpp` + `source/UnicodeNames.cpp` -> Compiler-Library;
-- Sample-Tools `teckit_compile` und `txtconv`;
-- `SFconv` mit Expat.
+- `source/Engine.cpp` → TECkit engine
+- `source/Compiler.cpp` and `source/UnicodeNames.cpp` → compiler library
+- Sample tools `teckit_compile` and `txtconv`
+- `SFconv` with Expat
 
-Das ist eine bewusste Downstream-Buildbeschreibung. Die Upstream-Sourcen selbst bleiben unverändert.
+This is an explicit downstream build description; upstream C++ sources remain unchanged. zlib and Expat are actual package dependencies. Under the corrected FSM rule, TECkit build begins only after both dependencies complete `Install` and consumes their installed package surfaces.
 
-zlib und Expat sind echte Package-Dependencies. Nach der korrigierten FSM-Regel beginnt TECkit Build erst nach vollständig abgeschlossenem `Install` beider Dependencies und konsumiert deren installierte Package-Sicht.
-
-Der Upstream-Testtreiber `test/dotests.pl` ist Windows-aware und bleibt unverändert. Er prüft alle drei Tools; dadurch bleibt die behavioral Evidence trotz geändertem Buildsystem erhalten.
+The Windows-aware upstream test driver `test/dotests.pl` remains unchanged and tests all three tools, preserving functional evidence despite using a different build system.
 
 ---
 
 ## ICU4C 78.3
 
-ICU nutzt BuildEngine ProjectImport als read-only Windows-Projektinventar. Importiert werden aktuell:
+ICU uses BuildEngine ProjectImport as a **read-only** Windows project inventory, importing:
 
-- `stubdata/stubdata.vcxproj`;
-- `common/common.vcxproj`;
-- `i18n/i18n.vcxproj`.
+- `stubdata/stubdata.vcxproj`
+- `common/common.vcxproj`
+- `i18n/i18n.vcxproj`
 
-Wichtig ist die Trennung:
+The separation matters: VCXPROJ supplies source/resource inventory and target structure; BuildEngine supplies toolchain, defines, linker flags, variants and installation paths; CMake/Ninja/BCC64X builds the result.
 
-- VCXPROJ liefert Source-/Resource-Inventar und Targetstruktur;
-- BuildEngine liefert Toolchain, Defines, Links, Varianten und Installlayout;
-- CMake/Ninja/BCC64X führt den Build aus;
-- MSBuild/MSVC/NMAKE/MSYS/`runConfigureICU` gehören nicht zum Pfad.
-
-Der aktuelle Bootstrap erzeugt `icudt -> icuuc -> icuin`. Volle Daten-Generator- und Upstream-Testabdeckung wird für diesen Bootstrap nicht behauptet.
+MSBuild, MSVC, NMAKE, MSYS and `runConfigureICU` do not become part of the active route. The bootstrap produces `icudt → icuuc → icuin`. No full data-generator or upstream-test coverage is claimed for this bootstrap.
 
 ---
 
 ## Poppler 26.09.0
 
-Poppler wird mit Upstream-CMake gebaut und hängt explizit von zlib, FreeType, libjpeg-turbo, libpng und libtiff ab.
+Poppler is built using upstream CMake with explicit zlib, FreeType, libjpeg-turbo, libpng and libtiff dependencies.
 
-Die Windows-SDK-Header erwarten auf x64 teilweise den Microsoft-Architekturselector `_AMD64_`. BCC64X beschreibt den Zielcompiler nicht identisch. Der aktuelle Vertrag setzt daher Poppler-lokal:
+Some Windows SDK x64 headers expect the Microsoft architecture selector `_AMD64_`; BCC64X does not describe its target in exactly the same way. The Poppler-local profile therefore defines:
 
 ```text
 -D_AMD64_ -DNOMINMAX
 ```
 
-Diese Bridge wird bewusst **nicht** global in die BCC64X-Toolchain verschoben, solange sie nur für diesen Upstream-Pfad nachgewiesen ist.
+This compatibility definition is **not** added globally to the BCC64X toolchain without broader evidence.
 
-Der aktuelle Poppler-Proof schaltet mehrere optionale Consumer-/Backend-Welten aus, darunter Qt/GLib, Boost, OpenJPEG, LCMS, libcurl, NSS/GPGME und Utilities. Das ist ein bewusst begrenztes Profil.
-
-Die Release-Tarballs enthalten nicht das separate `poppler/test-data`-Repository. Upstream-Testintegration bleibt daher ein eigener reproduzierbarer Schritt; fehlende Testdaten werden nicht durch Deaktivieren und anschließendes Behaupten vollständiger Tests verdeckt.
+The bounded Poppler profile disables optional Qt/GLib, Boost, OpenJPEG, LCMS, curl, NSS/GPGME, utilities and other backends. Release archives do not include the separate `poppler/test-data` repository, so upstream test-data provisioning needs its own reproducible contract. Missing test data is not justification for falsely claiming full upstream tests.
 
 ---
 
-## Generische BuildEngine-Erkenntnisse aus dieser Integrationsrunde
+## Generic BuildEngine lessons from this integration round
 
-### 1. Transitive Runtime-Abhängigkeiten gehören in Package-Smokes
+### 1. Transitive runtime dependencies belong in package smokes
 
-Ein Package-Smoke darf nicht nur die direkten DLL-Verzeichnisse einer Bibliothek in `PATH` aufnehmen. FreeType -> bzip2 und ähnliche Ketten haben gezeigt, dass die Runtime-Closure rekursiv aus dem BuildEngine-Abhängigkeitsgraphen bestimmt werden muss.
+The smoke `PATH` must include recursively resolved runtime DLL directories, not just immediate dependencies. FreeType → bzip2 is one example. BuildEngine now resolves the runtime closure from the versioned dependency graph.
 
-BuildEngine löst diese transitive Runtime-Kette inzwischen für Package-Smokes auf.
+### 2. Bundled components must appear in the SBOM
 
-### 2. Gebündelte Komponenten müssen in die SBOM
+Skia intentionally pins and builds some third-party sources internally. The external BuildEngine dependency graph alone is insufficient; metadata must include bundled components, distinguishing them from external packages.
 
-Bei Skia reicht der BuildEngine-Dependency-Graph allein nicht aus, weil ein Teil der Third-Party-Komponenten bewusst von Skia selbst gepinnt und mitgebaut wird.
+### 3. Toolchain defects must not be hidden as library patches
 
-Die Metadata-Pipeline kann deshalb zusätzlich eine ermittelte Liste gebündelter Source-Komponenten aufnehmen. Dadurch bleiben externe BuildEngine-Pakete und eingebettete Upstream-Komponenten getrennt sichtbar.
+The generic BCC64X UCRT defect was first observed through Skia but reproduced independently and fixed in the generic tool/link layer. Conversely, Catch2's obsolete `__BORLANDC__` detection is package-specific and stays in its contract.
 
-### 3. Toolchain-Probleme nicht als Bibliothekspatch verstecken
+### 4. Never fabricate a patch from guessed context
 
-Der BCC64X-UCRT-Fehler wurde durch Skia entdeckt, aber außerhalb Skias reproduziert. Deshalb gehört die Lösung in die generische BCC64X-Tool-/Linkschicht und nicht in Skia-Quellcode.
+Generate versioned patches from the fully materialized exact upstream state and validate with `git apply --check`. Do not reconstruct source hunks from log excerpts or assumptions.
 
-Das gleiche Prinzip gilt umgekehrt für Catch2s `__BORLANDC__`-Autodetection: Das ist Catch2-spezifisch und bleibt im Catch2-Vertrag.
+### 5. Distinguish upstream packaging defects from language compatibility
 
-### 4. Keine geschätzten Patches
+- HarfBuzz missing `find_dependency(Threads)` or `hb-subset-depend.h`: packaging/install issue
+- Catch2 `std::_isnan`: obsolete upstream compiler-family detection
+- Catch2 UTF-8 narrow literals: BCC64X execution code-page semantics
+- Skia UCRT math imports: generic BCC64X runtime/linker problem
+- GN `libs` versus absolute import libraries: build-system/toolchain adapter issue
 
-Versionsgebundene Patches werden nur aus exakt materialisiertem Upstream-Zustand erzeugt und mit `git apply --check` gegen den vorgesehenen Zustand validiert. Ein Patch wird nicht aus Logausschnitten oder vermutetem Source-Kontext rekonstruiert.
-
-### 5. Upstream-Paketfehler von Sprachkompatibilität trennen
-
-Beispiele:
-
-- HarfBuzz fehlendes `find_dependency(Threads)` bzw. fehlender `hb-subset-depend.h`: Packaging-/Installationsproblem;
-- Catch2 `std::_isnan`: veraltete Compilererkennung im Upstream;
-- Catch2 UTF-8-Narrow-Literals: BCC64X-Execution-Codepage-Semantik;
-- Skia UCRT-Math-Imports: generischer BCC64X-Runtime-/Linkerbefund;
-- GN `libs` vs. absolute BCC64X-Importlibs: Buildsystem-/Toolchain-Adapterproblem.
-
-Diese Trennung ist wichtig, damit spätere Upstream-Updates gezielt neu bewertet werden können.
+This classification determines how later upstream version updates should be reassessed.
 
 ---
 
+## Project files as input inventories rather than build-system boundaries
 
-## Projektdateien als Importquelle statt Buildsystemgrenze
+ICU revealed a reusable architectural idea: a native Windows project file can contain valuable upstream source/target inventory without becoming the BuildEngine build system.
 
-Die ICU-Analyse führte zu einem zusätzlichen generischen Integrationsbefund.
-
-Eine vorhandene Windows-Projektdatei kann wertvolle Upstream-Information enthalten, ohne dass das zugehörige Buildsystem zur BuildEngine-Toolchain werden muss. Für ICU enthalten die Visual-Studio-Projekte beispielsweise Source- und Targetinventar, während die eigentliche BCC64X-Produktion weiterhin über CMake/Ninja erfolgen kann.
-
-BuildEngine Schema 16 führt deshalb einen Projektimport innerhalb von `cmake mode="configure"` ein.
-
-Der Mechanismus trennt:
+Schema 16 therefore introduced ProjectImport inside `cmake mode="configure"`:
 
 ```text
-Projektmetadaten
-   -> Importadapter
-   -> neutrales Targetmodell
-   -> generiertes CMakeLists.txt
+Project metadata
+   -> import adapter
+   -> neutral target model
+   -> generated CMakeLists.txt
 
-BuildEngine-Vertrag
-   -> Toolchain
-   -> Varianten
-   -> Dependencies
-   -> Installation
+BuildEngine contract
+   -> toolchain
+   -> build variants
+   -> dependencies
+   -> installation
 
-beides zusammen
+both combined
    -> CMake
    -> Ninja
    -> BCC64X
 ```
 
-Die ersten Importadapter sind:
+Initial adapters: `vcxproj` and `cbproj`. Importing VCXPROJ does not switch to MSBuild/MSVC; importing CBPROJ does not modify the original project or make it a second build authority.
 
-- `vcxproj`
-- `cbproj`
+The approach is deliberately conservative: unresolved conditional source selection causes import to fail rather than generating a guessed target. The same model could project existing C++Builder metadata into a native CMake/Ninja/BCC64X build.
 
-Damit entsteht kein MSVC- oder MSBuild-Fallback. Auch beim Import eines `.vcxproj` bleibt BCC64X die Zieltoolchain. Ebenso wird ein `.cbproj` nicht durch BuildEngine verändert oder als alternative Buildautorität verwendet.
+**Status at the time:** implementation and schema existed. ICU 78.3 was the first configured VCXPROJ example (`stubdata`, `common`, `i18n` → `icudt`, `icuuc`, `icuin`). A complete native BCC64X proof for this route and a real CBPROJ proof remained pending.
 
-Die Architektur ist bewusst konservativ: komplexe bedingte Source-Selektion wird nicht geschätzt. Der Import scheitert, wenn Source-Items Bedingungen tragen, deren Semantik nicht sicher in das neutrale Modell überführt werden kann.
+## Open verification items at the time
 
-Der technische Nutzen geht über ICU hinaus. Dasselbe Modell kann vorhandene C++Builder-Projektmetadaten in einen CMake/Ninja/BCC64X-Pfad projizieren. Damit wird ein Projektformat zu einer austauschbaren Eingangsrepräsentation und nicht zu einer dauerhaften Grenze des Buildsystems.
+- Repeat the complete Catch2 Release/Debug workflow, including all 82 CTest cases, install, publish and two installed-consumer smokes after the final execution-code-page correction.
+- Verify final Skia Debug smoke after UCRT correction from an actual log.
+- Reassess why upstream tests were disabled for libpng, libtiff and libjpeg-turbo; record explicit technical rationale.
+- Evaluate any global UTF-8 execution-code-page policy separately; until then, keep `-fborland-exec-code-page=65001` local to Catch2.
+- Incorporate tool identities and other external build inputs more precisely into incremental state beyond library timestamps and dependency edges.
 
-**Status:** Implementierung und Schema sind vorhanden. ICU 78.3 ist als erster realer VCXPROJ-Proof in den aktiven Vertrag eingebaut (`stubdata`, `common`, `i18n` -> `icudt`, `icuuc`, `icuin`). Der abschließende BCC64X-Lauf dieses neuen Pfads sowie ein realer CBPROJ-Proof stehen noch aus.
+## Related documentation
 
-
-## Offene Punkte
-
-- vollständiger erneuter Catch2-BuildEngine-Lauf für Release und Debug einschließlich aller 82 CTest-Einträge, Install, Publish und beider Package-Smokes nach der finalen Execution-Codepage-Einstellung;
-- endgültigen Skia-Debug-Package-Smoke nach der UCRT-Lösung mit realem Log nachweisen;
-- bei libpng, libtiff und libjpeg-turbo die derzeit deaktivierten Upstream-Tests im Rahmen der Test-Policy erneut bewerten und die technische Entscheidung explizit dokumentieren;
-- prüfen, ob UTF-8 als globale BCC64X-Execution-Codepage zukünftig eine bewusste Toolchain-Policy werden soll; bis dahin bleibt `-fborland-exec-code-page=65001` Catch2-lokal;
-- Tool-Identitäten und externe lokale Buildinputs zukünftig gezielt in den inkrementellen Library-State aufnehmen, statt nur Library-Timestamps und Dependencies zu berücksichtigen.
-
-## Zugehörige Dokumentation
-
-- `docs/bcc64x-ucrt-runtime-link-bug.md` – reproduzierter BCC64X-UCRT-Link-/Laufzeitfehler;
-- `docs/library-license-sbom.md` – kumulierte Lizenzinformationen und CycloneDX-SBOM;
-- `admin/build-libraries.xml` – autoritativer Bibliotheks- und Dependency-Vertrag;
-- `admin/build-tools.xml` – Tool- und Generated-Tool-Vertrag, einschließlich `bcc64x-ucrt-compat`.
-
+- `docs/bcc64x-ucrt-runtime-link-bug.md` — reproduced BCC64X UCRT loader defect
+- `docs/library-license-sbom.md` — cumulative licensing and CycloneDX
+- `admin/build-libraries.xml` — authoritative package/dependency contract
+- `admin/build-tools.xml` — tool and generated-tool contract, including `bcc64x-ucrt-compat`
 
 ## PostgreSQL client stack: libpq 18.6 and libpqxx 8.0.2
 
