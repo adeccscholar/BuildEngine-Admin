@@ -66,6 +66,10 @@ Direct: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`
 
 ## 10 November 2026 — BCC64X FastDownCast producer patch
 
+**FSM source invalidation:** the library contract revision timestamp was advanced from `2026-11-10T00:31:00Z` to `2026-11-10T01:43:00Z`. The BuildEngine `ScopeStateStore` persists the library timestamp for each successful scope; `LibraryProgressEvaluator::ScopeCompletedAt` rejects older timestamps. This invalidates existing VTK 9.7.2 source, build and downstream evidence on the next run, allowing extraction and `git apply --check` / `git apply` to run before CMake configure/build for Release and Debug. No cache wipe or force rebuilding of unrelated libraries is required.
+
+
+
 The VTK 9.7.2-specific source patch `admin/patches/vtk/9.7.2/bcc64x-fastdowncast-exports.patch` moves the `FastDownCast` definitions in `vtkAffineArray.h`, `vtkStructuredPointArray.h` and `vtkConstantArray.h` from the class body to out-of-class template definitions. The methods remain callable for other template arguments; explicit instantiation in `CommonCore` now sees an out-of-class definition rather than a class-body inline definition. The patch is applied at source preparation with `git apply --check` followed by `git apply`. No global warning suppression or compiler/runtime replacement is introduced.
 
 The four previously unresolved `FastDownCast` instantiations are the regression target. The source-level change is committed, but rebuilt DLL export tables, import libraries and Release/Debug link results are **[not verified]** until the Windows BCC64X run completes. Inspect exports first and then confirm `CommonDataModel` and the package consumer for each configuration.
