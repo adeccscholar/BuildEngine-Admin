@@ -22,8 +22,14 @@ A chronological engineering history reconstructed from dated repository commits.
 - **[2026-09-09](/news/2026-09-09/)** — Managed Graphviz documentation tooling and pinned version preservation
 - **[2026-09-05](/news/2026-09-05/)** — Skia integration repairs, GN patches, wrapper removal and reverted cleanup
 - **[2026-09-02](/news/2026-09-02/)** — Reproducible Meson and managed Python source bootstraps
+- **[2026-08-31](/news/2026-08-31/)** — Xerces-C, Doxygen 1.18, license metadata, SBOM and ACE/TAO ports
+- **[2026-08-30](/news/2026-08-30/)** — Boost 1.92 DLL stream and serialization limits
+- **[2026-08-29](/news/2026-08-29/)** — curl fixes, rebuilds, resets and libzip
+- **[2026-08-28](/news/2026-08-28/)** — curl 8.21, installed-consumer smokes, XZ/libarchive and zlib variants
 - **[2026-08-27](/news/2026-08-27/)** — NASM for OpenSSL and removal of the zstd static product
+- **[2026-08-26](/news/2026-08-26/)** — OpenSSL, Perl, gmake and versioned dependency contracts
 - **[2026-08-25](/news/2026-08-25/)** — Schema 5 dependency contracts, zlib/libarchive integration and library timing
+- **[2026-08-24](/news/2026-08-24/)** — August feasibility study, initial schema 3 with one library and schema 4 with two
 
 ## Evidence classification
 
@@ -35,7 +41,13 @@ A chronological engineering history reconstructed from dated repository commits.
 
 ## Historical counts
 
+The initial repository history from 24 August 2026 confirms **one versioned library in schema 3 (pugiXML)** and **two in schema 4 (pugiXML and nlohmann-json)**. The earlier feasibility study investigated approximately **20 libraries in ten days** according to the retrospective project story; those experiments are not registered package counts.
+
 The 2026-09-25 entry records an historical set of **44 library documentation entries**. The 2026-11-10 documentation refresh refers to **95 versioned pages across 62 library IDs**. Those numbers describe documented inventory at different points in time, not passing build counts.
+
+## How the project started
+
+The original question was whether **C++Builder 13 / BCC64X could compile contemporary upstream C and C++ libraries itself**, not merely link against libraries built elsewhere. The first feasibility tests in August preceded the administrative repository. The later technical task graph was progressively refactored into a **per-library/version finite-state machine**. The dated August entries preserve initial conditions, library choices, unsuccessful patches, resets and accepted compatibility limitations. Read the [full engineering story](/manual/story.md) for that architectural evolution.
 
 ## Storage and dating rules
 
