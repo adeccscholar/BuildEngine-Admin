@@ -2,6 +2,8 @@
 
 [TOC|Content]
 
+**Aktueller Katalogstand, 10. November 2026:** Schema 17 enthält **95 versionierte Bibliothekseinträge / 62 logische IDs** und **32 Einträge mit `supersededBy`**. Ausführungsnachweise gelten ausschließlich für den jeweiligen FSM-Binärstand. [Vollständiger Katalog](/manual/libraries.md) · [Änderungshistorie](/news/).
+
 **Status:** extension contract reviewed 21 October 2026. Several Common/ownership implementation gaps are explicitly identified below and remain **not verified**.
 
 A library extension is a logically independent library that deliberately continues inside the physical source, producer or installation layout of another logical BuildEngine library.
@@ -13,7 +15,7 @@ There are two extension kinds.
 
 ## October 2026 catalog and version semantics
 
-Schema 17 lists 58 versioned library entries and 52 logical IDs. `tao@4.0.6` still shares the ACE 8.0.6 upstream producer and physical package directories; `libpqxx@8.0.2` extends `libpq@18.6` as an independent package. Superseded versions do not rewrite these declared extension coordinates. Shared physical output does not prove that logical metadata, installed-state endpoints or ZIP export ownership are correct: the implementation gaps below remain open until tested on the active BuildEngine-Common and production tree.
+Schema 17 lists 95 versioned library entries and 62 logical IDs. `tao@4.0.6` extends ACE 8.0.6, while `tao@4.0.8` extends ACE 8.0.8; both use shared-source producer semantics; `libpqxx@8.0.2` extends `libpq@18.6` as an independent package. Superseded versions do not rewrite these declared extension coordinates. Shared physical output does not prove that logical metadata, installed-state endpoints or ZIP export ownership are correct: the implementation gaps below remain open until tested on the active BuildEngine-Common and production tree.
 
 ## Core rule
 
