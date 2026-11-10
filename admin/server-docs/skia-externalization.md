@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Vertragsanalyse vom 10. November 2026.** Die nachfolgenden Vorschläge ändern Skia nicht. Die neue DLL-Integration wäre jeweils ein eigener versionierter BCC64X-Build mit Consumer-Smoketests. PDFium ist separat gegen seinen konkreten Skia-ABI-Stand zu verifizieren.
+**Vertragsanalyse vom 10. November 2026.** Die nachfolgenden Vorschläge ändern Skia nicht. Die neue DLL-Integration wäre jeweils ein eigener versionierter BCC64X-Build mit Consumer-Smoketests. Der aktuelle PDFium-XML-Vertrag referenziert **Skia 153**; die zugehörige DLL-/ABI-Laufzeit ist gesondert über FSM- und Loader-Smokes zu verifizieren.
 
 ## Bereits ausgelagerte Bibliotheken
 
