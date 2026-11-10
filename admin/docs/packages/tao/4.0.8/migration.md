@@ -2,17 +2,17 @@
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data, not verified build execution.** Earlier test results apply only to exact versions and builds; new runs remain **[not verified]**.
 
 CORBA object request broker and middleware services built on top of ACE.
 
-**Koordinate:** `tao@4.0.8` · **Kategorie:** `middleware` · **Lizenzampel:** `green`
+**Coordinate:** `tao@4.0.8` · **Category:** `middleware` · **License indicator:** `green`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (full transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Edges come from exactly pinned XML dependencies. Dashed edges denote extensions, solid edges package dependencies. Bundled upstream components are not additional BuildEngine coordinates.
 
 ```mermaid
 flowchart LR
@@ -32,15 +32,15 @@ flowchart LR
    N3 --> N6
 ```
 
-**Direkte Abhängigkeiten:** `ace@8.0.8` (Erweiterung)
+**Direct dependencies:** `ace@8.0.8` (Erweiterung)
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-D{BMakeConfiguration}`
 
-**Build-Umgebung:**
+**Build environment:**
 
 - `ACE_ROOT={ExtensionProducerRoot}`
 - `TAO_ROOT={ExtensionProducerRoot}\TAO`
@@ -80,4 +80,4 @@ flowchart LR
 - `{ExtensionInstallRoot}\TAO_VERSION.txt`
 - `{ExtensionInstallRoot}\.buildengine\extensions\{LibraryId}\{LibraryVersion}\COPYING`
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
