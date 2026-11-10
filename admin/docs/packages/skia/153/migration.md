@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -32,7 +32,7 @@ flowchart LR
 
 Direkt: `opengl@26.2.1`, `zlib@1.4`, `brotli@1.2.1`, `libjpeg-turbo@3.2.1`, `libpng@1.6.59`, `harfbuzz@15.1.0`, `freetype@2.15.0`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 
 ```gn
@@ -157,7 +157,7 @@ extra_cflags = ["-DWIN32_LEAN_AND_MEAN","-DNOMINMAX"]
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # skia 153: BCC64X migration and integration record
 
