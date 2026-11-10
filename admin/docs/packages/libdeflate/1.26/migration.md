@@ -1,6 +1,6 @@
 ## Updated BuildEngine contract (10 November 2026)
 
-**Aktuelle Deklaration; keine neue PASS-Aussage.** Historische Befunde folgen unverändert unterhalb dieses Abschnitts.
+**Current declaration; no new PASS claim.** Historical findings are preserved below.
 
 ### Complete transitive dependency graph
 
