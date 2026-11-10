@@ -317,8 +317,8 @@ With library contract schema 16, a CMake configure action can import metadata fr
 
 Initially supported:
 
-- `vcxproj` mit `ClCompile` und `ResourceCompile`;
-- `cbproj` mit `CppCompile`, `ResourceCompile` und `RcCompile`.
+- `vcxproj` with `ClCompile` and `ResourceCompile`;
+- `cbproj` with `CppCompile`, `ResourceCompile` and `RcCompile`.
 
 The project file is read-only. BuildEngine modifies neither `.vcxproj` nor `.cbproj`.
 
