@@ -4,8 +4,8 @@
 - [x] Register libdeflate 1.26 (MIT) as an upstream CMake/Ninja project with DLL/import library, Release/Debug, upstream CTest, installed consumer smoke, source integrity and license/SBOM inputs.
 - [x] Register Google Benchmark 1.10.0 (Apache-2.0) as an upstream CMake/Ninja project with DLL/import library, Release/Debug, upstream CTest, installed consumer smoke and license/SBOM inputs; no automatic dependency downloads.
 - [x] Rebase OpenCV 5.1 optional MLAS patch against the upstream source and update expected DLL/import library version suffix to 510.
-- [ ] Confirm source downloads, OpenCV patch application and all seven BCC64X native Release/Debug builds on the Windows build host. **[nicht verifiziert]**
-- [ ] Validate CTest, package consumer smokes, install requirements, metadata, license/SBOM, publish and Doxygen. **[nicht verifiziert]**
+- [ ] Confirm source downloads, OpenCV patch application and all seven BCC64X native Release/Debug builds on the Windows build host. **[not verified]**
+- [ ] Validate CTest, package consumer smokes, install requirements, metadata, license/SBOM, publish and Doxygen. **[not verified]**
 - [ ] Verify the precise native output artifact filenames for libdeflate and Google Benchmark on BCC64X; amend the contracts based on real install evidence.
 - [ ] Investigate unexpectedly long OpenCV compilation independently, using per-step logs and build progress.
 - [ ] Review explicit reverse-dependency pins: libarchive 3.8.11 remains on LZ4 1.10.0; PDFium 2025.11.19 remains on ICU 78.3. Upgrade those consumers only after their own validation.
@@ -120,9 +120,9 @@ Observed target-machine evidence:
 - [x] Poppler 26.09.0 install/common/metadata/publish/doxygen/ready: PASS. This is the first complete BCC64X build evidence for Poppler with `ENABLE_CPP=ON`.
 - [x] QPDF 12.4.1 Release build: PASS.
 - [x] QPDF 12.4.1 Debug build: PASS.
-- [ ] QPDF upstream tests: 0/7 passed. Upstream qtest's Windows path handling assumes MinGW/MSYS Perl, while BuildEngine deliberately provides Strawberry Perl. A version-bound native-Windows qtest adapter is added; result remains **[nicht verifiziert]** until the next run.
+- [ ] QPDF upstream tests: 0/7 passed. Upstream qtest's Windows path handling assumes MinGW/MSYS Perl, while BuildEngine deliberately provides Strawberry Perl. A version-bound native-Windows qtest adapter is added; result remains **[not verified]** until the next run.
 - [x] libxml2 2.15.3 source/build remains PASS in both variants.
-- [ ] libxml2 tests now reach the real upstream output comparison. Failure occurs at the stderr comparison in `run_and_diff.cmake`; the helper now normalizes CRLF/LF before textual comparison. Result remains **[nicht verifiziert]** until the next run.
+- [ ] libxml2 tests now reach the real upstream output comparison. Failure occurs at the stderr comparison in `run_and_diff.cmake`; the helper now normalizes CRLF/LF before textual comparison. Result remains **[not verified]** until the next run.
 - [ ] PoDoFo remains blocked solely by libxml2 test/install evidence; no PoDoFo compiler result is inferred.
 
 ## Fifth PDF/XML integration run: 22 September 2026
@@ -172,10 +172,10 @@ Observed target-machine evidence:
 
 The following participants are now declared in the active Schema-16 BuildEngine stack:
 
-- [x] Poppler 26.09.0: enable `ENABLE_CPP=ON`. **[nicht verifiziert]**
-- [x] libxml2 2.15.3: add shared CMake/Ninja/BCC64X contract with zlib, XML Schema, Relax NG, XPath, XInclude, tests, package publish and consumer smoke. **[nicht verifiziert]**
-- [x] QPDF 12.4.1: add shared CMake/Ninja/BCC64X contract using managed zlib and libjpeg-turbo with native Windows crypto, upstream tests, package publish and consumer smoke. **[nicht verifiziert]**
-- [x] PoDoFo 1.1.1: add shared CMake/Ninja/BCC64X contract using managed zlib, OpenSSL, FreeType, libxml2, JPEG, PNG and TIFF; use Win32 GDI font search and keep AFDKO/tools disabled in the first library profile. **[nicht verifiziert]**
+- [x] Poppler 26.09.0: enable `ENABLE_CPP=ON`. **[not verified]**
+- [x] libxml2 2.15.3: add shared CMake/Ninja/BCC64X contract with zlib, XML Schema, Relax NG, XPath, XInclude, tests, package publish and consumer smoke. **[not verified]**
+- [x] QPDF 12.4.1: add shared CMake/Ninja/BCC64X contract using managed zlib and libjpeg-turbo with native Windows crypto, upstream tests, package publish and consumer smoke. **[not verified]**
+- [x] PoDoFo 1.1.1: add shared CMake/Ninja/BCC64X contract using managed zlib, OpenSSL, FreeType, libxml2, JPEG, PNG and TIFF; use Win32 GDI font search and keep AFDKO/tools disabled in the first library profile. **[not verified]**
 - [ ] Run the new source/configure/build paths and correct only evidence-backed BCC64X incompatibilities.
 - [ ] Run upstream tests for libxml2, QPDF and PoDoFo.
 - [ ] Run Release package consumer smokes for all three libraries.
