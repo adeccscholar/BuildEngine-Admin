@@ -1,3 +1,23 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["bitmapplusplus 1.1.1"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+
+---
+
+## Historische Integrationsnotizen
+
 # bitmapplusplus 1.1.1: BCC64X migration and integration record
 
 [TOC|Content]
