@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -15,7 +15,7 @@ flowchart LR
 
 Direkt: `zlib@1.4`, `zstd@1.5.7`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -49,19 +49,19 @@ Direkt: `zlib@1.4`, `zstd@1.5.7`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # MariaDB Connector/C 3.4.11
 
 [TOC|Content]
 
-## Aufgabe und Integration
+## Purpose and integration
 
 MariaDB native C client as a BCC64X-built shared DLL.
 
-**Stand:** BuildEngine-XML-Vertrag vom 10. November 2026; native Builds und Smoke-Ergebnisse **[nicht verifiziert]**.
+**Status:** BuildEngine XML contract dated 10 November 2026; native builds and smoke results **[not verified]**.
 
-## Abhängigkeiten einschließlich transitiver Stufen
+## Dependencies including transitive levels
 
 ```mermaid
 flowchart LR
@@ -72,7 +72,7 @@ flowchart LR
    N0 --> N2
 ```
 
-**Direkte Abhängigkeiten:** `zlib@1.4`, `zstd@1.5.7`
+**Direct dependencies:** `zlib@1.4`, `zstd@1.5.7`
 
 ## Konfiguration
 
@@ -108,7 +108,7 @@ flowchart LR
 - `-DMARIADB_INCLUDE_DIR:PATH={ConsumerRoot}\include`
 - `-DMARIADB_LIBRARY:FILEPATH={ConsumerRoot}\lib\libmariadb.lib`
 
-### Build-Umgebung
+### Build environment
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -117,7 +117,7 @@ flowchart LR
 - `CB_BDS={BDS}`
 - `CB_WINDOWS_RC={Tool:windows-rc}`
 
-### Quellen
+### Sources
 
 - `https://github.com/mariadb-corporation/mariadb-connector-c/archive/refs/tags/v{LibraryVersion}.tar.gz`
 
@@ -125,8 +125,8 @@ flowchart LR
 
 - `consumer / Release / published`
 
-## Besonderheiten
+## Special considerations
 
-Versionierte Quell- und Build-Aktionen sowie eventuell erforderliche BCC64X-Patches sind im ausführbaren `admin/build-libraries.xml` dokumentiert. Eingetragene Fixes sind ohne FSM-Nachweis kein Test-PASS.
+Versioned source/build actions and necessary BCC64X patches are defined in `admin/build-libraries.xml`. A recorded fix is not a test PASS without FSM evidence.
 
-[Bibliotheksübersicht](/manual/libraries.md)
+[Library overview](/manual/libraries.md)
