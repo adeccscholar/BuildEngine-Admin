@@ -1,0 +1,193 @@
+diff --git a/Common/Core/vtkSetGet.h b/Common/Core/vtkSetGet.h
+--- a/Common/Core/vtkSetGet.h
++++ b/Common/Core/vtkSetGet.h
+@@ -1151,14 +1151,7 @@
+   {                                                                                                \
+     return this->thisClass::IsTypeOf(type);                                                        \
+   }                                                                                                \
+-  static thisClass* SafeDownCast(vtkObjectBase* o)                                                 \
+-  {                                                                                                \
+-    if (o && o->IsA(thisClassName))                                                                \
+-    {                                                                                              \
+-      return static_cast<thisClass*>(o);                                                           \
+-    }                                                                                              \
+-    return nullptr;                                                                                \
+-  }                                                                                                \
++  static thisClass* SafeDownCast(vtkObjectBase* o);                                                 \
+   VTK_NEWINSTANCE instanceType* NewInstance() const;                                                \
+   static vtkIdType GetNumberOfGenerationsFromBaseType(const char* type)                            \
+   {                                                                                                \
+diff --git a/Common/Core/vtkAffineArray.h b/Common/Core/vtkAffineArray.h
+--- a/Common/Core/vtkAffineArray.h
++++ b/Common/Core/vtkAffineArray.h
+@@ -98,8 +98,18 @@
+   void operator=(const vtkAffineArray&) = delete;
+ };
+ 
+-template <class ValueTypeT>
+-auto vtkAffineArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
++template <class ValueTypeT>
++auto vtkAffineArray<ValueTypeT>::SafeDownCast(vtkObjectBase* o) -> SelfType*
++{
++  if (o && o->IsA(typeid(SelfType).name()))
++  {
++    return static_cast<SelfType*>(o);
++  }
++  return nullptr;
++}
++
++template <class ValueTypeT>
++auto vtkAffineArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
+ {
+   return vtkAOSDataArrayTemplate<ValueTypeT>::SafeDownCast(this->NewInstanceInternal());
+ }
+diff --git a/Common/Core/vtkConstantArray.h b/Common/Core/vtkConstantArray.h
+--- a/Common/Core/vtkConstantArray.h
++++ b/Common/Core/vtkConstantArray.h
+@@ -89,8 +89,18 @@
+   void operator=(const vtkConstantArray&) = delete;
+ };
+ 
+-template <class ValueTypeT>
+-auto vtkConstantArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
++template <class ValueTypeT>
++auto vtkConstantArray<ValueTypeT>::SafeDownCast(vtkObjectBase* o) -> SelfType*
++{
++  if (o && o->IsA(typeid(SelfType).name()))
++  {
++    return static_cast<SelfType*>(o);
++  }
++  return nullptr;
++}
++
++template <class ValueTypeT>
++auto vtkConstantArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
+ {
+   return vtkAOSDataArrayTemplate<ValueTypeT>::SafeDownCast(this->NewInstanceInternal());
+ }
+diff --git a/Common/Core/vtkStructuredPointArray.h b/Common/Core/vtkStructuredPointArray.h
+--- a/Common/Core/vtkStructuredPointArray.h
++++ b/Common/Core/vtkStructuredPointArray.h
+@@ -93,8 +93,18 @@
+   void operator=(const vtkStructuredPointArray&) = delete;
+ };
+ 
+-template <class ValueTypeT>
+-auto vtkStructuredPointArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
++template <class ValueTypeT>
++auto vtkStructuredPointArray<ValueTypeT>::SafeDownCast(vtkObjectBase* o) -> SelfType*
++{
++  if (o && o->IsA(typeid(SelfType).name()))
++  {
++    return static_cast<SelfType*>(o);
++  }
++  return nullptr;
++}
++
++template <class ValueTypeT>
++auto vtkStructuredPointArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
+ {
+   return vtkAOSDataArrayTemplate<ValueTypeT>::SafeDownCast(this->NewInstanceInternal());
+ }
+diff --git a/Common/Core/vtkIndexedArray.h b/Common/Core/vtkIndexedArray.h
+--- a/Common/Core/vtkIndexedArray.h
++++ b/Common/Core/vtkIndexedArray.h
+@@ -58,7 +58,7 @@
+ #endif
+ public:
+   using SelfType = vtkIndexedArray<ValueTypeT>;
+-  vtkImplicitArrayTypeMacro(SelfType, ImplicitArrayType);
++  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType, ValueTypeT);
+ #ifndef __VTK_WRAP__
+   using typename Superclass::ArrayTypeTag;
+   using typename Superclass::DataTypeTag;
+@@ -79,10 +79,7 @@
+   /**
+    * A faster alternative to SafeDownCast for downcasting vtkAbstractArrays.
+    */
+-  static vtkIndexedArray<ValueType>* FastDownCast(vtkAbstractArray* source)
+-  {
+-    return static_cast<vtkIndexedArray<ValueType>*>(Superclass::FastDownCast(source));
+-  }
++  static vtkIndexedArray<ValueType>* FastDownCast(vtkAbstractArray* source);
+ 
+   ///@{
+   /**
+@@ -117,7 +114,29 @@
+   void operator=(const vtkIndexedArray&) = delete;
+ };
+ 
+-// Declare vtkArrayDownCast implementations for Indexed arrays:
++template <class ValueTypeT>
++auto vtkIndexedArray<ValueTypeT>::SafeDownCast(vtkObjectBase* o) -> SelfType*
++{
++  if (o && o->IsA(typeid(SelfType).name()))
++  {
++    return static_cast<SelfType*>(o);
++  }
++  return nullptr;
++}
++
++template <class ValueTypeT>
++auto vtkIndexedArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
++{
++  return vtkAOSDataArrayTemplate<ValueTypeT>::SafeDownCast(this->NewInstanceInternal());
++}
++
++template <class ValueTypeT>
++auto vtkIndexedArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source) -> vtkIndexedArray<ValueType>*
++{
++  return static_cast<vtkIndexedArray<ValueType>*>(Superclass::FastDownCast(source));
++}
++
++// Declare vtkArrayDownCast implementations for Indexed arrays:
+ vtkArrayDownCast_TemplateFastCastMacro(vtkIndexedArray);
+ 
+ VTK_ABI_NAMESPACE_END
+diff --git a/Rendering/OpenGL2/CMakeLists.txt b/Rendering/OpenGL2/CMakeLists.txt
+--- a/Rendering/OpenGL2/CMakeLists.txt
++++ b/Rendering/OpenGL2/CMakeLists.txt
+@@ -440,13 +440,36 @@
+   "${CMAKE_CURRENT_SOURCE_DIR}/vtkRenderingOpenGLConfigure.h.in"
+   "${CMAKE_CURRENT_BINARY_DIR}/vtkRenderingOpenGLConfigure.h")
+ 
+-vtk_module_add_module(VTK::RenderingOpenGL2
+-  CLASSES ${classes}
+-  PRIVATE_CLASSES ${private_classes}
+-  SOURCES ${sources} ${vtk_object_factory_source} ${private_sources}
+-  HEADERS ${headers}
+-  NOWRAP_HEADERS ${nowrap_headers}
+-  PRIVATE_HEADERS ${private_headers} ${vtk_object_factory_header})
++vtk_module_add_module(VTK::RenderingOpenGL2
++  CLASSES ${classes}
++  PRIVATE_CLASSES ${private_classes}
++  SOURCES ${sources} ${vtk_object_factory_source} ${private_sources}
++  HEADERS ${headers}
++  NOWRAP_HEADERS ${nowrap_headers}
++  PRIVATE_HEADERS ${private_headers} ${vtk_object_factory_header})
++
++# Resolve WinRT WRL headers through BuildEngine's registered Windows SDK.
++if (VTK_USE_WIN32_OPENGL)
++  if (NOT DEFINED ENV{CB_WINDOWS_RC} OR "$ENV{CB_WINDOWS_RC}" STREQUAL "")
++    message(FATAL_ERROR "VTK OpenGL2 requires a registered Windows SDK RC tool")
++  endif ()
++  get_filename_component(_vtk_rc_arch "$ENV{CB_WINDOWS_RC}" DIRECTORY)
++  get_filename_component(_vtk_rc_ver_dir "${_vtk_rc_arch}" DIRECTORY)
++  get_filename_component(_vtk_rc_ver "${_vtk_rc_ver_dir}" NAME)
++  get_filename_component(_vtk_rc_bin "${_vtk_rc_ver_dir}" DIRECTORY)
++  get_filename_component(_vtk_rc_sdk "${_vtk_rc_bin}" DIRECTORY)
++  set(_vtk_wrl_dir "${_vtk_rc_sdk}/Include/${_vtk_rc_ver}/winrt")
++  if (NOT EXISTS "${_vtk_wrl_dir}/wrl/client.h")
++    message(FATAL_ERROR "Registered Windows SDK WRL header missing: ${_vtk_wrl_dir}/wrl/client.h")
++  endif ()
++  vtk_module_include(VTK::RenderingOpenGL2 PRIVATE "${_vtk_wrl_dir}")
++  unset(_vtk_rc_arch)
++  unset(_vtk_rc_ver_dir)
++  unset(_vtk_rc_ver)
++  unset(_vtk_rc_bin)
++  unset(_vtk_rc_sdk)
++  unset(_vtk_wrl_dir)
++endif ()
+ 
+ set_property(SOURCE vtkEGLDefaultConfig.cxx vtkEGLWaylandConfig.cxx APPEND
+   PROPERTY

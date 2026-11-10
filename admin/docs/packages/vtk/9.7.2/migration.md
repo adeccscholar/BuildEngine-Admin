@@ -106,6 +106,16 @@ The VTK-specific `vtkImplicitArrayTypeMacroOutOfLine` now has a third `valueType
 
 An isolated reproduction of the previous mismatch fails Clang and GCC, and the corrected three-class VTK-style macro example passes Clang (Linux and Windows-MSVC target) and GCC. Native BCC64X compilation and DLL linking remain **[not verified]**. The library revision changes from `2026-11-10T04:57:00Z` to `2026-11-10T04:58:00Z` to invalidate the source scope.
 
+## 10 November 2026 — IndexedArray exports and managed Windows SDK WRL
+
+Debug failed linking `FiltersHyperTree` due to the missing `vtkIndexedArray<double>::SafeDownCast(vtkObjectBase*)` export; Release failed compiling `vtkWin32OpenGLDXRenderWindow.cxx` because `wrl/client.h` was not on the BCC64X C++ include path.
+
+The new VTK source patch moves `SafeDownCast` out of the specialized template macro and supplies out-of-line definitions for `vtkAffineArray`, `vtkConstantArray`, and `vtkStructuredPointArray`. It also converts `vtkIndexedArray` to the existing out-of-line macro variant and supplies `SafeDownCast`, `NewInstance` and `FastDownCast` definitions so their explicit CommonCore instantiations can export the methods. The original type checks and AOS array semantics are retained.
+
+For OpenGL2, the patch derives the registered Windows SDK location from BuildEngine's `CB_WINDOWS_RC`, validates `Include/<version>/winrt/wrl/client.h` and adds that WinRT directory privately to `VTK::RenderingOpenGL2` using `vtk_module_include`, which is present in upstream VTK 9.7.2. Win32 OpenGL2/WGL, DirectX interoperability, and volume ray casting remain enabled; no hard-coded SDK path or compiler-wide workaround is introduced.
+
+The new patch is applied in the source phase after both previously integrated VTK patches. The six edited files and their hunks were structurally replayed against the exact upstream v9.7.2 file contents with preceding patches applied. This is not native BCC64X validation. The VTK revision advances from `2026-11-10T04:58:00Z` to `2026-11-10T05:54:00Z`. **Native compilation, DLL exports, and final links remain [not verified].**
+
 ## Historical integration notes
 
 # vtk 9.7.2: BCC64X migration and integration record
