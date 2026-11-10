@@ -74,6 +74,12 @@ The VTK 9.7.2-specific source patch `admin/patches/vtk/9.7.2/bcc64x-fastdowncast
 
 The four previously unresolved `FastDownCast` instantiations are the regression target. The source-level change is committed, but rebuilt DLL export tables, import libraries and Release/Debug link results are **[not verified]** until the Windows BCC64X run completes. Inspect exports first and then confirm `CommonDataModel` and the package consumer for each configuration.
 
+### 10 November 2026 — E4010 compiler correction
+
+The initial out-of-class definition incorrectly replaced the declaration's dependent `ValueType` alias with the template parameter `ValueTypeT` in the return type. Native BCC64X rejected this with `E4010` while compiling `vtkArrayBulkInstantiate_vtkIdType.cxx` in both configurations. Preserve the exact declared return type through a trailing return type: `auto vtkAffineArray<ValueTypeT>::FastDownCast(vtkAbstractArray*) -> vtkAffineArray<ValueType>*` (and the same transformation for `vtkStructuredPointArray` and `vtkConstantArray`). The cast in the body uses `ValueType` as in the original upstream definition. An isolated C++23 test reproduces the initial Clang type-mismatch diagnostic and accepts the new form, including a Windows-target Clang syntax check. **Native BCC64X Release/Debug compilation and resulting DLL exports remain [not verified].**
+
+The library revision was advanced from `2026-11-10T01:43:00Z` to `2026-11-10T02:11:05Z` to invalidate the completed source scope and force clean re-extraction and patch application. BuildEngine's extraction stage creates a new temporary tree and replaces the target tree, so previously patched headers do not persist into the new source scope.
+
 ## 10 November 2026 — Debug linker diagnosis
 
 The native BCC64X Debug build compiled and linked numerous VTK modules successfully before the **589/835** link step failed for `libvtkCommonDataModel-9.7d.dll`. The link command used the expected **dynamic BCC64X runtime** (`-tR`) and the managed UCRT compatibility archive. The failure is isolated to four unresolved methods:

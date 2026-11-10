@@ -14,9 +14,9 @@ diff --git a/Common/Core/vtkAffineArray.h b/Common/Core/vtkAffineArray.h
 @@ -104,3 +101,9 @@
  // Declare vtkArrayDownCast implementations for Affine arrays:
 +template <class ValueTypeT>
-+vtkAffineArray<ValueTypeT>* vtkAffineArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source)
++auto vtkAffineArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source) -> vtkAffineArray<ValueType>*
 +{
-+  return static_cast<vtkAffineArray<ValueTypeT>*>(Superclass::FastDownCast(source));
++  return static_cast<vtkAffineArray<ValueType>*>(Superclass::FastDownCast(source));
 +}
 +
  vtkArrayDownCast_TemplateFastCastMacro(vtkAffineArray);
@@ -37,9 +37,9 @@ diff --git a/Common/Core/vtkStructuredPointArray.h b/Common/Core/vtkStructuredPo
 @@ -99,3 +96,9 @@
  // Declare vtkArrayDownCast implementations for StructuredPoint arrays:
 +template <class ValueTypeT>
-+vtkStructuredPointArray<ValueTypeT>* vtkStructuredPointArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source)
++auto vtkStructuredPointArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source) -> vtkStructuredPointArray<ValueType>*
 +{
-+  return static_cast<vtkStructuredPointArray<ValueTypeT>*>(Superclass::FastDownCast(source));
++  return static_cast<vtkStructuredPointArray<ValueType>*>(Superclass::FastDownCast(source));
 +}
 +
  vtkArrayDownCast_TemplateFastCastMacro(vtkStructuredPointArray);
@@ -60,9 +60,9 @@ diff --git a/Common/Core/vtkConstantArray.h b/Common/Core/vtkConstantArray.h
 @@ -95,3 +92,9 @@
  // Declare vtkArrayDownCast implementations for Constant arrays:
 +template <class ValueTypeT>
-+vtkConstantArray<ValueTypeT>* vtkConstantArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source)
++auto vtkConstantArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source) -> vtkConstantArray<ValueType>*
 +{
-+  return static_cast<vtkConstantArray<ValueTypeT>*>(Superclass::FastDownCast(source));
++  return static_cast<vtkConstantArray<ValueType>*>(Superclass::FastDownCast(source));
 +}
 +
  vtkArrayDownCast_TemplateFastCastMacro(vtkConstantArray);

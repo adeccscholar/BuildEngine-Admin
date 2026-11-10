@@ -5379,7 +5379,7 @@
       <smoke id="consumer" source="smokes\vtk\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="vtk-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{DependencyRoot:onetbb}\bin\win64\Release;{DependencyRoot:llvm-openmp}\bin\win64\Release;{ENV:PATH}"/></smoke>
    </library>
 
-   <library id="vtk" version="9.7.2" category="graphics" timestamp="2026-11-10T01:43:00Z">
+   <library id="vtk" version="9.7.2" category="graphics" timestamp="2026-11-10T02:11:05Z">
       <dependency library="onetbb" version="2023.2.0"/><dependency library="llvm-openmp" version="20.1.7"/>
       <metadata name="VTK" supplier="Kitware / VTK contributors" homepage="https://vtk.org/" description="Visualization Toolkit for 3D computer graphics, image processing, scientific visualization, and data analysis. VTK 9.7.2 core pipeline, CommonCache, oneTBB 2023.2.0 and LLVM OpenMP 20.1.7; BCC64X Release/Debug validation pending." licenseSignal="green"><license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="Copyright.txt"/></metadata>
       <source>
