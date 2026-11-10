@@ -36,7 +36,7 @@ flowchart LR
    N0["eigen 5.0.1"]
 ```
 
-**Direct dependencies:** keine
+**Direct dependencies:** none
 
 ## Configuration
 
