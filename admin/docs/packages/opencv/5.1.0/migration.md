@@ -246,6 +246,6 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_imgcodecs510{DebugPostfix}.lib`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libopencv_videoio510{DebugPostfix}.dll`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_videoio510{DebugPostfix}.lib`
-- 11 weitere Einträge im XML-Vertrag.
+- 11 additional records in the XML contract.
 
 **Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
