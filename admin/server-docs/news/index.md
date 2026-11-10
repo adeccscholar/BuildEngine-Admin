@@ -11,6 +11,8 @@ Chronologische Änderungshistorie auf Grundlage datierter Repository-Commits. Di
 - **[2026-11-07](/news/2026-11-07/)** — ACE/TAO Build-Parallelisierung und Windows-Schnittstellen für libpq
 - **[2026-10-30](/news/2026-10-30/)** — Brotli 1.2.1 und OpenSSL-Ressourcencompiler
 - **[2026-10-28](/news/2026-10-28/)** — MariaDB Connector/C 3.4.11 und Importbibliotheken
+- **[2026-10-21](/news/2026-10-21/)** — oneTBB 2023.1.0, LLVM OpenMP, RC-CMake-Integration und Bibliotheksgraphen
+- **[2026-10-20](/news/2026-10-20/)** — PDFium/Abseil-DLL-Grenze, libpq-ABI, RC-Tooling und Debug-Consumer
 - **[2026-10-25](/news/2026-10-25/)** — WIL, Tesseract, Leptonica, OpenCV Contrib und WinRT
 - **[2026-10-15](/news/2026-10-15/)** — XZ, Expat, libarchive, Abseil, Mermaid und Dokumentationswerkzeuge
 - **[2026-09-25](/news/2026-09-25/)** — Dynamische BCC64X-Runtime und PoDoFo-DLL-Nachweise
