@@ -32,7 +32,7 @@ flowchart LR
 
 ---
 
-## Bisherige Migrationsnotizen
+## Previous migration notes
 
 # ACE 8.0.6: BCC64X migration and integration record
 
