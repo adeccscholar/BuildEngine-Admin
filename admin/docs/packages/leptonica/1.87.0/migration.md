@@ -1,3 +1,58 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["leptonica 1.87.0"]
+   N1["zlib 1.4"]
+   N2["libpng 1.6.59"]
+   N3["libjpeg-turbo 3.2.1"]
+   N4["libtiff 4.7.2"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+   N0 --> N4
+   N2 --> N1
+   N4 --> N1
+   N4 --> N3
+```
+
+Direkt: `zlib@1.4`, `libpng@1.6.59`, `libjpeg-turbo@3.2.1`, `libtiff@4.7.2`
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DBUILD_PROG:BOOL=OFF`
+- `-DSW_BUILD:BOOL=OFF`
+- `-DENABLE_ZLIB:BOOL=ON`
+- `-DENABLE_PNG:BOOL=ON`
+- `-DENABLE_JPEG:BOOL=ON`
+- `-DENABLE_TIFF:BOOL=ON`
+- `-DENABLE_GIF:BOOL=OFF`
+- `-DENABLE_WEBP:BOOL=OFF`
+- `-DENABLE_OPENJPEG:BOOL=OFF`
+- `-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib};{DependencyRoot:libpng};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libtiff}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_DEBUG_POSTFIX:STRING=d`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-DLeptonica_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\leptonica`
+
+---
+
+## Historische Integrationsnotizen
+
 # Leptonica 1.87.0
 
 [TOC|Content]
