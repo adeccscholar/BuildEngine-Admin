@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -22,7 +22,7 @@ flowchart LR
 
 Direkt: `zlib@1.4`, `bzip2@1.0.8`, `brotli@1.2.1`, `libpng@1.6.59`, `harfbuzz@14.4.0`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -58,7 +58,7 @@ Direkt: `zlib@1.4`, `bzip2@1.0.8`, `brotli@1.2.1`, `libpng@1.6.59`, `harfbuzz@14
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # freetype 2.14.3: BCC64X migration and integration record
 
