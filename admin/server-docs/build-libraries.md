@@ -2,6 +2,8 @@
 
 [TOC|Content]
 
+**Aktueller Katalogstand, 10. November 2026:** Schema 17 enthält **95 versionierte Bibliothekseinträge / 62 logische IDs** und **32 Einträge mit `supersededBy`**. Ausführungsnachweise gelten ausschließlich für den jeweiligen FSM-Binärstand. [Vollständiger Katalog](/manual/libraries.md) · [Änderungshistorie](/news/).
+
 **Status:** current declarative contract reviewed **21 October 2026**. The active `admin/build-libraries.xml` uses **schemaVersion 17** and `schemas/build-libraries.xsd`.
 
 `admin/build-libraries.xml` is the executable declarative contract for C and C++ libraries managed by BuildEngine. It describes logical library identity, exact versions, dependencies, source acquisition/preparation, build variants, tests, installation, publication, smoke tests, metadata/security evidence, documentation and library extensions.
@@ -17,22 +19,17 @@ Related documents:
 - [Third-party licenses](licenses.md)
 - [PDF and E-invoice processing roadmap](pdf-processing.md)
 
-## Current declarative scope and acceptance (21 October 2026)
+## Current declarative scope and acceptance (10 November 2026)
 
-The active Schema-17 XML contains **58 `<library>` records for 52
-logical IDs** (six superseded versions deliberately retained), with
+The active Schema-17 XML contains **95 `<library>` records for 62
+logical IDs** (32 entries with `supersededBy` retained), with
 direct versioned `dependency` edges, optional `extension` relations,
 managed build/test/install variants and smoke scopes. The complete
 inventory is in [Integrated Third-Party Libraries](libraries.md).
 BuildEngine resolves and executes the XML; a source/metadata comment or
 historical example is never another executable library.
 
-Six version lines are marked `supersededBy`: XZ 5.8.3→5.8.4,
-libarchive 3.8.9→3.8.10, OpenSSL 3.5.8→3.5.9,
-curl 8.21.0→8.23.0, Skia 144→153 and Expat 2.8.4→2.9.0.
-A dependent package may intentionally pin a predecessor (for example,
-PDFium→Skia 144). Do not change such edges merely because a later
-version exists.
+32 version lines are marked `supersededBy`. The precise predecessor/successor relationships are listed in the current [library catalog](/manual/libraries.md). Dependent packages may deliberately retain an earlier version; never rewrite a pin merely because a newer release exists.
 
 **Smoke configuration contract:** `scope="published"` (default)
 requires `configuration` equal to the library's publish configuration;
