@@ -1,3 +1,79 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die bisherigen Migrationsnotizen folgen unverändert.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["curl 8.21.0"]
+   N1["openssl 3.5.8"]
+   N2["zlib 1.3.2"]
+   N3["brotli 1.2.0"]
+   N4["zstd 1.5.7"]
+   N0 --> N1
+   N0 --> N2
+   N1 --> N2
+   N1 --> N3
+   N1 --> N4
+```
+
+**Direkte Abhängigkeiten:** `openssl@3.5.8`, `zlib@1.3.2`
+
+### Konfiguration und Patches
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DCMAKE_DEBUG_POSTFIX:STRING=d`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DBUILD_STATIC_LIBS:BOOL=OFF`
+- `-DIMPORT_LIB_SUFFIX:STRING=`
+- `-DBUILD_CURL_EXE:BOOL=OFF`
+- `-DBUILD_EXAMPLES:BOOL=OFF`
+- `-DBUILD_TESTING:BOOL=OFF`
+- `-DBUILD_LIBCURL_DOCS:BOOL=OFF`
+- `-DBUILD_MISC_DOCS:BOOL=OFF`
+- `-DENABLE_CURL_MANUAL:BOOL=OFF`
+- `-DCURL_ENABLE_EXPORT_TARGET:BOOL=ON`
+- `-DCURL_USE_OPENSSL:BOOL=ON`
+- `-DCURL_USE_SCHANNEL:BOOL=OFF`
+- `-DENABLE_ARES:BOOL=OFF`
+- `-DUSE_LIBIDN2:BOOL=OFF`
+- `-DCURL_ZLIB:STRING=ON`
+- `-DCURL_BROTLI:STRING=OFF`
+- `-DCURL_ZSTD:STRING=OFF`
+- `-DCURL_USE_PKGCONFIG:BOOL=OFF`
+- `-DCURL_USE_CMAKECONFIG:BOOL=OFF`
+- `-DCMAKE_FIND_PACKAGE_PREFER_CONFIG:BOOL=OFF`
+- `-DOPENSSL_USE_STATIC_LIBS:BOOL=OFF`
+- `-DZLIB_USE_STATIC_LIBS:BOOL=OFF`
+- `-DCURL_USE_LIBPSL:BOOL=OFF`
+- `-DCURL_USE_LIBSSH2:BOOL=OFF`
+- `-DCURL_USE_LIBSSH:BOOL=OFF`
+- `-DUSE_NGHTTP2:BOOL=OFF`
+- `-DUSE_NGTCP2:BOOL=OFF`
+- `-DUSE_QUICHE:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include`
+- `-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include`
+- `-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\Release\libz.lib`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include`
+- `-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include`
+- `-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\Debug\libzd.lib`
+
+---
+
+## Bisherige Migrationsnotizen
+
 # curl 8.21.0: BCC64X migration and integration record
 
 [TOC|Content]
