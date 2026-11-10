@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Aktueller Katalogstand, 10. November 2026:** Schema 17 enthält **95 versionierte Bibliothekseinträge / 62 logische IDs** und **32 Einträge mit `supersededBy`**. Ausführungsnachweise gelten ausschließlich für den jeweiligen FSM-Binärstand. [Vollständiger Katalog](/manual/libraries.md) · [Änderungshistorie](/news/).
+**Catalog snapshot, 10 November 2026:** Schema 17 declares **95 versioned library records across 62 logical IDs** and **32 `supersededBy` entries**. Execution evidence applies only to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
 
 **Status:** reviewed 21 October 2026. Documentation is integrated into the active Library-FSM architecture. Individual end-to-end documentation paths remain subject to targeted BCC64X/runtime verification.
 
@@ -252,7 +252,7 @@ Documentation status follows the logical library identity. New package extension
 
 The hierarchical Documentation FSM, standard/collection/linked modes, dynamic collection-scope materialization and explicit Doxygen tagfile relationships are implemented in the active source.
 
-Targeted BCC64X compilation has been performed for major parts of this path. A complete fresh documentation/clean-room run across all library profiles remains **[nicht verifiziert]** until separately executed and recorded.
+Targeted BCC64X compilation has been performed for major parts of this path. A complete fresh documentation/clean-room run across all library profiles remains **[not verified]** until separately executed and recorded.
 
 ## StackBuilder distribution documentation
 
