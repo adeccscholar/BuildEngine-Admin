@@ -1,17 +1,17 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration, not a new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["expat 2.10.0"]
 ```
 
-Direkt: keine
+Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -37,28 +37,28 @@ Direkt: keine
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # Expat 2.10.0
 
 [TOC|Content]
 
-## Aufgabe und Integration
+## Purpose and integration
 
 Streaming XML parser used as a native dependency by TECkit SFconv and other XML-consuming components.
 
-**Stand:** BuildEngine-XML-Vertrag vom 10. November 2026; native Builds und Smoke-Ergebnisse **[nicht verifiziert]**.
+**Status:** BuildEngine XML contract dated 10 November 2026; native builds and smoke results **[not verified]**.
 
-## Abhängigkeiten einschließlich transitiver Stufen
+## Dependencies including transitive levels
 
 ```mermaid
 flowchart LR
    N0["expat 2.10.0"]
 ```
 
-**Direkte Abhängigkeiten:** keine
+**Direct dependencies:** keine
 
-## Konfiguration
+## Configuration
 
 ### CMake
 
@@ -84,7 +84,7 @@ flowchart LR
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
 
-### Build-Umgebung
+### Build environment
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -92,7 +92,7 @@ flowchart LR
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
 
-### Quellen
+### Sources
 
 - `https://github.com/libexpat/libexpat/releases/download/R_2_10_0/expat-{LibraryVersion}.tar.xz`
 
@@ -100,8 +100,8 @@ flowchart LR
 
 - `consumer / Release / published`
 
-## Besonderheiten
+## Special considerations
 
-Versionierte Quell- und Build-Aktionen sowie eventuell erforderliche BCC64X-Patches sind im ausführbaren `admin/build-libraries.xml` dokumentiert. Eingetragene Fixes sind ohne FSM-Nachweis kein Test-PASS.
+Versioned source/build actions and required BCC64X patches are defined in executable `admin/build-libraries.xml`. A registered fix is not a test PASS without matching FSM evidence.
 
-[Bibliotheksübersicht](/manual/libraries.md)
+[Library overview](/manual/libraries.md)
