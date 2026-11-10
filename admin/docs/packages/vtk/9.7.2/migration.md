@@ -13,7 +13,7 @@ flowchart LR
    N0 --> N2
 ```
 
-Direkt: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`
+Direct: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`
 
 ### Current configuration
 
@@ -63,6 +63,23 @@ Direkt: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`
 **Contract identity:** `vtk@9.7.2` · **Category:** graphics · **Target:** RAD Studio 13 Florence / BCC64X 20.1.7 / Windows x64.
 
 **Verification boundary:** Registration in `admin/build-libraries.xml` is not evidence of successful compilation, installation or consumer execution. All Windows-specific outcomes below remain **[not verified]** until the BuildEngine FSM and logs report them.
+
+## 10 November 2026 — Debug linker diagnosis
+
+The native BCC64X Debug build compiled and linked numerous VTK modules successfully before the **589/835** link step failed for `libvtkCommonDataModel-9.7d.dll`. The link command used the expected **dynamic BCC64X runtime** (`-tR`) and the managed UCRT compatibility archive. The failure is isolated to four unresolved methods:
+
+```text
+vtkAffineArray<int>::FastDownCast(vtkAbstractArray*)
+vtkAffineArray<long long>::FastDownCast(vtkAbstractArray*)
+vtkStructuredPointArray<double>::FastDownCast(vtkAbstractArray*)
+vtkConstantArray<unsigned char>::FastDownCast(vtkAbstractArray*)
+```
+
+These methods have inline definitions in their respective VTK 9.7.2 `Common/Core` headers, while the same template classes use extern-template declarations with `VTKCOMMONCORE_EXPORT`. VTK generates class template instantiations in `vtkArrayBulkInstantiate_<type>.cxx` and provides them through `vtkCommonCore`. The evidence is consistent with the BCC64X compiler not emitting or exporting the four static inline instantiations expected by the `CommonDataModel` consumer. Confirm the exact producer symbol table before creating any patch.
+
+The log contains **11,033 warnings**: `W6679` 10,949 (ignored `dllimport` on redeclared inline methods), `W6398` 78 (ignored import/export attributes on inline functions), `W6645` 5 (deprecated `GetVersionEx`) and `W6701` 1 (redundant equality parentheses in `vtkSocket.cxx`). Many arise repeatedly through common VTK header inclusion; they are not 11,033 independent defects.
+
+**Recommended investigation:** inspect `libvtkCommonCore-9.7d.dll` exports and the corresponding import library for the four exact `FastDownCast` symbols. If absent, construct a minimal **VTK 9.7.2-specific** source patch that forces the required methods to be emitted from the `CommonCore` producer with correct DLL visibility; build the producer first, then relink `CommonDataModel` before proceeding to the remaining modules. Do not globally disable `-Wignored-attributes`, and do not switch away from BCC64X. This document records the diagnosis only; it does not introduce an untested upstream patch or alter BuildEngine XML.
 
 ## Source provenance
 
