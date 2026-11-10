@@ -6,6 +6,7 @@ Chronologische Änderungshistorie auf Grundlage datierter Repository-Commits. Di
 
 ## Chronik (neueste zuerst)
 
+- **[2026-11-10](/news/2026-11-10/)** — 95 Bibliotheksseiten, transitive Mermaid-Diagramme, News-Routen und Skia-DLL-Bewertung
 - **[2026-11-09](/news/2026-11-09/)** — VTK 9.7.2, OpenCV 5.1, neue Tools und Patches für libarchive, PDFium, libtiff sowie OpenXLSX
 - **[2026-11-08](/news/2026-11-08/)** — Catch2, GoogleTest, oneTBB, PoDoFo, Poppler, Tesseract und weitere Bibliotheksupgrades
 - **[2026-11-07](/news/2026-11-07/)** — ACE/TAO Build-Parallelisierung und Windows-Schnittstellen für libpq
