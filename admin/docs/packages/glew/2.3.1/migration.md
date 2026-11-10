@@ -1,3 +1,37 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["glew 2.3.1"]
+   N1["opengl 26.2.1"]
+   N0 --> N1
+```
+
+Direkt: `opengl@26.2.1`
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DGLEW_SOURCE_DIR:PATH={Workspace}`
+- `-DOPENGL_LIBRARY:FILEPATH={DependencyRoot:opengl}\lib\win64\{Configuration}\opengl32.lib`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+
+---
+
+## Historische Integrationsnotizen
+
 # glew 2.3.1: BCC64X migration and integration record
 
 [TOC|Content]
