@@ -56,7 +56,7 @@ flowchart LR
    N0["expat 2.10.0"]
 ```
 
-**Direct dependencies:** keine
+**Direct dependencies:** none
 
 ## Configuration
 
