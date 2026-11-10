@@ -54,6 +54,14 @@ Direct: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`
 
 ---
 
+## 10 November 2026 — Installed consumer CMake dependency discovery
+
+The installed VTK 9.7.2 Release consumer reached CMake configuration but failed before building: the exported `vtk-9.7/FindTBB.cmake` reported `Could NOT find TBB (missing: TBB_DIR)` and `Required library TBB not found`. The smoke already supplied `VTK_DIR` and managed dependency roots in `CMAKE_PREFIX_PATH`, but the oneTBB package uses the configuration-specific `lib/win64/<Configuration>/cmake/TBB` directory rather than an ordinary default CMake package layout. VTK's own producer configuration and the oneTBB consumer already specify this exact `TBB_DIR` path.
+
+Both VTK 9.7.2 package smokes (Release and Debug) now pass the managed `TBB_DIR` using `{DependencyRoot:onetbb}` and `{Configuration}`. They also forward the same OpenMP C++ discovery settings as the VTK producer (`OpenMP_CXX_FLAGS=-fopenmp`, `OpenMP_CXX_LIB_NAMES=omp`, and `OpenMP_omp_LIBRARY` pointing to the matching `llvm-openmp` runtime). No installed package, compiler, library source, module selection, or global CMake search path is changed.
+
+**Scope evidence:** This is a smoke-only configuration fix. The library revision timestamp is intentionally unchanged so completed VTK source/build/install work can be reused; the failed consumer smoke has no successful completion evidence and is eligible for retry. The updated Release/Debug smoke outcome is **[not verified]** until the Windows run completes.
+
 ## Historical integration notes
 
 # vtk 9.7.2: BCC64X migration and integration record
