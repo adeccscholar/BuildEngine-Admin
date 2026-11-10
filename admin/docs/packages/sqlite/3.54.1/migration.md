@@ -1,17 +1,17 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["sqlite 3.54.1"]
 ```
 
-Direkt: keine
+Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DSQLITE_SOURCE_DIR:PATH={Workspace}`
 - `-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}`
@@ -23,34 +23,34 @@ Direkt: keine
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # SQLite 3.54.1
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data, not verified build execution.** Earlier test results apply only to exact versions and builds; new runs remain **[not verified]**.
 
 Embedded relational database engine providing a self-contained SQL database in a single library.
 
-**Koordinate:** `sqlite@3.54.1` · **Kategorie:** `database` · **Lizenzampel:** `green`
+**Coordinate:** `sqlite@3.54.1` · **Category:** `database` · **License indicator:** `green`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (full transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Edges come from exactly pinned XML dependencies. Dashed edges denote extensions, solid edges package dependencies. Bundled upstream components are not additional BuildEngine coordinates.
 
 ```mermaid
 flowchart LR
    N0["sqlite 3.54.1"]
 ```
 
-**Direkte Abhängigkeiten:** Keine deklariert.
+**Direct dependencies:** None declared.
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-DSQLITE_SOURCE_DIR:PATH={Workspace}`
 - `-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}`
@@ -73,4 +73,4 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BaseName}.dll`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BaseName}.lib`
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
