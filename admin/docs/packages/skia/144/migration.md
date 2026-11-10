@@ -1,3 +1,99 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["skia 144"]
+   N1["zlib 1.4"]
+   N2["libjpeg-turbo 3.2.0"]
+   N3["libpng 1.6.59"]
+   N4["freetype 2.14.3"]
+   N5["opengl 26.2.1"]
+   N6["bzip2 1.0.8"]
+   N7["brotli 1.2.1"]
+   N8["harfbuzz 14.4.0"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+   N0 --> N4
+   N0 --> N5
+   N3 --> N1
+   N4 --> N1
+   N4 --> N6
+   N4 --> N7
+   N4 --> N3
+   N4 --> N8
+```
+
+Direkt: `zlib@1.4`, `libjpeg-turbo@3.2.0`, `libpng@1.6.59`, `freetype@2.14.3`, `opengl@26.2.1`
+
+### Aktuelle Konfiguration
+
+
+```gn
+skia_use_bcc64x = true
+target_cpu = "x64"
+target_cc = "bcc64x"
+target_cxx = "bcc64x"
+target_link = "bcc64x"
+target_ar = "llvm-ar"
+python_executable = getenv("CB_PYTHON")
+extra_ldflags = [getenv("CB_BCC64X_UCRT_COMPAT")]
+is_component_build = true
+is_trivial_abi = false
+is_official_build = {SkiaOfficialBuild}
+is_debug = {SkiaDebug}
+skia_enable_tools = false
+skia_build_fuzzers = false
+skia_build_rust_targets = false
+skia_enable_spirv_validation = false
+skia_enable_ganesh = true
+skia_enable_graphite = false
+skia_use_gl = true
+skia_use_direct3d = false
+skia_use_vulkan = false
+skia_use_dawn = false
+skia_enable_pdf = false
+skia_use_xps = false
+skia_enable_svg = false
+skia_enable_skottie = false
+skia_use_freetype = true
+skia_enable_fontmgr_custom_directory = false
+skia_enable_fontmgr_custom_embedded = false
+skia_enable_fontmgr_custom_empty = true
+skia_use_system_freetype2 = true
+skia_system_freetype2_include_path = getenv("CB_SKIA_FREETYPE_INCLUDE")
+skia_system_freetype2_lib = getenv("CB_SKIA_FREETYPE_LIB")
+skia_use_icu = false
+skia_use_harfbuzz = false
+skia_use_expat = false
+skia_use_libwebp_decode = false
+skia_use_libwebp_encode = false
+skia_use_wuffs = false
+skia_use_libavif = false
+skia_use_libjxl_decode = false
+skia_use_dng_sdk = false
+skia_use_jpeg_gainmaps = false
+skia_use_zlib = true
+skia_use_system_zlib = true
+skia_use_system_libpng = true
+skia_use_system_libjpeg_turbo = true
+bcc64x_zlib_include = getenv("CB_SKIA_ZLIB_INCLUDE")
+bcc64x_zlib_lib = getenv("CB_SKIA_ZLIB_LIB")
+bcc64x_libpng_include = getenv("CB_SKIA_LIBPNG_INCLUDE")
+bcc64x_libpng_lib = getenv("CB_SKIA_LIBPNG_LIB")
+bcc64x_libjpeg_include = getenv("CB_SKIA_LIBJPEG_INCLUDE")
+bcc64x_libjpeg_lib = getenv("CB_SKIA_LIBJPEG_LIB")
+extra_cflags = ["-DWIN32_LEAN_AND_MEAN","-DNOMINMAX","-Wno-unknown-pragmas"]
+```
+
+---
+
+## Historische Integrationsnotizen
+
 # Skia 144 for PDFium 2025.11.19 — independent BuildEngine package
 
 > **Shared translation inventory:** [General BCC64X/GN translation rules](../../../../server-docs/translation-rules.md) records the implemented compiler flags, linker response rewriting, library-specific GN/Skia decisions, and verification limits. This migration records package-specific evidence rather than duplicating the generic adapter table.
