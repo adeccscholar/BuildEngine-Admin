@@ -6,13 +6,13 @@ The project documentation is maintained in English so the project is accessible 
 
 ## Current status
 
-BuildEngine has moved from its original task/global-DAG orchestration to a **Library-FSM architecture**. Each active Library/Version follows the fachlich lifecycle:
+BuildEngine has moved from its original task/global-DAG orchestration to a **Library-FSM architecture**. Each active Library/Version follows its domain lifecycle:
 
 ```text
 Source -> Build -> Test -> Validation -> Install -> Metadata -> Publish -> Documentation -> Ready
 ```
 
-Technical jobs and local Action graphs execute only work released by that state machine. `ProcessScheduler` remains technical queue/worker infrastructure; it is no longer the fachlich model of a library.
+Technical jobs and local Action graphs execute only work released by that state machine. `ProcessScheduler` remains technical queue/worker infrastructure; it is no longer the domain model of a library.
 
 The Admin contract has continued to evolve beyond the old September freeze baseline. In particular, managed `libarchive 3.8.9` now depends explicitly on `bzip2 1.0.8` so BuildEngine's private libarchive runtime can gain native in-process `.tar.bz2` support.
 
@@ -48,25 +48,11 @@ This separation is binding.
 
 `admin/build-libraries.xml` is the **single normative library and dependency contract**.
 
-Current state:
+**Documented snapshot (10 November 2026):** XML schema 17, **95 versioned library records across 62 logical library IDs**, including **32 `supersededBy` declarations**. This supersedes the September-era 44-library list formerly repeated here. For exact current coordinates and dependencies, read the authoritative XML rather than treating a static README inventory as executable configuration.
 
-```text
-schemaVersion = 16
-current synchronized logical library catalog
-```
+The catalog covers database clients, XML, PDF and document processing, text shaping and Unicode, test frameworks, graphics, image and video processing, compression, networking, middleware, OCR, numerical computing, and native parallelism. [Complete library catalog](admin/server-docs/libraries.md) · [Migration guides](admin/docs/packages/README.md).
 
-Included (44 logical libraries):
-
-```text
-pugixml, zlib, brotli, zstd, xz, libzip, libarchive, openssl, curl,
-boost, nlohmann-json, ace, tao, bzip2, glew, opengl, raylib, sdl2,
-sqlite, libpq, libpqxx, xerces-c, soil2, vtk, opencv, cmark-gfm,
-googletest, catch2, bitmapplusplus, libjpeg-turbo, libpng, harfbuzz,
-freetype, libtiff, skia, graphite2, expat, teckit, icu, libxml2,
-qpdf, podofo, win-iconv, poppler
-```
-
-The catalog now covers database clients (SQLite and PostgreSQL), XML, PDF/document processing, text shaping/Unicode, test frameworks, graphics, compression, networking and middleware.
+The project began with an August feasibility study involving approximately twenty upstream libraries. On 24 August the new BuildEngine administration contract registered only pugiXML 1.16, later adding nlohmann-json 3.12.0 the same day. Those experimental cases and the present versioned catalog use different counting conventions. [Engineering story](admin/server-docs/story.md) · [News timeline](admin/server-docs/news/index.md).
 
 ## Core principle
 
@@ -105,7 +91,7 @@ require
 target
 ```
 
-Schema 16 XML uses optional technical graph metadata (`id`, `dependsOn`). These dependencies order Actions inside technical work; they do not replace the Library-FSM or create persistent state. The XML and active XSD contract are aligned on Schema 16.
+Schema 16 introduced optional technical graph metadata (`id`, `dependsOn`). Such dependencies order actions inside technical work; they do not replace the Library-FSM or create persistent state. The catalog has subsequently advanced to schema 17.
 
 ## Publish manifest and Doxygen
 
