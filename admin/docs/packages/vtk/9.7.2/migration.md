@@ -82,6 +82,14 @@ The bundled Verdict header selects `dllexport` based on `verdict_EXPORTS`, while
 
 Source checks: six source files are structurally checked against upstream VTK v9.7.2 and the prior FastDownCast patch. The VTK source revision advances from `2026-11-10T02:45:00Z` to `2026-11-10T04:55:00Z` so the FSM re-extracts before rebuilding Debug and Release. No global warning flags or alternate toolchains are added. Native BCC64X compilation, DLL exports, and downstream links remain **[not verified]**.
 
+## 10 November 2026 — Correct invalid Verdict patch EOF context
+
+The previous `bcc64x-verdict-newinstance.patch` erroneously used the Verdict `vtkverdict/CMakeLists.txt` hunk range `@@ -25,5 +25,10 @@`, including a nonexistent blank context line after the source's last newline. Upstream VTK 9.7.2 ends the file at line 28 (`HEADERS_SUBDIR "vtkverdict")`). BuildEngine therefore stopped at `verdict-newinstance-patch-check` before any compile step.
+
+The hunk is now `@@ -25,4 +25,9 @@` without the trailing phantom context line. The actual `verdict_EXPORTS` CMake change and every other patch hunk remain unchanged. The failing original patch and corrected hunk were both exercised with real `git apply --check --no-index --whitespace=nowarn` against the original 28-line VTK CMake file: original **FAIL**, corrected **PASS**. The VTK library revision advances from `2026-11-10T04:55:00Z` to `2026-11-10T04:56:00Z` to invalidate the source scope.
+
+The complete VTK source/build and native Windows/BCC64X compiler and linker outcomes remain **[not verified]**.
+
 ## Historical integration notes
 
 # vtk 9.7.2: BCC64X migration and integration record

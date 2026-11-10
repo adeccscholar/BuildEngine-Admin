@@ -164,7 +164,7 @@ diff --git a/Common/Core/vtkStructuredPointArray.h b/Common/Core/vtkStructuredPo
 diff --git a/ThirdParty/verdict/vtkverdict/CMakeLists.txt b/ThirdParty/verdict/vtkverdict/CMakeLists.txt
 --- a/ThirdParty/verdict/vtkverdict/CMakeLists.txt
 +++ b/ThirdParty/verdict/vtkverdict/CMakeLists.txt
-@@ -25,5 +25,10 @@
+@@ -25,4 +25,9 @@
  vtk_module_add_module(VTK::verdict
    HEADERS ${headers}
    SOURCES ${sources}
@@ -175,4 +175,3 @@ diff --git a/ThirdParty/verdict/vtkverdict/CMakeLists.txt b/ThirdParty/verdict/v
 +if (WIN32 AND BUILD_SHARED_LIBS)
 +  vtk_module_compile_definitions(VTK::verdict PRIVATE verdict_EXPORTS)
 +endif ()
- 
