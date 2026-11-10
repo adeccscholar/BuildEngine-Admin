@@ -1,3 +1,40 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktuelle Deklaration; keine neue PASS-Aussage.** Historische Befunde folgen unverändert unterhalb dieses Abschnitts.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["brotli 1.2.1"]
+```
+
+**Direkte Versionen:** keine
+
+### Konfiguration und Besonderheiten
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DBROTLI_BUILD_FOR_PACKAGE:BOOL=OFF`
+- `-DBROTLI_BUILD_TOOLS:BOOL=ON`
+- `-DBROTLI_BUNDLED_MODE:BOOL=OFF`
+- `-DBROTLI_DISABLE_TESTS:BOOL={TestsDisabled}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+
+---
+
+## Bisherige Migrations- und Integrationsnotizen
+
 # brotli 1.2.1: BCC64X migration and integration record
 
 [TOC|Content]
