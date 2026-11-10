@@ -1,102 +1,76 @@
-# Zentrale Bibliotheksbewertung
+# Central Library Security Assessment
 
-Fuer den aktuellen BuildEngine-Stand existiert genau **eine** Security-Bewertungsebene: die zentrale Bewertung der von BuildEngine erzeugten Bibliotheken.
+At this documented stage, BuildEngine has exactly **one** assessment level: a centralized security assessment of the specific libraries built by BuildEngine.
 
-## Zentrale Datenbank im Arbeitsbereich
+## Central working database
 
-Die von den Programmen verwendete Datenbank liegt unter:
+The programs share:
 
 ```text
 <ProductionRoot>\admin\security\build-assessments.sqlite
 ```
 
-Sie enthaelt gemeinsam:
+It stores languages, localized reference values, provider findings, build/library findings and centralized assessment revisions.
 
-- Sprachen,
-- lokalisierte Referenzwerte,
-- Provider-Findings,
-- Build-/Bibliotheks-Findings,
-- zentrale Assessment-Revisionen.
+`BuildEngine-Manager` reads and writes this database directly. `BuildEngine-Server` opens the same file in read-only mode.
 
-`BuildEngine-Manager` liest und schreibt diese Datei direkt. `BuildEngine-Server` oeffnet dieselbe Datei ausschliesslich read-only.
+There is currently **no** second working database under `build`, no separate local assessment tier and no application-specific assessment.
 
-Es gibt aktuell **keine** zweite Arbeitsdatenbank unter `build`, keine lokale Bewertungsebene und keine Anwendungsbewertung.
+## Repository as the distribution source
 
-## Repository als Verteilungsquelle
-
-Im `BuildEngine-Admin`-Repository liegt dieselbe Datenbank unter:
+The versioned reference database lives in `BuildEngine-Admin` at:
 
 ```text
 admin\security\build-assessments.sqlite
 ```
 
-Der Repository-Stand ist die verteilte Referenzversion. Eine neue Installation bzw. ein Repository-Sync uebernimmt diese Datei in den Arbeitsbereich.
+A fresh installation or standard repository synchronization transfers this file into the working directory. When the repository contains an updated copy, the normal Admin synchronization **may and should overwrite** the existing file at the production path. That is how centrally maintained languages, value ranges, provider findings and library assessments are distributed.
 
-Wenn im Repository eine aktualisierte Version der Datenbank vorhanden ist, **darf und soll** der normale Admin-Sync die vorhandene Datenbank unter
+Consequently, **do not mark this database as `preserve`** in repository synchronization.
 
-```text
-<ProductionRoot>\admin\security\build-assessments.sqlite
-```
+## Central editing workflow
 
-ueberschreiben. Genau dadurch werden neue Sprachen, Wertebereiche, Provider-Findings und bereits zentral erarbeitete Bibliotheksbewertungen verteilt.
-
-Die Datenbank darf deshalb im Repository-Sync **nicht** als `preserve` behandelt werden.
-
-## Zentrale Bearbeitung
-
-Die fachliche Bearbeitung erfolgt zentral auf der Datenbank des Arbeitsbereichs:
+Assessments are edited centrally in:
 
 ```text
 <ProductionRoot>\admin\security\build-assessments.sqlite
 ```
 
-Der Manager kann dort:
+The Manager can import new CVE/provider findings from monitoring, create new library assessments, update existing assessments as new revisions, and use or eventually administer localized languages and value ranges.
 
-- neue CVE-/Provider-Findings aus dem Monitoring uebernehmen,
-- neue Bibliotheksbewertungen anlegen,
-- bestehende Bewertungen als neue Revision fortschreiben,
-- Sprachen und Wertebereiche verwenden bzw. spaeter administrieren.
-
-Nach einer geprueften Aenderung wird diese Datenbank bewusst in den ausgecheckten `BuildEngine-Admin`-Arbeitsbaum kopiert:
+After reviewing a change, explicitly copy the working database to the checked-out Admin repository:
 
 ```text
 <RepositoriesRoot>\BuildEngine-Admin\admin\security\build-assessments.sqlite
 ```
 
-Danach folgen normaler Git-Review, Commit und Push. Ab diesem Zeitpunkt ist die neue Datenbankversion die verteilte Referenz und wird bei anderen BuildEngine-Arbeitsbereichen durch den normalen Admin-Sync uebernommen.
+Perform normal Git review, commit and push. The new repository version then becomes the shared reference and is distributed to other BuildEngine installations by the normal Admin sync.
 
-## Verteilungskreislauf
+## Distribution cycle
 
 ```text
-BuildEngine-Admin Repository
+BuildEngine-Admin repository
    admin\security\build-assessments.sqlite
         |
         | RepositorySync
         v
 <ProductionRoot>\admin\security\build-assessments.sqlite
         |
-        | BuildEngine-Manager: Monitoring + Bewertung
+        | BuildEngine-Manager: monitoring + assessment
         v
 <ProductionRoot>\admin\security\build-assessments.sqlite
         |
-        | bewusst zur Verteilung kopieren
+        | explicitly copy for distribution
         v
 <RepositoriesRoot>\BuildEngine-Admin\admin\security\build-assessments.sqlite
         |
-        | Git Review / Commit / Push
+        | Git review / commit / push
         v
-BuildEngine-Admin Repository
+BuildEngine-Admin repository
 ```
 
-## Aktueller fachlicher Umfang
+## Current assessment scope
 
-Bewertet wird ausschliesslich die konkrete BuildEngine-Bibliothekskonfiguration, z. B.:
+Assess only the concrete BuildEngine library configuration, for example: an affected feature disabled during the build; a vulnerable component not compiled or not shipped; an exploit prerequisite absent from the chosen build profile; a local patch applied; or a newer selected version containing the fix.
 
-- betroffene Funktion beim Build deaktiviert,
-- betroffene Komponente nicht gebaut,
-- betroffene Komponente nicht ausgeliefert,
-- Exploit-Voraussetzung in der Buildkonfiguration nicht vorhanden,
-- lokaler Patch vorhanden,
-- aktualisierte Version enthaelt den Fix.
-
-Anwendungsspezifische Aussagen sind nicht Bestandteil dieses Modells und werden erst in einer spaeteren Ausbaustufe eingefuehrt.
+Application-specific claims are outside this model and belong to a later extension.
