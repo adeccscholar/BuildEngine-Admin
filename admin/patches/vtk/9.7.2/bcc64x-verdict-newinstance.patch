@@ -64,14 +64,14 @@ diff --git a/Common/Core/vtkImplicitArray.h b/Common/Core/vtkImplicitArray.h
  
 -VTK_ABI_NAMESPACE_BEGIN
 -template <class BackendT, int ArrayType = vtkArrayTypes::VTK_IMPLICIT_ARRAY>
-+#define vtkImplicitArrayTypeMacroOutOfLine(thisClass, superclass)                                           \
++#define vtkImplicitArrayTypeMacroOutOfLine(thisClass, superclass, valueType)                                           \
 +  vtkAbstractTypeMacroWithNewInstanceTypeOutOfLine(thisClass, superclass,                                   \
-+    vtkAOSDataArrayTemplate<typename thisClass::ValueType>, typeid(thisClass).name());             \
++    vtkAOSDataArrayTemplate<valueType>, typeid(thisClass).name());             \
 +                                                                                                   \
 +protected:                                                                                         \
 +  vtkObjectBase* NewInstanceInternal() const override                                              \
 +  {                                                                                                \
-+    return vtkAOSDataArrayTemplate<typename thisClass::ValueType>::New();                          \
++    return vtkAOSDataArrayTemplate<valueType>::New();                          \
 +  }                                                                                                \
 +                                                                                                   \
 +public:
@@ -88,7 +88,7 @@ diff --git a/Common/Core/vtkAffineArray.h b/Common/Core/vtkAffineArray.h
  public:
    using SelfType = vtkAffineArray<ValueTypeT>;
 -  vtkImplicitArrayTypeMacro(SelfType, ImplicitArrayType);
-+  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType);
++  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType, ValueTypeT);
  #ifndef __VTK_WRAP__
    using typename Superclass::ArrayTypeTag;
    using typename Superclass::DataTypeTag;
@@ -98,9 +98,9 @@ diff --git a/Common/Core/vtkAffineArray.h b/Common/Core/vtkAffineArray.h
  
 -// Declare vtkArrayDownCast implementations for Affine arrays:
 +template <class ValueTypeT>
-+auto vtkAffineArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueType>*
++auto vtkAffineArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
 +{
-+  return vtkAOSDataArrayTemplate<ValueType>::SafeDownCast(this->NewInstanceInternal());
++  return vtkAOSDataArrayTemplate<ValueTypeT>::SafeDownCast(this->NewInstanceInternal());
 +}
 +
 +// Declare vtkArrayDownCast implementations for Affine arrays:
@@ -115,7 +115,7 @@ diff --git a/Common/Core/vtkConstantArray.h b/Common/Core/vtkConstantArray.h
  public:
    using SelfType = vtkConstantArray<ValueTypeT>;
 -  vtkImplicitArrayTypeMacro(SelfType, ImplicitArrayType);
-+  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType);
++  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType, ValueTypeT);
  #ifndef __VTK_WRAP__
    using typename Superclass::ArrayTypeTag;
    using typename Superclass::DataTypeTag;
@@ -125,9 +125,9 @@ diff --git a/Common/Core/vtkConstantArray.h b/Common/Core/vtkConstantArray.h
  
 -// Declare vtkArrayDownCast implementations for Constant arrays:
 +template <class ValueTypeT>
-+auto vtkConstantArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueType>*
++auto vtkConstantArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
 +{
-+  return vtkAOSDataArrayTemplate<ValueType>::SafeDownCast(this->NewInstanceInternal());
++  return vtkAOSDataArrayTemplate<ValueTypeT>::SafeDownCast(this->NewInstanceInternal());
 +}
 +
 +// Declare vtkArrayDownCast implementations for Constant arrays:
@@ -142,7 +142,7 @@ diff --git a/Common/Core/vtkStructuredPointArray.h b/Common/Core/vtkStructuredPo
  public:
    using SelfType = vtkStructuredPointArray<ValueTypeT>;
 -  vtkImplicitArrayTypeMacro(SelfType, ImplicitArrayType);
-+  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType);
++  vtkImplicitArrayTypeMacroOutOfLine(SelfType, ImplicitArrayType, ValueTypeT);
  #ifndef __VTK_WRAP__
    using typename Superclass::ArrayTypeTag;
    using typename Superclass::DataTypeTag;
@@ -152,9 +152,9 @@ diff --git a/Common/Core/vtkStructuredPointArray.h b/Common/Core/vtkStructuredPo
  
 -// Declare vtkArrayDownCast implementations for StructuredPoint arrays:
 +template <class ValueTypeT>
-+auto vtkStructuredPointArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueType>*
++auto vtkStructuredPointArray<ValueTypeT>::NewInstance() const -> vtkAOSDataArrayTemplate<ValueTypeT>*
 +{
-+  return vtkAOSDataArrayTemplate<ValueType>::SafeDownCast(this->NewInstanceInternal());
++  return vtkAOSDataArrayTemplate<ValueTypeT>::SafeDownCast(this->NewInstanceInternal());
 +}
 +
 +// Declare vtkArrayDownCast implementations for StructuredPoint arrays:

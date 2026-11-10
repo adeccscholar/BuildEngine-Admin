@@ -98,6 +98,14 @@ The Verdict patch now calls `vtk_module_definitions(VTK::verdict PRIVATE verdict
 
 The VTK source revision advances from `2026-11-10T04:56:00Z` to `2026-11-10T04:57:00Z` to invalidate the previous source-stage evidence and reapply the corrected patch. No unrelated packages are invalidated.
 
+## 10 November 2026 — NewInstance return type correction
+
+The native BCC64X Debug and Release builds failed with `E4010` in `vtkArrayBulkInstantiate_vtkIdType.cxx`. The out-of-class `NewInstance()` implementation returned `vtkAOSDataArrayTemplate<ValueType>*`, while the expanded declaration used the dependent type `vtkAOSDataArrayTemplate<typename SelfType::ValueType>*`. Merely substituting a typedef in the method definition does not guarantee the same dependent declaration in Clang.
+
+The VTK-specific `vtkImplicitArrayTypeMacroOutOfLine` now has a third `valueType` argument. The three affected classes (`vtkAffineArray`, `vtkConstantArray`, `vtkStructuredPointArray`) pass `ValueTypeT`, ensuring both the member declaration and out-of-line definition have exactly the same `vtkAOSDataArrayTemplate<ValueTypeT>*` return type. The internal `NewInstanceInternal()` also uses the same type. All other VTK macros, FastDownCast and Verdict exports remain unchanged.
+
+An isolated reproduction of the previous mismatch fails Clang and GCC, and the corrected three-class VTK-style macro example passes Clang (Linux and Windows-MSVC target) and GCC. Native BCC64X compilation and DLL linking remain **[not verified]**. The library revision changes from `2026-11-10T04:57:00Z` to `2026-11-10T04:58:00Z` to invalidate the source scope.
+
 ## Historical integration notes
 
 # vtk 9.7.2: BCC64X migration and integration record
