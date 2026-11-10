@@ -1,3 +1,88 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["poppler 26.09.0"]
+   N1["zlib 1.4"]
+   N2["freetype 2.15.0"]
+   N3["libjpeg-turbo 3.2.0"]
+   N4["libpng 1.6.59"]
+   N5["libtiff 4.7.2"]
+   N6["win-iconv 0.0.8"]
+   N7["bzip2 1.0.8"]
+   N8["brotli 1.2.1"]
+   N9["harfbuzz 15.1.0"]
+   N10["libjpeg-turbo 3.2.1"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+   N0 --> N4
+   N0 --> N5
+   N0 --> N6
+   N2 --> N1
+   N2 --> N7
+   N2 --> N8
+   N2 --> N4
+   N2 --> N9
+   N4 --> N1
+   N5 --> N1
+   N5 --> N10
+```
+
+Direkt: `zlib@1.4`, `freetype@2.15.0`, `libjpeg-turbo@3.2.0`, `libpng@1.6.59`, `libtiff@4.7.2`, `win-iconv@0.0.8`
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF`
+- `-DFONT_CONFIGURATION:STRING=win32`
+- `-DENABLE_CPP:BOOL=ON`
+- `-DENABLE_UNSTABLE_API_ABI_HEADERS:BOOL=ON`
+- `-DENABLE_UTILS:BOOL=OFF`
+- `-DENABLE_GLIB:BOOL=OFF`
+- `-DENABLE_QT5:BOOL=OFF`
+- `-DENABLE_QT6:BOOL=OFF`
+- `-DENABLE_BOOST:BOOL=OFF`
+- `-DENABLE_BROTLI:BOOL=OFF`
+- `-DENABLE_LIBOPENJPEG:BOOL=OFF`
+- `-DENABLE_LCMS:BOOL=OFF`
+- `-DENABLE_LIBCURL:BOOL=OFF`
+- `-DENABLE_NSS3:BOOL=OFF`
+- `-DENABLE_GPGME:BOOL=OFF`
+- `-DENABLE_LIBJPEG:BOOL=ON`
+- `-DENABLE_LIBTIFF:BOOL=ON`
+- `-DBUILD_GTK_TESTS:BOOL=OFF`
+- `-DBUILD_QT5_TESTS:BOOL=OFF`
+- `-DBUILD_QT6_TESTS:BOOL=OFF`
+- `-DBUILD_CPP_TESTS:BOOL=OFF`
+- `-DBUILD_MANUAL_TESTS:BOOL=OFF`
+- `-DRUN_GPERF_IF_PRESENT:BOOL=OFF`
+- `-DENABLE_RELOCATABLE:BOOL=ON`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DIconv_INCLUDE_DIR:PATH={DependencyRoot:win-iconv}\include`
+- `-DIconv_LIBRARY:FILEPATH={DependencyRoot:win-iconv}\lib\win64\Release\libiconv.lib`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DIconv_INCLUDE_DIR:PATH={DependencyRoot:win-iconv}\include`
+- `-DIconv_LIBRARY:FILEPATH={DependencyRoot:win-iconv}\lib\win64\Debug\libiconv.lib`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
+
+---
+
+## Historische Integrationsnotizen
+
 # Poppler 26.09.0: BCC64X migration and integration record
 
 [TOC|Content]
