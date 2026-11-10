@@ -1,17 +1,17 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration, not a new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["catch2 3.16.1"]
 ```
 
-Direkt: keine
+Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -49,34 +49,34 @@ Direkt: keine
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # Catch2 3.16.1
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Declared contract data, not verified build execution.** Previous results belong to their exact versions and binaries; new runs remain **[not verified]**.
 
 Modern C++ testing framework for unit tests, assertions, and test discovery.
 
-**Koordinate:** `catch2@3.16.1` · **Kategorie:** `testing` · **Lizenzampel:** `green`
+**Coordinate:** `catch2@3.16.1` · **Category:** `testing` · **License indicator:** `green`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (complete transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Graph edges are derived from exactly pinned XML dependencies. Dashed edges represent extensions; solid edges represent package dependencies. Internally bundled upstream components are not additional BuildEngine package coordinates.
 
 ```mermaid
 flowchart LR
    N0["catch2 3.16.1"]
 ```
 
-**Direkte Abhängigkeiten:** Keine deklariert.
+**Direct dependencies:** None declared.
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
