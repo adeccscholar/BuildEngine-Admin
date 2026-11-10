@@ -1,17 +1,17 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["libjpeg-turbo 3.2.1"]
 ```
 
-Direkt: keine
+Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -35,34 +35,34 @@ Direkt: keine
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # libjpeg-turbo 3.2.1
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data; no verified build execution.** Earlier test results apply only to their exact versions and binaries; new runs remain **[not verified]**.
 
 High-performance JPEG codec using SIMD acceleration while remaining API-compatible with libjpeg.
 
-**Koordinate:** `libjpeg-turbo@3.2.1` · **Kategorie:** `image` · **Lizenzampel:** `yellow`
+**Coordinate:** `libjpeg-turbo@3.2.1` · **Category:** `image` · **License indicator:** `yellow`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (full transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Graph edges reflect exact XML pins. Dashed edges represent extensions; solid edges represent package dependencies. Bundled upstream components are not additional BuildEngine packages.
 
 ```mermaid
 flowchart LR
    N0["libjpeg-turbo 3.2.1"]
 ```
 
-**Direkte Abhängigkeiten:** Keine deklariert.
+**Direct dependencies:** None declared.
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -84,7 +84,7 @@ flowchart LR
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
 
-**Build-Umgebung:**
+**Build environment:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -111,4 +111,4 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\turbojpeg.h`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md`
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
