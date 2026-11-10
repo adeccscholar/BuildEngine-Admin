@@ -1,0 +1,62 @@
+diff --git a/CMake/vtkOpenGLOptions.cmake b/CMake/vtkOpenGLOptions.cmake
+--- a/CMake/vtkOpenGLOptions.cmake
++++ b/CMake/vtkOpenGLOptions.cmake
+@@ -32,6 +32,11 @@
+   "WIN32" OFF)
+ mark_as_advanced(VTK_USE_WIN32_OPENGL)
+ 
++cmake_dependent_option(VTK_USE_WIN32_OPENGL_DX_INTEROP
++  "Enable OpenGL/Direct3D 11 interoperability for Win32 render windows" ON
++  "VTK_USE_WIN32_OPENGL" OFF)
++mark_as_advanced(VTK_USE_WIN32_OPENGL_DX_INTEROP)
++
+ cmake_dependent_option(VTK_USE_WIN32 "Use Win32 APIs for VTK render windows" ON
+   "WIN32 OR VTK_USE_WIN32_OPENGL" OFF)
+ 
+diff --git a/Rendering/OpenGL2/CMakeLists.txt b/Rendering/OpenGL2/CMakeLists.txt
+--- a/Rendering/OpenGL2/CMakeLists.txt
++++ b/Rendering/OpenGL2/CMakeLists.txt
+@@ -341,9 +341,10 @@
+     set(has_vtkRenderWindow_override 1)
+   endif ()
+ elseif (VTK_USE_WIN32_OPENGL)
+-  list(APPEND classes
+-    vtkWin32OpenGLRenderWindow
+-    vtkWin32OpenGLDXRenderWindow)
++  list(APPEND classes vtkWin32OpenGLRenderWindow)
++  if (VTK_USE_WIN32_OPENGL_DX_INTEROP)
++    list(APPEND classes vtkWin32OpenGLDXRenderWindow)
++  endif ()
+   if (NOT VTK_DEFAULT_RENDER_WINDOW_HEADLESS AND NOT has_vtkRenderWindow_override)
+     vtk_object_factory_declare(
+       BASE vtkRenderWindow
+@@ -462,7 +463,7 @@
+ 
+ if (VTK_USE_COCOA)
+   vtk_module_link(VTK::RenderingOpenGL2 PUBLIC "-framework Cocoa")
+-elseif (VTK_USE_WIN32_OPENGL)
++elseif (VTK_USE_WIN32_OPENGL AND VTK_USE_WIN32_OPENGL_DX_INTEROP)
+   # vtkWin32OpenGLDXRenderWindow requires D3D.
+   vtk_module_find_package(PRIVATE_IF_SHARED
+     PACKAGE DirectX)
+diff --git a/Rendering/OpenGL2/Testing/Cxx/CMakeLists.txt b/Rendering/OpenGL2/Testing/Cxx/CMakeLists.txt
+--- a/Rendering/OpenGL2/Testing/Cxx/CMakeLists.txt
++++ b/Rendering/OpenGL2/Testing/Cxx/CMakeLists.txt
+@@ -136,7 +136,7 @@
+     TestLabeledDataMappers.cxx,NO_SERDES)
+ endif ()
+ 
+-if (VTK_USE_WIN32_OPENGL)
++if (VTK_USE_WIN32_OPENGL AND VTK_USE_WIN32_OPENGL_DX_INTEROP)
+   vtk_add_test_cxx(vtkRenderingOpenGL2CxxTests tests
+     TestWin32OpenGLDXRenderWindow.cxx,NO_SERDES)
+ endif ()
+@@ -151,7 +151,7 @@
+   RENDERING_FACTORY
+   )
+ 
+-if (VTK_USE_WIN32_OPENGL)
++if (VTK_USE_WIN32_OPENGL AND VTK_USE_WIN32_OPENGL_DX_INTEROP)
+   # TestWin32OpenGLDXRenderWindow requires DirectX
+   find_package(DirectX REQUIRED)
+   target_link_libraries(vtkRenderingOpenGL2CxxTests PRIVATE DirectX::d3d11 DirectX::dxgi)
