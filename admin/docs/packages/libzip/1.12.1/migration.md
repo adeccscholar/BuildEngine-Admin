@@ -1,3 +1,63 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die historischen Migrationsnotizen folgen unverändert.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["libzip 1.12.1"]
+   N1["zlib 1.4"]
+   N2["xz 5.8.4"]
+   N3["zstd 1.5.7"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+```
+
+**Direkte Abhängigkeiten:** `zlib@1.4`, `xz@5.8.4`, `zstd@1.5.7`
+
+### Konfiguration und Patches
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DLIBZIP_DO_INSTALL:BOOL=ON`
+- `-DSHARED_LIB_VERSIONNING:BOOL=ON`
+- `-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include`
+- `-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}`
+- `-DENABLE_BZIP2:BOOL=OFF`
+- `-DENABLE_LZMA:BOOL=ON`
+- `-DLIBLZMA_INCLUDE_DIR:PATH={DependencyRoot:xz}\include`
+- `-DLIBLZMA_LIBRARY:FILEPATH={DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib`
+- `-DENABLE_ZSTD:BOOL=ON`
+- `-Dzstd_DIR:PATH={DependencyRoot:zstd}\lib\win64\{Configuration}\cmake\zstd`
+- `-DENABLE_WINDOWS_CRYPTO:BOOL=ON`
+- `-DENABLE_COMMONCRYPTO:BOOL=OFF`
+- `-DENABLE_OPENSSL:BOOL=OFF`
+- `-DENABLE_GNUTLS:BOOL=OFF`
+- `-DENABLE_MBEDTLS:BOOL=OFF`
+- `-DENABLE_FDOPEN:BOOL=ON`
+- `-DBUILD_TOOLS:BOOL=ON`
+- `-DBUILD_REGRESS:BOOL=OFF`
+- `-DBUILD_OSSFUZZ:BOOL=OFF`
+- `-DBUILD_EXAMPLES:BOOL=ON`
+- `-DBUILD_DOC:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+
+---
+
+## Bisherige Migrationsnotizen
+
 # libzip 1.12.1
 
 [TOC|Content]
