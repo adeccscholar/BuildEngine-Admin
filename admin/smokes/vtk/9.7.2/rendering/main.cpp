@@ -21,11 +21,12 @@ int main() {
    vtkNew<vtkPNGWriter> thePng;
    bool const bVersion = std::string_view{vtkVersion::GetVTKVersion()} == "9.7.2";
    bool const bRenderer = std::string_view{theRenderer->GetClassName()} == "vtkOpenGLRenderer";
-   bool const bRayCaster = std::string_view{theRayCaster->GetClassName()} == "vtkGPUVolumeRayCastMapper";
+   bool const bRayCaster = theRayCaster->IsA("vtkOpenGLGPUVolumeRayCastMapper") != 0;
    bool const bUI = theInteraction && theAxes && theText && thePng;
    std::println("SMOKE|CHECK|version|{}|VTK 9.7.2", bVersion ? "PASS" : "FAIL");
    std::println("SMOKE|CHECK|opengl2|{}|actual OpenGL2 renderer", bRenderer ? "PASS" : "FAIL");
-   std::println("SMOKE|CHECK|volume|{}|GPU ray cast mapper", bRayCaster ? "PASS" : "FAIL");
+   std::println("SMOKE|CHECK|volume|{}|OpenGL GPU ray cast mapper ({})",
+                bRayCaster ? "PASS" : "FAIL", theRayCaster->GetClassName());
    std::println("SMOKE|CHECK|ui-image|{}|interaction, axes, text, PNG", bUI ? "PASS" : "FAIL");
    bool const bOk = bVersion && bRenderer && bRayCaster && bUI;
    std::println("SMOKE|RESULT|{}|VTK rendering libraries linked", bOk ? "PASS" : "FAIL");
