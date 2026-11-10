@@ -1,3 +1,99 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die bisherigen Migrationsnotizen folgen unverändert.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["boost 1.92.0"]
+   N1["openssl 3.5.9"]
+   N2["zlib 1.4"]
+   N3["brotli 1.2.1"]
+   N4["zstd 1.5.7"]
+   N0 --> N1
+   N0 --> N2
+   N1 --> N2
+   N1 --> N3
+   N1 --> N4
+```
+
+**Direkte Abhängigkeiten:** `openssl@3.5.9`, `zlib@1.4`
+
+### Konfiguration und Patches
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\BuildEngineBoostProject.cmake`
+- `-DCMAKE_CXX_STANDARD:STRING=23`
+- `-DCMAKE_CXX_STANDARD_REQUIRED:BOOL=ON`
+- `-DCMAKE_CXX_EXTENSIONS:BOOL=OFF`
+- `-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DBOOST_INSTALL_LAYOUT:STRING=system`
+- `-DBOOST_INSTALL_CMAKEDIR:STRING=lib/win64/{Configuration}/cmake`
+- `-DBOOST_INCLUDE_LIBRARIES:STRING=filesystem;system;program_options;regex;thread;chrono;json;asio;beast;accumulators;decimal;endian;geometry;histogram;integer;math;multi_array;multiprecision;numeric/conversion;numeric/interval;numeric/odeint;numeric/ublas;polygon;qvm;random;ratio;rational;safe_numerics;units;utility;bind;callable_traits;core;describe;function_types;fusion;hana;hof;lambda;lambda2;local_function;metaparse;mp11;mpl;msm;parser;pfr;phoenix;preprocessor;proto;spirit;statechart;static_assert;tti;type_traits;typeof;vmd;yap;algorithm;any;array;bimap;bloom;circular_buffer;foreach;gil;graph;heap;icl;intrusive;iterator;multi_index;optional;poly_collection;property_map;property_tree;ptr_container;range;sort;tuple;unordered;uuid;variant;variant2;cobalt;context;coroutine;coroutine2;fiber;interprocess;lockfree;mqtt5;mysql;redis;assign;charconv;contract;convert;dll;exception;format;io;iostreams;leaf;lexical_cast;locale;log;nowide;process;serialization;stacktrace;static_string;test;timer;tokenizer;type_erasure;type_index;url;wave;winapi;xpressive;align;assert;compat;concept_check;config;container_hash;conversion;crc;detail;dynamic_bitset;flyweight;function;functional;hash2;logic;move;openmethod;outcome;parameter;pool;predef;scope;scope_exit;signals2;smart_ptr;stl_interfaces;throw_exception`
+- `-DBOOST_ENABLE_MPI:BOOL=OFF`
+- `-DBOOST_ENABLE_PYTHON:BOOL=OFF`
+- `-DBOOST_IOSTREAMS_ENABLE_ZLIB:BOOL=ON`
+- `-DBOOST_RANDOM_ENABLE_RANDOM_DEVICE:BOOL=OFF`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DBUILD_TESTING:BOOL=OFF`
+- `-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include`
+- `-DADECC_BOOST_OPENSSL_SSL_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libssl.lib`
+- `-DADECC_BOOST_OPENSSL_CRYPTO_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libcrypto.lib`
+- `-DOPENSSL_USE_STATIC_LIBS:BOOL=OFF`
+- `-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include`
+- `-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-DBOOST_GATE:STRING=closure`
+- `-DBOOST_GATE:STRING=closure`
+- `-DBOOST_PACKAGE_CMAKE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\bcc64x-native-clang\project-include.cmake`
+- `-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `-DBOOST_GATE:STRING=math-numerics`
+- `-DBOOST_GATE:STRING=math-numerics`
+- `-DBOOST_PACKAGE_CMAKE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\bcc64x-native-clang\project-include.cmake`
+- `-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `-DBOOST_GATE:STRING=state-parsing-meta`
+- `-DBOOST_GATE:STRING=state-parsing-meta`
+- `-DBOOST_PACKAGE_CMAKE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\bcc64x-native-clang\project-include.cmake`
+- `-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `-DBOOST_GATE:STRING=algorithms-containers-data`
+- `-DBOOST_GATE:STRING=algorithms-containers-data`
+- `-DBOOST_PACKAGE_CMAKE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\bcc64x-native-clang\project-include.cmake`
+- `-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `-DBOOST_GATE:STRING=concurrency-async`
+- `-DBOOST_GATE:STRING=concurrency-async`
+- `-DBOOST_PACKAGE_CMAKE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\bcc64x-native-clang\project-include.cmake`
+- `-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `-DBOOST_GATE:STRING=system-io-runtime`
+- `-DBOOST_GATE:STRING=system-io-runtime`
+- `-DBOOST_PACKAGE_CMAKE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\bcc64x-native-clang\project-include.cmake`
+- `-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+- `-DBOOST_GATE:STRING=foundation-language`
+- `-DBOOST_GATE:STRING=foundation-language`
+- `-DBOOST_PACKAGE_CMAKE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Debug\cmake`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH={BuildFileDir}\cmake\boost\bcc64x-native-clang\project-include.cmake`
+- `-DADECC_BOOST_MANAGED_INCLUDE_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include`
+
+---
+
+## Bisherige Migrationsnotizen
+
 # boost 1.92.0: BCC64X migration and integration record
 
 [TOC|Content]
