@@ -92,7 +92,7 @@ flowchart LR
 
 ---
 
-## Bisherige Migrationsnotizen
+## Previous migration notes
 
 # boost 1.92.0: BCC64X migration and integration record
 
