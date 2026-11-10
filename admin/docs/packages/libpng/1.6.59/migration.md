@@ -1,3 +1,42 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["libpng 1.6.59"]
+   N1["zlib 1.4"]
+   N0 --> N1
+```
+
+Direkt: `zlib@1.4`
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib}`
+- `-DPNG_SHARED:BOOL=ON`
+- `-DPNG_STATIC:BOOL=OFF`
+- `-DPNG_TESTS:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_DEBUG_POSTFIX:STRING=d`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+
+---
+
+## Historische Integrationsnotizen
+
 # libpng 1.6.59
 
 [TOC|Content]
