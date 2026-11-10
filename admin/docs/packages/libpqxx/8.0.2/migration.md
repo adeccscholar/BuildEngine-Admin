@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -22,7 +22,7 @@ flowchart LR
 
 Direkt: `libpq@18.6`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -51,7 +51,7 @@ Direkt: `libpq@18.6`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # libpqxx 8.0.2: BCC64X migration and integration record
 
