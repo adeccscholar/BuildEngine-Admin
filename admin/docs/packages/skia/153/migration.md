@@ -1,3 +1,164 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["skia 153"]
+   N1["opengl 26.2.1"]
+   N2["zlib 1.4"]
+   N3["brotli 1.2.1"]
+   N4["libjpeg-turbo 3.2.1"]
+   N5["libpng 1.6.59"]
+   N6["harfbuzz 15.1.0"]
+   N7["freetype 2.15.0"]
+   N8["bzip2 1.0.8"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+   N0 --> N4
+   N0 --> N5
+   N0 --> N6
+   N0 --> N7
+   N5 --> N2
+   N7 --> N2
+   N7 --> N8
+   N7 --> N3
+   N7 --> N5
+   N7 --> N6
+```
+
+Direkt: `opengl@26.2.1`, `zlib@1.4`, `brotli@1.2.1`, `libjpeg-turbo@3.2.1`, `libpng@1.6.59`, `harfbuzz@15.1.0`, `freetype@2.15.0`
+
+### Aktuelle Konfiguration
+
+
+```gn
+skia_use_bcc64x = true
+target_cpu = "x64"
+target_cc = "bcc64x"
+target_cxx = "bcc64x"
+target_link = "bcc64x"
+target_ar = "llvm-ar"
+python_executable = getenv("CB_PYTHON")
+bcc64x_rad_lib_dir = getenv("CB_BDS") + "/lib/win64x/release"
+bcc64x_rad_psdk_lib_dir = getenv("CB_BDS") + "/lib/win64x/release/psdk"
+extra_ldflags = [getenv("CB_BCC64X_UCRT_COMPAT")]
+bcc64x_opengl_lib = getenv("CB_SKIA_OPENGL_LIB")
+bcc64x_zlib_include = getenv("CB_SKIA_ZLIB_INCLUDE")
+bcc64x_zlib_lib = getenv("CB_SKIA_ZLIB_LIB")
+bcc64x_brotli_include = getenv("CB_SKIA_BROTLI_INCLUDE")
+bcc64x_brotli_common_lib = getenv("CB_SKIA_BROTLI_COMMON_LIB")
+bcc64x_brotli_decode_lib = getenv("CB_SKIA_BROTLI_DECODE_LIB")
+bcc64x_libpng_include = getenv("CB_SKIA_LIBPNG_INCLUDE")
+bcc64x_libpng_lib = getenv("CB_SKIA_LIBPNG_LIB")
+bcc64x_libjpeg_include = getenv("CB_SKIA_LIBJPEG_INCLUDE")
+bcc64x_libjpeg_lib = getenv("CB_SKIA_LIBJPEG_LIB")
+bcc64x_harfbuzz_include = getenv("CB_SKIA_HARFBUZZ_INCLUDE")
+bcc64x_harfbuzz_lib = getenv("CB_SKIA_HARFBUZZ_LIB")
+bcc64x_harfbuzz_subset_lib = getenv("CB_SKIA_HARFBUZZ_SUBSET_LIB")
+skia_system_freetype2_include_path = getenv("CB_SKIA_FREETYPE_INCLUDE")
+skia_system_freetype2_lib = getenv("CB_SKIA_FREETYPE_LIB")
+is_official_build = {SkiaOfficialBuild}
+is_debug = {SkiaDebug}
+is_component_build = true
+is_trivial_abi = false
+skia_enable_tools = false
+skia_build_fuzzers = false
+skia_build_rust_targets = false
+skia_use_partition_alloc = false
+skia_enable_precompile = true
+skia_enable_discrete_gpu = true
+skia_enable_gpu_debug_layers = false
+skia_generate_workarounds = false
+skia_enable_ganesh = true
+skia_enable_graphite = true
+skia_use_gl = true
+skia_use_direct3d = true
+skia_use_vulkan = true
+skia_use_vma = true
+skia_enable_spirv_validation = false
+skia_use_dawn = false
+skia_use_angle = false
+skia_use_egl = false
+skia_use_epoxy_egl = false
+skia_use_webgl = false
+skia_use_webgpu = false
+skia_enable_fontmgr_win = true
+skia_enable_fontmgr_win_gdi = true
+skia_use_freetype = true
+skia_use_system_freetype2 = true
+skia_use_freetype_woff2 = true
+skia_use_freetype_svg = true
+skia_use_freetype_zlib = true
+skia_use_freetype_zlib_bundled = false
+skia_enable_fontmgr_custom_directory = true
+skia_enable_fontmgr_custom_embedded = true
+skia_enable_fontmgr_custom_empty = true
+skia_use_fontconfig = false
+skia_use_fontations = false
+skia_use_icu = true
+skia_use_system_icu = false
+skia_enable_skunicode = true
+skia_use_harfbuzz = true
+skia_use_system_harfbuzz = true
+skia_pdf_subset_harfbuzz = true
+skia_use_client_icu = false
+skia_use_bidi = false
+skia_use_icu4x = false
+skia_use_libgrapheme = false
+skia_use_expat = true
+skia_use_system_expat = false
+skia_enable_pdf = true
+skia_use_xps = true
+skia_enable_svg = true
+skia_enable_skottie = true
+skia_use_libpng_decode = true
+skia_use_libpng_encode = true
+skia_use_no_png_encode = false
+skia_use_system_libpng = true
+skia_use_libjpeg_turbo_decode = true
+skia_use_libjpeg_turbo_encode = true
+skia_use_no_jpeg_encode = false
+skia_use_system_libjpeg_turbo = true
+skia_use_jpeg_gainmaps = true
+skia_use_libwebp_decode = true
+skia_use_libwebp_encode = true
+skia_use_no_webp_encode = false
+skia_use_system_libwebp = false
+skia_use_wuffs = true
+skia_include_multiframe_procs = true
+skia_use_libavif = true
+skia_use_crabbyavif = false
+skia_use_libjxl_decode = true
+skia_use_dng_sdk = true
+skia_use_piex = false
+skia_use_system_brotli = true
+skia_use_zlib = true
+skia_use_system_zlib = true
+skia_use_rust_png_decode = false
+skia_use_rust_png_encode = false
+skia_use_rust_jpeg_decode = false
+skia_use_rust_jpeg_encode = false
+skia_use_rust_bmp_decode = false
+skia_use_rust_ico_decode = false
+skia_use_rust_exif = false
+skia_use_rust_icc = false
+skia_use_ffmpeg = false
+skia_use_lua = false
+skia_use_perfetto = false
+skia_use_pprof = false
+skia_use_sfml = false
+skia_enable_vello_shaders = false
+extra_cflags = ["-DWIN32_LEAN_AND_MEAN","-DNOMINMAX"]
+```
+
+---
+
+## Historische Integrationsnotizen
+
 # skia 153: BCC64X migration and integration record
 
 [TOC|Content]
