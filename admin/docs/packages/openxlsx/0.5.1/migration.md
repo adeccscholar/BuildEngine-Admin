@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -30,7 +30,7 @@ flowchart LR
 
 Direkt: `pugixml@1.16`, `libzip@1.12.1`, `boost@1.92.0`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -70,7 +70,7 @@ Direkt: `pugixml@1.16`, `libzip@1.12.1`, `boost@1.92.0`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # openxlsx 0.5.1: BCC64X migration and integration record
 
