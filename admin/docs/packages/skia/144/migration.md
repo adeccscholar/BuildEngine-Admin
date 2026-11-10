@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -30,7 +30,7 @@ flowchart LR
 
 Direkt: `zlib@1.4`, `libjpeg-turbo@3.2.0`, `libpng@1.6.59`, `freetype@2.14.3`, `opengl@26.2.1`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 
 ```gn
@@ -92,7 +92,7 @@ extra_cflags = ["-DWIN32_LEAN_AND_MEAN","-DNOMINMAX","-Wno-unknown-pragmas"]
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # Skia 144 for PDFium 2025.11.19 — independent BuildEngine package
 
