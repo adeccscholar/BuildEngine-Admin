@@ -1,3 +1,40 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["simdutf 9.3.3"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DBUILD_SHARED_LIBS:BOOL=OFF`
+- `-DSIMDUTF_TESTS:BOOL=OFF`
+- `-DSIMDUTF_TOOLS:BOOL=OFF`
+- `-DSIMDUTF_BENCHMARKS:BOOL=OFF`
+- `-DSIMDUTF_ICONV:BOOL=OFF`
+- `-DSIMDUTF_INSTALL_CMAKEDIR:STRING=lib/win64/{Configuration}/cmake/simdutf`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-Dsimdutf_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\simdutf`
+
+---
+
+## Historische Integrationsnotizen
+
 # simdutf 9.3.3
 
 [TOC|Content]
