@@ -1,3 +1,48 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["libpq 18.6"]
+   N1["openssl 3.5.9"]
+   N2["zlib 1.4"]
+   N3["brotli 1.2.1"]
+   N4["zstd 1.5.7"]
+   N0 --> N1
+   N0 --> N2
+   N1 --> N2
+   N1 --> N3
+   N1 --> N4
+```
+
+Direkt: `openssl@3.5.9`, `zlib@1.4`
+
+### Aktuelle Konfiguration
+
+- `-Dssl=openssl`
+- `-Dzlib=enabled`
+- `-Dreadline=disabled`
+- `-Dicu=disabled`
+- `-Dldap=disabled`
+- `-Dgssapi=disabled`
+- `-Dlibcurl=disabled`
+- `-Dnls=disabled`
+- `-Ddocs=disabled`
+- `-Ddocs_pdf=disabled`
+- `-Dtap_tests=disabled`
+- `-DPERL={Tool:perl}`
+- `-Dextra_include_dirs={DependencyRoot:openssl}\include,{DependencyRoot:zlib}\include`
+- `-Dextra_lib_dirs={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\compat-lib,{DependencyRoot:openssl}\lib\win64\{Configuration},{DependencyRoot:zlib}\lib\win64\{Configuration}`
+- `-DPostgreSQL_INCLUDE_DIR:PATH={ConsumerRoot}\include`
+- `-DPostgreSQL_LIBRARY:FILEPATH={ConsumerRoot}\lib\libpq.lib`
+
+---
+
+## Historische Integrationsnotizen
+
 # libpq 18.6: BCC64X migration and integration record
 
 [TOC|Content]
