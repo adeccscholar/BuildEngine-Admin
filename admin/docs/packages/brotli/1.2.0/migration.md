@@ -1,4 +1,4 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
 **Current declaration; no new PASS claim.** Historical findings remain unchanged below this section.
 
