@@ -123,6 +123,9 @@ Important routes include:
 | `/package/{library}/{version}/` | Package detail/export |
 | `/security/` | Security overview |
 | `/security/{library}/{version}/` | Security detail |
+| `/news/` | Chronologische BuildEngine-Änderungsübersicht aus `admin/server-docs/news/index.md` |
+| `/news/YYYY-MM-DD/` | Datierter News-Eintrag `news-YYYY-MM-DD.md` |
+| `/package/{library}/{version}/migration` | Versionsbezogene Konfiguration, Besonderheiten und transitive Mermaid-Abhängigkeiten |
 | `/manual/*.md` | Synchronized project/server documentation |
 | `/index.html` | Generated central documentation index |
 
