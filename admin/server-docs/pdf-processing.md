@@ -2,6 +2,8 @@
 
 [TOC|Content]
 
+**Aktueller Katalogstand, 10. November 2026:** Schema 17 enthält **95 versionierte Bibliothekseinträge / 62 logische IDs** und **32 Einträge mit `supersededBy`**. Ausführungsnachweise gelten ausschließlich für den jeweiligen FSM-Binärstand. [Vollständiger Katalog](/manual/libraries.md) · [Änderungshistorie](/news/).
+
 **Status:** PDF/XML/PDFium integration snapshot reviewed **21 October 2026**. Poppler 26.09.0, win-iconv 0.0.8, libxml2 2.15.3, QPDF 12.4.1 and PoDoFo 1.1.1 are declared in the Schema-16 BuildEngine stack. Poppler and win-iconv have target-machine package evidence. PoDoFo reached build/test/install/metadata/publish/doxygen PASS before the final BCC64X runtime-policy correction; the dynamic-runtime rerun and installed XMP DLL smoke are its remaining final evidence gate.
 
 ## PDFium 2025.11.19 / fast_float source migration
