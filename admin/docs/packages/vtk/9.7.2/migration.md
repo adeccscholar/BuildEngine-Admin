@@ -1,3 +1,13 @@
+## 10 November 2026 — Rendering smoke: concrete GPU mapper factory type
+
+The installed-package rendering smoke reached runtime with VTK 9.7.2, the OpenGL2 renderer, and the interaction/axes/text/PNG checks passing; the `volume` check alone failed (three checks passed, one failed, process exit 1, no stderr). The smoke compared `vtkGPUVolumeRayCastMapper::New()`'s runtime class name against `vtkGPUVolumeRayCastMapper`. In upstream VTK 9.7.2 this is an abstract object-factory creation path: `RenderingVolumeOpenGL2` registers `vtkOpenGLGPUVolumeRayCastMapper` as the concrete backend override. Therefore the previous exact base-class name comparison was not an appropriate success condition for OpenGL GPU volume rendering.
+
+The rendering smoke now checks `theRayCaster->IsA("vtkOpenGLGPUVolumeRayCastMapper") != 0` and includes `theRayCaster->GetClassName()` in the check detail. This asserts selection of the OpenGL-specific mapper and preserves the existing installed-package linkage test. No library source, build profile, module configuration, or revision timestamp changes are required; this is a smoke-only correction. The real GPU rendering and screenshot test remains separate from this no-graphics-context smoke.
+
+**Evidence:** The supplied smoke-validation log recorded `version=PASS`, `opengl2=PASS`, `volume=FAIL`, `ui-image=PASS`. Runtime confirmation of the corrected smoke remains **[not verified]** until the next Windows/BCC64X run.
+
+---
+
 ## 10 November 2026 — Optional Direct3D interoperability for Win32 OpenGL2
 
 The native BCC64X Release log successfully linked `vtkCommonCore` and `vtkIOXML`. Its remaining compilation failure was `vtkWin32OpenGLDXRenderWindow.cxx` at build step 2202/2459 because `winrt/wrl/def.h` rejected the compiler with `WRL requires compiler version 16.00 or greater`. This is the optional OpenGL/Direct3D 11 interop window, not the ordinary Windows WGL renderer.
