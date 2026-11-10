@@ -1,17 +1,17 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["wil 1.0.260126.7"]
 ```
 
-Direkt: keine
+Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -26,34 +26,34 @@ Direkt: keine
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # Windows Implementation Library (WIL) 1.0.260126.7
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data, not verified build execution.** Earlier test results apply only to exact versions and builds; new runs remain **[not verified]**.
 
 Microsoft MIT-licensed header-only Windows COM and RAII library. BCC64X compatibility requires a native consumer smoke before use by OpenCV.
 
-**Koordinate:** `wil@1.0.260126.7` · **Kategorie:** `foundation` · **Lizenzampel:** `yellow`
+**Coordinate:** `wil@1.0.260126.7` · **Category:** `foundation` · **License indicator:** `yellow`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (full transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Edges come from exactly pinned XML dependencies. Dashed edges denote extensions, solid edges package dependencies. Bundled upstream components are not additional BuildEngine coordinates.
 
 ```mermaid
 flowchart LR
    N0["wil 1.0.260126.7"]
 ```
 
-**Direkte Abhängigkeiten:** Keine deklariert.
+**Direct dependencies:** None declared.
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -65,7 +65,7 @@ flowchart LR
 - `-DCMAKE_BUILD_TYPE:STRING=Release`
 - `-DCMAKE_BUILD_TYPE:STRING=Debug`
 
-**Build-Umgebung:**
+**Build environment:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -90,4 +90,4 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ThirdPartyNotices.txt`
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
