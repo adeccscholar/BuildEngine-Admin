@@ -1,3 +1,30 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["sqlite 3.54.1"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DSQLITE_SOURCE_DIR:PATH={Workspace}`
+- `-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+
+---
+
+## Historische Integrationsnotizen
+
 # SQLite 3.54.1
 
 [TOC|Content]
