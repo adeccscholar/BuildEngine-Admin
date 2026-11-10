@@ -1,3 +1,45 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktuelle Deklaration; keine neue PASS-Aussage.** Historische Befunde folgen unverändert unterhalb dieses Abschnitts.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["zlib 1.4"]
+```
+
+**Direkte Versionen:** keine
+
+### Konfiguration und Besonderheiten
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_PROJECT_INCLUDE:FILEPATH=`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DCMAKE_INSTALL_DOCDIR:STRING=share/doc`
+- `-DZLIB_BUILD_SHARED:BOOL=ON`
+- `-DZLIB_BUILD_STATIC:BOOL=OFF`
+- `-DZLIB_BUILD_TESTING:BOOL={TestsEnabled}`
+- `-DZLIB_INSTALL:BOOL=ON`
+- `-DZLIB_PREFIX:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_DEBUG_POSTFIX:STRING=d`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-rc-version-only.patch`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-nested-ctest-rc-flags.patch`
+
+---
+
+## Bisherige Migrations- und Integrationsnotizen
+
 # zlib 1.4: BCC64X migration
 
 [TOC|Content]
