@@ -1,3 +1,38 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die historischen Migrationsnotizen folgen unverändert.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["openssl 3.5.9"]
+   N1["zlib 1.4"]
+   N2["brotli 1.2.1"]
+   N3["zstd 1.5.7"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+```
+
+**Direkte Abhängigkeiten:** `zlib@1.4`, `brotli@1.2.1`, `zstd@1.5.7`
+
+### Konfiguration und Patches
+
+
+```gn
+my %targets = (
+```
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-memory-barrier.patch`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-response-paths.patch`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-linker-external-libs.patch`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-quic-winsock-inline.patch`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-pdb-platform.patch`
+
+---
+
+## Bisherige Migrationsnotizen
+
 # openssl 3.5.9: BCC64X migration and integration record
 
 [TOC|Content]
