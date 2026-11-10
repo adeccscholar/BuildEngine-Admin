@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -48,7 +48,7 @@ flowchart LR
 
 Direkt: `abseil@20260817.0`, `fast_float@8.3.3`, `skia@153`, `zlib@1.4`, `libjpeg-turbo@3.2.1`, `libpng@1.6.59`, `freetype@2.15.0`, `icu@79.1`, `lcms2@2.20`, `openjpeg@2.5.4`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DPDFIUM_SOURCE_ROOT:PATH={CurrentArtifact}`
 - `-DPDFIUM_SOURCE_ROOT:PATH={Workspace}`
@@ -79,7 +79,7 @@ is_debug = {PdfiumDebug}
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 ## 8 November 2026: Migrate the installed Skia dependency from 144 to 153
 
@@ -111,7 +111,7 @@ every build. Loader probes use `skia.dll`, not `skia144.dll`. Skia's
 own runtime component DLLs are gathered through the versioned dependency
 closure. This avoids version search or hard-coded installation paths.
 
-**[nicht verifiziert]** The native Windows BCC64X Debug/Release compilation,
+**[not verified]** The native Windows BCC64X Debug/Release compilation,
 Skia 153 export closure, PDFium DLL link, loader probe, rendered output,
 and regenerated SBOM still require a full FSM run. Keep the old Skia 144
 package untouched for reproducible comparison, but do not mix its DLLs
@@ -560,7 +560,7 @@ The separately uploaded `02-cmake-build(3).log` is the older 21:11:36 UTC linkin
 
 **External consumer contract:** `PDFium::pdfium` is `SHARED IMPORTED` with separate `IMPORTED_LOCATION_<CONFIG>` and `IMPORTED_IMPLIB_<CONFIG>`, and the consumer gets `COMPONENT_BUILD`. Runtime smoke checks the loaded `pdfium.dll` and public C exports via `GetModuleHandleW`/`GetProcAddress`, in addition to rendering the memory PDF. Dependency closure and runtime DLL search paths are supplied by BuildEngine's existing package-scope smoke environment.
 
-**Status:** Changes reflect a checked static-source contract and toolchain documentation. **[nicht verifiziert]** GN regeneration, Windows BCC64X component linking, DLL exports and both consumer-smoke runs still require real local evidence. Never report this as a completed DLL build without that evidence.
+**Status:** Changes reflect a checked static-source contract and toolchain documentation. **[not verified]** GN regeneration, Windows BCC64X component linking, DLL exports and both consumer-smoke runs still require real local evidence. Never report this as a completed DLL build without that evidence.
 
 ## Shared PDFium GN debug CRT option (18 October 2026)
 
@@ -572,7 +572,7 @@ The actual Debug and Release compiler diagnostics report `'dllimport' attribute 
 
 **Corrected ownership:** `is_component_build=false` restores the previously proven Chromium/Skia non-component compilation. A version-pinned Git patch replaces only PDFium's `component("pdfium")` target with GN `shared_library("pdfium")`. It adds `BUILDENGINE_PDFIUM_DLL` alongside the existing `FPDF_IMPLEMENTATION` in PDFium's C-API implementation config, and extends the public `FPDF_EXPORT` condition to use this local producer-only define. The external CMake consumer still defines upstream `COMPONENT_BUILD` for its normal DLL imports. This leaves the installed PDFium artifact **dynamic**, with the existing BCC64X `solink` producing the import library, while removing `SKIA_DLL` and `COMPONENT_BUILD` from its third-party compile graph.
 
-The source-phase patch has `git apply --check`, `git apply`, and `git apply --reverse --check` steps and targets exactly pinned upstream paths. Generated-Ninja preflight rejects global component leakage and requires the PDFium-specific API export defines before triggering compilation. The existing BCC64X runtime adapter still maps Chromium's `/MT[d]` flags to project-defined dynamic `-tR` (no MSVC static CRT is used). **[nicht verifiziert]** GN and DLL linking require an actual BCC64X run.
+The source-phase patch has `git apply --check`, `git apply`, and `git apply --reverse --check` steps and targets exactly pinned upstream paths. Generated-Ninja preflight rejects global component leakage and requires the PDFium-specific API export defines before triggering compilation. The existing BCC64X runtime adapter still maps Chromium's `/MT[d]` flags to project-defined dynamic `-tR` (no MSVC static CRT is used). **[not verified]** GN and DLL linking require an actual BCC64X run.
 
 ## MSVC CET Shadow Stack linker flags under BCC64X (18 October 2026)
 
@@ -600,7 +600,7 @@ Both variants reached DLL linking, but LLD reported missing `-lD:localembarcader
 
 **Correction:** The existing BuildEngine BCC64X `gn_argument_adapter.py` translates GN drive-absolute `-lD:\\...\\libfreetype.lib` tokens to direct `D:/.../libfreetype.lib` linker inputs before the driver expands the response file. It preserves quoting for paths containing spaces. The established `-lname.lib` to `-lname` normalization for system libraries remains separate. Existing exact `-l:filename.lib` and normal `-lname` tokens, and the MSVC-to-LLD CET/ASLR option forwarding, remain intact. An unmatched drive-qualified `-lX:` fails explicitly rather than being passed through silently.
 
-**Validation:** Nine isolated regression cases (both observed FreeType variants, forward-slash path, both quoted conventions, system libraries, exact filename, already-normalized full path, and /CETCOMPAT forwarding) passed against the new implementation logic. The PDFium XML preflight additionally checks both actual FreeType path patterns. Only the adapter and preflight change; the pinned source content, GN toolchain, PDFium DLL-only artifact contract and source timestamp remain unchanged. **[nicht verifiziert]** The actual BCC64X DLL link and consumer smokes require a subsequent native execution.
+**Validation:** Nine isolated regression cases (both observed FreeType variants, forward-slash path, both quoted conventions, system libraries, exact filename, already-normalized full path, and /CETCOMPAT forwarding) passed against the new implementation logic. The PDFium XML preflight additionally checks both actual FreeType path patterns. Only the adapter and preflight change; the pinned source content, GN toolchain, PDFium DLL-only artifact contract and source timestamp remain unchanged. **[not verified]** The actual BCC64X DLL link and consumer smokes require a subsequent native execution.
 
 ## Debug PDFium DLL: bundled Abseil BigUnsigned<4>::Digits10 (18 October 2026)
 
@@ -610,7 +610,7 @@ Both variants reached DLL linking, but LLD reported missing `-lD:localembarcader
 
 **XML source-only correction:** Immediately after extracting `third_party/abseil-cpp`, the PDFium Source FSM applies the **same existing** Abseil patch by `git apply --directory=third_party/abseil-cpp`. A preliminary `--check` and subsequent `--reverse --check` verify that the intended, unmodified source locations match and that the patch was applied. The original patch file and standalone Abseil project are unchanged; no separate helper script, link-time synthetic symbol, different Abseil DLL or static PDFium fallback was introduced. A local Git check confirmed `--directory` with `--no-index` handles nested checkout paths. The Chromium Abseil-source pattern matches the version-pinned 20250814.1 Abseil header and source comparison, but the exact downloaded DEPS checkout cannot be compiled here.
 
-**Build invalidation:** PDFium's library timestamp increases from `2026-10-18T00:32:00Z` to `00:33:00Z` because the nested header and source compiled into PDFium have changed. The complete dependency graph does not require rebuilding other 56 libraries. **[nicht verifiziert]** Actual Debug DLL link and both smokes remain to be confirmed by a native BCC64X run.
+**Build invalidation:** PDFium's library timestamp increases from `2026-10-18T00:32:00Z` to `00:33:00Z` because the nested header and source compiled into PDFium have changed. The complete dependency graph does not require rebuilding other 56 libraries. **[not verified]** Actual Debug DLL link and both smokes remain to be confirmed by a native BCC64X run.
 
 ## Application-local DLL deployment and reusable CMake consumer bootstrap (18 October 2026)
 
@@ -618,7 +618,7 @@ The BuildEngine consumer tree now provides `BuildEngineRuntime.cmake` and `Build
 
 The generic smoke builder supplies the already-computed XML dependency-closure package roots to CMake as `ADECC_RUNTIME_PACKAGE_ROOTS`. PDFium's installed package consumer now invokes the common staging helper after its link. `BuildEngineConsumer.cmake` includes the runtime helper for published applications. Full OS-level dependency tree introspection and portable Stage-0 bootstrap remain separately planned; the existing StackBuilder archive/lock and `bootstrap/Bootstrap.cpp` are not replaced.
 
-**[nicht verifiziert]** Native Windows PE64 staging, deployed PDFium smoke load and Debug/Release execution still require actual BCC64X/Windows runs.
+**[not verified]** Native Windows PE64 staging, deployed PDFium smoke load and Debug/Release execution still require actual BCC64X/Windows runs.
 
 ## Windows 0xC000007B loader diagnostic preflight (18 October 2026)
 
@@ -628,7 +628,7 @@ The generic smoke builder supplies the already-computed XML dependency-closure p
 
 **Staging provenance:** `BuildEngineStageRuntime.cmake` additionally logs each selected local x64 DLL's exact source filename and SHA-256, to distinguish wrong-version and same-name DLL substitution without altering the package dependency closure or using PATH for version selection.
 
-**Limits:** A failure from a DLL's *transitive* import may still surface at the root `LoadLibraryExW`; listed import names and a Windows loader trace are required to identify its precise child. If the probe EXE itself fails with `0xC000007B`, the issue is in the application/BCC64X runtime startup rather than any direct PDFium import. This is a diagnostic enhancement, **not a claimed fix** for the underlying incorrect image. The native BCC64X loader test is [nicht verifiziert].
+**Limits:** A failure from a DLL's *transitive* import may still surface at the root `LoadLibraryExW`; listed import names and a Windows loader trace are required to identify its precise child. If the probe EXE itself fails with `0xC000007B`, the issue is in the application/BCC64X runtime startup rather than any direct PDFium import. This is a diagnostic enhancement, **not a claimed fix** for the underlying incorrect image. The native BCC64X loader test is [not verified].
 
 ## Ordered library-by-library LoadLibraryExW probe (18 October 2026)
 
@@ -636,7 +636,7 @@ The PDFium consumer's generic `RuntimeLoaderProbe.cpp` now reads an ordered `ADE
 
 The probe checks application-local DLLs first. If a named Embarcadero runtime is already loaded into the probe, it resolves and probes **that exact module path** rather than searching for an arbitrary DLL on PATH. It reports a missing file or module explicitly and prints ASCII-only Win32 error names to avoid the previously observed localized `FormatMessageW` output causing a UTF-8 decoding error in BuildEngine's logging. No changes to the installed packages, BuildEngine loader, GN link rules, or PDFium C API were necessary. The PDFium source timestamp is unchanged: only the consumer smoke executable and XML smoke environment change.
 
-**Verification:** Review of the source establishes ordering, diagnostic branch coverage and no PDFium import by the probe itself. Native BCC64X compile and dynamic loads require an actual Windows run and remain [nicht verifiziert].
+**Verification:** Review of the source establishes ordering, diagnostic branch coverage and no PDFium import by the probe itself. Native BCC64X compile and dynamic loads require an actual Windows run and remain [not verified].
 
 ## Next Release loader probe: FreeType transitive imports (18 October 2026)
 
@@ -644,7 +644,7 @@ The newly uploaded native Release loader log proves `libc++-370.dll`, `libunwind
 
 Without touching PDFium's compiled artifacts or the smoke probe C++ source, the **Release** XML smoke's ordered probe list now includes the actual observed direct FreeType imports (and Brotlidec's common runtime, plus ICU data) before FreeType. This will identify which particular staged DLLs are missing or cannot be loaded by filename, with the existing module-by-module PASS/FAIL diagnostics. The root list is declarative XML; the engine executes unchanged. The **Debug list stays unchanged** until a Debug PE import log verifies its suffix-sensitive names (`bzip2d.dll`, `libicuuc78d.dll`, etc.) instead of guessing. No library Source/Build timestamp is changed, because this affects only smoke inputs.
 
-**Caution:** PE direct imports alone do not prove the full nested dependency chain or Windows API-set resolution. Failure 193 in PDFium may have an independent cause; inspect it again once FreeType's 126 has been resolved. Native execution of the expanded Release test is [nicht verifiziert].
+**Caution:** PE direct imports alone do not prove the full nested dependency chain or Windows API-set resolution. Failure 193 in PDFium may have an independent cause; inspect it again once FreeType's 126 has been resolved. Native execution of the expanded Release test is [not verified].
 
 ## HarfBuzz loader error 126: explicitly stage Embarcadero pthread runtime (18 October 2026)
 
