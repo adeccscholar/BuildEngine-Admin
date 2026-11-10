@@ -1,3 +1,33 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["raylib 6.2"]
+   N1["opengl 26.2.1"]
+   N0 --> N1
+```
+
+Direkt: `opengl@26.2.1`
+
+### Aktuelle Konfiguration
+
+- `-DRAYLIB_SOURCE_DIR:PATH={Workspace}`
+- `-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}`
+- `-DOPENGL_LIBRARY:FILEPATH={DependencyRoot:opengl}\lib\win64\{Configuration}\opengl32.lib`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+
+---
+
+## Historische Integrationsnotizen
+
 # raylib 6.2
 
 [TOC|Content]
