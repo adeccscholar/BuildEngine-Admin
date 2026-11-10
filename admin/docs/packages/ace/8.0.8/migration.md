@@ -30,13 +30,13 @@ flowchart LR
 
 ---
 
-## Bisherige Migrationsnotizen
+## Previous migration notes
 
 # ACE 8.0.8
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
 **Contract data, not confirmed build execution.** Earlier test results are tied to specific versions and builds; new runs remain **[not verified]**.
 
