@@ -1,17 +1,17 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["llvm-openmp 20.1.7"]
 ```
 
-Direkt: keine
+Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_MODULE_PATH:PATH={BuildFileDir}\patches\llvm-openmp\20.1.7`
 - `-DPython3_EXECUTABLE:FILEPATH={Tool:python}`
@@ -41,26 +41,26 @@ Direkt: keine
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # LLVM OpenMP Runtime 20.1.7
 
 [TOC|Content]
 
-## Aufgabe und Integration
+## Purpose and integration
 
 Self-built dynamic LLVM libomp runtime, BCC64X compiler consumer validation.
 
-**Stand:** BuildEngine-XML-Vertrag vom 10. November 2026; native Builds und Smoke-Ergebnisse **[nicht verifiziert]**.
+**Status:** BuildEngine XML contract dated 10 November 2026; native builds and smoke results **[not verified]**.
 
-## Abhängigkeiten einschließlich transitiver Stufen
+## Dependencies including transitive levels
 
 ```mermaid
 flowchart LR
    N0["llvm-openmp 20.1.7"]
 ```
 
-**Direkte Abhängigkeiten:** keine
+**Direct dependencies:** none
 
 ## Konfiguration
 
@@ -92,7 +92,7 @@ flowchart LR
 - `-DOPENMP_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
 - `-DOPENMP_CONFIGURATION:STRING=Debug`
 
-### Build-Umgebung
+### Build environment
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -106,7 +106,7 @@ flowchart LR
 - `PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Debug;{ENV:PATH}`
 - `OPENMP_PACKAGE_RUNTIME_DLL={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Debug\libomp.dll`
 
-### Quellen
+### Sources
 
 - `https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/openmp-20.1.7.src.tar.xz`
 
@@ -115,8 +115,8 @@ flowchart LR
 - `consumer / Release / package`
 - `consumer / Debug / package`
 
-## Besonderheiten
+## Special considerations
 
-Versionierte Quell- und Build-Aktionen sowie eventuell erforderliche BCC64X-Patches sind im ausführbaren `admin/build-libraries.xml` dokumentiert. Eingetragene Fixes sind ohne FSM-Nachweis kein Test-PASS.
+Versioned source/build actions and necessary BCC64X patches are defined in `admin/build-libraries.xml`. A recorded fix is not a test PASS without FSM evidence.
 
-[Bibliotheksübersicht](/manual/libraries.md)
+[Library overview](/manual/libraries.md)
