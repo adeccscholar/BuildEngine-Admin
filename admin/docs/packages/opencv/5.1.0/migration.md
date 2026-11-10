@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -17,7 +17,7 @@ flowchart LR
 
 Direkt: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`, `zlib@1.4`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -89,23 +89,23 @@ Direkt: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`, `zlib@1.4`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # OpenCV 5.1.0
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data, not verified build execution.** Earlier test results apply only to exact versions and builds; new runs remain **[not verified]**.
 
 Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning, Windows DirectShow camera capture (MSMF COM compatibility pending), and image stitching. Native oneTBB 2023.2 parallel backend configured; Release consumer smoke regression pending; LLVM OpenMP 20.1.7 enabled as a build dependency.
 
-**Koordinate:** `opencv@5.1.0` · **Kategorie:** `graphics` · **Lizenzampel:** `yellow`
+**Coordinate:** `opencv@5.1.0` · **Category:** `graphics` · **License indicator:** `yellow`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (full transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Edges come from exactly pinned XML dependencies. Dashed edges denote extensions, solid edges package dependencies. Bundled upstream components are not additional BuildEngine coordinates.
 
 ```mermaid
 flowchart LR
@@ -118,11 +118,11 @@ flowchart LR
    N0 --> N3
 ```
 
-**Direkte Abhängigkeiten:** `onetbb@2023.2.0`, `llvm-openmp@20.1.7`, `zlib@1.4`
+**Direct dependencies:** `onetbb@2023.2.0`, `llvm-openmp@20.1.7`, `zlib@1.4`
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -192,7 +192,7 @@ flowchart LR
 - `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
 - `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
 
-**Build-Umgebung:**
+**Build environment:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -248,4 +248,4 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libopencv_videoio510{DebugPostfix}.lib`
 - 11 weitere Einträge im XML-Vertrag.
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
