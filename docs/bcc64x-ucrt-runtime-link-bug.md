@@ -1,19 +1,19 @@
-# BCC64X 20.1.7: fehlerhafte UCRT-Symbolauflösung bei Win64
+# BCC64X 20.1.7: Incorrect UCRT Symbol Resolution on Win64
 
-Status: **reproduziert und durch Gegenprobe bestätigt**  
+Status: **reproduced and confirmed by control experiment**  
 Toolchain: RAD Studio 13 Florence / BCC64X 20.1.7 / Win64 Modern / LLD 20.1.7
 
-## Kurzfassung
+## Summary
 
-BCC64X erzeugt bei einer echten, adressierbaren Referenz auf bestimmte mathematische C-Runtime-Funktionen einen PE-Import aus `api-ms-win-crt-math-l1-1-0.dll`. Die DLL wird erfolgreich gelinkt, kann unter Windows jedoch nicht geladen werden (`ERROR_PROC_NOT_FOUND`, Fehler 127).
+When BCC64X takes the address of certain C runtime math functions, it emits a PE import from `api-ms-win-crt-math-l1-1-0.dll`. The DLL links successfully but fails to load on Windows (`ERROR_PROC_NOT_FOUND`, error 127).
 
-Die mit RAD Studio ausgelieferte `x86_64-w64-mingw32/lib/libucrt.a` enthält für dieselben Symbole zusätzlich lokale `libucrt_extra`-Implementierungen. Werden diese Objekte explizit vor der normalen Runtime gelinkt, verschwinden die problematischen API-Set-Imports und `LoadLibrary` funktioniert.
+The `x86_64-w64-mingw32/lib/libucrt.a` shipped with RAD Studio also contains local `libucrt_extra` implementations of those symbols. Linking these objects explicitly ahead of the normal runtime removes the problematic API-set imports and allows `LoadLibrary` to succeed.
 
-Der Fehler wurde zunächst durch Skia Debug sichtbar, ist aber **nicht Skia-spezifisch**.
+The defect was initially exposed by a Skia Debug build, but is **not specific to Skia**.
 
-## Betroffene Symbole
+## Affected symbols
 
-In der untersuchten `libucrt.a` existieren für genau folgende Symbole sowohl ein API-Set-Anbieter als auch eine lokale `libucrt_extra`-Implementierung:
+In the inspected `libucrt.a`, each of these symbols has both an API-set definition and a local `libucrt_extra` implementation:
 
 - `fabsf`
 - `nextafterl`
@@ -21,30 +21,30 @@ In der untersuchten `libucrt.a` existieren für genau folgende Symbole sowohl ei
 - `nexttowardf`
 - `nexttowardl`
 
-Dazu gehören vier lokale Objekte:
+The corresponding local implementations reside in four object files:
 
 - `lib64_libucrt_extra_a-fabsf.o`
-- `lib64_libucrt_extra_a-nextafterl.o` (liefert auch `nexttowardl`)
+- `lib64_libucrt_extra_a-nextafterl.o` (also provides `nexttowardl`)
 - `lib64_libucrt_extra_a-nexttoward.o`
 - `lib64_libucrt_extra_a-nexttowardf.o`
 
-## Minimaler Reproducer
+## Minimal reproducer
 
-Quelle: `admin/programs/bcc64x/ucrt-runtime-probe.c`
+Source: `admin/programs/bcc64x/ucrt-runtime-probe.c`
 
-Build ohne Workaround:
+Build without workaround:
 
 ```cmd
 "C:\Program Files (x86)\Embarcadero\Studio\37.0\bin64\bcc64x.exe" -tD ucrt-runtime-probe.c -o ucrt-runtime-probe.dll
 ```
 
-Importtabelle:
+Import table:
 
 ```cmd
 tdump -em ucrt-runtime-probe.dll | findstr /i "fabsf nextafterl nexttoward"
 ```
 
-Beobachtetes Ergebnis:
+Observed result:
 
 ```text
 IMPORT: api-ms-win-crt-math-l1-1-0.dll='fabsf'
@@ -54,11 +54,11 @@ IMPORT: api-ms-win-crt-math-l1-1-0.dll='nexttowardf'
 IMPORT: api-ms-win-crt-math-l1-1-0.dll='nexttowardl'
 ```
 
-`LoadLibrary` schlägt anschließend mit Fehler 127 (`Die angegebene Prozedur wurde nicht gefunden`) fehl.
+`LoadLibrary` then fails with error 127 (`The specified procedure could not be found`).
 
-## Evidenz aus `libucrt.a`
+## Evidence from `libucrt.a`
 
-Für `fabsf` zeigt `llvm-nm --print-armap` gleichzeitig:
+For `fabsf`, `llvm-nm --print-armap` reports both:
 
 ```text
 __imp_fabsf in api-ms-win-crt-math-l1-1-0.dll
@@ -68,43 +68,43 @@ lib64_libucrt_extra_a-fabsf.o:
 00000000 T fabsf
 ```
 
-Die normale Link-Map enthält andere `libucrt_extra`-Objekte, aber nicht `lib64_libucrt_extra_a-fabsf.o`. Das fertige PE importiert stattdessen das API-Set-Symbol.
+The ordinary link map includes other `libucrt_extra` objects but not `lib64_libucrt_extra_a-fabsf.o`. The resulting PE imports the API-set symbol instead.
 
-Die genaue interne LLD-Auswahlregel (z. B. erster Archive-Map-Treffer) ist **[nicht verifiziert]**. Verifiziert ist dagegen, welcher Anbieter im fertigen PE verwendet wird und dass die lokale Implementierung im normalen Link nicht extrahiert wird.
+The exact internal LLD selection rule (for example, the first matching archive-map entry) is **[not verified]**. What has been verified is the provider selected in the final PE and the absence of extraction of the local implementation during the normal link.
 
-## Positive Gegenprobe
+## Positive control experiment
 
-Die vier genannten Objekte wurden aus derselben, lokal installierten `libucrt.a` extrahiert und zu `libbcc64x-ucrt-compat.a` zusammengefasst. Derselbe Reproducer wurde anschließend mit diesem Archiv vor der normalen Runtime gelinkt.
+The four objects were extracted from the same locally installed `libucrt.a` and combined into `libbcc64x-ucrt-compat.a`. The same reproducer was then linked with this archive ahead of the normal runtime.
 
-Ergebnis:
+Result:
 
-- keiner der fünf problematischen API-Set-Imports ist mehr vorhanden;
-- die DLL linkt erfolgreich;
-- `LoadLibrary` liefert `LOAD OK`.
+- none of the five problematic API-set imports remains;
+- the DLL links successfully;
+- `LoadLibrary` reports `LOAD OK`.
 
-Damit ist die Fehlerursache unterhalb der Bibliotheksebene reproduziert.
+This reproduces the underlying problem below the third-party library layer.
 
-## BuildEngine-Workaround
+## BuildEngine workaround
 
-Der Workaround wird nicht als Skia-Quellpatch und nicht über ein PowerShell-Hilfsskript umgesetzt. Die vollständige Provisioning-Logik liegt im BuildEngine-Toolvertrag.
+The workaround is neither a Skia source patch nor a PowerShell helper script. All provisioning logic belongs to the BuildEngine tool contract.
 
-`admin/build-tools.xml` deklariert ein generiertes Tool `bcc64x-ucrt-compat`. Der Vertrag enthält:
+`admin/build-tools.xml` declares a generated tool called `bcc64x-ucrt-compat`. Its contract includes:
 
-- das lokal installierte BCC64X-`llvm-ar` als Archiver,
-- die lokal installierte `x86_64-w64-mingw32/lib/libucrt.a` als Quellarchiv,
-- genau die vier verifizierten `libucrt_extra`-Members,
-- das versionierte Zielverzeichnis unter dem BuildEngine-Tools-Root,
-- `libbcc64x-ucrt-compat.a` als registrierten Tool-Entry.
+- the locally installed BCC64X `llvm-ar` as the archiver,
+- the locally installed `x86_64-w64-mingw32/lib/libucrt.a` as the source archive,
+- exactly the four verified `libucrt_extra` members,
+- the versioned destination directory under the BuildEngine tools root,
+- `libbcc64x-ucrt-compat.a` as the registered tool entry.
 
-BuildEngine erzeugt dieses Archiv selbst. Existiert der versionierte Tool-Entry bereits und ist er nicht älter als die Quell-`libucrt.a`, wird keine Generierung ausgeführt. Andernfalls extrahiert BuildEngine die deklarierten Members mit `llvm-ar`, prüft die extrahierten Dateien, erzeugt das Compat-Archiv in einem temporären Verzeichnis und promotet es erst nach erfolgreichem Abschluss in den endgültigen Toolpfad.
+BuildEngine generates the archive itself. If the versioned tool entry already exists and is not older than the source `libucrt.a`, generation is skipped. Otherwise BuildEngine extracts the declared members using `llvm-ar`, verifies the extracted files, creates the compatibility archive in a temporary directory and promotes it to the final tool path only after success.
 
-Damit wird das Archiv einmal pro Toolversion und Produktionsumgebung bereitgestellt und anschließend wiederverwendet. Es werden keine Embarcadero-Objektdateien oder Archive im Repository gespeichert.
+The archive is provisioned once per tool version and production environment, then reused. No Embarcadero object files or archives are stored in the repository.
 
-Der generische CMake-BCC64X-Vertrag konsumiert nur das bereits bereitgestellte Tool und hängt dessen Archiv vor die normalen Runtime-Bibliotheken. CMake selbst erzeugt kein Compat-Archiv mehr.
+The generic CMake/BCC64X contract consumes the provisioned tool and links its archive ahead of normal runtime libraries. CMake itself no longer generates a compatibility archive.
 
-Der Workaround gilt für Win64-BCC64X-Linkvorgänge allgemein und ist nicht auf Debug beschränkt. Debug machte den Fehler lediglich sichtbar, weil Optimierung bei `fabsf` häufig eine externe Referenz vermeidet.
+The workaround applies to Win64 BCC64X linking generally, not only Debug. Debug merely exposed the defect because optimization frequently eliminates the external reference to `fabsf`.
 
-## Vorschlag für Embarcadero-Bugreport (Englisch)
+## Proposed Embarcadero bug report (English)
 
 **Title:** BCC64X 20.1.7 libucrt.a resolves x64 math compatibility symbols to non-loadable API-set imports
 
