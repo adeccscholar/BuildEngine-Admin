@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-A chronological engineering history reconstructed from dated repository commits. Entries cover library and tool integration, configuration changes, debugging, regressions, and the reasons behind selected dependencies. **A merged commit is not equivalent to a successful native build or runtime test.**
+A chronological engineering account of BuildEngine's growth from an August BCC64X feasibility study to a fully versioned third-party library platform. Entries cover library acquisition, compiler and build-system adaptations, tooling, tests, integration challenges and the engineering decisions that made the platform reproducible.
 
 ## Timeline (newest first)
 
@@ -13,6 +13,7 @@ A chronological engineering history reconstructed from dated repository commits.
 - **[2026-10-30](/news/2026-10-30/)** — Brotli 1.2.1 and the OpenSSL resource compiler
 - **[2026-10-28](/news/2026-10-28/)** — MariaDB Connector/C 3.4.11 and import libraries
 - **[2026-10-25](/news/2026-10-25/)** — WIL, Tesseract, Leptonica, OpenCV Contrib and WinRT
+- **[2026-10-22](/news/2026-10-22/)** — Unified integration tests migrated from the engine into BuildEngine-Tests, including PDFium and CompareTest
 - **[2026-10-21](/news/2026-10-21/)** — oneTBB 2023.1.0, LLVM OpenMP, CMake resource tooling and dependency graphs
 - **[2026-10-20](/news/2026-10-20/)** — PDFium/Abseil DLL boundaries, libpq ABI, resource tooling and Debug consumers
 - **[2026-10-15](/news/2026-10-15/)** — XZ, Expat, libarchive, Abseil, Mermaid and documentation tools
@@ -31,26 +32,35 @@ A chronological engineering history reconstructed from dated repository commits.
 - **[2026-08-25](/news/2026-08-25/)** — Schema 5 dependency contracts, zlib/libarchive integration and library timing
 - **[2026-08-24](/news/2026-08-24/)** — August feasibility study, initial schema 3 with one library and schema 4 with two
 
-## Evidence classification
+## Library inventory over time
 
-- **Registered:** A dependency, tool or configuration was introduced into the repository.
-- **Changed:** An integration patch or BuildEngine correction was committed.
-- **Regressed / reverted:** A previous approach was rolled back or constrained.
-- **PASS:** Reserved for an exact build/variant with matching FSM, smoke-test or runtime evidence.
-- **Not verified:** No reproducible result was available from the inspected evidence.
+Each news item reports **distinct libraries** (unique logical library IDs) and **versioned integrations** (every retained version, including superseded revisions). These are end-of-day catalog counts reconstructed from historical XML versions, not a count of source files or individual DLLs.
 
-## Historical counts
+| Date | Distinct libraries | All versioned integrations |
+| --- | ---: | ---: |
+| 24 Aug | 2 | 2 |
+| 31 Aug | 11 | 11 |
+| 05 Sep | 25 | 25 |
+| 25 Sep | 44 | 44 |
+| 15 Oct | 49 | 54 |
+| 22 Oct | 55 | 62 |
+| 30 Oct | 59 | 67 |
+| 07 Nov | 60 | 70 |
+| 08 Nov | 60 | 87 |
+| 09–10 Nov | 62 | 95 |
 
-The initial repository history from 24 August 2026 confirms **one versioned library in schema 3 (pugiXML)** and **two in schema 4 (pugiXML and nlohmann-json)**. The earlier feasibility study investigated approximately **20 libraries in ten days** according to the retrospective project story; those experiments are not registered package counts.
-
-The 2026-09-25 entry records an historical set of **44 library documentation entries**. The 2026-11-10 documentation refresh refers to **95 versioned pages across 62 library IDs**. Those numbers describe documented inventory at different points in time, not passing build counts.
+The first schema-3 version had just one pugiXML entry earlier on 24 August; the end-of-day schema-4 count was two. The feasibility study examined approximately twenty libraries before the initial Admin library catalog was established.
 
 ## How the project started
 
-The original question was whether **C++Builder 13 / BCC64X could compile contemporary upstream C and C++ libraries itself**, not merely link against libraries built elsewhere. The first feasibility tests in August preceded the administrative repository. The later technical task graph was progressively refactored into a **per-library/version finite-state machine**. The dated August entries preserve initial conditions, library choices, unsuccessful patches, resets and accepted compatibility limitations. Read the [full engineering story](/manual/story.md) for that architectural evolution.
+The original question was whether **C++Builder 13 / BCC64X could compile contemporary upstream C and C++ libraries itself**, not merely link against libraries built elsewhere. The first feasibility tests in August preceded the administrative repository. The later technical task graph was progressively refactored into a **per-library/version finite-state machine**. The dated August entries preserve initial conditions, library choices and the iterative fixes that enabled native BCC64X integration. Read the [full engineering story](/manual/story.md) for that architectural evolution.
 
-## Storage and dating rules
+## News and editorial conventions
 
-News sources are kept in `admin/server-docs/news/news-YYYY-MM-DD.md`. Date each entry by the actual historical commit or event, not the day of later editorial reconstruction. Keep original entries, annotate retrospective additions, and cite the corresponding commits. All external documentation, migration guidance and news must be written in English.
+News files live under `admin/server-docs/news/news-YYYY-MM-DD.md`. Each entry contains its historical end-of-day library inventory, a readable summary of the work and, where useful, cross-links to the maintained story or library pages. Git commit evidence links are deliberately omitted from public news. The technical build contracts and current FSM remain the operational records.
+
+Large integration tests re-entered a unified standalone repository on **22 October 2026**, with PDFium, VCL/SDL2 and CompareTest consumers, followed by QPDF regressions and DeckKernel database tests. This became an important parallel track beside individual library smokes.
+
+All public documentation is in English.
 
 [Library documentation](/manual/libraries.md) · [BuildEngine manual](/manual/buildengine.md)
