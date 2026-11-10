@@ -1,17 +1,17 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["fast_float 8.3.3"]
 ```
 
-Direkt: keine
+Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -33,28 +33,28 @@ Direkt: keine
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # fast_float 8.3.3
 
 [TOC|Content]
 
-## Aufgabe und Integration
+## Purpose and integration
 
 High-performance C++ floating-point parser
 
-**Stand:** BuildEngine-XML-Vertrag vom 10. November 2026; native Builds und Smoke-Ergebnisse **[nicht verifiziert]**.
+**Status:** BuildEngine XML contract as of 10 November 2026; native builds and smoke tests **[not verified]**.
 
-## Abhängigkeiten einschließlich transitiver Stufen
+## Dependencies including transitive levels
 
 ```mermaid
 flowchart LR
    N0["fast_float 8.3.3"]
 ```
 
-**Direkte Abhängigkeiten:** keine
+**Direct dependencies:** none
 
-## Konfiguration
+## Configuration
 
 ### CMake
 
@@ -76,7 +76,7 @@ flowchart LR
 - `-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/Debug`
 - `-DFastFloat_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\FastFloat`
 
-### Build-Umgebung
+### Build environment
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -84,7 +84,7 @@ flowchart LR
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
 
-### Quellen
+### Sources
 
 - `https://github.com/fastfloat/fast_float/archive/refs/tags/v8.3.3.tar.gz`
 
@@ -92,8 +92,8 @@ flowchart LR
 
 - `consumer / Release / package`
 
-## Besonderheiten
+## Special considerations
 
-Versionierte Quell- und Build-Aktionen sowie eventuell erforderliche BCC64X-Patches sind im ausführbaren `admin/build-libraries.xml` dokumentiert. Eingetragene Fixes sind ohne FSM-Nachweis kein Test-PASS.
+Versioned source and build actions and any necessary BCC64X patches are defined in `admin/build-libraries.xml`. Recorded fixes are not test PASS without matching FSM evidence.
 
-[Bibliotheksübersicht](/manual/libraries.md)
+[Library overview](/manual/libraries.md)
