@@ -1,3 +1,40 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["fast_float 8.3.3"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DFASTFLOAT_TEST:BOOL=OFF`
+- `-DFASTFLOAT_BENCHMARKS:BOOL=OFF`
+- `-DFASTFLOAT_INSTALL:BOOL=ON`
+- `-DFASTFLOAT_SANITIZE:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/Debug`
+- `-DFastFloat_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\FastFloat`
+
+---
+
+## Historische Integrationsnotizen
+
 # fast_float 8.3.3
 
 [TOC|Content]
