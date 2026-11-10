@@ -64,6 +64,20 @@ The project deliberately does not hide such evidence behind another compiler. If
 
 That proof has succeeded strongly enough to change the premise of the discussion: **C++Builder 13 can again be treated as a full member of the modern C++ family.** It can build and consume substantial contemporary open-source C and C++ software, including projects that exercise far more than a trivial compiler test.
 
+### August 2026: the feasibility study and the first reproducible contracts
+
+The chronology begins **before** the first BuildEngine repository commit. In August 2026, an initial feasibility study investigated approximately twenty third-party libraries over roughly ten days. Its purpose was specific: not simply to make binaries available *to* C++Builder 13, but to establish that the BCC64X compiler *could itself build* the upstream C and C++ libraries. When a package required a source patch, a change in compiler recognition, a different build-system invocation, or a Windows linkage adjustment, that difficulty belonged to the evidence, not to a convenient fallback to MSVC.
+
+The evidence study and the later BuildEngine inventory are separate counts. We did not enter those twenty experiments into a mature library catalog on day one. On **24 August 2026**, the first versioned Admin library contract, **schema 3**, registered **only pugiXML 1.16**. Later the same day, **schema 4** added **nlohmann-json 3.12.0**, making **two** registered libraries. These are directly verifiable historical snapshots; the approximate study count comes from the project account and cannot be assigned to individual commit dates.
+
+The early repository separated the C++ execution engine, the administration contract and consumer tests. XML schemas described what to download, which tools and source files were required, how to compile, how to install, and how to verify the published result. This was already moving away from one-off feasibility scripts toward a reproducible process. The precise **library-oriented FSM** emerged through later architectural work: initially technical tasks and dependency DAGs orchestrated the work, before the library/version itself became the owner of persistent logical progress.
+
+The earliest dated commits tell the story more clearly than a retrospective statement of success could. **25 August** brought dependency contracts, zlib and libarchive, together with repeated patch and line-ending corrections. **26 August** brought OpenSSL and the need to manage Perl and gmake along with the compiler. **28–29 August** brought staged curl source pins, installed-consumer tests, XZ/libarchive relationships, failed approaches, repeated repairs, and resets. **30 August** exposed Boost's cross-DLL iostream and serialization boundaries: a recorded limitation, not a reason to declare the entire ecosystem broken or to invent a PASS. **31 August** added work on Xerces-C, Doxygen, license metadata, and ACE/TAO Windows ports.
+
+The pattern was already visible. Every additional upstream library contributed one more type of constraint, and every failure made the requirements of a generic engine more precise: source identity, tool identity, variant-specific outputs, explicit dependency edges, source patches, imported symbols, and independent consumer evidence. These were the problems that eventually made the FSM a natural architecture instead of simply an attractive scheduling abstraction.
+
+See the [August 2026 news records](/news/) for dated commits and details. The initial repository inventory is documented by [schema 3](https://github.com/adeccscholar/BuildEngine-Admin/commit/1e8e992ecf38f8a4f079fae8926b501e3394e539) and [schema 4](https://github.com/adeccscholar/BuildEngine-Admin/commit/7ca2977fa451822836b099a736c6bc386d05f31b).
+
 ### The tests became more extreme — and the question changed
 
 Success did not end the experiment. It changed the experiment.
@@ -969,11 +983,35 @@ These rules are important because they move knowledge upward: from a single fail
 
 ## October 2026 update: 58 versioned packages, two PDF viewers
 
-The later Schema-17 catalog declares **58 library/version records across 52 logical library IDs**, retaining six superseded version lines deliberately. That later snapshot does not change the chronology of the earlier 44-library milestone. BuildEngine now also integrates PDFium 2025.11.19 with pinned Skia 144, external Abseil 20260817.0, and a larger native PDF/image/text dependency closure. A newer Skia 153 is maintained independently.
+The later Schema-17 catalog declared **58 library/version records across 52 logical library IDs**, retaining six superseded version lines deliberately. This is an **October historical snapshot**, not the current package inventory. It also records the PDFium 2025.11.19 integration work with then-pinned Skia 144 and external Abseil 20260817.0. Later development moved the active PDFium contract to Skia 153; both Skia versions must not be conflated.
 
 The next evidence layer is practical application consumption: two PDFium navigation viewers, one pure SDL2/CMake/BCC64X window and one native C++Builder VCL Unit/DFM application. Shared page rasterization and viewport/navigation logic demonstrates how the same binary stack serves different UI frameworks. The GUI applications remain an ongoing test, not a claim of verified native startup. The earlier PDFium Release/Debug loader smokes passed, but later runtime-staging and SBOM revisions still require fresh machine evidence.
 
 The license and SBOM work now distinguishes external BuildEngine components from genuinely bundled third-party sources. In particular, PDFium's internal Chromium Abseil DLL has been retired in favour of the version-pinned installed Abseil package. This is the same architectural theme as the initial experiment: reproducible libraries are useful only when their dependency ownership, ABI boundaries and deployment evidence are explicit.
+
+## November 2026 update: from experiments to a versioned native library platform
+
+The November catalog documents **95 library/version records across 62 logical library IDs**, with **32 `supersededBy` declarations** in the server documentation snapshot. Compared with the single pugiXML entry in the initial schema 3 contract on 24 August, this is an expansion by **94 version records**, not proof that 94 additional packages have passed every build stage. Comparing with the original approximately twenty feasibility libraries would be misleading, because feasibility cases and registered package versions are different units.
+
+That growth brought two complementary changes. The library FSM had to protect a consistent release/Debug state across source provisioning, build, tests, install, metadata, publishing, documentation and independent smoke checks. At the same time, the native toolchain contract had to become more precise. The maintained BCC64X dynamic runtime is mandatory, and helper tools such as CMake, Ninja, Perl, NASM, GN, the Windows resource compiler and documentation generators are managed as explicit dependencies rather than taken from the developer's ambient PATH.
+
+### New capabilities raised harder evidence questions
+
+The late-October and November waves expanded the work in several directions. OpenCV, Tesseract and Leptonica provided computer vision and OCR consumers. MariaDB Connector/C supplemented the earlier PostgreSQL and SQLite work. oneTBB and LLVM OpenMP extended native concurrency testing. VTK introduced a larger dependency and compiler challenge. PDFium, PoDoFo, Poppler, QPDF and Skia made binary boundaries, GN/Ninja integration, resource compilation and library identity particularly important.
+
+The most valuable part of that expansion was not the growing list of product names. It was the accumulation of failure modes and the effort to remove classes of repeated failure. For example, using an unregistered `Ninja` path in a nested CMake test made the OpenXLSX configuration fail; using the wrong Windows resource compiler mode could break OpenSSL, PoDoFo or other libraries even though the C++ source had compiled; and a change to an installed dependency graph could invalidate otherwise reassuring SBOM or loader evidence.
+
+The lesson was uncomfortable but useful: a green source compilation is not a green library, a green library is not necessarily a working installed consumer, and a passing binary from last week is not proof about a different current binary. That is why BuildEngine separates **registered**, **corrected**, **tested**, **installed**, **published** and **verified** states, and why its history must preserve failed and reverted attempts as carefully as successful ones.
+
+### Documentation and provenance become part of the product
+
+By 10 November, the external server documentation had been expanded to **95 versioned library pages**, including **28 newly created pages**. Transitive Mermaid dependency diagrams, current configuration declarations, migration notes and a dated news archive connect the package graph with its human explanation.
+
+This is an important continuation of the August philosophy. Initially the issue was whether a source tree could be compiled with BCC64X. The mature question is whether another developer can reconstruct **which** source was compiled, **with which** tools and patches, **against which** dependencies and ABI boundaries, and **what independent evidence** supports the installed result.
+
+A change log must therefore be more than a release advertisement. It should say why OpenSSL needed a managed assembler, why curl integration was repeatedly reset, why a libarchive patch had to respect source line endings, why an earlier Skia workaround was reverted, or why a recorded Boost DLL boundary limitation mattered. A failure is not a story defect: it is an engineering result that can prevent the next failure.
+
+The [news archive](/news/) captures these dated developments, from the original August contracts to November's package and server integration. A commit confirms that work was recorded in a repository; a build PASS still requires the corresponding FSM, smoke-test or runtime record.
 
 ## 24. The project is still evolving
 
