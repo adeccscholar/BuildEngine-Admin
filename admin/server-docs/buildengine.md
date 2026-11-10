@@ -4,7 +4,7 @@
 
 [TOC|Content]
 
-**Aktueller Katalogstand, 10. November 2026:** Schema 17 enthält **95 versionierte Bibliothekseinträge / 62 logische IDs** und **32 Einträge mit `supersededBy`**. Ausführungsnachweise gelten ausschließlich für den jeweiligen FSM-Binärstand. [Vollständiger Katalog](/manual/libraries.md) · [Änderungshistorie](/news/).
+**Catalog snapshot, 10 November 2026:** Schema 17 declares **95 versioned library records across 62 logical IDs** and **32 `supersededBy` entries**. Execution evidence applies only to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
 
 **Status:** architecture and integration snapshot reviewed **21 October 2026**. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
 
@@ -313,30 +313,30 @@ The newly added private-libarchive BZip2 path is **not verified** until the priv
 
 ## Projectimport im CMake-Configure-Schritt
 
-Mit Bibliotheksvertrag Schema 16 kann eine CMake-Configure-Action Projektmetadaten aus vorhandenen Projektdateien importieren und daraus vor dem eigentlichen Configure-Lauf eine `CMakeLists.txt` erzeugen.
+With library contract schema 16, a CMake configure action can import metadata from existing project files and generate a `CMakeLists.txt` before the actual configuration run.
 
-Unterstützt werden zunächst:
+Initially supported:
 
 - `vcxproj` mit `ClCompile` und `ResourceCompile`;
 - `cbproj` mit `CppCompile`, `ResourceCompile` und `RcCompile`.
 
-Die Projektdatei wird ausschließlich gelesen. BuildEngine verändert weder `.vcxproj` noch `.cbproj`.
+The project file is read-only. BuildEngine modifies neither `.vcxproj` nor `.cbproj`.
 
-Der Ablauf ist:
+Execution order:
 
 ```text
 cmake configure
    -> optionale project imports
    -> neutrales Targetmodell
    -> generiertes CMakeLists.txt
-   -> reguläres CMake configure
+   -> regular CMake configure
    -> Ninja / BCC64X
 ```
 
-Der Importer ist bewusst kein MSBuild- oder C++Builder-Projekt-Interpreter. Toolchain, Plattform, Varianten, Installationspfade, Dependencies und allgemeine Buildargumente bleiben im bestehenden BuildEngine-Vertrag. Der Import liefert Projektinventar und wenige targetbezogene Angaben.
+The importer is deliberately not an MSBuild or C++Builder project interpreter. Toolchain, platform, build variants, installation paths, dependencies and general build arguments remain in the existing BuildEngine contract. Import supplies source inventory and a limited set of target-specific properties.
 
-Bedingte Source-Semantik wird nicht geraten. Ein Source-Eintrag mit nicht aufgelöster Condition bzw. `ExcludedFromBuild` führt zum Abbruch des Imports. Dadurch kann der Generator nicht stillschweigend ein anderes Target erzeugen als das Projekt beschreibt.
+Conditional source semantics are never guessed. An unresolved condition or `ExcludedFromBuild` on a source entry causes import to fail, preventing the generator from silently producing a target different from the original project.
 
-Mehrere Imports dürfen in derselben Configure-Action zusammengeführt werden. Damit können beispielsweise mehrere Upstream-Windows-Projekte ein gemeinsames generiertes CMake-Projekt bilden.
+Multiple imports may be combined in one configure action, allowing several upstream Windows projects to form a single generated CMake project.
 
-**Verifikationsstatus:** Implementierung und Schema sind vorhanden; der reale BCC64X-Proof für VCXPROJ und CBPROJ steht noch aus.
+**Verification status:** The implementation and schema are present; the native BCC64X proof for VCXPROJ and CBPROJ remains pending.
