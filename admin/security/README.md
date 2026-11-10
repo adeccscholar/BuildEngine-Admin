@@ -1,123 +1,90 @@
-# BuildEngine Security-Bewertungen
+# BuildEngine Security Assessments
 
-Dieser Bereich enthaelt die **zentrale, verteilbare Bewertung der konkreten BuildEngine-Bibliotheks- und Buildkonfiguration**.
+This directory contains the **centralized, distributable assessment of the actual BuildEngine library and build configuration**. Application-specific assessments are not yet part of the documented design.
 
-Eine anwendungsspezifische Bewertung existiert im aktuellen Ausbaustand noch nicht.
+## One shared database
 
-## Eine gemeinsame Datenbank
-
-Die zentrale BuildEngine-Bewertung verwendet genau eine SQLite-Datenbank:
+The central assessment uses one SQLite file:
 
 ```text
 admin\security\build-assessments.sqlite
 ```
 
-Im laufenden BuildEngine-Arbeitsbereich liegt dieselbe Datenbank nach dem Admin-Sync unter:
+In the working BuildEngine environment it is synchronized to:
 
 ```text
 <ProductionRoot>\admin\security\build-assessments.sqlite
 ```
 
-Die Datenbank enthaelt gemeinsam:
+The same database stores provider findings, BuildEngine/library findings, assessment revisions, languages, localized reference values, a review queue and views.
 
-- Provider-Findings,
-- BuildEngine-/Bibliotheks-Findings,
-- Bewertungsrevisionen,
-- Sprachen,
-- lokalisierte Referenzwerte,
-- Review-Queue und Views.
+There is **no** second database solely for reference values and **no** separate working database under `build`. The `schema.sql` and `reference-data.sql` files are readable bootstrap and migration definitions for the same SQLite database.
 
-Es gibt **keine zweite Datenbank nur fuer Referenzwerte** und aktuell auch **keine zweite Arbeitsdatenbank unter `build`**. `schema.sql` und `reference-data.sql` sind textuell nachvollziehbare Bootstrap-/Migrationsvertraege fuer dieselbe SQLite-Datei.
+## Repository as distribution source
 
-## Repository als Verteilungsquelle
-
-Die Datei im `BuildEngine-Admin`-Repository ist die verteilte Referenzversion:
+The reference copy is versioned at:
 
 ```text
 BuildEngine-Admin\admin\security\build-assessments.sqlite
 ```
 
-Der normale Repository-Sync kopiert diese Datei nach:
+Normal repository synchronization copies it to:
 
 ```text
 <ProductionRoot>\admin\security\build-assessments.sqlite
 ```
 
-Wenn die Repository-Version aktualisiert wurde, **darf und soll** sie die vorhandene Datenbank im Arbeitsbereich ueberschreiben. So werden zentral gepflegte Sprachen, Wertebereiche, Provider-Findings und Bibliotheksbewertungen an andere Installationen verteilt.
+When the repository copy changes, it **may and should overwrite** the working copy to distribute centrally maintained languages, value ranges, provider findings and library assessments. The file must **not** be marked as `preserve`.
 
-Die Datenbank darf daher im Repository-Sync **nicht** als `preserve` behandelt werden.
+## Central editing
 
-## Zentrale Bearbeitung
+`BuildEngine-Manager` reads and writes the working database, importing new CVE/provider findings, updating library findings, recording assessment revisions and loading languages and localized values from that same file.
 
-`BuildEngine-Manager` oeffnet die Datenbank unter
+`BuildEngine-Server` opens the same file strictly read-only and displays the centrally distributed assessments.
 
-```text
-<ProductionRoot>\admin\security\build-assessments.sqlite
-```
+## Publishing reviewed assessments
 
-lesend und schreibend. Dort werden:
-
-- neue CVE-/Provider-Findings aus dem Monitoring uebernommen,
-- Bibliotheks-Findings aktualisiert,
-- zentrale Bewertungen als Revisionen gespeichert,
-- Sprache und lokalisierte Werte aus derselben Datenbank geladen.
-
-`BuildEngine-Server` oeffnet dieselbe Datei ausschliesslich read-only und zeigt die zentral verteilte Bewertung an.
-
-## Rueckverteilung
-
-Nach einer geprueften zentralen Aenderung kopiert der Manager die Datenbank bewusst in den ausgecheckten Admin-Repository-Arbeitsbaum:
+After a reviewed central change, deliberately copy the database back to the checked-out Admin repository:
 
 ```text
 <RepositoriesRoot>\BuildEngine-Admin\admin\security\build-assessments.sqlite
 ```
 
-Danach folgen normaler Git-Review, Commit und Push. Erst damit wird die neue Version zur verteilten Referenz fuer andere BuildEngine-Arbeitsbereiche.
+Perform Git review, commit and push. Only then does the updated version become the reference distributed to other BuildEngine working environments.
 
-## Sprache
+## Language handling
 
-Sprachen sind Datensaetze mit stabiler ID in `language`.
+Languages have stable identifiers in `language`. Reference values also have stable IDs; their localized texts live in `reference_value_text`.
 
-Die Referenzwerte besitzen ebenfalls stabile IDs und werden ueber `reference_value_text` pro Sprache lokalisiert.
-
-Der Server liest seine Standardsprache aus `BuildEngine.xml`, z. B.:
+The Server reads its default language from `BuildEngine.xml`, for example:
 
 ```xml
 <parameters serverLanguage="de" ... />
 ```
 
-Der Manager liest seine Startsprache aus `managerLanguage`. Fehlt dieser Eintrag, gilt Englisch (`en`). Beide Sprachcodes werden auf `language.code` aufgeloest.
+The Manager uses `managerLanguage`, falling back to English (`en`) if absent. Both codes resolve through `language.code`. German (`id=1`, `code=de`) and English (`id=2`, `code=en`) are initially present.
 
-Deutsch (`id=1`, `code=de`) und Englisch (`id=2`, `code=en`) sind initial enthalten.
+**UI localization is separate from the external documentation policy:** all public Markdown documentation is written in English.
 
-## Aktueller fachlicher Umfang
+## Current assessment scope
 
-Bewertet wird ausschliesslich die konkrete BuildEngine-Bibliothekskonfiguration, z. B.:
+The assessment is limited to a concrete library/build configuration, such as: an affected feature disabled at build time; a vulnerable component not compiled or not deployed; exploit prerequisites absent from the selected profile; a local fix; or a newer version including a fix. Application-specific assertions are outside the current assessment level.
 
-- betroffene Funktion beim Build deaktiviert,
-- betroffene Komponente nicht gebaut,
-- betroffene Komponente nicht ausgeliefert,
-- Exploit-Voraussetzung in der Buildkonfiguration nicht vorhanden,
-- lokaler Patch vorhanden,
-- aktualisierte Version enthaelt den Fix.
+## Versioned companion files
 
-Anwendungsspezifische Aussagen sind nicht Bestandteil dieses Modells und werden erst in einer spaeteren Ausbaustufe eingefuehrt.
+- `schema.sql`: canonical SQLite database schema
+- `reference-data.sql`: initial languages and localized applicability, exposure, effective risk, decision and justification values
+- `build-assessments.sqlite`: versioned centralized assessment database
 
-## Versionierte Begleitdateien
+Schema and reference values remain in the repository alongside the binary database so the structure, migrations and reviews can be inspected.
 
-- `schema.sql` — kanonisches Schema der SQLite-Datenbank.
-- `reference-data.sql` — initiale Sprachen und lokalisierte Werte fuer Anwendbarkeit, Exposition, effektives Risiko, Entscheidung und Begruendung.
-- `build-assessments.sqlite` — versionierte zentrale Bewertungsdatenbank.
+## Principles
 
-Schema und Referenzwerte bleiben neben der binaeren SQLite-Datei im Repository, damit Aufbau, Migrationen und Reviews nachvollziehbar sind.
-
-## Grundsaetze
-
-- Provider-Severity wird nie ueberschrieben.
-- `no finding` bedeutet nicht `safe`.
-- Eine Buildbewertung ist an Bibliothek, Version, Upstream-Identitaet/Commit und Build-Evidence zu binden.
-- Aendert sich die Evidence, muss eine alte Bewertung als veraltet erkennbar sein.
-- Bewertungen werden revisionsorientiert gespeichert; alte Entscheidungen werden nicht destruktiv ueberschrieben.
-- Unbekannte Findings werden automatisch in die Review-Queue aufgenommen.
-- `not applicable` ist nicht dasselbe wie `false positive`.
-- Die zentrale Datenbank darf nur Buildkonfigurationsaussagen enthalten.
+- Never overwrite provider severity.
+- `no finding` does not mean `safe`.
+- Bind assessments to the library, version, upstream identity/commit and build evidence.
+- When evidence changes, previous assessments must become visibly stale.
+- Store revisions; never destructively replace historical decisions.
+- Automatically place unknown findings in the review queue.
+- `not applicable` is not equivalent to `false positive`.
+- The central database may contain only build-configuration assessments.
