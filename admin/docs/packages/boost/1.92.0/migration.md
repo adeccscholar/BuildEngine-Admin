@@ -1,4 +1,4 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
 **Current XML contract; no new PASS evidence.** The previous migration notes below remain unchanged.
 
