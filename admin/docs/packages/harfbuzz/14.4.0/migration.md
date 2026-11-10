@@ -1,3 +1,56 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["harfbuzz 14.4.0"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DHB_HAVE_FREETYPE:BOOL=OFF`
+- `-DHB_HAVE_CAIRO:BOOL=OFF`
+- `-DHB_HAVE_GRAPHITE2:BOOL=OFF`
+- `-DHB_HAVE_GLIB:BOOL=OFF`
+- `-DHB_HAVE_ICU:BOOL=OFF`
+- `-DHB_HAVE_GOBJECT:BOOL=OFF`
+- `-DHB_HAVE_INTROSPECTION:BOOL=OFF`
+- `-DHB_HAVE_UNISCRIBE:BOOL=OFF`
+- `-DHB_HAVE_GDI:BOOL=OFF`
+- `-DHB_HAVE_DIRECTWRITE:BOOL=OFF`
+- `-DHB_BUILD_SUBSET:BOOL=ON`
+- `-DHB_BUILD_RASTER:BOOL=OFF`
+- `-DHB_BUILD_VECTOR:BOOL=OFF`
+- `-DHB_BUILD_GPU:BOOL=OFF`
+- `-DHB_BUILD_GPU_DEMO:STRING=OFF`
+- `-DHB_BUILD_UTILS:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_DEBUG_POSTFIX:STRING=d`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-Dharfbuzz_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\harfbuzz`
+
+---
+
+## Historische Integrationsnotizen
+
 # harfbuzz 14.4.0: BCC64X migration and integration record
 
 [TOC|Content]
