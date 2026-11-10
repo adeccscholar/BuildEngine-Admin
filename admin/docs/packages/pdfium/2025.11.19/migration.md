@@ -1,3 +1,86 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["pdfium 2025.11.19"]
+   N1["abseil 20260817.0"]
+   N2["fast_float 8.3.3"]
+   N3["skia 153"]
+   N4["zlib 1.4"]
+   N5["libjpeg-turbo 3.2.1"]
+   N6["libpng 1.6.59"]
+   N7["freetype 2.15.0"]
+   N8["icu 79.1"]
+   N9["lcms2 2.20"]
+   N10["openjpeg 2.5.4"]
+   N11["opengl 26.2.1"]
+   N12["brotli 1.2.1"]
+   N13["harfbuzz 15.1.0"]
+   N14["bzip2 1.0.8"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+   N0 --> N4
+   N0 --> N5
+   N0 --> N6
+   N0 --> N7
+   N0 --> N8
+   N0 --> N9
+   N0 --> N10
+   N3 --> N11
+   N3 --> N4
+   N3 --> N12
+   N3 --> N5
+   N3 --> N6
+   N3 --> N13
+   N3 --> N7
+   N6 --> N4
+   N7 --> N4
+   N7 --> N14
+   N7 --> N12
+   N7 --> N6
+   N7 --> N13
+```
+
+Direkt: `abseil@20260817.0`, `fast_float@8.3.3`, `skia@153`, `zlib@1.4`, `libjpeg-turbo@3.2.1`, `libpng@1.6.59`, `freetype@2.15.0`, `icu@79.1`, `lcms2@2.20`, `openjpeg@2.5.4`
+
+### Aktuelle Konfiguration
+
+- `-DPDFIUM_SOURCE_ROOT:PATH={CurrentArtifact}`
+- `-DPDFIUM_SOURCE_ROOT:PATH={Workspace}`
+- `-DABSEIL_INCLUDE_VERIFY_ONLY:BOOL=ON`
+- `-DABSEIL_PACKAGE_ROOT:PATH={DependencyRoot:abseil}`
+- `-DPDFIUM_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DBUILD_CONFIGURATION:STRING={Configuration}`
+
+```gn
+target_cpu = "x64"
+custom_toolchain = "//build/toolchain/bcc64x:bcc64x"
+is_clang = true
+is_component_build = true
+use_custom_libcxx = false
+pdf_is_complete_lib = false
+clang_use_chrome_plugins = false
+pdf_enable_v8 = false
+pdf_enable_xfa = false
+pdf_use_partition_alloc = false
+use_system_lcms2 = true
+use_system_libopenjpeg2 = true
+pdf_use_skia = true
+pdf_bundle_freetype = false
+use_system_freetype = true
+pdf_is_standalone = false
+is_debug = {PdfiumDebug}
+```
+
+---
+
+## Historische Integrationsnotizen
+
 ## 8 November 2026: Migrate the installed Skia dependency from 144 to 153
 
 The active `pdfium@2025.11.19` GN producer now depends on **`skia@153`** rather than
