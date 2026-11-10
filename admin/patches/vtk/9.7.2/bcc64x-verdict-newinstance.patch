@@ -173,5 +173,5 @@ diff --git a/ThirdParty/verdict/vtkverdict/CMakeLists.txt b/ThirdParty/verdict/v
 +
 +# vtkverdict has a VTK target name; verdict.h requires verdict_EXPORTS.
 +if (WIN32 AND BUILD_SHARED_LIBS)
-+  vtk_module_compile_definitions(VTK::verdict PRIVATE verdict_EXPORTS)
++  vtk_module_definitions(VTK::verdict PRIVATE verdict_EXPORTS)
 +endif ()

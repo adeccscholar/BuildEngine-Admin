@@ -90,6 +90,14 @@ The hunk is now `@@ -25,4 +25,9 @@` without the trailing phantom context line. T
 
 The complete VTK source/build and native Windows/BCC64X compiler and linker outcomes remain **[not verified]**.
 
+## 10 November 2026 — Fix unsupported Verdict CMake function
+
+The VTK 9.7.2 Release and Debug configurations stopped at `ThirdParty/verdict/vtkverdict/CMakeLists.txt:32`. The source patch had introduced `vtk_module_compile_definitions(VTK::verdict PRIVATE verdict_EXPORTS)`, but upstream VTK 9.7.2 provides **`vtk_module_definitions`**, not `vtk_module_compile_definitions`. This was an error in the previous integration patch, before compilation could begin.
+
+The Verdict patch now calls `vtk_module_definitions(VTK::verdict PRIVATE verdict_EXPORTS)`, the actual VTK 9.7.2 API, which forwards private compile definitions to the underlying module target. This retains the intended producer `dllexport` behavior without modifying the Verdict implementation or any compiler-wide setting. The upstream `CMake/vtkModule.cmake` signature and its `target_compile_definitions` delegation were inspected; full Windows BCC64X configure/build/link remains **[not verified]**.
+
+The VTK source revision advances from `2026-11-10T04:56:00Z` to `2026-11-10T04:57:00Z` to invalidate the previous source-stage evidence and reapply the corrected patch. No unrelated packages are invalidated.
+
 ## Historical integration notes
 
 # vtk 9.7.2: BCC64X migration and integration record
