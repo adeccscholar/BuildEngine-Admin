@@ -1,3 +1,23 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die bisherigen Migrationsnotizen folgen unverändert.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["nlohmann-json 3.12.0"]
+```
+
+**Direkte Abhängigkeiten:** keine
+
+### Konfiguration und Patches
+
+
+---
+
+## Bisherige Migrationsnotizen
+
 # nlohmann-json 3.12.0: BCC64X migration and integration record
 
 [TOC|Content]
