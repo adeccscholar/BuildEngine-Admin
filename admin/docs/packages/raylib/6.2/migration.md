@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -13,7 +13,7 @@ flowchart LR
 
 Direkt: `opengl@26.2.1`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DRAYLIB_SOURCE_DIR:PATH={Workspace}`
 - `-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}`
@@ -26,23 +26,23 @@ Direkt: `opengl@26.2.1`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # raylib 6.2
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data, not verified build execution.** Earlier test results apply only to exact versions and builds; new runs remain **[not verified]**.
 
 Simple cross-platform C library for graphics, audio, input, and game and application development.
 
-**Koordinate:** `raylib@6.2` · **Kategorie:** `graphics` · **Lizenzampel:** `green`
+**Coordinate:** `raylib@6.2` · **Category:** `graphics` · **License indicator:** `green`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (full transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Edges come from exactly pinned XML dependencies. Dashed edges denote extensions, solid edges package dependencies. Bundled upstream components are not additional BuildEngine coordinates.
 
 ```mermaid
 flowchart LR
@@ -51,11 +51,11 @@ flowchart LR
    N0 --> N1
 ```
 
-**Direkte Abhängigkeiten:** `opengl@26.2.1`
+**Direct dependencies:** `opengl@26.2.1`
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-DRAYLIB_SOURCE_DIR:PATH={Workspace}`
 - `-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}`
@@ -84,4 +84,4 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BaseName}.dll`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BaseName}.lib`
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
