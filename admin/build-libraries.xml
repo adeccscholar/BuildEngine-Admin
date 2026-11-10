@@ -5390,6 +5390,9 @@
 	  <require path="Common\DataModel\CMakeLists.txt"/>
 	  <require path="Filters\Core\CMakeLists.txt"/>
 	  </extract>
+	  <copy source="{BuildFileDir}\patches\vtk\9.7.2\bcc64x-fastdowncast-exports.patch" target="{Workspace}\.buildengine\patches\bcc64x-fastdowncast-exports.patch" overwrite="true" preserveCurrentArtifact="true"/>
+	  <execute name="fastdowncast-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\bcc64x-fastdowncast-exports.patch"/></execute>
+	  <execute name="fastdowncast-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\bcc64x-fastdowncast-exports.patch"/></execute>
 	  </source>
       <build testsAffectBuild="false"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <argument value="-G"/><argument value="Ninja"/><argument value="-Wno-dev"/><argument value="--fresh"/><argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/><argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/><argument value="-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/><argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/><argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/><argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>

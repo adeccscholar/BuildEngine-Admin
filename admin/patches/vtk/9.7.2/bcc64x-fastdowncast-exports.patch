@@ -1,0 +1,69 @@
+diff --git a/Common/Core/vtkAffineArray.h b/Common/Core/vtkAffineArray.h
+--- a/Common/Core/vtkAffineArray.h
++++ b/Common/Core/vtkAffineArray.h
+@@ -56,8 +56,5 @@
+    * A faster alternative to SafeDownCast for downcasting vtkAbstractArrays.
+    */
+-  static vtkAffineArray<ValueType>* FastDownCast(vtkAbstractArray* source)
+-  {
+-    return static_cast<vtkAffineArray<ValueType>*>(Superclass::FastDownCast(source));
+-  }
++  static vtkAffineArray<ValueType>* FastDownCast(vtkAbstractArray* source);
+ 
+   /**
+@@ -104,3 +101,9 @@
+ // Declare vtkArrayDownCast implementations for Affine arrays:
++template <class ValueTypeT>
++vtkAffineArray<ValueTypeT>* vtkAffineArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source)
++{
++  return static_cast<vtkAffineArray<ValueTypeT>*>(Superclass::FastDownCast(source));
++}
++
+ vtkArrayDownCast_TemplateFastCastMacro(vtkAffineArray);
+ 
+diff --git a/Common/Core/vtkStructuredPointArray.h b/Common/Core/vtkStructuredPointArray.h
+--- a/Common/Core/vtkStructuredPointArray.h
++++ b/Common/Core/vtkStructuredPointArray.h
+@@ -59,8 +59,5 @@
+    * A faster alternative to SafeDownCast for downcasting vtkAbstractArrays.
+    */
+-  static vtkStructuredPointArray<ValueType>* FastDownCast(vtkAbstractArray* source)
+-  {
+-    return static_cast<vtkStructuredPointArray<ValueType>*>(Superclass::FastDownCast(source));
+-  }
++  static vtkStructuredPointArray<ValueType>* FastDownCast(vtkAbstractArray* source);
+ 
+   ///@{
+@@ -99,3 +96,9 @@
+ // Declare vtkArrayDownCast implementations for StructuredPoint arrays:
++template <class ValueTypeT>
++vtkStructuredPointArray<ValueTypeT>* vtkStructuredPointArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source)
++{
++  return static_cast<vtkStructuredPointArray<ValueTypeT>*>(Superclass::FastDownCast(source));
++}
++
+ vtkArrayDownCast_TemplateFastCastMacro(vtkStructuredPointArray);
+ 
+diff --git a/Common/Core/vtkConstantArray.h b/Common/Core/vtkConstantArray.h
+--- a/Common/Core/vtkConstantArray.h
++++ b/Common/Core/vtkConstantArray.h
+@@ -58,8 +58,5 @@
+    * A faster alternative to SafeDownCast for downcasting vtkAbstractArrays.
+    */
+-  static vtkConstantArray<ValueType>* FastDownCast(vtkAbstractArray* source)
+-  {
+-    return static_cast<vtkConstantArray<ValueType>*>(Superclass::FastDownCast(source));
+-  }
++  static vtkConstantArray<ValueType>* FastDownCast(vtkAbstractArray* source);
+ 
+   /**
+@@ -95,3 +92,9 @@
+ // Declare vtkArrayDownCast implementations for Constant arrays:
++template <class ValueTypeT>
++vtkConstantArray<ValueTypeT>* vtkConstantArray<ValueTypeT>::FastDownCast(vtkAbstractArray* source)
++{
++  return static_cast<vtkConstantArray<ValueTypeT>*>(Superclass::FastDownCast(source));
++}
++
+ vtkArrayDownCast_TemplateFastCastMacro(vtkConstantArray);
+ 

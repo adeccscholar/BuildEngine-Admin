@@ -64,6 +64,12 @@ Direct: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`
 
 **Verification boundary:** Registration in `admin/build-libraries.xml` is not evidence of successful compilation, installation or consumer execution. All Windows-specific outcomes below remain **[not verified]** until the BuildEngine FSM and logs report them.
 
+## 10 November 2026 — BCC64X FastDownCast producer patch
+
+The VTK 9.7.2-specific source patch `admin/patches/vtk/9.7.2/bcc64x-fastdowncast-exports.patch` moves the `FastDownCast` definitions in `vtkAffineArray.h`, `vtkStructuredPointArray.h` and `vtkConstantArray.h` from the class body to out-of-class template definitions. The methods remain callable for other template arguments; explicit instantiation in `CommonCore` now sees an out-of-class definition rather than a class-body inline definition. The patch is applied at source preparation with `git apply --check` followed by `git apply`. No global warning suppression or compiler/runtime replacement is introduced.
+
+The four previously unresolved `FastDownCast` instantiations are the regression target. The source-level change is committed, but rebuilt DLL export tables, import libraries and Release/Debug link results are **[not verified]** until the Windows BCC64X run completes. Inspect exports first and then confirm `CommonDataModel` and the package consumer for each configuration.
+
 ## 10 November 2026 — Debug linker diagnosis
 
 The native BCC64X Debug build compiled and linked numerous VTK modules successfully before the **589/835** link step failed for `libvtkCommonDataModel-9.7d.dll`. The link command used the expected **dynamic BCC64X runtime** (`-tR`) and the managed UCRT compatibility archive. The failure is isolated to four unresolved methods:
