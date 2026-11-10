@@ -1,3 +1,53 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktuelle Deklaration; keine neue PASS-Aussage.** Historische Befunde folgen unverändert unterhalb dieses Abschnitts.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["libdeflate 1.26"]
+   N1["zlib 1.4"]
+   N0 --> N1
+```
+
+**Direkte Versionen:** `zlib@1.4`
+
+### Konfiguration und Besonderheiten
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include`
+- `-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}`
+- `-DLIBDEFLATE_BUILD_STATIC_LIB:BOOL=OFF`
+- `-DLIBDEFLATE_BUILD_SHARED_LIB:BOOL=ON`
+- `-DLIBDEFLATE_COMPRESSION_SUPPORT:BOOL=ON`
+- `-DLIBDEFLATE_DECOMPRESSION_SUPPORT:BOOL=ON`
+- `-DLIBDEFLATE_ZLIB_SUPPORT:BOOL=ON`
+- `-DLIBDEFLATE_GZIP_SUPPORT:BOOL=ON`
+- `-DLIBDEFLATE_BUILD_GZIP:BOOL=OFF`
+- `-DLIBDEFLATE_BUILD_TESTS:BOOL=ON`
+- `-DLIBDEFLATE_USE_SHARED_LIB:BOOL=ON`
+- `-DLIBDEFLATE_INSTALL:BOOL=ON`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_DEBUG_POSTFIX:STRING=`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_DEBUG_POSTFIX:STRING=d`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-Dlibdeflate_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\libdeflate`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-wmain-tests.patch`
+
+---
+
+## Bisherige Migrations- und Integrationsnotizen
+
 # libdeflate 1.26
 
 [TOC|Content]
