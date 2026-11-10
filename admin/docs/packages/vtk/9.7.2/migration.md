@@ -1,3 +1,13 @@
+## 10 November 2026 — Optional Direct3D interoperability for Win32 OpenGL2
+
+The native BCC64X Release log successfully linked `vtkCommonCore` and `vtkIOXML`. Its remaining compilation failure was `vtkWin32OpenGLDXRenderWindow.cxx` at build step 2202/2459 because `winrt/wrl/def.h` rejected the compiler with `WRL requires compiler version 16.00 or greater`. This is the optional OpenGL/Direct3D 11 interop window, not the ordinary Windows WGL renderer.
+
+The VTK 9.7.2 version-bound patch `bcc64x-opengl-dx-interop.patch` introduces `VTK_USE_WIN32_OPENGL_DX_INTEROP` as a dependent CMake option with an upstream-compatible default of `ON`. It conditionally registers the interop class, its DirectX D3D11/DXGI linkage, and its dedicated test. The BCC64X build explicitly configures `-DVTK_USE_WIN32_OPENGL_DX_INTEROP:BOOL=OFF`. `VTK_USE_WIN32_OPENGL`, `RenderingOpenGL2`, `RenderingVolume`, and `RenderingVolumeOpenGL2` remain enabled. The existing SDK WRL include-path patch is now conditional on interop as well; a regular Win32 OpenGL renderer does not require the WinRT WRL headers. No simulated MSVC version or global compiler workaround is used.
+
+The source stage copies the patch from `admin/patches/vtk/9.7.2/`, checks it using `git apply --check`, and then applies it after the three existing BCC64X VTK patches. The VTK library revision timestamp was advanced to `2026-11-10T13:35:00Z` to invalidate the previous source stage for Debug and Release. Source-level CMake anchors were inspected against the VTK v9.7.2 tag. Native Windows/BCC64X compilation, linking, installed-package smokes, and actual GPU volume rendering remain **[not verified]** until subsequent build and runtime evidence is available.
+
+---
+
 ## Updated BuildEngine contract (10 November 2026)
 
 **Declared configuration; no new test PASS.**
