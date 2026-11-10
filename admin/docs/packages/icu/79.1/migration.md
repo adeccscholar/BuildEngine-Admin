@@ -1,17 +1,17 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
    N0["icu 79.1"]
 ```
 
-Direkt: keine
+Direct: none
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -35,26 +35,26 @@ Direkt: keine
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # ICU4C 79.1
 
 [TOC|Content]
 
-## Aufgabe und Integration
+## Purpose and integration
 
 Unicode and globalization library providing text, locale, normalization, collation, and conversion services.
 
-**Stand:** BuildEngine-XML-Vertrag vom 10. November 2026; native Builds und Smoke-Ergebnisse **[nicht verifiziert]**.
+**Status:** BuildEngine XML contract from 10 November 2026; native builds and smoke results **[not verified]**.
 
-## Abhängigkeiten einschließlich transitiver Stufen
+## Dependencies including transitive levels
 
 ```mermaid
 flowchart LR
    N0["icu 79.1"]
 ```
 
-**Direkte Abhängigkeiten:** keine
+**Direct dependencies:** none
 
 ## Konfiguration
 
@@ -80,7 +80,7 @@ flowchart LR
 - `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0 -D_DEBUG`
 - `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0 -D_DEBUG`
 
-### Build-Umgebung
+### Build environment
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -88,7 +88,7 @@ flowchart LR
 - `CB_LLVM_AR={Tool:llvm-ar}`
 - `CB_LLVM_RANLIB={Tool:llvm-ranlib}`
 
-### Quellen
+### Sources
 
 - `https://github.com/unicode-org/icu/releases/download/release-{LibraryVersion}/icu4c-{LibraryVersion}-sources.tgz`
 
@@ -96,8 +96,8 @@ flowchart LR
 
 Nicht deklariert.
 
-## Besonderheiten
+## Special considerations
 
-Versionierte Quell- und Build-Aktionen sowie eventuell erforderliche BCC64X-Patches sind im ausführbaren `admin/build-libraries.xml` dokumentiert. Eingetragene Fixes sind ohne FSM-Nachweis kein Test-PASS.
+Versioned source/build actions and required BCC64X patches are declared in `admin/build-libraries.xml`. A recorded fix is not a test PASS without FSM evidence.
 
-[Bibliotheksübersicht](/manual/libraries.md)
+[Library overview](/manual/libraries.md)
