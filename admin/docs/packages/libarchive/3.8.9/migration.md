@@ -1,3 +1,92 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die historischen Migrationsnotizen folgen unverändert.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["libarchive 3.8.9"]
+   N1["zlib 1.3.2"]
+   N2["xz 5.8.3"]
+   N3["zstd 1.5.7"]
+   N4["bzip2 1.0.8"]
+   N5["openssl 3.5.9"]
+   N6["zlib 1.4"]
+   N7["brotli 1.2.1"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+   N0 --> N4
+   N0 --> N5
+   N5 --> N6
+   N5 --> N7
+   N5 --> N3
+```
+
+**Direkte Abhängigkeiten:** `zlib@1.3.2`, `xz@5.8.3`, `zstd@1.5.7`, `bzip2@1.0.8`, `openssl@3.5.9`
+
+### Konfiguration und Patches
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DENABLE_INSTALL:BOOL=ON`
+- `-DENABLE_TEST:BOOL={TestsEnabled}`
+- `-DENABLE_TAR:BOOL=ON`
+- `-DENABLE_TAR_SHARED:BOOL=ON`
+- `-DENABLE_CPIO:BOOL=ON`
+- `-DENABLE_CPIO_SHARED:BOOL=ON`
+- `-DENABLE_CAT:BOOL=ON`
+- `-DENABLE_CAT_SHARED:BOOL=ON`
+- `-DENABLE_UNZIP:BOOL=ON`
+- `-DENABLE_UNZIP_SHARED:BOOL=ON`
+- `-DENABLE_ZLIB:BOOL=ON`
+- `-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include`
+- `-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibLibraryName}.lib`
+- `-DENABLE_CNG:BOOL=ON`
+- `-DENABLE_WIN32_XMLLITE:BOOL=ON`
+- `-DENABLE_OPENSSL:BOOL=ON`
+- `-DOPENSSL_ROOT_DIR:PATH={DependencyRoot:openssl}`
+- `-DOPENSSL_INCLUDE_DIR:PATH={DependencyRoot:openssl}\include`
+- `-DOPENSSL_SSL_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libssl.lib`
+- `-DOPENSSL_CRYPTO_LIBRARY:FILEPATH={DependencyRoot:openssl}\lib\win64\{Configuration}\libcrypto.lib`
+- `-DOPENSSL_USE_STATIC_LIBS:BOOL=FALSE`
+- `-DENABLE_MBEDTLS:BOOL=OFF`
+- `-DENABLE_NETTLE:BOOL=OFF`
+- `-DENABLE_LIBB2:BOOL=OFF`
+- `-DENABLE_LZ4:BOOL=OFF`
+- `-DENABLE_LZO:BOOL=OFF`
+- `-DENABLE_LZMA:BOOL=ON`
+- `-DLIBLZMA_INCLUDE_DIR:PATH={DependencyRoot:xz}\include`
+- `-DLIBLZMA_LIBRARY:FILEPATH={DependencyRoot:xz}\lib\win64\{Configuration}\liblzma.lib`
+- `-DENABLE_ZSTD:BOOL=ON`
+- `-DZSTD_INCLUDE_DIR:PATH={DependencyRoot:zstd}\include`
+- `-DZSTD_LIBRARY:FILEPATH={DependencyRoot:zstd}\lib\win64\{Configuration}\libzstd.lib`
+- `-DENABLE_BZip2:BOOL=ON`
+- `-DBZIP2_INCLUDE_DIR:PATH={DependencyRoot:bzip2}\include`
+- `-DBZIP2_LIBRARIES:FILEPATH={DependencyRoot:bzip2}\lib\win64\{Configuration}\{Bzip2LibraryName}.lib`
+- `-DENABLE_LIBXML2:BOOL=OFF`
+- `-DENABLE_EXPAT:BOOL=OFF`
+- `-DPOSIX_REGEX_LIB:STRING=NONE`
+- `-DENABLE_PCREPOSIX:BOOL=OFF`
+- `-DENABLE_PCRE2POSIX:BOOL=OFF`
+- `-DENABLE_LIBGCC:BOOL=OFF`
+- `-DENABLE_ICONV:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_DEBUG_POSTFIX:STRING=d`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-modern-borland-compat.patch`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\managed-bzip2-contract.patch`
+
+---
+
+## Bisherige Migrationsnotizen
+
 # libarchive 3.8.9: BCC64X migration and integration record
 
 [TOC|Content]
