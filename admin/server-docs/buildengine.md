@@ -4,15 +4,17 @@
 
 [TOC|Content]
 
+**Aktueller Katalogstand, 10. November 2026:** Schema 17 enthält **95 versionierte Bibliothekseinträge / 62 logische IDs** und **32 Einträge mit `supersededBy`**. Ausführungsnachweise gelten ausschließlich für den jeweiligen FSM-Binärstand. [Vollständiger Katalog](/manual/libraries.md) · [Änderungshistorie](/news/).
+
 **Status:** architecture and integration snapshot reviewed **21 October 2026**. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
 
 BuildEngine is a declarative C++23 orchestration system centered on Embarcadero C++Builder 13 / BCC64X. The current architecture separates the declarative library contract, the runtime Library-FSM, persistent logical scope state, technical WorkItems/Actions, artifact evidence, Common repository semantics and read-only presentation.
 
-## Current platform and integration snapshot (21 October 2026)
+## Current platform and integration snapshot (10 November 2026)
 
 The synchronized Admin library contract is now **Schema 17**, containing
-**58 versioned library entries across 52 library IDs**, including six
-retained superseded versions. The current tools contract declares **27
+**95 versioned library entries across 62 library IDs**, including 32
+retained superseded coordinates. The current tools contract declares **27
 tool IDs**. These counts refer to the Git definitions, not to a claimed
 successful machine run. See the [full library matrix](libraries.md) and
 [tool inventory](tools.md).
@@ -26,7 +28,7 @@ source artifacts, not as hidden per-library orchestrators.
 The current cross-package BCC64X boundary includes `-tR` dynamic
 runtime linkage, exact Release/Debug variant roots, GN-to-BCC64X flag
 translation and version-bound source patches. The latest PDFium contract
-pins `pdfium@2025.11.19` to `skia@144`, external
+currently pins `pdfium@2025.11.19` to `skia@153`, external
 `abseil@20260817.0` and the image/font/ICU stack; Skia 153 is a
 separate later general-purpose build. Standalone `libabseil_dll.dll`
 replaces the retired internal Chromium Abseil component DLL.
@@ -37,7 +39,7 @@ Release/Debug loader smokes passed, but the standalone
 and [VCL Unit/DFM viewer](https://github.com/adeccscholar/BuildEngine/tree/main/Test/PDFiumVCL)
 still require their own GUI builds/tests. The previously reported 56/58
 catalog run predates correction of BZip2/HarfBuzz Debug consumer CMake
-configuration. No fresh 58/58 run is established by this documentation
+configuration. No fresh 95/95 run is established by this documentation
 update. Machine-local FSM state, CI logs and installed package evidence
 remain authoritative.
 
