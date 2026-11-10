@@ -1,6 +1,6 @@
 ## Updated BuildEngine contract (10 November 2026)
 
-**Current XML contract; no new PASS evidence.** Die historischen Migrationsnotizen folgen unverändert.
+**Current XML contract; no new PASS evidence.** Historical migration notes are preserved below.
 
 ### Complete transitive dependency graph
 
