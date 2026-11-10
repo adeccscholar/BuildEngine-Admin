@@ -1,3 +1,41 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["sdl2 2.32.10"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}`
+- `-DSDL_SHARED:BOOL=ON`
+- `-DSDL_STATIC:BOOL=OFF`
+- `-DSDL_TEST:BOOL=OFF`
+- `-DSDL_TEST_LIBRARY:BOOL=OFF`
+- `-DSDL_DIRECTX:BOOL=OFF`
+- `-DSDL_RENDER_D3D:BOOL=OFF`
+- `-DSDL_RENDER_D3D11:BOOL=OFF`
+- `-DSDL_RENDER_D3D12:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+
+---
+
+## Historische Integrationsnotizen
+
 # sdl2 2.32.10: BCC64X migration and integration record
 
 [TOC|Content]
