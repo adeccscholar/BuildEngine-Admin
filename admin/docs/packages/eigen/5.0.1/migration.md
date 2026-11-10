@@ -1,3 +1,24 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["eigen 5.0.1"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DEIGEN_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+
+---
+
+## Historische Integrationsnotizen
+
 # Eigen 5.0.1
 
 [TOC|Content]
