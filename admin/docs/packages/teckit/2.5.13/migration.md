@@ -1,3 +1,42 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["teckit 2.5.13"]
+   N1["zlib 1.4"]
+   N2["expat 2.10.0"]
+   N0 --> N1
+   N0 --> N2
+```
+
+Direkt: `zlib@1.4`, `expat@2.10.0`
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DTECKIT_SOURCE_DIR:PATH={Workspace}`
+- `-DZLIB_DIR:PATH={DependencyRoot:zlib}\lib\win64\{Configuration}\cmake\zlib`
+- `-Dexpat_DIR:PATH={DependencyRoot:expat}\lib\win64\{Configuration}\cmake\expat-{DependencyVersion:expat}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+
+---
+
+## Historische Integrationsnotizen
+
 # TECkit 2.5.13: BCC64X migration and integration record
 
 [TOC|Content]
