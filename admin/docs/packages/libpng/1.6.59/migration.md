@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -13,7 +13,7 @@ flowchart LR
 
 Direkt: `zlib@1.4`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -35,23 +35,23 @@ Direkt: `zlib@1.4`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # libpng 1.6.59
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data; no verified build execution.** Earlier test results apply only to their exact versions and binaries; new runs remain **[not verified]**.
 
 Reference PNG library for reading, writing, and manipulating Portable Network Graphics images.
 
-**Koordinate:** `libpng@1.6.59` · **Kategorie:** `image` · **Lizenzampel:** `green`
+**Coordinate:** `libpng@1.6.59` · **Category:** `image` · **License indicator:** `green`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (full transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Graph edges reflect exact XML pins. Dashed edges represent extensions; solid edges represent package dependencies. Bundled upstream components are not additional BuildEngine packages.
 
 ```mermaid
 flowchart LR
@@ -60,11 +60,11 @@ flowchart LR
    N0 --> N1
 ```
 
-**Direkte Abhängigkeiten:** `zlib@1.4`
+**Direct dependencies:** `zlib@1.4`
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -84,7 +84,7 @@ flowchart LR
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 - `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
 
-**Build-Umgebung:**
+**Build environment:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -105,4 +105,4 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\pngconf.h`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE`
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
