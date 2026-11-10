@@ -1,26 +1,20 @@
-# BuildEngine-Admin – eingefrorener Vertragsstand vor abschließendem Clean-Room-Test
+# BuildEngine-Admin — Historical Contract Freeze Before the Final Clean-Room Test
 
-**Stand:** 8. September 2026  
-**Status:** CONTRACT FREEZE / Clean-Room-Kandidat  
-**Primärsprache:** Deutsch
+**Snapshot date:** 8 September 2026  
+**Status at that time:** CONTRACT FREEZE / clean-room candidate  
+**Documentation language:** English
 
-## 1. Zweck
+> Historical record: this freeze reflects the September 2026 contract, not the active November catalog. Its numerical claims and evidence are preserved as historical observations.
 
-Dieses Dokument friert den aktuellen deklarativen Admin-Vertrag vor einem abschließenden vollständigen Clean-Room-Test ein. Der Admin-Stand soll bis zum Abschluss dieses Tests funktional unverändert bleiben.
+## 1. Purpose
 
-Dokumentiert werden:
+This document records the frozen declarative Admin contract before a final complete clean-room test. Functional changes to the selected Admin revision were to be avoided until the test was complete.
 
-- die Rolle des Admin-Repositories,
-- der verifizierte gemeinsame BuildEngine-/Admin-Stand,
-- der aktuelle Schema-/Bibliotheksvertrag,
-- die verbindlichen Regeln für Toolchain, Patches, Tests und Produktformen,
-- die Freeze-Grenzen,
-- die nach dem Clean-Room-Test fortzusetzenden Aufgaben,
-- die Evidence-Anforderungen des Clean-Room-Abschlusses.
+It documents the role of the Admin repository, the verified shared BuildEngine/Admin baseline, the library and schema snapshot, binding rules for the toolchain, patches, tests and product types, the freeze boundary, follow-up work and clean-room evidence requirements.
 
-## 2. Verifizierte gemeinsame Basis
+## 2. Verified shared baseline
 
-Der letzte unveränderte Zielmaschinen-Folgelauf der BuildEngine mit diesem funktionalen Admin-Vertrag lieferte:
+The last unchanged follow-up run on the target machine with that functional Admin contract produced:
 
 ```text
 [SUMMARY] jobs=471, current=451, passed=20, failed=0, blocked=0, incomplete=0
@@ -30,61 +24,55 @@ Machine state summary
 jobs=471, success=471, failed=0, blocked=0, incomplete=0
 ```
 
-Damit ist verifiziert:
+This verified **451/451 library tasks recognized as `CURRENT`**, no unnecessary library-task execution during that unchanged second run, and no remaining failed, blocked or incomplete jobs.
 
-- 451/451 Library-Tasks wurden als `CURRENT` erkannt,
-- kein Library-Task wurde im unveränderten Folgelauf unnötig neu ausgeführt,
-- keine Fehler, Blockierungen oder unvollständigen Jobs blieben zurück.
-
-Funktionaler BuildEngine-Stand:
+Functional BuildEngine revision:
 
 ```text
 268504010b54245124005fde968400f57b6514b5
 ```
 
-Funktionaler Admin-Stand vor diesem reinen Dokumentationsblock:
+Functional Admin revision preceding the documentation-only freeze block:
 
 ```text
 f7c6183cf7dc4d2b56bbc7da8b5a963eb911e97f
 Allow graph metadata on technical actions
 ```
 
-Die nachfolgenden Commits des Freeze-Blocks dürfen ausschließlich Dokumentation ändern.
+Subsequent commits in the freeze block were restricted to documentation changes.
 
-## 3. Rolle des Admin-Repositories
+## 3. Role of the Admin repository
 
-`BuildEngine-Admin` ist die deklarative Administrationsschicht des Projekts. Der BuildEngine-Kern implementiert generische Mechanismen; Bibliothekswissen wird soweit möglich im Admin-Vertrag gehalten.
-
-Autoritative Rollen:
+`BuildEngine-Admin` is the project's declarative administration layer. The BuildEngine core implements generic mechanisms; library-specific knowledge belongs in the Admin contract wherever possible.
 
 ```text
 BuildEngine
-   C++23-Kern, Scheduler, Actions, State, Repository-Sync, Publish-Orchestrierung
+   C++23 core, scheduler, actions, state, repository sync, publish orchestration
 
 BuildEngine-Admin
-   Tool-/Library-Verträge, XSD, Patches, CMake-/Buildsystem-Adapter,
-   Security-Metadaten, kleine Package-Smokes
+   Tool/library contracts, XSD, patches, CMake/build-system adapters,
+   security metadata, small package smokes
 
 BuildEngine-Tests
-   komplexere Integrations-, Demo- und Lernwelt
+   Complex integration, demonstration and learning projects
 ```
 
-## 4. Normativer Bibliotheksvertrag
+## 4. Normative library contract
 
-Der einzige normative Bibliotheks- und Dependency-Vertrag ist:
+The only normative library and dependency contract is:
 
 ```text
 admin/build-libraries.xml
 ```
 
-Aktueller Vertragsstand:
+The **historical** contract snapshot declared:
 
 ```text
 schemaVersion = 14
-22 Bibliotheks-/Plattformverträge
+22 library/platform contracts
 ```
 
-Aktuell enthalten:
+Included at the time:
 
 ```text
 pugixml
@@ -111,11 +99,11 @@ vtk
 opencv
 ```
 
-OpenCL und GoogleTest sind bewusst noch nicht Teil des eingefrorenen Vertrags.
+OpenCL and GoogleTest were deliberately outside this frozen contract.
 
-## 5. Technische Action-Semantik
+## 5. Technical action semantics
 
-Der Admin-Vertrag verwendet generische Actions, unter anderem:
+The Admin contract used generic actions including:
 
 ```text
 download
@@ -127,156 +115,124 @@ require
 target
 ```
 
-Schema 14 erlaubt optionale technische Graph-Metadaten wie `id` und `dependsOn`. Diese Metadaten sind generisch; sie begründen keine bibliotheksspezifische Schedulerlogik.
+Schema 14 allowed optional technical graph metadata such as `id` and `dependsOn`. These were generic metadata rather than library-specific scheduler logic. For backward compatibility, the historical serial action order applied in the absence of `dependsOn`; an explicitly empty value could declare an independent action; and explicit dependencies referenced already defined actions through stable IDs.
 
-Backwards-Kompatibilität:
+No new DAG structures were to be added to library contracts until the clean-room test concluded.
 
-- ohne `dependsOn` bleibt die historische serielle Action-Reihenfolge,
-- ein explizit leeres `dependsOn` kann eine unabhängige Action deklarieren,
-- explizite Dependencies referenzieren derzeit vorher definierte Actions mit stabiler ID.
+## 6. BCC64X contract
 
-Bis nach dem Clean-Room-Test werden keine neuen DAG-Strukturen in den Library-Verträgen eingeführt.
+The project's explicit purpose was to establish evidence for C++Builder 13 / BCC64X.
 
-## 6. BCC64X-Vertrag
+1. BCC64X remains the actual target compiler.
+2. Do not silently substitute MSVC, clang-cl or MinGW.
+3. Preserve upstream build systems where possible.
+4. Alternative toolchains may be used only as clearly separated comparisons or workaround experiments.
+5. Analyze and document a build problem rather than hiding it behind a compiler switch.
 
-Das Projekt dient ausdrücklich der Evidence für C++Builder 13 / BCC64X.
-
-Verbindlich:
-
-1. BCC64X bleibt reale Zieltoolchain.
-2. Kein stiller Ersatz durch MSVC, clang-cl oder MinGW.
-3. Upstream-Buildsysteme werden bevorzugt erhalten.
-4. Alternative Toolchains sind höchstens getrennte Workaround-/Vergleichspfade.
-5. Ein Buildproblem wird analysiert und dokumentiert, nicht durch Compilerwechsel verdeckt.
-
-## 7. Source- und Patchvertrag
-
-Der Standardpfad lautet:
+## 7. Source and patch contract
 
 ```text
-Upstream herunterladen
--> Source-Pin / Hash / Identität prüfen
--> vollständig extrahieren
--> versionsgebundenen Patch prüfen
--> Patch anwenden
--> originales Buildsystem ausführen
+Download upstream source
+-> verify source pin / hash / identity
+-> extract completely
+-> validate version-specific patch
+-> apply patch
+-> execute original build system
 ```
 
-Patches liegen versionsbezogen unter `admin/patches/` und müssen reproduzierbar sein.
+Patches are version-bound under `admin/patches/` and must be reproducible. Source trees are regenerable artifacts: when source state is invalid, replace the old tree. Temporary extraction trees must never be exposed as valid source.
 
-Source-Bäume sind regenerierbare Artefakte. Bei ungültigem Source-State wird der alte Source-Baum ersetzt. Temporäre Extract-Bäume dürfen nicht als gültige Quelle sichtbar werden.
+## 8. Product form
 
-## 8. Produktform
+For normal runtime libraries, shared DLL plus import library is the preferred product form when upstream and the library's purpose permit it. Separately, a strict toolchain rule requires the **dynamic runtime (`-tR`)** for every BCC64X Windows EXE, DLL and MODULE link. Static BCC64X runtime linkage is forbidden.
 
-Für normale Runtime-Bibliotheken bleibt Shared DLL + Import-Library der bevorzugte Produktstandard, soweit Upstream und Bibliothekszweck dies sinnvoll unterstützen. Davon getrennt gilt als harte Toolchain-Regel: Jeder BCC64X-Windows-EXE/DLL/MODULE-Link verwendet die dynamische Laufzeit (`-tR`); statische BCC64X-Laufzeit ist verboten.
+Static library output remains an admissible, explicitly documented exception. The GoogleTest decision was postponed until the freeze was lifted.
 
-Static ist eine zulässige, zu dokumentierende Ausnahme. Für GoogleTest wird diese Entscheidung erst nach Aufhebung des Freeze getroffen.
+## 9. Tests and smokes
 
-## 9. Tests und Smokes
+Do not disable upstream tests without technical analysis.
 
-Upstream-Tests werden nicht ohne technische Analyse deaktiviert.
-
-Package-Smokes unter `admin/smokes/` bleiben klein und prüfen den tatsächlichen Consumer-Vertrag:
+Package smokes under `admin/smokes/` should remain small and validate the real installed-consumer contract:
 
 ```text
 configure
 -> compile
 -> link
--> kleiner Runtime-Pfad
+-> small runtime path
 -> PASS
 ```
 
-Komplexe Mehrprozess-, Integrations-, Demo- und Lernfälle gehören in `BuildEngine-Tests`.
+Complex multiprocess integration, demonstrations and learning scenarios belong in `BuildEngine-Tests`. The ACE/TAO smoke already exercised a small realistic IDL/ORB/Naming route and was not intended to replace full CORBA testing.
 
-Der ACE/TAO-Smoke enthält bereits den kleinen realistischen IDL-/ORB-/Naming-Pfad und ist kein Ersatz für eine umfassende CORBA-Testwelt.
+## 10. OpenGL/Mesa compatibility bridge
 
-## 10. OpenGL/Mesa-Spezialbrücke
+`admin/programs/opengl/meson_bootstrap.py` was retained as an explicitly accepted technical compatibility bridge for Mesa/Meson/BCC64X, not as generic orchestration logic. It was not to be altered during the freeze.
 
-`admin/programs/opengl/meson_bootstrap.py` bleibt eine ausdrücklich zulässige technische Kompatibilitätsbrücke für Mesa/Meson/BCC64X.
+## 11. Incremental state
 
-Sie ist keine generische Orchestrierungslogik und wird während des Freeze nicht verändert.
+The BuildEngine core owns incremental state. For Admin, the relevant rules were:
 
-## 11. Incremental-State-Bezug
+- The library `timestamp` represents its contract revision.
+- Timestamps must not change during the freeze.
+- Documentation-only edits outside the runtime contract must not trigger library rebuilds.
+- The unchanged second run had recognized 451/451 library tasks as `CURRENT`.
 
-Der Incremental State wird vom BuildEngine-Kern verwaltet. Für den Admin-Vertrag ist entscheidend:
+## 12. Freeze rule
 
-- der Library-`timestamp` repräsentiert den Änderungsstand des Vertrags,
-- Timestamps dürfen während des Freeze nicht geändert werden,
-- reine Dokumentationsänderungen außerhalb des Laufzeitvertrags dürfen keine Library-Neubauten auslösen,
-- der aktuelle unveränderte Folgelauf hat 451/451 Library-Tasks als `CURRENT` bestätigt.
+Until clean-room acceptance, only non-runtime-impacting Admin edits were permitted.
 
-## 12. Freeze-Regel
+Allowed: documentation, evidence records and TODO/handoff clarifications.
 
-Bis zum Clean-Room-Abschluss sind im Admin-Repository nur Änderungen ohne Laufzeitwirkung erlaubt.
+Prohibited: changes to `admin/build-libraries.xml`, `admin/build-tools.xml`, XSD/schema, patches, CMake/toolchain adapters, `admin/programs/`, smokes, library inventory, library timestamps, source pins/hashes, or build/test/install/publish parameters.
 
-Erlaubt:
+If clean-room testing found a defect, only the minimal required correction was permitted. The new functional Admin baseline then had to be documented and the full clean-room test repeated.
 
-- Dokumentation,
-- Evidence-Protokolle,
-- TODO-/Handoff-Klarstellungen.
+## 13. Deferred work
 
-Nicht erlaubt:
+Resume only after successful clean-room acceptance:
 
-- Änderungen an `admin/build-libraries.xml`,
-- Änderungen an `admin/build-tools.xml`,
-- XSD-/Schemaänderungen,
-- neue oder geänderte Patches,
-- neue oder geänderte CMake-/Toolchain-Adapter,
-- Änderungen an `admin/programs/`,
-- neue oder geänderte Smokes,
-- neue Bibliotheken,
-- geänderte Library-Timestamps,
-- geänderte Source-Pins/Hashes,
-- geänderte Build-/Test-/Install-/Publishparameter.
+1. Bring OpenCL from historical BCC64X evidence into the active contract.
+2. Bring GoogleTest from historical evidence into the active contract.
+3. Explicitly decide and document GoogleTest static versus shared output.
+4. Add security repository identities where automatic inference is insufficient.
+5. Develop publish/consumer ownership together with the BuildEngine core.
+6. Introduce further DAG parallelism only after measurement and resource-model work.
+7. Add more libraries only when they provide additional BCC64X, ABI, runtime or build-system evidence.
 
-Wenn der Clean-Room-Test einen Fehler findet, ist nur die minimal notwendige Korrektur zulässig. Danach wird die neue funktionale Admin-Basis dokumentiert und der vollständige Clean-Room-Test wiederholt.
+## 14. Clean-room evidence requirements
 
-## 13. Eingefrorene Nachfolgearbeit
-
-Erst nach erfolgreichem Clean-Room-Test wieder aufnehmen:
-
-1. OpenCL aus historischer BCC64X-Evidence in den aktuellen Vertrag überführen.
-2. GoogleTest aus historischer Evidence in den aktuellen Vertrag überführen.
-3. GoogleTest Static-vs-Shared bewusst entscheiden und dokumentieren.
-4. Security-Repository-Identitäten dort ergänzen, wo automatische Ableitung nicht belastbar genug ist.
-5. Publish-/Consumer-Ownership gemeinsam mit dem BuildEngine-Kern weiterentwickeln.
-6. neue DAG-Parallelisierung erst nach Messung und Scheduler-Ressourcenmodell nutzen.
-7. weitere Bibliotheken nur aufnehmen, wenn sie zusätzlichen Erkenntniswert für BCC64X, ABI, RTL oder Buildsystemintegration liefern.
-
-## 14. Clean-Room-Test – Anforderungen an den Admin-Nachweis
-
-Der Clean-Room-Abschluss soll mindestens dokumentieren:
+The record must include at least:
 
 ```text
 BuildEngine commit
 BuildEngine-Admin commit
-BuildEngine-Tests commit, soweit verwendet
-Schema-Version
-Liste/Anzahl der Library-Verträge
-Toolversionen
-Source-Pins und angewendete Patches
-SUMMARY des vollständigen ersten Laufs
-Machine state summary des ersten Laufs
-SUMMARY des unveränderten zweiten Laufs
-Machine state summary des zweiten Laufs
+BuildEngine-Tests commit, if used
+Schema version
+Library contract list and count
+Tool versions
+Source pins and applied patches
+SUMMARY of the complete first run
+Machine state summary of the first run
+SUMMARY of the unchanged second run
+Machine state summary of the second run
 ```
 
-Der zweite Lauf muss den unveränderten Library-Vertrag vollständig wiederverwenden und darf keine ungerechtfertigten Source-/Build-/Test-/Install-/Publish-/Smoke-Wiederholungen zeigen.
+The second run must reuse the unchanged library contract completely, without unjustified repetitions of source, build, test, install, publish or smoke stages.
 
-## 15. Aufhebung des Freeze
+## 15. Lifting the freeze
 
-Der Contract Freeze wird erst aufgehoben, wenn:
+The historical freeze could be lifted only when:
 
-1. der vollständige Clean-Room-Lauf erfolgreich ist,
-2. alle Library-Gates erfolgreich sind,
-3. 0 `failed`, 0 `blocked`, 0 `incomplete` vorliegen,
-4. ein unmittelbar folgender unveränderter Lauf die Library-Tasks als `CURRENT` bestätigt,
-5. die vollständige Evidence in BuildEngine und BuildEngine-Admin dokumentiert wurde.
+1. The complete clean-room run succeeded.
+2. All library gates passed.
+3. There were zero `failed`, `blocked` and `incomplete` jobs.
+4. A directly following unchanged run confirmed the library tasks as `CURRENT`.
+5. Complete evidence was documented in both BuildEngine and BuildEngine-Admin.
 
-## Ergänzte harte Regeln aus der späteren Integration
+## Additional hard rules established by later integration
 
-Auch für spätere Clean-Room-Wiederholungen gelten zusätzlich:
+These rules also apply to later clean-room repetitions:
 
-- BCC64X ist Clang/LLVM; MinGW-Kompatibilitätsmakros oder der `x86_64-w64-mingw32`-Targetkontext dürfen nicht als Beweis für eine MinGW/GCC-Toolchain interpretiert werden.
-- Die BCC64X-Laufzeit wird ausschließlich dynamisch (`-tR`) gelinkt.
-- Patch-Erzeugung erfolgt immer aus dem vollständigen effektiven Dateistand an der konkreten Position in der Patchkette; Zielzustand vollständig erzeugen, Diff mechanisch erzeugen, erneut anwenden und byteidentisch prüfen.
+- BCC64X is Clang/LLVM; MinGW compatibility macros and the `x86_64-w64-mingw32` target context are not proof of a MinGW/GCC toolchain.
+- The BCC64X runtime must always be linked dynamically (`-tR`).
+- Patch generation must start from the full effective file state at the specific point in the ordered patch chain. Create the complete desired target file, generate the diff mechanically, reapply and verify byte-identical output.
