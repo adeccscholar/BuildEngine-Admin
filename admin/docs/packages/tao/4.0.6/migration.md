@@ -1,3 +1,40 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die bisherigen Migrationsnotizen folgen unverändert.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["tao 4.0.6"]
+   N1["ace 8.0.6"]
+   N2["openssl 3.5.9"]
+   N3["xerces-c 3.3.0"]
+   N4["zlib 1.4"]
+   N5["brotli 1.2.1"]
+   N6["zstd 1.5.7"]
+   N0 -.-> N1
+   N1 --> N2
+   N1 --> N3
+   N1 --> N4
+   N2 --> N4
+   N2 --> N5
+   N2 --> N6
+```
+
+**Direkte Abhängigkeiten:** `ace@8.0.6`
+
+### Konfiguration und Patches
+
+- `-D{BMakeConfiguration}`
+- `-D{BMakeConfiguration}`
+- `-D{BMakeConfiguration}`
+- `-D{BMakeConfiguration}`
+
+---
+
+## Bisherige Migrationsnotizen
+
 # TAO 4.0.6: BCC64X migration and integration record
 
 [TOC|Content]
