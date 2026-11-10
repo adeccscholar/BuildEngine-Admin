@@ -1,3 +1,43 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["openjpeg 2.5.4"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DBUILD_STATIC_LIBS:BOOL=OFF`
+- `-DBUILD_CODEC:BOOL=OFF`
+- `-DBUILD_TESTING:BOOL=OFF`
+- `-DBUILD_DOC:BOOL=OFF`
+- `-DBUILD_JPIP:BOOL=OFF`
+- `-DBUILD_VIEWER:BOOL=OFF`
+- `-DBUILD_JAVA:BOOL=OFF`
+- `-DOPENJPEG_INSTALL_PACKAGE_DIR:STRING=lib/win64/{Configuration}/cmake/openjpeg-2.5`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-DOpenJPEG_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\openjpeg-2.5`
+
+---
+
+## Historische Integrationsnotizen
+
 # openjpeg 2.5.4: BCC64X migration and integration record
 
 [TOC|Content]
