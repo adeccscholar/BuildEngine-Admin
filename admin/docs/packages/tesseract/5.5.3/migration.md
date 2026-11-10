@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -24,7 +24,7 @@ flowchart LR
 
 Direkt: `leptonica@1.87.0`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -56,23 +56,23 @@ Direkt: `leptonica@1.87.0`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # Tesseract OCR 5.5.3
 
 [TOC|Content]
 
-## Aktueller BuildEngine-Vertrag (10. November 2026)
+## Current BuildEngine contract (10 November 2026)
 
-**Vertragsdaten, keine bestätigte Build-Ausführung.** Ergebnisse aus früheren Tests sind versions- und buildgebunden; neue Ausführungen bleiben **[nicht verifiziert]**.
+**Contract data, not verified build execution.** Earlier test results apply only to exact versions and builds; new runs remain **[not verified]**.
 
 Dynamically linked C++ OCR engine; language traineddata is provisioned and licensed separately.
 
-**Koordinate:** `tesseract@5.5.3` · **Kategorie:** `text` · **Lizenzampel:** `yellow` · **Abgelöst durch:** `tesseract@5.5.4`
+**Coordinate:** `tesseract@5.5.3` · **Category:** `text` · **License indicator:** `yellow` · **Abgelöst durch:** `tesseract@5.5.4`
 
-### Deklarierte Abhängigkeiten (vollständig transitiv)
+### Declared dependencies (full transitive closure)
 
-Die Diagrammkanten stammen aus den exakt gepinnten XML-Abhängigkeiten. Gestrichelte Kanten kennzeichnen Erweiterungen, durchgezogene Kanten Paketabhängigkeiten. Upstream-intern gebündelte Komponenten sind keine zusätzlichen BuildEngine-Koordinaten.
+Edges come from exactly pinned XML dependencies. Dashed edges denote extensions, solid edges package dependencies. Bundled upstream components are not additional BuildEngine coordinates.
 
 ```mermaid
 flowchart LR
@@ -92,11 +92,11 @@ flowchart LR
    N4 --> N2
 ```
 
-**Direkte Abhängigkeiten:** `leptonica@1.87.0`
+**Direct dependencies:** `leptonica@1.87.0`
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
-**CMake-Argumente:**
+**CMake arguments:**
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -121,7 +121,7 @@ flowchart LR
 - `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
 - `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
 
-**Build-Umgebung:**
+**Build environment:**
 
 - `CB_BCC64X={Tool:bcc64x}`
 - `CB_BDS={BDS}`
@@ -148,4 +148,4 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tesseract\baseapi.h`
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata\eng.traineddata`
 
-**Verbindliche Quellen:** `admin/build-libraries.xml` für Konfiguration und Pins; FSM/Buildlogs für tatsächliche Ausführung. [Bibliotheksverzeichnis](/manual/libraries.md).
+**Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
