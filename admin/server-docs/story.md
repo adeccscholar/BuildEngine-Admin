@@ -76,7 +76,7 @@ The earliest dated commits tell the story more clearly than a retrospective stat
 
 The pattern was already visible. Every additional upstream library contributed one more type of constraint, and every failure made the requirements of a generic engine more precise: source identity, tool identity, variant-specific outputs, explicit dependency edges, source patches, imported symbols, and independent consumer evidence. These were the problems that eventually made the FSM a natural architecture instead of simply an attractive scheduling abstraction.
 
-See the [August 2026 news records](/news/) for dated commits and details. The initial repository inventory is documented by [schema 3](https://github.com/adeccscholar/BuildEngine-Admin/commit/1e8e992ecf38f8a4f079fae8926b501e3394e539) and [schema 4](https://github.com/adeccscholar/BuildEngine-Admin/commit/7ca2977fa451822836b099a736c6bc386d05f31b).
+See the [August 2026 news records](/news/) for the initial library contracts, milestones and engineering developments.
 
 ### The tests became more extreme — and the question changed
 
@@ -989,9 +989,17 @@ The next evidence layer is practical application consumption: two PDFium navigat
 
 The license and SBOM work now distinguishes external BuildEngine components from genuinely bundled third-party sources. In particular, PDFium's internal Chromium Abseil DLL has been retired in favour of the version-pinned installed Abseil package. This is the same architectural theme as the initial experiment: reproducible libraries are useful only when their dependency ownership, ABI boundaries and deployment evidence are explicit.
 
+### 22 October 2026: application-scale integration tests return
+
+The next milestone was about more than collecting libraries. On **22 October**, we moved substantial integration programs into the unified **BuildEngine-Tests** structure instead of keeping them among the engine's small package-specific smokes. PDFium's SDL2 and native VCL viewers, shared PDF rendering utilities, image-extraction tests and CompareTest were among the initial programs. The following days brought deterministic QPDF image extraction, the Skia showcase and applications migrated from DeckKernel, including the PostgreSQL and MSSQL backends and OpenXLSX consumers.
+
+This division answered a practical question that the first feasibility work had raised: how do we show that a library compiled *by C++Builder 13* is actually useful in a real C++ program? The package's small smoke proves that the installed binary can be included, linked and exercised. The larger tests combine multiple libraries, databases, native UI code, real data and build variants. Both kinds of evidence are necessary, but they belong to different levels of the system.
+
+The catalog also provides a measurable chronology. Its end-of-day snapshots contained **2 distinct library IDs and 2 versions on 24 August**, **44/44 on 25 September**, **55 IDs and 62 versioned integrations on 22 October**, and **62 IDs and 95 versioned integrations on 10 November**. Multiple retained versions reflect upgrades and their migration history; they do not imply entirely new logical libraries. These figures come from the library contracts of the corresponding dates and appear in each [dated news entry](/news/).
+
 ## November 2026 update: from experiments to a versioned native library platform
 
-The November catalog documents **95 library/version records across 62 logical library IDs**, with **32 `supersededBy` declarations** in the server documentation snapshot. Compared with the single pugiXML entry in the initial schema 3 contract on 24 August, this is an expansion by **94 version records**, not proof that 94 additional packages have passed every build stage. Comparing with the original approximately twenty feasibility libraries would be misleading, because feasibility cases and registered package versions are different units.
+The November catalog contains **95 library/version records across 62 logical library IDs**, with **32 `supersededBy` declarations**. Compared with the single pugiXML entry in the initial schema 3 contract on 24 August, this is an expansion by **94 version records**, not proof that 94 additional packages have passed every build stage. Comparing with the original approximately twenty feasibility libraries would be misleading, because feasibility cases and registered package versions are different units.
 
 That growth brought two complementary changes. The library FSM had to protect a consistent release/Debug state across source provisioning, build, tests, install, metadata, publishing, documentation and independent smoke checks. At the same time, the native toolchain contract had to become more precise. The maintained BCC64X dynamic runtime is mandatory, and helper tools such as CMake, Ninja, Perl, NASM, GN, the Windows resource compiler and documentation generators are managed as explicit dependencies rather than taken from the developer's ambient PATH.
 
@@ -1011,7 +1019,7 @@ This is an important continuation of the August philosophy. Initially the issue 
 
 A change log must therefore be more than a release advertisement. It should say why OpenSSL needed a managed assembler, why curl integration was repeatedly reset, why a libarchive patch had to respect source line endings, why an earlier Skia workaround was reverted, or why a recorded Boost DLL boundary limitation mattered. A failure is not a story defect: it is an engineering result that can prevent the next failure.
 
-The [news archive](/news/) captures these dated developments, from the original August contracts to November's package and server integration. A commit confirms that work was recorded in a repository; a build PASS still requires the corresponding FSM, smoke-test or runtime record.
+The [news archive](/news/) captures these dated developments, from the original August contracts to November's package and server integration, including the library inventory at every milestone.
 
 ## 24. The project is still evolving
 
