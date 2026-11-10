@@ -1,3 +1,37 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die bisherigen Migrationsnotizen folgen unverändert.
+
+### Vollständiger transitiver Abhängigkeitsgraph
+
+```mermaid
+flowchart LR
+   N0["ace 8.0.8"]
+   N1["openssl 3.5.9"]
+   N2["xerces-c 3.3.0"]
+   N3["zlib 1.4"]
+   N4["brotli 1.2.1"]
+   N5["zstd 1.5.7"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+   N1 --> N3
+   N1 --> N4
+   N1 --> N5
+```
+
+**Direkte Abhängigkeiten:** `openssl@3.5.9`, `xerces-c@3.3.0`, `zlib@1.4`
+
+### Konfiguration und Patches
+
+- `-D{BMakeConfiguration}`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-xerces-modern-borland.patch`
+- Patch: `{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-zlib-library-names.patch`
+
+---
+
+## Bisherige Migrationsnotizen
+
 # ACE 8.0.8
 
 [TOC|Content]
