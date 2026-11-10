@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Aktueller Katalogstand, 10. November 2026:** Schema 17 enthält **95 versionierte Bibliothekseinträge / 62 logische IDs** und **32 Einträge mit `supersededBy`**. Ausführungsnachweise gelten ausschließlich für den jeweiligen FSM-Binärstand. [Vollständiger Katalog](/manual/libraries.md) · [Änderungshistorie](/news/).
+**Catalog snapshot, 10 November 2026:** Schema 17 declares **95 versioned library records across 62 logical IDs** and **32 `supersededBy` entries**. Execution evidence applies only to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
 
 **Status:** server contract reviewed 21 October 2026. The server is Common-based, but several extension/package details are still open implementation issues and are explicitly identified below.
 
@@ -123,9 +123,9 @@ Important routes include:
 | `/package/{library}/{version}/` | Package detail/export |
 | `/security/` | Security overview |
 | `/security/{library}/{version}/` | Security detail |
-| `/news/` | Chronologische BuildEngine-Änderungsübersicht aus `admin/server-docs/news/index.md` |
+| `/news/` | Chronological BuildEngine change history from `admin/server-docs/news/index.md` |
 | `/news/YYYY-MM-DD/` | Datierter News-Eintrag `news-YYYY-MM-DD.md` |
-| `/package/{library}/{version}/migration` | Versionsbezogene Konfiguration, Besonderheiten und transitive Mermaid-Abhängigkeiten |
+| `/package/{library}/{version}/migration` | Version-specific configuration, integration notes and transitive Mermaid dependencies |
 | `/manual/*.md` | Synchronized project/server documentation |
 | `/index.html` | Generated central documentation index |
 
