@@ -1,3 +1,34 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["bzip2 1.0.8"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DBZIP2_SOURCE_DIR:PATH={Workspace}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib\win64\{Configuration}`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin\win64\{Configuration}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DBZip2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\BZip2`
+
+---
+
+## Historische Integrationsnotizen
+
 # bzip2 1.0.8: BCC64X migration and integration record
 
 [TOC|Content]
