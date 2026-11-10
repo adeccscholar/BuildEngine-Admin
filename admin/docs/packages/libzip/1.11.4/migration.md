@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die historischen Migrationsnotizen folgen unverändert.
+**Current XML contract; no new PASS evidence.** Historical migration notes are preserved below.
 
-### Vollständiger transitiver Abhängigkeitsgraph
+### Complete transitive dependency graph
 
 ```mermaid
 flowchart LR
@@ -15,9 +15,9 @@ flowchart LR
    N0 --> N3
 ```
 
-**Direkte Abhängigkeiten:** `zlib@1.4`, `xz@5.8.4`, `zstd@1.5.7`
+**Direct dependencies:** `zlib@1.4`, `xz@5.8.4`, `zstd@1.5.7`
 
-### Konfiguration und Patches
+### Configuration and patches
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
@@ -56,7 +56,7 @@ flowchart LR
 
 ---
 
-## Bisherige Migrationsnotizen
+## Previous migration notes
 
 # libzip 1.11.4: BCC64X migration and integration record
 
