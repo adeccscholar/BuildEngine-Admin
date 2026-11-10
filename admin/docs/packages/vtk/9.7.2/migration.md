@@ -62,6 +62,16 @@ Both VTK 9.7.2 package smokes (Release and Debug) now pass the managed `TBB_DIR`
 
 **Scope evidence:** This is a smoke-only configuration fix. The library revision timestamp is intentionally unchanged so completed VTK source/build/install work can be reused; the failed consumer smoke has no successful completion evidence and is eligible for retry. The updated Release/Debug smoke outcome is **[not verified]** until the Windows run completes.
 
+## 10 November 2026 — OpenGL2 and volume-rendering expansion
+
+The BuildEngine 9.7.2 profile was expanded from a headless-only core subset to a genuine Windows WGL rendering profile. Enabled modules explicitly include `RenderingCore`, `RenderingOpenGL2`, `RenderingFreeType`, `RenderingVolume`, `RenderingVolumeOpenGL2`, `RenderingAnnotation`, `InteractionStyle`, `FiltersSources`, `IOImage` and `ImagingCore`. Required companion modules are resolved through VTK's native module dependency graph, while Web, MPI, and unnecessary full-group enablement remain disabled.
+
+Direct BuildEngine dependencies: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`, `opengl@26.2.1`. The installed Mesa 26.2.1 package supplies a pinned Windows WGL OpenGL import library through `OPENGL_gl_LIBRARY`; it is a software-rasterizer distribution, **not proof of hardware-accelerated rendering**. VTK 9.7.2's OpenGL2 modules internally use GLAD, so GLEW is not a VTK producer dependency. For the native interactive application the locally deployed Mesa `opengl32.dll` must be excluded if the system ICD/GPU is intended; an explicit optional software-Mesa deployment remains available for diagnostics. No untracked SDK import library is introduced.
+
+For both Debug and Release, installation now requires the OpenGL2, volume, interaction, PNG I/O, filtering, text, and annotation module DLLs and import libraries. Dedicated installed-package `rendering` smokes resolve the same exact oneTBB, OpenMP, OpenGL and VTK paths as the producer and validate construction and linkage of the rendering components without requiring a graphics desktop. The separate `BuildEngine-Tests/vtk-visualization` project covers actual interactive rendering, PNG capture, analytic surface validation, multiple SMP backends and configurable load tests.
+
+The library revision timestamp advanced from `2026-11-10T02:11:05Z` to `2026-11-10T02:45:00Z` so the FSM rebuilds both variants with new module targets. All native BCC64X rendering/link/runtime results remain **[not verified]** until a Windows run and actual GPU screenshots are obtained.
+
 ## Historical integration notes
 
 # vtk 9.7.2: BCC64X migration and integration record
