@@ -1,14 +1,14 @@
-# Skia 153: extern nutzbare Bibliotheken und DLL-Grenzen
+# Skia 153: External Library Candidates and DLL Boundaries
 
 [TOC|Content]
 
-**Vertragsanalyse vom 10. November 2026.** Die nachfolgenden Vorschläge ändern Skia nicht. Die neue DLL-Integration wäre jeweils ein eigener versionierter BCC64X-Build mit Consumer-Smoketests. Der aktuelle PDFium-XML-Vertrag referenziert **Skia 153**; die zugehörige DLL-/ABI-Laufzeit ist gesondert über FSM- und Loader-Smokes zu verifizieren.
+**Contract review dated 10 November 2026.** These proposals do not modify Skia. Each proposed new DLL integration would require a separate, versioned BCC64X build with installed-consumer smoke tests. The current PDFium XML contract references **Skia 153**; its DLL/ABI runtime behavior must be verified separately through FSM and loader smokes.
 
-## Bereits ausgelagerte Bibliotheken
+## Libraries already configured as external
 
-Der aktuelle BuildEngine-Vertrag für Skia 153 referenziert diese externen Komponenten ausdrücklich:
+The current BuildEngine contract for Skia 153 explicitly references the following externally managed components:
 
-| Bibliothek | Version | GN-Vertrag |
+| Library | Version | GN contract |
 | --- | --- | --- |
 | zlib | 1.4 | `skia_use_system_zlib = true` |
 | Brotli | 1.2.1 | `skia_use_system_brotli = true` |
@@ -17,25 +17,25 @@ Der aktuelle BuildEngine-Vertrag für Skia 153 referenziert diese externen Kompo
 | HarfBuzz | 15.1.0 | `skia_use_system_harfbuzz = true` |
 | FreeType | 2.15.0 | `skia_use_system_freetype2 = true` |
 
-Außerdem ist OpenGL 26.2.1 als BuildEngine-Abhängigkeit deklariert. Das Umschalten einer GN-Option beweist noch keine DLL-Importbeziehung; zur Verifikation müssen die PE-Importtabellen und Debug-/Release-Artefakte geprüft werden.
+OpenGL 26.2.1 is additionally declared as a BuildEngine dependency. Enabling a GN option does **not** by itself prove a DLL import relationship. The PE import tables and exact Debug/Release artifacts must be inspected for verification.
 
-## Noch intern und potenziell wiederverwendbar
+## Components currently bundled and potentially reusable
 
-| Komponente | Aktueller Zustand | Bewertung |
+| Component | Current contract | Assessment |
 | --- | --- | --- |
-| Expat | `skia_use_expat=true`, `skia_use_system_expat=false` | **Priorität 1:** vorhandenes `expat@2.10.0` wiederverwenden; XML/SVG-Tests erforderlich |
-| ICU | `skia_use_icu=true`, `skia_use_system_icu=false` | **Priorität 2:** `icu@79.1` untersuchen; Chromium-Pin, ICU-Daten, ABI und Unicode-Layout zuerst klären |
-| libWebP | Decode/Encode aktiv, `skia_use_system_libwebp=false` | **Priorität 3:** sinnvoller unabhängiger Codec; derzeit kein `webp`-Eintrag im aktiven XML-Katalog |
-| libavif / libgav1 | Quellcode intern gepinnt | Später: Codec- und AV1-Abhängigkeitskette gesondert aufbauen |
-| JPEG XL / highway | Intern gepinnt | Später: komplexe C++- und SIMD-Schnittstellen |
-| SPIRV-Cross, glslang, SPIRV-Tools | Bestandteil der Shader-/GPU-Pipeline | Nicht als triviale Drop-in-DLL behandeln |
-| Wuffs, skcms | Skia-interne Decoder- und Farbverarbeitung | Vorerst intern belassen |
-| DNG SDK, Vulkan Memory Allocator | Eingebundene Hilfskomponenten | Nur mit konkreten anderen Konsumenten und stabiler DLL-API auslagern |
+| Expat | `skia_use_expat=true`, `skia_use_system_expat=false` | **Priority 1:** Evaluate reuse of `expat@2.10.0`; XML/SVG smoke tests required |
+| ICU | `skia_use_icu=true`, `skia_use_system_icu=false` | **Priority 2:** Investigate `icu@79.1`; first resolve the Chromium pin, ICU data, ABI and Unicode layout |
+| libWebP | Decode/encode enabled, `skia_use_system_libwebp=false` | **Priority 3:** Potential independent image codec; no `webp` entry in the active XML catalog reviewed |
+| libavif / libgav1 | Sources pinned internally | Later: assess the full codec and AV1 dependency chain |
+| JPEG XL / highway | Internally pinned | Later: investigate complex C++ and SIMD interfaces |
+| SPIRV-Cross, glslang, SPIRV-Tools | Part of the shader/GPU pipeline | Do not assume a trivial drop-in DLL replacement |
+| Wuffs, skcms | Internal Skia decoders and color processing | Keep bundled for now |
+| DNG SDK, Vulkan Memory Allocator | Bundled utility components | Extract only with additional real consumers and a stable DLL API |
 
-## Vorgehensweise für einen Austausch
+## Controlled externalization procedure
 
-Zunächst muss der bestehende Skia-153-Consumer in Release und Debug nachweisbar funktionieren. Danach jeweils **eine** Bibliothek auslagern, beginnend mit Expat, und die GN-Anbindung mit der tatsächlich installierten DLL und Importbibliothek prüfen. Die BuildEngine-DAG erhält erst nach verifiziertem Build einen zusätzlichen versionsgebundenen Dependency-Eintrag. Die Projekt-SBOM muss zwischen ausgegliederten und weiterhin gebündelten Komponenten unterscheiden.
+First demonstrate that the existing Skia 153 installed consumer works in both Release and Debug. Then externalize **one** library at a time, starting with Expat, and validate the GN integration against the actual installed DLL and import library. Add a version-specific dependency record to the BuildEngine graph only after the corresponding build has been verified. The project SBOM must distinguish newly externalized components from sources that remain bundled.
 
-**Wichtig:** Eine eingebundene Quellbibliothek ist nicht automatisch eine separat austauschbare DLL. Insbesondere ICU-Daten, private Symbolversionen und Shader-Tools können die Austauschbarkeit einschränken. Für die vorgeschlagenen Umstellungen liegen bisher keine gesonderten BCC64X-PASS-Nachweise vor: **[nicht verifiziert]**.
+**Important:** Bundled upstream source is not automatically interchangeable with a separately built DLL. ICU data, private symbol versions and shader tooling may constrain compatibility. None of the proposed conversions has separate BCC64X PASS evidence so far: **[not verified]**.
 
-[Skia 153](/package/skia/153/migration) · [News](/news/) · [Bibliotheken](/manual/libraries.md)
+[Skia 153](/package/skia/153/migration) · [News](/news/) · [Libraries](/manual/libraries.md)
