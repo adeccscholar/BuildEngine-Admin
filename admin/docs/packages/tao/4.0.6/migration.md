@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Aktueller XML-Vertrag; kein neuer PASS-Nachweis.** Die bisherigen Migrationsnotizen folgen unverändert.
+**Current XML contract; no new PASS evidence.** Earlier migration notes are preserved below.
 
-### Vollständiger transitiver Abhängigkeitsgraph
+### Complete transitive dependency graph
 
 ```mermaid
 flowchart LR
@@ -22,9 +22,9 @@ flowchart LR
    N2 --> N6
 ```
 
-**Direkte Abhängigkeiten:** `ace@8.0.6`
+**Direct dependencies:** `ace@8.0.6`
 
-### Konfiguration und Patches
+### Configuration and patches
 
 - `-D{BMakeConfiguration}`
 - `-D{BMakeConfiguration}`
@@ -33,7 +33,7 @@ flowchart LR
 
 ---
 
-## Bisherige Migrationsnotizen
+## Previous migration notes
 
 # TAO 4.0.6: BCC64X migration and integration record
 
