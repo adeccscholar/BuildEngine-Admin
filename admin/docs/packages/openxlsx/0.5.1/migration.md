@@ -1,3 +1,77 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["openxlsx 0.5.1"]
+   N1["pugixml 1.16"]
+   N2["libzip 1.12.1"]
+   N3["boost 1.92.0"]
+   N4["zlib 1.4"]
+   N5["xz 5.8.4"]
+   N6["zstd 1.5.7"]
+   N7["openssl 3.5.9"]
+   N8["brotli 1.2.1"]
+   N0 --> N1
+   N0 --> N2
+   N0 --> N3
+   N2 --> N4
+   N2 --> N5
+   N2 --> N6
+   N3 --> N7
+   N3 --> N4
+   N7 --> N4
+   N7 --> N8
+   N7 --> N6
+```
+
+Direkt: `pugixml@1.16`, `libzip@1.12.1`, `boost@1.92.0`
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DCMAKE_CXX_STANDARD:STRING=23`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DOPENXLSX_CREATE_DOCS:BOOL=OFF`
+- `-DOPENXLSX_BUILD_SAMPLES:BOOL=OFF`
+- `-DOPENXLSX_BUILD_TESTS:BOOL=OFF`
+- `-DOPENXLSX_BUILD_BENCHMARKS:BOOL=OFF`
+- `-DOPENXLSX_ENABLE_LIBZIP:BOOL=ON`
+- `-DOPENXLSX_NOWIDE_STANDALONE:BOOL=OFF`
+- `-DOPENXLSX_LOCAL_PACKAGES_ONLY:BOOL=ON`
+- `-DUSE_SYSTEM_LIBS:BOOL=ON`
+- `-DFETCH_DEPS_AUTO:BOOL=OFF`
+- `-DTestPackage_LOG_LEVEL:STRING=DEBUG`
+- `-DCMAKE_MESSAGE_LOG_LEVEL:STRING=VERBOSE`
+- `-DFORCE_FETCH_ALL:BOOL=OFF`
+- `-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:boost}\lib\win64\{Configuration}\cmake\boost_nowide-1.92.0-shared;{DependencyRoot:boost}\lib\win64\{Configuration}\cmake;{DependencyRoot:pugixml}\lib\win64\{Configuration}\cmake;{DependencyRoot:libzip}\lib\win64\{Configuration}\cmake`
+- `-Dboost_nowide_DIR:PATH={DependencyRoot:boost}\lib\win64\{Configuration}\cmake\boost_nowide-1.92.0-shared`
+- `-DBoost_DIR:PATH={DependencyRoot:boost}\lib\win64\{Configuration}\cmake\Boost-1.92.0`
+- `-DLibZip_DIR:PATH={DependencyRoot:libzip}\lib\win64\{Configuration}\cmake\libzip`
+- `-Dpugixml_DIR:PATH={DependencyRoot:pugixml}\lib\win64\{Configuration}\cmake\pugixml`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+- `-DOpenXLSX_DIR:PATH={InstallRoot}\packages\openxlsx\0.5.1\lib\win64\Release\cmake\OpenXLSX`
+- `-DBoost_DIR:PATH={DependencyRoot:boost}\lib\win64\Release\cmake\Boost-1.92.0`
+- `-DLibZip_DIR:PATH={DependencyRoot:libzip}\lib\win64\Release\cmake\libzip`
+- `-Dpugixml_DIR:PATH={DependencyRoot:pugixml}\lib\win64\Release\cmake\pugixml`
+
+---
+
+## Historische Integrationsnotizen
+
 # openxlsx 0.5.1: BCC64X migration and integration record
 
 [TOC|Content]
