@@ -1,3 +1,58 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["vtk 9.6.2"]
+   N1["onetbb 2023.2.0"]
+   N2["llvm-openmp 20.1.7"]
+   N0 --> N1
+   N0 --> N2
+```
+
+Direkt: `onetbb@2023.2.0`, `llvm-openmp@20.1.7`
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-DVTK_BUILD_TESTING:BOOL=OFF`
+- `-DVTK_GROUP_ENABLE_StandAlone:STRING=DONT_WANT`
+- `-DVTK_GROUP_ENABLE_Rendering:STRING=DONT_WANT`
+- `-DVTK_GROUP_ENABLE_Web:STRING=DONT_WANT`
+- `-DVTK_GROUP_ENABLE_MPI:STRING=DONT_WANT`
+- `-DVTK_MODULE_ENABLE_VTK_CommonCore:STRING=YES`
+- `-DVTK_MODULE_ENABLE_VTK_CommonDataModel:STRING=YES`
+- `-DVTK_MODULE_ENABLE_VTK_FiltersCore:STRING=YES`
+- `-DVTK_SMP_IMPLEMENTATION_TYPE:STRING=TBB`
+- `-DVTK_SMP_ENABLE_TBB:BOOL=ON`
+- `-DVTK_SMP_ENABLE_OPENMP:BOOL=ON`
+- `-DTBB_DIR:PATH={DependencyRoot:onetbb}\lib\win64\{Configuration}\cmake\TBB`
+- `-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:onetbb}`
+- `-DOpenMP_CXX_FLAGS:STRING=-fopenmp`
+- `-DOpenMP_CXX_LIB_NAMES:STRING=omp`
+- `-DOpenMP_omp_LIBRARY:FILEPATH={DependencyRoot:llvm-openmp}\lib\win64\{Configuration}\libomp.lib`
+- `-DVTK_WRAP_PYTHON:BOOL=OFF`
+- `-DVTK_WRAP_JAVA:BOOL=OFF`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
+
+---
+
+## Historische Integrationsnotizen
+
 # vtk 9.6.2: BCC64X migration and integration record
 
 [TOC|Content]
