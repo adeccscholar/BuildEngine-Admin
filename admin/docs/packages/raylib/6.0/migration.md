@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -13,7 +13,7 @@ flowchart LR
 
 Direkt: `opengl@26.2.1`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-DRAYLIB_SOURCE_DIR:PATH={Workspace}`
 - `-DBCC64X_EXECUTABLE:FILEPATH={Tool:bcc64x}`
@@ -26,7 +26,7 @@ Direkt: `opengl@26.2.1`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # raylib 6.0: BCC64X migration and integration record
 
