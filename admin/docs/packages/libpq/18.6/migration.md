@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+**Declared configuration; no new test PASS.**
 
-### Vollständige transitive Abhängigkeiten
+### Complete transitive dependencies
 
 ```mermaid
 flowchart LR
@@ -20,7 +20,7 @@ flowchart LR
 
 Direkt: `openssl@3.5.9`, `zlib@1.4`
 
-### Aktuelle Konfiguration
+### Current configuration
 
 - `-Dssl=openssl`
 - `-Dzlib=enabled`
@@ -41,7 +41,7 @@ Direkt: `openssl@3.5.9`, `zlib@1.4`
 
 ---
 
-## Historische Integrationsnotizen
+## Historical integration notes
 
 # libpq 18.6: BCC64X migration and integration record
 
