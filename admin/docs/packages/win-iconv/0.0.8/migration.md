@@ -1,3 +1,36 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["win-iconv 0.0.8"]
+```
+
+Direkt: keine
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}`
+- `-DBUILD_SHARED:BOOL=ON`
+- `-DBUILD_STATIC:BOOL=OFF`
+- `-DBUILD_EXECUTABLE:BOOL=OFF`
+- `-DBUILD_TEST:BOOL={TestsEnabled}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DIconv_INCLUDE_DIR:PATH={ConsumerRoot}\include`
+- `-DIconv_LIBRARY:FILEPATH={ConsumerRoot}\lib\win64\{Configuration}\libiconv.lib`
+
+---
+
+## Historische Integrationsnotizen
+
 # win-iconv 0.0.8: BCC64X migration and integration record
 
 [TOC|Content]
