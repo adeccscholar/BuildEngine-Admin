@@ -1,3 +1,49 @@
+## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+
+**Deklarierte Konfiguration, nicht neuer Test-PASS.**
+
+### Vollständige transitive Abhängigkeiten
+
+```mermaid
+flowchart LR
+   N0["libtiff 4.7.2"]
+   N1["zlib 1.4"]
+   N2["libjpeg-turbo 3.2.1"]
+   N0 --> N1
+   N0 --> N2
+```
+
+Direkt: `zlib@1.4`, `libjpeg-turbo@3.2.1`
+
+### Aktuelle Konfiguration
+
+- `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
+- `-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}`
+- `-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}`
+- `-DCMAKE_INSTALL_INCLUDEDIR:STRING=include`
+- `-DBUILD_SHARED_LIBS:BOOL=ON`
+- `-Dtiff-static:BOOL=OFF`
+- `-Dtiff-tools:BOOL=OFF`
+- `-Dtiff-tests:BOOL=OFF`
+- `-Dtiff-contrib:BOOL=OFF`
+- `-Dtiff-docs:BOOL=OFF`
+- `-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib};{DependencyRoot:libjpeg-turbo}`
+- `-DCMAKE_BUILD_TYPE:STRING=Release`
+- `-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release`
+- `-DCMAKE_BUILD_TYPE:STRING=Debug`
+- `-DCMAKE_C_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0`
+- `-DCMAKE_DEBUG_POSTFIX:STRING=d`
+- `-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug`
+- `-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug`
+
+---
+
+## Historische Integrationsnotizen
+
 # libtiff 4.7.2: BCC64X migration and integration record
 
 [TOC|Content]
