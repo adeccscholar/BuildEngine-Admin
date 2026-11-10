@@ -1,8 +1,8 @@
-## Aktualisierter BuildEngine-Vertrag (10. November 2026)
+## Updated BuildEngine contract (10 November 2026)
 
-**Aktuelle Deklaration; keine neue PASS-Aussage.** Historische Befunde folgen unverändert unterhalb dieses Abschnitts.
+**Current declaration; no new PASS claim.** Historical findings are preserved below.
 
-### Vollständiger transitiver Abhängigkeitsgraph
+### Complete transitive dependency graph
 
 ```mermaid
 flowchart LR
@@ -11,7 +11,7 @@ flowchart LR
 
 **Direkte Versionen:** keine
 
-### Konfiguration und Besonderheiten
+### Configuration and integration notes
 
 - `-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake`
 - `-DCMAKE_PROJECT_INCLUDE:FILEPATH=`
