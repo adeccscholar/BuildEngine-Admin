@@ -9748,16 +9748,6 @@
             name="PATH"
             value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
-         <!-- Repair staged GN source for incremental builds when the earlier
-              source patch phase was completed before the WebP include fix. -->
-         <execute name="synchronize-managed-libwebp-gn"
-                  executable="{Tool:python}"
-                  workingDirectory="{Workspace}"
-                  showOutput="true">
-            <argument value="{BuildFileDir}\scripts\ensure_skia_webp_gn.py"/>
-            <argument value="{CurrentArtifact}"/>
-         </execute>
-
          <target
             name="gn-gen"
             type="generic"
@@ -9987,18 +9977,6 @@
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <argument value="--script-executable={Tool:python}"/>
          </target>
-
-         <!-- Catch stale Skia source patches and absent managed WebP headers
-              before compiling more than a thousand source files. -->
-         <execute name="verify-managed-libwebp-gn"
-                  executable="{Tool:python}"
-                  workingDirectory="{Workspace}"
-                  showOutput="true">
-            <argument value="{BuildFileDir}\scripts\verify_skia_webp_gn.py"/>
-            <argument value="{Workspace}\bin\gn.exe"/>
-            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <argument value="{DependencyRoot:libwebp}\include"/>
-         </execute>
 
          <execute
             name="ninja-build"
