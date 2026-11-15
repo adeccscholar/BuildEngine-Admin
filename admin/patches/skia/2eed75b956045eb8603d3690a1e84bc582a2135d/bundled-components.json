@@ -50,6 +50,10 @@
     {
       "name": "libjxl",
       "version": "0.13.0"
+    },
+    {
+      "name": "vulkan-memory-allocator",
+      "version": "3.4.0"
     }
   ],
   "bundledComponents": [
@@ -130,12 +134,6 @@
       "version": "f9973cd97e6f3584707e7ef1c425e336f1b92a5b",
       "versionScheme": "git",
       "repository": "https://github.com/KhronosGroup/Vulkan-Headers.git"
-    },
-    {
-      "name": "VulkanMemoryAllocator",
-      "version": "eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7",
-      "versionScheme": "git",
-      "repository": "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git"
     }
   ]
 }
