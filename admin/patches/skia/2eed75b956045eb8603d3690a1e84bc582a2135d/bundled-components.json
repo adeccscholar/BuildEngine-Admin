@@ -54,6 +54,10 @@
     {
       "name": "vulkan-memory-allocator",
       "version": "3.4.0"
+    },
+    {
+      "name": "libwebp",
+      "version": "1.6.0"
     }
   ],
   "bundledComponents": [
@@ -74,18 +78,6 @@
       "version": "5cf722e659014ebaf2f573a6dd935116d36eadf1",
       "versionScheme": "git",
       "repository": "https://chromium.googlesource.com/codecs/libgav1.git"
-    },
-    {
-      "name": "libwebp",
-      "version": "845d5476a866141ba35ac133f856fa62f0b7445f",
-      "versionScheme": "git",
-      "repository": "https://chromium.googlesource.com/webm/libwebp.git"
-    },
-    {
-      "name": "piex",
-      "version": "bb217acdca1cc0c16b704669dd6f91a1b509c406",
-      "versionScheme": "git",
-      "repository": "https://android.googlesource.com/platform/external/piex.git"
     },
     {
       "name": "SPIRV-Cross",
