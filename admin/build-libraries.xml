@@ -5645,7 +5645,7 @@
       <smoke id="consumer" source="smokes\opencv\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="opencv-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{DependencyRoot:onetbb}\bin\win64\Release;{DependencyRoot:llvm-openmp}\bin\win64\Release;{ENV:PATH}"/></smoke>
 	  
    </library>
-   <library id="opencv" version="5.1.0" category="graphics" timestamp="2026-11-09T12:48:00Z">
+   <library id="opencv" version="5.1.0" category="graphics" timestamp="2026-11-15T16:58:00Z">
       <dependency library="onetbb" version="2023.2.0"/><dependency library="llvm-openmp" version="20.1.7"/>
       <dependency library="zlib" version="1.4"/>
       <metadata name="OpenCV" supplier="OpenCV project" homepage="https://opencv.org/" description="Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning, Windows DirectShow camera capture (MSMF COM compatibility pending), image stitching, and selected Contrib algorithms (img_hash, optflow, quality, ximgproc). Native oneTBB 2023.2 parallel backend configured; Release consumer smoke regression pending; LLVM OpenMP 20.1.7 enabled as a build dependency." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
