@@ -15450,6 +15450,21 @@
             <require path="aom\aom_codec.h"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\libaom\3.15.1\bcc64x-native-win32-threads.patch"
+               target="{Workspace}\.buildengine\bcc64x-native-win32-threads.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="native-win32-threads-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\bcc64x-native-win32-threads.patch"/>
+         </execute>
+         <execute name="native-win32-threads-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\bcc64x-native-win32-threads.patch"/>
+         </execute>
+         <execute name="native-win32-threads-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\bcc64x-native-win32-threads.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -15510,6 +15525,21 @@
             <require path="aom\aom_codec.h"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\libaom\3.15.3\bcc64x-native-win32-threads.patch"
+               target="{Workspace}\.buildengine\bcc64x-native-win32-threads.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="native-win32-threads-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\bcc64x-native-win32-threads.patch"/>
+         </execute>
+         <execute name="native-win32-threads-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\bcc64x-native-win32-threads.patch"/>
+         </execute>
+         <execute name="native-win32-threads-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\bcc64x-native-win32-threads.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
