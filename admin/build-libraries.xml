@@ -8725,7 +8725,7 @@
          <argument value="-DWEBP_BUILD_WEBPMUX:BOOL=OFF"/>
          <argument value="-DWEBP_BUILD_EXTRAS:BOOL=OFF"/>
          <argument value="-DWEBP_BUILD_LIBWEBPMUX:BOOL=ON"/>
-         <argument value="-DWEBP_ENABLE_SIMD:BOOL=OFF"/>
+         <argument value="-DWEBP_ENABLE_SIMD:BOOL=ON"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
