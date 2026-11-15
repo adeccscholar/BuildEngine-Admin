@@ -1,5 +1,15 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## Pending Skia source reduction (15 November 2026)
+
+**Configuration changed; build validation pending.** The registered Skia 153 source contract now consumes the separately installed `wuffs@0.3` source through `{DependencyRoot:wuffs}`. Wuffs is a single-file C distribution and remains compiled by the Skia GN target with Skia's GIF module definitions; no independently linked Wuffs DLL is claimed.
+
+Skia's redundant source downloads and extraction actions for **libyuv** and **Vulkan-Headers** were removed. libyuv remains an external transitive dependency through libavif 1.4.2. Vulkan-Headers remains a transitive dependency through Vulkan Memory Allocator 3.4.0, and the pre-existing BCC64X GN patch selects installed Vulkan headers. These changes require a new Skia source/configure/build/install and SBOM pass before they can be called verified.
+
+**The separate libwebp externalization is blocked:** no `libwebp` coordinate is currently registered in `admin/build-libraries.xml`. Do not enable `skia_use_system_libwebp` without a matching producer package and GN import-library configuration. The standalone SPIR-V packages likewise do not yet replace Skia's pinned internal SPIR-V GN closure; retain their downloads until the debug validator's generated targets and compatible binaries are wired to managed packages.
+
+After a successful rebuild, the *expected* installed package breakdown is **29 components = 1 root + 19 external dependencies + 9 bundled components**, with 13 direct and 6 transitive external coordinates. These are predicted from the updated contract, not a reported test result.
+
 ## Current BuildEngine status (15 November 2026)
 
 **Build result: PASS.** The operator confirmed successful completion of all **109 of 109 versioned library integrations**. This is the observed final FSM outcome, not merely a registered source contract. Individual downstream application tests and a separate proof of binary externalization are not implied by that result.
