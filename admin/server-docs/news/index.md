@@ -6,7 +6,7 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
-- **[2026-11-15](/news/2026-11-15/)** — 109/109 successful library integrations; Skia 153, external graphics/shader packages, SBOM corrections and English guides
+- **[2026-11-15](/news/2026-11-15/)** — 109/109 previously verified, followed by libwebp registration; Skia 153, external graphics/shader packages, SBOM corrections and English guides
 
 - **[2026-11-10](/news/2026-11-10/)** — 95 library documentation pages, transitive Mermaid graphs, news routes and Skia DLL review
 - **[2026-11-09](/news/2026-11-09/)** — VTK 9.7.2, OpenCV 5.1, new tools and libarchive, PDFium, libtiff and OpenXLSX corrections
@@ -50,7 +50,7 @@ Each news item reports **distinct libraries** (unique logical library IDs) and *
 | 07 Nov | 60 | 70 |
 | 08 Nov | 60 | 87 |
 | 09–10 Nov | 62 | 95 |
-| 15 Nov | 74 | 109 |
+| 15 Nov | 75 | 110 |
 
 The first schema-3 version had just one pugiXML entry earlier on 24 August; the end-of-day schema-4 count was two. The feasibility study examined approximately twenty libraries before the initial Admin library catalog was established.
 
