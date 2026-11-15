@@ -48,7 +48,7 @@ This separation is binding.
 
 `admin/build-libraries.xml` is the **single normative library and dependency contract**.
 
-**Documented snapshot (10 November 2026):** XML schema 17, **95 versioned library records across 62 logical library IDs**, including **32 `supersededBy` declarations**. This supersedes the September-era 44-library list formerly repeated here. For exact current coordinates and dependencies, read the authoritative XML rather than treating a static README inventory as executable configuration.
+**Current declared catalog (16 November 2026 audit of the 15 November XML):** XML schema 17 contains **112 versioned library records across 77 logical library IDs**. These values were counted directly from `admin/build-libraries.xml`; they describe declarations, not completed builds. The prior 78/113 values in documentation do not match the checked XML. Always use the XML for effective coordinates and dependency relationships.
 
 The catalog covers database clients, XML, PDF and document processing, text shaping and Unicode, test frameworks, graphics, image and video processing, compression, networking, middleware, OCR, numerical computing, and native parallelism. [Complete library catalog](admin/server-docs/libraries.md) · [Migration guides](admin/docs/packages/README.md).
 
