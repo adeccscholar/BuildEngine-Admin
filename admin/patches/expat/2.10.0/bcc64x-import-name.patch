@@ -1,0 +1,10 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -583,2 +583,6 @@
+     set(_EXPAT_OUTPUT_NAME libexpat)
+     set_property(TARGET expat PROPERTY OUTPUT_NAME ${_EXPAT_OUTPUT_NAME})
++    # BuildEngine BCC64X: explicit COFF import-library naming contract.
++    # Keep upstream Debug/Release postfixes; avoid the toolchain default
++    # import prefix being prepended to the upstream libexpat output name.
++    set_property(TARGET expat PROPERTY IMPORT_PREFIX "")
