@@ -10023,15 +10023,15 @@
 
                <line value="skia_use_harfbuzz = true"/>
                <line value="skia_use_system_harfbuzz = true"/>
-               <line value="bcc64x__icu_include = getenv(&quot;"CB_SKIA_ICU_INCLUDE&quot;)"/>
-               <line value="bcc64x__icu_uc_lib = getenv(&quot;"CB_SKIA_ICU_UC_LIB&quot;)"/>
-               <line value="bcc64x__icu_i18n_lib = getenv(&quot;"CB_SKIA_ICU_I18N_LIB&quot;)"/>
-               <line value="bcc64x__expat_include = getenv(&quot;"CB_SKIA_EXPAT_INCLUDE&quot;)"/>
-               <line value="bcc64x__expat_lib = getenv(&quot;"CB_SKIA_EXPAT_LIB&quot;)"/>
-               <line value="bcc64x__libavif_include = getenv(&quot;"CB_SKIA_LIBAVIF_INCLUDE&quot;)"/>
-               <line value="bcc64x__libavif_lib = getenv(&quot;"CB_SKIA_LIBAVIF_LIB&quot;)"/>
-               <line value="bcc64x__libjxl_include = getenv(&quot;"CB_SKIA_LIBJXL_INCLUDE&quot;)"/>
-               <line value="bcc64x__libjxl_lib = getenv(&quot;"CB_SKIA_LIBJXL_LIB&quot;)"/>
+               <line value="bcc64x_icu_include = getenv(&quot;CB_SKIA_ICU_INCLUDE&quot;)"/>
+               <line value="bcc64x_icu_uc_lib = getenv(&quot;CB_SKIA_ICU_UC_LIB&quot;)"/>
+               <line value="bcc64x_icu_i18n_lib = getenv(&quot;CB_SKIA_ICU_I18N_LIB&quot;)"/>
+               <line value="bcc64x_expat_include = getenv(&quot;CB_SKIA_EXPAT_INCLUDE&quot;)"/>
+               <line value="bcc64x_expat_lib = getenv(&quot;CB_SKIA_EXPAT_LIB&quot;)"/>
+               <line value="bcc64x_libavif_include = getenv(&quot;CB_SKIA_LIBAVIF_INCLUDE&quot;)"/>
+               <line value="bcc64x_libavif_lib = getenv(&quot;CB_SKIA_LIBAVIF_LIB&quot;)"/>
+               <line value="bcc64x_libjxl_include = getenv(&quot;CB_SKIA_LIBJXL_INCLUDE&quot;)"/>
+               <line value="bcc64x_libjxl_lib = getenv(&quot;CB_SKIA_LIBJXL_LIB&quot;)"/>
                <line value="skia_pdf_subset_harfbuzz = true"/>
 
                <line value="skia_use_client_icu = false"/>
