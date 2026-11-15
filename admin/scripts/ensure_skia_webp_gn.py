@@ -55,12 +55,56 @@ def Main() -> int:
       strThirdParty = pathThirdParty.read_text(encoding="utf-8")
       strBuild = pathBuild.read_text(encoding="utf-8")
 
-      # The first externalization patch is a mandatory precondition. Do not
-      # silently convert a bundled build or alter the managed import archives.
-      if 'bcc64x_libwebp_include = ""' not in strThirdParty or 'bcc64x_libwebp_lib = ""' not in strThirdParty:
-         raise RuntimeError("Staged third_party/libwebp/BUILD.gn lacks the external WebP GN patch; rerun Skia source preparation")
+      # A completed source job can leave the original upstream GN file in
+      # the staging directory. Reconcile its exact, version-pinned declaration
+      # and system target here instead of repeatedly failing the build job.
+      strUpstreamDeclaration = (
+         'declare_args() {\n'
+         '  skia_use_system_libwebp = is_official_build && !is_canvaskit\n'
+         '}\n'
+      )
+      strManagedDeclaration = (
+         '  bcc64x_libwebp_include = ""\n'
+         '  bcc64x_libwebp_lib = ""\n'
+         '  bcc64x_libwebp_demux_lib = ""\n'
+         '  bcc64x_libwebp_mux_lib = ""\n'
+      )
+      strBundledImports = (
+         '    libs = [\n'
+         '      "webp",\n'
+         '      "webpdemux",\n'
+         '      "webpmux",\n'
+         '    ]\n'
+      )
+      strManagedImports = (
+         '    assert(bcc64x_libwebp_include != "", "Managed libwebp include path required")\n'
+         '    assert(bcc64x_libwebp_lib != "", "Managed libwebp import library required")\n'
+         '    assert(bcc64x_libwebp_demux_lib != "", "Managed libwebp demux import required")\n'
+         '    assert(bcc64x_libwebp_mux_lib != "", "Managed libwebp mux import required")\n'
+         '    include_dirs = [ bcc64x_libwebp_include ]\n'
+         '    ldflags = [\n'
+         '      bcc64x_libwebp_lib,\n'
+         '      bcc64x_libwebp_demux_lib,\n'
+         '      bcc64x_libwebp_mux_lib,\n'
+         '    ]\n'
+      )
 
       bThirdPartyChanged = False
+      if strManagedDeclaration not in strThirdParty:
+         if strThirdParty.count(strUpstreamDeclaration) != 1:
+            raise RuntimeError("Unknown libwebp GN declaration; refuse to modify unrecognized source")
+         strThirdParty = strThirdParty.replace(
+            strUpstreamDeclaration,
+            strUpstreamDeclaration.replace('}\n', strManagedDeclaration + '}\n'),
+            1)
+         bThirdPartyChanged = True
+
+      if strManagedImports not in strThirdParty:
+         if strThirdParty.count(strBundledImports) != 1:
+            raise RuntimeError("Unknown libwebp system import target; refuse to change GN linkage")
+         strThirdParty = strThirdParty.replace(strBundledImports, strManagedImports, 1)
+         bThirdPartyChanged = True
+
       if 'config("managed_webp_includes")' not in strThirdParty:
          strAnchor = 'if (skia_use_system_libwebp) {\n'
          if strThirdParty.count(strAnchor) != 1:
