@@ -4,6 +4,10 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/ml.hpp>
 #include <opencv2/stitching.hpp>
+#include <opencv2/img_hash.hpp>
+#include <opencv2/optflow.hpp>
+#include <opencv2/quality.hpp>
+#include <opencv2/ximgproc.hpp>
 #include <opencv2/videoio/registry.hpp>
 
 #include <print>
@@ -22,7 +26,12 @@ int main() {
    cv::dnn::Net theNet;
    cv::Ptr<cv::ml::SVM> const theSvm=cv::ml::SVM::create();
    cv::Ptr<cv::Stitcher> const theStitcher=cv::Stitcher::create();
-   bool const bModules=!theSvm.empty() && !theStitcher.empty();
+   cv::Ptr<cv::img_hash::ImgHashBase> const theHash=cv::img_hash::AverageHash::create();
+   cv::Ptr<cv::quality::QualityMSE> const theQuality=cv::quality::QualityMSE::create(theSource);
+   cv::Mat const theGuided=cv::ximgproc::guidedFilter(theSource, theSource, 1, 1.0);
+   bool const bContrib=!theHash.empty() && !theQuality.empty() && !theGuided.empty();
+   std::println("SMOKE|CHECK|contrib|{}|img_hash quality ximgproc and linked optflow",bContrib?"PASS":"FAIL");
+   bool const bModules=!theSvm.empty() && !theStitcher.empty() && bContrib;
    std::println("SMOKE|CHECK|ml-stitching|{}|OpenCV ML and panorama instances",
       bModules?"PASS":"FAIL");
    bool const bMsmf=cv::videoio_registry::hasBackend(cv::CAP_MSMF);
@@ -45,7 +54,7 @@ int main() {
 
    std::println("SMOKE|CHECK|runtime|{}|OpenCV {} core/imgproc/imgcodecs/dnn runtime",
                 bRuntime ? "PASS" : "FAIL", CV_VERSION);
-   std::println("SMOKE|RESULT|{}|OpenCV 17-module consumer with Windows camera backends usable",
+   std::println("SMOKE|RESULT|{}|OpenCV 21-module consumer with Windows camera backends usable",
                 (bRuntime && bTbb && bModules && bDshow) ? "PASS" : "FAIL");
    return (bRuntime && bTbb && bModules && bDshow) ? 0 : 1;
 }
