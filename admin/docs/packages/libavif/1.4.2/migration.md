@@ -4,24 +4,27 @@
 
 ## Purpose and current integration
 
-AVIF image encoder and decoder using externally managed libaom and optional libyuv
+AVIF encoder using managed libaom; AVIF decoder using managed libgav1; libyuv conversion is managed separately
 
 **BuildEngine package:** `libavif@1.4.2`  
 **Upstream source reference:** `v1.4.2`  
-**Status:** Successful completion of the 109/109 BuildEngine integration run was confirmed on 15 November 2026. This is not a claim that Skia's separately bundled upstream copies have been replaced by the corresponding external packages.
+**Status:** Updated to an external libgav1 decoding backend on 15 November 2026; the revised libavif and Skia build, link, runtime loader and consumer smoke remain **unverified**. The historical 109/109 build result predates this change.
 
 ## Direct and transitive dependencies
 
 - `libaom@3.15.3`
 - `libyuv@r1924`
+- `libgav1@0.20.0`
 
 ```mermaid
 flowchart LR
    libavif_1_4_2["libavif@1.4.2"]
    libaom_3_15_3["libaom@3.15.3"]
    libyuv_r1924["libyuv@r1924"]
+   libgav1_0_20_0["libgav1@0.20.0"]
    libavif_1_4_2 --> libaom_3_15_3
    libavif_1_4_2 --> libyuv_r1924
+   libavif_1_4_2 --> libgav1_0_20_0
 ```
 
 The graph follows the version-specific BuildEngine XML dependency declarations. Shared dependencies are shown once. It does not infer binary linkage from the presence of a package in the overall closure.
@@ -37,10 +40,15 @@ The graph follows the version-specific BuildEngine XML dependency declarations. 
 -DCMAKE_INSTALL_INCLUDEDIR:STRING=include
 -DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}
 -DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}
--DCMAKE_PREFIX_PATH:PATH={DependencyRoot:libaom};{DependencyRoot:libyuv}
+-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:libaom};{DependencyRoot:libyuv};{DependencyRoot:libgav1}
 -DAOM_LIBRARY:FILEPATH={DependencyRoot:libaom}\lib\win64\{Configuration}\libaom_dll.lib
 -DBUILD_SHARED_LIBS:BOOL=ON
 -DAVIF_CODEC_AOM:STRING=SYSTEM
+-DAVIF_CODEC_AOM_DECODE:BOOL=OFF
+-DAVIF_CODEC_AOM_ENCODE:BOOL=ON
+-DAVIF_CODEC_LIBGAV1:STRING=SYSTEM
+-DLIBGAV1_INCLUDE_DIR:PATH={DependencyRoot:libgav1}\include
+-DLIBGAV1_LIBRARY:FILEPATH={DependencyRoot:libgav1}\lib\win64\{Configuration}\libgav1_shared.lib
 -DAVIF_CODEC_DAV1D:STRING=OFF
 -DAVIF_CODEC_RAV1E:STRING=OFF
 -DAVIF_CODEC_SVT:STRING=OFF
@@ -61,7 +69,7 @@ No version-specific source patch is declared in the source workflow.
 
 
 
-AV1/AOM and libyuv are configured as system packages; no bundled codec switch is required.
+AV1 encoding, AV1 decoding and libyuv conversion use independently managed BuildEngine packages. Upstream libavif 1.4.2 supports `AVIF_CODEC_LIBGAV1=SYSTEM`; `LIBGAV1_LIBRARY` selects the import library from the exact BCC64X package configuration.
 
 
 
@@ -69,6 +77,6 @@ AV1/AOM and libyuv are configured as system packages; no bundled codec switch is
 
 ## Verification and maintenance
 
-The overall BuildEngine run was reported successful for 109 versioned library integrations. Check each package's installed artifacts and its package-specific logs for per-configuration and consumer-test evidence. The authoritative configuration is `admin/build-libraries.xml`; do not duplicate dependency paths or names as fixed values outside its variables.
+The earlier BuildEngine run was reported successful for 109 versioned library integrations, before libgav1 decoding was introduced. Check each package's installed artifacts and its package-specific logs for per-configuration and consumer-test evidence. The authoritative configuration is `admin/build-libraries.xml`; do not duplicate dependency paths or names as fixed values outside its variables.
 
 [Library overview](/manual/libraries.md)
