@@ -1,5 +1,15 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+
+## Staged Skia source without the original external WebP patch (15 November 2026)
+
+The subsequent Debug and Release runs failed immediately at `synchronize-managed-libwebp-gn` with `Staged third_party/libwebp/BUILD.gn lacks the external WebP GN patch`. This proves that the already-staged Skia source had not received the earlier source-phase externalization patch; the prior synchronization script only rejected this state.
+
+The synchronization script now recognizes the **exact pinned upstream GN declaration and system import target**, and installs the already-declared external WebP arguments, managed import paths, and codec include configs directly in the staged source before `gn gen`. It is idempotent, refuses unknown or conflicting GN layouts, and uses a Windows source-tree lock so parallel Debug and Release jobs do not write the same GN files concurrently. The post-generation `gn desc` verifier remains the required gate before Ninja. Existing producer packages are untouched.
+
+This is a source/build phase recovery, not evidence of a successful Skia Debug or Release build.
+
+
 ## Incremental WebP GN source synchronization (15 November 2026)
 
 Skia's source phase may have completed before the last versioned `bcc64x-system-libwebp.patch` update, leaving both source `BUILD.gn` files and the generated Ninja graph stale. The BuildEngine XML now runs `admin/scripts/ensure_skia_webp_gn.py` **before GN generation**, which requires the prior external-libwebp patch to be present and idempotently adds the managed include config to both `webp_decode` and `webp_encode` when missing. It deliberately rejects unexpected upstream layouts or any attempt to switch a bundled WebP target without the required import wiring.
