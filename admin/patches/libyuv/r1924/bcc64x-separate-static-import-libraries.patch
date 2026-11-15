@@ -1,7 +1,7 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -171,6 +171,11 @@
+@@ -172,5 +172,10 @@
  # this creates the static library (.a)
  add_library( ${ly_lib_static} STATIC ${ly_lib_parts})
 +if(WIN32)
