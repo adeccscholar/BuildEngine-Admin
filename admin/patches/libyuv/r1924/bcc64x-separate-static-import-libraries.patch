@@ -1,14 +1,46 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -172,5 +172,10 @@
- # this creates the static library (.a)
- add_library( ${ly_lib_static} STATIC ${ly_lib_parts})
-+if(WIN32)
-+  # Avoid collision between the static archive and the shared DLL import archive
-+  # on toolchains that apply the "lib" archive prefix to both targets.
-+  set_target_properties( ${ly_lib_static} PROPERTIES OUTPUT_NAME "yuv_static" )
-+endif()
+@@ -169,9 +169,6 @@
+   endif()
+ endif()
  
+-# this creates the static library (.a)
+-add_library( ${ly_lib_static} STATIC ${ly_lib_parts})
+-
  # this creates the shared library (.so)
  add_library( ${ly_lib_shared} SHARED ${ly_lib_parts})
+ set_target_properties( ${ly_lib_shared} PROPERTIES OUTPUT_NAME "${ly_lib_name}" )
+@@ -180,18 +177,6 @@
+   set_target_properties( ${ly_lib_shared} PROPERTIES IMPORT_PREFIX "lib" )
+ endif()
+ 
+-# this creates the cpuid tool
+-add_executable      ( cpuid ${ly_base_dir}/util/cpuid.c )
+-target_link_libraries  ( cpuid ${ly_lib_static} )
+-
+-# this creates the conversion tool
+-add_executable			( yuvconvert ${ly_base_dir}/util/yuvconvert.cc )
+-target_link_libraries	( yuvconvert ${ly_lib_static} )
+-
+-# this creates the yuvconstants tool
+-add_executable      ( yuvconstants ${ly_base_dir}/util/yuvconstants.c )
+-target_link_libraries  ( yuvconstants ${ly_lib_static} )
+-
+ find_package ( JPEG )
+ if (JPEG_FOUND)
+   include_directories( ${JPEG_INCLUDE_DIR} )
+@@ -241,10 +226,9 @@
+ endif()
+ 
+ 
+-# install the conversion tool, .so, .a, and all the header files
+-install ( TARGETS yuvconvert DESTINATION bin )
+-install ( TARGETS ${ly_lib_static}						DESTINATION lib )
+-install ( TARGETS ${ly_lib_shared} LIBRARY DESTINATION lib RUNTIME DESTINATION bin ARCHIVE DESTINATION lib )
++# Install only the DLL and its import library using the BuildEngine layout
++install ( TARGETS ${ly_lib_shared} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
++install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include )
+ install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/		DESTINATION include )
+ 
+ # create the .deb and .rpm packages using cpack
