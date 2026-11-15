@@ -15158,7 +15158,7 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
-   <library id="spirv-cross" version="vulkan-sdk-1.4.363.0" category="graphics" timestamp="2026-11-15T23:00:00Z">
+   <library id="spirv-cross" version="vulkan-sdk-1.4.363.0" category="graphics" timestamp="2026-11-15T23:08:00Z">
       <metadata name="spirv-cross" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Cross" description="SPIR-V shader reflection and cross-compilation" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\spirv-cross\LICENSE"/>
       </metadata>
@@ -15194,6 +15194,7 @@
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DSPIRV_CROSS_STATIC:BOOL=OFF"/>
          <argument value="-DSPIRV_CROSS_SHARED:BOOL=ON"/>
+         <argument value="-DSPIRV_CROSS_EXCEPTIONS_TO_ASSERTIONS:BOOL=ON"/>
          <argument value="-DBUILDENGINE_SPIRV_CROSS_CXX_SHARED:BOOL=ON"/>
          <argument value="-DSPIRV_CROSS_ENABLE_GLSL:BOOL=ON"/>
          <argument value="-DSPIRV_CROSS_ENABLE_HLSL:BOOL=ON"/>
