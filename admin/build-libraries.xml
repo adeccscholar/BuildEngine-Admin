@@ -15142,4 +15142,56 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
+   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-15T16:58:00Z">
+      <dependency library="spirv-headers" version="942fe4b988359a0750b79f0ae7ed735994d3147d"/>
+      <metadata name="SPIRV-Tools" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Tools" description="SPIR-V assembler, validator, optimizer and associated libraries" licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/KhronosGroup/SPIRV-Tools.git" ref="v2026.4"/></security>
+      <source>
+         <download url="https://github.com/KhronosGroup/SPIRV-Tools/archive/refs/tags/v2026.4.tar.gz" archive="spirv-tools-2026.4.tar.gz"/>
+         <extract format="libarchive" root="SPIRV-Tools-2026.4">
+            <require path="CMakeLists.txt"/>
+            <require path="include\spirv-tools\libspirv.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DSPIRV-Headers_SOURCE_DIR:PATH={DependencyRoot:spirv-headers}"/>
+         <argument value="-DSPIRV_SKIP_TESTS:BOOL=ON"/>
+         <argument value="-DSPIRV_SKIP_EXECUTABLES:BOOL=OFF"/>
+         <argument value="-DSPIRV_WERROR:BOOL=OFF"/>
+         <argument value="-DSPIRV_TOOLS_USE_MIMALLOC:BOOL=OFF"/>
+         <argument value="-DSPIRV_TOOLS_BUILD_STATIC:BOOL=ON"/>
+         <argument value="-DENABLE_SPIRV_TOOLS_INSTALL:BOOL=ON"/>
+         <argument value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\spirv-tools\libspirv.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\spirv-tools\LICENSE" overwrite="true"/></common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+   </library>
 </buildLibraries>
