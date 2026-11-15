@@ -14933,7 +14933,7 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
-   <library id="highway" version="1.4.0" category="math" timestamp="2026-11-15T16:58:00Z">
+   <library id="highway" version="1.4.0" category="math" timestamp="2026-11-15T18:20:00Z">
       <metadata name="Highway" supplier="Google" homepage="https://github.com/google/highway" description="Portable cross-platform SIMD operations for C++" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
       </metadata>
@@ -14956,7 +14956,7 @@
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
-         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DHWY_ENABLE_TESTS:BOOL=OFF"/>
          <argument value="-DHWY_ENABLE_EXAMPLES:BOOL=OFF"/>
          <argument value="-DHWY_ENABLE_BENCHMARKS:BOOL=OFF"/>
@@ -15001,14 +15001,14 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
-   <library id="spirv-headers" version="942fe4b988359a0750b79f0ae7ed735994d3147d" category="graphics" timestamp="2026-11-15T16:58:00Z">
+   <library id="spirv-headers" version="v1.202609.0" category="graphics" timestamp="2026-11-15T18:20:00Z">
       <metadata name="SPIRV-Headers" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Headers" description="Pinned SPIR-V grammar and C/C++ headers for shader tools; source snapshot compatible with Skia 153" licenseSignal="green">
          <license name="MIT" spdx="MIT" file="LICENSE"/>
       </metadata>
-      <security><repository url="https://github.com/KhronosGroup/SPIRV-Headers.git" commit="942fe4b988359a0750b79f0ae7ed735994d3147d"/></security>
+      <security><repository url="https://github.com/KhronosGroup/SPIRV-Headers.git" ref="v1.202609.0"/></security>
       <source>
-         <download url="https://github.com/KhronosGroup/SPIRV-Headers/archive/942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz" archive="spirv-headers-942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"/>
-         <extract format="libarchive" root="SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d">
+         <download url="https://github.com/KhronosGroup/SPIRV-Headers/archive/refs/tags/v1.202609.0.tar.gz" archive="spirv-headers-v1.202609.0.tar.gz"/>
+         <extract format="libarchive" root="SPIRV-Headers-v1.202609.0">
             <require path="CMakeLists.txt"/>
             <require path="include\spirv\unified1\spirv.h"/>
             <require path="LICENSE"/>
@@ -15041,14 +15041,14 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
-   <library id="spirv-cross" version="b8fcf307f1f347089e3c46eb4451d27f32ebc8d3" category="graphics" timestamp="2026-11-15T16:58:00Z">
+   <library id="spirv-cross" version="vulkan-sdk-1.4.363.0" category="graphics" timestamp="2026-11-15T18:20:00Z">
       <metadata name="spirv-cross" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Cross" description="SPIR-V shader reflection and cross-compilation" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
       </metadata>
-      <security><repository url="https://github.com/KhronosGroup/SPIRV-Cross.git" ref="b8fcf307f1f347089e3c46eb4451d27f32ebc8d3"/></security>
+      <security><repository url="https://github.com/KhronosGroup/SPIRV-Cross.git" ref="vulkan-sdk-1.4.363.0"/></security>
       <source>
-         <download url="https://github.com/KhronosGroup/SPIRV-Cross/archive/b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz" archive="spirv-cross-b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz"/>
-         <extract format="libarchive" root="SPIRV-Cross-b8fcf307f1f347089e3c46eb4451d27f32ebc8d3">
+         <download url="https://github.com/KhronosGroup/SPIRV-Cross/archive/refs/tags/vulkan-sdk-1.4.363.0.tar.gz" archive="spirv-cross-vulkan-sdk-1.4.363.0.tar.gz"/>
+         <extract format="libarchive" root="SPIRV-Cross-vulkan-sdk-1.4.363.0">
             <require path="CMakeLists.txt"/>
             <require path="spirv_cross.hpp"/>
             <require path="LICENSE"/>
@@ -15065,9 +15065,9 @@
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
-         <argument value="-DSPIRV_CROSS_STATIC:BOOL=ON"/>
-         <argument value="-DSPIRV_CROSS_SHARED:BOOL=OFF"/>
-         <argument value="-DSPIRV_CROSS_CLI:BOOL=ON"/>
+         <argument value="-DSPIRV_CROSS_STATIC:BOOL=OFF"/>
+         <argument value="-DSPIRV_CROSS_SHARED:BOOL=ON"/>
+         <argument value="-DSPIRV_CROSS_CLI:BOOL=OFF"/>
          <argument value="-DSPIRV_CROSS_ENABLE_TESTS:BOOL=OFF"/>
          <argument value="-DSPIRV_CROSS_SKIP_INSTALL:BOOL=OFF"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -15090,7 +15090,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="glslang" version="16.6.0" category="graphics" timestamp="2026-11-15T16:58:00Z">
+   <library id="glslang" version="16.6.0" category="graphics" timestamp="2026-11-15T18:20:00Z">
       <metadata name="glslang" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/glslang" description="GLSL/HLSL to SPIR-V compiler, validator and libraries" licenseSignal="green">
          <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE.txt"/>
       </metadata>
@@ -15107,20 +15107,20 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
-         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/><argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
-         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DGLSLANG_ENABLE_INSTALL:BOOL=ON"/>
          <argument value="-DGLSLANG_TESTS:BOOL=OFF"/>
          <argument value="-DENABLE_SPIRV:BOOL=ON"/>
          <argument value="-DENABLE_OPT:BOOL=OFF"/>
-         <argument value="-DENABLE_HLSL:BOOL=ON"/>
-         <argument value="-DENABLE_GLSLANG_BINARIES:BOOL=ON"/>
+         <argument value="-DENABLE_HLSL:BOOL=OFF"/>
+         <argument value="-DENABLE_GLSLANG_BINARIES:BOOL=OFF"/>
          <argument value="-DBUILD_EXTERNAL:BOOL=OFF"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -15142,8 +15142,8 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-15T16:58:00Z">
-      <dependency library="spirv-headers" version="942fe4b988359a0750b79f0ae7ed735994d3147d"/>
+   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-15T18:20:00Z">
+      <dependency library="spirv-headers" version="v1.202609.0"/>
       <metadata name="SPIRV-Tools" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Tools" description="SPIR-V assembler, validator, optimizer and associated libraries" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
       </metadata>
@@ -15167,12 +15167,12 @@
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
-         <argument value="-DSPIRV-Headers_SOURCE_DIR:PATH={DependencyRoot:spirv-headers}"/>
+         <argument value="-DSPIRV-Headers_DIR:PATH={DependencyRoot:spirv-headers}\share\cmake\SPIRV-Headers"/>
          <argument value="-DSPIRV_SKIP_TESTS:BOOL=ON"/>
-         <argument value="-DSPIRV_SKIP_EXECUTABLES:BOOL=OFF"/>
+         <argument value="-DSPIRV_SKIP_EXECUTABLES:BOOL=ON"/>
          <argument value="-DSPIRV_WERROR:BOOL=OFF"/>
          <argument value="-DSPIRV_TOOLS_USE_MIMALLOC:BOOL=OFF"/>
-         <argument value="-DSPIRV_TOOLS_BUILD_STATIC:BOOL=ON"/>
+         <argument value="-DSPIRV_TOOLS_BUILD_STATIC:BOOL=OFF"/><argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DENABLE_SPIRV_TOOLS_INSTALL:BOOL=ON"/>
          <argument value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -15259,7 +15259,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="libyuv" version="r1924" category="graphics" timestamp="2026-11-15T16:58:00Z">
+   <library id="libyuv" version="r1924" category="graphics" timestamp="2026-11-15T18:20:00Z">
       <metadata name="libyuv" supplier="Chromium project" homepage="https://chromium.googlesource.com/libyuv/libyuv" description="YUV scaling and color conversion; Chromium M149 pinned revision, JPEG add-on disabled" licenseSignal="green">
          <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE"/>
       </metadata>
@@ -15271,6 +15271,9 @@
             <require path="include\libyuv.h"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\libyuv\r1924\bcc64x-separate-static-import-libraries.patch" target="{Workspace}\.buildengine\bcc64x-separate-static-import-libraries.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="libyuv-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--check"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\bcc64x-separate-static-import-libraries.patch"/></execute>
+         <execute name="libyuv-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false"><argument value="apply"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\bcc64x-separate-static-import-libraries.patch"/></execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
