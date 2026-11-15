@@ -1,5 +1,9 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## Correction: Python helper steps withdrawn (15 November 2026)
+
+The previously added Python scripts `ensure_skia_webp_gn.py` and `verify_skia_webp_gn.py` and their Skia build invocations have been **removed**. The earlier entries below describing them as active are historical and superseded by this correction. External WebP integration must remain in the version-pinned GN patch and the existing BuildEngine XML source preparation actions; do not introduce auxiliary Python orchestration or silently edit staged source trees during the build phase. The unresolved WebP issue is not declared fixed, and no successful Skia build has been verified.
+
 
 ## Staged Skia source without the original external WebP patch (15 November 2026)
 
