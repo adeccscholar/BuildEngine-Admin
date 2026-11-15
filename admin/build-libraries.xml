@@ -9637,6 +9637,11 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjxl.patch"/>
          </execute>
+         <!-- Resolve the installed Expat CMake import target at GN generation time. -->
+         <copy source="{BuildFileDir}\cmake\skia\resolve-expat-import.py"
+               target="{Workspace}\.buildengine\resolve-expat-import.py"
+               overwrite="true" preserveCurrentArtifact="true"/>
+
          <execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
@@ -9724,7 +9729,8 @@
          <environment name="CB_SKIA_ICU_UC_LIB" value="{DependencyRoot:icu}\lib\win64\{Configuration}\{IcuCommonImport}.lib"/>
          <environment name="CB_SKIA_ICU_I18N_LIB" value="{DependencyRoot:icu}\lib\win64\{Configuration}\{IcuI18nImport}.lib"/>
          <environment name="CB_SKIA_EXPAT_INCLUDE" value="{DependencyRoot:expat}\include"/>
-         <environment name="CB_SKIA_EXPAT_LIB" value="{DependencyRoot:expat}\lib\win64\{Configuration}\{ExpatLibraryName}.lib"/>
+         <environment name="CB_SKIA_EXPAT_ROOT" value="{DependencyRoot:expat}"/>
+         <environment name="CB_SKIA_EXPAT_CONFIGURATION" value="{Configuration}"/>
          <environment name="CB_SKIA_LIBAVIF_INCLUDE" value="{DependencyRoot:libavif}\include"/>
          <environment name="CB_SKIA_LIBAVIF_LIB" value="{DependencyRoot:libavif}\lib\win64\{Configuration}\libavif.lib"/>
          <environment name="CB_SKIA_LIBJXL_INCLUDE" value="{DependencyRoot:libjxl}\include"/>
@@ -9864,7 +9870,7 @@
                <line value="bcc64x_icu_uc_lib = getenv(&quot;CB_SKIA_ICU_UC_LIB&quot;)"/>
                <line value="bcc64x_icu_i18n_lib = getenv(&quot;CB_SKIA_ICU_I18N_LIB&quot;)"/>
                <line value="bcc64x_expat_include = getenv(&quot;CB_SKIA_EXPAT_INCLUDE&quot;)"/>
-               <line value="bcc64x_expat_lib = getenv(&quot;CB_SKIA_EXPAT_LIB&quot;)"/>
+               <line value="bcc64x_expat_lib = exec_script(&quot;//.buildengine/resolve-expat-import.py&quot;, [getenv(&quot;CB_SKIA_EXPAT_ROOT&quot;), getenv(&quot;CB_SKIA_EXPAT_CONFIGURATION&quot;)], &quot;trim string&quot;)"/>
                <line value="bcc64x_libavif_include = getenv(&quot;CB_SKIA_LIBAVIF_INCLUDE&quot;)"/>
                <line value="bcc64x_libavif_lib = getenv(&quot;CB_SKIA_LIBAVIF_LIB&quot;)"/>
                <line value="bcc64x_libjxl_include = getenv(&quot;CB_SKIA_LIBJXL_INCLUDE&quot;)"/>
@@ -9998,7 +10004,7 @@
             <variable name="FreeTypeLibraryName" value="libfreetype"/>
              <variable name="IcuCommonImport" value="libicuuc"/>
              <variable name="IcuI18nImport" value="libicuin"/>
-             <variable name="ExpatLibraryName" value="libexpat"/>
+             
          </variant>
 
          <variant name="Debug">
@@ -10013,7 +10019,7 @@
             <variable name="FreeTypeLibraryName" value="libfreetyped"/>
              <variable name="IcuCommonImport" value="libicuucd"/>
              <variable name="IcuI18nImport" value="libicuind"/>
-             <variable name="ExpatLibraryName" value="libexpat"/>
+             
          </variant>
 
          <install>
