@@ -8806,7 +8806,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T22:49:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T22:54:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -8913,11 +8913,6 @@
          <download
             url="https://android.googlesource.com/platform/external/dng_sdk.git/+archive/dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"
             archive="skia-deps\dng_sdk-dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/codecs/libgav1.git/+archive/5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"
-            archive="skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
-
 
 <!-- ======================================================== -->
          <!-- Direct3D / Vulkan / shader closure.                      -->
@@ -9058,28 +9053,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\dng_sdk\source\dng_host.h"/>
-
-         <execute name="mkdir-libgav1"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libgav1"/>
-         </execute>
-
-         <execute name="extract-libgav1"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\libgav1"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\libgav1\src\gav1\decoder.h"/>
-
 
 <!-- Consume managed Wuffs source, compiled by Skia with GIF module flags.
               No independent Wuffs DLL is declared. -->
@@ -9545,35 +9518,7 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-harfbuzz-system.patch"/>
          </execute>
 
-         <!-- libgav1 must use its Windows threading implementation. -->
-         <copy
-            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-libgav1-winthreads.patch"
-            target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"
-            overwrite="true"
-            preserveCurrentArtifact="true"/>
-
-         <execute name="libgav1-winthreads-patch-check"
-                  executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="apply"/>
-            <argument value="--check"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"/>
-         </execute>
-
-         <execute name="libgav1-winthreads-patch-apply"
-                  executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="apply"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-libgav1-winthreads.patch"/>
-         </execute>
-
-         <!-- Embarcadero D3D12 structure-return ABI compatibility. -->
+<!-- Embarcadero D3D12 structure-return ABI compatibility. -->
          <copy
             source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-d3d-getdesc.patch"
             target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"
