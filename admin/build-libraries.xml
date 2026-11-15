@@ -8818,7 +8818,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T23:58:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-16T01:00:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -9065,6 +9065,43 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\dng_sdk\source\dng_host.h"/>
+         <!-- Pinned DNG SDK still builds for Skia RAW decoding. C++23 removes
+              std::auto_ptr; modernize just the two owning RAII locals. -->
+         <require path="{CurrentArtifact}\third_party\externals\dng_sdk\source\dng_pthread.cpp"/>
+         <copy
+            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\dng-sdk-cxx23-unique-ptr.patch"
+            target="{Workspace}\.buildengine\patches\{LibraryVersion}\dng-sdk-cxx23-unique-ptr.patch"
+            overwrite="true"
+            preserveCurrentArtifact="true"/>
+         <execute name="dng-sdk-cxx23-patch-check"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\dng-sdk-cxx23-unique-ptr.patch"/>
+         </execute>
+         <execute name="dng-sdk-cxx23-patch-apply"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\dng-sdk-cxx23-unique-ptr.patch"/>
+         </execute>
+         <execute name="dng-sdk-cxx23-patch-verify"
+                  executable="{Tool:git}"
+                  workingDirectory="{CurrentArtifact}"
+                  showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\dng-sdk-cxx23-unique-ptr.patch"/>
+         </execute>
 
 <!-- Consume managed Wuffs source, compiled by Skia with GIF module flags.
               No independent Wuffs DLL is declared. -->
