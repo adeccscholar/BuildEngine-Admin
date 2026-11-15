@@ -65,7 +65,7 @@ The graph follows the version-specific BuildEngine XML dependency declarations. 
 
 ## Integration patches and special considerations
 
-No version-specific source patch is declared in the source workflow.
+No version-specific libavif source patch is declared in the source workflow. The external libgav1 producer carries its own version-pinned Windows install and import-library naming patch; libavif continues to consume its exact variant-specific `libgav1_shared.lib` coordinate. In the 16 November FSM run both libgav1 native builds passed, but its install failed before libavif could build. A producer contract correction has been committed; the subsequent Windows import-library install and libavif consumer remain **[not verified]**.
 
 
 
