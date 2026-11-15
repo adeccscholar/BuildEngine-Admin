@@ -9,6 +9,7 @@ blocks and the already-externalized libwebp group are accepted.
 
 from __future__ import annotations
 
+import os
 import pathlib
 import sys
 
@@ -129,5 +130,26 @@ def Main() -> int:
       return 1
 
 
+def SynchronizedMain() -> int:
+   # Debug and Release share one staged source tree and execute in parallel.
+   # Serialize the source reconciliation to prevent concurrent file writes.
+   if os.name != "nt":
+      return Main()
+
+   import msvcrt
+
+   pathRoot = pathlib.Path(sys.argv[1]) if len(sys.argv) == 2 else pathlib.Path(".")
+   pathLock = pathRoot / ".buildengine" / "webp-gn-source.lock"
+   pathLock.parent.mkdir(parents=True, exist_ok=True)
+   with pathLock.open("a+b") as theLock:
+      theLock.seek(0)
+      msvcrt.locking(theLock.fileno(), msvcrt.LK_LOCK, 1)
+      try:
+         return Main()
+      finally:
+         theLock.seek(0)
+         msvcrt.locking(theLock.fileno(), msvcrt.LK_UNLCK, 1)
+
+
 if __name__ == "__main__":
-   raise SystemExit(Main())
+   raise SystemExit(SynchronizedMain())
