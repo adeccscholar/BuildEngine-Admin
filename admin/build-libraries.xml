@@ -8689,7 +8689,7 @@
       </publish>
    </library>
 
-   <library id="libgav1" version="0.20.0" category="graphics" timestamp="2026-11-15T23:16:00Z">
+   <library id="libgav1" version="0.20.0" category="graphics" timestamp="2026-11-15T23:57:00Z">
       <metadata name="libgav1" supplier="libgav1 Authors" homepage="https://chromium.googlesource.com/codecs/libgav1/" description="Independent AV1 decoder package built from upstream libgav1 0.20.0 with BCC64X and dynamic runtime." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\libgav1\LICENSE"/>
       </metadata>
@@ -8711,6 +8711,16 @@
          </execute>
          <execute name="libgav1-winthreads-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="{Workspace}\.buildengine\bcc64x-winthreads.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\libgav1\0.20.0\bcc64x-install-layout.patch" target="{Workspace}\.buildengine\bcc64x-install-layout.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="libgav1-layout-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\bcc64x-install-layout.patch"/>
+         </execute>
+         <execute name="libgav1-layout-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\bcc64x-install-layout.patch"/>
+         </execute>
+         <execute name="libgav1-layout-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="{Workspace}\.buildengine\bcc64x-install-layout.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="false">
@@ -8737,6 +8747,8 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\gav1\decoder.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libgav1_shared.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libgav1_shared.dll"/>
             </perVariant>
             <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libgav1\LICENSE" overwrite="true"/></common>
          </install>
@@ -15596,10 +15608,11 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="libavif" version="1.4.2" category="graphics" timestamp="2026-11-15T16:58:00Z">
+   <library id="libavif" version="1.4.2" category="graphics" timestamp="2026-11-15T23:57:00Z">
       <dependency library="libaom" version="3.15.3"/>
       <dependency library="libyuv" version="r1924"/>
-      <metadata name="libavif" supplier="Alliance for Open Media" homepage="https://github.com/AOMediaCodec/libavif" description="AVIF image encoder and decoder using externally managed libaom and optional libyuv" licenseSignal="green">
+      <dependency library="libgav1" version="0.20.0"/>
+      <metadata name="libavif" supplier="Alliance for Open Media" homepage="https://github.com/AOMediaCodec/libavif" description="AVIF encoding through external libaom, decoding through external libgav1, and conversion through managed libyuv" licenseSignal="green">
          <license name="BSD 2-Clause" spdx="BSD-2-Clause" file="licenses\libavif\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/AOMediaCodec/libavif.git" ref="v1.4.2"/></security>
@@ -15622,11 +15635,17 @@
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
-         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:libaom};{DependencyRoot:libyuv}"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:libaom};{DependencyRoot:libyuv};{DependencyRoot:libgav1}"/>
          <!-- Select the DLL import library, never the separately installed static libaom archive. -->
          <argument value="-DAOM_LIBRARY:FILEPATH={DependencyRoot:libaom}\lib\win64\{Configuration}\libaom_dll.lib"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DAVIF_CODEC_AOM:STRING=SYSTEM"/>
+         <argument value="-DAVIF_CODEC_AOM_DECODE:BOOL=OFF"/>
+         <argument value="-DAVIF_CODEC_AOM_ENCODE:BOOL=ON"/>
+         <argument value="-DAVIF_CODEC_LIBGAV1:STRING=SYSTEM"/>
+         <argument value="-DLIBGAV1_INCLUDE_DIR:PATH={DependencyRoot:libgav1}\include"/>
+         <argument value="-DLIBGAV1_LIBRARY:FILEPATH={DependencyRoot:libgav1}\lib\win64\{Configuration}\libgav1_shared.lib"/>
+         <argument value="-DCMAKE_BUILD_RPATH_USE_ORIGIN:BOOL=ON"/>
          <argument value="-DAVIF_CODEC_DAV1D:STRING=OFF"/>
          <argument value="-DAVIF_CODEC_RAV1E:STRING=OFF"/>
          <argument value="-DAVIF_CODEC_SVT:STRING=OFF"/>
