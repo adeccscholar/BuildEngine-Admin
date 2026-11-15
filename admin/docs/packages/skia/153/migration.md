@@ -1,5 +1,13 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## DNG SDK C++23 source-compatibility fix (16 November 2026)
+
+The operator's native Skia 153 Release and Debug builds both failed in `third_party/externals/dng_sdk/source/dng_pthread.cpp:316` because the pinned upstream DNG SDK uses `std::auto_ptr`, which is unavailable in the current C++23 standard library. The GN contract explicitly enables `skia_use_dng_sdk = true` for RAW image handling, and upstream Skia's `third_party/dng_sdk/BUILD.gn` compiles these bundled sources. Consequently, the DNG SDK is **still an embedded source dependency**; it has not been externalized to a separately installed BuildEngine binary.
+
+The version-bound source stage now checks, applies, and reverse-verifies `admin/patches/skia/2eed75b956045eb8603d3690a1e84bc582a2135d/dng-sdk-cxx23-unique-ptr.patch`. The patch changes the two owning `std::auto_ptr` declarations in the DNG pthread trampoline setup to `std::unique_ptr` without changing `get()`/`release()` ownership-transfer behavior. The XML timestamp was updated so the corrected source stage is reconsidered. No global standard-library compatibility switch, DNG feature disablement, or untracked build-time source edit was introduced.
+
+**[not verified]** This targeted patch has not yet been executed against the actual Windows staged DNG tarball or validated by a subsequent BCC64X build. Do not claim a successful Skia Release or Debug build until logs establish that outcome.
+
 ## Current declarative integration (16 November 2026 audit)
 
 The active schema-17 XML declares **17 direct Skia 153 dependencies**. Its version-pinned `bundled-components.json` lists the same **17 external BuildEngine coordinates**, without missing or extra entries. The manifest retains **five bundled components**: D3D12MemoryAllocator, dng_sdk, SPIRV-Headers, SPIRV-Tools, and glslang. These are declarations, not proof of native linkage or bundled-code elimination in the installed binaries.
