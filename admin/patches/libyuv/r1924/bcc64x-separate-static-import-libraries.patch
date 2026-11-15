@@ -38,7 +38,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
  find_package ( JPEG )
  if (JPEG_FOUND)
    include_directories( ${JPEG_INCLUDE_DIR} )
-@@ -241,10 +226,9 @@
+@@ -241,9 +226,8 @@
  endif()
  
  
