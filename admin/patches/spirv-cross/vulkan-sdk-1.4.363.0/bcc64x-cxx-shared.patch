@@ -1,0 +1,42 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -656,4 +656,38 @@
+ 					"cmake with -DPYTHON_EXECUTABLE:FILEPATH=/path/to/python3 to help it find the executable")
+ 		endif()
+ 	endif()
+ endif()
++
++# BuildEngine: native BCC64X C++ shared API for direct consumers such as Skia.
++# Upstream SPIRV_CROSS_SHARED exports only the C API; keep that target intact.
++option(BUILDENGINE_SPIRV_CROSS_CXX_SHARED "Build native C++ shared interface" OFF)
++if(BUILDENGINE_SPIRV_CROSS_CXX_SHARED)
++  add_library(spirv-cross-cxx-shared SHARED
++    ${spirv-cross-core-sources}
++    ${spirv-cross-glsl-sources}
++    ${spirv-cross-hlsl-sources}
++    ${spirv-cross-msl-sources}
++    ${spirv-cross-cpp-sources}
++    ${spirv-cross-reflect-sources}
++    ${spirv-cross-util-sources}
++  )
++  target_include_directories(spirv-cross-cxx-shared PUBLIC
++    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
++    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/spirv_cross>)
++  target_compile_definitions(spirv-cross-cxx-shared PRIVATE ${spirv-compiler-defines})
++  target_compile_options(spirv-cross-cxx-shared PRIVATE ${spirv-compiler-options})
++  set_target_properties(spirv-cross-cxx-shared PROPERTIES
++    WINDOWS_EXPORT_ALL_SYMBOLS ON
++    DEBUG_POSTFIX d
++    OUTPUT_NAME spirv-cross-cxx
++  )
++  if(NOT SPIRV_CROSS_SKIP_INSTALL)
++    install(TARGETS spirv-cross-cxx-shared
++      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
++    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
++      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/spirv_cross
++      FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
++  endif()
++endif()
