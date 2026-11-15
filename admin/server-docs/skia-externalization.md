@@ -10,6 +10,10 @@ Skia 153 no longer downloads or extracts PIE-X because the active GN contract se
 
 [libwebp 1.6.0 integration guide](/package/libwebp/1.6.0/migration).
 
+## PIE-X producer follow-up (15 November 2026)
+
+\`piex@0.27\` is now registered with the seven C++ sources from the upstream GYP build translated into a BuildEngine CMake adapter. The independent DLL, Debug/Release imports, source compatibility and Skia RAW-preview smoke have **not** yet been verified. Skia 153 still has \`skia_use_piex = false\`. The earlier unused bundled PIE-X download was removed independently, and must not be reintroduced until a specific active fallback requires it. [PIE-X integration guide](/package/piex/0.27/migration).
+
 ## Current status: 15 November 2026
 
 **BuildEngine FSM completed successfully: 109 / 109 versioned library integrations, with no failures or blocked jobs.** The earlier text below documents a 10 November proposal and is historical. The active Skia 153 GN configuration already uses external zlib, Brotli, libpng, libjpeg-turbo, HarfBuzz, FreeType, ICU, Expat, libavif and libjxl, plus independently declared OpenGL and Vulkan Memory Allocator dependencies. Transitive managed packages include Highway, libyuv and Vulkan-Headers.
