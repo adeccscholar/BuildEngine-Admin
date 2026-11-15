@@ -15307,7 +15307,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="libaom" version="3.15.1" category="graphics" timestamp="2026-11-15T16:58:00Z">
+   <library id="libaom" version="3.15.1" category="graphics" timestamp="2026-11-15T18:32:00Z">
       <metadata name="libaom" supplier="Alliance for Open Media" homepage="https://aomedia.org/" description="AV1 encoder and decoder for the independently managed libavif codec" licenseSignal="green">
          <license name="BSD 2-Clause" spdx="BSD-2-Clause" file="LICENSE"/>
       </metadata>
@@ -15332,7 +15332,7 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DAOM_TARGET_CPU:STRING=x86_64"/>
-         <argument value="-DNASM_EXECUTABLE:FILEPATH={Tool:nasm}"/>
+         <argument value="-DAS_EXECUTABLE:FILEPATH={Tool:nasm}"/>
          <argument value="-DCONFIG_AV1_DECODER:STRING=1"/>
          <argument value="-DCONFIG_AV1_ENCODER:STRING=1"/>
          <argument value="-DCONFIG_LIBYUV:STRING=0"/>
