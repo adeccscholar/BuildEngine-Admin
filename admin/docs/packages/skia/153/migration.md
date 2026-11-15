@@ -2,7 +2,7 @@
 
 ## PIE-X 0.27 independent producer (15 November 2026)
 
-The PIE-X native package \`piex@0.27\` now has its own BuildEngine XML entry and CMake adapter. No BCC64X DLL build PASS, Skia ABI check, RAW preview smoke, or external GN link PASS has been confirmed. Therefore Skia remains configured with \`skia_use_piex = false\` and does not gain an unverified direct dependency. [PIE-X 0.27 integration](/package/piex/0.27/migration).
+The PIE-X native package `piex@0.27` now has its own BuildEngine XML entry and CMake adapter. No BCC64X DLL build PASS, Skia ABI check, RAW preview smoke, or external GN link PASS has been confirmed. Therefore Skia remains configured with `skia_use_piex = false` and does not gain an unverified direct dependency. [PIE-X 0.27 integration](/package/piex/0.27/migration).
 
 ## PIE-X cleanup and libwebp producer (15 November 2026)
 
