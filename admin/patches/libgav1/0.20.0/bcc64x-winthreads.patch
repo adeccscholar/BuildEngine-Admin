@@ -1,0 +1,31 @@
+diff --git a/src/utils/threadpool.cc b/src/utils/threadpool.cc
+--- a/src/utils/threadpool.cc
++++ b/src/utils/threadpool.cc
+@@ -15,5 +15,5 @@
+ #include "src/utils/threadpool.h"
+ 
+-#if defined(_MSC_VER)
++#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
+ #include <process.h>
+ #include <windows.h>
+@@ -141,5 +141,5 @@
+ 
+  private:
+-#if defined(_MSC_VER)
++#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
+   static unsigned int __stdcall ThreadBody(void* arg);
+ #else
+@@ -151,5 +151,5 @@
+ 
+   ThreadPool* pool_;
+-#if defined(_MSC_VER)
++#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
+   HANDLE handle_;
+ #else
+@@ -160,5 +160,5 @@
+ ThreadPool::WorkerThread::WorkerThread(ThreadPool* pool) : pool_(pool) {}
+ 
+-#if defined(_MSC_VER)
++#if defined(_MSC_VER) || (defined(__BORLANDC__) && defined(_WIN64))
+ 
+ bool ThreadPool::WorkerThread::Start() {
