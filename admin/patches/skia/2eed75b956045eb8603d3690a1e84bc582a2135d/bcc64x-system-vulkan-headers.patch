@@ -1,0 +1,17 @@
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -2282,4 +2282,9 @@
+-config("use_skia_vulkan_headers") {
+-  include_dirs = [ "include/third_party/vulkan" ]
+-  defines = [ "SK_USE_INTERNAL_VULKAN_HEADERS" ]
+-}
++config("use_skia_vulkan_headers") {
++  if (skia_use_bcc64x) {
++    assert(bcc64x_vulkan_headers_include != "", "BuildEngine Vulkan headers required")
++    include_dirs = [ bcc64x_vulkan_headers_include ]
++  } else {
++    include_dirs = [ "include/third_party/vulkan" ]
++    defines = [ "SK_USE_INTERNAL_VULKAN_HEADERS" ]
++  }
++}
