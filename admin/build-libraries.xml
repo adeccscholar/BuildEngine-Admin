@@ -15112,7 +15112,7 @@
    </library>
    <library id="wuffs" version="0.3" category="graphics" timestamp="2026-11-15T16:58:00Z">
       <metadata name="Wuffs" supplier="Google" homepage="https://github.com/google/wuffs" description="Stable 0.3 single-file C image and data decoding library; source/header distribution, no DLL" licenseSignal="green">
-         <license name="Apache License 2.0 or MIT" spdx="Apache-2.0 OR MIT" file="LICENSE"/>
+         <license name="Apache License 2.0 or MIT" spdx="Apache-2.0 OR MIT" file="licenses\wuffs\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/google/wuffs-mirror-release-c.git" commit="e3f919ccfe3ef542cfc983a82146070258fb57f8"/></security>
       <source>
@@ -15134,7 +15134,7 @@
    </library>
    <library id="spirv-headers" version="v1.202609.0" category="graphics" timestamp="2026-11-15T18:20:00Z">
       <metadata name="SPIRV-Headers" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Headers" description="Pinned SPIR-V grammar and C/C++ headers for shader tools; source snapshot compatible with Skia 153" licenseSignal="green">
-         <license name="MIT" spdx="MIT" file="LICENSE"/>
+         <license name="MIT" spdx="MIT" file="licenses\spirv-headers\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/KhronosGroup/SPIRV-Headers.git" ref="v1.202609.0"/></security>
       <source>
@@ -15392,7 +15392,7 @@
    </library>
    <library id="libyuv" version="r1924" category="graphics" timestamp="2026-11-15T18:20:00Z">
       <metadata name="libyuv" supplier="Chromium project" homepage="https://chromium.googlesource.com/libyuv/libyuv" description="YUV scaling and color conversion; Chromium M149 pinned revision, JPEG add-on disabled" licenseSignal="green">
-         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE"/>
+         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\libyuv\LICENSE"/>
       </metadata>
       <security><repository url="https://chromium.googlesource.com/libyuv/libyuv.git" commit="644251f252a84bf8ce91ff0aca86a9b16b069ab8"/></security>
       <source>
@@ -15440,7 +15440,7 @@
    </library>
    <library id="libaom" version="3.15.1" supersededBy="3.15.3" category="graphics" timestamp="2026-11-15T18:32:00Z">
       <metadata name="libaom" supplier="Alliance for Open Media" homepage="https://aomedia.org/" description="AV1 encoder and decoder for the independently managed libavif codec" licenseSignal="green">
-         <license name="BSD 2-Clause" spdx="BSD-2-Clause" file="LICENSE"/>
+         <license name="BSD 2-Clause" spdx="BSD-2-Clause" file="licenses\libaom\LICENSE"/>
       </metadata>
       <security><repository url="https://aomedia.googlesource.com/aom" ref="v3.15.1"/></security>
       <source>
