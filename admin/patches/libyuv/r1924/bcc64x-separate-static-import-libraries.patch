@@ -41,6 +41,5 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 +# Install only the DLL and its import library using the BuildEngine layout
 +install ( TARGETS ${ly_lib_shared} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
 +install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include )
- install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/		DESTINATION include )
  
  # create the .deb and .rpm packages using cpack
