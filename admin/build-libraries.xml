@@ -15139,7 +15139,7 @@
       <security><repository url="https://github.com/KhronosGroup/SPIRV-Headers.git" ref="v1.202609.0"/></security>
       <source>
          <download url="https://github.com/KhronosGroup/SPIRV-Headers/archive/refs/tags/v1.202609.0.tar.gz" archive="spirv-headers-v1.202609.0.tar.gz"/>
-         <extract format="libarchive" root="SPIRV-Headers-v1.202609.0">
+         <extract format="libarchive" root="SPIRV-Headers-1.202609.0">
             <require path="CMakeLists.txt"/>
             <require path="include\spirv\unified1\spirv.h"/>
             <require path="LICENSE"/>
@@ -15465,7 +15465,9 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DAOM_TARGET_CPU:STRING=x86_64"/>
-         <argument value="-DENABLE_NASM:BOOL=ON"/>
+         <!-- Upstream find_program overwrites AS_EXECUTABLE when ENABLE_NASM=ON. Keep pinned managed NASM path in CMake cache. -->
+         <argument value="-DAS_EXECUTABLE:FILEPATH={Tool:nasm}"/>
+         <argument value="-DENABLE_NASM:BOOL=OFF"/>
          <argument value="-DCONFIG_AV1_DECODER:STRING=1"/>
          <argument value="-DCONFIG_AV1_ENCODER:STRING=1"/>
          <argument value="-DCONFIG_LIBYUV:STRING=0"/>
@@ -15521,7 +15523,9 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DAOM_TARGET_CPU:STRING=x86_64"/>
-         <argument value="-DENABLE_NASM:BOOL=ON"/>
+         <!-- Upstream find_program overwrites AS_EXECUTABLE when ENABLE_NASM=ON. Keep pinned managed NASM path in CMake cache. -->
+         <argument value="-DAS_EXECUTABLE:FILEPATH={Tool:nasm}"/>
+         <argument value="-DENABLE_NASM:BOOL=OFF"/>
          <argument value="-DCONFIG_AV1_DECODER:STRING=1"/>
          <argument value="-DCONFIG_AV1_ENCODER:STRING=1"/>
          <argument value="-DCONFIG_LIBYUV:STRING=0"/>
