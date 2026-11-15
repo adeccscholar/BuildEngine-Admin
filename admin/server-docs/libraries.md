@@ -2,9 +2,9 @@
 
 [TOC|Content]
 
-**Current library catalog (10 November 2026): 62 distinct libraries and 95 versioned integrations, including 32 superseded versions.** Source: `admin/build-libraries.xml` (schema 17). The version totals cover all retained historical versions; a successor is not counted as a new distinct library.
+**Current library catalog (15 November 2026): 74 distinct libraries and 109 versioned integrations, including retained superseded versions.** Source: `admin/build-libraries.xml` (schema 17). The version totals cover all retained historical versions; a successor is not counted as a new distinct library.
 
-The catalog begins with **2 packages on 24 August**, grows to **44 on 25 September**, and reaches **62 distinct library IDs across 95 version records in November**. The original August compiler feasibility study preceded the first two-entry library catalog. Details appear in the [project story](/manual/story.md) and [dated news](/news/).
+The catalog begins with **2 packages on 24 August**, grows to **44 on 25 September**, and reaches **74 distinct library IDs across 109 version records on 15 November**. The original August compiler feasibility study preceded the first two-entry library catalog. Details appear in the [project story](/manual/story.md) and [dated news](/news/).
 
 The catalog lists upstream versions built and managed with C++Builder 13 / BCC64X, their direct dependencies and extension relationships. The per-version guides contain build configuration, porting notes, migration information and transitive Mermaid diagrams. The native BCC64X build also maintains integrated library smokes and dedicated, larger consumer tests in BuildEngine-Tests.
 
@@ -193,5 +193,28 @@ Direct references above come from the versioned `<dependency>` and `<extension>`
 
 ## Library counts and build outcomes
 
-The two catalog counts measure **registered unique library IDs** and **versioned integrations**, respectively. Technical build outcomes are recorded by the running FSM and its installed-consumer checks. Large application-level test programs are maintained separately in BuildEngine-Tests. The VTK 9.7.2 Debug run of 10 November currently has a specific `vtkCommonDataModel` link failure; that does not invalidate earlier integrated libraries.
+The two catalog counts measure **registered unique library IDs** and **versioned integrations**, respectively. Technical build outcomes are recorded by the running FSM and its installed-consumer checks. Large application-level test programs are maintained separately in BuildEngine-Tests. The operator confirmed a complete 109/109 library FSM run with zero failures and zero blocked libraries on 15 November 2026. Historical failures should remain in dated reports, not as the current status.
 
+
+
+## Graphics and shader libraries added in November 2026
+
+The following versions are maintained by BuildEngine and have dedicated English migration guides with versioned build switches and Mermaid dependency graphs. The operational XML contract is authoritative for dependency roots, library names and toolchain paths.
+
+| Package | Version | Guide |
+| --- | --- | --- |
+| Highway | 1.4.0 | [Configuration](/package/highway/1.4.0/migration) |
+| Wuffs | 0.3 | [Configuration](/package/wuffs/0.3/migration) |
+| SPIRV-Headers | v1.202609.0 | [Configuration](/package/spirv-headers/v1.202609.0/migration) |
+| SPIRV-Tools | 2026.4 | [Configuration](/package/spirv-tools/2026.4/migration) |
+| SPIRV-Cross | vulkan-sdk-1.4.363.0 | [Configuration](/package/spirv-cross/vulkan-sdk-1.4.363.0/migration) |
+| glslang | 16.6.0 | [Configuration](/package/glslang/16.6.0/migration) |
+| libjxl | 0.13.0 | [Configuration](/package/libjxl/0.13.0/migration) |
+| libyuv | r1924 | [Configuration](/package/libyuv/r1924/migration) |
+| libaom | 3.15.3 | [Configuration](/package/libaom/3.15.3/migration) |
+| libavif | 1.4.2 | [Configuration](/package/libavif/1.4.2/migration) |
+| Vulkan-Headers | 1.4.368 | [Configuration](/package/vulkan-headers/1.4.368/migration) |
+| Vulkan Memory Allocator | 3.4.0 | [Configuration](/package/vulkan-memory-allocator/3.4.0/migration) |
+| Skia | 153 | [Complete dependency and GN guide](/package/skia/153/migration) |
+
+**Build summary:** 109 / 109 finished, 0 failed and 0 blocked. A package dependency does not itself prove that upstream vendor sources have been removed from Skia's GN graph.
