@@ -58,6 +58,10 @@
     {
       "name": "libwebp",
       "version": "1.6.0"
+    },
+    {
+      "name": "wuffs",
+      "version": "0.3"
     }
   ],
   "bundledComponents": [
