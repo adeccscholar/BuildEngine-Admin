@@ -10,7 +10,7 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 
 [Library status](/libraries/) · [Version-specific documentation](/library-docs/) · [News](/news/) · [Skia dependencies](/manual/skia-externalization.md)
 
-**Latest registrations:** `libgav1@0.20.0`, `libwebp@1.6.0` and `piex@0.27`. Skia 153 now declares PIE-X as a managed dependency. libyuv is consumed transitively through external libavif 1.4.2, which explicitly requests AVIF_LIBYUV=SYSTEM; no redundant Skia dependency is declared. The Skia and libgav1 Debug/Release builds require BCC64X verification. SPIRV-Cross now builds a separate native C++ DLL alongside its C-API DLL, and Skia 153 uses that package for Direct3D HLSL translation. Build and ABI compatibility remain unverified until BCC64X tests. The prior 109/109 FSM result predates these additions.
+**Latest registrations:** `libgav1@0.20.0`, `libwebp@1.6.0` and `piex@0.27`. Skia 153 now declares PIE-X as a managed dependency. libyuv is consumed transitively through external libavif 1.4.2, which explicitly requests AVIF_LIBYUV=SYSTEM; no redundant Skia dependency is declared. The Skia and libgav1 Debug/Release builds require BCC64X verification. SPIRV-Cross now builds a native C++ DLL instead of the C-only DLL, and Skia 153 uses that package for Direct3D HLSL translation. Build and ABI compatibility remain unverified until BCC64X tests. The prior 109/109 FSM result predates these additions.
 
 ## Libraries by category
 
