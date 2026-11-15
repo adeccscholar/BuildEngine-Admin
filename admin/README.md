@@ -1,7 +1,7 @@
 # BuildEngine-Admin – Technical Administration Data
 
-**Status date:** November 9, 2026  
-**Status:** active Schema-17 declarative contract for the Library-FSM architecture and 62 logical libraries
+**Status date:** November 16, 2026  
+**Status:** active Schema-17 declarative contract for the Library-FSM architecture; 77 logical libraries and 112 version records declared
 
 This directory contains the administration contracts that BuildEngine synchronizes and uses at runtime for tool provisioning, library builds, packaging, publishing, and small consumer smokes.
 
@@ -17,21 +17,20 @@ Active libraries are not distributed across XML fragments.
 
 ```text
 build-libraries.xml : Schema 17
-Library contracts   : current synchronized logical catalog
+Library contracts   : 77 logical IDs / 112 version records (XML declaration count)
 ```
 
-Included (62 logical libraries, with previous versions retained):
+Declared logical IDs (77; older versions retained):
 
 ```text
-pugixml, zlib, brotli, zstd, xz, libzip, libarchive, openssl, curl,
-boost, nlohmann-json, ace, tao, bzip2, glew, opengl, raylib, sdl2,
-sqlite, libpq, libpqxx, xerces-c, soil2, vtk, opencv, cmark-gfm,
-googletest, catch2, bitmapplusplus, libjpeg-turbo, libpng, harfbuzz,
-freetype, libtiff, skia, graphite2, expat, teckit, icu, libxml2,
-qpdf, podofo, win-iconv, poppler, lz4, libdeflate, leptonica,
-tesseract, wil, openxlsx, fast_float, abseil, lcms2, openjpeg,
-simdutf, agg, pdfium, onetbb, llvm-openmp, eigen,
-mariadb-connector-c, google-benchmark
+abseil, ace, agg, bitmapplusplus, boost, brotli, bzip2, catch2, cmark-gfm, curl, eigen,
+expat, fast_float, freetype, glew, glslang, google-benchmark, googletest, graphite2, harfbuzz,
+highway, icu, lcms2, leptonica, libaom, libarchive, libavif, libdeflate, libgav1, libjpeg-turbo,
+libjxl, libpng, libpq, libpqxx, libtiff, libwebp, libxml2, libyuv, libzip, llvm-openmp,
+lz4, mariadb-connector-c, nlohmann-json, onetbb, opencv, opengl, openjpeg, openssl, openxlsx,
+pdfium, piex, podofo, poppler, pugixml, qpdf, raylib, sdl2, simdutf, skia, soil2, spirv-cross,
+spirv-headers, spirv-tools, sqlite, tao, teckit, tesseract, vtk, vulkan-headers, vulkan-memory-allocator,
+wil, win-iconv, wuffs, xerces-c, xz, zlib, zstd
 ```
 
 Other central content:
