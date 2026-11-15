@@ -2,11 +2,17 @@
 
 [TOC|Content]
 
+## Managed libwebp externalization (15 November 2026)
+
+Skia 153 now declares `libwebp@1.6.0` as a direct BuildEngine dependency, uses `skia_use_system_libwebp = true` with WebP decode/encode enabled, and receives per-configuration import library paths via `DependencyRoot:libwebp` and a version-pinned `bcc64x-system-libwebp.patch`. The previous Skia-bundled WebP archive and extract actions were removed. The SBOM manifest tracks libwebp as external, not bundled; inactive PIE-X is also absent from the bundled list.
+
+**Validation pending:** The supplied libwebp Release log failed because upstream `WEBP_ENABLE_SIMD=OFF` introduced `-mno-sse2`, producing E714 floating-point ABI errors and compiler crashes. The producer was reconfigured with `WEBP_ENABLE_SIMD=ON`; no successful retest, DLL import-library-name verification, GN generation, Skia Debug/Release link or loader smoke is yet available. The historical 109/109 FSM result predates these changes.
+
 ## Incremental source cleanup and libwebp registration (15 November 2026)
 
 Skia 153 no longer downloads or extracts PIE-X because the active GN contract sets `skia_use_piex = false`. The unrelated DNG SDK remains enabled and its source is retained. The Skia SPIR-V, glslang, and SPIRV-Cross archives remain pinned while their GN-generated targets have not been replaced by demonstrably compatible managed imports.
 
-**libwebp 1.6.0** is now registered as a separately managed BuildEngine library. Its BCC64X build and the Skia GN integration are pending verification; the active Skia configuration still has `skia_use_system_libwebp = false`. Keep the bundled WebP download and extraction until installed DLL/header integration, relevant patching, Debug and Release link tests, and SBOM checks are completed. Do not mark the 109/109 historical build as proof for the newly added library.
+**libwebp 1.6.0** is now registered as a separately managed BuildEngine library. Its BCC64X build and Skia's configured GN DLL imports require validation. The active Skia configuration now sets `skia_use_system_libwebp = true`; its bundled WebP source download/extraction has been removed from the declared source workflow. Do not mark the 109/109 historical build as proof for the newly added library.
 
 [libwebp 1.6.0 integration guide](/package/libwebp/1.6.0/migration).
 
