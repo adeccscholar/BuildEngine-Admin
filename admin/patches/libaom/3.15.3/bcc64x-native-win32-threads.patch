@@ -1,0 +1,17 @@
+diff --git a/cmake/aom_configure.cmake b/cmake/aom_configure.cmake
+--- a/cmake/aom_configure.cmake
++++ b/cmake/aom_configure.cmake
+@@ -256,7 +256,12 @@
+ 
+ # Don't just check for pthread.h, but use the result of the full pthreads
+ # including a linking check in FindThreads above.
+-set(HAVE_PTHREAD_H ${CMAKE_USE_PTHREADS_INIT})
++if(WIN32 AND DEFINED ENV{CB_BCC64X})
++  # BCC64X uses native Win32 threading; do not select an unlinked pthread ABI.
++  set(HAVE_PTHREAD_H 0)
++else()
++  set(HAVE_PTHREAD_H ${CMAKE_USE_PTHREADS_INIT})
++endif()
+ aom_check_source_compiles("unistd_check" "#include <unistd.h>" HAVE_UNISTD_H)
+ 
+ if(HAVE_PTHREAD_H)
