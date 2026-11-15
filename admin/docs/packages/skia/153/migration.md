@@ -1,5 +1,12 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## libwebp GN include propagation fix (15 November 2026)
+
+The Release Skia rebuild stopped at Ninja step 843/1218 after two failed codec compilations: `src/encode/SkWebpEncoderImpl.cpp` could not find `webp/encode.h`, and `src/codec/SkWebpCodec.cpp` could not find `webp/decode.h`. The emitted compiler invocations lacked the managed `{DependencyRoot:libwebp}/include` directory. The original external `system("libwebp")` target attached `include_dirs` to a GN group configuration that does not propagate the includes to the separate `webp_decode` and `webp_encode` source sets.
+
+The versioned `bcc64x-system-libwebp.patch` now adds `config("managed_webp_includes")` and attaches it explicitly to both codec source targets in Skia's root `BUILD.gn`. This keeps the include root driven by the existing `CB_SKIA_LIBWEBP_INCLUDE` GN argument, with no hardcoded absolute paths or changes to the successfully built libwebp producer. All four patch hunks were checked against the pinned Skia source; Debug/Release compilation and linking of the revised consumer are **not yet verified**.
+
+
 ## Managed libwebp externalization (15 November 2026)
 
 Skia 153 now declares `libwebp@1.6.0` as a direct BuildEngine dependency, uses `skia_use_system_libwebp = true` with WebP decode/encode enabled, and receives per-configuration import library paths via `DependencyRoot:libwebp` and a version-pinned `bcc64x-system-libwebp.patch`. The previous Skia-bundled WebP archive and extract actions were removed. The SBOM manifest tracks libwebp as external, not bundled; inactive PIE-X is also absent from the bundled list.
