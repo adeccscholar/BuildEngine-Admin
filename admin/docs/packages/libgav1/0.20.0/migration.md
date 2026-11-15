@@ -16,7 +16,7 @@ This guide describes the **declared schema-17 contract**, not an independently v
 - Security source reference: `https://chromium.googlesource.com/codecs/libgav1/`, commit `c05bf9be660cf170d7c26bd06bb42b3322180e58`
 - License contract: Apache-2.0; installed original `licenses/libgav1/LICENSE`
 
-The source phase requires the upstream CMake project, install script, decoder header and license. Both patches are version-bound, checked with `git apply --check`, applied, and verified with `git apply --reverse --check`.
+The source phase requires the upstream CMake project, install script, decoder header and license. Both patches are version-bound, checked with `git apply --check`, applied, and verified with `git apply --reverse --check`. The install-layout patch was corrected on 16 November 2026 to carry upstream context lines; the prior zero-context hunk failed under standard `git apply` even though the removed lines matched the upstream v0.20.0 file. No `--unidiff-zero` workaround is used.
 
 ## Native Windows build and installation
 
