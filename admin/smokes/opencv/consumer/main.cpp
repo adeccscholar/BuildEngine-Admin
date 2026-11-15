@@ -28,7 +28,8 @@ int main() {
    cv::Ptr<cv::Stitcher> const theStitcher=cv::Stitcher::create();
    cv::Ptr<cv::img_hash::ImgHashBase> const theHash=cv::img_hash::AverageHash::create();
    cv::Ptr<cv::quality::QualityMSE> const theQuality=cv::quality::QualityMSE::create(theSource);
-   cv::Mat const theGuided=cv::ximgproc::guidedFilter(theSource, theSource, 1, 1.0);
+   cv::Mat theGuided;
+   cv::ximgproc::guidedFilter(theSource, theSource, theGuided, 1, 1.0);
    bool const bContrib=!theHash.empty() && !theQuality.empty() && !theGuided.empty();
    std::println("SMOKE|CHECK|contrib|{}|img_hash quality ximgproc and linked optflow",bContrib?"PASS":"FAIL");
    bool const bModules=!theSvm.empty() && !theStitcher.empty() && bContrib;
