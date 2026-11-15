@@ -1,10 +1,7 @@
 diff --git a/third_party/externals/dng_sdk/source/dng_pthread.cpp b/third_party/externals/dng_sdk/source/dng_pthread.cpp
 --- a/third_party/externals/dng_sdk/source/dng_pthread.cpp
 +++ b/third_party/externals/dng_sdk/source/dng_pthread.cpp
-@@ -313,10 +313,10 @@
- {
- try
- {
+@@ -314,6 +314,6 @@
  uintptr_t result;
  unsigned threadID;
 -std::auto_ptr<trampoline_args> args(new (std::nothrow) trampoline_args);
@@ -13,4 +10,3 @@ diff --git a/third_party/externals/dng_sdk/source/dng_pthread.cpp b/third_party/
 +std::unique_ptr<void *> resultHolder(new (std::nothrow) (void *));
  
  if (args.get() == NULL || resultHolder.get () == NULL)
- return -1; // ENOMEM
