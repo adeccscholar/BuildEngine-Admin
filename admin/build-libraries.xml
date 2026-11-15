@@ -8759,6 +8759,7 @@
       <dependency library="expat" version="2.10.0"/>
       <dependency library="libavif" version="1.4.2"/>
       <dependency library="libjxl" version="0.13.0"/>
+      <dependency library="libwebp" version="1.6.0"/>
       <dependency library="vulkan-memory-allocator" version="3.4.0"/>
       <dependency library="wuffs" version="0.3"/>
 
@@ -8855,11 +8856,6 @@
          <download
             url="https://chromium.googlesource.com/codecs/libgav1.git/+archive/5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"
             archive="skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/webm/libwebp.git/+archive/845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"
-            archive="skia-deps\libwebp-845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"/>
-
 
 
 <!-- ======================================================== -->
@@ -9022,28 +9018,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\libgav1\src\gav1\decoder.h"/>
-
-         <execute name="mkdir-libwebp"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libwebp"/>
-         </execute>
-
-         <execute name="extract-libwebp"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\libwebp"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libwebp-845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\libwebp\src\webp\decode.h"/>
-         <require path="{CurrentArtifact}\third_party\externals\libwebp\src\webp\encode.h"/>
 
 
 <!-- Consume managed Wuffs source, compiled by Skia with GIF module flags.
@@ -9654,6 +9628,19 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjxl.patch"/>
          </execute>
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-libwebp.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libwebp.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="system-libwebp-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libwebp.patch"/>
+         </execute>
+         <execute name="system-libwebp-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libwebp.patch"/>
+         </execute>
+         <execute name="system-libwebp-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libwebp.patch"/>
+         </execute>
          <execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
@@ -9746,6 +9733,10 @@
          <environment name="CB_SKIA_LIBAVIF_LIB" value="{DependencyRoot:libavif}\lib\win64\{Configuration}\libavif.lib"/>
          <environment name="CB_SKIA_LIBJXL_INCLUDE" value="{DependencyRoot:libjxl}\include"/>
          <environment name="CB_SKIA_LIBJXL_LIB" value="{DependencyRoot:libjxl}\lib\win64\{Configuration}\libjxl.lib"/>
+         <environment name="CB_SKIA_LIBWEBP_INCLUDE" value="{DependencyRoot:libwebp}\include"/>
+         <environment name="CB_SKIA_LIBWEBP_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\webp.lib"/>
+         <environment name="CB_SKIA_LIBWEBP_DEMUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\webpdemux.lib"/>
+         <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\webpmux.lib"/>
 
          <!--
             Runtime DLL resolution for all BuildEngine package dependencies.
@@ -9886,6 +9877,10 @@
                <line value="bcc64x_libavif_lib = getenv(&quot;CB_SKIA_LIBAVIF_LIB&quot;)"/>
                <line value="bcc64x_libjxl_include = getenv(&quot;CB_SKIA_LIBJXL_INCLUDE&quot;)"/>
                <line value="bcc64x_libjxl_lib = getenv(&quot;CB_SKIA_LIBJXL_LIB&quot;)"/>
+               <line value="bcc64x_libwebp_include = getenv(&quot;CB_SKIA_LIBWEBP_INCLUDE&quot;)"/>
+               <line value="bcc64x_libwebp_lib = getenv(&quot;CB_SKIA_LIBWEBP_LIB&quot;)"/>
+               <line value="bcc64x_libwebp_demux_lib = getenv(&quot;CB_SKIA_LIBWEBP_DEMUX_LIB&quot;)"/>
+               <line value="bcc64x_libwebp_mux_lib = getenv(&quot;CB_SKIA_LIBWEBP_MUX_LIB&quot;)"/>
                <line value="skia_pdf_subset_harfbuzz = true"/>
 
                <line value="skia_use_client_icu = false"/>
@@ -9919,7 +9914,7 @@
                <line value="skia_use_libwebp_decode = true"/>
                <line value="skia_use_libwebp_encode = true"/>
                <line value="skia_use_no_webp_encode = false"/>
-               <line value="skia_use_system_libwebp = false"/>
+               <line value="skia_use_system_libwebp = true"/>
 
                <!-- Bundled Wuffs / multi-frame. -->
                <line value="skia_use_wuffs = true"/>
