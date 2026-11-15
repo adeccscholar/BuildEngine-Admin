@@ -1,16 +1,77 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
-## Current integration status (15 November 2026)
+## Current BuildEngine status (15 November 2026)
 
-The active BuildEngine contract pins Skia to revision `2eed75b956045eb8603d3690a1e84bc582a2135d` (Chrome M153). It declares direct BuildEngine dependencies on OpenGL 26.2.1, zlib 1.4, Brotli 1.2.1, libjpeg-turbo 3.2.1, libpng 1.6.59, HarfBuzz 15.1.0, FreeType 2.15.0, ICU 79.1, Expat 2.10.0, libavif 1.4.2, libjxl 0.13.0, and Vulkan Memory Allocator 3.4.0.
+**Build result: PASS.** The operator confirmed successful completion of all **109 of 109 versioned library integrations**. This is the observed final FSM outcome, not merely a registered source contract. Individual downstream application tests and a separate proof of binary externalization are not implied by that result.
 
-Skia's Highway source download and extraction have been removed from the source contract. Its bundled-components manifest no longer declares Highway, because the independently managed libjxl 0.13.0 already depends on Highway 1.4.0. Whether the installed Skia binary actually uses external Highway directly is not verified; no direct Highway dependency should be inferred for Skia from the libjxl dependency alone.
+The Skia M153 source is pinned to revision `2eed75b956045eb8603d3690a1e84bc582a2135d`. The XML contract declares **12 direct dependencies**, six additional distinct transitive external coordinates, and a separately tracked bundled component inventory. The installed package report last showed **29 total components = 1 Skia root + 18 external + 10 bundled**.
 
-**SPIR-V work remains open:** SPIRV-Cross, SPIRV-Headers, SPIRV-Tools, and glslang are still pinned and extracted as Skia source dependencies. Their externalization must include corresponding GN target and link changes before their sources or bundled SBOM entries are removed. The Debug GN patch currently forces SPIR-V validation in Debug, regardless of the `skia_enable_spirv_validation` setting.
+### Complete external BuildEngine dependency graph
 
-**Dashboard counts are installed-artifact evidence, not a live source declaration:** `Components`, `Dependencies`, and `Bundled` on the library detail page are calculated from the installed CycloneDX SBOM package closure. An in-progress rebuild may therefore still display the previous counts (for example, 27 / 8 / 18) until a new verified SBOM is installed. These numbers must never be silently replaced with expected counts derived from the updated source XML.
+```mermaid
+flowchart LR
+   skia["Skia 153"]
+   opengl["OpenGL 26.2.1"]
+   zlib["zlib 1.4"]
+   brotli["Brotli 1.2.1"]
+   jpeg["libjpeg-turbo 3.2.1"]
+   png["libpng 1.6.59"]
+   harfbuzz["HarfBuzz 15.1.0"]
+   freetype["FreeType 2.15.0"]
+   icu["ICU 79.1"]
+   expat["Expat 2.10.0"]
+   avif["libavif 1.4.2"]
+   jxl["libjxl 0.13.0"]
+   vma["Vulkan Memory Allocator 3.4.0"]
+   bzip["bzip2 1.0.8"]
+   aom["libaom 3.15.3"]
+   yuv["libyuv r1924"]
+   highway["Highway 1.4.0"]
+   lcms["LCMS2 2.20"]
+   vkheaders["Vulkan-Headers 1.4.368"]
+   skia --> opengl
+   skia --> zlib
+   skia --> brotli
+   skia --> jpeg
+   skia --> png
+   skia --> harfbuzz
+   skia --> freetype
+   skia --> icu
+   skia --> expat
+   skia --> avif
+   skia --> jxl
+   skia --> vma
+   png --> zlib
+   freetype --> zlib
+   freetype --> bzip
+   freetype --> brotli
+   freetype --> png
+   freetype --> harfbuzz
+   avif --> aom
+   avif --> yuv
+   jxl --> highway
+   jxl --> brotli
+   jxl --> lcms
+   jxl --> png
+   vma --> vkheaders
+```
 
-The sections below retain the earlier build configuration record and must not be mistaken for the complete current dependency graph.
+**Counters:** Total Components = 29; Direct Dependencies = 12; Transitive Dependencies = 6; Bundled Components = 10; Total External Dependencies = 18. These figures reflect the last reported installed SBOM. The server calculates the live values from its installed package graph rather than persisting these example counts.
+
+### Active GN and integration characteristics
+
+- BCC64X x64 target, Ninja/GN generation, component build; Ganesh and Graphite enabled with OpenGL, Direct3D and Vulkan backends
+- Externally configured: zlib, Brotli, libjpeg-turbo, libpng, FreeType, HarfBuzz, ICU, Expat, libavif and libjxl; Vulkan Memory Allocator and OpenGL are separately managed BuildEngine dependencies
+- The currently accepted Expat import naming convention is `liblibexpat.lib` (Release) and `liblibexpatd.lib` (Debug). The BuildEngine XML resolves their package roots and configurations; no absolute path is declared
+- Highway is external through libjxl, libyuv through libavif, and Vulkan-Headers through the Vulkan Memory Allocator; these are not direct Skia XML dependencies
+- The bundled-component SBOM manifest excludes Highway, libyuv and Vulkan-Headers from its external-coordinate duplicates. **This SBOM correction alone does not prove that all upstream copies have been removed from Skia's source or link graph**
+- SPIRV-Cross, SPIRV-Headers, SPIRV-Tools, and glslang remain pinned inside the Skia source workflow. The standalone BuildEngine packages exist, but GN externalization is still a separate engineering change. Debug SPIR-V validation remains enabled by the versioned patch
+
+### New version-specific integration guides
+
+[libavif 1.4.2](/package/libavif/1.4.2/migration) · [libjxl 0.13.0](/package/libjxl/0.13.0/migration) · [libaom 3.15.3](/package/libaom/3.15.3/migration) · [libyuv r1924](/package/libyuv/r1924/migration) · [Highway 1.4.0](/package/highway/1.4.0/migration) · [SPIRV-Tools 2026.4](/package/spirv-tools/2026.4/migration) · [glslang 16.6.0](/package/glslang/16.6.0/migration)
+
+The following historical section records earlier configuration iterations. It is retained for change history; use this section and the current XML contract for the active state.
 
 ---
 
