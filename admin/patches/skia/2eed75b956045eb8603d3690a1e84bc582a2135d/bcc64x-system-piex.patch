@@ -1,0 +1,48 @@
+diff --git a/third_party/piex/BUILD.gn b/third_party/piex/BUILD.gn
+--- a/third_party/piex/BUILD.gn
++++ b/third_party/piex/BUILD.gn
+@@ -4,20 +4,37 @@
+ # found in the LICENSE file.
+ 
+ declare_args() {
++  skia_use_system_piex = false
++  bcc64x_piex_include = ""
++  bcc64x_piex_lib = ""
+ }
+ 
+ import("../third_party.gni")
+ 
+-third_party("piex") {
+-  public_include_dirs = [ "../externals/piex" ]
++if (skia_use_system_piex) {
++  assert(bcc64x_piex_include != "", "Managed PIE-X include path required")
++  assert(bcc64x_piex_lib != "", "Managed PIE-X DLL import library required")
++  system("piex") {
++    include_dirs = [ bcc64x_piex_include ]
++    ldflags = [ bcc64x_piex_lib ]
++  }
++} else {
++  third_party("piex") {
++    public_include_dirs = [ "../externals/piex" ]
+ 
+-  defines = [ "BREAK_IF_DEBUGGING_AND_OUT_OF_RANGE" ]
++    defines = [ "BREAK_IF_DEBUGGING_AND_OUT_OF_RANGE" ]
+ 
+-  sources = [
+-    "../externals/piex/src/binary_parse/cached_paged_byte_array.cc",
+-    "../externals/piex/src/binary_parse/range_checked_byte_ptr.cc",
+-    "../externals/piex/src/image_type_recognition/image_type_recognition_lite.cc",
+-    "../externals/piex/src/piex.cc",
+-    "../externals/piex/src/tiff_directory/tiff_directory.cc",
+-    "../externals/piex/src/tiff_parser.cc",
+-  ]
++    sources = [
++      "../externals/piex/src/binary_parse/cached_paged_byte_array.cc",
++      "../externals/piex/src/binary_parse/range_checked_byte_ptr.cc",
++      "../externals/piex/src/image_type_recognition/image_type_recognition_lite.cc",
++      "../externals/piex/src/piex.cc",
++      "../externals/piex/src/tiff_directory/tiff_directory.cc",
++      "../externals/piex/src/tiff_parser.cc",
++    ]
++  }
+ }
