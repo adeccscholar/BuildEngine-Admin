@@ -15503,6 +15503,8 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\aom\aom_codec.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <!-- The DLL import library must be available separately from the static libaom archive. -->
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libaom_dll.lib"/>
             </perVariant>
             <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libaom\LICENSE" overwrite="true"/></common>
          </install>
@@ -15579,6 +15581,8 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\aom\aom_codec.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <!-- The DLL import library must be available separately from the static libaom archive. -->
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libaom_dll.lib"/>
             </perVariant>
             <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libaom\LICENSE" overwrite="true"/></common>
          </install>
@@ -15617,6 +15621,8 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:libaom};{DependencyRoot:libyuv}"/>
+         <!-- Select the DLL import library, never the separately installed static libaom archive. -->
+         <argument value="-DAOM_LIBRARY:FILEPATH={DependencyRoot:libaom}\lib\win64\{Configuration}\libaom_dll.lib"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DAVIF_CODEC_AOM:STRING=SYSTEM"/>
          <argument value="-DAVIF_CODEC_DAV1D:STRING=OFF"/>
