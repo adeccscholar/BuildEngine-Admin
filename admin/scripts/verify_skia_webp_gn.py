@@ -50,12 +50,16 @@ def Main() -> int:
          print(f"[SKIA WEBP] Invalid GN JSON for {strTarget}: {theError}", file=sys.stderr)
          return 1
       if isinstance(theIncludes, dict):
-         theIncludes = theIncludes.get("include_dirs", [])
+         # GN versions differ: a requested field can be emitted directly
+         # or nested under the fully qualified target name.
+         theIncludes = theIncludes.get("include_dirs", theIncludes.get(strTarget, theIncludes))
+         if isinstance(theIncludes, dict):
+            theIncludes = theIncludes.get("include_dirs", [])
       if not isinstance(theIncludes, list):
          print(f"[SKIA WEBP] Unexpected GN include_dirs for {strTarget}: {theIncludes!r}", file=sys.stderr)
          return 1
 
-      vecIncludes = [NormalizePath(strPath) for strPath in theIncludes if isinstance(strPath, str)]
+      vecIncludes = [NormalizePath(strPath) for strPath in theIncludes if isinstance(strPath)]
       if strExpected not in vecIncludes:
          print(f"[SKIA WEBP] {strTarget} does not contain managed include root: {strInclude}", file=sys.stderr)
          print(f"[SKIA WEBP] Actual GN include directories: {theIncludes}", file=sys.stderr)
