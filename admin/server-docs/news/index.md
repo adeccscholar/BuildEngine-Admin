@@ -4,6 +4,8 @@
 
 A chronological engineering account of BuildEngine's growth from an August BCC64X feasibility study to a fully versioned third-party library platform. Entries cover library acquisition, compiler and build-system adaptations, tooling, tests, integration challenges and the engineering decisions that made the platform reproducible.
 
+[How this site presents live data and how its documentation was prepared](/manual/about-this-site.md)
+
 ## Timeline (newest first)
 
 - **[2026-11-15](/news/2026-11-15/)** — 109/109 previously verified, followed by libwebp and PIE-X registrations; Skia 153, external graphics/shader packages, SBOM corrections and English guides
