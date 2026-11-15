@@ -12,7 +12,7 @@ Skia 153 no longer downloads or extracts PIE-X because the active GN contract se
 
 ## PIE-X producer follow-up (15 November 2026)
 
-\`piex@0.27\` is now registered with the seven C++ sources from the upstream GYP build translated into a BuildEngine CMake adapter. The independent DLL, Debug/Release imports, source compatibility and Skia RAW-preview smoke have **not** yet been verified. Skia 153 still has \`skia_use_piex = false\`. The earlier unused bundled PIE-X download was removed independently, and must not be reintroduced until a specific active fallback requires it. [PIE-X integration guide](/package/piex/0.27/migration).
+`piex@0.27` is now registered with the seven C++ sources from the upstream GYP build translated into a BuildEngine CMake adapter. The independent DLL, Debug/Release imports, source compatibility and Skia RAW-preview smoke have **not** yet been verified. Skia 153 still has `skia_use_piex = false`. The earlier unused bundled PIE-X download was removed independently, and must not be reintroduced until a specific active fallback requires it. [PIE-X integration guide](/package/piex/0.27/migration).
 
 ## Current status: 15 November 2026
 
