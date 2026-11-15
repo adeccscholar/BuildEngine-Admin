@@ -10,7 +10,7 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 
 [Library status](/libraries/) · [Version-specific documentation](/library-docs/) · [News](/news/) · [Skia dependencies](/manual/skia-externalization.md)
 
-**Latest registrations:** `libwebp@1.6.0` and `piex@0.27` (XML/adapter registration only; build validation pending). [libwebp guide](/package/libwebp/1.6.0/migration) · [PIE-X guide](/package/piex/0.27/migration). Skia 153 now declares a direct managed dependency on libwebp 1.6.0; the new Debug/Release builds remain unverified. The earlier 109/109 FSM result predates these additions.
+**Latest registrations:** `libgav1@0.20.0`, `libwebp@1.6.0` and `piex@0.27`. Skia 153 now declares managed PIE-X and libyuv dependencies in addition to the other external codec and graphics packages. The Skia and libgav1 Debug/Release builds require BCC64X verification. SPIRV-Cross still uses bundled C++ sources in Skia because the current external SPIRV-Cross shared package exposes a C API, not the directly consumed C++ ABI. The prior 109/109 FSM result predates these additions.
 
 ## Libraries by category
 
@@ -99,13 +99,14 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 | `boost` | `1.92.0` | Comprehensive collection of portable C++ libraries covering containers, algorithms, networking, concurrency, and more. | openssl@3.5.9, zlib@1.4 | green | [Integration guide](/package/boost/1.92.0/migration) |
 | `wil` | `1.0.260126.7` | Microsoft MIT-licensed header-only Windows COM and RAII library. BCC64X compatibility requires a native consumer smoke before use by OpenCV. | — | yellow | [Integration guide](/package/wil/1.0.260126.7/migration) |
 
-### graphics (17 versions)
+### graphics (18 versions)
 
 | Library | Version | Purpose | Direct dependencies and extensions | License signal | Details |
 | --- | --- | --- | --- | --- | --- |
 | `agg` | `2.6` | AGG core rasterization without GPC | — | yellow | [Integration guide](/package/agg/2.6/migration) |
 | `bitmapplusplus` | `1.1.1` | Header-only C++ bitmap image library for loading, manipulating, and saving BMP data. | — | green | [Integration guide](/package/bitmapplusplus/1.1.1/migration) |
 | `glew` | `2.3.1` | OpenGL Extension Wrangler Library for discovering and loading OpenGL extensions and entry points. | opengl@26.2.1 | yellow | [Integration guide](/package/glew/2.3.1/migration) |
+| `libgav1` | `0.20.0` | Independent AV1 decoder built as a BCC64X DLL using the upstream CMake build; integration unverified. | — | green | [Integration guide](/package/libgav1/0.20.0/migration) |
 | `lcms2` | `2.20` | LittleCMS 2 ICC color-management engine (GPL plugins excluded) | — | yellow | [Integration guide](/package/lcms2/2.20/migration) |
 | `lcms2` | `2.19.1` (superseded by `2.20`) | LittleCMS 2 ICC color-management engine (GPL plugins excluded) | — | yellow | [Integration guide](/package/lcms2/2.19.1/migration) |
 | `opencv` | `5.1.0` | Computer vision and image-processing library with algorithms for vision, geometry, filtering, and machine learning, Windows DirectShow camera capture (MSMF COM compatibility pending), and image stitching. Native oneTBB 2023.2 parallel backend configured; Release consumer smoke regression pending; LLVM OpenMP 20.1.7 enabled as a build dependency. | onetbb@2023.2.0, llvm-openmp@20.1.7, zlib@1.4 | yellow | [Integration guide](/package/opencv/5.1.0/migration) |
@@ -115,7 +116,7 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 | `raylib` | `6.2` | Simple cross-platform C library for graphics, audio, input, and game and application development. | opengl@26.2.1 | green | [Integration guide](/package/raylib/6.2/migration) |
 | `raylib` | `6.0` (superseded by `6.2`) | Simple cross-platform C library for graphics, audio, input, and game and application development. | opengl@26.2.1 | green | [Integration guide](/package/raylib/6.0/migration) |
 | `sdl2` | `2.32.10` | Cross-platform multimedia library for windows, input, audio, rendering, and platform integration. | — | green | [Integration guide](/package/sdl2/2.32.10/migration) |
-| `skia` | `153` | 2D graphics engine providing raster, vector, text, image, and GPU-accelerated rendering capabilities. | opengl@26.2.1, zlib@1.4, brotli@1.2.1, libjpeg-turbo@3.2.1, libpng@1.6.59, harfbuzz@15.1.0, freetype@2.15.0 | yellow | [Integration guide](/package/skia/153/migration) |
+| `skia` | `153` | 2D graphics engine providing raster, vector, text, image, and GPU-accelerated rendering capabilities. | opengl@26.2.1, zlib@1.4, brotli@1.2.1, libjpeg-turbo@3.2.1, libpng@1.6.59, harfbuzz@15.1.0, freetype@2.15.0, icu@79.1, expat@2.10.0, libavif@1.4.2, libjxl@0.13.0, libwebp@1.6.0, vulkan-memory-allocator@3.4.0, wuffs@0.3, piex@0.27, libyuv@r1924 | yellow | [Integration guide](/package/skia/153/migration) |
 | `skia` | `144` (superseded by `153`) | Pinned Skia 144 shared CPU/raster package for PDFium 2025.11.19. Superseded for general consumers by Skia 153. | zlib@1.4, libjpeg-turbo@3.2.0, libpng@1.6.59, freetype@2.14.3, opengl@26.2.1 | yellow | [Integration guide](/package/skia/144/migration) |
 | `soil2` | `1.3.0` | Small image-loading helper library for OpenGL textures based on stb image decoders. | opengl@26.2.1 | green | [Integration guide](/package/soil2/1.3.0/migration) |
 | `vtk` | `9.7.2` | Visualization Toolkit for 3D computer graphics, image processing, scientific visualization, and data analysis. VTK 9.7.2 core pipeline, CommonCache, oneTBB 2023.2.0 and LLVM OpenMP 20.1.7; BCC64X Release/Debug validation pending. | onetbb@2023.2.0, llvm-openmp@20.1.7 | green | [Integration guide](/package/vtk/9.7.2/migration) |
