@@ -9977,6 +9977,18 @@
             <argument value="--script-executable={Tool:python}"/>
          </target>
 
+         <!-- Catch stale Skia source patches and absent managed WebP headers
+              before compiling more than a thousand source files. -->
+         <execute name="verify-managed-libwebp-gn"
+                  executable="{Tool:python}"
+                  workingDirectory="{Workspace}"
+                  showOutput="true">
+            <argument value="{BuildFileDir}\scripts\verify_skia_webp_gn.py"/>
+            <argument value="{Workspace}\bin\gn.exe"/>
+            <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <argument value="{DependencyRoot:libwebp}\include"/>
+         </execute>
+
          <execute
             name="ninja-build"
             executable="{Tool:ninja}"
