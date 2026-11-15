@@ -8747,12 +8747,8 @@
             archive="skia-deps\libwebp-845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"/>
 
 
-         <download
-            url="https://android.googlesource.com/platform/external/piex.git/+archive/bb217acdca1cc0c16b704669dd6f91a1b509c406.tar.gz"
-            archive="skia-deps\piex-bb217acdca1cc0c16b704669dd6f91a1b509c406.tar.gz"/>
 
-
-         <!-- ======================================================== -->
+<!-- ======================================================== -->
          <!-- Direct3D / Vulkan / shader closure.                      -->
          <!-- ======================================================== -->
 
@@ -8935,29 +8931,8 @@
          <require path="{CurrentArtifact}\third_party\externals\libwebp\src\webp\decode.h"/>
          <require path="{CurrentArtifact}\third_party\externals\libwebp\src\webp\encode.h"/>
 
-         <execute name="mkdir-piex"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\piex"/>
-         </execute>
 
-         <execute name="extract-piex"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\piex"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\piex-bb217acdca1cc0c16b704669dd6f91a1b509c406.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\piex\src\piex.h"/>
-         <require path="{CurrentArtifact}\third_party\externals\piex\src\piex.cc"/>
-
-         <!-- Consume managed Wuffs source, compiled by Skia with GIF module flags.
+<!-- Consume managed Wuffs source, compiled by Skia with GIF module flags.
               No independent Wuffs DLL is declared. -->
          <execute name="mkdir-external-wuffs-source"
                   executable="{Tool:cmake}"
