@@ -8806,7 +8806,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T22:58:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T23:05:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -8820,6 +8820,7 @@
       <dependency library="libjxl" version="0.13.0"/>
       <dependency library="libwebp" version="1.6.0"/>
       <dependency library="piex" version="0.27"/>
+      <dependency library="spirv-cross" version="vulkan-sdk-1.4.363.0"/>
       
       <dependency library="vulkan-memory-allocator" version="3.4.0"/>
       <dependency library="wuffs" version="0.3"/>
@@ -8918,9 +8919,7 @@
          <!-- Direct3D / Vulkan / shader closure.                      -->
          <!-- ======================================================== -->
 
-         <download
-            url="https://chromium.googlesource.com/external/github.com/KhronosGroup/SPIRV-Cross/+archive/b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz"
-            archive="skia-deps\spirv-cross-b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz"/>
+         
 
          <download
             url="https://github.com/KhronosGroup/SPIRV-Headers/archive/942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"
@@ -9072,31 +9071,7 @@
          <!-- Direct3D / Vulkan / SPIR-V closure.                      -->
          <!-- ======================================================== -->
 
-         <execute name="mkdir-spirv-cross"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\spirv-cross"/>
-         </execute>
-
-         <execute name="extract-spirv-cross"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-cross"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\spirv-cross-b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_cfg.cpp"/>
-         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_cross.cpp"/>
-         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_cross.hpp"/>
-         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_glsl.cpp"/>
-         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_hlsl.cpp"/>
-         <require path="{CurrentArtifact}\third_party\externals\spirv-cross\spirv_hlsl.hpp"/>
+         
 
          <execute name="mkdir-spirv-headers"
                   executable="{Tool:cmake}"
@@ -9657,6 +9632,16 @@
          <execute name="bcc64x-system-piex-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-piex.patch"/>
          </execute>
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-spirv-cross.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-spirv-cross.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="bcc64x-system-spirv-cross-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-spirv-cross.patch"/>
+         </execute>
+         <execute name="bcc64x-system-spirv-cross-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-spirv-cross.patch"/>
+         </execute>
+         <execute name="bcc64x-system-spirv-cross-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-spirv-cross.patch"/>
+         </execute>
 <execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
@@ -9753,6 +9738,8 @@
          <environment name="CB_SKIA_LIBWEBP_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebp.lib"/>
          <environment name="CB_SKIA_LIBWEBP_DEMUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpdemux.lib"/>
          <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpmux.lib"/>
+         <environment name="CB_SKIA_SPIRV_CROSS_INCLUDE" value="{DependencyRoot:spirv-cross}\include\spirv_cross"/>
+         <environment name="CB_SKIA_SPIRV_CROSS_LIB" value="{DependencyRoot:spirv-cross}\lib\win64\{Configuration}\{SpirvCrossCxxImport}.lib"/>
          <environment name="CB_SKIA_PIEX_INCLUDE" value="{DependencyRoot:piex}\include"/>
          <environment name="CB_SKIA_PIEX_LIB" value="{DependencyRoot:piex}\lib\win64\{Configuration}\{PiexLibraryName}.lib"/>
          
@@ -9765,7 +9752,7 @@
          -->
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
          <target
             name="gn-gen"
@@ -9901,6 +9888,9 @@
                <line value="bcc64x_libwebp_lib = getenv(&quot;CB_SKIA_LIBWEBP_LIB&quot;)"/>
                <line value="bcc64x_libwebp_demux_lib = getenv(&quot;CB_SKIA_LIBWEBP_DEMUX_LIB&quot;)"/>
                <line value="bcc64x_libwebp_mux_lib = getenv(&quot;CB_SKIA_LIBWEBP_MUX_LIB&quot;)"/>
+               <line value="bcc64x_spirv_cross_include = getenv(&quot;CB_SKIA_SPIRV_CROSS_INCLUDE&quot;)"/>
+               <line value="bcc64x_spirv_cross_lib = getenv(&quot;CB_SKIA_SPIRV_CROSS_LIB&quot;)"/>
+               <line value="skia_use_system_spirv_cross = true"/>
                <line value="bcc64x_piex_include = getenv(&quot;CB_SKIA_PIEX_INCLUDE&quot;)"/>
                <line value="bcc64x_piex_lib = getenv(&quot;CB_SKIA_PIEX_LIB&quot;)"/>
                
@@ -9996,7 +9986,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="gen"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10011,7 +10001,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="-C"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10037,6 +10027,7 @@
              <variable name="IcuCommonImport" value="libicuuc"/>
              <variable name="IcuI18nImport" value="libicuin"/>
              <variable name="ExpatLibraryName" value="liblibexpat"/>
+            <variable name="SpirvCrossCxxImport" value="libspirv-cross-cxx"/>
             <variable name="PiexLibraryName" value="libpiex"/>
             
          </variant>
@@ -10054,6 +10045,7 @@
              <variable name="IcuCommonImport" value="libicuucd"/>
              <variable name="IcuI18nImport" value="libicuind"/>
              <variable name="ExpatLibraryName" value="liblibexpatd"/>
+            <variable name="SpirvCrossCxxImport" value="libspirv-cross-cxxd"/>
             <variable name="PiexLibraryName" value="libpiexd"/>
             
          </variant>
@@ -10287,7 +10279,7 @@
 
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:brotli}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:harfbuzz}\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{DependencyRoot:libwebp}\bin\win64\Release;{DependencyRoot:piex}\bin\win64\Release;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:brotli}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:harfbuzz}\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{DependencyRoot:libwebp}\bin\win64\Release;{DependencyRoot:spirv-cross}\bin\win64\Release;{DependencyRoot:piex}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
 
       <smoke
@@ -10306,7 +10298,7 @@
 
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:brotli}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:harfbuzz}\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{DependencyRoot:libwebp}\bin\win64\Debug;{DependencyRoot:piex}\bin\win64\Debug;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:brotli}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:harfbuzz}\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{DependencyRoot:libwebp}\bin\win64\Debug;{DependencyRoot:spirv-cross}\bin\win64\Debug;{DependencyRoot:piex}\bin\win64\Debug;{ENV:PATH}"/>
       </smoke>
    </library>
    
