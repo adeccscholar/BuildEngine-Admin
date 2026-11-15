@@ -2,7 +2,15 @@
 
 [TOC|Content]
 
-## Scope and evidence
+## Confirmed BuildEngine integration result
+
+The operator confirmed **109/109 versioned library integrations completed successfully, with zero failed and zero blocked** on 15 November 2026. This supersedes the prospective run status in the original implementation notes below. No claim is made for separate application-level smokes without their logs.
+
+Added guides: [Skia 153](/package/skia/153/migration), [libjxl](/package/libjxl/0.13.0/migration), [libavif](/package/libavif/1.4.2/migration), [SPIRV-Tools](/package/spirv-tools/2026.4/migration), [glslang](/package/glslang/16.6.0/migration), [Vulkan-Headers](/package/vulkan-headers/1.4.368/migration).
+
+Skia's external SBOM closure and physically compiled Skia GN targets remain distinct; its bundled SPIR-V integration has not yet been replaced by the standalone packages. Earlier validation notes below are preserved as dated integration observations.
+
+## Original scope and evidence (historical)
 
 This note tracks the requested BuildEngine expansion and deliberately distinguishes XML registration from verified native Windows/BCC64X builds. No source code package or binary is declared successful without a producer, install, and consumer smoke result.
 
