@@ -2,7 +2,15 @@
 
 [TOC|Content]
 
-**Contract review dated 10 November 2026.** These proposals do not modify Skia. Each proposed new DLL integration would require a separate, versioned BCC64X build with installed-consumer smoke tests. The current PDFium XML contract references **Skia 153**; its DLL/ABI runtime behavior must be verified separately through FSM and loader smokes.
+## Current status: 15 November 2026
+
+**BuildEngine FSM completed successfully: 109 / 109 versioned library integrations, with no failures or blocked jobs.** The earlier text below documents a 10 November proposal and is historical. The active Skia 153 GN configuration already uses external zlib, Brotli, libpng, libjpeg-turbo, HarfBuzz, FreeType, ICU, Expat, libavif and libjxl, plus independently declared OpenGL and Vulkan Memory Allocator dependencies. Transitive managed packages include Highway, libyuv and Vulkan-Headers.
+
+Skia's bundled manifest now excludes Highway, libyuv and Vulkan-Headers to avoid conflicting external coordinates in CycloneDX. **The standalone SPIR-V packages do not yet imply that Skia's GN targets use their external builds**: SPIRV-Tools, SPIRV-Cross, SPIRV-Headers and glslang still have version-pinned source components in the Skia build. Do not remove source trees or claim binary externalization without GN wiring and actual link verification.
+
+[Current Skia GN settings and complete dependency diagram](/package/skia/153/migration).
+
+**Historical contract review dated 10 November 2026.** These proposals do not modify Skia. Each proposed new DLL integration would require a separate, versioned BCC64X build with installed-consumer smoke tests. The current PDFium XML contract references **Skia 153**; its DLL/ABI runtime behavior must be verified separately through FSM and loader smokes.
 
 ## Libraries already configured as external
 
