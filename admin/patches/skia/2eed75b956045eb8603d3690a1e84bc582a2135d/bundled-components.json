@@ -32,6 +32,10 @@
       "version": "1.4.2"
     },
     {
+      "name": "libgav1",
+      "version": "0.20.0"
+    },
+    {
       "name": "libjpeg-turbo",
       "version": "3.2.1"
     },
