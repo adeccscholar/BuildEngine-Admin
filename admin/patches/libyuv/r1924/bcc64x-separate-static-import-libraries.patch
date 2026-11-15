@@ -1,6 +1,14 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
+@@ -4,6 +4,7 @@
+ 
+ cmake_minimum_required( VERSION 3.16 )
+ project ( YUV C CXX )	# "C" is required even for C++ projects
++include(GNUInstallDirs)
+ option( UNIT_TEST "Built unit tests" OFF )
+ 
+ include(CheckCSourceCompiles)
 @@ -169,9 +169,6 @@
    endif()
  endif()
