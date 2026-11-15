@@ -56,6 +56,10 @@
       "version": "0.27"
     },
     {
+      "name": "spirv-cross",
+      "version": "vulkan-sdk-1.4.363.0"
+    },
+    {
       "name": "vulkan-memory-allocator",
       "version": "3.4.0"
     },
@@ -80,12 +84,6 @@
       "version": "dbe0a676450d9b8c71bf00688bb306409b779e90",
       "versionScheme": "git",
       "repository": "https://android.googlesource.com/platform/external/dng_sdk.git"
-    },
-    {
-      "name": "SPIRV-Cross",
-      "version": "b8fcf307f1f347089e3c46eb4451d27f32ebc8d3",
-      "versionScheme": "git",
-      "repository": "https://github.com/KhronosGroup/SPIRV-Cross.git"
     },
     {
       "name": "SPIRV-Headers",
