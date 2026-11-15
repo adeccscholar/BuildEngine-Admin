@@ -15259,4 +15259,49 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
+   <library id="libyuv" version="r1924" category="graphics" timestamp="2026-11-15T16:58:00Z">
+      <metadata name="libyuv" supplier="Chromium project" homepage="https://chromium.googlesource.com/libyuv/libyuv" description="YUV scaling and color conversion; Chromium M149 pinned revision, JPEG add-on disabled" licenseSignal="green">
+         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://chromium.googlesource.com/libyuv/libyuv.git" commit="644251f252a84bf8ce91ff0aca86a9b16b069ab8"/></security>
+      <source>
+         <download url="https://github.com/lemenkov/libyuv/archive/644251f252a84bf8ce91ff0aca86a9b16b069ab8.tar.gz" archive="libyuv-644251f252a84bf8ce91ff0aca86a9b16b069ab8.tar.gz"/>
+         <extract format="libarchive" root="libyuv-644251f252a84bf8ce91ff0aca86a9b16b069ab8">
+            <require path="CMakeLists.txt"/>
+            <require path="include\libyuv.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DUNIT_TEST:BOOL=OFF"/>
+         <argument value="-DLIBYUV_DISABLE_JPEG:BOOL=ON"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libyuv.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libyuv\LICENSE" overwrite="true"/></common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+   </library>
 </buildLibraries>
