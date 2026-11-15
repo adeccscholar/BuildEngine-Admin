@@ -22,7 +22,7 @@ The requested package list has now been entered into `admin/build-libraries.xml`
 
 | Coordinate | Integration model | Qualification |
 | --- | --- | --- |
-| `highway@1.4.0` | CMake, static library, both variants | Upstream target/export to verify |
+| `highway@1.4.0` | CMake, shared library, both variants | Upstream target/export to verify |
 | `wuffs@0.3` | Pinned Wuffs release-C source file | Source distribution; no DLL |
 | `libavif@1.4.2` | CMake, libaom and libyuv dependencies | Verify SYSTEM provider discovery and installed codec support |
 | `libaom@3.15.1` | CMake, AV1 decode/encode | Newly added prerequisite for libavif; NASM/Clang toolchain to verify |
@@ -30,10 +30,10 @@ The requested package list has now been entered into `admin/build-libraries.xml`
 | `libyuv@r1924` | Pinned CMake source snapshot | Verify source mirror provenance, target installation and link artifacts |
 | `vulkan-headers@1.4.368` | Header-only package | Vulkan loader is not provided |
 | `vulkan-memory-allocator@3.4.0` | Header/source package | Consumer provides implementation; depends on Vulkan headers |
-| `spirv-headers@942fe4b988359a0750b79f0ae7ed735994d3147d` | Pinned CMake headers package | Revision matches Skia 153's bundled manifest |
-| `spirv-tools@2026.4` | CMake producer | Verify upstream release and SPIRV-Headers CMake discovery |
-| `spirv-cross@b8fcf307f1f347089e3c46eb4451d27f32ebc8d3` | Pinned CMake producer | Verify static libraries, CLI and export paths |
-| `glslang@16.6.0` | CMake producer | Verify upstream tag and downstream SPIR-V linker closure |
+| `spirv-headers@v1.202609.0` | Pinned CMake headers package | Revision matches Skia 153's bundled manifest |
+| `spirv-tools@2026.4` | CMake shared-library producer | Verify upstream release and SPIRV-Headers CMake discovery |
+| `spirv-cross@vulkan-sdk-1.4.363.0` | Tagged shared C API producer | Verify static libraries, CLI and export paths |
+| `glslang@16.6.0` | CMake shared-library producer | Verify upstream tag and downstream SPIR-V linker closure |
 
 **No new package has a verified native BCC64X PASS result from this change set.** The assigned coordinates, archive layouts, CMake flags, and installation artifacts must be checked in the Windows environment. Do not use these registry entries as evidence that the source was compiled or that a third-party Skia dependency has already been externalized. In particular, upstream source pinning is not an independent runtime linkage guarantee.
 
@@ -55,3 +55,11 @@ The requested package list has now been entered into `admin/build-libraries.xml`
 4. Run each newly registered package with a consumer, and verify the DLL/import-library boundaries where applicable.
 5. Resolve and implement the remaining codec and shader toolchain producers in dependency order.
 6. Externalize bundled Skia dependencies one at a time only after exact GN and PE linkage is verified. Update bundled-component SBOM provenance only after an actual replacement.
+
+## 15 November 2026 — Dynamic-library correction
+
+The production goal is DLLs with import libraries. The BuildEngine definitions for Highway, SPIRV-Tools, SPIRV-Cross, and glslang now request shared targets rather than static packages; SPIRV-Cross CLI is disabled because its upstream CMake requires the static target. SPIRV-Headers uses upstream release tag `v1.202609.0` and SPIRV-Cross uses `vulkan-sdk-1.4.363.0`; commit hashes are not used as package version coordinates.
+
+libyuv has a version-specific upstream CMake patch removing the static library target and its three static-only tools, avoiding competing `libyuv.lib` outputs. Installation uses GNUInstallDirs to place the DLL and import library in the BuildEngine configuration directories. The version-specific patch is checked with `git apply --check` before use.
+
+Release/Debug native builds and package smokes still need to run. The earlier glslang configure and libaom configure messages do not include the underlying `find_package` or AOM fatal error diagnostics; no root cause for those failures is claimed without their complete logs.
