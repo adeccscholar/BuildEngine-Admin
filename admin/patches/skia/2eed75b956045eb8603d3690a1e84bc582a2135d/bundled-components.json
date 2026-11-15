@@ -82,12 +82,6 @@
       "repository": "https://chromium.googlesource.com/webm/libwebp.git"
     },
     {
-      "name": "libyuv",
-      "version": "d248929c059ff7629a85333699717d7a677d8d96",
-      "versionScheme": "git",
-      "repository": "https://chromium.googlesource.com/libyuv/libyuv.git"
-    },
-    {
       "name": "piex",
       "version": "bb217acdca1cc0c16b704669dd6f91a1b509c406",
       "versionScheme": "git",
@@ -122,12 +116,6 @@
       "version": "1d47ffa8ac4374a19b302021e216a20f22a3de92",
       "versionScheme": "git",
       "repository": "https://github.com/KhronosGroup/glslang.git"
-    },
-    {
-      "name": "Vulkan-Headers",
-      "version": "f9973cd97e6f3584707e7ef1c425e336f1b92a5b",
-      "versionScheme": "git",
-      "repository": "https://github.com/KhronosGroup/Vulkan-Headers.git"
     }
   ]
 }
