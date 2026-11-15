@@ -1,7 +1,7 @@
 diff --git a/third_party/piex/BUILD.gn b/third_party/piex/BUILD.gn
 --- a/third_party/piex/BUILD.gn
 +++ b/third_party/piex/BUILD.gn
-@@ -4,20 +4,37 @@
+@@ -4,21 +4,33 @@
  # found in the LICENSE file.
  
  declare_args() {
