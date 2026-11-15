@@ -8689,7 +8689,7 @@
       </publish>
    </library>
 
-   <library id="libgav1" version="0.20.0" category="graphics" timestamp="2026-11-15T23:57:00Z">
+   <library id="libgav1" version="0.20.0" category="graphics" timestamp="2026-11-16T00:00:00Z">
       <metadata name="libgav1" supplier="libgav1 Authors" homepage="https://chromium.googlesource.com/codecs/libgav1/" description="Independent AV1 decoder package built from upstream libgav1 0.20.0 with BCC64X and dynamic runtime." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\libgav1\LICENSE"/>
       </metadata>
