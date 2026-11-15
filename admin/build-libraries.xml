@@ -8748,7 +8748,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T19:59:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T22:26:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -9735,9 +9735,9 @@
          <environment name="CB_SKIA_LIBJXL_INCLUDE" value="{DependencyRoot:libjxl}\include"/>
          <environment name="CB_SKIA_LIBJXL_LIB" value="{DependencyRoot:libjxl}\lib\win64\{Configuration}\libjxl.lib"/>
          <environment name="CB_SKIA_LIBWEBP_INCLUDE" value="{DependencyRoot:libwebp}\include"/>
-         <environment name="CB_SKIA_LIBWEBP_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\webp.lib"/>
-         <environment name="CB_SKIA_LIBWEBP_DEMUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\webpdemux.lib"/>
-         <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\webpmux.lib"/>
+         <environment name="CB_SKIA_LIBWEBP_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebp.lib"/>
+         <environment name="CB_SKIA_LIBWEBP_DEMUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpdemux.lib"/>
+         <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpmux.lib"/>
 
          <!--
             Runtime DLL resolution for all BuildEngine package dependencies.
