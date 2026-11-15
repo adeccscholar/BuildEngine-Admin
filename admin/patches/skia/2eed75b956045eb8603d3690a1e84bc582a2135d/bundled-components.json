@@ -70,12 +70,6 @@
       "repository": "https://android.googlesource.com/platform/external/dng_sdk.git"
     },
     {
-      "name": "highway",
-      "version": "457c891775a7397bdb0376bb1031e6e027af1c48",
-      "versionScheme": "git",
-      "repository": "https://github.com/google/highway.git"
-    },
-    {
       "name": "libgav1",
       "version": "5cf722e659014ebaf2f573a6dd935116d36eadf1",
       "versionScheme": "git",
