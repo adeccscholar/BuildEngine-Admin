@@ -8818,7 +8818,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T23:05:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T23:58:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -8829,6 +8829,7 @@
       <dependency library="icu" version="79.1"/>
       <dependency library="expat" version="2.10.0"/>
       <dependency library="libavif" version="1.4.2"/>
+      <dependency library="libgav1" version="0.20.0"/>
       <dependency library="libjxl" version="0.13.0"/>
       <dependency library="libwebp" version="1.6.0"/>
       <dependency library="piex" version="0.27"/>
@@ -9764,7 +9765,7 @@
          -->
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
          <target
             name="gn-gen"
@@ -9998,7 +9999,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="gen"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10013,7 +10014,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="-C"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
