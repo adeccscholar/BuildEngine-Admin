@@ -2,13 +2,15 @@
 
 [TOC|Content]
 
-**Current library catalog (15 November 2026): 74 distinct libraries and 109 versioned integrations, including retained superseded versions.** Source: `admin/build-libraries.xml` (schema 17). The version totals cover all retained historical versions; a successor is not counted as a new distinct library.
+**Current library catalog (15 November 2026): 75 distinct libraries and 110 versioned integrations, including retained superseded versions.** Source: `admin/build-libraries.xml` (schema 17). The version totals cover all retained historical versions; a successor is not counted as a new distinct library.
 
-The catalog begins with **2 packages on 24 August**, grows to **44 on 25 September**, and reaches **74 distinct library IDs across 109 version records on 15 November**. The original August compiler feasibility study preceded the first two-entry library catalog. Details appear in the [project story](/manual/story.md) and [dated news](/news/).
+The catalog begins with **2 packages on 24 August**, grows to **44 on 25 September**, and reaches **75 distinct library IDs across 110 version records on 15 November**. The original August compiler feasibility study preceded the first two-entry library catalog. Details appear in the [project story](/manual/story.md) and [dated news](/news/).
 
 The catalog lists upstream versions built and managed with C++Builder 13 / BCC64X, their direct dependencies and extension relationships. The per-version guides contain build configuration, porting notes, migration information and transitive Mermaid diagrams. The native BCC64X build also maintains integrated library smokes and dedicated, larger consumer tests in BuildEngine-Tests.
 
 [Library status](/libraries/) · [Version-specific documentation](/library-docs/) · [News](/news/) · [Skia dependencies](/manual/skia-externalization.md)
+
+**Latest registration:** `libwebp@1.6.0` (BuildEngine XML registration only; build validation pending). [Version-specific integration guide](/package/libwebp/1.6.0/migration). The earlier 109/109 FSM result predates this addition.
 
 ## Libraries by category
 
