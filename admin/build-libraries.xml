@@ -8633,7 +8633,7 @@
 </library>
 
 
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-09T14:30:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T18:51:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
