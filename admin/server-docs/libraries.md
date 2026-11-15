@@ -10,7 +10,7 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 
 [Library status](/libraries/) · [Version-specific documentation](/library-docs/) · [News](/news/) · [Skia dependencies](/manual/skia-externalization.md)
 
-**Latest registrations:** `libwebp@1.6.0` and `piex@0.27` (XML/adapter registration only; build validation pending). [libwebp guide](/package/libwebp/1.6.0/migration) · [PIE-X guide](/package/piex/0.27/migration). The earlier 109/109 FSM result predates this addition.
+**Latest registrations:** `libwebp@1.6.0` and `piex@0.27` (XML/adapter registration only; build validation pending). [libwebp guide](/package/libwebp/1.6.0/migration) · [PIE-X guide](/package/piex/0.27/migration). Skia 153 now declares a direct managed dependency on libwebp 1.6.0; the new Debug/Release builds remain unverified. The earlier 109/109 FSM result predates these additions.
 
 ## Libraries by category
 
