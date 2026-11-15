@@ -1,0 +1,32 @@
+diff --git a/third_party/libwebp/BUILD.gn b/third_party/libwebp/BUILD.gn
+--- a/third_party/libwebp/BUILD.gn
++++ b/third_party/libwebp/BUILD.gn
+@@ -8,6 +8,10 @@
+ declare_args() {
+   skia_use_system_libwebp = is_official_build && !is_canvaskit
++  bcc64x_libwebp_include = ""
++  bcc64x_libwebp_lib = ""
++  bcc64x_libwebp_demux_lib = ""
++  bcc64x_libwebp_mux_lib = ""
+ }
+ 
+ import("../third_party.gni")
+@@ -15,11 +19,13 @@
+ if (skia_use_system_libwebp) {
+   system("libwebp") {
+-    libs = [
+-      "webp",
+-      "webpdemux",
+-      "webpmux",
++    assert(bcc64x_libwebp_include != "", "Managed libwebp include path required")
++    assert(bcc64x_libwebp_lib != "", "Managed libwebp import library required")
++    assert(bcc64x_libwebp_demux_lib != "", "Managed libwebp demux import required")
++    assert(bcc64x_libwebp_mux_lib != "", "Managed libwebp mux import required")
++    include_dirs = [ bcc64x_libwebp_include ]
++    ldflags = [
++      bcc64x_libwebp_lib,
++      bcc64x_libwebp_demux_lib,
++      bcc64x_libwebp_mux_lib,
+     ]
+   }
+ } else {
