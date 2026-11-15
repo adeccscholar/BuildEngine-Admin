@@ -1,5 +1,21 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## Follow-up: repeated WebP header errors and staged source verification (15 November 2026)
+
+Both Debug and Release still report `F1129` for `webp/encode.h` in `SkWebpEncoderImpl.cpp` (and the previous Release run also failed to locate `webp/decode.h` in `SkWebpCodec.cpp`). The library `libwebp@1.6.0` was already reported successfully built by the operator. The BuildEngine XML does set `skia_use_system_libwebp = true` and provide `CB_SKIA_LIBWEBP_INCLUDE`, and the versioned GN patch explicitly attaches `managed_webp_includes` to the two WebP targets. Repeating the same fatal error therefore requires inspecting the **effective staged Skia source and generated GN/Ninja output**, not another blind change to the producer.
+
+The Skia build contract now executes `admin/scripts/verify_skia_webp_gn.py` after `gn gen` and before the expensive Ninja compilation. This verifies the installed `include/webp/encode.h` and `decode.h` exist and checks `gn desc` for the managed include root on both `//:webp_decode` and `//:webp_encode`. If a previously prepared source workspace bypassed the updated source patch phase, the check fails early and identifies the missing generated include instead of compiling 800 or more files. **This does not prove the patch has been re-applied to any particular running workspace.** A fresh source preparation plus GN generation is necessary to adopt a changed patch in an existing staged tree.
+
+### Externalization status
+
+- **libwebp 1.6.0:** independent managed DLL, reported PASS by the operator, configured as an external Skia dependency; the Skia compile/link is still failing.
+- **Wuffs 0.3:** managed source-only BuildEngine package; Skia copies the installed Wuffs source and compiles it in its own target. It is externally *sourced*, not an independently linked DLL. The SBOM manifest now declares this managed source coordinate externally.
+- **PIE-X 0.27:** registered as an independent package candidate, but `skia_use_piex = false`; no active Skia PIE-X build, import or replacement is claimed.
+- **libgav1:** still a Skia-bundled, pinned source; no independent `libgav1` entry exists in the BuildEngine XML as of this revision. Its Windows-thread implementation remains in the Skia-specific patch. A separate BCC64X producer and GN consumer verification are required before removing that source.
+
+The updated Skia SBOM manifest retains only genuinely bundled active components, and now names Wuffs together with the other BuildEngine-managed dependencies. Installing the new Skia package and generating the SBOM remain unverified.
+
+
 ## libwebp GN include propagation fix (15 November 2026)
 
 The Release Skia rebuild stopped at Ninja step 843/1218 after two failed codec compilations: `src/encode/SkWebpEncoderImpl.cpp` could not find `webp/encode.h`, and `src/codec/SkWebpCodec.cpp` could not find `webp/decode.h`. The emitted compiler invocations lacked the managed `{DependencyRoot:libwebp}/include` directory. The original external `system("libwebp")` target attached `include_dirs` to a GN group configuration that does not propagate the includes to the separate `webp_decode` and `webp_encode` source sets.
