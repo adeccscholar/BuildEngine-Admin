@@ -4,6 +4,7 @@ project(BuildEngineSmokeOpenCV LANGUAGES CXX)
 find_package(OpenCV 5.0 CONFIG REQUIRED COMPONENTS
    core imgproc geometry flann features video photo stereo ptcloud
    calib ml dnn objdetect imgcodecs videoio highgui stitching
+   img_hash optflow quality ximgproc
 )
 
 add_executable(opencv-consumer main.cpp)
