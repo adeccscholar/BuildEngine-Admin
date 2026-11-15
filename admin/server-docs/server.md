@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Catalog snapshot, 10 November 2026:** Schema 17 declares **95 versioned library records across 62 logical IDs** and **32 `supersededBy` entries**. Execution evidence applies only to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
+**Current catalog, 15 November 2026:** Schema 17 declares **112 versioned library records across 77 logical IDs**. The 10 November historical snapshot comprised 95 records across 62 IDs, including 32 `supersededBy` entries. Build success evidence remains tied to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
 
 **Status:** server contract reviewed 21 October 2026. The server is Common-based, but several extension/package details are still open implementation issues and are explicitly identified below.
 
