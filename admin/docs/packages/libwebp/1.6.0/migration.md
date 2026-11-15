@@ -12,7 +12,7 @@ WebP image decoding, encoding, and container muxing via the upstream WebM Projec
 
 ## Dependency graph
 
-The initial library XML declares no direct external package dependencies. An external Skia link must be added only once a matching installed import library and the GN wiring have been verified.
+The initial library XML declares no direct external package dependencies. Skia 153 now declares this coordinate as a direct dependency. The GN external linkage is configured, but the installed import names and DLL/consumer runtime are not yet verified.
 
 ```mermaid
 flowchart LR
@@ -33,7 +33,7 @@ The BuildEngine XML remains the authoritative source of tool and package roots; 
 -DBUILD_SHARED_LIBS:BOOL=ON
 -DWEBP_LINK_STATIC:BOOL=OFF
 -DWEBP_BUILD_LIBWEBPMUX:BOOL=ON
--DWEBP_ENABLE_SIMD:BOOL=OFF
+-DWEBP_ENABLE_SIMD:BOOL=ON
 -DWEBP_BUILD_CWEBP:BOOL=OFF
 -DWEBP_BUILD_DWEBP:BOOL=OFF
 -DWEBP_BUILD_GIF2WEBP:BOOL=OFF
@@ -46,7 +46,7 @@ The BuildEngine XML remains the authoritative source of tool and package roots; 
 -DCMAKE_BUILD_TYPE:STRING=Release|Debug
 ```
 
-SIMD is initially disabled for a conservative first BCC64X port; enabling upstream SIMD optimizations is a separate measured follow-up, not an assumed optimization.
+**BCC64X build correction (15 November 2026):** The attached Release build log showed repeated `E714: SSE2 register return with SSE2 disabled` and X86 FP Stackifier crashes. Upstream `cmake/cpu.cmake` adds `-mno-sse2` to the global C flags when `WEBP_ENABLE_SIMD=OFF`. On x64 that also disables the floating-point ABI required by the compiler. The BuildEngine configuration now sets `WEBP_ENABLE_SIMD=ON` so the upstream feature detection preserves baseline SSE2. Debug and Release retests are still required. This must not be fixed by changing individual floating-point functions or the shared BCC64X toolchain.
 
 ## Install and metadata
 
@@ -54,6 +54,6 @@ Headers are required under `include/webp`; import libraries under `lib/win64/{Co
 
 ## Skia externalization
 
-Skia 153 currently enables WebP encoding and decoding but still uses `skia_use_system_libwebp = false`. Its pinned bundled WebP source must remain available until the Skia GN target has been adapted to consume installed headers and DLL import libraries, with both configurations and consumer linkage verified. **The independent libwebp registration alone does not make Skia external.**
+Skia 153 now declares `libwebp@1.6.0` directly and selects `skia_use_system_libwebp = true` for both encoding and decoding. Its versioned GN patch replaces the upstream system target's bare library names with BuildEngine-managed include paths and per-configuration import archives for `webp`, `webpdemux` and `webpmux`. The old bundled source archive/extraction is no longer in the Skia source workflow. **This is declared integration, not a proven BCC64X link:** rebuild libwebp, inspect the actual installed import names and DLLs, then run Skia Debug/Release GN, build, loader smoke and SBOM checks. Do not claim a successful consumer before this evidence exists.
 
 [Skia externalization](/manual/skia-externalization.md) · [Libraries](/manual/libraries.md) · [News](/news/)
