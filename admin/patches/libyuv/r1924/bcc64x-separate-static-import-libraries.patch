@@ -38,7 +38,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
  find_package ( JPEG )
  if (JPEG_FOUND)
    include_directories( ${JPEG_INCLUDE_DIR} )
-@@ -241,9 +226,8 @@
+@@ -241,10 +226,8 @@
  endif()
  
  
@@ -48,6 +48,6 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 -install ( TARGETS ${ly_lib_shared} LIBRARY DESTINATION lib RUNTIME DESTINATION bin ARCHIVE DESTINATION lib )
 +# Install only the DLL and its import library using the BuildEngine layout
 +install ( TARGETS ${ly_lib_shared} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} )
-+install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/ DESTINATION include )
+ install ( DIRECTORY ${PROJECT_SOURCE_DIR}/include/		DESTINATION include )
  
  # create the .deb and .rpm packages using cpack
