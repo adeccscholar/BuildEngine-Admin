@@ -14933,9 +14933,9 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
-   <library id="highway" version="1.4.0" category="math" timestamp="2026-11-15T18:20:00Z">
+   <library id="highway" version="1.4.0" category="math" timestamp="2026-11-15T16:49:00Z">
       <metadata name="Highway" supplier="Google" homepage="https://github.com/google/highway" description="Portable cross-platform SIMD operations for C++" licenseSignal="green">
-         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\highway\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/google/highway.git" ref="1.4.0"/></security>
       <source>
@@ -15041,9 +15041,9 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
-   <library id="spirv-cross" version="vulkan-sdk-1.4.363.0" category="graphics" timestamp="2026-11-15T18:20:00Z">
+   <library id="spirv-cross" version="vulkan-sdk-1.4.363.0" category="graphics" timestamp="2026-11-15T16:49:00Z">
       <metadata name="spirv-cross" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Cross" description="SPIR-V shader reflection and cross-compilation" licenseSignal="green">
-         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\spirv-cross\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/KhronosGroup/SPIRV-Cross.git" ref="vulkan-sdk-1.4.363.0"/></security>
       <source>
@@ -15142,10 +15142,10 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-15T18:20:00Z">
+   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-15T16:49:00Z">
       <dependency library="spirv-headers" version="v1.202609.0"/>
       <metadata name="SPIRV-Tools" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Tools" description="SPIR-V assembler, validator, optimizer and associated libraries" licenseSignal="green">
-         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\spirv-tools\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/KhronosGroup/SPIRV-Tools.git" ref="v2026.4"/></security>
       <source>
@@ -15194,13 +15194,13 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="libjxl" version="0.13.0" category="graphics" timestamp="2026-11-15T16:58:00Z">
+   <library id="libjxl" version="0.13.0" category="graphics" timestamp="2026-11-15T16:49:00Z">
       <dependency library="highway" version="1.4.0"/>
       <dependency library="brotli" version="1.2.1"/>
       <dependency library="lcms2" version="2.20"/>
       <dependency library="libpng" version="1.6.59"/>
       <metadata name="libjxl" supplier="JPEG XL project" homepage="https://github.com/libjxl/libjxl" description="JPEG XL image encoder and decoder with managed Highway, Brotli and LCMS2 dependencies" licenseSignal="yellow">
-         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE"/>
+         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\libjxl\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/libjxl/libjxl.git" ref="v0.13.0"/></security>
       <source>
