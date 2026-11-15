@@ -15166,7 +15166,7 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
-   <library id="spirv-cross" version="vulkan-sdk-1.4.363.0" category="graphics" timestamp="2026-11-15T16:49:00Z">
+   <library id="spirv-cross" version="vulkan-sdk-1.4.363.0" category="graphics" timestamp="2026-11-15T23:00:00Z">
       <metadata name="spirv-cross" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Cross" description="SPIR-V shader reflection and cross-compilation" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\spirv-cross\LICENSE"/>
       </metadata>
@@ -15178,6 +15178,16 @@
             <require path="spirv_cross.hpp"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\spirv-cross\vulkan-sdk-1.4.363.0\bcc64x-cxx-shared.patch" target="{Workspace}\.buildengine\bcc64x-cxx-shared.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="spirv-cross-cxx-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\bcc64x-cxx-shared.patch"/>
+         </execute>
+         <execute name="spirv-cross-cxx-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\bcc64x-cxx-shared.patch"/>
+         </execute>
+         <execute name="spirv-cross-cxx-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="{Workspace}\.buildengine\bcc64x-cxx-shared.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -15192,17 +15202,22 @@
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DSPIRV_CROSS_STATIC:BOOL=OFF"/>
          <argument value="-DSPIRV_CROSS_SHARED:BOOL=ON"/>
+         <argument value="-DBUILDENGINE_SPIRV_CROSS_CXX_SHARED:BOOL=ON"/>
+         <argument value="-DSPIRV_CROSS_ENABLE_GLSL:BOOL=ON"/>
+         <argument value="-DSPIRV_CROSS_ENABLE_HLSL:BOOL=ON"/>
          <argument value="-DSPIRV_CROSS_CLI:BOOL=OFF"/>
          <argument value="-DSPIRV_CROSS_ENABLE_TESTS:BOOL=OFF"/>
          <argument value="-DSPIRV_CROSS_SKIP_INSTALL:BOOL=OFF"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
-         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <variant name="Release"><variable name="SpirvCrossCxxImport" value="libspirv-cross-cxx"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><variable name="SpirvCrossCxxImport" value="libspirv-cross-cxxd"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
          <install>
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{SpirvCrossCxxImport}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{SpirvCrossCxxImport}.dll"/>
             </perVariant>
             <common>
                <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\spirv-cross\LICENSE" overwrite="true"/>
