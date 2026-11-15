@@ -1,7 +1,7 @@
 diff --git a/cmake/libgav1_install.cmake b/cmake/libgav1_install.cmake
 --- a/cmake/libgav1_install.cmake
 +++ b/cmake/libgav1_install.cmake
-@@ -55,7 +55,9 @@
+@@ -55,7 +55,15 @@
      install(TARGETS libgav1_static DESTINATION
                      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 -    if(BUILD_SHARED_LIBS)
@@ -9,6 +9,12 @@ diff --git a/cmake/libgav1_install.cmake b/cmake/libgav1_install.cmake
 -                      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 -    endif()
 +    if(BUILD_SHARED_LIBS)
++      # Pin the native Windows import library name for BCC64X consumers.
++      set_target_properties(libgav1_shared PROPERTIES
++                            OUTPUT_NAME "libgav1_shared"
++                            IMPORT_PREFIX ""
++                            IMPORT_SUFFIX ".lib"
++                            ARCHIVE_OUTPUT_NAME "libgav1_shared")
 +      install(TARGETS libgav1_shared
 +              RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 +              LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
