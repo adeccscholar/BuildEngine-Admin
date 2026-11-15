@@ -9744,6 +9744,7 @@
             name="CB_SKIA_FREETYPE_LIB"
             value="{DependencyRoot:freetype}\lib\win64\{Configuration}\{FreeTypeLibraryName}.lib"/>
 
+         <environment name="CB_SKIA_VMA_ROOT" value="{DependencyRoot:vulkan-memory-allocator}"/>
          <environment name="CB_SKIA_ICU_INCLUDE" value="{DependencyRoot:icu}\include"/>
          <environment name="CB_SKIA_ICU_UC_LIB" value="{DependencyRoot:icu}\lib\win64\{Configuration}\{IcuCommonImport}.lib"/>
          <environment name="CB_SKIA_ICU_I18N_LIB" value="{DependencyRoot:icu}\lib\win64\{Configuration}\{IcuI18nImport}.lib"/>
