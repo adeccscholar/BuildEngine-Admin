@@ -1,0 +1,19 @@
+diff --git a/src/gpu/vk/vulkanmemoryallocator/BUILD.gn b/src/gpu/vk/vulkanmemoryallocator/BUILD.gn
+--- a/src/gpu/vk/vulkanmemoryallocator/BUILD.gn
++++ b/src/gpu/vk/vulkanmemoryallocator/BUILD.gn
+@@ -18,5 +18,10 @@
+-  include_dirs = [
+-    "../../../../include/third_party/vulkan",
+-    "../../../../",
+-  ]
+-  defines = [ "SK_USE_INTERNAL_VULKAN_HEADERS" ]
++  if (skia_use_bcc64x) {
++    assert(bcc64x_vulkan_headers_include != "", "BuildEngine Vulkan headers required")
++    include_dirs = [ bcc64x_vulkan_headers_include, "../../../../" ]
++  } else {
++    include_dirs = [
++      "../../../../include/third_party/vulkan",
++      "../../../../",
++    ]
++    defines = [ "SK_USE_INTERNAL_VULKAN_HEADERS" ]
++  }
