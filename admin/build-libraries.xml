@@ -8633,7 +8633,7 @@
 </library>
 
 
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T18:51:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T21:05:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -8646,6 +8646,7 @@
       <dependency library="libavif" version="1.4.2"/>
       <dependency library="libjxl" version="0.13.0"/>
       <dependency library="vulkan-memory-allocator" version="3.4.0"/>
+      <dependency library="wuffs" version="0.3"/>
 
       <metadata name="Skia" supplier="Google" homepage="https://skia.org/" description="2D graphics engine providing raster, vector, text, image, and GPU-accelerated rendering capabilities." licenseSignal="yellow">
          <license name="BSD 3-Clause"
@@ -8745,17 +8746,11 @@
             url="https://chromium.googlesource.com/webm/libwebp.git/+archive/845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"
             archive="skia-deps\libwebp-845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"/>
 
-         <download
-            url="https://chromium.googlesource.com/libyuv/libyuv.git/+archive/d248929c059ff7629a85333699717d7a677d8d96.tar.gz"
-            archive="skia-deps\libyuv-d248929c059ff7629a85333699717d7a677d8d96.tar.gz"/>
 
          <download
             url="https://android.googlesource.com/platform/external/piex.git/+archive/bb217acdca1cc0c16b704669dd6f91a1b509c406.tar.gz"
             archive="skia-deps\piex-bb217acdca1cc0c16b704669dd6f91a1b509c406.tar.gz"/>
 
-         <download
-            url="https://github.com/google/wuffs-mirror-release-c/archive/e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"
-            archive="skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
 
          <!-- ======================================================== -->
          <!-- Direct3D / Vulkan / shader closure.                      -->
@@ -8777,9 +8772,6 @@
             url="https://chromium.googlesource.com/external/github.com/KhronosGroup/glslang/+archive/1d47ffa8ac4374a19b302021e216a20f22a3de92.tar.gz"
             archive="skia-deps\glslang-1d47ffa8ac4374a19b302021e216a20f22a3de92.tar.gz"/>
 
-         <download
-            url="https://chromium.googlesource.com/external/github.com/KhronosGroup/Vulkan-Headers/+archive/f9973cd97e6f3584707e7ef1c425e336f1b92a5b.tar.gz"
-            archive="skia-deps\vulkan-headers-f9973cd97e6f3584707e7ef1c425e336f1b92a5b.tar.gz"/>
 
          <!-- ======================================================== -->
          <!-- Skia source archive.                                    -->
@@ -8943,27 +8935,6 @@
          <require path="{CurrentArtifact}\third_party\externals\libwebp\src\webp\decode.h"/>
          <require path="{CurrentArtifact}\third_party\externals\libwebp\src\webp\encode.h"/>
 
-         <execute name="mkdir-libyuv"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libyuv"/>
-         </execute>
-
-         <execute name="extract-libyuv"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\libyuv"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libyuv-d248929c059ff7629a85333699717d7a677d8d96.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\libyuv\include\libyuv.h"/>
-
          <execute name="mkdir-piex"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -8986,40 +8957,18 @@
          <require path="{CurrentArtifact}\third_party\externals\piex\src\piex.h"/>
          <require path="{CurrentArtifact}\third_party\externals\piex\src\piex.cc"/>
 
-         <execute name="mkdir-wuffs"
+         <!-- Consume managed Wuffs source, compiled by Skia with GIF module flags.
+              No independent Wuffs DLL is declared. -->
+         <execute name="mkdir-external-wuffs-source"
                   executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
+                  workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="-E"/>
             <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\wuffs"/>
+            <argument value="{CurrentArtifact}\third_party\externals\wuffs\release\c"/>
          </execute>
-
-         <execute name="extract-wuffs"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\wuffs"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
-         </execute>
-         <!-- GitHub pinned revision, root folder wuffs-mirror-release-c-e3f919ccfe3ef542cfc983a82146070258fb57f8.
-              Verify pinned source before copying and remove the staging root. -->
-         <require path="{CurrentArtifact}\third_party\externals\wuffs\wuffs-mirror-release-c-e3f919ccfe3ef542cfc983a82146070258fb57f8\release\c\wuffs-v0.3.c"/>
-         <execute name="flatten-wuffs-github-archive" executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\wuffs" showOutput="false">
-            <argument value="-E"/><argument value="copy_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\wuffs\wuffs-mirror-release-c-e3f919ccfe3ef542cfc983a82146070258fb57f8"/>
-            <argument value="{CurrentArtifact}\third_party\externals\wuffs"/>
-         </execute>
-         <require path="{CurrentArtifact}\third_party\externals\wuffs\release\c\wuffs-v0.3.c"/>
-         <execute name="cleanup-wuffs-github-root" executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\wuffs" showOutput="false">
-            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
-            <argument value="{CurrentArtifact}\third_party\externals\wuffs\wuffs-mirror-release-c-e3f919ccfe3ef542cfc983a82146070258fb57f8"/>
-         </execute>
-
+         <copy source="{DependencyRoot:wuffs}\include\wuffs\wuffs-v0.3.c"
+               target="{CurrentArtifact}\third_party\externals\wuffs\release\c\wuffs-v0.3.c"
+               overwrite="true" preserveCurrentArtifact="true"/>
          <require path="{CurrentArtifact}\third_party\externals\wuffs\release\c\wuffs-v0.3.c"/>
 
          <!-- ======================================================== -->
@@ -9145,27 +9094,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\glslang\glslang\Public\ShaderLang.h"/>
-
-         <execute name="mkdir-vulkan-headers"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\vulkan-headers"/>
-         </execute>
-
-         <execute name="extract-vulkan-headers"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\vulkan-headers"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\vulkan-headers-f9973cd97e6f3584707e7ef1c425e336f1b92a5b.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\vulkan-headers\include\vulkan\vulkan.h"/>
 
          <!-- ======================================================== -->
          <!-- BCC64X compatibility / system integration patches.      -->
