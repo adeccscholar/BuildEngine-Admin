@@ -14897,4 +14897,40 @@
          <argument value="-DMARIADB_LIBRARY:FILEPATH={ConsumerRoot}\lib\libmariadb.lib"/>
       </smoke>
    </library>
+   <library id="vulkan-headers" version="1.4.368" category="graphics" timestamp="2026-11-15T16:58:00Z">
+      <metadata name="vulkan-headers" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/Vulkan-Headers" description="Vulkan C and C++ API headers; no runtime DLL" licenseSignal="yellow"/>
+      <security><repository url="https://github.com/KhronosGroup/Vulkan-Headers.git" ref="v1.4.368"/></security>
+      <source>
+         <download url="https://github.com/KhronosGroup/Vulkan-Headers/archive/refs/tags/v1.4.368.tar.gz" archive="vulkan-headers-1.4.368.tar.gz"/>
+         <extract format="libarchive" root="Vulkan-Headers-1.4.368">
+            <require path="include\vulkan\vulkan.h"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\include\vulkan" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\vulkan" recursive="true" overwrite="true"/>
+         <copy source="{Workspace}\include\vk_video" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\vk_video" recursive="true" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\vulkan\vulkan.h"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+      </publish>
+   </library>
+   <library id="vulkan-memory-allocator" version="3.4.0" category="graphics" timestamp="2026-11-15T16:58:00Z">
+      <dependency library="vulkan-headers" version="1.4.368"/>
+      <metadata name="vulkan-memory-allocator" supplier="AMD GPUOpen" homepage="https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator" description="Single-header Vulkan GPU memory allocator; downstream code provides implementation" licenseSignal="yellow"/>
+      <security><repository url="https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git" ref="v3.4.0"/></security>
+      <source>
+         <download url="https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/archive/refs/tags/v3.4.0.tar.gz" archive="vulkan-memory-allocator-3.4.0.tar.gz"/>
+         <extract format="libarchive" root="VulkanMemoryAllocator-3.4.0">
+            <require path="include\vk_mem_alloc.h"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\include\vk_mem_alloc.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\vk_mem_alloc.h" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\vk_mem_alloc.h"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+      </publish>
+   </library>
 </buildLibraries>
