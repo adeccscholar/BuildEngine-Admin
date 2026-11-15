@@ -8645,6 +8645,7 @@
       <dependency library="expat" version="2.10.0"/>
       <dependency library="libavif" version="1.4.2"/>
       <dependency library="libjxl" version="0.13.0"/>
+      <dependency library="vulkan-memory-allocator" version="3.4.0"/>
 
       <metadata name="Skia" supplier="Google" homepage="https://skia.org/" description="2D graphics engine providing raster, vector, text, image, and GPU-accelerated rendering capabilities." licenseSignal="yellow">
          <license name="BSD 3-Clause"
@@ -8783,10 +8784,6 @@
          <download
             url="https://chromium.googlesource.com/external/github.com/KhronosGroup/Vulkan-Headers/+archive/f9973cd97e6f3584707e7ef1c425e336f1b92a5b.tar.gz"
             archive="skia-deps\vulkan-headers-f9973cd97e6f3584707e7ef1c425e336f1b92a5b.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/external/github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/+archive/eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7.tar.gz"
-            archive="skia-deps\vulkanmemoryallocator-eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7.tar.gz"/>
 
          <!-- ======================================================== -->
          <!-- Skia source archive.                                    -->
@@ -9194,27 +9191,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\vulkan-headers\include\vulkan\vulkan.h"/>
-
-         <execute name="mkdir-vulkanmemoryallocator"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\vulkanmemoryallocator"/>
-         </execute>
-
-         <execute name="extract-vulkanmemoryallocator"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\vulkanmemoryallocator"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\vulkanmemoryallocator-eb744ea7a2b17040121b4bbb4d6f9e8a77e3cae7.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\vulkanmemoryallocator\include\vk_mem_alloc.h"/>
 
          <!-- ======================================================== -->
          <!-- BCC64X compatibility / system integration patches.      -->
@@ -9867,6 +9843,7 @@
                <line value="skia_use_direct3d = true"/>
                <line value="skia_use_vulkan = true"/>
                <line value="skia_use_vma = true"/>
+               <line value="skia_vulkan_memory_allocator_dir = getenv(&quot;CB_SKIA_VMA_ROOT&quot;)"/>
 
                <line value="skia_enable_spirv_validation = false"/>
 
