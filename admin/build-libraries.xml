@@ -15455,8 +15455,8 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
-         <environment name="NASM_PATH" value="{ToolDir:nasm}"/>
-         <environment name="PATH" value="{ToolDir:nasm};{ENV:PATH}"/>
+         <environment name="NASM_PATH" value="{ToolDir:nasm}\nasm-3.02"/>
+         <environment name="PATH" value="{ToolDir:nasm}\nasm-3.02;{ENV:PATH}"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -15465,9 +15465,7 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DAOM_TARGET_CPU:STRING=x86_64"/>
-         <!-- Upstream find_program overwrites AS_EXECUTABLE when ENABLE_NASM=ON. Keep pinned managed NASM path in CMake cache. -->
-         <argument value="-DAS_EXECUTABLE:FILEPATH={Tool:nasm}"/>
-         <argument value="-DENABLE_NASM:BOOL=OFF"/>
+         <argument value="-DENABLE_NASM:BOOL=ON"/>
          <argument value="-DCONFIG_AV1_DECODER:STRING=1"/>
          <argument value="-DCONFIG_AV1_ENCODER:STRING=1"/>
          <argument value="-DCONFIG_LIBYUV:STRING=0"/>
@@ -15476,6 +15474,7 @@
          <argument value="-DENABLE_DOCS:BOOL=OFF"/>
          <argument value="-DENABLE_TOOLS:BOOL=OFF"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <execute name="probe-managed-nasm" executable="{Tool:nasm}" workingDirectory="{Workspace}" showOutput="true"><argument value="-v"/></execute>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
@@ -15513,8 +15512,8 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
-         <environment name="NASM_PATH" value="{ToolDir:nasm}"/>
-         <environment name="PATH" value="{ToolDir:nasm};{ENV:PATH}"/>
+         <environment name="NASM_PATH" value="{ToolDir:nasm}\nasm-3.02"/>
+         <environment name="PATH" value="{ToolDir:nasm}\nasm-3.02;{ENV:PATH}"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -15523,9 +15522,7 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DAOM_TARGET_CPU:STRING=x86_64"/>
-         <!-- Upstream find_program overwrites AS_EXECUTABLE when ENABLE_NASM=ON. Keep pinned managed NASM path in CMake cache. -->
-         <argument value="-DAS_EXECUTABLE:FILEPATH={Tool:nasm}"/>
-         <argument value="-DENABLE_NASM:BOOL=OFF"/>
+         <argument value="-DENABLE_NASM:BOOL=ON"/>
          <argument value="-DCONFIG_AV1_DECODER:STRING=1"/>
          <argument value="-DCONFIG_AV1_ENCODER:STRING=1"/>
          <argument value="-DCONFIG_LIBYUV:STRING=0"/>
@@ -15534,6 +15531,7 @@
          <argument value="-DENABLE_DOCS:BOOL=OFF"/>
          <argument value="-DENABLE_TOOLS:BOOL=OFF"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <execute name="probe-managed-nasm" executable="{Tool:nasm}" workingDirectory="{Workspace}" showOutput="true"><argument value="-v"/></execute>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
