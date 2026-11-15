@@ -14979,4 +14979,26 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
+   <library id="wuffs" version="0.3" category="graphics" timestamp="2026-11-15T16:58:00Z">
+      <metadata name="Wuffs" supplier="Google" homepage="https://github.com/google/wuffs" description="Stable 0.3 single-file C image and data decoding library; source/header distribution, no DLL" licenseSignal="green">
+         <license name="Apache License 2.0 or MIT" spdx="Apache-2.0 OR MIT" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/google/wuffs-mirror-release-c.git" commit="e3f919ccfe3ef542cfc983a82146070258fb57f8"/></security>
+      <source>
+         <download url="https://github.com/google/wuffs-mirror-release-c/archive/e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz" archive="wuffs-e3f919ccfe3ef542cfc983a82146070258fb57f8.tar.gz"/>
+         <extract format="libarchive" root="wuffs-mirror-release-c-e3f919ccfe3ef542cfc983a82146070258fb57f8">
+            <require path="release\c\wuffs-v0.3.c"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\release\c\wuffs-v0.3.c" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\wuffs\wuffs-v0.3.c" overwrite="true"/>
+         <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\wuffs\LICENSE" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\wuffs\wuffs-v0.3.c"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\wuffs\LICENSE"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+      </publish>
+   </library>
 </buildLibraries>
