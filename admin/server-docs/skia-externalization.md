@@ -2,6 +2,14 @@
 
 [TOC|Content]
 
+## Incremental source cleanup and libwebp registration (15 November 2026)
+
+Skia 153 no longer downloads or extracts PIE-X because the active GN contract sets `skia_use_piex = false`. The unrelated DNG SDK remains enabled and its source is retained. The Skia SPIR-V, glslang, and SPIRV-Cross archives remain pinned while their GN-generated targets have not been replaced by demonstrably compatible managed imports.
+
+**libwebp 1.6.0** is now registered as a separately managed BuildEngine library. Its BCC64X build and the Skia GN integration are pending verification; the active Skia configuration still has `skia_use_system_libwebp = false`. Keep the bundled WebP download and extraction until installed DLL/header integration, relevant patching, Debug and Release link tests, and SBOM checks are completed. Do not mark the 109/109 historical build as proof for the newly added library.
+
+[libwebp 1.6.0 integration guide](/package/libwebp/1.6.0/migration).
+
 ## Current status: 15 November 2026
 
 **BuildEngine FSM completed successfully: 109 / 109 versioned library integrations, with no failures or blocked jobs.** The earlier text below documents a 10 November proposal and is historical. The active Skia 153 GN configuration already uses external zlib, Brotli, libpng, libjpeg-turbo, HarfBuzz, FreeType, ICU, Expat, libavif and libjxl, plus independently declared OpenGL and Vulkan Memory Allocator dependencies. Transitive managed packages include Highway, libyuv and Vulkan-Headers.
@@ -33,7 +41,7 @@ OpenGL 26.2.1 is additionally declared as a BuildEngine dependency. Enabling a G
 | --- | --- | --- |
 | Expat | `skia_use_expat=true`, `skia_use_system_expat=false` | **Priority 1:** Evaluate reuse of `expat@2.10.0`; XML/SVG smoke tests required |
 | ICU | `skia_use_icu=true`, `skia_use_system_icu=false` | **Priority 2:** Investigate `icu@79.1`; first resolve the Chromium pin, ICU data, ABI and Unicode layout |
-| libWebP | Decode/encode enabled, `skia_use_system_libwebp=false` | **Priority 3:** Potential independent image codec; no `webp` entry in the active XML catalog reviewed |
+| libWebP | Decode/encode enabled, `skia_use_system_libwebp=false` | **Priority 3:** Potential independent image codec; managed `libwebp@1.6.0` now registered; Skia GN DLL wiring not yet verified |
 | libavif / libgav1 | Sources pinned internally | Later: assess the full codec and AV1 dependency chain |
 | JPEG XL / highway | Internally pinned | Later: investigate complex C++ and SIMD interfaces |
 | SPIRV-Cross, glslang, SPIRV-Tools | Part of the shader/GPU pipeline | Do not assume a trivial drop-in DLL replacement |
