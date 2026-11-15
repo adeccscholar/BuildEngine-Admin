@@ -11476,7 +11476,7 @@
       </publish>
    </library>
 
-   <library id="libxml2" version="2.15.3" category="data" timestamp="2026-11-07T17:24:00Z">
+   <library id="libxml2" version="2.15.3" supersededBy="2.15.4" category="data" timestamp="2026-11-07T17:24:00Z">
       <dependency library="zlib" version="1.4"/>
       <metadata name="libxml2" supplier="GNOME / libxml2 contributors" homepage="https://gitlab.gnome.org/GNOME/libxml2" description="C XML toolkit providing parsing, XPath, XML Schema, Relax NG, XInclude and serialization support." licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="Copyright"/>
@@ -11495,6 +11495,137 @@
             <require path="include\libxml\relaxng.h"/>
          </extract>
          <copy source="{BuildFileDir}\patches\libxml2\2.15.3\release-test-helpers.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\release-test-helpers.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\release-test-helpers.patch"/>
+         </execute>
+         <execute name="patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\release-test-helpers.patch"/>
+         </execute>
+         <execute name="patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\release-test-helpers.patch"/>
+         </execute>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
+         <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DLIBXML2_WITH_DOCS:BOOL=OFF"/>
+         <argument value="-DLIBXML2_WITH_PROGRAMS:BOOL=ON"/>
+         <argument value="-DLIBXML2_WITH_PYTHON:BOOL=OFF"/>
+         <argument value="-DLIBXML2_WITH_TESTS:BOOL={TestsEnabled}"/>
+         <argument value="-DLIBXML2_WITH_ICONV:BOOL=OFF"/>
+         <argument value="-DLIBXML2_WITH_ICU:BOOL=OFF"/>
+         <argument value="-DLIBXML2_WITH_MODULES:BOOL=OFF"/>
+         <argument value="-DLIBXML2_WITH_ZLIB:BOOL=ON"/>
+         <argument value="-DLIBXML2_WITH_SCHEMAS:BOOL=ON"/>
+         <argument value="-DLIBXML2_WITH_RELAXNG:BOOL=ON"/>
+         <argument value="-DLIBXML2_WITH_XPATH:BOOL=ON"/>
+         <argument value="-DLIBXML2_WITH_XINCLUDE:BOOL=ON"/>
+         <argument value="-DLIBXML2_WITH_XPTR:BOOL=ON"/>
+         <argument value="-DLIBXML2_WITH_OUTPUT:BOOL=ON"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:zlib}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
+            <argument value="-DCMAKE_DEBUG_POSTFIX:STRING=d"/>
+            <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
+            <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Debug"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                        workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libxml2\libxml\parser.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libxml2\libxml\xmlschemas.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\Copyright"
+                     target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\Copyright"
+                     overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\Copyright"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe;.pdb" optional="true"/>
+         <tree source="lib\win64\{Configuration}\pkgconfig" target="lib\pkgconfig" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\libxml2\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="libxml2-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DLibXml2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libxml2"/>
+      </smoke>
+      <smoke id="relaxng-recovery" scope="package" source="smokes\libxml2\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="libxml2-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DLibXml2_DIR:PATH={ConsumerRoot}\lib\win64\{Configuration}\cmake\libxml2"/>
+      </smoke>
+   </library>
+   <library id="libxml2" version="2.15.4" category="data" timestamp="2026-11-15T16:50:00Z">
+      <dependency library="zlib" version="1.4"/>
+      <metadata name="libxml2" supplier="GNOME / libxml2 contributors" homepage="https://gitlab.gnome.org/GNOME/libxml2" description="C XML toolkit providing parsing, XPath, XML Schema, Relax NG, XInclude and serialization support." licenseSignal="green">
+         <license name="MIT License" spdx="MIT" file="Copyright"/>
+      </metadata>
+      <security>
+         <repository url="https://gitlab.gnome.org/GNOME/libxml2.git" ref="v{LibraryVersion}"/>
+      </security>
+      <source>
+         <download url="https://download.gnome.org/sources/libxml2/2.15/libxml2-{LibraryVersion}.tar.xz"
+                   archive="libxml2-{LibraryVersion}.tar.xz"/>
+         <extract format="libarchive" root="libxml2-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="Copyright"/>
+            <require path="include\libxml\parser.h"/>
+            <require path="include\libxml\xmlschemas.h"/>
+            <require path="include\libxml\relaxng.h"/>
+         </extract>
+         <copy source="{BuildFileDir}\patches\libxml2\2.15.4\release-test-helpers.patch"
                target="{Workspace}\.buildengine\patches\{LibraryVersion}\release-test-helpers.patch"
                overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
@@ -12294,7 +12425,7 @@
       <dependency library="zlib" version="1.4"/>
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="freetype" version="2.15.0"/>
-      <dependency library="libxml2" version="2.15.3"/>
+      <dependency library="libxml2" version="2.15.4"/>
       <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="libtiff" version="4.7.2"/>
@@ -15307,7 +15438,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="libaom" version="3.15.1" category="graphics" timestamp="2026-11-15T18:32:00Z">
+   <library id="libaom" version="3.15.1" supersededBy="3.15.3" category="graphics" timestamp="2026-11-15T18:32:00Z">
       <metadata name="libaom" supplier="Alliance for Open Media" homepage="https://aomedia.org/" description="AV1 encoder and decoder for the independently managed libavif codec" licenseSignal="green">
          <license name="BSD 2-Clause" spdx="BSD-2-Clause" file="LICENSE"/>
       </metadata>
@@ -15361,8 +15492,62 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
+   <library id="libaom" version="3.15.3" category="graphics" timestamp="2026-11-15T16:50:00Z">
+      <metadata name="libaom" supplier="Alliance for Open Media" homepage="https://aomedia.org/" description="AV1 encoder and decoder for the independently managed libavif codec" licenseSignal="green">
+         <license name="BSD 2-Clause" spdx="BSD-2-Clause" file="licenses\libaom\LICENSE"/>
+      </metadata>
+      <security><repository url="https://aomedia.googlesource.com/aom" ref="v3.15.3"/></security>
+      <source>
+         <download url="https://storage.googleapis.com/aom-releases/libaom-3.15.3.tar.gz" archive="libaom-3.15.3.tar.gz"/>
+         <extract format="libarchive" root="libaom-3.15.3">
+            <require path="CMakeLists.txt"/>
+            <require path="aom\aom_codec.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DAOM_TARGET_CPU:STRING=x86_64"/>
+         <argument value="-DAS_EXECUTABLE:FILEPATH={Tool:nasm}"/>
+         <argument value="-DCONFIG_AV1_DECODER:STRING=1"/>
+         <argument value="-DCONFIG_AV1_ENCODER:STRING=1"/>
+         <argument value="-DCONFIG_LIBYUV:STRING=0"/>
+         <argument value="-DENABLE_TESTS:BOOL=OFF"/>
+         <argument value="-DENABLE_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DENABLE_DOCS:BOOL=OFF"/>
+         <argument value="-DENABLE_TOOLS:BOOL=OFF"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\aom\aom_codec.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libaom\LICENSE" overwrite="true"/></common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+   </library>
    <library id="libavif" version="1.4.2" category="graphics" timestamp="2026-11-15T16:58:00Z">
-      <dependency library="libaom" version="3.15.1"/>
+      <dependency library="libaom" version="3.15.3"/>
       <dependency library="libyuv" version="r1924"/>
       <metadata name="libavif" supplier="Alliance for Open Media" homepage="https://github.com/AOMediaCodec/libavif" description="AVIF image encoder and decoder using externally managed libaom and optional libyuv" licenseSignal="green">
          <license name="BSD 2-Clause" spdx="BSD-2-Clause" file="LICENSE"/>
