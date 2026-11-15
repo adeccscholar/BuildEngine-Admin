@@ -2,6 +2,10 @@
 
 [TOC|Content]
 
+## DNG SDK remains embedded (16 November 2026)
+
+Skia 153 still enables `skia_use_dng_sdk = true` and compiles the pinned DNG SDK from `third_party/externals/dng_sdk`; this is not a separately built BuildEngine DLL. The operator's Release and Debug builds failed on obsolete `std::auto_ptr` uses in `dng_pthread.cpp`. A version-bound C++23 source patch replaces those two owners with `std::unique_ptr`, retaining RAW support and the original ownership-transfer calls. **[not verified]** The revised build has not been run yet. The current bundled-component manifest continues to list DNG SDK.
+
 ## Current AV1 codec ownership (16 November 2026 XML audit)
 
 The current managed codec closure is `Skia 153 -> libavif 1.4.2 -> libgav1 0.20.0`. libgav1 is also declared as a direct Skia dependency to establish the FSM build gate and provide its DLL location in the per-configuration Skia runtime environment. libavif selects `AVIF_CODEC_LIBGAV1=SYSTEM`, disables AOM decoding and retains managed libaom 3.15.3 for encoding. libyuv r1924 remains a libavif dependency and is selected with `AVIF_LIBYUV=SYSTEM`.
