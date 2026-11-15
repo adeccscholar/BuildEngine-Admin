@@ -1,34 +1,30 @@
 diff --git a/third_party/icu/BUILD.gn b/third_party/icu/BUILD.gn
 --- a/third_party/icu/BUILD.gn
 +++ b/third_party/icu/BUILD.gn
-@@ -6,4 +6,11 @@
- import("../../gn/skia.gni")
+@@ -7,9 +7,23 @@
  import("../third_party.gni")
  import("icu.gni")
+ 
+-if (skia_use_system_icu) {
+-  system("icu") {
+-    libs = [ "icuuc" ]
 +declare_args() {
 +  bcc64x_icu_include = ""
 +  bcc64x_icu_uc_lib = ""
 +  bcc64x_icu_i18n_lib = ""
 +}
 +
-+
- 
-@@ -10,6 +17,14 @@
- if (skia_use_system_icu) {
--  system("icu") {
--    libs = [ "icuuc" ]
--    defines = [ "U_USING_ICU_NAMESPACE=0" ]
--  }
++if (skia_use_system_icu) {
 +  system("icu") {
-+    defines = [ "U_USING_ICU_NAMESPACE=0" ]
 +    if (skia_use_bcc64x) {
-+      assert(bcc64x_icu_include != "", "BuildEngine ICU include is required")
-+      assert(bcc64x_icu_uc_lib != "", "BuildEngine ICU common import library is required")
-+      assert(bcc64x_icu_i18n_lib != "", "BuildEngine ICU i18n import library is required")
++      assert(bcc64x_icu_include != "", "BuildEngine ICU include required")
++      assert(bcc64x_icu_uc_lib != "", "BuildEngine ICU common import required")
++      assert(bcc64x_icu_i18n_lib != "", "BuildEngine ICU i18n import required")
 +      include_dirs = [ bcc64x_icu_include ]
 +      ldflags = [ bcc64x_icu_uc_lib, bcc64x_icu_i18n_lib ]
 +    } else {
 +      libs = [ "icuuc" ]
 +    }
-+  }
+     defines = [ "U_USING_ICU_NAMESPACE=0" ]
+   }
  } else {
