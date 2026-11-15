@@ -10,6 +10,9 @@ BuildEngine Server is the read-only HTTP presentation and machine-interface laye
 
 The server is **not** an independent state or repository authority.
 
+The server's **primary purpose is the live, read-only visualization of the BuildEngine working environment**. It also serves existing HTML files and renders repository-managed Markdown documents with syntax highlighting, Mermaid diagrams, and MathJax where required by the document. Library and package data are read from the configured environment, while narrative documentation is prepared separately from project owner materials, architectural specifications, blog posts, development history, and repository revisions with AI editorial assistance. The shared footer links to [About This Site: Live BuildEngine View and Documentation Provenance](/manual/about-this-site.md), which explains this distinction and the verification rules.
+
+
 ## Dependency closure display (15 November 2026)
 
 The version detail page at `/library/{library}/{version}` and the installed package page at `/package/{library}/{version}` now expose three expandable component inventories: **Direct dependencies**, **Transitive dependencies**, and **Bundled components**. Direct package relationships are classified from the authoritative BuildEngine XML catalog. The complete external component closure and embedded third-party components are derived from the installed CycloneDX SBOM. The existing four-part summary of direct, transitive, bundled and overall components remains, and each list includes distinct library/version coordinates without double counting.
