@@ -8688,6 +8688,63 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
       </publish>
    </library>
+   <library id="libgav1" version="5cf722e" category="graphics" timestamp="2026-11-15T22:00:00Z">
+      <metadata name="libgav1" supplier="The libgav1 Authors" homepage="https://chromium.googlesource.com/codecs/libgav1" description="AV1 decoder; standalone BCC64X candidate pinned to the identical source commit used by Skia 153; Skia GN DLL integration pending verification" licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\libgav1\LICENSE"/>
+      </metadata>
+      <security><repository url="https://chromium.googlesource.com/codecs/libgav1.git" commit="5cf722e659014ebaf2f573a6dd935116d36eadf1"/></security>
+      <source>
+         <download url="https://chromium.googlesource.com/codecs/libgav1.git/+archive/5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz" archive="libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
+         <!-- Google Gitiles +archive tarballs contain a rootless source tree. -->
+         <execute name="extract-pinned-libgav1" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
+            <argument value="{DownloadsRoot}\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
+         </execute>
+         <require path="{Workspace}\CMakeLists.txt"/>
+         <require path="{Workspace}\src\gav1\decoder.h"/>
+         <require path="{Workspace}\src\libgav1_decoder.cmake"/>
+         <require path="{Workspace}\LICENSE"/>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DLIBGAV1_ENABLE_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DLIBGAV1_ENABLE_TESTS:BOOL=OFF"/>
+         <argument value="-DLIBGAV1_THREADPOOL_USE_STD_MUTEX:STRING=1"/>
+         <argument value="-DLIBGAV1_MAX_BITDEPTH:STRING=12"/>
+         <argument value="-DLIBGAV1_ENABLE_AVX2:BOOL=OFF"/>
+         <argument value="-DLIBGAV1_ENABLE_SSE4_1:BOOL=OFF"/>
+         <argument value="-DLIBGAV1_ENABLE_NEON:BOOL=OFF"/>
+         <argument value="-DLIBGAV1_VERBOSE:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\gav1\decoder.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libgav1\LICENSE" overwrite="true"/></common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+   </library>
    <library id="libwebp" version="1.6.0" category="graphics" timestamp="2026-11-15T20:30:00Z">
       <metadata name="libwebp" supplier="WebM Project" homepage="https://developers.google.com/speed/webp" description="WebP image encoding, decoding and muxing with a native BCC64X shared-library build." licenseSignal="green">
          <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\libwebp\COPYING"/>
