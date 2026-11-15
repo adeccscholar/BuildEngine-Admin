@@ -32,6 +32,8 @@ The library is configured with BuildEngine's `bcc64x-buildengine-cxx.cmake` tool
 -DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}
 ```
 
+**16 November 2026, install-artifact correction:** The operator confirmed both native build variants PASS (66.8 seconds each), but both install gates failed because `libgav1_shared.lib` was absent in `lib/win64/{Configuration}`. The version-specific install patch now explicitly sets `OUTPUT_NAME`, `ARCHIVE_OUTPUT_NAME`, `IMPORT_PREFIX` and `IMPORT_SUFFIX` for the Windows shared target before its `install(TARGETS ...)` declaration. The library XML timestamp was advanced to trigger source re-preparation. The corrected patch passed local `git apply --check`, apply and reverse-check. The actual name, output and installed import library after a new BCC64X run remain **[not verified]**.
+
 The two source patches are:
 
 - `admin/patches/libgav1/0.20.0/bcc64x-winthreads.patch`: select the Windows worker-thread implementation under BCC64X/Win64.
@@ -63,7 +65,7 @@ libavif declares `AVIF_CODEC_LIBGAV1=SYSTEM`, `AVIF_CODEC_AOM_DECODE=OFF`, `AVIF
 
 ## Verification boundary
 
-**[not verified]** A matching BCC64X Release and Debug run, import-library and DLL outputs, libavif's effective decoder target resolution, PE import tables, Windows loader closure, and an AVIF decoding consumer smoke still require machine evidence. A valid XML/SBOM dependency declaration alone does not prove an external DLL import.
+**Verified from the operator's 16 November 2026 FSM log:** libgav1 Release and Debug both built successfully. **[not verified]** Their new installed import libraries and DLLs, libavif's effective decoder target resolution, PE import tables, Windows loader closure, and an AVIF decoding consumer smoke still require machine evidence. A valid XML/SBOM dependency declaration alone does not prove an external DLL import.
 
 No library-specific alternate compiler, hidden bundled fallback, or source rewriting during Build is part of this contract. Update this guide only from the current XML and concrete build evidence.
 
