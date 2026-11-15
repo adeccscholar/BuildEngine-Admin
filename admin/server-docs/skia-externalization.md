@@ -2,6 +2,15 @@
 
 [TOC|Content]
 
+## Current AV1 codec ownership (15 November 2026)
+
+The current managed codec closure is `Skia 153 -> libavif 1.4.2 -> libgav1 0.20.0`. libgav1 is also declared as a direct Skia dependency to establish the FSM build gate and provide its DLL location in the per-configuration Skia runtime environment. libavif selects `AVIF_CODEC_LIBGAV1=SYSTEM`, disables AOM decoding and retains managed libaom 3.15.3 for encoding. libyuv r1924 remains a libavif dependency and is selected with `AVIF_LIBYUV=SYSTEM`.
+
+No libgav1 archive is downloaded by the Skia source workflow. Its decoder implementation is built only by the independent libgav1 0.20.0 producer and consumed through the libavif DLL. The bundled component manifest lists libgav1 as an external BuildEngine dependency rather than bundled code.
+
+**Validation pending:** libgav1 BCC64X DLL and import library, libavif codec discovery and linkage, Skia runtime loader path and AVIF decoding smoke. The previous 109/109 result does not verify this updated chain.
+
+
 ## Managed libwebp externalization (15 November 2026)
 
 Skia 153 now declares `libwebp@1.6.0` as a direct BuildEngine dependency, uses `skia_use_system_libwebp = true` with WebP decode/encode enabled, and receives per-configuration import library paths via `DependencyRoot:libwebp` and a version-pinned `bcc64x-system-libwebp.patch`. The previous Skia-bundled WebP archive and extract actions were removed. The SBOM manifest tracks libwebp as external, not bundled; inactive PIE-X is also absent from the bundled list.
