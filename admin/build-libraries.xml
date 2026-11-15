@@ -8748,7 +8748,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T22:26:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T22:44:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -8761,6 +8761,8 @@
       <dependency library="libavif" version="1.4.2"/>
       <dependency library="libjxl" version="0.13.0"/>
       <dependency library="libwebp" version="1.6.0"/>
+      <dependency library="piex" version="0.27"/>
+      <dependency library="libyuv" version="r1924"/>
       <dependency library="vulkan-memory-allocator" version="3.4.0"/>
       <dependency library="wuffs" version="0.3"/>
 
@@ -9642,7 +9644,27 @@
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libwebp.patch"/>
          </execute>
-         <execute name="fetch-gn"
+                  <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-piex.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-piex.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="bcc64x-system-piex-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-piex.patch"/>
+         </execute>
+         <execute name="bcc64x-system-piex-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-piex.patch"/>
+         </execute>
+         <execute name="bcc64x-system-piex-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-piex.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-libyuv.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libyuv.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="bcc64x-system-libyuv-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libyuv.patch"/>
+         </execute>
+         <execute name="bcc64x-system-libyuv-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libyuv.patch"/>
+         </execute>
+         <execute name="bcc64x-system-libyuv-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libyuv.patch"/>
+         </execute>
+<execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
                   showOutput="false">
@@ -9738,6 +9760,10 @@
          <environment name="CB_SKIA_LIBWEBP_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebp.lib"/>
          <environment name="CB_SKIA_LIBWEBP_DEMUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpdemux.lib"/>
          <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpmux.lib"/>
+         <environment name="CB_SKIA_PIEX_INCLUDE" value="{DependencyRoot:piex}\include"/>
+         <environment name="CB_SKIA_PIEX_LIB" value="{DependencyRoot:piex}\lib\win64\{Configuration}\{PiexLibraryName}.lib"/>
+         <environment name="CB_SKIA_LIBYUV_INCLUDE" value="{DependencyRoot:libyuv}\include"/>
+         <environment name="CB_SKIA_LIBYUV_LIB" value="{DependencyRoot:libyuv}\lib\win64\{Configuration}\{LibYuvLibraryName}.lib"/>
 
          <!--
             Runtime DLL resolution for all BuildEngine package dependencies.
@@ -9882,6 +9908,10 @@
                <line value="bcc64x_libwebp_lib = getenv(&quot;CB_SKIA_LIBWEBP_LIB&quot;)"/>
                <line value="bcc64x_libwebp_demux_lib = getenv(&quot;CB_SKIA_LIBWEBP_DEMUX_LIB&quot;)"/>
                <line value="bcc64x_libwebp_mux_lib = getenv(&quot;CB_SKIA_LIBWEBP_MUX_LIB&quot;)"/>
+               <line value="bcc64x_piex_include = getenv(&quot;CB_SKIA_PIEX_INCLUDE&quot;)"/>
+               <line value="bcc64x_piex_lib = getenv(&quot;CB_SKIA_PIEX_LIB&quot;)"/>
+               <line value="bcc64x_libyuv_include = getenv(&quot;CB_SKIA_LIBYUV_INCLUDE&quot;)"/>
+               <line value="bcc64x_libyuv_lib = getenv(&quot;CB_SKIA_LIBYUV_LIB&quot;)"/>
                <line value="skia_pdf_subset_harfbuzz = true"/>
 
                <line value="skia_use_client_icu = false"/>
@@ -9938,7 +9968,9 @@
                   The pinned source is retained as part of the prepared source
                   closure and SBOM input, but is not active in the product.
                -->
-               <line value="skia_use_piex = false"/>
+               <line value="skia_use_piex = true"/>
+               <line value="skia_use_system_piex = true"/>
+               <line value="skia_use_system_libyuv = true"/>
 
                <!-- BuildEngine Brotli package. -->
                <line value="skia_use_system_brotli = true"/>
@@ -10012,6 +10044,8 @@
              <variable name="IcuCommonImport" value="libicuuc"/>
              <variable name="IcuI18nImport" value="libicuin"/>
              <variable name="ExpatLibraryName" value="liblibexpat"/>
+            <variable name="PiexLibraryName" value="libpiex"/>
+            <variable name="LibYuvLibraryName" value="libyuv"/>
          </variant>
 
          <variant name="Debug">
@@ -10027,6 +10061,8 @@
              <variable name="IcuCommonImport" value="libicuucd"/>
              <variable name="IcuI18nImport" value="libicuind"/>
              <variable name="ExpatLibraryName" value="liblibexpatd"/>
+            <variable name="PiexLibraryName" value="libpiexd"/>
+            <variable name="LibYuvLibraryName" value="libyuv"/>
          </variant>
 
          <install>
