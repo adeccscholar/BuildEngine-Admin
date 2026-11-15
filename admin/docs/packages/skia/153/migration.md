@@ -1,5 +1,11 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## Managed libwebp externalization (15 November 2026)
+
+Skia 153 now declares `libwebp@1.6.0` as a direct BuildEngine dependency, uses `skia_use_system_libwebp = true` with WebP decode/encode enabled, and receives per-configuration import library paths via `DependencyRoot:libwebp` and a version-pinned `bcc64x-system-libwebp.patch`. The previous Skia-bundled WebP archive and extract actions were removed. The SBOM manifest tracks libwebp as external, not bundled; inactive PIE-X is also absent from the bundled list.
+
+**Validation pending:** The supplied libwebp Release log failed because upstream `WEBP_ENABLE_SIMD=OFF` introduced `-mno-sse2`, producing E714 floating-point ABI errors and compiler crashes. The producer was reconfigured with `WEBP_ENABLE_SIMD=ON`; no successful retest, DLL import-library-name verification, GN generation, Skia Debug/Release link or loader smoke is yet available. The historical 109/109 FSM result predates these changes.
+
 ## PIE-X 0.27 independent producer (15 November 2026)
 
 The PIE-X native package `piex@0.27` now has its own BuildEngine XML entry and CMake adapter. No BCC64X DLL build PASS, Skia ABI check, RAW preview smoke, or external GN link PASS has been confirmed. Therefore Skia remains configured with `skia_use_piex = false` and does not gain an unverified direct dependency. [PIE-X 0.27 integration](/package/piex/0.27/migration).
@@ -8,7 +14,7 @@ The PIE-X native package `piex@0.27` now has its own BuildEngine XML entry and C
 
 The source contract no longer downloads or extracts PIE-X because `skia_use_piex = false`. This is a configuration change and not a new build PASS. DNG SDK remains active.
 
-`libwebp@1.6.0` is now registered as an independent BuildEngine producer, but it is not yet a validated DLL import for Skia. The existing bundled libwebp source, GN flags and SBOM representation remain unchanged until GN adaptation and Debug/Release consumer validation are successful. The 109/109 PASS result predates the new registration. [libwebp integration guide](/package/libwebp/1.6.0/migration).
+`libwebp@1.6.0` is now registered as an independent BuildEngine producer, but it is not yet a validated DLL import for Skia. The GN externalization and removal of the bundled source are now declared, but they remain unverified by an actual Skia rebuild. The 109/109 PASS result predates the new registration. [libwebp integration guide](/package/libwebp/1.6.0/migration).
 
 ## Pending Skia source reduction (15 November 2026)
 
@@ -16,7 +22,7 @@ The source contract no longer downloads or extracts PIE-X because `skia_use_piex
 
 Skia's redundant source downloads and extraction actions for **libyuv** and **Vulkan-Headers** were removed. libyuv remains an external transitive dependency through libavif 1.4.2. Vulkan-Headers remains a transitive dependency through Vulkan Memory Allocator 3.4.0, and the pre-existing BCC64X GN patch selects installed Vulkan headers. These changes require a new Skia source/configure/build/install and SBOM pass before they can be called verified.
 
-**The separate libwebp externalization remains pending:** `libwebp@1.6.0` is now registered, but its producer DLL/import library and Skia consumer GN wiring are not verified. Do not enable `skia_use_system_libwebp` without a matching producer package and GN import-library configuration. The standalone SPIR-V packages likewise do not yet replace Skia's pinned internal SPIR-V GN closure; retain their downloads until the debug validator's generated targets and compatible binaries are wired to managed packages.
+**The separate libwebp externalization remains pending:** `libwebp@1.6.0` is now registered, but its producer DLL/import library and Skia consumer GN wiring are not verified. The XML now enables `skia_use_system_libwebp` with managed GN import paths; installed artifacts and actual linkage still require validation. The standalone SPIR-V packages likewise do not yet replace Skia's pinned internal SPIR-V GN closure; retain their downloads until the debug validator's generated targets and compatible binaries are wired to managed packages.
 
 After a successful rebuild, the *expected* installed package breakdown is **29 components = 1 root + 19 external dependencies + 9 bundled components**, with 13 direct and 6 transitive external coordinates. These are predicted from the updated contract, not a reported test result.
 
