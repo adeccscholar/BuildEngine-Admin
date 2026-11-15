@@ -15022,4 +15022,105 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
+   <library id="spirv-cross" version="b8fcf307f1f347089e3c46eb4451d27f32ebc8d3" category="graphics" timestamp="2026-11-15T16:58:00Z">
+      <metadata name="spirv-cross" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Cross" description="SPIR-V shader reflection and cross-compilation" licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/KhronosGroup/SPIRV-Cross.git" ref="b8fcf307f1f347089e3c46eb4451d27f32ebc8d3"/></security>
+      <source>
+         <download url="https://github.com/KhronosGroup/SPIRV-Cross/archive/b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz" archive="spirv-cross-b8fcf307f1f347089e3c46eb4451d27f32ebc8d3.tar.gz"/>
+         <extract format="libarchive" root="SPIRV-Cross-b8fcf307f1f347089e3c46eb4451d27f32ebc8d3">
+            <require path="CMakeLists.txt"/>
+            <require path="spirv_cross.hpp"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DSPIRV_CROSS_STATIC:BOOL=ON"/>
+         <argument value="-DSPIRV_CROSS_SHARED:BOOL=OFF"/>
+         <argument value="-DSPIRV_CROSS_CLI:BOOL=ON"/>
+         <argument value="-DSPIRV_CROSS_ENABLE_TESTS:BOOL=OFF"/>
+         <argument value="-DSPIRV_CROSS_SKIP_INSTALL:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\spirv-cross\LICENSE" overwrite="true"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+   </library>
+   <library id="glslang" version="16.6.0" category="graphics" timestamp="2026-11-15T16:58:00Z">
+      <metadata name="glslang" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/glslang" description="GLSL/HLSL to SPIR-V compiler, validator and libraries" licenseSignal="green">
+         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE.txt"/>
+      </metadata>
+      <security><repository url="https://github.com/KhronosGroup/glslang.git" ref="16.6.0"/></security>
+      <source>
+         <download url="https://github.com/KhronosGroup/glslang/archive/refs/tags/16.6.0.tar.gz" archive="glslang-16.6.0.tar.gz"/>
+         <extract format="libarchive" root="glslang-16.6.0">
+            <require path="CMakeLists.txt"/>
+            <require path="glslang\Public\ShaderLang.h"/>
+            <require path="LICENSE.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DGLSLANG_ENABLE_INSTALL:BOOL=ON"/>
+         <argument value="-DGLSLANG_TESTS:BOOL=OFF"/>
+         <argument value="-DENABLE_SPIRV:BOOL=ON"/>
+         <argument value="-DENABLE_OPT:BOOL=OFF"/>
+         <argument value="-DENABLE_HLSL:BOOL=ON"/>
+         <argument value="-DENABLE_GLSLANG_BINARIES:BOOL=ON"/>
+         <argument value="-DBUILD_EXTERNAL:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\glslang\LICENSE.txt" overwrite="true"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+   </library>
 </buildLibraries>
