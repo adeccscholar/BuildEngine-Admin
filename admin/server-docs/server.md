@@ -10,6 +10,16 @@ BuildEngine Server is the read-only HTTP presentation and machine-interface laye
 
 The server is **not** an independent state or repository authority.
 
+## Dependency closure display (15 November 2026)
+
+The version detail page at `/library/{library}/{version}` and the installed package page at `/package/{library}/{version}` now expose three expandable component inventories: **Direct dependencies**, **Transitive dependencies**, and **Bundled components**. Direct package relationships are classified from the authoritative BuildEngine XML catalog. The complete external component closure and embedded third-party components are derived from the installed CycloneDX SBOM. The existing four-part summary of direct, transitive, bundled and overall components remains, and each list includes distinct library/version coordinates without double counting.
+
+The direct and transitive entries link to versioned library detail pages. Bundled components are explicitly labeled as embedded and do not link to nonexistent BuildEngine package coordinates. The display reads existing repository data: it neither creates another dependency source of truth nor asserts that a newly registered library has been installed. Pages for uninstalled versions continue to show the configured direct relationships only, and must not fabricate an SBOM closure.
+
+The normalized `/api/v1/library/{library}/{version}` JSON also exposes the `componentList[].relation` values `root`, `direct`, `transitive`, and `bundled`. These values correspond to the same categorization displayed in the HTML tables. All direct edges that have not yet been installed are visible only in the configuration section, not as existing SBOM components.
+
+**Verification:** Changes to BuildEngine-Common have been committed. Deployment, BCC64X compilation and browser tests have not yet been performed in the production environment. The operator confirmed `libwebp@1.6.0` built successfully; the new Skia build was still in progress.
+
 ## Server-facing catalog update (10 November 2026)
 
 The synchronized Schema-17 contract declares **95 library/version records across 62 logical IDs**. 32 version lines have a `supersededBy` successor; both a predecessor and a successor remain addressable where logically installed. The server must reflect the resolved catalog, not assume that a directory count, a previous 44-library figure, or a file's presence proves successful installation. Details: [full inventory](libraries.md).
