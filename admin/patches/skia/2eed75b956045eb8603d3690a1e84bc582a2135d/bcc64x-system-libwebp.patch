@@ -11,8 +11,14 @@ diff --git a/third_party/libwebp/BUILD.gn b/third_party/libwebp/BUILD.gn
  }
  
  import("../third_party.gni")
-@@ -14,9 +18,14 @@
+@@ -14,9 +18,20 @@
  if (skia_use_system_libwebp) {
++  # GN's system() group does not forward include_dirs to dependent
++  # Skia source sets. Expose an explicit compile-time include config.
++  config("managed_webp_includes") {
++    include_dirs = [ bcc64x_libwebp_include ]
++  }
++
    system("libwebp") {
 -    libs = [
 -      "webp",
@@ -30,3 +36,23 @@ diff --git a/third_party/libwebp/BUILD.gn b/third_party/libwebp/BUILD.gn
      ]
    }
  } else {
+diff --git a/BUILD.gn b/BUILD.gn
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -1951,7 +1951,8 @@
+ optional("webp_decode") {
+   enabled = skia_use_libwebp_decode
+   public_defines = [ "SK_CODEC_DECODES_WEBP" ]
+ 
++  configs = [ "//third_party/libwebp:managed_webp_includes" ]
+   deps = [ "//third_party/libwebp" ]
+   sources = [ "src/codec/SkWebpCodec.cpp" ]
+ }
+@@ -1959,6 +1960,7 @@
+ optional("webp_encode") {
+   enabled = skia_use_libwebp_encode && !skia_use_ndk_images
+   public_defines = [ "SK_CODEC_ENCODES_WEBP" ]
+   public = skia_encode_webp_public
+ 
++  configs = [ "//third_party/libwebp:managed_webp_includes" ]
+   deps = [
