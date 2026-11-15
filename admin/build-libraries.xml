@@ -8738,10 +8738,6 @@
             archive="skia-deps\dng_sdk-dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"/>
 
          <download
-            url="https://chromium.googlesource.com/external/github.com/google/highway.git/+archive/457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"
-            archive="skia-deps\highway-457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"/>
-
-         <download
             url="https://chromium.googlesource.com/codecs/libgav1.git/+archive/5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"
             archive="skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
 
@@ -8903,27 +8899,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\dng_sdk\source\dng_host.h"/>
-
-         <execute name="mkdir-highway"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\highway"/>
-         </execute>
-
-         <execute name="extract-highway"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\highway"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\highway-457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\highway\hwy\highway.h"/>
 
          <execute name="mkdir-libgav1"
                   executable="{Tool:cmake}"
