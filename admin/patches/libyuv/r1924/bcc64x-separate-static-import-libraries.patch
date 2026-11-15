@@ -1,0 +1,14 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -171,6 +171,11 @@
+ # this creates the static library (.a)
+ add_library( ${ly_lib_static} STATIC ${ly_lib_parts})
++if(WIN32)
++  # Avoid collision between the static archive and the shared DLL import archive
++  # on toolchains that apply the "lib" archive prefix to both targets.
++  set_target_properties( ${ly_lib_static} PROPERTIES OUTPUT_NAME "yuv_static" )
++endif()
+ 
+ # this creates the shared library (.so)
+ add_library( ${ly_lib_shared} SHARED ${ly_lib_parts})
