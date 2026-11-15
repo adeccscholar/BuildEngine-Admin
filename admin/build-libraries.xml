@@ -14933,4 +14933,50 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
+   <library id="highway" version="1.4.0" category="math" timestamp="2026-11-15T16:58:00Z">
+      <metadata name="Highway" supplier="Google" homepage="https://github.com/google/highway" description="Portable cross-platform SIMD operations for C++" licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/google/highway.git" ref="1.4.0"/></security>
+      <source>
+         <download url="https://github.com/google/highway/archive/refs/tags/1.4.0.tar.gz" archive="highway-1.4.0.tar.gz"/>
+         <extract format="libarchive" root="highway-1.4.0">
+            <require path="CMakeLists.txt"/>
+            <require path="hwy\highway.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
+         <argument value="-DHWY_ENABLE_TESTS:BOOL=OFF"/>
+         <argument value="-DHWY_ENABLE_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DHWY_ENABLE_BENCHMARKS:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\hwy\highway.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\highway\LICENSE" overwrite="true"/></common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+   </library>
 </buildLibraries>
