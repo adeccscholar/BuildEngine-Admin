@@ -9910,7 +9910,7 @@
                <line value="skia_use_system_libjpeg_turbo = true"/>
                <line value="skia_use_jpeg_gainmaps = true"/>
 
-               <!-- Bundled WebP. -->
+               <!-- BuildEngine-managed external WebP decode/encode. -->
                <line value="skia_use_libwebp_decode = true"/>
                <line value="skia_use_libwebp_encode = true"/>
                <line value="skia_use_no_webp_encode = false"/>
