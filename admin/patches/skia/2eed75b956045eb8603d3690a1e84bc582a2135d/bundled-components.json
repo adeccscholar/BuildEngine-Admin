@@ -48,10 +48,6 @@
       "version": "1.6.0"
     },
     {
-      "name": "libyuv",
-      "version": "r1924"
-    },
-    {
       "name": "opengl",
       "version": "26.2.1"
     },
