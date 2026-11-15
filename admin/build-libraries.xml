@@ -9998,7 +9998,7 @@
             <variable name="FreeTypeLibraryName" value="libfreetype"/>
              <variable name="IcuCommonImport" value="libicuuc"/>
              <variable name="IcuI18nImport" value="libicuin"/>
-             <variable name="ExpatLibraryName" value="libexpat"/>
+             <variable name="ExpatLibraryName" value="liblibexpat"/>
          </variant>
 
          <variant name="Debug">
@@ -10013,7 +10013,7 @@
             <variable name="FreeTypeLibraryName" value="libfreetyped"/>
              <variable name="IcuCommonImport" value="libicuucd"/>
              <variable name="IcuI18nImport" value="libicuind"/>
-             <variable name="ExpatLibraryName" value="libexpatd"/>
+             <variable name="ExpatLibraryName" value="liblibexpatd"/>
          </variant>
 
          <install>
@@ -10758,7 +10758,7 @@
       </smoke>
    </library>
 
-   <library id="expat" version="2.10.0" category="data" timestamp="2026-11-15T20:05:00Z">
+   <library id="expat" version="2.10.0" category="data" timestamp="2026-11-08T03:45:00Z">
       <metadata name="Expat" supplier="Expat Project" homepage="https://libexpat.github.io/" description="Streaming XML parser used as a native dependency by TECkit SFconv and other XML-consuming components." licenseSignal="green">
          <license name="MIT" spdx="MIT" file="COPYING"/>
       </metadata>
@@ -10805,31 +10805,6 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\native-windows-tests.patch"/>
          </execute>
-         <!-- BCC64X COFF import libraries must have an explicit, reproducible name. -->
-         <copy source="{BuildFileDir}\patches\expat\2.10.0\bcc64x-import-name.patch"
-               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-import-name.patch"
-               overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="bcc64x-import-name-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/>
-            <argument value="--check"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-import-name.patch"/>
-         </execute>
-         <execute name="bcc64x-import-name-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-import-name.patch"/>
-         </execute>
-         <execute name="bcc64x-import-name-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/>
-            <argument value="--reverse"/>
-            <argument value="--check"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-import-name.patch"/>
-         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -10859,14 +10834,14 @@
                 executable="{Tool:cmake}"
                 build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release">
-            <variable name="ExpatImportLibraryName" value="libexpat"/>
+            <variable name="ExpatImportLibraryName" value="liblibexpat"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
             <argument value="-DCMAKE_C_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Release"/>
             <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/Release"/>
          </variant>
          <variant name="Debug">
-            <variable name="ExpatImportLibraryName" value="libexpatd"/>
+            <variable name="ExpatImportLibraryName" value="liblibexpatd"/>
             <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
             <argument value="-DCMAKE_C_FLAGS_DEBUG:STRING=-O0"/>
             <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/Debug"/>
