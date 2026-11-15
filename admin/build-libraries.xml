@@ -9637,11 +9637,6 @@
             <argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjxl.patch"/>
          </execute>
-         <!-- Resolve the installed Expat CMake import target at GN generation time. -->
-         <copy source="{BuildFileDir}\cmake\skia\resolve-expat-import.py"
-               target="{Workspace}\.buildengine\resolve-expat-import.py"
-               overwrite="true" preserveCurrentArtifact="true"/>
-
          <execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
@@ -9744,6 +9739,17 @@
          <environment
             name="PATH"
             value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+
+         <!-- Always stage the resolver on a build retry, even when source is already complete. -->
+         <execute name="stage-expat-resolver"
+                  executable="{Tool:cmake}"
+                  workingDirectory="{Workspace}"
+                  showOutput="false">
+            <argument value="-E"/>
+            <argument value="copy_if_different"/>
+            <argument value="{BuildFileDir}\cmake\skia\resolve-expat-import.py"/>
+            <argument value="{Workspace}\.buildengine\resolve-expat-import.py"/>
+         </execute>
 
          <target
             name="gn-gen"
