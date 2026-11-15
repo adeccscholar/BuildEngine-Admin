@@ -6,6 +6,18 @@ Skia 153 now declares `libwebp@1.6.0` as a direct BuildEngine dependency, uses `
 
 **Validation pending:** The supplied libwebp Release log failed because upstream `WEBP_ENABLE_SIMD=OFF` introduced `-mno-sse2`, producing E714 floating-point ABI errors and compiler crashes. The producer was reconfigured with `WEBP_ENABLE_SIMD=ON`; no successful retest, DLL import-library-name verification, GN generation, Skia Debug/Release link or loader smoke is yet available. The historical 109/109 FSM result predates these changes.
 
+### Updated direct dependency
+
+```mermaid
+flowchart LR
+   skia["Skia 153"] --> webp["libwebp 1.6.0"]
+   webp --> decode["WebP decode / encode"]
+   webp --> demux["WebP demux"]
+   webp --> mux["WebP mux"]
+```
+
+The XML now declares 14 direct dependencies, including Wuffs (source-only) and libwebp (expected DLL imports). The complete external closure and SBOM count must be recalculated from the rebuilt installation, not copied from the historical 12-dependency snapshot below. Verify 16-bit RGB565/BGR565 pixel order specifically: Skia's earlier bundled WebP build used the non-standard `WEBP_SWAP_16BIT_CSP` compile definition, whereas a standalone upstream WebP codec does not necessarily preserve this behavior.
+
 ## PIE-X 0.27 independent producer (15 November 2026)
 
 The PIE-X native package `piex@0.27` now has its own BuildEngine XML entry and CMake adapter. No BCC64X DLL build PASS, Skia ABI check, RAW preview smoke, or external GN link PASS has been confirmed. Therefore Skia remains configured with `skia_use_piex = false` and does not gain an unverified direct dependency. [PIE-X 0.27 integration](/package/piex/0.27/migration).
