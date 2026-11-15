@@ -1,5 +1,13 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## Current declarative integration (16 November 2026 audit)
+
+The active schema-17 XML declares **17 direct Skia 153 dependencies**. Its version-pinned `bundled-components.json` lists the same **17 external BuildEngine coordinates**, without missing or extra entries. The manifest retains **five bundled components**: D3D12MemoryAllocator, dng_sdk, SPIRV-Headers, SPIRV-Tools, and glslang. These are declarations, not proof of native linkage or bundled-code elimination in the installed binaries.
+
+The AV1 decode path is `Skia 153 -> libavif 1.4.2 -> libgav1 0.20.0`. libgav1 is also a direct Skia dependency for the FSM install gate and runtime search path. libavif selects `AVIF_CODEC_LIBGAV1=SYSTEM`, `AVIF_CODEC_AOM_DECODE=OFF`, `AVIF_CODEC_AOM_ENCODE=ON`, and `AVIF_LIBYUV=SYSTEM`. Its declared import library is `libgav1_shared.lib` from the matching BuildEngine variant. No Skia-local libgav1 download is declared.
+
+**[not verified]** The revised libgav1, libavif, and Skia Debug/Release BCC64X builds, actual PE import closure, and AVIF decode smoke have no new matching execution evidence in this audit. The operator-confirmed 109/109 FSM completion was for an earlier contract. The dated integration notes below are retained as engineering history and must not override this section or the active XML.
+
 ## Correction: Python helper steps withdrawn (15 November 2026)
 
 The previously added Python scripts `ensure_skia_webp_gn.py` and `verify_skia_webp_gn.py` and their Skia build invocations have been **removed**. The earlier entries below describing them as active are historical and superseded by this correction. External WebP integration must remain in the version-pinned GN patch and the existing BuildEngine XML source preparation actions; do not introduce auxiliary Python orchestration or silently edit staged source trees during the build phase. The unresolved WebP issue is not declared fixed, and no successful Skia build has been verified.
