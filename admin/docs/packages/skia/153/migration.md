@@ -1,3 +1,19 @@
+# Skia 153: BuildEngine integration and dependency provenance
+
+## Current integration status (15 November 2026)
+
+The active BuildEngine contract pins Skia to revision `2eed75b956045eb8603d3690a1e84bc582a2135d` (Chrome M153). It declares direct BuildEngine dependencies on OpenGL 26.2.1, zlib 1.4, Brotli 1.2.1, libjpeg-turbo 3.2.1, libpng 1.6.59, HarfBuzz 15.1.0, FreeType 2.15.0, ICU 79.1, Expat 2.10.0, libavif 1.4.2, libjxl 0.13.0, and Vulkan Memory Allocator 3.4.0.
+
+Skia's Highway source download and extraction have been removed from the source contract. Its bundled-components manifest no longer declares Highway, because the independently managed libjxl 0.13.0 already depends on Highway 1.4.0. Whether the installed Skia binary actually uses external Highway directly is not verified; no direct Highway dependency should be inferred for Skia from the libjxl dependency alone.
+
+**SPIR-V work remains open:** SPIRV-Cross, SPIRV-Headers, SPIRV-Tools, and glslang are still pinned and extracted as Skia source dependencies. Their externalization must include corresponding GN target and link changes before their sources or bundled SBOM entries are removed. The Debug GN patch currently forces SPIR-V validation in Debug, regardless of the `skia_enable_spirv_validation` setting.
+
+**Dashboard counts are installed-artifact evidence, not a live source declaration:** `Components`, `Dependencies`, and `Bundled` on the library detail page are calculated from the installed CycloneDX SBOM package closure. An in-progress rebuild may therefore still display the previous counts (for example, 27 / 8 / 18) until a new verified SBOM is installed. These numbers must never be silently replaced with expected counts derived from the updated source XML.
+
+The sections below retain the earlier build configuration record and must not be mistaken for the complete current dependency graph.
+
+---
+
 ## Updated BuildEngine contract (10 November 2026)
 
 **Declared configuration; no new test PASS.**
@@ -30,7 +46,7 @@ flowchart LR
    N7 --> N6
 ```
 
-Direkt: `opengl@26.2.1`, `zlib@1.4`, `brotli@1.2.1`, `libjpeg-turbo@3.2.1`, `libpng@1.6.59`, `harfbuzz@15.1.0`, `freetype@2.15.0`
+Direct dependencies in the earlier configuration: `opengl@26.2.1`, `zlib@1.4`, `brotli@1.2.1`, `libjpeg-turbo@3.2.1`, `libpng@1.6.59`, `harfbuzz@15.1.0`, `freetype@2.15.0`.
 
 ### Current configuration
 
