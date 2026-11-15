@@ -1,5 +1,12 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## Incremental WebP GN source synchronization (15 November 2026)
+
+Skia's source phase may have completed before the last versioned `bcc64x-system-libwebp.patch` update, leaving both source `BUILD.gn` files and the generated Ninja graph stale. The BuildEngine XML now runs `admin/scripts/ensure_skia_webp_gn.py` **before GN generation**, which requires the prior external-libwebp patch to be present and idempotently adds the managed include config to both `webp_decode` and `webp_encode` when missing. It deliberately rejects unexpected upstream layouts or any attempt to switch a bundled WebP target without the required import wiring.
+
+A separate `verify_skia_webp_gn.py` step executes **after GN generation and before Ninja**, checks the installed WebP headers and the GN-described include directories of both codec targets, and fails immediately with the actual GN directories if the expected managed path is absent. This combination handles cached/staged source trees without weakening the explicit versioned patch contract. **No new Debug/Release build result has been supplied yet.**
+
+
 ## Follow-up: repeated WebP header errors and staged source verification (15 November 2026)
 
 Both Debug and Release still report `F1129` for `webp/encode.h` in `SkWebpEncoderImpl.cpp` (and the previous Release run also failed to locate `webp/decode.h` in `SkWebpCodec.cpp`). The library `libwebp@1.6.0` was already reported successfully built by the operator. The BuildEngine XML does set `skia_use_system_libwebp = true` and provide `CB_SKIA_LIBWEBP_INCLUDE`, and the versioned GN patch explicitly attaches `managed_webp_includes` to the two WebP targets. Repeating the same fatal error therefore requires inspecting the **effective staged Skia source and generated GN/Ninja output**, not another blind change to the producer.
