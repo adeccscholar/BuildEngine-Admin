@@ -9724,8 +9724,7 @@
          <environment name="CB_SKIA_ICU_UC_LIB" value="{DependencyRoot:icu}\lib\win64\{Configuration}\{IcuCommonImport}.lib"/>
          <environment name="CB_SKIA_ICU_I18N_LIB" value="{DependencyRoot:icu}\lib\win64\{Configuration}\{IcuI18nImport}.lib"/>
          <environment name="CB_SKIA_EXPAT_INCLUDE" value="{DependencyRoot:expat}\include"/>
-         <environment name="CB_SKIA_EXPAT_ROOT" value="{DependencyRoot:expat}"/>
-         <environment name="CB_SKIA_EXPAT_CONFIGURATION" value="{Configuration}"/>
+         <environment name="CB_SKIA_EXPAT_LIB" value="{DependencyRoot:expat}\lib\win64\{Configuration}\{ExpatLibraryName}.lib"/>
          <environment name="CB_SKIA_LIBAVIF_INCLUDE" value="{DependencyRoot:libavif}\include"/>
          <environment name="CB_SKIA_LIBAVIF_LIB" value="{DependencyRoot:libavif}\lib\win64\{Configuration}\libavif.lib"/>
          <environment name="CB_SKIA_LIBJXL_INCLUDE" value="{DependencyRoot:libjxl}\include"/>
@@ -9739,17 +9738,6 @@
          <environment
             name="PATH"
             value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
-
-         <!-- Always stage the resolver on a build retry, even when source is already complete. -->
-         <execute name="stage-expat-resolver"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{Workspace}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="copy_if_different"/>
-            <argument value="{BuildFileDir}\cmake\skia\resolve-expat-import.py"/>
-            <argument value="{Workspace}\.buildengine\resolve-expat-import.py"/>
-         </execute>
 
          <target
             name="gn-gen"
@@ -9876,7 +9864,7 @@
                <line value="bcc64x_icu_uc_lib = getenv(&quot;CB_SKIA_ICU_UC_LIB&quot;)"/>
                <line value="bcc64x_icu_i18n_lib = getenv(&quot;CB_SKIA_ICU_I18N_LIB&quot;)"/>
                <line value="bcc64x_expat_include = getenv(&quot;CB_SKIA_EXPAT_INCLUDE&quot;)"/>
-               <line value="bcc64x_expat_lib = exec_script(&quot;//.buildengine/resolve-expat-import.py&quot;, [getenv(&quot;CB_SKIA_EXPAT_ROOT&quot;), getenv(&quot;CB_SKIA_EXPAT_CONFIGURATION&quot;)], &quot;trim string&quot;)"/>
+               <line value="bcc64x_expat_lib = getenv(&quot;CB_SKIA_EXPAT_LIB&quot;)"/>
                <line value="bcc64x_libavif_include = getenv(&quot;CB_SKIA_LIBAVIF_INCLUDE&quot;)"/>
                <line value="bcc64x_libavif_lib = getenv(&quot;CB_SKIA_LIBAVIF_LIB&quot;)"/>
                <line value="bcc64x_libjxl_include = getenv(&quot;CB_SKIA_LIBJXL_INCLUDE&quot;)"/>
@@ -10010,7 +9998,7 @@
             <variable name="FreeTypeLibraryName" value="libfreetype"/>
              <variable name="IcuCommonImport" value="libicuuc"/>
              <variable name="IcuI18nImport" value="libicuin"/>
-             
+             <variable name="ExpatLibraryName" value="libexpat"/>
          </variant>
 
          <variant name="Debug">
@@ -10025,7 +10013,7 @@
             <variable name="FreeTypeLibraryName" value="libfreetyped"/>
              <variable name="IcuCommonImport" value="libicuucd"/>
              <variable name="IcuI18nImport" value="libicuind"/>
-             
+             <variable name="ExpatLibraryName" value="libexpat"/>
          </variant>
 
          <install>
