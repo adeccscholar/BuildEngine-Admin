@@ -15194,4 +15194,69 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
+   <library id="libjxl" version="0.13.0" category="graphics" timestamp="2026-11-15T16:58:00Z">
+      <dependency library="highway" version="1.4.0"/>
+      <dependency library="brotli" version="1.2.1"/>
+      <dependency library="lcms2" version="2.20"/>
+      <dependency library="libpng" version="1.6.59"/>
+      <metadata name="libjxl" supplier="JPEG XL project" homepage="https://github.com/libjxl/libjxl" description="JPEG XL image encoder and decoder with managed Highway, Brotli and LCMS2 dependencies" licenseSignal="yellow">
+         <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/libjxl/libjxl.git" ref="v0.13.0"/></security>
+      <source>
+         <download url="https://github.com/libjxl/libjxl/archive/refs/tags/v0.13.0.tar.gz" archive="libjxl-0.13.0.tar.gz"/>
+         <extract format="libarchive" root="libjxl-0.13.0">
+            <require path="CMakeLists.txt"/>
+            <require path="lib\include\jxl\decode.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:highway};{DependencyRoot:brotli};{DependencyRoot:lcms2};{DependencyRoot:libpng}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TESTING:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_TOOLS:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_BENCHMARK:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_JNI:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_OPENEXR:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_SJPEG:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_MANPAGES:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_DOXYGEN:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_VIEWERS:BOOL=OFF"/>
+         <argument value="-DJPEGXL_ENABLE_SKCMS:BOOL=OFF"/>
+         <argument value="-DJPEGXL_FORCE_SYSTEM_BROTLI:BOOL=ON"/>
+         <argument value="-DJPEGXL_FORCE_SYSTEM_HWY:BOOL=ON"/>
+         <argument value="-DJPEGXL_FORCE_SYSTEM_LCMS2:BOOL=ON"/>
+         <argument value="-DJPEGXL_BUNDLE_LIBPNG:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\jxl\decode.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libjxl\LICENSE" overwrite="true"/></common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+   </library>
 </buildLibraries>
