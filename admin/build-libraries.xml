@@ -8689,7 +8689,7 @@
       </publish>
    </library>
 
-   <library id="libgav1" version="0.20.0" category="graphics" timestamp="2026-11-15T22:44:00Z">
+   <library id="libgav1" version="0.20.0" category="graphics" timestamp="2026-11-15T22:51:00Z">
       <metadata name="libgav1" supplier="libgav1 Authors" homepage="https://chromium.googlesource.com/codecs/libgav1/" description="Independent AV1 decoder package built from upstream libgav1 0.20.0 with BCC64X and dynamic runtime." licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\libgav1\LICENSE"/>
       </metadata>
@@ -8702,6 +8702,16 @@
             <require path="src\gav1\decoder.h"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\libgav1\0.20.0\bcc64x-winthreads.patch" target="{Workspace}\.buildengine\bcc64x-winthreads.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="libgav1-winthreads-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\bcc64x-winthreads.patch"/>
+         </execute>
+         <execute name="libgav1-winthreads-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\bcc64x-winthreads.patch"/>
+         </execute>
+         <execute name="libgav1-winthreads-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="{Workspace}\.buildengine\bcc64x-winthreads.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
