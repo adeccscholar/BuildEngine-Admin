@@ -1,3 +1,11 @@
+## 15 November 2026 — Selected OpenCV Contrib expansion
+
+The existing pinned `opencv_contrib` source is retained. The `opencv@5.1.0` build list now includes `img_hash`, `optflow`, `quality`, and `ximgproc` in addition to the previous 17 modules. This change is limited to OpenCV 5.1.0; it does not alter the older 5.0.0 profile or introduce FFmpeg, CUDA, GStreamer, or additional image-codec dependencies.
+
+Both per-configuration install contracts require matching DLL and import-library pairs for all four added modules. The installed consumer smoke now requests their CMake components and tests usable image-hash, quality and guided-filter functionality (optflow is linked as a component). Windows/BCC64X compilation and runtime: **[not verified]**, pending the next BuildEngine run.
+
+---
+
 ## Updated BuildEngine contract (10 November 2026)
 
 **Declared configuration; no new test PASS.**
