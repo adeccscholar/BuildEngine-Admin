@@ -8737,28 +8737,12 @@
             archive="skia-deps\dng_sdk-dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"/>
 
          <download
-            url="https://chromium.googlesource.com/external/github.com/libexpat/libexpat.git/+archive/6154446fccefbf3ca644894f598969113b0c7bcd.tar.gz"
-            archive="skia-deps\expat-6154446fccefbf3ca644894f598969113b0c7bcd.tar.gz"/>
-
-         <download
             url="https://chromium.googlesource.com/external/github.com/google/highway.git/+archive/457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"
             archive="skia-deps\highway-457c891775a7397bdb0376bb1031e6e027af1c48.tar.gz"/>
 
          <download
-            url="https://chromium.googlesource.com/chromium/deps/icu.git/+archive/d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738.tar.gz"
-            archive="skia-deps\icu-d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738.tar.gz"/>
-
-         <download
-            url="https://github.com/AOMediaCodec/libavif/archive/55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"
-            archive="skia-deps\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"/>
-
-         <download
             url="https://chromium.googlesource.com/codecs/libgav1.git/+archive/5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"
             archive="skia-deps\libgav1-5cf722e659014ebaf2f573a6dd935116d36eadf1.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/external/gitlab.com/wg1/jpeg-xl.git/+archive/332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"
-            archive="skia-deps\libjxl-332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"/>
 
          <download
             url="https://chromium.googlesource.com/webm/libwebp.git/+archive/845d5476a866141ba35ac133f856fa62f0b7445f.tar.gz"
@@ -8923,27 +8907,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\dng_sdk\source\dng_host.h"/>
 
-         <execute name="mkdir-expat"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\expat"/>
-         </execute>
-
-         <execute name="extract-expat"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\expat"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\expat-6154446fccefbf3ca644894f598969113b0c7bcd.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\expat\expat\lib\expat.h"/>
-
          <execute name="mkdir-highway"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -8965,63 +8928,6 @@
 
          <require path="{CurrentArtifact}\third_party\externals\highway\hwy\highway.h"/>
 
-         <execute name="mkdir-icu"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\icu"/>
-         </execute>
-
-         <execute name="extract-icu"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\icu"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\icu-d578f2e8b7bd5938e21cfb6bf15c079e0aa5b738.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\icu\source\common\unicode\utypes.h"/>
-
-         <execute name="mkdir-libavif"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libavif"/>
-         </execute>
-
-         <execute name="extract-libavif"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\libavif"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.tar.gz"/>
-         </execute>
-         <!-- GitHub pinned revision, root folder libavif-55aab4ac0607ab651055d354d64c4615cf3d8000.
-              Verify pinned source before copying and remove the staging root. -->
-         <require path="{CurrentArtifact}\third_party\externals\libavif\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000\include\avif\avif.h"/>
-         <execute name="flatten-libavif-github-archive" executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\libavif" showOutput="false">
-            <argument value="-E"/><argument value="copy_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libavif\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libavif"/>
-         </execute>
-         <require path="{CurrentArtifact}\third_party\externals\libavif\include\avif\avif.h"/>
-         <execute name="cleanup-libavif-github-root" executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\libavif" showOutput="false">
-            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libavif\libavif-55aab4ac0607ab651055d354d64c4615cf3d8000"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\libavif\include\avif\avif.h"/>
-
          <execute name="mkdir-libgav1"
                   executable="{Tool:cmake}"
                   workingDirectory="{CurrentArtifact}"
@@ -9042,28 +8948,6 @@
          </execute>
 
          <require path="{CurrentArtifact}\third_party\externals\libgav1\src\gav1\decoder.h"/>
-
-         <execute name="mkdir-libjxl"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\libjxl"/>
-         </execute>
-
-         <execute name="extract-libjxl"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\libjxl"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\libjxl-332feb17d17311c748445f7ee75c4fb55cc38530.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\libjxl\lib\include\jxl\decode.h"/>
-         <require path="{CurrentArtifact}\third_party\externals\libjxl\lib\lib.gni"/>
 
          <execute name="mkdir-libwebp"
                   executable="{Tool:cmake}"
