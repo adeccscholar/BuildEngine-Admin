@@ -6,6 +6,8 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
+- **[2026-11-15](/news/2026-11-15/)** — libxml2 2.15.4, libaom 3.15.3, dependency refresh and OpenSSL 3.5.10 follow-up
+
 - **[2026-11-10](/news/2026-11-10/)** — 95 library documentation pages, transitive Mermaid graphs, news routes and Skia DLL review
 - **[2026-11-09](/news/2026-11-09/)** — VTK 9.7.2, OpenCV 5.1, new tools and libarchive, PDFium, libtiff and OpenXLSX corrections
 - **[2026-11-08](/news/2026-11-08/)** — Catch2, GoogleTest, oneTBB, PoDoFo, Poppler, Tesseract and other library upgrades
@@ -48,6 +50,7 @@ Each news item reports **distinct libraries** (unique logical library IDs) and *
 | 07 Nov | 60 | 70 |
 | 08 Nov | 60 | 87 |
 | 09–10 Nov | 62 | 95 |
+| 15 Nov | 74 | 109 |
 
 The first schema-3 version had just one pugiXML entry earlier on 24 August; the end-of-day schema-4 count was two. The feasibility study examined approximately twenty libraries before the initial Admin library catalog was established.
 
