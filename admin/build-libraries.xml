@@ -15598,7 +15598,7 @@
       <dependency library="libaom" version="3.15.3"/>
       <dependency library="libyuv" version="r1924"/>
       <metadata name="libavif" supplier="Alliance for Open Media" homepage="https://github.com/AOMediaCodec/libavif" description="AVIF image encoder and decoder using externally managed libaom and optional libyuv" licenseSignal="green">
-         <license name="BSD 2-Clause" spdx="BSD-2-Clause" file="LICENSE"/>
+         <license name="BSD 2-Clause" spdx="BSD-2-Clause" file="licenses\libavif\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/AOMediaCodec/libavif.git" ref="v1.4.2"/></security>
       <source>
