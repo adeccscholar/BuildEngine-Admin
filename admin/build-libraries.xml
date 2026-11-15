@@ -8806,7 +8806,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T22:54:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-15T22:58:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -8820,7 +8820,7 @@
       <dependency library="libjxl" version="0.13.0"/>
       <dependency library="libwebp" version="1.6.0"/>
       <dependency library="piex" version="0.27"/>
-      <dependency library="libyuv" version="r1924"/>
+      
       <dependency library="vulkan-memory-allocator" version="3.4.0"/>
       <dependency library="wuffs" version="0.3"/>
 
@@ -9657,16 +9657,6 @@
          <execute name="bcc64x-system-piex-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-piex.patch"/>
          </execute>
-         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-libyuv.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libyuv.patch" overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="bcc64x-system-libyuv-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libyuv.patch"/>
-         </execute>
-         <execute name="bcc64x-system-libyuv-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libyuv.patch"/>
-         </execute>
-         <execute name="bcc64x-system-libyuv-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
-            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libyuv.patch"/>
-         </execute>
 <execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
@@ -9765,8 +9755,8 @@
          <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpmux.lib"/>
          <environment name="CB_SKIA_PIEX_INCLUDE" value="{DependencyRoot:piex}\include"/>
          <environment name="CB_SKIA_PIEX_LIB" value="{DependencyRoot:piex}\lib\win64\{Configuration}\{PiexLibraryName}.lib"/>
-         <environment name="CB_SKIA_LIBYUV_INCLUDE" value="{DependencyRoot:libyuv}\include"/>
-         <environment name="CB_SKIA_LIBYUV_LIB" value="{DependencyRoot:libyuv}\lib\win64\{Configuration}\{LibYuvLibraryName}.lib"/>
+         
+         
 
          <!--
             Runtime DLL resolution for all BuildEngine package dependencies.
@@ -9775,7 +9765,7 @@
          -->
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:libyuv}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
          <target
             name="gn-gen"
@@ -9913,8 +9903,8 @@
                <line value="bcc64x_libwebp_mux_lib = getenv(&quot;CB_SKIA_LIBWEBP_MUX_LIB&quot;)"/>
                <line value="bcc64x_piex_include = getenv(&quot;CB_SKIA_PIEX_INCLUDE&quot;)"/>
                <line value="bcc64x_piex_lib = getenv(&quot;CB_SKIA_PIEX_LIB&quot;)"/>
-               <line value="bcc64x_libyuv_include = getenv(&quot;CB_SKIA_LIBYUV_INCLUDE&quot;)"/>
-               <line value="bcc64x_libyuv_lib = getenv(&quot;CB_SKIA_LIBYUV_LIB&quot;)"/>
+               
+               
                <line value="skia_pdf_subset_harfbuzz = true"/>
 
                <line value="skia_use_client_icu = false"/>
@@ -9973,7 +9963,7 @@
                -->
                <line value="skia_use_piex = true"/>
                <line value="skia_use_system_piex = true"/>
-               <line value="skia_use_system_libyuv = true"/>
+               
 
                <!-- BuildEngine Brotli package. -->
                <line value="skia_use_system_brotli = true"/>
@@ -10006,7 +9996,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:libyuv}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="gen"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10021,7 +10011,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:libyuv}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="-C"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10048,7 +10038,7 @@
              <variable name="IcuI18nImport" value="libicuin"/>
              <variable name="ExpatLibraryName" value="liblibexpat"/>
             <variable name="PiexLibraryName" value="libpiex"/>
-            <variable name="LibYuvLibraryName" value="libyuv"/>
+            
          </variant>
 
          <variant name="Debug">
@@ -10065,7 +10055,7 @@
              <variable name="IcuI18nImport" value="libicuind"/>
              <variable name="ExpatLibraryName" value="liblibexpatd"/>
             <variable name="PiexLibraryName" value="libpiexd"/>
-            <variable name="LibYuvLibraryName" value="libyuv"/>
+            
          </variant>
 
          <install>
@@ -10297,7 +10287,7 @@
 
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:brotli}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:harfbuzz}\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{DependencyRoot:libwebp}\bin\win64\Release;{DependencyRoot:piex}\bin\win64\Release;{DependencyRoot:libyuv}\bin\win64\Release;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:brotli}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:harfbuzz}\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{DependencyRoot:libwebp}\bin\win64\Release;{DependencyRoot:piex}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
 
       <smoke
@@ -10316,7 +10306,7 @@
 
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:brotli}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:harfbuzz}\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{DependencyRoot:libwebp}\bin\win64\Debug;{DependencyRoot:piex}\bin\win64\Debug;{DependencyRoot:libyuv}\bin\win64\Debug;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:brotli}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:harfbuzz}\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{DependencyRoot:libwebp}\bin\win64\Debug;{DependencyRoot:piex}\bin\win64\Debug;{ENV:PATH}"/>
       </smoke>
    </library>
    
