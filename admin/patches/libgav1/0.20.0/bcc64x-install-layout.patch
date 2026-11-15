@@ -1,7 +1,9 @@
 diff --git a/cmake/libgav1_install.cmake b/cmake/libgav1_install.cmake
 --- a/cmake/libgav1_install.cmake
 +++ b/cmake/libgav1_install.cmake
-@@ -57,4 +57,6 @@
+@@ -55,7 +55,9 @@
+     install(TARGETS libgav1_static DESTINATION
+                     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 -    if(BUILD_SHARED_LIBS)
 -      install(TARGETS libgav1_shared DESTINATION
 -                      "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
@@ -12,3 +14,4 @@ diff --git a/cmake/libgav1_install.cmake b/cmake/libgav1_install.cmake
 +              LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 +              ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 +    endif()
+   endif()
