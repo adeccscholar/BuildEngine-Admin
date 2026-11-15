@@ -15001,4 +15001,25 @@
          <tree source="include" target="include" optional="false"/>
       </publish>
    </library>
+   <library id="spirv-headers" version="942fe4b988359a0750b79f0ae7ed735994d3147d" category="graphics" timestamp="2026-11-15T16:58:00Z">
+      <metadata name="SPIRV-Headers" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Headers" description="Pinned SPIR-V grammar and C/C++ headers for shader tools; source snapshot compatible with Skia 153" licenseSignal="green">
+         <license name="MIT" spdx="MIT" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/KhronosGroup/SPIRV-Headers.git" commit="942fe4b988359a0750b79f0ae7ed735994d3147d"/></security>
+      <source>
+         <download url="https://github.com/KhronosGroup/SPIRV-Headers/archive/942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz" archive="spirv-headers-942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"/>
+         <extract format="libarchive" root="SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d">
+            <require path="include\spirv\unified1\spirv.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\include\spirv" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\spirv" recursive="true" overwrite="true"/>
+         <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\spirv-headers\LICENSE" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\spirv\unified1\spirv.h"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+      </publish>
+   </library>
 </buildLibraries>
