@@ -4,17 +4,16 @@
 
 [TOC|Content]
 
-**Catalog snapshot, 10 November 2026:** Schema 17 declares **95 versioned library records across 62 logical IDs** and **32 `supersededBy` entries**. Execution evidence applies only to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
+**Catalog declaration audit, 16 November 2026:** Schema 17 contains **112 versioned library records across 77 logical IDs** in the checked XML. The 10 November 95/62 snapshot is historical. Execution evidence applies only to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
 
 **Status:** architecture and integration snapshot reviewed **21 October 2026**. The Library-FSM architecture is active; individual integration capabilities can still be marked not verified until their real target-machine run is complete.
 
 BuildEngine is a declarative C++23 orchestration system centered on Embarcadero C++Builder 13 / BCC64X. The current architecture separates the declarative library contract, the runtime Library-FSM, persistent logical scope state, technical WorkItems/Actions, artifact evidence, Common repository semantics and read-only presentation.
 
-## Current platform and integration snapshot (10 November 2026)
+## Current platform and integration snapshot (16 November 2026 XML audit)
 
-The synchronized Admin library contract is now **Schema 17**, containing
-**95 versioned library entries across 62 library IDs**, including 32
-retained superseded coordinates. The current tools contract declares **27
+The synchronized Admin library contract uses **Schema 17**, containing
+**112 versioned library entries across 77 library IDs**. Superseded coordinates remain retained in the versioned contract. The current tools contract declares **27
 tool IDs**. These counts refer to the Git definitions, not to a claimed
 successful machine run. See the [full library matrix](libraries.md) and
 [tool inventory](tools.md).
