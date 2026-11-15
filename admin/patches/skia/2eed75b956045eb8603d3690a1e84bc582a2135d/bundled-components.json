@@ -86,12 +86,6 @@
       "repository": "https://android.googlesource.com/platform/external/dng_sdk.git"
     },
     {
-      "name": "libgav1",
-      "version": "5cf722e659014ebaf2f573a6dd935116d36eadf1",
-      "versionScheme": "git",
-      "repository": "https://chromium.googlesource.com/codecs/libgav1.git"
-    },
-    {
       "name": "SPIRV-Cross",
       "version": "b8fcf307f1f347089e3c46eb4451d27f32ebc8d3",
       "versionScheme": "git",
