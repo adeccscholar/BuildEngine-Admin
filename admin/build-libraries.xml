@@ -8641,6 +8641,10 @@
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="harfbuzz" version="15.1.0"/>
       <dependency library="freetype" version="2.15.0"/>
+      <dependency library="icu" version="79.1"/>
+      <dependency library="expat" version="2.10.0"/>
+      <dependency library="libavif" version="1.4.2"/>
+      <dependency library="libjxl" version="0.13.0"/>
 
       <metadata name="Skia" supplier="Google" homepage="https://skia.org/" description="2D graphics engine providing raster, vector, text, image, and GPU-accelerated rendering capabilities." licenseSignal="yellow">
          <license name="BSD 3-Clause"
@@ -9710,6 +9714,94 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-d3d-getdesc.patch"/>
          </execute>
 
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-icu.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-icu.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="system-icu-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-icu.patch"/>
+         </execute>
+         <execute name="system-icu-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-icu.patch"/>
+         </execute>
+         <execute name="system-icu-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-icu.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-expat.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-expat.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="system-expat-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-expat.patch"/>
+         </execute>
+         <execute name="system-expat-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-expat.patch"/>
+         </execute>
+         <execute name="system-expat-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-expat.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-libavif.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libavif.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="system-libavif-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libavif.patch"/>
+         </execute>
+         <execute name="system-libavif-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libavif.patch"/>
+         </execute>
+         <execute name="system-libavif-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libavif.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-libjxl.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjxl.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="system-libjxl-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjxl.patch"/>
+         </execute>
+         <execute name="system-libjxl-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjxl.patch"/>
+         </execute>
+         <execute name="system-libjxl-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--reverse"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-libjxl.patch"/>
+         </execute>
          <execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
@@ -9792,6 +9884,16 @@
             name="CB_SKIA_FREETYPE_LIB"
             value="{DependencyRoot:freetype}\lib\win64\{Configuration}\{FreeTypeLibraryName}.lib"/>
 
+         <environment name="CB_SKIA_ICU_INCLUDE" value="{DependencyRoot:icu}\include"/>
+         <environment name="CB_SKIA_ICU_UC_LIB" value="{DependencyRoot:icu}\lib\win64\{Configuration}\{IcuCommonImport}.lib"/>
+         <environment name="CB_SKIA_ICU_I18N_LIB" value="{DependencyRoot:icu}\lib\win64\{Configuration}\{IcuI18nImport}.lib"/>
+         <environment name="CB_SKIA_EXPAT_INCLUDE" value="{DependencyRoot:expat}\include"/>
+         <environment name="CB_SKIA_EXPAT_LIB" value="{DependencyRoot:expat}\lib\win64\{Configuration}\{ExpatLibraryName}.lib"/>
+         <environment name="CB_SKIA_LIBAVIF_INCLUDE" value="{DependencyRoot:libavif}\include"/>
+         <environment name="CB_SKIA_LIBAVIF_LIB" value="{DependencyRoot:libavif}\lib\win64\{Configuration}\libavif.lib"/>
+         <environment name="CB_SKIA_LIBJXL_INCLUDE" value="{DependencyRoot:libjxl}\include"/>
+         <environment name="CB_SKIA_LIBJXL_LIB" value="{DependencyRoot:libjxl}\lib\win64\{Configuration}\libjxl.lib"/>
+
          <!--
             Runtime DLL resolution for all BuildEngine package dependencies.
             They remain separate packages; no dependency DLL is copied into
@@ -9799,7 +9901,7 @@
          -->
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
          <target
             name="gn-gen"
@@ -9916,11 +10018,20 @@
 
                <!-- Unicode / shaping. -->
                <line value="skia_use_icu = true"/>
-               <line value="skia_use_system_icu = false"/>
+               <line value="skia_use_system_icu = true"/>
                <line value="skia_enable_skunicode = true"/>
 
                <line value="skia_use_harfbuzz = true"/>
                <line value="skia_use_system_harfbuzz = true"/>
+               <line value="bcc64x__icu_include = getenv(&quot;"CB_SKIA_ICU_INCLUDE&quot;)"/>
+               <line value="bcc64x__icu_uc_lib = getenv(&quot;"CB_SKIA_ICU_UC_LIB&quot;)"/>
+               <line value="bcc64x__icu_i18n_lib = getenv(&quot;"CB_SKIA_ICU_I18N_LIB&quot;)"/>
+               <line value="bcc64x__expat_include = getenv(&quot;"CB_SKIA_EXPAT_INCLUDE&quot;)"/>
+               <line value="bcc64x__expat_lib = getenv(&quot;"CB_SKIA_EXPAT_LIB&quot;)"/>
+               <line value="bcc64x__libavif_include = getenv(&quot;"CB_SKIA_LIBAVIF_INCLUDE&quot;)"/>
+               <line value="bcc64x__libavif_lib = getenv(&quot;"CB_SKIA_LIBAVIF_LIB&quot;)"/>
+               <line value="bcc64x__libjxl_include = getenv(&quot;"CB_SKIA_LIBJXL_INCLUDE&quot;)"/>
+               <line value="bcc64x__libjxl_lib = getenv(&quot;"CB_SKIA_LIBJXL_LIB&quot;)"/>
                <line value="skia_pdf_subset_harfbuzz = true"/>
 
                <line value="skia_use_client_icu = false"/>
@@ -9930,7 +10041,7 @@
 
                <!-- XML / vector / documents / animation. -->
                <line value="skia_use_expat = true"/>
-               <line value="skia_use_system_expat = false"/>
+               <line value="skia_use_system_expat = true"/>
                <line value="skia_enable_pdf = true"/>
                <line value="skia_use_xps = true"/>
 
@@ -9962,10 +10073,12 @@
 
                <!-- Bundled AVIF. -->
                <line value="skia_use_libavif = true"/>
+               <line value="skia_use_system_libavif = true"/>
                <line value="skia_use_crabbyavif = false"/>
 
                <!-- Bundled JPEG XL. -->
                <line value="skia_use_libjxl_decode = true"/>
+               <line value="skia_use_system_libjxl = true"/>
 
                <!-- Bundled RAW / DNG. -->
                <line value="skia_use_dng_sdk = true"/>
@@ -10008,7 +10121,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="gen"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10023,7 +10136,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="-C"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10046,6 +10159,9 @@
             <variable name="HarfBuzzLibraryName" value="libharfbuzz"/>
             <variable name="HarfBuzzSubsetLibraryName" value="libharfbuzz-subset"/>
             <variable name="FreeTypeLibraryName" value="libfreetype"/>
+             <variable name="IcuCommonImport" value="libicuuc"/>
+             <variable name="IcuI18nImport" value="libicuin"/>
+             <variable name="ExpatLibraryName" value="libexpat"/>
          </variant>
 
          <variant name="Debug">
@@ -10058,6 +10174,9 @@
             <variable name="HarfBuzzLibraryName" value="libharfbuzzd"/>
             <variable name="HarfBuzzSubsetLibraryName" value="libharfbuzz-subsetd"/>
             <variable name="FreeTypeLibraryName" value="libfreetyped"/>
+             <variable name="IcuCommonImport" value="libicuucd"/>
+             <variable name="IcuI18nImport" value="libicuind"/>
+             <variable name="ExpatLibraryName" value="libexpat"/>
          </variant>
 
          <install>
@@ -10122,11 +10241,6 @@
                   target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skottie.lib"
                   overwrite="true"/>
 
-               <copy
-                  source="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\icudtl.dat"
-                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\icudtl.dat"
-                  overwrite="true"/>
-
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skia.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skia.lib"/>
 
@@ -10144,8 +10258,6 @@
 
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\skottie.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\skottie.lib"/>
-
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\icudtl.dat"/>
             </perVariant>
 
             <common>
