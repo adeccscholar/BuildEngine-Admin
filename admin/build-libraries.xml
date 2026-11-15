@@ -15485,6 +15485,7 @@
          <argument value="-DENABLE_NASM:BOOL=ON"/>
          <argument value="-DCONFIG_AV1_DECODER:STRING=1"/>
          <argument value="-DCONFIG_AV1_ENCODER:STRING=1"/>
+         <argument value="-DCONFIG_MULTITHREAD:STRING=1"/>
          <argument value="-DCONFIG_LIBYUV:STRING=0"/>
          <argument value="-DENABLE_TESTS:BOOL=OFF"/>
          <argument value="-DENABLE_EXAMPLES:BOOL=OFF"/>
@@ -15560,6 +15561,7 @@
          <argument value="-DENABLE_NASM:BOOL=ON"/>
          <argument value="-DCONFIG_AV1_DECODER:STRING=1"/>
          <argument value="-DCONFIG_AV1_ENCODER:STRING=1"/>
+         <argument value="-DCONFIG_MULTITHREAD:STRING=1"/>
          <argument value="-DCONFIG_LIBYUV:STRING=0"/>
          <argument value="-DENABLE_TESTS:BOOL=OFF"/>
          <argument value="-DENABLE_EXAMPLES:BOOL=OFF"/>
