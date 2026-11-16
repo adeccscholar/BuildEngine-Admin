@@ -1,15 +1,24 @@
-diff --git a/third_party/externals/spirv-tools/BUILD.gn b/third_party/externals/spirv-tools/BUILD.gn
-new file mode 100644
---- /dev/null
-+++ b/third_party/externals/spirv-tools/BUILD.gn
-@@ -0,0 +1,30 @@
-+import("//third_party/third_party.gni")
-+
+diff --git a/gn/skia.gni b/gn/skia.gni
+--- a/gn/skia.gni
++++ b/gn/skia.gni
+@@ -9,6 +9,12 @@
+ is_skia_dev_build = is_skia_standalone && !is_official_build
+ 
 +declare_args() {
 +  bcc64x_spirv_tools_include = ""
 +  bcc64x_spirv_headers_include = ""
 +  bcc64x_spirv_tools_lib = ""
 +}
++
+ declare_args() {
+   is_canvaskit = false
+ }
+diff --git a/third_party/externals/spirv-tools/BUILD.gn b/third_party/externals/spirv-tools/BUILD.gn
+new file mode 100644
+--- /dev/null
++++ b/third_party/externals/spirv-tools/BUILD.gn
+@@ -0,0 +1,24 @@
++import("//third_party/third_party.gni")
 +
 +assert(bcc64x_spirv_tools_include != "", "Managed SPIRV-Tools include path required")
 +assert(bcc64x_spirv_headers_include != "", "Managed SPIRV-Headers include path required")
