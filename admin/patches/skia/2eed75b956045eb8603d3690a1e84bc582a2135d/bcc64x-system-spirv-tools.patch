@@ -1,7 +1,7 @@
 diff --git a/gn/skia.gni b/gn/skia.gni
 --- a/gn/skia.gni
 +++ b/gn/skia.gni
-@@ -9,6 +9,12 @@
+@@ -9,5 +9,11 @@
  is_skia_dev_build = is_skia_standalone && !is_official_build
  
 +declare_args() {
