@@ -1,5 +1,15 @@
 # Adobe DNG SDK 1.7.1 Build 2802: independent BuildEngine producer
 
+## Metadata updater XMP-disabled build fix (16 November 2026)
+
+The next BCC64X Debug/Release compile failed in `dng_update_meta.cpp:3028`, where `CleanUpMetadataForUpdate` calls `dng_metadata::GetXMP()`. A second unguarded XMP update branch appears later in the same translation unit at approximately line 3236. Both refer to functionality omitted by the explicitly configured `qDNGUseXMP=0`.
+
+The version-pinned `xmp-disabled-update-meta.patch` now guards both XMP-only branches. Existing IPTC, EXIF, GPS, and big-table processing remains compiled. The source FSM checks, applies, and reverse-checks the patch, and the DNG logical timestamp is advanced to `2026-11-16T13:04:00Z`.
+
+**Architecture qualification:** this patch is consistent with the current intentionally reduced producer, but repeated XMP guards indicate a broader source-level feature assumption. Restoring full XMP functionality instead requires a managed XMP Toolkit dependency and a distinct integration decision; no such work is claimed here.
+
+**[not verified]** Native Debug and Release build, install, package consumer smoke, and Skia integration still require execution on the Windows host.
+
 ## BCC64X Clang / native timespec compatibility (16 November 2026)
 
 The next native Debug and Release builds failed in `dng_pthread.cpp`, where BCC64X's Clang/MinGW-compatible `sys/timeb.h` redeclared `dng_timespec`. Adobe's Windows pthread compatibility header unconditionally creates its own `struct dng_timespec` and, for the historical `_MSC_VER < 1900` branch, globally defines `timespec` as `dng_timespec`. BCC64X is Clang, not an old MSVC compiler: the macro therefore rewrites unrelated `timespec` declarations later encountered in the compiler-provided C headers.
