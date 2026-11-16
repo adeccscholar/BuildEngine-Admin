@@ -1,10 +1,11 @@
 diff --git a/third_party/dng_sdk/BUILD.gn b/third_party/dng_sdk/BUILD.gn
 --- a/third_party/dng_sdk/BUILD.gn
 +++ b/third_party/dng_sdk/BUILD.gn
-@@ -7,7 +7,28 @@
+@@ -7,7 +7,29 @@
  declare_args() {
 +  skia_use_system_dng_sdk = false
 +  bcc64x_dng_sdk_include = ""
++  bcc64x_dng_sdk_libjxl_include = ""
 +  bcc64x_dng_sdk_lib = ""
  }
  
@@ -15,7 +16,7 @@ diff --git a/third_party/dng_sdk/BUILD.gn b/third_party/dng_sdk/BUILD.gn
 +  assert(bcc64x_dng_sdk_include != "", "Managed DNG SDK include path required")
 +  assert(bcc64x_dng_sdk_lib != "", "Managed DNG SDK import library required")
 +  system("dng_sdk") {
-+    include_dirs = [ bcc64x_dng_sdk_include ]
++    include_dirs = [ bcc64x_dng_sdk_include, bcc64x_dng_sdk_libjxl_include ]
 +    defines = [
 +      "qDNGBigEndian=0",
 +      "qWinOS=1",
