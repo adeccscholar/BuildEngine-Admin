@@ -1,0 +1,32 @@
+diff --git a/third_party/dng_sdk/BUILD.gn b/third_party/dng_sdk/BUILD.gn
+--- a/third_party/dng_sdk/BUILD.gn
++++ b/third_party/dng_sdk/BUILD.gn
+@@ -7,7 +7,22 @@
+ declare_args() {
++  skia_use_system_dng_sdk = false
++  bcc64x_dng_sdk_include = ""
++  bcc64x_dng_sdk_lib = ""
+ }
+ 
+ import("../third_party.gni")
+ 
+-third_party("dng_sdk") {
++if (skia_use_system_dng_sdk) {
++  assert(bcc64x_dng_sdk_include != "", "Managed DNG SDK include path required")
++  assert(bcc64x_dng_sdk_lib != "", "Managed DNG SDK import library required")
++  system("dng_sdk") {
++    include_dirs = [ bcc64x_dng_sdk_include ]
++    defines = [
++      "qDNGBigEndian=0",
++      "SK_DNG_VERSION=0x01070100",
++    ]
++    ldflags = [ bcc64x_dng_sdk_lib ]
++  }
++} else {
++  third_party("dng_sdk") {
+   public_include_dirs = [ "../externals/dng_sdk/source" ]
+@@ -178,3 +193,4 @@
+     "../externals/dng_sdk/source/dng_xy_coord.h",
+   ]
+ }
++}
