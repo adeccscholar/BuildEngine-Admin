@@ -1,5 +1,10 @@
 # Adobe DNG SDK 1.7.1 Build 2802: independent BuildEngine producer
 
+## JXL decoder XMP-disabled correction (16 November 2026)
+
+The subsequent native Debug and Release build both reported `dng_jxl.cpp:3880: variable has incomplete type 'dng_xmp'`. The pinned DNG SDK source's `ProcessXMPBox()` instantiates `dng_xmp` even though the native producer intentionally defines `qDNGUseXMP=0`. The versioned `xmp-disabled-jxl.patch` now also guards the decoder's XMP parsing block with `#if qDNGUseXMP`, in addition to the existing XMP encoder guard. EXIF, IPTC and the JPEG XL codec remain enabled, and XMP support remains explicitly disabled. The existing patch hunk header was corrected to match its actual line counts, and the logical DNG library timestamp was advanced to trigger source/build reevaluation.
+
+The patch's source contexts have been checked against the exact pinned upstream `3a31897afe53aad5f15854eba0f04bab77cc4f82` revision. **[not verified]** Native `git apply`, BCC64X Debug/Release compilation, binary packaging, consumer smoke and Skia 153 integration must still be executed on the Windows build host. No successful build is claimed here.
 ## JXL / disabled XMP compile correction (16 November 2026)
 
 The operator's subsequent native DNG compilation reached `dng_jxl.cpp:1540` and reported `no member named 'GetXMP' in 'dng_metadata'`. This is a source configuration mismatch: the producer deliberately defines `qDNGUseXMP=0`, but the pinned Adobe JXL encoder source refers to `dng_metadata::GetXMP()` twice without a preprocessing guard.
