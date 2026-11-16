@@ -72,6 +72,7 @@ add_library(dng_sdk SHARED
    dng_sdk/source/dng_tone_curve.cpp
    dng_sdk/source/dng_update_meta.cpp
    dng_sdk/source/dng_utils.cpp
+   dng_sdk/source/dng_xmp_sdk.cpp
    dng_sdk/source/dng_xmp.cpp
    dng_sdk/source/dng_xy_coord.cpp
 )
@@ -91,7 +92,7 @@ set_target_properties(dng_sdk PROPERTIES
    CXX_STANDARD_REQUIRED ON
    CXX_EXTENSIONS OFF
 )
-foreach(theRoot DNG_ZLIB_ROOT DNG_JPEG_ROOT DNG_JXL_ROOT)
+foreach(theRoot DNG_ZLIB_ROOT DNG_JPEG_ROOT DNG_JXL_ROOT DNG_XMP_ROOT)
    if(NOT DEFINED ${theRoot} OR NOT IS_DIRECTORY "${${theRoot}}")
       message(FATAL_ERROR "Missing managed dependency root: ${theRoot}")
    endif()
@@ -114,6 +115,10 @@ foreach(theLibrary IN ITEMS dng_jpeg dng_zlib)
       message(FATAL_ERROR "Managed DNG dependency import library missing: ${${theLibrary}}")
    endif()
 endforeach()
+find_library(dng_xmp_core NAMES XMPCore
+   PATHS "${DNG_XMP_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
+find_library(dng_xmp_files NAMES XMPFiles
+   PATHS "${DNG_XMP_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
 find_library(dng_jxl NAMES jxl libjxl
    PATHS "${DNG_JXL_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
 find_library(dng_jxl_threads NAMES jxl_threads libjxl_threads
@@ -126,12 +131,13 @@ target_include_directories(dng_sdk
       "${DNG_JPEG_ROOT}/include"
       "${DNG_ZLIB_ROOT}/include"
       "${DNG_JXL_ROOT}/include"
+      "${DNG_XMP_ROOT}/include/xmp"
 )
 target_compile_definitions(dng_sdk
    PUBLIC
       qDNGBigEndian=0
       qWinOS=1
-      qDNGUseXMP=0
+      qDNGUseXMP=1
       qDNGThreadSafe=1
       qDNGUseLibJPEG=1
       qDNGValidate=0
@@ -141,7 +147,8 @@ target_compile_definitions(dng_sdk
       qDNGReportErrors=0
 )
 target_link_libraries(dng_sdk PRIVATE
-   "${dng_jpeg}" "${dng_zlib}" "${dng_jxl}" "${dng_jxl_threads}")
+   "${dng_jpeg}" "${dng_zlib}" "${dng_jxl}" "${dng_jxl_threads}"
+   "${dng_xmp_core}" "${dng_xmp_files}")
 include(GNUInstallDirs)
 install(TARGETS dng_sdk
    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
