@@ -1,5 +1,15 @@
 # Adobe DNG SDK 1.7.1 Build 2802: independent BuildEngine producer
 
+## Semantic-mask preview RAII correction (16 November 2026)
+
+The subsequent BCC64X Debug and Release builds reached `dng_preview.cpp` and failed inside the standard `unique_ptr` deleter because `tag_string` was incomplete. The upstream `dng_semantic_mask_preview` header owns `std::unique_ptr<tag_string>` and `std::unique_ptr<tag_uint32_ptr>` while declaring only forward references. Its constructor was inline and the destructor implicitly generated. Compiling the constructor's exception-cleanup and implicit destructor can instantiate the deleter at a location where these types are incomplete.
+
+The pinned `semantic-mask-unique-ptr-lifetime.patch` moves the constructor implementation into `dng_preview.cpp` and explicitly declares/defines the destructor there; the implementation source has the complete tag definitions. No ownership semantics or standard-library implementation are changed. The source FSM now applies this patch using explicit precheck, application and reverse-check actions. The logical timestamp was advanced.
+
+**XMP scope decision:** The separate XMP disablement is a deliberate integration policy, not a BCC64X type-system defect. The CMake adapter defines `qDNGUseXMP=0`, omits the separate Adobe XMP Toolkit integration, and leaves JPEG XL enabled. That reduced feature scope led to the earlier JXL XMP-only source guards. Full XMP support would require an explicit, licensed Adobe XMP Toolkit producer and additional dependency/ABI validation; it should not be restored with a standalone `-DqDNGUseXMP=1` flag.
+
+**[not verified]** The updated Windows native build/install, consumer smoke, and Skia RAW decode have not been executed or observed.
+
 ## JXL decoder XMP-disabled correction (16 November 2026)
 
 The subsequent native Debug and Release build both reported `dng_jxl.cpp:3880: variable has incomplete type 'dng_xmp'`. The pinned DNG SDK source's `ProcessXMPBox()` instantiates `dng_xmp` even though the native producer intentionally defines `qDNGUseXMP=0`. The versioned `xmp-disabled-jxl.patch` now also guards the decoder's XMP parsing block with `#if qDNGUseXMP`, in addition to the existing XMP encoder guard. EXIF, IPTC and the JPEG XL codec remain enabled, and XMP support remains explicitly disabled. The existing patch hunk header was corrected to match its actual line counts, and the logical DNG library timestamp was advanced to trigger source/build reevaluation.
