@@ -169,7 +169,7 @@ diff --git a/gn/toolchain/BUILD.gn b/gn/toolchain/BUILD.gn
          rspfile_content = "{{inputs}}"
          rm_py = rebase_path("../rm.py")
 -        command = "$shell python3 \"$rm_py\" \"{{output}}\" && $ar rcs {{output}} @$rspfile"
-+        command = "$shell $python_executable \"$rm_py\" \"{{output}}\" && $ar rcs {{output}} @$rspfile"
++        command = "$shell $python_executable \"$rm_py\" \"{{output}}\" && \"$ar\" rcs {{output}} @$rspfile"
        }
  
        outputs =
