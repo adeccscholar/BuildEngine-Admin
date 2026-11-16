@@ -9086,7 +9086,7 @@
          <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libjxl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xmp-toolkit}\bin\win64\Release;{DependencyRoot:expat}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-16T12:09:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-16T17:58:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -9925,7 +9925,7 @@
          <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpmux.lib"/>
          <environment name="CB_SKIA_SPIRV_TOOLS_INCLUDE" value="{DependencyRoot:spirv-tools}\include"/>
          <environment name="CB_SKIA_SPIRV_HEADERS_INCLUDE" value="{DependencyRoot:spirv-headers}\include"/>
-         <environment name="CB_SKIA_SPIRV_TOOLS_LIB" value="{DependencyRoot:spirv-tools}\lib\win64\{Configuration}\SPIRV-Tools-shared.lib"/>
+         <environment name="CB_SKIA_SPIRV_TOOLS_LIB" value="{DependencyRoot:spirv-tools}\lib\win64\{Configuration}\libSPIRV-Tools-shared.lib"/>
          <environment name="CB_SKIA_SPIRV_CROSS_INCLUDE" value="{DependencyRoot:spirv-cross}\include\spirv_cross"/>
          <environment name="CB_SKIA_SPIRV_CROSS_LIB" value="{DependencyRoot:spirv-cross}\lib\win64\{Configuration}\{SpirvCrossCxxImport}.lib"/>
          <environment name="CB_SKIA_DNG_SDK_INCLUDE" value="{DependencyRoot:dng-sdk}\include\dng_sdk\source"/>
@@ -9943,6 +9943,11 @@
          <environment
             name="PATH"
             value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:spirv-tools}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+
+         <execute name="verify-managed-spirv-tools-import" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\skia\VerifyManagedSpirvTools.cmake"/>
+         </execute>
 
          <target
             name="gn-gen"
@@ -15475,7 +15480,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-15T16:49:00Z">
+   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-16T17:58:00Z">
       <dependency library="spirv-headers" version="v1.202609.0"/>
       <metadata name="SPIRV-Tools" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Tools" description="SPIR-V assembler, validator, optimizer and associated libraries" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\spirv-tools\LICENSE"/>
@@ -15516,7 +15521,7 @@
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\spirv-tools\libspirv.h"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libSPIRV-Tools-shared.lib"/>
             </perVariant>
             <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\spirv-tools\LICENSE" overwrite="true"/></common>
          </install>
