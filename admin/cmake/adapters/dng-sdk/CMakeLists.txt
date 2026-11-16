@@ -73,11 +73,14 @@ add_library(dng_sdk SHARED
    dng_sdk/source/dng_update_meta.cpp
    dng_sdk/source/dng_utils.cpp
    dng_sdk/source/dng_xmp.cpp
-   dng_sdk/source/dng_xmp_sdk.cpp
    dng_sdk/source/dng_xy_coord.cpp
 )
 set_target_properties(dng_sdk PROPERTIES
    OUTPUT_NAME dng_sdk
+   ARCHIVE_OUTPUT_NAME dng_sdk
+   PREFIX ""
+   IMPORT_PREFIX ""
+   IMPORT_SUFFIX ".lib"
    WINDOWS_EXPORT_ALL_SYMBOLS ON
    CXX_VISIBILITY_PRESET default
    CXX_STANDARD 23
@@ -109,13 +112,13 @@ target_include_directories(dng_sdk
 target_compile_definitions(dng_sdk
    PUBLIC
       qDNGBigEndian=0
+      qWinOS=1
       qDNGUseXMP=0
       qDNGThreadSafe=1
       qDNGUseLibJPEG=1
       qDNGValidate=0
       qDNGValidateTarget=1
    PRIVATE
-      qWinOS=1
       AdobePrivate=0
       qDNGReportErrors=0
 )
