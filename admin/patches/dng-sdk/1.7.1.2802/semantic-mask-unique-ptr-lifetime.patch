@@ -1,0 +1,41 @@
+diff --git a/dng_sdk/source/dng_preview.h b/dng_sdk/source/dng_preview.h
+--- a/dng_sdk/source/dng_preview.h
++++ b/dng_sdk/source/dng_preview.h
+@@ -321,13 +321,8 @@
+ 		
+ 	public:
+ 	
+-		dng_semantic_mask_preview ()
+-			{
+-			fMaskSubArea [0] = 0;
+-			fMaskSubArea [1] = 0;
+-			fMaskSubArea [2] = 0;
+-			fMaskSubArea [3] = 0;
+-			}
++		dng_semantic_mask_preview ();
++		virtual ~dng_semantic_mask_preview ();
+ 		
+ 		virtual void SetIFDInfo (dng_host &host,
+ 								 const dng_image &image);
+diff --git a/dng_sdk/source/dng_preview.cpp b/dng_sdk/source/dng_preview.cpp
+--- a/dng_sdk/source/dng_preview.cpp
++++ b/dng_sdk/source/dng_preview.cpp
+@@ -20,6 +20,18 @@
+ 
+ /*****************************************************************************/
+ 
++dng_semantic_mask_preview::dng_semantic_mask_preview ()
++	{
++	fMaskSubArea [0] = 0;
++	fMaskSubArea [1] = 0;
++	fMaskSubArea [2] = 0;
++	fMaskSubArea [3] = 0;
++	}
++
++dng_semantic_mask_preview::~dng_semantic_mask_preview () = default;
++
++/*****************************************************************************/
++
+ class dng_preview_tag_set: public dng_basic_tag_set
+ 	{
+ 	
