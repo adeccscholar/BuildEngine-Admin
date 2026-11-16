@@ -8818,7 +8818,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="dng-sdk" version="1.7.1.2802" category="graphics" timestamp="2026-11-16T11:00:00Z">
+   <library id="dng-sdk" version="1.7.1.2802" category="graphics" timestamp="2026-11-16T12:00:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libjxl" version="0.13.0"/>
