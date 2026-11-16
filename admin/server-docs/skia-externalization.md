@@ -1,5 +1,16 @@
 # Skia 153: External Library Candidates and DLL Boundaries
 
+## Managed SPIR-V integration (16 November 2026)
+
+Skia 153 now declares **SPIRV-Headers v1.202609.0, SPIRV-Tools 2026.4, and glslang 16.6.0** as independent BuildEngine dependencies. All three previously pinned source downloads and the associated extraction actions have been removed from the Skia source contract. The bundled-component manifest now lists only D3D12MemoryAllocator, and the three SPIR-V components are represented as external BuildEngine packages.
+
+The pinned GN bridge `bcc64x-system-spirv-tools.patch` recreates the two existing Skia labels `//third_party/externals/spirv-tools:spvtools` and `:spvtools_val` as groups exposing managed SPIRV-Tools and SPIRV-Headers include paths and the SPIRV-Tools DLL import library. This retains the Debug Graphite/Vulkan SPIR-V validation compilation path without rebuilding Skia's archived SPIRV-Tools sources. Per-variant library and runtime paths come from BuildEngine dependency resolution; no new toolchain is introduced.
+
+Skia currently uses `skia_use_dawn=false`, so **glslang has no direct link target in the active Skia GN graph**. It is still an explicit managed package dependency and no longer downloaded as a Skia-bundled source. Independently, the glslang producer has `ENABLE_SPIRV=ON`, `ENABLE_OPT=ON` and `ALLOW_EXTERNAL_SPIRV_TOOLS=ON`, linked against the separately produced `SPIRV-Tools-opt` package.
+
+**[not verified]** Applying the new-file GN patch, GN generation, per-configuration link with `SPIRV-Tools.lib`, Skia Debug/Release build and Vulkan runtime smoke require a new BuildEngine run. Upstream glslang 16.6.0 pins a different SPIRV-Tools revision, so compatibility of the managed 2026.4 optimizer must also be validated. Earlier sections on bundled SPIR-V components are retained as dated history and superseded by this update.
+
+
 ## External Adobe DNG SDK integration (16 November 2026)
 
 **Current declared configuration:** `dng-sdk@1.7.1.2802` is an independent BuildEngine DLL producer with a version-pinned source mirror, original Adobe license, and managed zlib, libjpeg-turbo and libjxl dependencies. Skia 153 declares it directly and uses `skia_use_system_dng_sdk=true`, avoiding the old embedded Android DNG source compilation while keeping RAW decoding enabled.
