@@ -10048,7 +10048,7 @@
                <line value="target_cc = &quot;bcc64x&quot;"/>
                <line value="target_cxx = &quot;bcc64x&quot;"/>
                <line value="target_link = &quot;bcc64x&quot;"/>
-               <line value="target_ar = &quot;llvm-ar&quot;"/>
+               <line value="target_ar = getenv(&quot;CB_LLVM_AR&quot;)"/>
 
                <line value="python_executable = getenv(&quot;CB_PYTHON&quot;)"/>
 
@@ -10168,6 +10168,7 @@
                <line value="bcc64x_spirv_cross_lib = getenv(&quot;CB_SKIA_SPIRV_CROSS_LIB&quot;)"/>
                <line value="skia_use_system_spirv_cross = true"/>
                <line value="bcc64x_dng_sdk_include = getenv(&quot;CB_SKIA_DNG_SDK_INCLUDE&quot;)"/>
+               <line value="bcc64x_dng_sdk_libjxl_include = getenv(&quot;CB_SKIA_LIBJXL_INCLUDE&quot;)"/>
                <line value="bcc64x_dng_sdk_lib = getenv(&quot;CB_SKIA_DNG_SDK_LIB&quot;)"/>
                <line value="bcc64x_piex_include = getenv(&quot;CB_SKIA_PIEX_INCLUDE&quot;)"/>
                <line value="bcc64x_piex_lib = getenv(&quot;CB_SKIA_PIEX_LIB&quot;)"/>
