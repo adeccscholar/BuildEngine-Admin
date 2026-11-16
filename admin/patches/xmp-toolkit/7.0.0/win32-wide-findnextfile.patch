@@ -1,0 +1,12 @@
+diff --git a/xmp/toolkit/source/Host_IO-Win.cpp b/xmp/toolkit/source/Host_IO-Win.cpp
+--- a/xmp/toolkit/source/Host_IO-Win.cpp
++++ b/xmp/toolkit/source/Host_IO-Win.cpp
+@@ -595,7 +595,7 @@
+ 	if ( folder == Host_IO::noFolderRef ) return false;
+ 
+ 	do {	// Ignore all children with names starting in '.'. This covers ., .., .DS_Store, etc.
+-		found = (bool) FindNextFile ( folder, &childInfo );
++		found = (bool) FindNextFileW ( folder, &childInfo );
+ 	} while ( found && (childInfo.cFileName[0] == '.') );
+ 	if ( ! found ) return false;
+ 
