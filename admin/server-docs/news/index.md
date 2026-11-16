@@ -8,7 +8,7 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
-- **[2026-11-16](/news/2026-11-16/)** — Adobe DNG SDK 1.7.1 Build 2802 as a managed BCC64X producer; Skia 153 external RAW codec dependency, GN integration and SBOM correction (78 libraries / 113 versions)
+- **[2026-11-16](/news/2026-11-16/)** — Managed Adobe XMP Toolkit 7.0 Core/Files restores full DNG metadata support alongside Skia 153 RAW decoding (79 libraries / 114 versions)
 
 - **[2026-11-15](/news/2026-11-15/)** — 109/109 previously verified, followed by libwebp and PIE-X registrations; Skia 153, external graphics/shader packages, SBOM corrections and English guides
 
@@ -55,6 +55,7 @@ Each news item reports **distinct libraries** (unique logical library IDs) and *
 | 08 Nov | 60 | 87 |
 | 09–10 Nov | 62 | 95 |
 | 15 Nov | 77 | 112 |
+| 16 Nov | 79 | 114 |
 
 The first schema-3 version had just one pugiXML entry earlier on 24 August; the end-of-day schema-4 count was two. The feasibility study examined approximately twenty libraries before the initial Admin library catalog was established.
 
