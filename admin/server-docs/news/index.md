@@ -8,6 +8,8 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
+- **[2026-11-16](/news/2026-11-16/)** — Adobe DNG SDK 1.7.1 Build 2802 as a managed BCC64X producer; Skia 153 external RAW codec dependency, GN integration and SBOM correction (78 libraries / 113 versions)
+
 - **[2026-11-15](/news/2026-11-15/)** — 109/109 previously verified, followed by libwebp and PIE-X registrations; Skia 153, external graphics/shader packages, SBOM corrections and English guides
 
 - **[2026-11-10](/news/2026-11-10/)** — 95 library documentation pages, transitive Mermaid graphs, news routes and Skia DLL review
