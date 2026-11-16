@@ -1,7 +1,7 @@
 # BuildEngine-Admin – Technical Administration Data
 
 **Status date:** November 16, 2026  
-**Status:** active Schema-17 declarative contract for the Library-FSM architecture; 77 logical libraries and 112 version records declared
+**Status:** active Schema-17 declarative contract for the Library-FSM architecture; 78 logical libraries and 113 version records declared
 
 This directory contains the administration contracts that BuildEngine synchronizes and uses at runtime for tool provisioning, library builds, packaging, publishing, and small consumer smokes.
 
@@ -17,13 +17,13 @@ Active libraries are not distributed across XML fragments.
 
 ```text
 build-libraries.xml : Schema 17
-Library contracts   : 77 logical IDs / 112 version records (XML declaration count)
+Library contracts   : 78 logical IDs / 113 version records (XML declaration count)
 ```
 
-Declared logical IDs (77; older versions retained):
+Declared logical IDs (78; older versions retained):
 
 ```text
-abseil, ace, agg, bitmapplusplus, boost, brotli, bzip2, catch2, cmark-gfm, curl, eigen,
+abseil, ace, agg, bitmapplusplus, boost, brotli, bzip2, catch2, cmark-gfm, curl, dng-sdk, eigen,
 expat, fast_float, freetype, glew, glslang, google-benchmark, googletest, graphite2, harfbuzz,
 highway, icu, lcms2, leptonica, libaom, libarchive, libavif, libdeflate, libgav1, libjpeg-turbo,
 libjxl, libpng, libpq, libpqxx, libtiff, libwebp, libxml2, libyuv, libzip, llvm-openmp,
