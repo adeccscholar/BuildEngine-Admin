@@ -1,0 +1,50 @@
+diff --git a/dng_sdk/source/dng_pthread.h b/dng_sdk/source/dng_pthread.h
+--- a/dng_sdk/source/dng_pthread.h
++++ b/dng_sdk/source/dng_pthread.h
+@@ -37,7 +37,8 @@
+ 
+ /*****************************************************************************/
+ 
+-#include <stdlib.h>
++#include <stdlib.h>
++#include <time.h>
+ 
+ #if _MSC_VER >= 1600
+ 
+@@ -163,9 +164,9 @@
+ #undef PTHREAD_ONCE_INIT
+ #define PTHREAD_ONCE_INIT DNG_PTHREAD_ONCE_INIT
+ 
+-#if _MSC_VER < 1900
+-#define timespec dng_timespec
+-#endif
++#if !defined(__clang__) && (!defined(_MSC_VER) || _MSC_VER < 1900)
++#define timespec dng_timespec
++#endif
+ 
+ /* If it is defined on Windows, it probably has the wrong value... */
+ #if defined(WIN32) || !defined(ETIMEDOUT)
+diff --git a/dng_sdk/source/dng_pthread.cpp b/dng_sdk/source/dng_pthread.cpp
+--- a/dng_sdk/source/dng_pthread.cpp
++++ b/dng_sdk/source/dng_pthread.cpp
+@@ -813,7 +813,7 @@
+ 	
+ 	struct dng_timespec sys_timespec;
+ 	
+-#if defined(_MSC_VER) && _MSC_VER >= 1900
++#if defined(__clang__) || (defined(_MSC_VER) && _MSC_VER >= 1900)
+ 
+ 	struct timespec temp;
+ 	dng_pthread_now (&temp);
+diff --git a/dng_sdk/source/dng_mutex.cpp b/dng_sdk/source/dng_mutex.cpp
+--- a/dng_sdk/source/dng_mutex.cpp
++++ b/dng_sdk/source/dng_mutex.cpp
+@@ -506,7 +506,7 @@
+ 		now.tv_sec	= (time_t) seconds;
+ 		now.tv_nsec = nanoseconds;
+ 
+-		#if defined(_MSC_VER) && _MSC_VER >= 1900 
++		#if defined(__clang__) || (defined(_MSC_VER) && _MSC_VER >= 1900) 
+ 		
+ 		struct dng_timespec tempNow;
+ 		
