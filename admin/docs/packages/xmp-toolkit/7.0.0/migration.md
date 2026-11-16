@@ -1,5 +1,11 @@
 # Adobe XMP Toolkit 7.0.0 — managed XMPCore and XMPFiles
 
+## Concurrent source archive cache isolation (16 November 2026)
+
+DNG SDK and XMP Toolkit intentionally fetch the same pinned upstream commit, but their independent FSM source producers previously declared the same local download archive `dng-sdk-1.7.1.2802.tar.gz`. During concurrent downloads, both attempted to write and rename the same `.part` file, causing a Windows sharing violation. The XMP Toolkit archive name is now `xmp-toolkit-7.0.0-dng-sdk-1.7.1.2802.tar.gz`, while its upstream URL, extracted root, commit, and all features remain unchanged. This isolates concurrent cache keys without serializing the build or introducing another source release. The XMP logical timestamp is `2026-11-16T14:04:00Z`.
+
+**[not verified]** The next concurrent native source download and Debug/Release builds must confirm successful operation.
+
 ## BCC64X Clang SAL annotation compatibility (16 November 2026)
 
 The next native Debug/Release compilation failed at `source/SafeStringAPIs.h:122` on `_Check_return_wat_`. This is an Adobe annotation configuration issue: `SafeStringAPIs.h` already includes `SuppressSAL.h`, but that compatibility header only defines empty SAL annotations for non-Windows targets. BCC64X identifies as Windows while using Clang, and its headers do not provide that legacy MSVC annotation.
