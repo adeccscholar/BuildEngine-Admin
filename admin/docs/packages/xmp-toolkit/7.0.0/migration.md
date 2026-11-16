@@ -1,5 +1,13 @@
 # Adobe XMP Toolkit 7.0.0 — managed XMPCore and XMPFiles
 
+## BCC64X Clang SAL annotation compatibility (16 November 2026)
+
+The next native Debug/Release compilation failed at `source/SafeStringAPIs.h:122` on `_Check_return_wat_`. This is an Adobe annotation configuration issue: `SafeStringAPIs.h` already includes `SuppressSAL.h`, but that compatibility header only defines empty SAL annotations for non-Windows targets. BCC64X identifies as Windows while using Clang, and its headers do not provide that legacy MSVC annotation.
+
+The version-pinned `clang-sal-annotations.patch` extends Adobe's existing portability branch to Clang on Windows. This restores the complete set of Adobe-provided SAL annotation macros rather than adding one-off definitions for `_Check_return_wat_` or changing the function implementations. XMP functionality, the native Windows platform path, and the BCC64X toolchain remain unchanged. The standard source check/apply/reverse-check workflow is retained; the XMP logical source timestamp is now `2026-11-16T14:03:00Z`.
+
+**[not verified]** A new native BCC64X Debug/Release build and XMP consumer have not yet been observed.
+
 ## BCC64X Clang TR1 compatibility correction (16 November 2026)
 
 The native XMPCore build reached `XMPCommonFwdDeclarations.h:40` and failed because `std::tr1` is absent from the compiler's standard library. Adobe's `XMPCommonDefines.h` selects the pre-Visual Studio 2010 TR1 path whenever `_MSC_VER <= 1600`; BCC64X uses modern Clang, whose compiler identity must take precedence over that historical MSVC version test. The pinned `clang-standard-shared-ptr.patch` excludes `__clang__` from the legacy branch, restoring `std::shared_ptr`, `std::enable_shared_from_this`, `std::mem_fn`, and the existing standard atomic implementation, without disabling XMP functionality.
