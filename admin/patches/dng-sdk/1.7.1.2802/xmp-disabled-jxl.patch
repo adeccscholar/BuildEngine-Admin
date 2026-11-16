@@ -1,0 +1,51 @@
+diff --git a/dng_sdk/source/dng_jxl.cpp b/dng_sdk/source/dng_jxl.cpp
+--- a/dng_sdk/source/dng_jxl.cpp
++++ b/dng_sdk/source/dng_jxl.cpp
+@@ -1535,45 +1535,47 @@
+ 
+ 			} // exif
+ 			
++		#if qDNGUseXMP
+ 		// XMP.
+ 
+ 		if (includeXMP && metadata && metadata->GetXMP ())
+ 			{
+ 
+ 			// TODO(erichan): Serialize routine has a forJPEG parameter. Does
+ 			// it make sense to use this for JXL? Hmm.
+ 
+ 			AutoPtr<dng_memory_block> xmpBlock
+ 				(metadata->GetXMP ()->Serialize (true));
+ 
+ 			uint32 xmpSize = xmpBlock->LogicalSize ();
+ 
+ 			if (xmpSize > 0)
+ 				{
+ 
+ 				JxlBoxType type = { 'x', 'm', 'l', ' ' };
+ 
+ 				// For now, leave XMP block uncompressed for broader
+ 				// compatibility with other tools (e.g., exiftool) which
+ 				// currently do not support compressed XMP. -erichan 2023-8-18
+ 
+ 				JXL_BOOL compressBox = JXL_FALSE;
+ 
+ 				EnsureUseBoxes (enc, useBoxesOnceFlag);
+ 
+ 				CheckResult (JxlEncoderAddBox (enc,
+ 											   type,
+ 											   xmpBlock->Buffer_uint8 (),
+ 											   (size_t) xmpSize,
+ 											   compressBox),
+ 							 "JxlEncoderAddBox-XMP",
+ 							 &parallelData);
+ 
+ 				didAddBox = true;
+ 
+ 				}
+ 
+ 			} // xmp
+ 
++		#endif // qDNGUseXMP
+ 		// IPTC.
+ 
