@@ -18,7 +18,7 @@ new file mode 100644
 --- /dev/null
 +++ b/third_party/externals/spirv-tools/BUILD.gn
 @@ -0,0 +1,24 @@
-+import("//third_party/third_party.gni")
++import("//gn/skia.gni")
 +
 +assert(bcc64x_spirv_tools_include != "", "Managed SPIRV-Tools include path required")
 +assert(bcc64x_spirv_headers_include != "", "Managed SPIRV-Headers include path required")
