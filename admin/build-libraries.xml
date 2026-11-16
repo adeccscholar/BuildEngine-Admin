@@ -15503,7 +15503,8 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="glslang" version="16.6.0" category="graphics" timestamp="2026-11-15T18:20:00Z">
+   <library id="glslang" version="16.6.0" category="graphics" timestamp="2026-11-16T12:05:00Z">
+      <dependency library="spirv-tools" version="2026.4"/>
       <metadata name="glslang" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/glslang" description="GLSL/HLSL to SPIR-V compiler, validator and libraries" licenseSignal="green">
          <license name="BSD 3-Clause" spdx="BSD-3-Clause" file="licenses\glslang\LICENSE.txt"/>
       </metadata>
@@ -15531,7 +15532,9 @@
          <argument value="-DGLSLANG_ENABLE_INSTALL:BOOL=ON"/>
          <argument value="-DGLSLANG_TESTS:BOOL=OFF"/>
          <argument value="-DENABLE_SPIRV:BOOL=ON"/>
-         <argument value="-DENABLE_OPT:BOOL=OFF"/>
+         <argument value="-DENABLE_OPT:BOOL=ON"/>
+         <argument value="-DALLOW_EXTERNAL_SPIRV_TOOLS:BOOL=ON"/>
+         <argument value="-DSPIRV-Tools-opt_DIR:PATH={DependencyRoot:spirv-tools}\lib\win64\{Configuration}\cmake\SPIRV-Tools-opt"/>
          <argument value="-DENABLE_HLSL:BOOL=OFF"/>
          <argument value="-DENABLE_GLSLANG_BINARIES:BOOL=OFF"/>
          <argument value="-DBUILD_EXTERNAL:BOOL=OFF"/>
