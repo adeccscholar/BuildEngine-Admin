@@ -1,5 +1,16 @@
 # Adobe DNG SDK 1.7.1 Build 2802: independent BuildEngine producer
 
+## Full XMP support restored (16 November 2026)
+
+The original reduction to `qDNGUseXMP=0` is withdrawn. The BuildEngine now declares `xmp-toolkit@7.0.0` as a managed dependency, with the actual Adobe XMPCore and XMPFiles libraries from the same pinned DNG distribution. The DNG adapter compiles both `dng_xmp.cpp` and `dng_xmp_sdk.cpp`, sets `qDNGUseXMP=1`, and resolves installed matching Debug/Release XMP import libraries and public headers. The XMP bridge uses `XMP_DynamicBuild` to match the independently produced DLLs.
+
+Both previously introduced disabled-XMP guard patches (`xmp-disabled-jxl.patch` and `xmp-disabled-update-meta.patch`) have been removed from the active Source-FSM. The genuine Clang timespec and semantic-mask RAII fixes are retained. The now historical sections below document why the reduced configuration failed and must **not** be interpreted as current build instructions.
+
+The managed DNG coordinate now depends on `zlib@1.4`, `libjpeg-turbo@3.2.1`, `libjxl@0.13.0`, `xmp-toolkit@7.0.0`, and `expat@2.10.0` (explicit runtime closure). The XMP Toolkit itself depends on Expat and zlib. The package consumer PATH contains its shared XMP DLLs.
+
+**[not verified]** A native BCC64X build of XMPCore and XMPFiles, DNG Debug/Release compilation/install, XMP functional smoke, and Skia 153 RAW/DNG decode have not been observed. The declarative integration is not a claim of build success.
+
+
 ## Metadata updater XMP-disabled build fix (16 November 2026)
 
 The next BCC64X Debug/Release compile failed in `dng_update_meta.cpp:3028`, where `CleanUpMetadataForUpdate` calls `dng_metadata::GetXMP()`. A second unguarded XMP update branch appears later in the same translation unit at approximately line 3236. Both refer to functionality omitted by the explicitly configured `qDNGUseXMP=0`.
@@ -80,8 +91,10 @@ The BuildEngine CMake adapter is located at `admin/cmake/adapters/dng-sdk/CMakeL
 - `zlib@1.4`
 - `libjpeg-turbo@3.2.1`
 - `libjxl@0.13.0`
+- `xmp-toolkit@7.0.0`
+- `expat@2.10.0` (runtime closure)
 
-These are declared through versioned BuildEngine coordinates. The adapter resolves installed variant-specific import libraries, rather than compiling privately bundled copies. XMP is deliberately disabled in this first RAW decoder producer; its separate XMP Toolkit subtree is not built. JPEG XL sources remain enabled and use the managed JPEG XL producer. The adapter explicitly excludes `dng_xmp_sdk.cpp` because that file unconditionally imports the XMP Toolkit even when XMP support is disabled.
+These dependencies are declared through versioned BuildEngine coordinates. The adapter resolves installed variant-specific import libraries instead of building private copies. JPEG XL and XMP are both enabled. The adapter includes the Adobe XMP bridge implementation and links to managed XMPCore/XMPFiles DLLs. The original no-XMP limitation described in the historical sections above is retired.
 
 Required per-variant artifacts:
 
@@ -108,6 +121,8 @@ flowchart LR
    dng --> jpeg["libjpeg-turbo 3.2.1"]
    dng --> zlib["zlib 1.4"]
    dng --> jxl["libjxl 0.13.0"]
+   dng --> xmp["Adobe XMP Toolkit 7.0.0"]
+   xmp --> expat["Expat 2.10.0"]
 ```
 
 ## Installed DLL consumer smoke
