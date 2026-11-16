@@ -1,5 +1,11 @@
 # spirv-tools 2026.4: BuildEngine integration
 
+## DLL import-library installation contract (16 November 2026)
+
+The installed shared import library required by Skia's GN bridge is now explicitly named `libSPIRV-Tools-shared.lib` under `lib/win64/{Configuration}` according to the BCC64X CMake shared-library prefix convention. The producer's Release/Debug install phase must find that exact file, instead of accepting an otherwise empty library directory. Skia performs an independent preflight before GN generation.
+
+**[not verified]** The Windows-host producer output still needs to confirm this exact filename. If the actual output differs, correct the producer naming contract and then the consumer declaration together rather than disguising a missing artifact.
+
 ## Skia 153 Debug consumer link failure (16 November 2026)
 
 The operator-reported no-change Skia 153 Debug run failed because the consumer expected `lib/win64/Debug/SPIRV-Tools-shared.lib` at this package's installed root. The linker could not open the file. This is a missing expected import artifact, not evidence of a C++ compile or shader validation error. Check the actual generated Debug import-library name and installation directory from the producer build before updating the consumer contract. Keep the managed DLL architecture and Debug validation enabled. The independently registered producer and the successful historical overall run do not prove that this exact Debug import path exists. **[not verified]** End-to-end Skia Debug consumer linking after correction.
