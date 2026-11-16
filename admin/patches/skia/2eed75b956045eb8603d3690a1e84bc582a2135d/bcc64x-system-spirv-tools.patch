@@ -1,0 +1,35 @@
+diff --git a/third_party/externals/spirv-tools/BUILD.gn b/third_party/externals/spirv-tools/BUILD.gn
+new file mode 100644
+--- /dev/null
++++ b/third_party/externals/spirv-tools/BUILD.gn
+@@ -0,0 +1,30 @@
++import("//third_party/third_party.gni")
++
++declare_args() {
++  bcc64x_spirv_tools_include = ""
++  bcc64x_spirv_headers_include = ""
++  bcc64x_spirv_tools_lib = ""
++}
++
++assert(bcc64x_spirv_tools_include != "", "Managed SPIRV-Tools include path required")
++assert(bcc64x_spirv_headers_include != "", "Managed SPIRV-Headers include path required")
++assert(bcc64x_spirv_tools_lib != "", "Managed SPIRV-Tools import library required")
++
++# Keep the existing Skia GN labels; provide both from the installed
++# BuildEngine SPIRV-Tools DLL, rather than compiling Skia-bundled sources.
++config("managed_spirv_tools") {
++  include_dirs = [
++    bcc64x_spirv_tools_include,
++    bcc64x_spirv_headers_include,
++  ]
++  ldflags = [ bcc64x_spirv_tools_lib ]
++}
++
++group("spvtools") {
++  public_configs = [ ":managed_spirv_tools" ]
++}
++
++group("spvtools_val") {
++  public_configs = [ ":managed_spirv_tools" ]
++}
++
