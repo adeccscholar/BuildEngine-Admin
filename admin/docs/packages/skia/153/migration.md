@@ -1,5 +1,13 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## External Adobe DNG SDK 1.7.1 Build 2802 (16 November 2026)
+
+The previous DNG SDK C++23 patch is **superseded**. Skia 153 now declares `dng-sdk@1.7.1.2802` as an eighteenth direct managed dependency and sets `skia_use_system_dng_sdk=true`. The version-bound GN patch switches `third_party/dng_sdk/BUILD.gn` to a `system("dng_sdk")` target, passing the installed BCC64X include directory and import library. RAW support remains enabled with `skia_use_dng_sdk=true` and `SK_DNG_VERSION=0x01070100`.
+
+The old Android DNG source download, extraction and obsolete `std::auto_ptr` patch actions are **removed from the active XML source stage**. The DNG producer is separately registered in BuildEngine; its archive is pinned to DNG SDK 1.7.1 Build 2802. The Skia external-dependency manifest contains 18 managed dependencies and records only four remaining bundled components: D3D12MemoryAllocator, SPIRV-Headers, SPIRV-Tools and glslang.
+
+**[not verified]** Native BCC64X Release and Debug producer builds, DLL/import-library packaging, Skia GN dependency closure, link ABI and RAW decode are pending. Earlier sections below describe the superseded engineering history; the active XML and this section define the current intended configuration. See [DNG SDK migration](/package/dng-sdk/1.7.1.2802/migration).
+
 ## DNG SDK C++23 source-compatibility fix (16 November 2026)
 
 The operator's native Skia 153 Release and Debug builds both failed in `third_party/externals/dng_sdk/source/dng_pthread.cpp:316` because the pinned upstream DNG SDK uses `std::auto_ptr`, which is unavailable in the current C++23 standard library. The GN contract explicitly enables `skia_use_dng_sdk = true` for RAW image handling, and upstream Skia's `third_party/dng_sdk/BUILD.gn` compiles these bundled sources. Consequently, the DNG SDK is **still an embedded source dependency**; it has not been externalized to a separately installed BuildEngine binary.
