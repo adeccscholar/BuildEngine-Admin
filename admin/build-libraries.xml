@@ -8818,7 +8818,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="dng-sdk" version="1.7.1.2802" category="graphics" timestamp="2026-11-16T13:02:00Z">
+   <library id="dng-sdk" version="1.7.1.2802" category="graphics" timestamp="2026-11-16T13:03:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libjxl" version="0.13.0"/>
@@ -8868,6 +8868,23 @@
          <execute name="dng-preview-raii-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{Workspace}\.buildengine\semantic-mask-unique-ptr-lifetime.patch"/>
+         </execute>
+         <!-- Adobe's legacy pthread mapping rewrites system timespec in Clang
+              compatibility headers. Retain native timespec and convert at ABI calls. -->
+         <copy source="{BuildFileDir}\patches\dng-sdk\1.7.1.2802\clang-native-timespec.patch"
+               target="{Workspace}\.buildengine\clang-native-timespec.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="dng-clang-timespec-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\clang-native-timespec.patch"/>
+         </execute>
+         <execute name="dng-clang-timespec-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\clang-native-timespec.patch"/>
+         </execute>
+         <execute name="dng-clang-timespec-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\clang-native-timespec.patch"/>
          </execute>
          <copy source="{BuildFileDir}\cmake\adapters\dng-sdk\CMakeLists.txt" target="{Workspace}\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
       </source>
