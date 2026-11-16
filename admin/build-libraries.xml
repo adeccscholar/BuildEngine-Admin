@@ -8874,7 +8874,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
       </publish>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-16T01:00:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-16T12:00:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -8887,6 +8887,7 @@
       <dependency library="libavif" version="1.4.2"/>
       <dependency library="libgav1" version="0.20.0"/>
       <dependency library="libjxl" version="0.13.0"/>
+      <dependency library="dng-sdk" version="1.7.1.2802"/>
       <dependency library="libwebp" version="1.6.0"/>
       <dependency library="piex" version="0.27"/>
       <dependency library="spirv-cross" version="vulkan-sdk-1.4.363.0"/>
@@ -8979,10 +8980,6 @@
          <download
             url="https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator/archive/169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"
             archive="skia-deps\d3d12allocator-169895d529dfce00390a20e69c2f516066fe7a3b.tar.gz"/>
-
-         <download
-            url="https://android.googlesource.com/platform/external/dng_sdk.git/+archive/dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"
-            archive="skia-deps\dng_sdk-dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"/>
 
 <!-- ======================================================== -->
          <!-- Direct3D / Vulkan / shader closure.                      -->
@@ -9101,65 +9098,24 @@
             <argument value="{CurrentArtifact}\third_party\externals\d3d12allocator\D3D12MemoryAllocator-169895d529dfce00390a20e69c2f516066fe7a3b"/>
          </execute>
 
-         <execute name="mkdir-dng-sdk"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\dng_sdk"/>
+         <!-- External DNG SDK producer: no bundled source download or C++23 patch. -->
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-dng-sdk.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dng-sdk.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="dng-system-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dng-sdk.patch"/>
+         </execute>
+         <execute name="dng-system-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dng-sdk.patch"/>
+         </execute>
+         <execute name="dng-system-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-dng-sdk.patch"/>
          </execute>
 
-         <execute name="extract-dng-sdk"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\dng_sdk"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\dng_sdk-dbe0a676450d9b8c71bf00688bb306409b779e90.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\dng_sdk\source\dng_host.h"/>
-         <!-- Pinned DNG SDK still builds for Skia RAW decoding. C++23 removes
-              std::auto_ptr; modernize just the two owning RAII locals. -->
-         <require path="{CurrentArtifact}\third_party\externals\dng_sdk\source\dng_pthread.cpp"/>
-         <copy
-            source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\dng-sdk-cxx23-unique-ptr.patch"
-            target="{Workspace}\.buildengine\patches\{LibraryVersion}\dng-sdk-cxx23-unique-ptr.patch"
-            overwrite="true"
-            preserveCurrentArtifact="true"/>
-         <execute name="dng-sdk-cxx23-patch-check"
-                  executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="apply"/>
-            <argument value="--check"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\dng-sdk-cxx23-unique-ptr.patch"/>
-         </execute>
-         <execute name="dng-sdk-cxx23-patch-apply"
-                  executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="apply"/>
-            <argument value="--no-index"/>
-            <argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\dng-sdk-cxx23-unique-ptr.patch"/>
-         </execute>
-         <execute name="dng-sdk-cxx23-patch-verify"
-                  executable="{Tool:git}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="apply"/>
-            <argument value="--reverse"/>
-            <argument value="--check"/>
-            <argument value="--no-index"/>
-            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\dng-sdk-cxx23-unique-ptr.patch"/>
-         </execute>
-
-<!-- Consume managed Wuffs source, compiled by Skia with GIF module flags.
+         <!-- Consume managed Wuffs source, compiled by Skia with GIF module flags.
               No independent Wuffs DLL is declared. -->
          <execute name="mkdir-external-wuffs-source"
                   executable="{Tool:cmake}"
@@ -9846,6 +9802,8 @@
          <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpmux.lib"/>
          <environment name="CB_SKIA_SPIRV_CROSS_INCLUDE" value="{DependencyRoot:spirv-cross}\include\spirv_cross"/>
          <environment name="CB_SKIA_SPIRV_CROSS_LIB" value="{DependencyRoot:spirv-cross}\lib\win64\{Configuration}\{SpirvCrossCxxImport}.lib"/>
+         <environment name="CB_SKIA_DNG_SDK_INCLUDE" value="{DependencyRoot:dng-sdk}\include\dng_sdk\source"/>
+         <environment name="CB_SKIA_DNG_SDK_LIB" value="{DependencyRoot:dng-sdk}\lib\win64\{Configuration}\dng_sdk.lib"/>
          <environment name="CB_SKIA_PIEX_INCLUDE" value="{DependencyRoot:piex}\include"/>
          <environment name="CB_SKIA_PIEX_LIB" value="{DependencyRoot:piex}\lib\win64\{Configuration}\{PiexLibraryName}.lib"/>
          
@@ -9858,7 +9816,7 @@
          -->
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
          <target
             name="gn-gen"
@@ -9997,6 +9955,8 @@
                <line value="bcc64x_spirv_cross_include = getenv(&quot;CB_SKIA_SPIRV_CROSS_INCLUDE&quot;)"/>
                <line value="bcc64x_spirv_cross_lib = getenv(&quot;CB_SKIA_SPIRV_CROSS_LIB&quot;)"/>
                <line value="skia_use_system_spirv_cross = true"/>
+               <line value="bcc64x_dng_sdk_include = getenv(&quot;CB_SKIA_DNG_SDK_INCLUDE&quot;)"/>
+               <line value="bcc64x_dng_sdk_lib = getenv(&quot;CB_SKIA_DNG_SDK_LIB&quot;)"/>
                <line value="bcc64x_piex_include = getenv(&quot;CB_SKIA_PIEX_INCLUDE&quot;)"/>
                <line value="bcc64x_piex_lib = getenv(&quot;CB_SKIA_PIEX_LIB&quot;)"/>
                
@@ -10049,8 +10009,9 @@
                <line value="skia_use_libjxl_decode = true"/>
                <line value="skia_use_system_libjxl = true"/>
 
-               <!-- Bundled RAW / DNG. -->
+               <!-- Managed external DNG SDK with RAW decoding enabled. -->
                <line value="skia_use_dng_sdk = true"/>
+               <line value="skia_use_system_dng_sdk = true"/>
 
                <!--
                   PIE-X is deliberately disabled on Windows by upstream Skia.
@@ -10092,7 +10053,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="gen"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10107,7 +10068,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="-C"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10385,7 +10346,7 @@
 
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:brotli}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:harfbuzz}\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{DependencyRoot:libwebp}\bin\win64\Release;{DependencyRoot:spirv-cross}\bin\win64\Release;{DependencyRoot:piex}\bin\win64\Release;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:brotli}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:harfbuzz}\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{DependencyRoot:libwebp}\bin\win64\Release;{DependencyRoot:spirv-cross}\bin\win64\Release;{DependencyRoot:piex}\bin\win64\Release;{DependencyRoot:dng-sdk}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
 
       <smoke
@@ -10404,7 +10365,7 @@
 
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:brotli}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:harfbuzz}\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{DependencyRoot:libwebp}\bin\win64\Debug;{DependencyRoot:spirv-cross}\bin\win64\Debug;{DependencyRoot:piex}\bin\win64\Debug;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:brotli}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:harfbuzz}\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{DependencyRoot:libwebp}\bin\win64\Debug;{DependencyRoot:spirv-cross}\bin\win64\Debug;{DependencyRoot:piex}\bin\win64\Debug;{DependencyRoot:dng-sdk}\bin\win64\Debug;{ENV:PATH}"/>
       </smoke>
    </library>
    
