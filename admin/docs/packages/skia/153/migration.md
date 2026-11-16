@@ -1,5 +1,13 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## Migration decision: SPIR-V externalization, Debug import contract, and D3D12MemoryAllocator (16 November 2026)
+
+The active version-pinned `bundled-components.json` declares only D3D12MemoryAllocator as bundled. SPIRV-Headers v1.202609.0, SPIRV-Tools 2026.4, and glslang 16.6.0 are managed BuildEngine dependencies, not bundled Skia source dependencies. If a deployed server still displays four bundled components, its displayed installed SBOM/provenance must be reconciled against the current manifest and installed package revision. Do not label a component external merely because a package exists: verify that Skia's generated GN targets actually consume the managed package and no embedded copy remains in the binary.
+
+**Keep D3D12MemoryAllocator embedded.** In the current Skia build it is a small, locally compiled source unit without a proven maintainable DLL export/import interface. A separate package would introduce versioning, deployment and ABI obligations without demonstrated cross-package reuse. This is an intentional exception to the otherwise preferred external dependency policy, not unfinished work. Reconsider only upon an evidenced ABI/export design and independent consumer use.
+
+**Observed Debug failure:** Skia 153 Debug link tried to open `spirv-tools/2026.4/lib/win64/Debug/SPIRV-Tools-shared.lib`, which was absent from that install location. The GN bridge uses `bcc64x_spirv_tools_lib` for both `spvtools` and `spvtools_val`. The producer's actual installed Debug artifact name and placement must be inspected first, followed by correction of the variant-specific import path in the XML/GN generation contract and an early artifact-existence gate. No guessed rename, static fallback or validation disablement is acceptable. **[not verified]** Corrected Debug linking, runtime DLL closure and validator smoke remain pending.
+
 ## External Adobe DNG SDK 1.7.1 Build 2802 (16 November 2026)
 
 The previous DNG SDK C++23 patch is **superseded**. Skia 153 now declares `dng-sdk@1.7.1.2802` as an eighteenth direct managed dependency and sets `skia_use_system_dng_sdk=true`. The version-bound GN patch switches `third_party/dng_sdk/BUILD.gn` to a `system("dng_sdk")` target, passing the installed BCC64X include directory and import library. RAW support remains enabled with `skia_use_dng_sdk=true` and `SK_DNG_VERSION=0x01070100`.
