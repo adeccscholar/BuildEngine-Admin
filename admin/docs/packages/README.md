@@ -2,12 +2,13 @@
 
 [TOC|Content]
 
-This catalog links **112 version-specific migration guides** from the public BuildEngine Administration repository. The complete library catalog and configuration are determined by the current `admin/build-libraries.xml`; a documentation page may describe a superseded version or a configuration that has not yet passed native BCC64X builds.
+This catalog links **113 version-specific migration guides** from the public BuildEngine Administration repository. The complete library catalog and configuration are determined by the current `admin/build-libraries.xml`; a documentation page may describe a superseded version or a configuration that has not yet passed native BCC64X builds.
 
 Each versioned guide documents the intended native C++Builder 13/BCC64X build profile, upstream integration, chosen dependencies, CMake or other build settings, patch decisions, installation artifacts, runtime boundaries and consumer evidence. **The contract describes what should happen, not proof that it happened successfully.**
 
 ## Versioned package guides
 
+- [dng-sdk 1.7.1.2802](/package/dng-sdk/1.7.1.2802/migration)
 - [abseil 20260817.0](/package/abseil/20260817.0/migration)
 - [ace 8.0.6](/package/ace/8.0.6/migration)
 - [ace 8.0.8](/package/ace/8.0.8/migration)
