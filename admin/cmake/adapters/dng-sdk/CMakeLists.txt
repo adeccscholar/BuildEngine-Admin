@@ -75,6 +75,10 @@ add_library(dng_sdk SHARED
    dng_sdk/source/dng_xmp.cpp
    dng_sdk/source/dng_xy_coord.cpp
 )
+# DNG SDK contains conventional C++ translation units, not C++20 modules.
+# Suppress CMake 4.1's per-source .ddi dependency scanning for BCC64X.
+set_property(TARGET dng_sdk PROPERTY CXX_SCAN_FOR_MODULES OFF)
+
 set_target_properties(dng_sdk PROPERTIES
    OUTPUT_NAME dng_sdk
    ARCHIVE_OUTPUT_NAME dng_sdk
