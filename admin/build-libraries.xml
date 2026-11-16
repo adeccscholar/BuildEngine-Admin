@@ -8818,7 +8818,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="xmp-toolkit" version="7.0.0" category="data" timestamp="2026-11-16T14:07:00Z">
+   <library id="xmp-toolkit" version="7.0.0" category="data" timestamp="2026-11-16T14:08:00Z">
       <dependency library="expat" version="2.10.0"/>
       <dependency library="zlib" version="1.4"/>
       <metadata name="Adobe XMP Toolkit" supplier="Adobe Inc." homepage="https://www.adobe.com/devnet/xmp.html" description="Adobe XMP Core 7.0 and XMP Files 7.0, preserved in the DNG SDK 1.7.1 Build 2802 source distribution; BCC64X dynamic producer with managed Expat and zlib." licenseSignal="yellow">
@@ -8901,6 +8901,22 @@
          <execute name="xmp-modern-comparator-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{Workspace}\.buildengine\modern-comparator-functors.patch"/>
+         </execute>
+         <!-- UTF-16 plugin paths require explicit Win32 wide loading under Clang. -->
+         <copy source="{BuildFileDir}\patches\xmp-toolkit\7.0.0\win32-wide-loadlibrary.patch"
+               target="{Workspace}\.buildengine\win32-wide-loadlibrary.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="xmp-win32-wide-loadlibrary-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\win32-wide-loadlibrary.patch"/>
+         </execute>
+         <execute name="xmp-win32-wide-loadlibrary-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\win32-wide-loadlibrary.patch"/>
+         </execute>
+         <execute name="xmp-win32-wide-loadlibrary-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\win32-wide-loadlibrary.patch"/>
          </execute>
          <copy source="{BuildFileDir}\cmake\adapters\xmp-toolkit\CMakeLists.txt"
                target="{Workspace}\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
