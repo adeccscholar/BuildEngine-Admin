@@ -48,7 +48,7 @@ This separation is binding.
 
 `admin/build-libraries.xml` is the **single normative library and dependency contract**.
 
-**Current declared catalog (16 November 2026):** XML schema 17 contains **113 versioned library records across 78 logical library IDs**, including the newly registered Adobe DNG SDK 1.7.1 Build 2802. These values describe declared integration coordinates, not completed native builds. Always use the XML for effective coordinates and dependency relationships.
+**Current declared catalog (16 November 2026):** XML schema 17 contains **114 versioned library records across 79 logical library IDs**, including Adobe DNG SDK 1.7.1 Build 2802 and its separate XMP Toolkit 7.0.0 dependency. These values describe declared integration coordinates, not completed native builds. Always use the XML for effective coordinates and dependency relationships.
 
 The catalog covers database clients, XML, PDF and document processing, text shaping and Unicode, test frameworks, graphics, image and video processing, compression, networking, middleware, OCR, numerical computing, and native parallelism. [Complete library catalog](admin/server-docs/libraries.md) · [Migration guides](admin/docs/packages/README.md).
 
