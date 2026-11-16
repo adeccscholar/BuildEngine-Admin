@@ -51,7 +51,7 @@ target_compile_definitions(XMPCore PRIVATE
    WIN_ENV=1 XMP_DynamicBuild=1
    BUILDING_XMPCORE_LIB=1 BUILDING_XMPCORE_AS_DYNAMIC=1
    XMP_COMPONENT_INT_NAMESPACE=AdobeXMPCore_Int
-   AdobePrivate=0)
+)
 target_include_directories(XMPCore PRIVATE
    "${theXmpRoot}" "${theXmpRoot}/public/include"
    "${theXmpRoot}/XMPCore/resource/win"
@@ -87,7 +87,7 @@ set_property(TARGET XMPFiles PROPERTY CXX_SCAN_FOR_MODULES OFF)
 target_compile_definitions(XMPFiles PRIVATE
    WIN_ENV=1 XMP_DynamicBuild=1
    BUILDING_XMPFILES_LIB=1 BUILDING_XMPFILES_AS_DYNAMIC=1
-   AdobePrivate=0)
+)
 target_include_directories(XMPFiles PRIVATE
    "${theXmpRoot}" "${theXmpRoot}/public/include"
    "${theXmpRoot}/public/include/client-glue"
