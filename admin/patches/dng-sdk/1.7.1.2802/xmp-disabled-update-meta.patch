@@ -1,0 +1,35 @@
+diff --git a/dng_sdk/source/dng_update_meta.cpp b/dng_sdk/source/dng_update_meta.cpp
+--- a/dng_sdk/source/dng_update_meta.cpp
++++ b/dng_sdk/source/dng_update_meta.cpp
+@@ -3025,6 +3025,7 @@
+ 							   bool wantsIPTC)
+ 	{
+ 	
++	#if qDNGUseXMP
+ 	if (metadata.GetXMP () && metadata.GetExif ())
+ 		{
+ 		
+@@ -3073,6 +3074,7 @@
+ 						 
+ 		}
+ 
++	#endif // qDNGUseXMP
+ 	}
+ 
+ /*****************************************************************************/
+@@ -3231,6 +3233,7 @@
+ 
+ 		}
+ 		
++	#if qDNGUseXMP
+ 	// Update XMP.
+ 	
+ 	if (updatedMetadata->GetXMP ())
+@@ -3271,6 +3274,7 @@
+ 			
+ 		}
+ 		
++	#endif // qDNGUseXMP
+ 	// Update IPTC.
+ 	
+ 	updater.IFD0 ().UpdateTag (updater,
