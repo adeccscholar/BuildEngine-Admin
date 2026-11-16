@@ -1,5 +1,13 @@
 # Skia 153: External Library Candidates and DLL Boundaries
 
+## External Adobe DNG SDK integration (16 November 2026)
+
+**Current declared configuration:** `dng-sdk@1.7.1.2802` is an independent BuildEngine DLL producer with a version-pinned source mirror, original Adobe license, and managed zlib, libjpeg-turbo and libjxl dependencies. Skia 153 declares it directly and uses `skia_use_system_dng_sdk=true`, avoiding the old embedded Android DNG source compilation while keeping RAW decoding enabled.
+
+The old Gitiles DNG download, extraction and failed C++23 `auto_ptr` repair have been removed from the active Skia contract. The SBOM declaration now counts 18 external dependencies and four bundled components: D3D12MemoryAllocator, SPIRV-Headers, SPIRV-Tools and glslang. The license remains a proprietary Adobe agreement, requiring review before distribution.
+
+**[not verified]** Building and consuming the new DLL with BCC64X, correct import/export symbols, a GN graph check, and a RAW/DNG functional smoke. The dated note below that DNG "remains embedded" is superseded.
+
 [TOC|Content]
 
 ## DNG SDK remains embedded (16 November 2026)
