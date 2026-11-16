@@ -24,6 +24,10 @@
       "version": "2.15.0"
     },
     {
+      "name": "glslang",
+      "version": "16.6.0"
+    },
+    {
       "name": "harfbuzz",
       "version": "15.1.0"
     },
@@ -68,6 +72,14 @@
       "version": "vulkan-sdk-1.4.363.0"
     },
     {
+      "name": "spirv-headers",
+      "version": "v1.202609.0"
+    },
+    {
+      "name": "spirv-tools",
+      "version": "2026.4"
+    },
+    {
       "name": "vulkan-memory-allocator",
       "version": "3.4.0"
     },
@@ -86,24 +98,6 @@
       "version": "169895d529dfce00390a20e69c2f516066fe7a3b",
       "versionScheme": "git",
       "repository": "https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git"
-    },
-    {
-      "name": "SPIRV-Headers",
-      "version": "942fe4b988359a0750b79f0ae7ed735994d3147d",
-      "versionScheme": "git",
-      "repository": "https://github.com/KhronosGroup/SPIRV-Headers.git"
-    },
-    {
-      "name": "SPIRV-Tools",
-      "version": "388f5af1a6d4a4df4ab9bf69a1817255952e6ef1",
-      "versionScheme": "git",
-      "repository": "https://github.com/KhronosGroup/SPIRV-Tools.git"
-    },
-    {
-      "name": "glslang",
-      "version": "1d47ffa8ac4374a19b302021e216a20f22a3de92",
-      "versionScheme": "git",
-      "repository": "https://github.com/KhronosGroup/glslang.git"
     }
   ]
 }
