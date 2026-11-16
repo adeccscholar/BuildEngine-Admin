@@ -1,5 +1,9 @@
 # spirv-tools 2026.4: BuildEngine integration
 
+## Skia 153 Debug consumer link failure (16 November 2026)
+
+The operator-reported no-change Skia 153 Debug run failed because the consumer expected `lib/win64/Debug/SPIRV-Tools-shared.lib` at this package's installed root. The linker could not open the file. This is a missing expected import artifact, not evidence of a C++ compile or shader validation error. Check the actual generated Debug import-library name and installation directory from the producer build before updating the consumer contract. Keep the managed DLL architecture and Debug validation enabled. The independently registered producer and the successful historical overall run do not prove that this exact Debug import path exists. **[not verified]** End-to-end Skia Debug consumer linking after correction.
+
 [TOC|Content]
 
 ## Purpose and current integration
