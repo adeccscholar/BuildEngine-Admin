@@ -1,5 +1,13 @@
 # Adobe XMP Toolkit 7.0.0 — managed XMPCore and XMPFiles
 
+## Modern C++ comparator compatibility (16 November 2026)
+
+The next XMPFiles Debug and Release builds reached `XMPFiles/source/PluginHandler/XMPAtoms.h:108` and failed because the obsolete `std::binary_function` base class is not available in the BCC64X standard library. The obsolete base supplied argument/result type aliases but no comparison behavior. The actual `StringCompare::operator()` already implements strict lexicographical ordering.
+
+The version-bound `modern-comparator-functors.patch` removes the legacy base class from both occurrences in the pinned source tree: `XMPAtoms.h` and `XMPFilesPlugins/api/source/PluginRegistry.h`. The comparator bodies, `std::map` usage, plugin registration behavior, and exposed library features remain unchanged. No shim is inserted into namespace `std`. The source FSM performs the standard check/apply/reverse-check and the logical XMP revision advances to `2026-11-16T14:07:00Z`.
+
+**[not verified]** A follow-up native Debug/Release build and the installed XMP/DNG consumers are required to establish acceptance.
+
 ## Explicit Win32 Unicode folder enumeration (16 November 2026)
 
 The native XMPFiles Debug and Release builds failed in `source/Host_IO-Win.cpp:598`: the source declares `WIN32_FIND_DATAW childInfo` and starts enumeration with `FindFirstFileW` but subsequently calls the generic `FindNextFile` macro. BCC64X resolves that macro to `FindNextFileA` in the current translation environment, whose `WIN32_FIND_DATAA*` parameter is incompatible with the Unicode structure. The version-pinned `win32-wide-findnextfile.patch` changes only that call to `FindNextFileW`; it preserves UTF-16 paths and Unicode child names, with no conversion, suppression, or change to XMP features.
