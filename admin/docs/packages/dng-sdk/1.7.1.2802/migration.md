@@ -1,5 +1,11 @@
 # Adobe DNG SDK 1.7.1 Build 2802: independent BuildEngine producer
 
+## CMake C++23 module-scanning failure (16 November 2026)
+
+The native Release and Debug builds reached CMake's `dng_globals.cpp.o.ddi` dependency-scanning step, which failed while processing the BCC64X-provided compatibility header `_mingw.h` because it could not find `sdks/_mingw_ddk.h`. This is **not evidence that a different compiler was selected**: the established BCC64X toolchain includes MinGW-derived compatibility headers. The DNG producer consists of conventional C++ translation units and does not use C++ modules, so the target now explicitly sets `CXX_SCAN_FOR_MODULES OFF`. No MinGW compiler, alternate ABI, global toolchain flag or header-directory workaround was introduced. The logical library timestamp was updated to force reevaluation.
+
+**[not verified]** The new BCC64X build has not been executed. If the missing header also appears during regular compilation, the missing header/include relationship must be investigated with the new command/log; module scanning is only one trigger.
+
 ## JPEG import-library configure repair (16 November 2026)
 
 The first supplied native Debug configure log failed at `CMakeLists.txt:95 (find_library)` because the adapter searched `jpeg` and `libjpeg`, while BuildEngine's established libjpeg-turbo 3.2.1 package names the exact import libraries `libjpeg.lib` (Release) and `libjpegd.lib` (Debug). The corresponding zlib variant names are `libz.lib` and `libzd.lib`. The adapter now selects the exact installed variant paths and checks their existence before linking, without searching an unrelated system installation. The DNG source scope timestamp has been advanced to reprocess the corrected adapter.
