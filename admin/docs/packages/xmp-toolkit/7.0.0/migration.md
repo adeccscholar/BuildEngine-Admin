@@ -1,5 +1,11 @@
 # Adobe XMP Toolkit 7.0.0 — managed XMPCore and XMPFiles
 
+## Explicit Win32 Unicode folder enumeration (16 November 2026)
+
+The native XMPFiles Debug and Release builds failed in `source/Host_IO-Win.cpp:598`: the source declares `WIN32_FIND_DATAW childInfo` and starts enumeration with `FindFirstFileW` but subsequently calls the generic `FindNextFile` macro. BCC64X resolves that macro to `FindNextFileA` in the current translation environment, whose `WIN32_FIND_DATAA*` parameter is incompatible with the Unicode structure. The version-pinned `win32-wide-findnextfile.patch` changes only that call to `FindNextFileW`; it preserves UTF-16 paths and Unicode child names, with no conversion, suppression, or change to XMP features.
+
+The Source-FSM checks/applies/reverse-checks the patch, and the XMP logical timestamp is advanced to `2026-11-16T14:06:00Z`. **[not verified]** Native Debug/Release builds and the installed consumer remain pending.
+
 ## XMPCore internal definition consistency (16 November 2026)
 
 The native Debug/Release build reached `XMPCore/source/XMPDocOps.cpp:396` and failed on `kXMPDirtyDoc_New`. This identifier is present in Adobe's `XMP_Const.h`, but its declaration is guarded by `#if AdobePrivate`. The BuildEngine XMP adapter had explicitly set `AdobePrivate=0` on both XMPCore and XMPFiles while compiling the internal Adobe source units requiring that interface. This violated the pinned upstream toolkit's default (`XMP_Environment.h` defines `AdobePrivate=1` when unspecified).
