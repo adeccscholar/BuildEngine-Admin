@@ -1,5 +1,11 @@
 # Adobe XMP Toolkit 7.0.0 — managed XMPCore and XMPFiles
 
+## Unicode Windows plugin module loading (16 November 2026)
+
+Both native XMPFiles configurations failed in `XMPFiles/source/PluginHandler/OS_Utils_WIN.cpp:40` because Adobe converts the plugin module path to UTF-16 but calls the generic `LoadLibraryEx` macro. BCC64X resolves the generic macro to `LoadLibraryExA`, requiring `LPCSTR`, while the call passes `WCHAR*`. The version-pinned `win32-wide-loadlibrary.patch` explicitly invokes `LoadLibraryExW`, preserving the existing UTF-16 conversion and full plugin-loading behavior.
+
+The patch is integrated into the XMP Source-FSM with check/apply/reverse-check, and the logical XMP timestamp is now `2026-11-16T14:08:00Z`. **[not verified]** Native Debug/Release and consumer acceptance remain outstanding.
+
 ## Modern C++ comparator compatibility (16 November 2026)
 
 The next XMPFiles Debug and Release builds reached `XMPFiles/source/PluginHandler/XMPAtoms.h:108` and failed because the obsolete `std::binary_function` base class is not available in the BCC64X standard library. The obsolete base supplied argument/result type aliases but no comparison behavior. The actual `StringCompare::operator()` already implements strict lexicographical ordering.
