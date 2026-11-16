@@ -92,10 +92,24 @@ foreach(theRoot DNG_ZLIB_ROOT DNG_JPEG_ROOT DNG_JXL_ROOT)
       message(FATAL_ERROR "Missing managed dependency root: ${theRoot}")
    endif()
 endforeach()
-find_library(dng_jpeg NAMES jpeg libjpeg
-   PATHS "${DNG_JPEG_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
-find_library(dng_zlib NAMES zlib zlib1 zlibstatic
-   PATHS "${DNG_ZLIB_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
+# Use the exact variant names already established by Skia's managed
+# libjpeg-turbo and zlib contracts. Do not search arbitrary system libraries.
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   set(_DNG_JPEG_LIBRARY_NAME "libjpegd.lib")
+   set(_DNG_ZLIB_LIBRARY_NAME "libzd.lib")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+   set(_DNG_JPEG_LIBRARY_NAME "libjpeg.lib")
+   set(_DNG_ZLIB_LIBRARY_NAME "libz.lib")
+else()
+   message(FATAL_ERROR "Unsupported DNG SDK build configuration: ${CMAKE_BUILD_TYPE}")
+endif()
+set(dng_jpeg "${DNG_JPEG_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}/${_DNG_JPEG_LIBRARY_NAME}")
+set(dng_zlib "${DNG_ZLIB_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}/${_DNG_ZLIB_LIBRARY_NAME}")
+foreach(theLibrary IN ITEMS dng_jpeg dng_zlib)
+   if(NOT EXISTS "${${theLibrary}}")
+      message(FATAL_ERROR "Managed DNG dependency import library missing: ${${theLibrary}}")
+   endif()
+endforeach()
 find_library(dng_jxl NAMES jxl libjxl
    PATHS "${DNG_JXL_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
 find_library(dng_jxl_threads NAMES jxl_threads libjxl_threads
