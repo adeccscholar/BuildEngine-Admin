@@ -1,5 +1,13 @@
 # Adobe DNG SDK 1.7.1 Build 2802: independent BuildEngine producer
 
+## JXL / disabled XMP compile correction (16 November 2026)
+
+The operator's subsequent native DNG compilation reached `dng_jxl.cpp:1540` and reported `no member named 'GetXMP' in 'dng_metadata'`. This is a source configuration mismatch: the producer deliberately defines `qDNGUseXMP=0`, but the pinned Adobe JXL encoder source refers to `dng_metadata::GetXMP()` twice without a preprocessing guard.
+
+A version-pinned `xmp-disabled-jxl.patch` now wraps only the JXL XMP metadata encoding branch in `#if qDNGUseXMP` / `#endif`. EXIF, IPTC and general JPEG XL encode/decode remain enabled. The source workflow performs standard `git apply --check`, apply, and reverse-check, and the DNG logical source timestamp is advanced. No XMP Toolkit is added and no compiler or ABI setting is changed.
+
+**[not verified]** The next native Release/Debug build and the installed DNG/JXL functional consumer have not yet been observed.
+
 ## CMake C++23 module-scanning failure (16 November 2026)
 
 The native Release and Debug builds reached CMake's `dng_globals.cpp.o.ddi` dependency-scanning step, which failed while processing the BCC64X-provided compatibility header `_mingw.h` because it could not find `sdks/_mingw_ddk.h`. This is **not evidence that a different compiler was selected**: the established BCC64X toolchain includes MinGW-derived compatibility headers. The DNG producer consists of conventional C++ translation units and does not use C++ modules, so the target now explicitly sets `CXX_SCAN_FOR_MODULES OFF`. No MinGW compiler, alternate ABI, global toolchain flag or header-directory workaround was introduced. The logical library timestamp was updated to force reevaluation.
