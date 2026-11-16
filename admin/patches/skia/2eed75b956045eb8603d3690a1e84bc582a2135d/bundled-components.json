@@ -12,6 +12,10 @@
       "version": "1.2.1"
     },
     {
+      "name": "dng-sdk",
+      "version": "1.7.1.2802"
+    },
+    {
       "name": "expat",
       "version": "2.10.0"
     },
@@ -82,12 +86,6 @@
       "version": "169895d529dfce00390a20e69c2f516066fe7a3b",
       "versionScheme": "git",
       "repository": "https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator.git"
-    },
-    {
-      "name": "dng_sdk",
-      "version": "dbe0a676450d9b8c71bf00688bb306409b779e90",
-      "versionScheme": "git",
-      "repository": "https://android.googlesource.com/platform/external/dng_sdk.git"
     },
     {
       "name": "SPIRV-Headers",
