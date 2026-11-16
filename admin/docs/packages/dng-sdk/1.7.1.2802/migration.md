@@ -57,6 +57,10 @@ flowchart LR
    dng --> jxl["libjxl 0.13.0"]
 ```
 
+## Installed DLL consumer smoke
+
+The declarative package contract includes `smokes/dng-sdk/consumer` with `scope="package"`. This C++23 smoke uses the managed Release package, compiles against the installed `dng_host.h`, links to `dng_sdk.lib`, constructs a `dng_host` and executes `PerformAreaTaskThreads()` through the DLL. This tests the binary import boundary beyond the mere existence of the files. A separate RAW/DNG image decode consumer remains necessary for functional acceptance.
+
 ## Verification gate
 
 The following checks must all pass before calling this migration complete: native Release and Debug configuration/build/install; exact DLL/import library and exported-symbol checks; GN generation proving the bundled `dng_pthread.cpp` is **not** in Skia's compilation graph; Skia Release and Debug link; PE DLL dependency closure; and a real RAW/DNG decode consumer test.
