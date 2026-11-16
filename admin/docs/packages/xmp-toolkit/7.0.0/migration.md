@@ -1,5 +1,13 @@
 # Adobe XMP Toolkit 7.0.0 — managed XMPCore and XMPFiles
 
+## XMPFiles Canon XF link: pre-include AdobePrivate consistency (16 November 2026)
+
+Both native XMPFiles variants reached the link stage and reported unresolved `CanonXF_CheckFormat`. Its implementation is present in `XMPFiles/source/FileHandlers/CanonXF_Handler.cpp`, but that translation unit begins with `#if AdobePrivate` *before* importing `XMP_Environment.h`, whose default `AdobePrivate=1` therefore takes effect too late. `HandlerRegistry.cpp` includes its environment first, sees the default, and registers the handler. The resulting mismatch excludes its implementation while retaining its reference.
+
+The XMP CMake adapter now explicitly defines `AdobePrivate=1` for **both** XMPCore and XMPFiles at the compiler command-line level, ensuring the setting is available before any header is parsed. This preserves Canon XF and other Adobe internal handlers; no handler is stubbed or disabled. The XMP logical timestamp advances to `2026-11-16T14:09:00Z`.
+
+**[not verified]** Debug/Release DLL linking and the installed package consumer must be confirmed by the next native BCC64X run.
+
 ## Unicode Windows plugin module loading (16 November 2026)
 
 Both native XMPFiles configurations failed in `XMPFiles/source/PluginHandler/OS_Utils_WIN.cpp:40` because Adobe converts the plugin module path to UTF-16 but calls the generic `LoadLibraryEx` macro. BCC64X resolves the generic macro to `LoadLibraryExA`, requiring `LPCSTR`, while the call passes `WCHAR*`. The version-pinned `win32-wide-loadlibrary.patch` explicitly invokes `LoadLibraryExW`, preserving the existing UTF-16 conversion and full plugin-loading behavior.
