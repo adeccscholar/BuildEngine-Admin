@@ -8818,10 +8818,68 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="dng-sdk" version="1.7.1.2802" category="graphics" timestamp="2026-11-16T13:04:00Z">
+   <library id="xmp-toolkit" version="7.0.0" category="data" timestamp="2026-11-16T14:00:00Z">
+      <dependency library="expat" version="2.10.0"/>
+      <dependency library="zlib" version="1.4"/>
+      <metadata name="Adobe XMP Toolkit" supplier="Adobe Inc." homepage="https://www.adobe.com/devnet/xmp.html" description="Adobe XMP Core 7.0 and XMP Files 7.0, preserved in the DNG SDK 1.7.1 Build 2802 source distribution; BCC64X dynamic producer with managed Expat and zlib." licenseSignal="yellow">
+         <license name="Adobe XMP SDK License Agreement" spdx="LicenseRef-Adobe-XMP-SDK" file="licenses\xmp-toolkit\LICENSE.txt"/>
+      </metadata>
+      <security><repository url="https://github.com/hfiguiere/dng_sdk.git" commit="3a31897afe53aad5f15854eba0f04bab77cc4f82"/></security>
+      <source>
+         <download url="https://github.com/hfiguiere/dng_sdk/archive/3a31897afe53aad5f15854eba0f04bab77cc4f82.tar.gz" archive="dng-sdk-1.7.1.2802.tar.gz"/>
+         <extract format="libarchive" root="dng_sdk-3a31897afe53aad5f15854eba0f04bab77cc4f82">
+            <require path="LICENSE.txt"/>
+            <require path="XMP_ReadMe.txt"/>
+            <require path="xmp\toolkit\public\include\XMP_Version.h"/>
+            <require path="xmp\toolkit\XMPCore\source\XMPCore_Impl.cpp"/>
+            <require path="xmp\toolkit\XMPFiles\source\XMPFiles.cpp"/>
+         </extract>
+         <copy source="{BuildFileDir}\cmake\adapters\xmp-toolkit\CMakeLists.txt"
+               target="{Workspace}\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DXMP_EXPAT_ROOT:PATH={DependencyRoot:expat}"/>
+         <argument value="-DXMP_ZLIB_ROOT:PATH={DependencyRoot:zlib}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\XMPCore.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\XMPCore.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\XMPFiles.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\XMPFiles.dll"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\xmp-toolkit\LICENSE.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xmp\XMP.hpp"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\xmp-toolkit\LICENSE.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+      </publish>
+   </library>
+   <library id="dng-sdk" version="1.7.1.2802" category="graphics" timestamp="2026-11-16T14:01:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libjxl" version="0.13.0"/>
+      <dependency library="xmp-toolkit" version="7.0.0"/>
       <metadata name="Adobe DNG SDK" supplier="Adobe Inc." homepage="https://helpx.adobe.com/camera-raw/digital-negative.html" description="Independent native DNG SDK 1.7.1 Build 2802 producer, sourced from the revision-preserving DNG SDK mirror; shared BCC64X DLL and import library for Skia RAW decoding." licenseSignal="yellow">
          <license name="Adobe DNG SDK License Agreement" spdx="LicenseRef-Adobe-DNG-SDK" file="licenses\dng-sdk\LICENSE.txt"/>
       </metadata>
@@ -8835,23 +8893,6 @@
             <require path="dng_sdk\source\dng_host.h"/>
             <require path="dng_sdk\source\dng_jxl.cpp"/>
          </extract>
-         <!-- DNG 1.7.1 JXL encoder accesses XMP metadata even when
-              qDNGUseXMP=0; guard only that code path, retain JXL/EXIF/IPTC. -->
-         <copy source="{BuildFileDir}\patches\dng-sdk\1.7.1.2802\xmp-disabled-jxl.patch"
-               target="{Workspace}\.buildengine\xmp-disabled-jxl.patch"
-               overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="dng-jxl-xmp-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\xmp-disabled-jxl.patch"/>
-         </execute>
-         <execute name="dng-jxl-xmp-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\xmp-disabled-jxl.patch"/>
-         </execute>
-         <execute name="dng-jxl-xmp-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="{Workspace}\.buildengine\xmp-disabled-jxl.patch"/>
-         </execute>
          <!-- Adobe semantic-mask preview owns incomplete tag types through unique_ptr.
               Define its constructor/destructor in the implementation translation unit. -->
          <copy source="{BuildFileDir}\patches\dng-sdk\1.7.1.2802\semantic-mask-unique-ptr-lifetime.patch"
@@ -8886,21 +8927,21 @@
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{Workspace}\.buildengine\clang-native-timespec.patch"/>
          </execute>
-         <!-- XMP-disabled producer: metadata update code must not call omitted XMP APIs. -->
-         <copy source="{BuildFileDir}\patches\dng-sdk\1.7.1.2802\xmp-disabled-update-meta.patch"
-               target="{Workspace}\.buildengine\xmp-disabled-update-meta.patch"
+         <!-- DNG XMP bridge targets the managed dynamic XMP Core/Files libraries. -->
+         <copy source="{BuildFileDir}\patches\dng-sdk\1.7.1.2802\xmp-shared-toolkit.patch"
+               target="{Workspace}\.buildengine\xmp-shared-toolkit.patch"
                overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="dng-update-meta-xmp-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+         <execute name="dng-xmp-shared-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\xmp-disabled-update-meta.patch"/>
+            <argument value="{Workspace}\.buildengine\xmp-shared-toolkit.patch"/>
          </execute>
-         <execute name="dng-update-meta-xmp-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+         <execute name="dng-xmp-shared-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\xmp-disabled-update-meta.patch"/>
+            <argument value="{Workspace}\.buildengine\xmp-shared-toolkit.patch"/>
          </execute>
-         <execute name="dng-update-meta-xmp-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+         <execute name="dng-xmp-shared-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
-            <argument value="{Workspace}\.buildengine\xmp-disabled-update-meta.patch"/>
+            <argument value="{Workspace}\.buildengine\xmp-shared-toolkit.patch"/>
          </execute>
          <copy source="{BuildFileDir}\cmake\adapters\dng-sdk\CMakeLists.txt" target="{Workspace}\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
       </source>
@@ -8918,6 +8959,7 @@
          <argument value="-DDNG_ZLIB_ROOT:PATH={DependencyRoot:zlib}"/>
          <argument value="-DDNG_JPEG_ROOT:PATH={DependencyRoot:libjpeg-turbo}"/>
          <argument value="-DDNG_JXL_ROOT:PATH={DependencyRoot:libjxl}"/>
+         <argument value="-DDNG_XMP_ROOT:PATH={DependencyRoot:xmp-toolkit}"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -8947,7 +8989,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="DNG_SDK_ROOT" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
-         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libjxl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{ENV:PATH}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libjxl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xmp-toolkit}\bin\win64\Release;{DependencyRoot:expat}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
    <library id="skia" version="153" category="graphics" timestamp="2026-11-16T12:00:00Z">
