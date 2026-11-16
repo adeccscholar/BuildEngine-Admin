@@ -1,5 +1,11 @@
 # Adobe DNG SDK 1.7.1 Build 2802: independent BuildEngine producer
 
+## JPEG import-library configure repair (16 November 2026)
+
+The first supplied native Debug configure log failed at `CMakeLists.txt:95 (find_library)` because the adapter searched `jpeg` and `libjpeg`, while BuildEngine's established libjpeg-turbo 3.2.1 package names the exact import libraries `libjpeg.lib` (Release) and `libjpegd.lib` (Debug). The corresponding zlib variant names are `libz.lib` and `libzd.lib`. The adapter now selects the exact installed variant paths and checks their existence before linking, without searching an unrelated system installation. The DNG source scope timestamp has been advanced to reprocess the corrected adapter.
+
+**[not verified]** The next configure and build have not been observed; the first supplied configure failed before any compilation.
+
 [TOC|Content]
 
 ## Integration and ownership
