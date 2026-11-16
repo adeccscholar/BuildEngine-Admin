@@ -9086,7 +9086,7 @@
          <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libjxl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xmp-toolkit}\bin\win64\Release;{DependencyRoot:expat}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-16T12:04:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-16T12:06:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -9103,6 +9103,9 @@
       <dependency library="libwebp" version="1.6.0"/>
       <dependency library="piex" version="0.27"/>
       <dependency library="spirv-cross" version="vulkan-sdk-1.4.363.0"/>
+      <dependency library="spirv-headers" version="v1.202609.0"/>
+      <dependency library="spirv-tools" version="2026.4"/>
+      <dependency library="glslang" version="16.6.0"/>
       
       <dependency library="vulkan-memory-allocator" version="3.4.0"/>
       <dependency library="wuffs" version="0.3"/>
@@ -9199,18 +9202,7 @@
 
          
 
-         <download
-            url="https://github.com/KhronosGroup/SPIRV-Headers/archive/942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"
-            archive="skia-deps\spirv-headers-942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"/>
-
-         <download
-            url="https://github.com/KhronosGroup/SPIRV-Tools/archive/388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"
-            archive="skia-deps\spirv-tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"/>
-
-         <download
-            url="https://chromium.googlesource.com/external/github.com/KhronosGroup/glslang/+archive/1d47ffa8ac4374a19b302021e216a20f22a3de92.tar.gz"
-            archive="skia-deps\glslang-1d47ffa8ac4374a19b302021e216a20f22a3de92.tar.gz"/>
-
+         <!-- SPIRV-Headers, SPIRV-Tools and glslang are BuildEngine dependencies. -->
 
          <!-- ======================================================== -->
          <!-- Skia source archive.                                    -->
@@ -9347,99 +9339,7 @@
 
          
 
-         <execute name="mkdir-spirv-headers"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\spirv-headers"/>
-         </execute>
-
-         <execute name="extract-spirv-headers"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-headers"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\spirv-headers-942fe4b988359a0750b79f0ae7ed735994d3147d.tar.gz"/>
-         </execute>
-         <!-- GitHub pinned revision, root folder SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d.
-              Verify pinned source before copying and remove the staging root. -->
-         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d\include\spirv\unified1\spirv.h"/>
-         <execute name="flatten-spirv-headers-github-archive" executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-headers" showOutput="false">
-            <argument value="-E"/><argument value="copy_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\spirv-headers\SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d"/>
-            <argument value="{CurrentArtifact}\third_party\externals\spirv-headers"/>
-         </execute>
-         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.h"/>
-         <execute name="cleanup-spirv-headers-github-root" executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-headers" showOutput="false">
-            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
-            <argument value="{CurrentArtifact}\third_party\externals\spirv-headers\SPIRV-Headers-942fe4b988359a0750b79f0ae7ed735994d3147d"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.h"/>
-         <require path="{CurrentArtifact}\third_party\externals\spirv-headers\include\spirv\unified1\spirv.hpp"/>
-
-         <execute name="mkdir-spirv-tools"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\spirv-tools"/>
-         </execute>
-
-         <execute name="extract-spirv-tools"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-tools"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\spirv-tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.tar.gz"/>
-         </execute>
-         <!-- GitHub pinned revision, root folder SPIRV-Tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1.
-              Verify pinned source before copying and remove the staging root. -->
-         <require path="{CurrentArtifact}\third_party\externals\spirv-tools\SPIRV-Tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1\source\val\validate.cpp"/>
-         <execute name="flatten-spirv-tools-github-archive" executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-tools" showOutput="false">
-            <argument value="-E"/><argument value="copy_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\spirv-tools\SPIRV-Tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1"/>
-            <argument value="{CurrentArtifact}\third_party\externals\spirv-tools"/>
-         </execute>
-         <require path="{CurrentArtifact}\third_party\externals\spirv-tools\source\val\validate.cpp"/>
-         <execute name="cleanup-spirv-tools-github-root" executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\spirv-tools" showOutput="false">
-            <argument value="-E"/><argument value="rm"/><argument value="-rf"/>
-            <argument value="{CurrentArtifact}\third_party\externals\spirv-tools\SPIRV-Tools-388f5af1a6d4a4df4ab9bf69a1817255952e6ef1"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\spirv-tools\source\val\validate.cpp"/>
-
-         <execute name="mkdir-glslang"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="make_directory"/>
-            <argument value="{CurrentArtifact}\third_party\externals\glslang"/>
-         </execute>
-
-         <execute name="extract-glslang"
-                  executable="{Tool:cmake}"
-                  workingDirectory="{CurrentArtifact}\third_party\externals\glslang"
-                  showOutput="false">
-            <argument value="-E"/>
-            <argument value="tar"/>
-            <argument value="xzf"/>
-            <argument value="{DownloadsRoot}\skia-deps\glslang-1d47ffa8ac4374a19b302021e216a20f22a3de92.tar.gz"/>
-         </execute>
-
-         <require path="{CurrentArtifact}\third_party\externals\glslang\glslang\Public\ShaderLang.h"/>
+         <!-- SPIR-V dependencies are provided by separately installed packages. -->
 
          <!-- ======================================================== -->
          <!-- BCC64X compatibility / system integration patches.      -->
@@ -9916,6 +9816,17 @@
          <execute name="bcc64x-system-spirv-cross-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-spirv-cross.patch"/>
          </execute>
+
+         <copy source="{BuildFileDir}\patches\skia\2eed75b956045eb8603d3690a1e84bc582a2135d\bcc64x-system-spirv-tools.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-spirv-tools.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="bcc64x-system-spirv-tools-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-spirv-tools.patch"/>
+         </execute>
+         <execute name="bcc64x-system-spirv-tools-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-spirv-tools.patch"/>
+         </execute>
+         <execute name="bcc64x-system-spirv-tools-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-system-spirv-tools.patch"/>
+         </execute>
 <execute name="fetch-gn"
                   executable="{Tool:python}"
                   workingDirectory="{CurrentArtifact}"
@@ -10012,6 +9923,9 @@
          <environment name="CB_SKIA_LIBWEBP_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebp.lib"/>
          <environment name="CB_SKIA_LIBWEBP_DEMUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpdemux.lib"/>
          <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpmux.lib"/>
+         <environment name="CB_SKIA_SPIRV_TOOLS_INCLUDE" value="{DependencyRoot:spirv-tools}\include"/>
+         <environment name="CB_SKIA_SPIRV_HEADERS_INCLUDE" value="{DependencyRoot:spirv-headers}\include"/>
+         <environment name="CB_SKIA_SPIRV_TOOLS_LIB" value="{DependencyRoot:spirv-tools}\lib\win64\{Configuration}\SPIRV-Tools.lib"/>
          <environment name="CB_SKIA_SPIRV_CROSS_INCLUDE" value="{DependencyRoot:spirv-cross}\include\spirv_cross"/>
          <environment name="CB_SKIA_SPIRV_CROSS_LIB" value="{DependencyRoot:spirv-cross}\lib\win64\{Configuration}\{SpirvCrossCxxImport}.lib"/>
          <environment name="CB_SKIA_DNG_SDK_INCLUDE" value="{DependencyRoot:dng-sdk}\include\dng_sdk\source"/>
@@ -10028,7 +9942,7 @@
          -->
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:spirv-tools}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
          <target
             name="gn-gen"
@@ -10113,6 +10027,9 @@
                <line value="skia_vulkan_memory_allocator_dir = getenv(&quot;CB_SKIA_VMA_ROOT&quot;)"/>
 
                <line value="skia_enable_spirv_validation = false"/>
+               <line value="bcc64x_spirv_tools_include = getenv(&quot;CB_SKIA_SPIRV_TOOLS_INCLUDE&quot;)"/>
+               <line value="bcc64x_spirv_headers_include = getenv(&quot;CB_SKIA_SPIRV_HEADERS_INCLUDE&quot;)"/>
+               <line value="bcc64x_spirv_tools_lib = getenv(&quot;CB_SKIA_SPIRV_TOOLS_LIB&quot;)"/>
 
                <line value="skia_use_dawn = false"/>
                <line value="skia_use_angle = false"/>
@@ -10266,7 +10183,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:spirv-tools}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="gen"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10281,7 +10198,7 @@
 
             <environment
                name="PATH"
-               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
+               value="{DependencyRoot:opengl}\bin\win64\{Configuration};{DependencyRoot:icu}\bin\win64\{Configuration};{DependencyRoot:expat}\bin\win64\{Configuration};{DependencyRoot:libavif}\bin\win64\{Configuration};{DependencyRoot:libgav1}\bin\win64\{Configuration};{DependencyRoot:libjxl}\bin\win64\{Configuration};{DependencyRoot:libwebp}\bin\win64\{Configuration};{DependencyRoot:spirv-cross}\bin\win64\{Configuration};{DependencyRoot:spirv-tools}\bin\win64\{Configuration};{DependencyRoot:piex}\bin\win64\{Configuration};{DependencyRoot:dng-sdk}\bin\win64\{Configuration};{DependencyRoot:zlib}\bin\win64\{Configuration};{DependencyRoot:brotli}\bin\win64\{Configuration};{DependencyRoot:libjpeg-turbo}\bin\win64\{Configuration};{DependencyRoot:libpng}\bin\win64\{Configuration};{DependencyRoot:harfbuzz}\bin\win64\{Configuration};{DependencyRoot:freetype}\bin\win64\{Configuration};{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:python};{ToolDir:ninja};{ENV:PATH}"/>
 
             <argument value="-C"/>
             <argument value="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -10559,7 +10476,7 @@
 
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:brotli}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:harfbuzz}\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{DependencyRoot:libwebp}\bin\win64\Release;{DependencyRoot:spirv-cross}\bin\win64\Release;{DependencyRoot:piex}\bin\win64\Release;{DependencyRoot:dng-sdk}\bin\win64\Release;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:brotli}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libpng}\bin\win64\Release;{DependencyRoot:harfbuzz}\bin\win64\Release;{DependencyRoot:freetype}\bin\win64\Release;{DependencyRoot:libwebp}\bin\win64\Release;{DependencyRoot:spirv-cross}\bin\win64\Release;{DependencyRoot:spirv-tools}\bin\win64\Release;{DependencyRoot:piex}\bin\win64\Release;{DependencyRoot:dng-sdk}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
 
       <smoke
@@ -10578,7 +10495,7 @@
 
          <environment
             name="PATH"
-            value="{DependencyRoot:opengl}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:brotli}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:harfbuzz}\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{DependencyRoot:libwebp}\bin\win64\Debug;{DependencyRoot:spirv-cross}\bin\win64\Debug;{DependencyRoot:piex}\bin\win64\Debug;{DependencyRoot:dng-sdk}\bin\win64\Debug;{ENV:PATH}"/>
+            value="{DependencyRoot:opengl}\bin\win64\Debug;{DependencyRoot:zlib}\bin\win64\Debug;{DependencyRoot:brotli}\bin\win64\Debug;{DependencyRoot:libjpeg-turbo}\bin\win64\Debug;{DependencyRoot:libpng}\bin\win64\Debug;{DependencyRoot:harfbuzz}\bin\win64\Debug;{DependencyRoot:freetype}\bin\win64\Debug;{DependencyRoot:libwebp}\bin\win64\Debug;{DependencyRoot:spirv-cross}\bin\win64\Debug;{DependencyRoot:spirv-tools}\bin\win64\Debug;{DependencyRoot:piex}\bin\win64\Debug;{DependencyRoot:dng-sdk}\bin\win64\Debug;{ENV:PATH}"/>
       </smoke>
    </library>
    
