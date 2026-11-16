@@ -1,5 +1,13 @@
 # Adobe XMP Toolkit 7.0.0 — managed XMPCore and XMPFiles
 
+## XMPCore internal definition consistency (16 November 2026)
+
+The native Debug/Release build reached `XMPCore/source/XMPDocOps.cpp:396` and failed on `kXMPDirtyDoc_New`. This identifier is present in Adobe's `XMP_Const.h`, but its declaration is guarded by `#if AdobePrivate`. The BuildEngine XMP adapter had explicitly set `AdobePrivate=0` on both XMPCore and XMPFiles while compiling the internal Adobe source units requiring that interface. This violated the pinned upstream toolkit's default (`XMP_Environment.h` defines `AdobePrivate=1` when unspecified).
+
+The two contradictory CMake definitions have been removed, restoring Adobe's upstream internal compilation mode for the complete source implementation. No public constants were duplicated, no internal source units were excluded, and no XMP functionality was disabled. The XMP logical timestamp was advanced to `2026-11-16T14:05:00Z`.
+
+**[not verified]** Follow-up BCC64X Debug/Release compilation and XMP/DNG consumer validation must still run.
+
 ## Concurrent source archive cache isolation (16 November 2026)
 
 DNG SDK and XMP Toolkit intentionally fetch the same pinned upstream commit, but their independent FSM source producers previously declared the same local download archive `dng-sdk-1.7.1.2802.tar.gz`. During concurrent downloads, both attempted to write and rename the same `.part` file, causing a Windows sharing violation. The XMP Toolkit archive name is now `xmp-toolkit-7.0.0-dng-sdk-1.7.1.2802.tar.gz`, while its upstream URL, extracted root, commit, and all features remain unchanged. This isolates concurrent cache keys without serializing the build or introducing another source release. The XMP logical timestamp is `2026-11-16T14:04:00Z`.
