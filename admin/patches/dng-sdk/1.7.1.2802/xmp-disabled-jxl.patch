@@ -1,7 +1,7 @@
 diff --git a/dng_sdk/source/dng_jxl.cpp b/dng_sdk/source/dng_jxl.cpp
 --- a/dng_sdk/source/dng_jxl.cpp
 +++ b/dng_sdk/source/dng_jxl.cpp
-@@ -1535,45 +1535,47 @@
+@@ -1535,44 +1535,46 @@
  
  			} // exif
  			
