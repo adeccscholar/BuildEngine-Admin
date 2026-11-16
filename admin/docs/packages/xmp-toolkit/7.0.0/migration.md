@@ -1,5 +1,11 @@
 # Adobe XMP Toolkit 7.0.0 — managed XMPCore and XMPFiles
 
+## BCC64X Clang TR1 compatibility correction (16 November 2026)
+
+The native XMPCore build reached `XMPCommonFwdDeclarations.h:40` and failed because `std::tr1` is absent from the compiler's standard library. Adobe's `XMPCommonDefines.h` selects the pre-Visual Studio 2010 TR1 path whenever `_MSC_VER <= 1600`; BCC64X uses modern Clang, whose compiler identity must take precedence over that historical MSVC version test. The pinned `clang-standard-shared-ptr.patch` excludes `__clang__` from the legacy branch, restoring `std::shared_ptr`, `std::enable_shared_from_this`, `std::mem_fn`, and the existing standard atomic implementation, without disabling XMP functionality.
+
+The source FSM checks, applies, and reverse-checks the patch, with logical XMP timestamp `2026-11-16T14:02:00Z`. **[not verified]** Native Debug/Release build and installed consumer smoke remain outstanding.
+
 [TOC|Content]
 
 ## Scope and provenance
