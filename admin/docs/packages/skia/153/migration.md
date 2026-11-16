@@ -1,5 +1,11 @@
 # Skia 153: BuildEngine integration and dependency provenance
 
+## Debug managed SPIRV-Tools import correction (16 November 2026)
+
+The operator repeated the no-change FSM run and reproduced Skia 153 Debug's missing `SPIRV-Tools-shared.lib` link input. The BuildEngine XML requested the unprefixed name although its native CMake shared-library convention includes the `lib` prefix. Skia now receives `libSPIRV-Tools-shared.lib` from its variant-specific `DependencyRoot:spirv-tools` installation. Before GN generation, `VerifyManagedSpirvTools.cmake` checks this exact artifact and reports directory contents if absent. The package producer's install gate also requires it. No fallback to bundled SPIRV-Tools, static runtime, or disabled Debug validation was introduced.
+
+**[not verified]** Actual installed producer artifact naming, Windows Debug/Release link and consumer smoke must be established by the next FSM execution. A producer mismatch now fails at its install gate or the consumer preflight, not during the long Skia link.
+
 ## Migration decision: SPIR-V externalization, Debug import contract, and D3D12MemoryAllocator (16 November 2026)
 
 The active version-pinned `bundled-components.json` declares only D3D12MemoryAllocator as bundled. SPIRV-Headers v1.202609.0, SPIRV-Tools 2026.4, and glslang 16.6.0 are managed BuildEngine dependencies, not bundled Skia source dependencies. If a deployed server still displays four bundled components, its displayed installed SBOM/provenance must be reconciled against the current manifest and installed package revision. Do not label a component external merely because a package exists: verify that Skia's generated GN targets actually consume the managed package and no embedded copy remains in the binary.
