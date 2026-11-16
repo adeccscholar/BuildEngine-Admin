@@ -48,4 +48,19 @@ diff --git a/dng_sdk/source/dng_jxl.cpp b/dng_sdk/source/dng_jxl.cpp
  
 +		#endif // qDNGUseXMP
  		// IPTC.
+@@ -3866,6 +3868,7 @@
  
+ 	if (fInfo)
+ 		{
++		#if qDNGUseXMP
+ 
+ 		try
+ 			{
+@@ -3903,6 +3906,7 @@
+ 
+ 			}
+ 
++		#endif // qDNGUseXMP
+ 		}
+ 	
+ 	}
