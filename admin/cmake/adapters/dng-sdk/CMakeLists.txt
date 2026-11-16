@@ -89,21 +89,14 @@ foreach(theRoot DNG_ZLIB_ROOT DNG_JPEG_ROOT DNG_JXL_ROOT)
       message(FATAL_ERROR "Missing managed dependency root: ${theRoot}")
    endif()
 endforeach()
-foreach(theName IN ITEMS
-   "dng_jpeg:${DNG_JPEG_ROOT}:jpeg;libjpeg"
-   "dng_zlib:${DNG_ZLIB_ROOT}:zlib;zlib1;zlibstatic"
-   "dng_jxl:${DNG_JXL_ROOT}:jxl;libjxl"
-   "dng_jxl_threads:${DNG_JXL_ROOT}:jxl_threads;libjxl_threads")
-   string(REPLACE ":" ";" theFields "${theName}")
-   list(GET theFields 0 theVariable)
-   list(GET theFields 1 theRoot)
-   list(GET theFields 2 theNames)
-   string(REPLACE ";" " " theNames "${theNames}")
-   separate_arguments(theCandidates NATIVE_COMMAND "${theNames}")
-   find_library(${theVariable} NAMES ${theCandidates}
-      PATHS "${theRoot}/lib/win64/${CMAKE_BUILD_TYPE}"
-      NO_DEFAULT_PATH REQUIRED)
-endforeach()
+find_library(dng_jpeg NAMES jpeg libjpeg
+   PATHS "${DNG_JPEG_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
+find_library(dng_zlib NAMES zlib zlib1 zlibstatic
+   PATHS "${DNG_ZLIB_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
+find_library(dng_jxl NAMES jxl libjxl
+   PATHS "${DNG_JXL_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
+find_library(dng_jxl_threads NAMES jxl_threads libjxl_threads
+   PATHS "${DNG_JXL_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
 target_include_directories(dng_sdk
    PUBLIC
       "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/dng_sdk/source>"
