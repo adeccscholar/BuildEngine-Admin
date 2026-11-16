@@ -8874,12 +8874,22 @@
          <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
       </publish>
+      <smoke id="consumer" scope="package" source="smokes\xmp-toolkit\consumer" configuration="Release"
+             cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+             toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+             executable="xmp-toolkit-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="XMP_TOOLKIT_ROOT" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{DependencyRoot:expat}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{ENV:PATH}"/>
+      </smoke>
    </library>
    <library id="dng-sdk" version="1.7.1.2802" category="graphics" timestamp="2026-11-16T14:01:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libjxl" version="0.13.0"/>
       <dependency library="xmp-toolkit" version="7.0.0"/>
+      <dependency library="expat" version="2.10.0"/>
       <metadata name="Adobe DNG SDK" supplier="Adobe Inc." homepage="https://helpx.adobe.com/camera-raw/digital-negative.html" description="Independent native DNG SDK 1.7.1 Build 2802 producer, sourced from the revision-preserving DNG SDK mirror; shared BCC64X DLL and import library for Skia RAW decoding." licenseSignal="yellow">
          <license name="Adobe DNG SDK License Agreement" spdx="LicenseRef-Adobe-DNG-SDK" file="licenses\dng-sdk\LICENSE.txt"/>
       </metadata>
