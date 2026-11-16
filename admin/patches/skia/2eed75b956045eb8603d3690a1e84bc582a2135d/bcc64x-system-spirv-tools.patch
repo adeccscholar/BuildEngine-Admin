@@ -17,7 +17,7 @@ diff --git a/third_party/externals/spirv-tools/BUILD.gn b/third_party/externals/
 new file mode 100644
 --- /dev/null
 +++ b/third_party/externals/spirv-tools/BUILD.gn
-@@ -0,0 +1,24 @@
+@@ -0,0 +1,27 @@
 +import("//gn/skia.gni")
 +
 +assert(bcc64x_spirv_tools_include != "", "Managed SPIRV-Tools include path required")
@@ -31,14 +31,17 @@ new file mode 100644
 +    bcc64x_spirv_tools_include,
 +    bcc64x_spirv_headers_include,
 +  ]
++  defines = [ "SPIRV_TOOLS_SHAREDLIB" ]
 +  ldflags = [ bcc64x_spirv_tools_lib ]
 +}
 +
 +group("spvtools") {
 +  public_configs = [ ":managed_spirv_tools" ]
++  all_dependent_configs = [ ":managed_spirv_tools" ]
 +}
 +
 +group("spvtools_val") {
 +  public_configs = [ ":managed_spirv_tools" ]
++  all_dependent_configs = [ ":managed_spirv_tools" ]
 +}
 +
