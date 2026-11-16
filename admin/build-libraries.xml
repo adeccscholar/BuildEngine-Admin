@@ -9086,7 +9086,7 @@
          <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libjxl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xmp-toolkit}\bin\win64\Release;{DependencyRoot:expat}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-16T12:08:00Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-16T12:09:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -9925,7 +9925,7 @@
          <environment name="CB_SKIA_LIBWEBP_MUX_LIB" value="{DependencyRoot:libwebp}\lib\win64\{Configuration}\libwebpmux.lib"/>
          <environment name="CB_SKIA_SPIRV_TOOLS_INCLUDE" value="{DependencyRoot:spirv-tools}\include"/>
          <environment name="CB_SKIA_SPIRV_HEADERS_INCLUDE" value="{DependencyRoot:spirv-headers}\include"/>
-         <environment name="CB_SKIA_SPIRV_TOOLS_LIB" value="{DependencyRoot:spirv-tools}\lib\win64\{Configuration}\SPIRV-Tools.lib"/>
+         <environment name="CB_SKIA_SPIRV_TOOLS_LIB" value="{DependencyRoot:spirv-tools}\lib\win64\{Configuration}\SPIRV-Tools-shared.lib"/>
          <environment name="CB_SKIA_SPIRV_CROSS_INCLUDE" value="{DependencyRoot:spirv-cross}\include\spirv_cross"/>
          <environment name="CB_SKIA_SPIRV_CROSS_LIB" value="{DependencyRoot:spirv-cross}\lib\win64\{Configuration}\{SpirvCrossCxxImport}.lib"/>
          <environment name="CB_SKIA_DNG_SDK_INCLUDE" value="{DependencyRoot:dng-sdk}\include\dng_sdk\source"/>
