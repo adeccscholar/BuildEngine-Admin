@@ -1,5 +1,13 @@
 # Adobe DNG SDK 1.7.1 Build 2802: independent BuildEngine producer
 
+## BCC64X Clang / native timespec compatibility (16 November 2026)
+
+The next native Debug and Release builds failed in `dng_pthread.cpp`, where BCC64X's Clang/MinGW-compatible `sys/timeb.h` redeclared `dng_timespec`. Adobe's Windows pthread compatibility header unconditionally creates its own `struct dng_timespec` and, for the historical `_MSC_VER < 1900` branch, globally defines `timespec` as `dng_timespec`. BCC64X is Clang, not an old MSVC compiler: the macro therefore rewrites unrelated `timespec` declarations later encountered in the compiler-provided C headers.
+
+The versioned `clang-native-timespec.patch` explicitly includes `<time.h>` in Adobe's Windows pthread compatibility header, leaves the native `timespec` identifier intact when `__clang__` is defined, and uses Adobe's already-existing native-to-`dng_timespec` conversion paths in `dng_pthread.cpp` and `dng_mutex.cpp` for Clang. The separate `dng_timespec` interface is retained. This is a source compatibility correction, not a global compiler macro, alternate MinGW toolchain, modified vendor header, or new runtime dependency.
+
+The source FSM performs the customary patch check, apply and reverse-check stages. The DNG logical timestamp was advanced to `2026-11-16T13:03:00Z`. **[not verified]** The Windows native Debug/Release builds, installation and consumer smoke need execution; success is not inferred from the committed patch.
+
 ## Semantic-mask preview RAII correction (16 November 2026)
 
 The subsequent BCC64X Debug and Release builds reached `dng_preview.cpp` and failed inside the standard `unique_ptr` deleter because `tag_string` was incomplete. The upstream `dng_semantic_mask_preview` header owns `std::unique_ptr<tag_string>` and `std::unique_ptr<tag_uint32_ptr>` while declaring only forward references. Its constructor was inline and the destructor implicitly generated. Compiling the constructor's exception-cleanup and implicit destructor can instantiate the deleter at a location where these types are incomplete.
