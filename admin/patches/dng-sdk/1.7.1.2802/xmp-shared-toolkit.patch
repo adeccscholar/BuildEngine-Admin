@@ -1,0 +1,12 @@
+diff --git a/dng_sdk/source/dng_xmp_sdk.cpp b/dng_sdk/source/dng_xmp_sdk.cpp
+--- a/dng_sdk/source/dng_xmp_sdk.cpp
++++ b/dng_sdk/source/dng_xmp_sdk.cpp
+@@ -44,7 +44,7 @@
+ 
+ #define XMP_INCLUDE_XMPFILES qDNGXMPFiles
+ 
+-#define XMP_StaticBuild 1
++#define XMP_DynamicBuild 1
+ 
+ #include "XMP.incl_cpp"
+ 
