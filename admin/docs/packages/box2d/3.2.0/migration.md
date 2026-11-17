@@ -1,5 +1,9 @@
 # Box2D 3.2.0: Native BCC64X integration
 
+## 17 November 2026: BCC64X import-library install correction
+
+Both Release and Debug native builds completed successfully. The install phase failed because the initial package gate requested `box2d.lib` / `box2dd.lib`. The target's existing BCC64X Windows-GNU import prefix is `lib` while the DLL name remains prefix-free. The package gate and the standalone `box2d::box2d` imported target now expect `libbox2d.lib` / `libbox2dd.lib` in their respective variant directories. No producer source, compiler rules, build timestamp or other package was modified. **[not verified]** Native installed file inventory and subsequent install/consumer smoke remain pending.
+
 [TOC|Content]
 
 ## Purpose and architecture
