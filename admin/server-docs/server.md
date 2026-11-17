@@ -176,6 +176,46 @@ Important routes include:
 | `/manual/*.md` | Synchronized project/server documentation |
 | `/index.html` | Generated central documentation index |
 
+## Security evidence refresh and planned PostgreSQL persistence (17 November 2026)
+
+The security monitor starts at server startup when enabled. Its refresh interval
+is `serverSecurityRefreshMinutes=1440` by default (24 hours), measured
+**after the previous scan completes**. The configured allowed range is 15 to
+10,080 minutes. During a scan, changed partial results may be published at
+most once per five seconds, and a final immutable snapshot is published when
+the scan finishes. No browser/API request causes an external provider query.
+
+The full CVSS 3.0/3.1/4.0 vector is retained, with English metric-level
+interpretations in the expanded security details. The compiled renderer now
+uses a plain ASCII hyphen between metric codes and descriptions. If the
+browser still shows a replacement character, verify that the deployed
+`BuildEngineCommon.dll` actually contains the current renderer build; the
+HTTP response declares UTF-8.
+
+The planned PostgreSQL database is named **BuildEngine**. Current additive
+schema migrations are in `admin/security/postgresql`:
+
+- `001-cve-cache.sql`: transactional CVE snapshot generations and current
+  snapshot publication.
+- `002-buildengine-core.sql`: logical library/version catalog, immutable
+  XML revisions, dependency revision history, advisory identities/aliases,
+  historical CVSS/EPSS/KEV observations and append-only assessments with
+  controlled value tables (`dom_assessment_status`, `dom_applicability`,
+  `dom_assessment_disposition`).
+
+The migrations are **staged, not deployed**. There is no active PostgreSQL
+adapter or history/assessment API yet. Read-only HTTP remains backed by
+published package evidence and the independent in-memory CVE snapshot.
+The intended native client stack is managed libpq/libpqxx; connections
+must remain independent of request-time provider retrieval.
+
+The next parallelization candidate is the background CVE scanner, with
+managed oneTBB 2023.2.0 for bounded per-library provider work and
+deterministic merging. LLVM OpenMP 20.1.7 may be considered for
+CPU-bound XML/SBOM processing if measured useful. Neither backend
+is currently linked into this scanner; provider rate limits and
+thread-safe evidence publication remain explicit integration gates.
+
 ## Machine API
 
 The machine API is GET-only. The versioned namespace is `/api/v1`; responses are JSON except for the downloadable ZIP. The server performs no outbound provider requests for an incoming HTTP request. Invalid routes return 404 and non-GET requests are rejected with 405.
