@@ -1,5 +1,9 @@
 # SDL3 3.4.20: Native BCC64X integration
 
+## FSM source invalidation for the pinned GameInput patch (17 November 2026)
+
+The follow-up FSM run still compiled the original `bool*` buffer in `SDL_gameinputjoystick.cpp`. Repository inspection confirms that BuildEngine's source token is based on the library ID, version, phase and declared timestamp, not changes in individual source actions. The GameInput patch had been registered without updating that timestamp, so the successful earlier source state was reused. Only `sdl3@3.4.20` now has an updated source timestamp, causing its pinned patch check/apply to execute before Debug and Release compilation. No changes were made to Box2D, Skia, SPIRV-Tools or global toolchain. **[not verified]** Execution of this newly invalidated source phase and subsequent build remain to be observed.
+
 ## GameInput BOOL buffer compatibility fix (17 November 2026)
 
 Both BCC64X configurations reached the SDL3 GameInput joystick source but failed with E3851 at `src/joystick/gdk/SDL_gameinputjoystick.cpp:870`. The pinned SDL3 3.4.20 code allocates `bool*` and passes it to `IGameInputReading::GetControllerButtonState`, whose native Windows declaration requires `BOOL*`. A cast would be incorrect because `BOOL` and C++ `bool` have different sizes. This is also an underlying buffer-width safety issue.
