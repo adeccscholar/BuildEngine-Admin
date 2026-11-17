@@ -1,5 +1,9 @@
 # SDL3 3.4.20: Native BCC64X integration
 
+## 17 November 2026: DirectX SDK detection under BCC64X
+
+Both configurations failed during the upstream SDL3 CMake configure at `CMakeLists.txt:2216`. SDL3 assumed a legacy `DXSDK_DIR` installation when the compiler was neither MSVC nor MinGW. BuildEngine correctly uses BCC64X with the registered Windows SDK, without adopting either compiler identity. The SDL3-specific adapter now sets upstream's `USE_WINSDK_DIRECTX=TRUE` before loading the pinned source tree. It retains DirectX support and does not modify the global BCC64X toolchain. The adapter also makes the shared target's import prefix empty to match the package's `SDL3.lib` / `SDL3d.lib` import contract. **[not verified]** Subsequent CMake feature detection, compilation, installation and consumer smoke remain pending.
+
 [TOC|Content]
 
 ## Purpose and architecture
