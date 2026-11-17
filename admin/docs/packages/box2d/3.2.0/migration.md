@@ -1,5 +1,9 @@
 # Box2D 3.2.0: Native BCC64X integration
 
+## Consumer smoke C++23 dependency-scanner adjustment (17 November 2026)
+
+Box2D library Debug/Release compilation succeeded, but the C++23 consumer smoke failed during the `main.cpp.o.ddi` module-dependency scan with a missing `sdks/_mingw_ddk.h` header. This smoke has no C++ modules. Its CMake target now sets `CXX_SCAN_FOR_MODULES OFF`, consistent with other BuildEngine consumer smokes, without changing library build artifacts or global include paths. **[not verified]** Consumer object compilation, link and execution remain to be confirmed.
+
 ## 17 November 2026: BCC64X import-library install correction
 
 Both Release and Debug native builds completed successfully. The install phase failed because the initial package gate requested `box2d.lib` / `box2dd.lib`. The target's existing BCC64X Windows-GNU import prefix is `lib` while the DLL name remains prefix-free. The package gate and the standalone `box2d::box2d` imported target now expect `libbox2d.lib` / `libbox2dd.lib` in their respective variant directories. No producer source, compiler rules, build timestamp or other package was modified. **[not verified]** Native installed file inventory and subsequent install/consumer smoke remain pending.
