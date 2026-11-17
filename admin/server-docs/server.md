@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Current catalog, 16 November 2026:** Schema 17 declares **113 versioned library records across 78 logical IDs**. The 10 November historical snapshot comprised 95 records across 62 IDs, including 32 `supersededBy` entries. Build success evidence remains tied to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
+**Current catalog, 17 November 2026:** Schema 17 declares **116 versioned library records across 81 logical IDs**. The 10 November historical snapshot comprised 95 records across 62 IDs, including 32 `supersededBy` entries. Build success evidence remains tied to its exact FSM and binary revision. [Full catalog](/manual/libraries.md) · [Change history](/news/).
 
 **Status:** server contract reviewed 21 October 2026. The server is Common-based, but several extension/package details are still open implementation issues and are explicitly identified below.
 
@@ -12,6 +12,36 @@ The server is **not** an independent state or repository authority.
 
 The server's **primary purpose is the live, read-only visualization of the BuildEngine working environment**. It also serves existing HTML files and renders repository-managed Markdown documents with syntax highlighting, Mermaid diagrams, and MathJax where required by the document. Library and package data are read from the configured environment, while narrative documentation is prepared separately from project owner materials, architectural specifications, blog posts, development history, and repository revisions with AI editorial assistance. The shared footer links to [About This Site: Live BuildEngine View and Documentation Provenance](/manual/about-this-site.md), which explains this distinction and the verification rules.
 
+
+## Passive internal HTTP server and in-memory cache (17 November 2026)
+
+The server remains a **read-only GET-only HTTP service**. HTTPS certificates, external authentication, rate limiting and TLS termination belong to the trusted firewall or reverse proxy. The internal hop may remain HTTP on a private, explicitly bound interface. There is **no** application request telemetry, search history, cookie tracking, or browser preference persistence.
+
+### Deployment controls
+
+The already supported `BuildEngine.xml` `<parameters>` attributes `serverAddress`, `serverName` and `serverPort` select a concrete local interface, expected Host identity and HTTP port. The following optional attributes provide the stricter deployment contract:
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `serverAllowedNetworks` | `127.0.0.1/32,::1/128` | Explicit comma-separated IPv4/IPv6 CIDR networks of allowed **direct TCP peers** |
+| `serverWorkers` | `4` | Fixed worker pool (1–32) with bounded pending queue |
+| `serverDownloadsEnabled` | `false` | Permit or reject ZIP download endpoint and hide its link |
+| `serverSecurityRefreshEnabled` | `false` | Opt in to independently scheduled OSV/NVD/EPSS/KEV collection |
+| `serverSecurityRefreshMinutes` | `1440` | Scan period, 15–10080 minutes |
+
+When enabling a reverse proxy, allowlist the **proxy's internal source IP**, not arbitrary client addresses. `X-Forwarded-For` is **not trusted for access authorization**. The reverse proxy must enforce its own authentication and inbound access policies. Wildcard listener addresses remain prohibited. IPv4/IPv6 CIDR prefix `/0` is rejected.
+
+The HTTP server uses a fixed, bounded worker pool, size-limited request headers and receive/send timeouts. Published overview HTML for Dashboard, Libraries, Packages, Security and the local Security inventory is built in a background thread and atomically swapped as an immutable in-memory snapshot. The refresh worker fingerprints XML **content** and installed SBOM, documentation and assessment evidence every five seconds. It does not use an external database. Failed source reads invalidate the overview snapshot, never silently promoting stale metadata.
+
+Individual package and security details read the published package information and **local security observations only**. HTTP requests never trigger CVE provider queries. The opt-in periodic security worker uses the existing SecurityScanService, which imports OSV, NVD, EPSS and CISA KEV observations into the existing local SQLite security assessment database. This is separate from the read-only HTTP worker pool. Future PostgreSQL adoption can replace or supplement the local data source without changing the public routes.
+
+### Security, package and catalog presentation
+
+XML timestamps are shown alongside the package coordinate across Dashboard/Libraries/Packages/Security. Package and Security overview tables have local-only name search, sortable Name/Category/XML timestamp and optional superseded hiding. Security findings expand to reveal evidence details, known fixes and upstream links; compact columns show normalized Severity, CVSS, EPSS, Percentile, KEV and Fix. Absent CVSS/EPSS evidence remains unknown rather than being assigned zero.
+
+The package ZIP export route exists only when explicitly enabled. The server must **not** expose the administrative filesystem as an unrestricted static web root. The shared physical-payload ownership caveat for extension ZIP exports remains a separate correctness constraint and is not solved merely by a download toggle.
+
+This section records the implemented repository contract. Native BCC64X/server concurrency tests, proxy configuration and deployment approval are separate operational gates; no new performance metric is asserted here.
 
 ## Dependency closure display (15 November 2026)
 
