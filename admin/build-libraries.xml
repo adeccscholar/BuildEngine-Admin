@@ -15869,7 +15869,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="sdl3" version="3.4.20" category="graphics" timestamp="2026-11-17T03:20:00Z">
+   <library id="sdl3" version="3.4.20" category="graphics" timestamp="2026-11-17T03:40:00Z">
       <metadata name="SDL3" supplier="SDL project" homepage="https://www.libsdl.org/" description="SDL3 multimedia framework for windows, controller input, audio, GPU, and rendering." licenseSignal="green">
          <license name="zlib License" spdx="Zlib" file="licenses\sdl3\LICENSE.txt"/>
       </metadata>
