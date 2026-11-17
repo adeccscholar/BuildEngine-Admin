@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.31)
+project(BuildEngineSmokeBox2D LANGUAGES CXX)
+find_package(box2d CONFIG REQUIRED)
+add_executable(box2d-consumer main.cpp)
+target_compile_features(box2d-consumer PRIVATE cxx_std_23)
+target_link_libraries(box2d-consumer PRIVATE box2d::box2d)
