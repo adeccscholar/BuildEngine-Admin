@@ -1,5 +1,13 @@
 # SDL3 3.4.20: Native BCC64X integration
 
+## GameInput BOOL buffer compatibility fix (17 November 2026)
+
+Both BCC64X configurations reached the SDL3 GameInput joystick source but failed with E3851 at `src/joystick/gdk/SDL_gameinputjoystick.cpp:870`. The pinned SDL3 3.4.20 code allocates `bool*` and passes it to `IGameInputReading::GetControllerButtonState`, whose native Windows declaration requires `BOOL*`. A cast would be incorrect because `BOOL` and C++ `bool` have different sizes. This is also an underlying buffer-width safety issue.
+
+The version-pinned `bcc64x-gameinput-bool.patch` changes the buffer's allocation type from `bool` to `BOOL` while retaining every controller feature and the original GameInput API. The BuildEngine source FSM copies, checks, and applies the patch **once before** concurrent Debug/Release builds. It must not be applied independently by both build variants, and it must not be implemented by disabling GameInput, changing the global toolchain, or using a reinterpret cast.
+
+**[not verified]** The next Windows-host FSM run must confirm the source patch, BCC64X Debug/Release compilation, DLL installation and smoke.
+
 ## SDL3 BCC64X C11 precompiled-header correction (17 November 2026)
 
 - The SDL3 Release build reached Ninja after successful configuration but failed on many C translation units with BCC64X error E904: the generated PCH had C11 enabled while the consuming translation units did not. The root is SDL3's upstream `target_precompile_headers(SDL3-shared ...)` configuration, not DirectX and not separate source failures.
