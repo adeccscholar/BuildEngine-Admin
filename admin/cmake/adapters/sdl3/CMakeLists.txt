@@ -23,7 +23,12 @@ add_subdirectory("${SDL3_UPSTREAM_SOURCE_DIR}" upstream)
 if(NOT TARGET SDL3-shared)
    message(FATAL_ERROR "Pinned SDL3 upstream DLL target is missing")
 endif()
+# SDL3 enables PCH for both C and C++ at its upstream target level.
+# BCC64X rejects the generated C PCH when translation units use a different
+# effective C language mode (E904: C11 enabled in the AST, disabled in TU).
+# Disable PCH for this package only, preserving all SDL3 sources and features.
 set_target_properties(SDL3-shared PROPERTIES
+   DISABLE_PRECOMPILE_HEADERS TRUE
    PREFIX ""
    IMPORT_PREFIX ""
    OUTPUT_NAME "SDL3"
