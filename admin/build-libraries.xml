@@ -15869,4 +15869,130 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
+   <library id="sdl3" version="3.4.20" category="graphics" timestamp="2026-11-17T03:20:00Z">
+      <metadata name="SDL3" supplier="SDL project" homepage="https://www.libsdl.org/" description="SDL3 multimedia framework for windows, controller input, audio, GPU, and rendering." licenseSignal="green">
+         <license name="zlib License" spdx="Zlib" file="licenses\sdl3\LICENSE.txt"/>
+      </metadata>
+      <security><repository url="https://github.com/libsdl-org/SDL.git" ref="release-3.4.20"/></security>
+      <source>
+         <download url="https://github.com/libsdl-org/SDL/archive/refs/tags/release-{LibraryVersion}.zip" archive="SDL3-{LibraryVersion}.zip"/>
+         <extract format="zip" root="SDL-release-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="include\SDL3\SDL.h"/>
+            <require path="LICENSE.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DSDL3_UPSTREAM_SOURCE_DIR:PATH={Workspace}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DSDL_SHARED:BOOL=ON"/>
+         <argument value="-DSDL_STATIC:BOOL=OFF"/>
+         <argument value="-DSDL_TESTS:BOOL=OFF"/>
+         <argument value="-DSDL_TEST_LIBRARY:BOOL=OFF"/>
+         <argument value="-DSDL_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DSDL_INSTALL:BOOL=ON"/>
+         <argument value="-DSDL_INSTALL_DOCS:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\adapters\sdl3" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><variable name="BinaryName" value="SDL3"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><variable name="BinaryName" value="SDL3d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BinaryName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BinaryName}.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildFileDir}\cmake\sdl3-package\SDL3Config.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\SDL3\SDL3Config.cmake" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\sdl3\LICENSE.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\SDL3\SDL.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\SDL3\SDL3Config.cmake"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+         <cmake source="lib\cmake" target="lib\cmake"/>
+      </publish>
+      <smoke id="consumer" source="smokes\sdl3\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="sdl3-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
+
+   <library id="box2d" version="3.2.0" category="graphics" timestamp="2026-11-17T03:20:00Z">
+      <metadata name="Box2D" supplier="Erin Catto" homepage="https://box2d.org/" description="Deterministic 2D rigid body dynamics, collision detection, and game physics." licenseSignal="green">
+         <license name="MIT License" spdx="MIT" file="licenses\box2d\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/erincatto/box2d.git" ref="v3.2.0"/></security>
+      <source>
+         <download url="https://github.com/erincatto/box2d/archive/refs/tags/v{LibraryVersion}.zip" archive="box2d-{LibraryVersion}.zip"/>
+         <extract format="zip" root="box2d-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="src\CMakeLists.txt"/>
+            <require path="include\box2d\box2d.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DBOX2D_UPSTREAM_SOURCE_DIR:PATH={Workspace}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBOX2D_SAMPLES:BOOL=OFF"/>
+         <argument value="-DBOX2D_UNIT_TESTS:BOOL=OFF"/>
+         <argument value="-DBOX2D_BENCHMARKS:BOOL=OFF"/>
+         <argument value="-DBOX2D_DOCS:BOOL=OFF"/>
+         <argument value="-DBOX2D_PROFILE:BOOL=OFF"/>
+         <argument value="-DBOX2D_DOUBLE_PRECISION:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\adapters\box2d" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><variable name="BinaryName" value="box2d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><variable name="BinaryName" value="box2dd"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BinaryName}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BinaryName}.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{BuildFileDir}\cmake\box2d-package\box2dConfig.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\box2d\box2dConfig.cmake" overwrite="true"/>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\box2d\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\box2d\box2d.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\box2d\box2dConfig.cmake"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+         <cmake source="lib\cmake" target="lib\cmake"/>
+      </publish>
+      <smoke id="consumer" source="smokes\box2d\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="box2d-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+      </smoke>
+   </library>
 </buildLibraries>
