@@ -39,3 +39,62 @@ The existing BuildEngine packages `libpq` 18.6 and `libpqxx` 8.0.2 are the inten
 **Not yet active:** PostgreSQL connection, native `libpqxx` consumer code, database migrations on a live server, restart reload, assessment archive import, throughput tests and failover testing. These require native BCC64X and PostgreSQL integration evidence.
 
 This is intentionally non-invasive: no BuildEngine library timestamp is changed, no existing archive is migrated, and no PostgreSQL service is silently started.
+
+
+## Phase 2: BuildEngine database and append-only histories (17 November 2026)
+
+The additive migration [002-buildengine-core.sql](002-buildengine-core.sql) introduces
+the first persistent model for a PostgreSQL database named **BuildEngine**.
+Run it **inside** that database, after [001-cve-cache.sql](001-cve-cache.sql).
+The migration does not create databases, roles, passwords or connections.
+
+### Data model
+
+- XML remains the declarative source for builds. Capture exact documents as
+  immutable content-addressed `xml_revision` rows linked to
+  `library_version_revision` and `dependency_revision`. Identical
+  (source path, SHA-256) pairs must not create duplicate revisions.
+- `buildengine_core.library` and `buildengine_core.library_version` hold stable
+  package identities and current descriptive data.
+- `cve_snapshot` and `cve_finding` from the previous migration hold complete
+  provider scan generations. `metric_observation` preserves CVSS, EPSS,
+  percentile, KEV and raw evidence across successive observations.
+- `advisory` / `advisory_alias` separate upstream advisory identity from the
+  question whether an installed package is actually affected.
+- `assessment` identifies the library/version/advisory under review.
+  Append-only `assessment_revision` rows retain status, applicability,
+  disposition, reviewer, justification and source evidence.
+  Controlled `dom_` value tables constrain decisions.
+
+**Publication:** Persist an internally consistent generation and atomically
+switch the active snapshot only after successful transaction completion.
+Incomplete provider results must be visible as incomplete rather than
+misrepresented as zero vulnerabilities. KEV unknown must not become false.
+
+**Current status:** The SQL schema is staged in GitHub; it has not been
+applied or connected. The libpq/libpqxx adapter, transactional import, writer,
+assessment API, authentication and history UI are not implemented.
+Provision the PostgreSQL database `BuildEngine` and restricted access roles
+separately. Never commit database credentials.
+
+### Implementation sequence
+
+1. Provision PostgreSQL and apply migrations 001 then 002.
+2. In Common, ingest XML revisions and normalize the current catalog.
+3. Write every provider observation transactionally while retaining historical metrics.
+4. Serve read-only current and historical data from committed snapshots.
+5. Implement assessment decisions through controlled value tables and audit history.
+
+### oneTBB and OpenMP integration
+
+Managed `onetbb@2023.2.0` and `llvm-openmp@20.1.7` already exist in the
+BuildEngine catalog. The proposed first oneTBB consumer is the background
+CVE monitor, where external-provider requests have variable latency.
+Each task must own its HTTP client and local findings; shared result mutation
+requires a deterministic serial merge. Bound concurrency and respect provider
+rate limits. Keep the HTTP request path independent.
+
+LLVM OpenMP is reserved for measured CPU-bound workloads such as large
+XML/SBOM transformations or statistical history analysis. Avoid nested
+oneTBB and OpenMP worker pools. This is a staged design; neither backend
+has yet been wired into the Common security monitor.
