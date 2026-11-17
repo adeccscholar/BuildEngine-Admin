@@ -7,9 +7,9 @@ if(NOT TARGET box2d::box2d)
    set_target_properties(box2d::box2d PROPERTIES
       IMPORTED_CONFIGURATIONS "Release;Debug"
       IMPORTED_LOCATION_RELEASE "${_BOX2D_ROOT}/bin/win64/Release/box2d.dll"
-      IMPORTED_IMPLIB_RELEASE "${_BOX2D_ROOT}/lib/win64/Release/box2d.lib"
+      IMPORTED_IMPLIB_RELEASE "${_BOX2D_ROOT}/lib/win64/Release/libbox2d.lib"
       IMPORTED_LOCATION_DEBUG "${_BOX2D_ROOT}/bin/win64/Debug/box2dd.dll"
-      IMPORTED_IMPLIB_DEBUG "${_BOX2D_ROOT}/lib/win64/Debug/box2dd.lib"
+      IMPORTED_IMPLIB_DEBUG "${_BOX2D_ROOT}/lib/win64/Debug/libbox2dd.lib"
       INTERFACE_INCLUDE_DIRECTORIES "${_BOX2D_ROOT}/include"
       INTERFACE_COMPILE_DEFINITIONS "BOX2D_DLL")
 endif()
