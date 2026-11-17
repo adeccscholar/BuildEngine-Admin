@@ -15974,7 +15974,7 @@
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\{BinaryName}.dll"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\{BinaryName}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\lib{BinaryName}.lib"/>
             </perVariant>
             <common>
                <copy source="{BuildFileDir}\cmake\box2d-package\box2dConfig.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\box2d\box2dConfig.cmake" overwrite="true"/>
