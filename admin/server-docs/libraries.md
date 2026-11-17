@@ -101,7 +101,7 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 | `boost` | `1.92.0` | Comprehensive collection of portable C++ libraries covering containers, algorithms, networking, concurrency, and more. | openssl@3.5.9, zlib@1.4 | green | [Integration guide](/package/boost/1.92.0/migration) |
 | `wil` | `1.0.260126.7` | Microsoft MIT-licensed header-only Windows COM and RAII library. BCC64X compatibility requires a native consumer smoke before use by OpenCV. | — | yellow | [Integration guide](/package/wil/1.0.260126.7/migration) |
 
-### graphics (19 versions)
+### graphics (21 versions)
 
 | Library | Version | Purpose | Direct dependencies and extensions | License signal | Details |
 | --- | --- | --- | --- | --- | --- |
