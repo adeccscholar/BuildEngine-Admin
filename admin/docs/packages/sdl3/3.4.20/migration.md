@@ -1,5 +1,11 @@
 # SDL3 3.4.20: Native BCC64X integration
 
+## SDL3 C++23 consumer smoke module scan (17 November 2026)
+
+- SDL3 reached the standalone Release consumer smoke; its CMake dependency-scan step `main.cpp.o.ddi` failed while resolving `sdks/_mingw_ddk.h` through `_mingw.h`. This is a non-modular C++23 consumer smoke; the same scan failure was already addressed in Box2D.
+- `admin/smokes/sdl3/consumer/CMakeLists.txt` now sets `CXX_SCAN_FOR_MODULES OFF` **only** for `sdl3-consumer`. The SDL3 library, build timestamp, compiler settings and all existing packages remain unchanged.
+- SDL3 Doxygen completed successfully (242.9 seconds). **[not verified]** The consumer compile, link and runtime smoke still require a native rerun.
+
 ## FSM source invalidation for the pinned GameInput patch (17 November 2026)
 
 The follow-up FSM run still compiled the original `bool*` buffer in `SDL_gameinputjoystick.cpp`. Repository inspection confirms that BuildEngine's source token is based on the library ID, version, phase and declared timestamp, not changes in individual source actions. The GameInput patch had been registered without updating that timestamp, so the successful earlier source state was reused. Only `sdl3@3.4.20` now has an updated source timestamp, causing its pinned patch check/apply to execute before Debug and Release compilation. No changes were made to Box2D, Skia, SPIRV-Tools or global toolchain. **[not verified]** Execution of this newly invalidated source phase and subsequent build remain to be observed.
