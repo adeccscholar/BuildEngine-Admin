@@ -15881,6 +15881,28 @@
             <require path="include\SDL3\SDL.h"/>
             <require path="LICENSE.txt"/>
          </extract>
+         <!--
+            Pinned upstream GameInput passes bool* where the Windows SDK
+            requires BOOL*. This mismatch is a buffer-width issue, not just
+            an implicit-conversion error. Apply once in the SDL3 source phase,
+            before parallel Debug and Release configurations start.
+         -->
+         <copy source="{BuildFileDir}\patches\sdl3\3.4.20\bcc64x-gameinput-bool.patch"
+               target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gameinput-bool.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="gameinput-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--check"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gameinput-bool.patch"/>
+         </execute>
+         <execute name="gameinput-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/>
+            <argument value="--no-index"/>
+            <argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-gameinput-bool.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
