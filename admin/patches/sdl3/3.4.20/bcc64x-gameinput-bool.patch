@@ -1,7 +1,7 @@
 diff --git a/src/joystick/gdk/SDL_gameinputjoystick.cpp b/src/joystick/gdk/SDL_gameinputjoystick.cpp
 --- a/src/joystick/gdk/SDL_gameinputjoystick.cpp
 +++ b/src/joystick/gdk/SDL_gameinputjoystick.cpp
-@@ -862,7 +862,7 @@ static void GAMEINPUT_ControllerUpdate(SDL_Joystick *joystick, IGameInputReading
+@@ -863,6 +863,6 @@ static void GAMEINPUT_ControllerUpdate(SDL_Joystick *joystick, IGameInputReading
  {
 -    bool *button_state = SDL_stack_alloc(bool, joystick->nbuttons);
 +    BOOL *button_state = SDL_stack_alloc(BOOL, joystick->nbuttons);
