@@ -26,18 +26,14 @@ The already supported `BuildEngine.xml` `<parameters>` attributes `serverAddress
 | `serverAllowedNetworks` | `127.0.0.1/32,::1/128` | Explicit comma-separated IPv4/IPv6 CIDR networks of allowed **direct TCP peers** |
 | `serverWorkers` | `4` | Fixed worker pool (1–32) with bounded pending queue |
 | `serverDownloadsEnabled` | `false` | Permit or reject ZIP download endpoint and hide its link |
-| `serverSecurityRefreshEnabled` | `false` | Opt in to independently scheduled OSV/NVD/EPSS/KEV collection |
+| `serverSecurityRefreshEnabled` | `true` when not explicitly set in the central configuration | Enable independently scheduled OSV/NVD/EPSS/KEV collection |
 | `serverSecurityRefreshMinutes` | `1440` | Scan period, 15–10080 minutes |
 
 When enabling a reverse proxy, allowlist the **proxy's internal source IP**, not arbitrary client addresses. `X-Forwarded-For` is **not trusted for access authorization**. The reverse proxy must enforce its own authentication and inbound access policies. Wildcard listener addresses remain prohibited. IPv4/IPv6 CIDR prefix `/0` is rejected.
 
-The HTTP server uses a fixed, bounded worker pool, size-limited request headers and receive/send timeouts. Published overview HTML for Dashboard, Libraries, Packages, Security and the local Security inventory is built in a background thread and atomically swapped as an immutable in-memory snapshot. The refresh worker fingerprints XML **content** and installed SBOM and documentation evidence every five seconds. The SQLite assessment archive is neither watched nor read by the HTTP server. It does not use an external database. Failed source reads invalidate the overview snapshot, never silently promoting stale metadata.
+The HTTP server uses a fixed, bounded worker pool, size-limited request headers and receive/send timeouts. Published overview HTML for Dashboard, Libraries, Packages, Security and the local Security inventory is built in a background thread and atomically swapped as an immutable in-memory snapshot. The refresh worker fingerprints XML **content** and installed SBOM and documentation evidence every five seconds. Failed source reads invalidate the overview snapshot, never silently promoting stale metadata.
 
-Individual package and security details read BuildEngine package evidence and the **independent in-memory CVE snapshot only**. HTTP requests never trigger CVE provider queries or SQLite archive reads. The periodic security worker uses `SecurityMonitorService` to retrieve OSV, NVD, EPSS and CISA KEV data. It atomically publishes independent partial snapshots during the scan and the final result even when individual provider or enrichment calls fail. Only successful OSV responses mark a package as `scanned`; partial results do not imply complete coverage. No `SecurityScanService` import is executed by the Server; it neither writes nor locks the SQLite assessment archive. After a restart and before a first successful refresh, coverage is explicitly `not-scanned`.
-
-The CVE snapshot is a separate authority from the independently managed **SQLite assessment archive**. Assessments may be imported from that archive through a future separate read-only adapter, using brief snapshot reads and without taking exclusive locks. That adapter is not enabled yet.
-
-Parallel PostgreSQL groundwork is in transactional CVE schema (repository source: `admin/security/postgresql/001-cve-cache.sql`). This introduces independently published MVCC snapshots and indexes for library, CVE and KEV queries. The PostgreSQL schema has been committed, but no PostgreSQL service, connection pool, live writer or data migration is enabled. When implemented, use the separately packaged native BCC64X `libpq` and `libpqxx` rather than introducing a second client stack.
+Individual package and security details read BuildEngine package evidence and the **independent in-memory CVE snapshot only**. HTTP requests never trigger CVE provider queries or SQLite archive reads. The periodic security worker uses `SecurityMonitorService` to retrieve OSV, NVD, EPSS and CISA KEV data. It atomically publishes independent partial snapshots during the scan and the final result even when individual provider or enrichment calls fail. Only successful OSV responses mark a package as `scanned`; partial results do not imply complete coverage. No provider scan is started by an incoming HTTP request. Until persistent evidence is integrated, coverage after startup remains `not-scanned` until the security worker publishes results.
 
 ### Security, package and catalog presentation
 
@@ -176,45 +172,16 @@ Important routes include:
 | `/manual/*.md` | Synchronized project/server documentation |
 | `/index.html` | Generated central documentation index |
 
-## Security evidence refresh and planned PostgreSQL persistence (17 November 2026)
+## PostgreSQL-backed server state
 
-The security monitor starts at server startup when enabled. Its refresh interval
-is `serverSecurityRefreshMinutes=1440` by default (24 hours), measured
-**after the previous scan completes**. The configured allowed range is 15 to
-10,080 minutes. During a scan, changed partial results may be published at
-most once per five seconds, and a final immutable snapshot is published when
-the scan finishes. No browser/API request causes an external provider query.
+BuildEngine Server uses a PostgreSQL database named **BuildEngine** to persist
+selected cache data, security findings and assessments. Persisted information is
+used to restore server state at startup and to retain the history of changes
+over time.
 
-The full CVSS 3.0/3.1/4.0 vector is retained, with English metric-level
-interpretations in the expanded security details. The compiled renderer now
-uses a plain ASCII hyphen between metric codes and descriptions. If the
-browser still shows a replacement character, verify that the deployed
-`BuildEngineCommon.dll` actually contains the current renderer build; the
-HTTP response declares UTF-8.
-
-The planned PostgreSQL database is named **BuildEngine**. Current additive
-schema migrations are in `admin/security/postgresql`:
-
-- `001-cve-cache.sql`: transactional CVE snapshot generations and current
-  snapshot publication.
-- `002-buildengine-core.sql`: logical library/version catalog, immutable
-  XML revisions, dependency revision history, advisory identities/aliases,
-  historical CVSS/EPSS/KEV observations and append-only assessments with
-  controlled value tables (`dom_assessment_status`, `dom_applicability`,
-  `dom_assessment_disposition`).
-
-The migrations are **staged, not deployed**. There is no active PostgreSQL
-adapter or history/assessment API yet. Read-only HTTP remains backed by
-published package evidence and the independent in-memory CVE snapshot.
-The intended native client stack is managed libpq/libpqxx; connections
-must remain independent of request-time provider retrieval.
-
-The next parallelization candidate is the background CVE scanner, with
-managed oneTBB 2023.2.0 for bounded per-library provider work and
-deterministic merging. LLVM OpenMP 20.1.7 may be considered for
-CPU-bound XML/SBOM processing if measured useful. Neither backend
-is currently linked into this scanner; provider rate limits and
-thread-safe evidence publication remain explicit integration gates.
+**Integration status:** PostgreSQL persistence and startup restoration are being
+implemented; the currently deployed server still uses its in-memory CVE
+snapshot. The database is not yet required for normal server operation.
 
 ## Machine API
 
@@ -249,7 +216,7 @@ Security `findings[]` records can include `id`, `primaryId`, `component`, `compo
 
 The browser detail view interprets available CVSS 3.0, 3.1 and 4.0 base vectors in English. CVSS 4.0 uses Attack Requirements and distinct Vulnerable/Subsequent System impacts rather than the CVSS 3.x Scope metric. Recognized additional CVSS 4.0 metrics are interpreted when present. The vector remains source evidence: the interpretation neither modifies the reported score nor establishes vulnerability applicability to the current build. Missing, incomplete or unsupported vector formats are not assigned invented values. Missing numeric evidence is not a score of zero. The KEV status is `yes`, `no` or `unknown`; `kevCatalogAvailable=false` means that negative KEV conclusions cannot be trusted. `queryStatus=not-scanned` does **not** establish absence of vulnerabilities.
 
-The `/risk` endpoint includes the root package and its dependency closure. Individual `/findings` is restricted to the queried package. Bundled components are reported separately. The `assessment` field currently describes `status=not-loaded` with `source=independent-assessment-archive`: the live REST API does not consult the SQLite assessment archive.
+The `/risk` endpoint includes the root package and its dependency closure. Individual `/findings` is restricted to the queried package. Bundled components are reported separately. The `assessment` field currently reports `status=not-loaded` until the PostgreSQL-backed assessments integration becomes available.
 
 ### Missing first-class package data
 
@@ -258,7 +225,7 @@ The `/risk` endpoint includes the root package and its dependency closure. Indiv
 | Build provenance | Verified upstream commit, source archive hash, applied patches, compiler/ABI and build variant, compile/link options, artifact inventory and fingerprints, reproducibility and tests per configuration. Some raw evidence may exist outside this API. |
 | Licensing | Complete normalized license/notice texts and licensing assessment; existing data is `licenseSignal`, availability flags and raw CycloneDX licenses. |
 | Security scan health | Last successful run timestamp, scan ID, per-provider failure diagnostics, complete coverage indicator, and CVE attribution confidence. Advisory identity and installed-version applicability are separate questions; a shared Git repository alone is insufficient. |
-| Assessments | Approved security applicability decisions from the independent archive; currently no live read-only adapter. |
+| Assessments | Persisted decisions and review histories are planned for PostgreSQL; they are not yet available through the REST API. |
 | Dependency contracts | Unified view comparing configured-but-not-installed XML dependencies with installed CycloneDX edges, including discrepancies. |
 | FSM and execution | BuildEngine lifecycle and state per library/variant, job/task history, build/test status and progress. `/status` describes the HTTP server, not the BuildEngine job scheduler. |
 
