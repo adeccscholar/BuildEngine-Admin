@@ -17,13 +17,15 @@ Germany
 
 The controller is the natural or legal person who, alone or jointly with others, determines the purposes and means of processing personal data.
 
-## Server log data
+## Access logging and data minimization
 
-When this website is accessed, technical request and error information is recorded in server logs. Depending on the request, this may include the IP address, access time, requested resource and technical status or error information.
+The BuildEngine application server implements a read-only HTTP interface. It does not create per-visitor access logs, record submitted search or filter terms, or set tracking cookies. Client-side search and sorting execute locally in the browser without network requests or persistent browser storage.
 
-The logs are used to operate the website, diagnose technical faults and protect the server against misuse. The legal basis is the controller's legitimate interests in secure and reliable operation (**Article 6(1)(f) GDPR**). Log data is retained only as long as necessary for these purposes, subject to applicable legal obligations.
+Access is restricted to explicitly configured internal CIDR networks and the HTTPS-terminating firewall/reverse proxy. The application uses the actual peer network address only to decide whether to accept a connection and does not retain that address.
 
-No additional personal-data collection is described here beyond these technical server logs. If you contact us by email, the information you provide is necessarily processed to respond to your enquiry.
+**Reverse-proxy and firewall logging are independent of this application's settings.** Whether the network infrastructure records IP addresses, access times, URLs or security events must be established from its actual deployment configuration and described separately before public operation. TLS terminates at that gateway; the protected gateway-to-server hop uses HTTP.
+
+The application may perform scheduled, server-initiated security data updates from public CVE providers. These do not depend on visitor activity or query terms. If you contact us by email, we process the information you supply to respond to your enquiry.
 
 ## Your rights
 
