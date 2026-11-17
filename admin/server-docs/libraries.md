@@ -2,15 +2,17 @@
 
 [TOC|Content]
 
-**Current library catalog (16 November 2026): 79 distinct libraries and 114 versioned integrations, including retained superseded versions.** Source: `admin/build-libraries.xml` (schema 17). The version totals cover all retained historical versions; a successor is not counted as a new distinct library.
+**Current library catalog (17 November 2026): 81 distinct libraries and 116 versioned integrations, including retained superseded versions.** Source: `admin/build-libraries.xml` (schema 17). The version totals cover all retained historical versions; a successor is not counted as a new distinct library.
 
-The catalog begins with **2 packages on 24 August**, grows to **44 on 25 September**, and reaches **79 distinct library IDs across 114 version records on 16 November**. The original August compiler feasibility study preceded the first two-entry library catalog. Details appear in the [project story](/manual/story.md) and [dated news](/news/).
+The catalog begins with **2 packages on 24 August**, grows to **44 on 25 September**, and reaches **81 distinct library IDs across 116 version records on 17 November**. The original August compiler feasibility study preceded the first two-entry library catalog. Details appear in the [project story](/manual/story.md) and [dated news](/news/).
 
 The catalog lists upstream versions built and managed with C++Builder 13 / BCC64X, their direct dependencies and extension relationships. The per-version guides contain build configuration, porting notes, migration information and transitive Mermaid diagrams. The native BCC64X build also maintains integrated library smokes and dedicated, larger consumer tests in BuildEngine-Tests.
 
 [Library status](/libraries/) · [Version-specific documentation](/library-docs/) · [News](/news/) · [Skia dependencies](/manual/skia-externalization.md)
 
-**Latest registrations:** `xmp-toolkit@7.0.0`, `dng-sdk@1.7.1.2802`, `libgav1@0.20.0`, `libwebp@1.6.0` and `piex@0.27`. Skia 153 declares PIE-X and libgav1 as managed dependencies. The external AVIF package consumes libgav1 0.20.0 as its decoder and libaom 3.15.3 as its encoder; libyuv r1924 remains a managed transitive dependency through AVIF_LIBYUV=SYSTEM. The Skia and libgav1 Debug/Release builds require BCC64X verification. SPIRV-Cross now builds a native C++ DLL instead of the C-only DLL, and Skia 153 uses that package for Direct3D HLSL translation. Build and ABI compatibility remain unverified until BCC64X tests. The prior 109/109 FSM result predates these additions.
+**New game-development packages (17 November 2026):** [SDL3 3.4.20](/package/sdl3/3.4.20/migration) and [Box2D 3.2.0](/package/box2d/3.2.0/migration), both registered for BCC64X Debug/Release DLL builds and pending native validation. SDL2 is unchanged.
+
+**Earlier registrations:** `xmp-toolkit@7.0.0`, `dng-sdk@1.7.1.2802`, `libgav1@0.20.0`, `libwebp@1.6.0` and `piex@0.27`. Skia 153 declares PIE-X and libgav1 as managed dependencies. The external AVIF package consumes libgav1 0.20.0 as its decoder and libaom 3.15.3 as its encoder; libyuv r1924 remains a managed transitive dependency through AVIF_LIBYUV=SYSTEM. The Skia and libgav1 Debug/Release builds require BCC64X verification. SPIRV-Cross now builds a native C++ DLL instead of the C-only DLL, and Skia 153 uses that package for Direct3D HLSL translation. Build and ABI compatibility remain unverified until BCC64X tests. The prior 109/109 FSM result predates these additions.
 
 ## Libraries by category
 
@@ -103,6 +105,8 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 
 | Library | Version | Purpose | Direct dependencies and extensions | License signal | Details |
 | --- | --- | --- | --- | --- | --- |
+| `SDL3` | `3.4.20` | Modern multimedia, controller, audio and rendering interfaces | — | green | [Integration guide](/package/sdl3/3.4.20/migration) |
+| `Box2D` | `3.2.0` | 2D rigid body physics and collision detection | — | green | [Integration guide](/package/box2d/3.2.0/migration) |
 | `agg` | `2.6` | AGG core rasterization without GPC | — | yellow | [Integration guide](/package/agg/2.6/migration) |
 | `bitmapplusplus` | `1.1.1` | Header-only C++ bitmap image library for loading, manipulating, and saving BMP data. | — | green | [Integration guide](/package/bitmapplusplus/1.1.1/migration) |
 | `xmp-toolkit` | `7.0.0` | Adobe XMPCore and XMPFiles DLLs for native XMP metadata processing; native acceptance pending. | expat@2.10.0, zlib@1.4 | yellow | [Integration guide](/package/xmp-toolkit/7.0.0/migration) |
