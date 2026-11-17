@@ -33,7 +33,7 @@ When enabling a reverse proxy, allowlist the **proxy's internal source IP**, not
 
 The HTTP server uses a fixed, bounded worker pool, size-limited request headers and receive/send timeouts. Published overview HTML for Dashboard, Libraries, Packages, Security and the local Security inventory is built in a background thread and atomically swapped as an immutable in-memory snapshot. The refresh worker fingerprints XML **content** and installed SBOM and documentation evidence every five seconds. The SQLite assessment archive is neither watched nor read by the HTTP server. It does not use an external database. Failed source reads invalidate the overview snapshot, never silently promoting stale metadata.
 
-Individual package and security details read BuildEngine package evidence and the **independent in-memory CVE snapshot only**. HTTP requests never trigger CVE provider queries or SQLite archive reads. The optional periodic security worker uses `SecurityMonitorService` to retrieve OSV, NVD, EPSS and CISA KEV data and publishes a complete JSON snapshot atomically **only when provider and enrichment errors are zero**. No `SecurityScanService` import is executed by the Server; it neither writes nor locks the SQLite assessment archive. After a restart and before a first successful refresh, coverage is explicitly `not-scanned`.
+Individual package and security details read BuildEngine package evidence and the **independent in-memory CVE snapshot only**. HTTP requests never trigger CVE provider queries or SQLite archive reads. The periodic security worker uses `SecurityMonitorService` to retrieve OSV, NVD, EPSS and CISA KEV data. It atomically publishes independent partial snapshots during the scan and the final result even when individual provider or enrichment calls fail. Only successful OSV responses mark a package as `scanned`; partial results do not imply complete coverage. No `SecurityScanService` import is executed by the Server; it neither writes nor locks the SQLite assessment archive. After a restart and before a first successful refresh, coverage is explicitly `not-scanned`.
 
 The CVE snapshot is a separate authority from the independently managed **SQLite assessment archive**. Assessments may be imported from that archive through a future separate read-only adapter, using brief snapshot reads and without taking exclusive locks. That adapter is not enabled yet.
 
@@ -178,24 +178,62 @@ Important routes include:
 
 ## Machine API
 
-New consumers should prefer `/api/v1`.
+The machine API is GET-only. The versioned namespace is `/api/v1`; responses are JSON except for the downloadable ZIP. The server performs no outbound provider requests for an incoming HTTP request. Invalid routes return 404 and non-GET requests are rejected with 405.
+
+### Implemented endpoints
+
+| Endpoint | Data returned |
+| :--- | :--- |
+| `GET /api/v1/status` | Application/API versions, API roots, bind, server name, port, worker count, download enablement, transport description. |
+| `GET /api/v1/tools` | Production-root tool inventory. |
+| `GET /api/v1/libraries` | `count` and `libraries[]`: logical library ID, name, version, category, description, XML timestamp, `supersededBy`, `licenseSignal`, installed/SBOM/documentation flags and optional extension relation. |
+| `GET /api/v1/libraries/{library}` | `count` and `versions[]`: versions with names, categories, descriptions, XML timestamps, license signals, supersession, installed/SBOM/license-info/documentation flags. |
+| `GET /api/v1/libraries/{library}/{version}` | Version metadata including `name`, `category`, `description`, `installed`, `timestamp`, `supersededBy`, `licenseSignal`, normalized CycloneDX root `component`, direct `dependencies[]`, `dependencyCount`, SBOM/license-info/documentation flags, CycloneDX version. |
+| `GET /api/v1/libraries/{library}/{version}/dependencies` | Direct SBOM edges (`library`, `version`, `bundled`) and count, not a full closure. |
+| `GET /api/v1/libraries/{library}/{version}/usage` | Reverse package consumers (`library`, `version`, `relation` = `direct` or `transitive`), count; currently computed by traversing other SBOM closures. |
+| `GET /api/v1/libraries/{library}/{version}/findings` | Exact-package in-memory CVE observations: `queryStatus`, `findingCount`, `findings[]`, `providerMode` and `kevCatalogAvailable`; not the dependency closure. |
+| `GET /api/v1/library/{library}/{version}` | Package closure and relation categories, count of direct, transitive and bundled components, package/SBOM/license-info paths, metadata fields, optional CycloneDX `dependencyGraph`. |
+| `GET /api/v1/sbom/{library}/{version}` | The full published CycloneDX JSON, including any component, license, PURL, dependency, hash or external-reference evidence present in that document. |
+| `GET /api/v1/risk/{library}/{version}` | Root and installed dependency-closure CVE findings; `findingCount`, `rootFindingCount`, `queriedComponents`, `components[]`, XML timestamp and assessment placeholder. |
+| `GET /api/v1/package/{library}/{version}/download` | On-demand package-closure ZIP, only if downloads are enabled in the server configuration. |
+
+The two similar package routes, `/libraries/{library}/{version}` and `/library/{library}/{version}`, have different payloads: the former describes the root component and direct edges; the latter describes the complete published component closure. These are existing contracts, not aliases.
+
+### Nested payloads and semantics
+
+The normalized `component` in a version detail includes `name`, `version`, `type`, `purl` and `bomRef`, plus optional `description`, `supplier`, `licenses`, `externalReferences` and `properties`.
+
+The package-closure `componentList[]` records `library`, `version`, `relation` (`root`, `direct`, `transitive` or `bundled`), `bundled`, and `packageRoot` when not bundled. The package totals include `components`, `buildEngineDependencies`, `directDependencies`, `transitiveDependencies` and `bundledComponents`. Source-of-truth metadata is the logical catalog and installed CycloneDX evidence, not filesystem directory proximity.
+
+Security `findings[]` records can include `id`, `primaryId`, `component`, `componentVersion`, `summary`, `details`, OSV `published` and `modified` timestamps, `providerSeverity`, `cvssSeverity`, `cvssVersion`, `cvssVector`, optional numeric `cvss`, `epss` and `percentile`, `kev`, `kevStatus`, `fixAvailable`, `fixedVersions[]` and `links[]`. Missing numeric evidence is not a score of zero. The KEV status is `yes`, `no` or `unknown`; `kevCatalogAvailable=false` means that negative KEV conclusions cannot be trusted. `queryStatus=not-scanned` does **not** establish absence of vulnerabilities.
+
+The `/risk` endpoint includes the root package and its dependency closure. Individual `/findings` is restricted to the queried package. Bundled components are reported separately. The `assessment` field currently describes `status=not-loaded` with `source=independent-assessment-archive`: the live REST API does not consult the SQLite assessment archive.
+
+### Missing first-class package data
+
+| Area | Currently not provided as an independent, normalized REST contract |
+| :--- | :--- |
+| Build provenance | Verified upstream commit, source archive hash, applied patches, compiler/ABI and build variant, compile/link options, artifact inventory and fingerprints, reproducibility and tests per configuration. Some raw evidence may exist outside this API. |
+| Licensing | Complete normalized license/notice texts and licensing assessment; existing data is `licenseSignal`, availability flags and raw CycloneDX licenses. |
+| Security scan health | Last successful run timestamp, scan ID, per-provider failure diagnostics, complete coverage indicator, and CVE attribution confidence. Advisory identity and installed-version applicability are separate questions; a shared Git repository alone is insufficient. |
+| Assessments | Approved security applicability decisions from the independent archive; currently no live read-only adapter. |
+| Dependency contracts | Unified view comparing configured-but-not-installed XML dependencies with installed CycloneDX edges, including discrepancies. |
+| FSM and execution | BuildEngine lifecycle and state per library/variant, job/task history, build/test status and progress. `/status` describes the HTTP server, not the BuildEngine job scheduler. |
+
+These are documented gaps, not values to guess. In particular, `findingCount=0` must not be interpreted as verified security clearance. The current extension route-validation and ownership-safe ZIP-export limitations remain separately documented below.
+
+### API examples
 
 ```text
-GET /api/v1/status
-GET /api/v1/libraries
-GET /api/v1/libraries/{library}
-GET /api/v1/libraries/{library}/{version}
-GET /api/v1/libraries/{library}/{version}/dependencies
-GET /api/v1/libraries/{library}/{version}/findings
-GET /api/v1/libraries/{library}/{version}/usage
-GET /api/v1/sbom/{library}/{version}
-GET /api/v1/risk/{library}/{version}
-GET /api/v1/package/{library}/{version}/download
+GET http://127.0.0.1:8765/api/v1/libraries/curl/8.21.0
+GET http://127.0.0.1:8765/api/v1/library/curl/8.21.0
+GET http://127.0.0.1:8765/api/v1/libraries/curl/8.21.0/dependencies
+GET http://127.0.0.1:8765/api/v1/libraries/curl/8.21.0/findings
+GET http://127.0.0.1:8765/api/v1/risk/curl/8.21.0
+GET http://127.0.0.1:8765/api/v1/sbom/curl/8.21.0
 ```
 
-`GET /api/v1/libraries` is catalog-oriented and can list configured logical libraries even when their physical payload is shared.
-
-The individual route-validation bug described above is an implementation gap, not a change in the logical API contract.
+The URLs demonstrate the route contract; they are not runtime test results. These endpoints are versioned read-only interfaces. Package identity and vulnerability applicability must always remain explicit.
 
 ## Current catalog breadth
 
