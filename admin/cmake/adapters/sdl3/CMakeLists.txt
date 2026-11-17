@@ -13,6 +13,11 @@ set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(SDL_INSTALL ON CACHE BOOL "" FORCE)
 set(SDL_INSTALL_DOCS OFF CACHE BOOL "" FORCE)
 
+# BCC64X uses the registered Windows SDK; it is neither MSVC nor MinGW.
+# SDL3's upstream DirectX probe otherwise wrongly requires the obsolete DXSDK_DIR.
+# Keep native Windows DirectX support enabled and use the SDK headers and libs.
+set(USE_WINSDK_DIRECTX TRUE)
+
 add_subdirectory("${SDL3_UPSTREAM_SOURCE_DIR}" upstream)
 
 if(NOT TARGET SDL3-shared)
@@ -20,6 +25,7 @@ if(NOT TARGET SDL3-shared)
 endif()
 set_target_properties(SDL3-shared PROPERTIES
    PREFIX ""
+   IMPORT_PREFIX ""
    OUTPUT_NAME "SDL3"
    DEBUG_POSTFIX "d"
 )
