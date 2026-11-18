@@ -9,15 +9,15 @@ Native 2D plotting extension for Dear ImGui: interactive lines, histograms, heat
 | Property | Value |
 | --- | --- |
 | Coordinate | `implot@1.1` |
-| Artifact type | **Shared Library (planned)** |
+| Artifact type | **Shared DLL and import library** |
 | Language | C++ |
 | License | MIT |
 | Upstream | [Project repository](https://github.com/epezent/implot) |
-| Native validation | **Not verified** |
+| Native validation | **Native FSM completed (user-confirmed)** |
 
 ## Dependency and extension decisions
 
-Package extension of imgui@1.93.0; uses the same Dear ImGui context and an import library with matching configuration. This release pair has not been compiled or compatibility-tested with BCC64X.
+Package extension of imgui@1.93.0; uses the same Dear ImGui context and an import library with matching configuration. This release pair was compiled and consumer smoke-tested with BCC64X as confirmed by the operator.
 
 The normative XML extension is `&lt;extension type="package" library="imgui" version="1.93.0"/&gt;`.
 
@@ -34,6 +34,8 @@ All native C/C++ code must be consumed by the BCC64X Clang toolchain, not an MSV
 
 The repository includes `admin/smokes/implot/consumer`, where a C++23 consumer verifies a real library operation. A committed test definition is not evidence of a successful test. Rendering, SDL2/OpenGL or VCL integration remain separate functional demonstration gates.
 
-## Status and follow-up
+## Final native status and visual demonstration boundary
 
-**Not verified:** source acquisition, native BCC64X build, installation, linked smoke, runtime graphics backend and package distribution. No successful build, installed artifact or package export is asserted.
+The operator confirmed completion of the 120-version BuildEngine FSM on 2026-11-18, including the BCC64X shared-library consumer smoke for this package. The separate BuildEngine-Tests graphics demonstration is newly authored and **[not verified]** until independently built and executed on Windows.
+
+Presentation sources, build commands, declared CycloneDX SBOM and licensing: https://github.com/adeccscholar/BuildEngine-Tests/tree/main/graphics
