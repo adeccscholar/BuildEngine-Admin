@@ -14,6 +14,12 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 
 **Earlier registrations:** `xmp-toolkit@7.0.0`, `dng-sdk@1.7.1.2802`, `libgav1@0.20.0`, `libwebp@1.6.0` and `piex@0.27`. Skia 153 declares PIE-X and libgav1 as managed dependencies. The external AVIF package consumes libgav1 0.20.0 as its decoder and libaom 3.15.3 as its encoder; libyuv r1924 remains a managed transitive dependency through AVIF_LIBYUV=SYSTEM. The Skia and libgav1 Debug/Release builds require BCC64X verification. SPIRV-Cross now builds a native C++ DLL instead of the C-only DLL, and Skia 153 uses that package for Direct3D HLSL translation. Build and ABI compatibility remain unverified until BCC64X tests. The prior 109/109 FSM result predates these additions.
 
+## Native C/C++ UI and plotting additions (18 November 2026)
+
+Four new versioned integrations are registered in `admin/build-libraries.xml`: [Dear ImGui 1.93.0](/package/imgui/1.93.0/migration) (shared GUI core), [ImPlot 1.1](/package/implot/1.1/migration) (shared plotting extension), [raygui 5.0](/package/raygui/5.0/migration) (header-only / interface extension of raylib 6.2) and [Matplot++ 1.2.2](/package/matplotplusplus/1.2.2/migration) (mathematical plotting).
+
+**Current declared catalog: 86 unique library IDs / 121 versioned library records.** The new packages are **[not verified]** until native BCC64X compilation and consumer smokes complete. Extension relationships and the distinction between `depends-on` and `extends` appear in [the engineering news](/news/2026-11-18/) with two Mermaid graphs. A header-only interface package is installed and smoke-tested without producing a DLL.
+
 ## Libraries by category
 
 ### archive (5 versions)
