@@ -15,7 +15,7 @@ The server's **primary purpose is the live, read-only visualization of the Build
 
 ## Passive internal HTTP server and in-memory cache (17 November 2026)
 
-The server remains a **read-only GET-only HTTP service**. HTTPS certificates, external authentication, rate limiting and TLS termination belong to the trusted firewall or reverse proxy. The internal hop may remain HTTP on a private, explicitly bound interface. There is **no** application request telemetry, search history, cookie tracking, or browser preference persistence.
+The server remains a **read-only GET-only HTTP service**. HTTPS certificates, external authentication, rate limiting and TLS termination belong to the trusted firewall or reverse proxy. The internal hop may remain HTTP on a private, explicitly bound interface. There is **no** application request telemetry, search history, or cookie tracking. Browser view/filter preferences use optional localStorage on the client only; they are never transmitted in requests.
 
 ### Deployment controls
 
@@ -25,19 +25,22 @@ The already supported `BuildEngine.xml` `<parameters>` attributes `serverAddress
 | --- | --- | --- |
 | `serverAllowedNetworks` | `127.0.0.1/32,::1/128` | Explicit comma-separated IPv4/IPv6 CIDR networks of allowed **direct TCP peers** |
 | `serverWorkers` | `4` | Fixed worker pool (1–32) with bounded pending queue |
-| `serverDownloadsEnabled` | `false` | Permit or reject ZIP download endpoint and hide its link |
+| `serverDownloadsEnabled` | `false` | Enable ZIP export endpoints (additional network authorization still applies) |
+| `serverDownloadAllowedNetworks` | `127.0.0.1/32,::1/128` | Independent IPv4/IPv6 direct-peer CIDR allowlist for ZIP downloads; the general server allowlist must also permit the peer |
 | `serverSecurityRefreshEnabled` | `true` when not explicitly set in the central configuration | Enable independently scheduled OSV/NVD/EPSS/KEV collection |
 | `serverSecurityRefreshMinutes` | `1440` | Scan period, 15–10080 minutes |
 
+Package ZIP downloads require both serverDownloadsEnabled and matching the independent serverDownloadAllowedNetworks list. The check uses the actual TCP peer address obtained from the accepted socket and ignores X-Forwarded-For. By default, only loopback clients are eligible even if ordinary pages are accessible from a wider network. Future mTLS identity authorization should be enforced separately from this network gate; it is not yet implemented.
+
 When enabling a reverse proxy, allowlist the **proxy's internal source IP**, not arbitrary client addresses. `X-Forwarded-For` is **not trusted for access authorization**. The reverse proxy must enforce its own authentication and inbound access policies. Wildcard listener addresses remain prohibited. IPv4/IPv6 CIDR prefix `/0` is rejected.
 
-The HTTP server uses a fixed, bounded worker pool, size-limited request headers and receive/send timeouts. Published overview HTML for Dashboard, Libraries, Packages, Security and the local Security inventory is built in a background thread and atomically swapped as an immutable in-memory snapshot. The refresh worker fingerprints XML **content** and installed SBOM and documentation evidence every five seconds. Failed source reads invalidate the overview snapshot, never silently promoting stale metadata.
+The HTTP server uses a fixed, bounded worker pool, size-limited request headers and receive/send timeouts. Published overview HTML for Dashboard, Libraries, Packages, Security, Status, Tools and the local Security inventory is built in a background thread and atomically swapped as an immutable in-memory snapshot. The refresh worker fingerprints XML **content** and installed SBOM and documentation evidence every five seconds. Failed refreshes retain the previous complete overview until a coherent replacement is available; the server reports failures to the startup log.
 
 Individual package and security details read BuildEngine package evidence and the **independent in-memory CVE snapshot only**. HTTP requests never trigger CVE provider queries or SQLite archive reads. The periodic security worker uses `SecurityMonitorService` to retrieve OSV, NVD, EPSS and CISA KEV data. It atomically publishes independent partial snapshots during the scan and the final result even when individual provider or enrichment calls fail. Only successful OSV responses mark a package as `scanned`; partial results do not imply complete coverage. No provider scan is started by an incoming HTTP request. Until persistent evidence is integrated, coverage after startup remains `not-scanned` until the security worker publishes results.
 
 ### Security, package and catalog presentation
 
-XML timestamps are shown alongside the package coordinate across Dashboard/Libraries/Packages/Security. Package and Security overview tables have local-only name search, sortable Name/Category/XML timestamp and optional superseded hiding. Security findings expand to reveal evidence details, known fixes and upstream links; compact columns show normalized Severity, CVSS, EPSS, Percentile, KEV and Fix. Absent CVSS/EPSS evidence remains unknown rather than being assigned zero.
+XML timestamps are shown alongside the package coordinate across Dashboard/Libraries/Packages/Security. Package and Security overview tables have local-only name search, sortable Name/Category/XML timestamp and optional superseded hiding. The browser optionally remembers sorting, superseded hiding and library tile/list view through localStorage (not cookies). Search queries are not persisted. Security findings expand to reveal evidence details, known fixes and upstream links; compact columns show normalized Severity, CVSS, EPSS, Percentile, KEV and Fix. Absent CVSS/EPSS evidence remains unknown rather than being assigned zero.
 
 The package ZIP export route exists only when explicitly enabled. The server must **not** expose the administrative filesystem as an unrestricted static web root. The shared physical-payload ownership caveat for extension ZIP exports remains a separate correctness constraint and is not solved merely by a download toggle.
 
