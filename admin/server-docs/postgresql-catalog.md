@@ -84,7 +84,7 @@ SBOM data, `LICENSE-INFO.txt`, artifact manifests containing real generated
 DLL/EXE/LIB paths and hashes, documentation availability, current tool
 registration, and security coverage status (including a successful scan
 with zero CVEs). These are now modeled with the `library_version` cache
-fields, `tool_cache` and `version_security_status`, supplementing the
+fields, `tool_cache`, `showcase_cache` and `version_security_status`, supplementing the
 existing `cve`, `version_cve`, `cve_rating` and
 `cve_assessment` tables.
 
@@ -92,6 +92,12 @@ Raw generated HTML, binaries, production logs and downloads are **not**
 duplicated into the relational catalog. The server may continue to serve
 the corresponding files while catalog and cache metadata come from
 PostgreSQL.
+
+The server also discovers standalone tests and showcases through
+`tests/**/showcase.json`. The `showcase_cache` table mirrors each complete
+manifest as a single text field with its discovery path and timestamp,
+without inventing relational identities for the contained applications.
+It does not replace the original test manifests.
 
 **Implementation status [not verified]:** The SQL model and audit are
 committed, but the BuildEngine C++ writer, filesystem-state reconciliation
