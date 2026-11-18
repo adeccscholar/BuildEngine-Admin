@@ -4,11 +4,11 @@
 
 The BuildEngine central server exposes **[Showcases & Extended Tests](/showcases/)** alongside Libraries, Tools, Packages and News. Projects are discovered from `<production-root>/tests`; for the active Windows workspace this is `D:\local\embarcadero\test_v3\tests`. No second checkout or GitHub API access is required by the server.
 
-The catalog is grouped by source directory. A project directory is recognized when it contains `Description.md` and either an independent `CMakeLists.txt` or a C++Builder `.cbproj`. Directories `bootstrap`, `cmake`, `cache`, `docs`, `docu-server`, build output and Git metadata are excluded from enumeration. Nested groups such as `database/mssql` remain visible.
+The catalog is grouped by source directory. A project directory is recognized when it contains `Description.md` and either an independent `CMakeLists.txt` or a C++Builder `.cbproj`. Directories `bootstrap`, `cmake`, `cache`, `docs`, build output and Git metadata are excluded from enumeration. The `docu-server` project is included as an independent test application. Nested groups such as `database/mssql` remain visible.
 
 ## Complete test metadata
 
-All **25 standalone BuildEngine-Tests applications** now declare a `showcase.json` manifest. Group-only `database/` is not an executable, and the dedicated `docu-server/` remains excluded as requested. Every manifest provides a concise functional description and a full list of managed package roots referenced by the test, distinguishing `direct: true` for directly consumed APIs from `direct: false` for supporting runtime closure packages.
+All **26 standalone BuildEngine-Tests applications** now declare a `showcase.json` manifest. Group-only `database/` is not an executable. The `docu-server/` documentation application is included as a standalone extended test. Every manifest provides a concise functional description and a full list of managed package roots referenced by the test, distinguishing `direct: true` for directly consumed APIs from `direct: false` for supporting runtime closure packages.
 
 A manifest may specify `"version": "active"` when its CMake project uses `adecc_package_current_root`. The central server resolves this value against the **unique, non-superseded catalog version on every request**, then displays a version-specific hyperlink. Explicit pinned CMake versions remain pinned. An absent or ambiguous catalog coordinate is reported as unresolved, **never guessed and never linked to a different version**.
 
@@ -55,4 +55,4 @@ The separate BuildEngine-Tests documentation server remains available and indepe
 
 ## Validation
 
-The three graphics showcases have their own versioned manifests in BuildEngine-Tests. The 120 native library FSM integrations are user-confirmed complete; **[not verified]** the newly added graphical demonstrations and central HTTP rendering require Windows host execution after rebuilding BuildEngine-Common and BuildEngine-Server.
+The three graphics showcases and the standalone documentation-server test have their own versioned manifests in BuildEngine-Tests. The 120 native library FSM integrations are user-confirmed complete; **[not verified]** the newly added graphical demonstrations and central HTTP rendering require Windows host execution after rebuilding BuildEngine-Common and BuildEngine-Server.
