@@ -3786,7 +3786,7 @@
 	  
    </library>
    <library id="nlohmann-json" version="3.12.0" category="data" timestamp="2026-08-29T17:38:02Z">
-      <metadata description="Modern C++ JSON library offering intuitive STL-like parsing, serialization, and data access." licenseSignal="green"/>
+      <metadata artifactType="interface" description="Modern C++ JSON library offering intuitive STL-like parsing, serialization, and data access." licenseSignal="green"/>
       <source>
          <download url="https://github.com/nlohmann/json/releases/download/v{LibraryVersion}/include.zip" archive="nlohmann-json-{LibraryVersion}-include.zip" sha256="b8cb0ef2dd7f57f18933997c9934bb1fa962594f701cd5a8d3c2c80541559372"/>
          <extract format="zip" root=".">
@@ -6588,7 +6588,7 @@
    </library>
    
    <library id="bitmapplusplus" version="1.1.1" category="graphics" timestamp="2026-09-07T22:22:00Z">
-      <metadata
+      <metadata artifactType="interface"
          name="BitmapPlusPlus"
          supplier="Bader-Eddine Ouaich and contributors"
          homepage="https://github.com/baderouaich/BitmapPlusPlus" description="Header-only C++ bitmap image library for loading, manipulating, and saving BMP data." licenseSignal="green">
@@ -13453,7 +13453,7 @@
       </smoke>
    </library>
    <library id="fast_float" version="8.2.3" supersededBy="8.3.3" category="data" timestamp="2026-10-15T12:53:00Z">
-      <metadata name="fast_float" supplier="fast_float authors" homepage="https://github.com/fastfloat/fast_float" description="High-performance C++ floating-point parser" licenseSignal="yellow">
+      <metadata artifactType="interface" name="fast_float" supplier="fast_float authors" homepage="https://github.com/fastfloat/fast_float" description="High-performance C++ floating-point parser" licenseSignal="yellow">
          <license name="MIT" spdx="MIT" file="licenses\fast_float\LICENSE-MIT"/>
       </metadata>
       <security><repository url="https://github.com/fastfloat/fast_float.git" ref="v8.2.3"/></security>
@@ -13519,7 +13519,7 @@
       </smoke>
    </library>
 <library id="fast_float" version="8.3.3" category="data" timestamp="2026-11-08T15:43:00Z">
-      <metadata name="fast_float" supplier="fast_float authors" homepage="https://github.com/fastfloat/fast_float" description="High-performance C++ floating-point parser" licenseSignal="yellow">
+      <metadata artifactType="interface" name="fast_float" supplier="fast_float authors" homepage="https://github.com/fastfloat/fast_float" description="High-performance C++ floating-point parser" licenseSignal="yellow">
          <license name="MIT" spdx="MIT" file="licenses\fast_float\LICENSE-MIT"/>
       </metadata>
       <security><repository url="https://github.com/fastfloat/fast_float.git" ref="v8.3.3" commit="dbeabeeb3e6791cb96994c2a7a084c36e62ccfb2"/></security>
@@ -15070,7 +15070,7 @@
    </library>
 
    <library id="eigen" version="5.0.1" category="math" timestamp="2026-10-22T21:55:00Z">
-      <metadata name="Eigen" supplier="Eigen contributors" homepage="https://eigen.tuxfamily.org/"
+      <metadata artifactType="interface" name="Eigen" supplier="Eigen contributors" homepage="https://eigen.tuxfamily.org/"
                 description="Header-only C++ matrix, geometry and sparse linear algebra templates. No DLL or import archive."
                 licenseSignal="yellow">
          <license name="Mozilla Public License 2.0 and upstream third-party notices" spdx="MPL-2.0" file="COPYING.README"/>
