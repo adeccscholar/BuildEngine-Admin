@@ -16017,4 +16017,177 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
+   <library id="imgui" version="1.93.0" category="graphics" timestamp="2026-11-18T09:55:00Z">
+      <metadata name="Dear ImGui" supplier="Omar Cornut and contributors" homepage="https://github.com/ocornut/imgui" description="Native immediate-mode C++ UI core for custom applications and tools; standalone BCC64X DLL without a fixed platform or renderer backend." artifactType="shared" licenseSignal="green">
+         <license name="MIT License" spdx="MIT" file="licenses\imgui\LICENSE.txt"/>
+      </metadata>
+      <security><repository url="https://github.com/ocornut/imgui.git" ref="v1.93.0"/></security>
+      <source>
+         <download url="https://github.com/ocornut/imgui/archive/refs/tags/v1.93.0.zip" archive="imgui-{LibraryVersion}.zip"/>
+         <extract format="zip" root="imgui-{LibraryVersion}">
+            <require path="imgui.h"/>
+            <require path="imgui.cpp"/>
+            <require path="imgui_draw.cpp"/>
+            <require path="imgui_widgets.cpp"/>
+            <require path="imgui_tables.cpp"/>
+            <require path="LICENSE.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DIMGUI_UPSTREAM_SOURCE_DIR:PATH={Workspace}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\adapters\imgui" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install><perVariant>
+            <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\imgui{VariantSuffix}.dll"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libimgui{VariantSuffix}.lib"/>
+         </perVariant><common>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\imgui\LICENSE.txt"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\imgui.h"/>
+         </common></install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\imgui\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="imgui-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DIMGUI_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
+   <library id="implot" version="1.1" category="graphics" timestamp="2026-11-18T09:55:00Z">
+      <extension type="package" library="imgui" version="1.93.0"/>
+      <metadata name="ImPlot" supplier="Evan Pezent and contributors" homepage="https://github.com/epezent/implot" description="Immediate-mode plotting extension for Dear ImGui, with native 2D graphs, histograms, heatmaps and interactive axes." artifactType="shared" licenseSignal="green">
+         <license name="MIT License" spdx="MIT" file="licenses\implot\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/epezent/implot.git" ref="v1.1"/></security>
+      <source>
+         <download url="https://github.com/epezent/implot/archive/refs/tags/v1.1.zip" archive="implot-{LibraryVersion}.zip"/>
+         <extract format="zip" root="implot-{LibraryVersion}">
+            <require path="implot.h"/>
+            <require path="implot.cpp"/>
+            <require path="implot_items.cpp"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DIMPLOT_UPSTREAM_SOURCE_DIR:PATH={Workspace}"/>
+         <argument value="-DIMGUI_PACKAGE_ROOT:PATH={DependencyRoot:imgui}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\adapters\implot" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install><perVariant>
+            <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\implot{VariantSuffix}.dll"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libimplot{VariantSuffix}.lib"/>
+         </perVariant><common>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\implot\LICENSE"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\implot.h"/>
+         </common></install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\implot\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="implot-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DIMPLOT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DIMGUI_PACKAGE_ROOT:PATH={DependencyRoot:imgui}"/>
+      </smoke>
+   </library>
+   <library id="raygui" version="5.0" category="graphics" timestamp="2026-11-18T09:55:00Z">
+      <extension type="package" library="raylib" version="6.2"/>
+      <metadata name="raygui" supplier="raysan5 and contributors" homepage="https://github.com/raysan5/raygui" description="Header-only C immediate-mode GUI controls extending raylib, with a single application-side implementation translation unit and no raygui DLL." artifactType="interface" licenseSignal="green">
+         <license name="Zlib License" spdx="Zlib" file="licenses\raygui\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/raysan5/raygui.git" ref="5.0"/></security>
+      <source>
+         <download url="https://github.com/raysan5/raygui/archive/refs/tags/5.0.zip" archive="raygui-{LibraryVersion}.zip"/>
+         <extract format="zip" root="raygui-{LibraryVersion}">
+            <require path="src\raygui.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\src\raygui.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raygui.h" overwrite="true"/>
+         <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\raygui\LICENSE" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\raygui.h"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\raygui\LICENSE"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\raygui\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="raygui-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DRAYGUI_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DRAYLIB_PACKAGE_ROOT:PATH={DependencyRoot:raylib}"/>
+      </smoke>
+   </library>
+   <library id="matplotplusplus" version="1.2.2" category="math" timestamp="2026-11-18T09:55:00Z">
+      <metadata name="Matplot++" supplier="Alan de Freitas and contributors" homepage="https://github.com/alandefreitas/matplotplusplus" description="Mathematical native C++ plotting library for 2D and 3D graphs, export and numerical visualization, with an independently verified graphics backend." artifactType="shared" licenseSignal="green">
+         <license name="MIT License" spdx="MIT" file="licenses\matplotplusplus\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/alandefreitas/matplotplusplus.git" ref="v1.2.2"/></security>
+      <source>
+         <download url="https://github.com/alandefreitas/matplotplusplus/archive/refs/tags/v1.2.2.zip" archive="matplotplusplus-{LibraryVersion}.zip"/>
+         <extract format="zip" root="matplotplusplus-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="source\CMakeLists.txt"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DMATPLOTPP_BUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DMATPLOTPP_BUILD_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DMATPLOTPP_BUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DMATPLOTPP_BUILD_INSTALLER:BOOL=ON"/>
+         <argument value="-DMATPLOTPP_BUILD_PACKAGE:BOOL=OFF"/>
+         <argument value="-DMATPLOTPP_BUILD_EXPERIMENTAL_OPENGL_BACKEND:BOOL=OFF"/>
+         <argument value="-DMATPLOTPP_BUILD_HIGH_RESOLUTION_WORLD_MAP:BOOL=OFF"/>
+         <argument value="-DMATPLOTPP_WITH_OPENCV:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install><perVariant>
+            <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         </perVariant><common>
+            <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\matplotplusplus\LICENSE" overwrite="true"/>
+         </common></install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\matplotplusplus\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="matplotplusplus-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DMATPLOT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
 </buildLibraries>
