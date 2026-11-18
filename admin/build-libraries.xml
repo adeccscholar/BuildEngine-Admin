@@ -16162,6 +16162,7 @@
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DMATPLOTPP_BUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DMATPLOTPP_BUILD_WITH_SANITIZERS:BOOL=OFF"/>
          <argument value="-DMATPLOTPP_BUILD_EXAMPLES:BOOL=OFF"/>
          <argument value="-DMATPLOTPP_BUILD_TESTS:BOOL=OFF"/>
          <argument value="-DMATPLOTPP_BUILD_INSTALLER:BOOL=ON"/>
