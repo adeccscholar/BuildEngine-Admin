@@ -53,6 +53,53 @@ When an operator or service account changes, update both the Windows identity/AD
 
 For connection examples, complete `pg_hba.conf`/`pg_ident.conf` templates, role tests and administrator maintenance procedures, see the [BuildEngine-Server PostgreSQL README](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/README.md#2-configure-postgresql-authentication-rules). PostgreSQL roles alone do not provision Windows accounts, and the SQL script deliberately embeds no passwords. **[not verified]** Real Windows service account login and SSPI negotiation remain to be tested against the target server.
 
+## Authoritative build evidence and database-backed server cache
+
+The **BuildEngine source of truth is unchanged**: `admin/build-libraries.xml` defines
+the build contracts, while the filesystem's per-scope `.state` files and
+the FSM's evidence checks determine whether work has completed. Database
+rows never authorize, suppress or invalidate a build.
+
+The intended startup sequence is: read the whole source XML, calculate
+SHA-256 over its bytes, compare against the last completed `catalog_sync`
+record, and, **only on a changed hash**, create a new synchronization attempt
+and reconcile the full catalog before scheduling work. When the XML hash
+is unchanged, current scope evidence still needs to be rechecked against
+the filesystem; an unchanged XML is not proof that states or binaries remain.
+
+`dom_library_state` is the numeric FSM reference domain. The
+`library_scope_state` table mirrors the individual logical scope, including
+variant scopes and dynamic documentation scopes, with its source contract
+timestamp, state file path, `completed_at` and `checked_at`. A successful
+filesystem `ScopeStateStore::Commit` precedes the cache write; the exact
+completion timestamp is copied, never regenerated in PostgreSQL. Invalid,
+removed and outdated scope records must be cleared by reconciliation.
+`v_library_state_cache` aggregates scope completion for the server and does
+not replace `LibraryProgressEvaluator`.
+
+### Verified cache-model coverage
+
+The code inspection also identified installed package presence, CycloneDX
+SBOM data, `LICENSE-INFO.txt`, artifact manifests containing real generated
+DLL/EXE/LIB paths and hashes, documentation availability, current tool
+registration, and security coverage status (including a successful scan
+with zero CVEs). These are now modeled with the `library_version` cache
+fields, `tool_cache` and `version_security_status`, supplementing the
+existing `cve`, `version_cve`, `cve_rating` and
+`cve_assessment` tables.
+
+Raw generated HTML, binaries, production logs and downloads are **not**
+duplicated into the relational catalog. The server may continue to serve
+the corresponding files while catalog and cache metadata come from
+PostgreSQL.
+
+**Implementation status [not verified]:** The SQL model and audit are
+committed, but the BuildEngine C++ writer, filesystem-state reconciliation
+and PostgreSQL-only HTTP reader are not yet connected. The existing server
+still uses `LibraryCatalog`, `BuildEngineRepository`,
+`SourceToolInventory` and independent memory CVE snapshots. SQL schema
+changes alone do not change those HTTP paths.
+
 ## Planned runtime integration
 
 BuildEngine remains responsible for reading XML and synchronizing the database using `adecc-core-lib`, `defined_type_list`, `Persistent_Systemdata`, and the existing PostgreSQL libpq/libpqxx package. The server is to read database data exclusively, retaining filesystem access for documents, logs and installed artifacts. No unrelated C++ compiler ecosystem or ORM is introduced.
