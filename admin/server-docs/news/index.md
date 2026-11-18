@@ -8,7 +8,7 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
-- **[2026-11-18](/news/2026-11-18/)** — Dear ImGui, ImPlot, raygui interface and Matplot++ registered; native UI/plot graphs and artifact-type distinctions (**86 libraries / 121 versions**, native builds pending)
+- **[2026-11-18](/news/2026-11-18/)** — Dear ImGui, ImPlot, raygui interface and Matplot++ registered; native UI/plot graphs and artifact-type distinctions (**85 libraries / 120 versions**, native builds pending)
 
 - **[2026-11-17](/news/2026-11-17/)** — Live catalog invalidation without stale reads; SDL3 3.4.20 and Box2D 3.2.0 registered (81 libraries / 116 versions)
 
