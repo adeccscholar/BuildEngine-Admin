@@ -40,6 +40,19 @@ The single SQL baseline provisions two login roles without embedded passwords: `
 
 Default read-only grants are applied to future tables/views created by `buildengine_user`. The script must be executed by a PostgreSQL administrator with role-creation privileges. Windows service identity mapping and integrated SSPI authentication are configured separately in PostgreSQL, not by committing credentials to this repository. The roles are **not** independently verified against a deployed server.
 
+## Windows integrated user security
+
+Authentication and permissions are managed separately. **Windows / Active Directory** authenticates the actual BuildEngine operator or Windows service process identity through PostgreSQL **SSPI**. PostgreSQL's `pg_ident.conf` then maps that authenticated Windows principal to an explicitly requested PostgreSQL login role. Finally, schema ownership, foreign keys and SQL `GRANT` permissions control the role's actions. The connection string includes a database role, **not** a Windows username or password.
+
+- **BuildEngine and trusted desktop administration:** an explicitly approved Windows principal maps to `buildengine_user`; this is the schema owner with create/alter/write rights.
+- **BuildEngine-Server Windows service:** a dedicated Windows service account maps to `buildengine_reader`; it can select from permitted current and future tables/views but cannot modify data or schema.
+
+The PostgreSQL administrator configures restrictive `pg_hba.conf` SSPI rules for `BuildEngine`, the two database role names and approved client addresses; `pg_ident.conf` maps only explicitly approved Windows principals to these roles. Keep realm identification enabled and respect the principal format returned by the local Windows/AD environment. When deployed across the network, also configure the PostgreSQL server's Kerberos SPN, restricted client networks and transport security, then verify authentication behavior. SSPI may negotiate NTLM instead of Kerberos, so the mere presence of SSPI configuration is not proof of Kerberos use.
+
+When an operator or service account changes, update both the Windows identity/AD permissions and the PostgreSQL identity mapping. Do not give the server account membership in the writer role. Future table read permissions are inherited from `ALTER DEFAULT PRIVILEGES` **only for tables created by `buildengine_user`**, so additional schema creators require deliberate permission management.
+
+For connection examples, complete `pg_hba.conf`/`pg_ident.conf` templates, role tests and administrator maintenance procedures, see the [BuildEngine-Server PostgreSQL README](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/README.md#2-configure-postgresql-authentication-rules). PostgreSQL roles alone do not provision Windows accounts, and the SQL script deliberately embeds no passwords. **[not verified]** Real Windows service account login and SSPI negotiation remain to be tested against the target server.
+
 ## Planned runtime integration
 
 BuildEngine remains responsible for reading XML and synchronizing the database using `adecc-core-lib`, `defined_type_list`, `Persistent_Systemdata`, and the existing PostgreSQL libpq/libpqxx package. The server is to read database data exclusively, retaining filesystem access for documents, logs and installed artifacts. No unrelated C++ compiler ecosystem or ORM is introduced.
