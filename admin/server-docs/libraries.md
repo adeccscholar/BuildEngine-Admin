@@ -18,7 +18,7 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 
 Four new versioned integrations are registered in `admin/build-libraries.xml`: [Dear ImGui 1.93.0](/package/imgui/1.93.0/migration) (shared GUI core), [ImPlot 1.1](/package/implot/1.1/migration) (shared plotting extension), [raygui 5.0](/package/raygui/5.0/migration) (header-only / interface extension of raylib 6.2) and [Matplot++ 1.2.2](/package/matplotplusplus/1.2.2/migration) (mathematical plotting).
 
-**Current declared catalog: 86 unique library IDs / 121 versioned library records.** The new packages are **[not verified]** until native BCC64X compilation and consumer smokes complete. Extension relationships and the distinction between `depends-on` and `extends` appear in [the engineering news](/news/2026-11-18/) with two Mermaid graphs. A header-only interface package is installed and smoke-tested without producing a DLL.
+**Current declared catalog: 85 unique library IDs / 120 versioned library records.** The new packages are **[not verified]** until native BCC64X compilation and consumer smokes complete. Extension relationships and the distinction between `depends-on` and `extends` appear in [the engineering news](/news/2026-11-18/) with two Mermaid graphs. A header-only interface package is installed and smoke-tested without producing a DLL.
 
 ## Libraries by category
 
