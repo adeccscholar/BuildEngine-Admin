@@ -16163,6 +16163,8 @@
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DMATPLOTPP_BUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DMATPLOTPP_BUILD_WITH_SANITIZERS:BOOL=OFF"/>
          <argument value="-DMATPLOTPP_BUILD_EXAMPLES:BOOL=OFF"/>
