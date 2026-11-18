@@ -34,6 +34,12 @@ Original/current XML contract timestamps are separate from created/modified data
 
 Provider scan attempts, copies of whole JSON documents, component inventories and additional revisions were intentionally omitted as unnecessary for the initial server data model.
 
+## Database roles and service access
+
+The single SQL baseline provisions two login roles without embedded passwords: `buildengine_user` owns the `buildengine` schema and its tables/views, can read/write data, create and alter schema objects, and is intended for BuildEngine and administrative UI execution. `buildengine_reader` has only database connection, schema usage, and `SELECT` permission on the current and future catalog tables/views, and is intended for the eventual Windows server service identity.
+
+Default read-only grants are applied to future tables/views created by `buildengine_user`. The script must be executed by a PostgreSQL administrator with role-creation privileges. Windows service identity mapping and integrated SSPI authentication are configured separately in PostgreSQL, not by committing credentials to this repository. The roles are **not** independently verified against a deployed server.
+
 ## Planned runtime integration
 
 BuildEngine remains responsible for reading XML and synchronizing the database using `adecc-core-lib`, `defined_type_list`, `Persistent_Systemdata`, and the existing PostgreSQL libpq/libpqxx package. The server is to read database data exclusively, retaining filesystem access for documents, logs and installed artifacts. No unrelated C++ compiler ecosystem or ORM is introduced.
