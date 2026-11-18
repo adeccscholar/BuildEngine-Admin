@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.25)
+project(BuildEngineSmokeMatplot LANGUAGES CXX)
+if(NOT DEFINED MATPLOT_PACKAGE_ROOT)
+   message(FATAL_ERROR "MATPLOT_PACKAGE_ROOT is required")
+endif()
+add_executable(matplotplusplus-consumer main.cpp)
+target_compile_features(matplotplusplus-consumer PRIVATE cxx_std_23)
+target_include_directories(matplotplusplus-consumer PRIVATE "${MATPLOT_PACKAGE_ROOT}/include")
+find_library(MATPLOT_IMPORT NAMES matplot matplotplusplus libmatplot libmatplotplusplus
+   PATHS "${MATPLOT_PACKAGE_ROOT}/lib/win64/Release" NO_DEFAULT_PATH REQUIRED)
+target_link_libraries(matplotplusplus-consumer PRIVATE "${MATPLOT_IMPORT}")
