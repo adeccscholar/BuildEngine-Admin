@@ -16,6 +16,14 @@ Library categories are linked to `dom_category`, which has a code, human label, 
 
 `library_relation` uses a domain code from `dom_relation_type`: `dependency`, `extended`, `supersededBy`, `direct`, `transitive`, `bundled`. `supersededBy` is an explicit edge from the older version to its exact replacement of the same library. `extended` retains shared-source/package mode and its additional extension metadata. Relationships have their own creation, modification and retirement times and optional source-version ordinal validity ranges.
 
+## Effective-dated relationships
+
+A library relationship is a stable association between two library identities, classified by its relation type. Each new effective-dated revision identifies the precise source and target versions. **The latest effective revision wins** in the server's default relationship display; a prior version remains accessible in the full history. The date of effective change is separate from the database ingestion timestamp.
+
+`supersededBy` retains a distinct history for each superseded source version. Other relation types such as `dependency` and `extended` replace previous target versions for the same library pair and relation type. New versions do not silently create multiple active associations. A dated withdrawn revision removes the relationship from the current view without deleting previous observations.
+
+The server model provides `v_library_relationships_current`, `v_library_relationships_history`, and `library_relationships_at(timestamptz)` for current and historical display.
+
 ## Security and assessments
 
 The security model preserves globally unique CVE identities, distinct non-CVE advisory aliases, affected component identities, an exact version-to-CVE table, and time-series OSV/NVD/EPSS/KEV provider observations. It includes scan coverage, failed requests, retry evidence and expiry-aware provider caches. The server's default severity view takes the **maximum historically observed CVSS score** while separate views expose chronological scores.
