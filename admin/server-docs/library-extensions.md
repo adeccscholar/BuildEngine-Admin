@@ -37,6 +37,20 @@ ACE and TAO may share source/producer/payload structures while retaining separat
 
 A physical directory is never itself the logical component identity.
 
+## New native UI and plotting package extensions (18 November 2026)
+
+The generic `type="package"` extension is used for `implot@1.1` on `imgui@1.93.0` and `raygui@5.0` on `raylib@6.2`. The extension edge denotes a versioned logical relationship, not shared source ownership. Both extensions retain independent download, installation, licensing, SBOM and consumer testing.
+
+The technical output form is orthogonal: ImPlot targets a native shared DLL, whereas raygui is header-only and must be presented as **Header-only / Interface** without expecting a raygui DLL. This is the same design principle used for nlohmann-json and other interface libraries.
+
+```mermaid
+flowchart TD
+    ImGui["Dear ImGui 1.93.0 - shared DLL"] -->|"extends"| ImPlot["ImPlot 1.1 - shared DLL"]
+    Raylib["raylib 6.2 - shared DLL"] -->|"extends"| Raygui["raygui 5.0 - header-only interface"]
+```
+
+**[not verified]** Native BCC64X compilation, runtime integration, artifact publication and end-to-end tests are pending. See [18 November 2026 news](/news/2026-11-18/) for both architecture diagrams.
+
 ## Normal dependency versus extension
 
 | Property | Normal dependency | Extension |
