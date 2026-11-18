@@ -30,8 +30,16 @@ The security model preserves globally unique CVE identities, distinct non-CVE ad
 
 Assessment history stores the six existing reference dimensions: applicability, exposure, effective risk, decision, reason and publication state, with versioned revisions, reviewer, explanation and evidence fingerprints. Historical security observations and assessment revisions are append-only.
 
+## Catalog synchronization and reference-data status
+
+The previous `catalog_generation` / `active_catalog_generation` design has been replaced by the simpler `catalog_sync` history. The table records one attempt to import the **entire** `admin/build-libraries.xml`, including its SHA-256, XML schema version, timestamps, counts of inserted/updated/unchanged/rejected/unprocessed records, and a human-readable `diagnostic_summary`.
+
+`catalog_sync.status_id integer` is a foreign key to `dom_catalog_sync_status`, containing the status code, label, description, notice and ordering. The four seeded statuses are `running` (10), `complete` (20), `partial` (30) and `failed` (40). A run is `complete` when all records were processed, even if nothing changed; it is `partial` when some records were accepted but others could not be processed; `failed` is reserved for a complete failure of file import with zero accepted records.
+
+Import timestamps and status suffice to retrieve the latest attempt and latest full success through `v_catalog_sync_latest` and `v_catalog_sync_last_complete`, without a mutable active-pointer table. The SHA-256 is indexed but **not unique** because a previously partial run can retry the identical file. Full and partial import diagnostics stay available in the history.
+
 ## Future synchronization
 
-BuildEngine will parse and validate the XML as the import source during the FSM workflow, reconcile stable IDs and typed relations, and publish a complete catalog generation transactionally. The HTTP server must then serve catalog/security content exclusively from PostgreSQL, retaining filesystem reads only for documentation, logs and binary artifacts. The implementation must use existing adecc-core-lib, `defined_type_list`, `Persistent_Systemdata` and managed libpq/libpqxx; no new ORM.
+BuildEngine will parse and validate the XML as the import source during the FSM workflow, reconcile stable IDs and typed relations, and record its outcome with a typed synchronization status and a diagnostic summary. The HTTP server must then serve catalog/security content exclusively from PostgreSQL, retaining filesystem reads only for documentation, logs and binary artifacts. The implementation must use existing adecc-core-lib, `defined_type_list`, `Persistent_Systemdata` and managed libpq/libpqxx; no new ORM.
 
 Source schema and read-only verification script: [BuildEngine-Server PostgreSQL baseline](https://github.com/adeccscholar/BuildEngine-Server/tree/main/internal/postgresql).
