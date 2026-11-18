@@ -15,6 +15,7 @@ int main() {
    ImGui::Render();
    bool const bPassed = ImGui::GetDrawData() != nullptr;
    ImGui::DestroyContext(pContext);
+   std::println("SMOKE|CHECK|runtime|{}|Dear ImGui draw data created", bPassed ? "PASS" : "FAIL");
    std::println("SMOKE|RESULT|{}|Dear ImGui DLL consumer", bPassed ? "PASS" : "FAIL");
    return bPassed ? 0 : 1;
 }
