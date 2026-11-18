@@ -16042,12 +16042,12 @@
          <argument value="-DIMGUI_UPSTREAM_SOURCE_DIR:PATH={Workspace}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\adapters\imgui" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
-         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <variant name="Release"><variable name="BinarySuffix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><variable name="BinarySuffix" value="d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
          <install><perVariant>
             <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\imgui{VariantSuffix}.dll"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libimgui{VariantSuffix}.lib"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\imgui{BinarySuffix}.dll"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libimgui{BinarySuffix}.lib"/>
          </perVariant><common>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\imgui\LICENSE.txt"/>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\imgui.h"/>
@@ -16089,12 +16089,12 @@
          <argument value="-DIMGUI_PACKAGE_ROOT:PATH={DependencyRoot:imgui}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\adapters\implot" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
-         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <variant name="Release"><variable name="BinarySuffix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><variable name="BinarySuffix" value="d"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
          <install><perVariant>
             <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\implot{VariantSuffix}.dll"/>
-            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libimplot{VariantSuffix}.lib"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\implot{BinarySuffix}.dll"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libimplot{BinarySuffix}.lib"/>
          </perVariant><common>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\implot\LICENSE"/>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\implot.h"/>
