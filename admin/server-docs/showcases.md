@@ -53,6 +53,16 @@ As a fallback for future projects without `showcase.json`, the server recognizes
 
 The separate BuildEngine-Tests documentation server remains available and independent. Both sites render documentation from the same tests workspace. The central server serves only a fixed set of recognized Markdown file names, and only for previously discovered standalone projects. It never executes CMake, projects or test programs via HTTP.
 
+## Native interactive graphics laboratories
+
+The three graphics examples are now native SDL2 applications rather than static SVG-first showcases:
+
+- **Dear ImGui Neon Laboratory:** Four animated procedural scenes, native ImGui sliders/buttons and a real SDL2 renderer that uploads the dynamic ImGui 1.93 font atlas. Text is drawn as textured glyphs rather than exported SVG triangle outlines.
+- **ImPlot Real-Time Signal Theater:** Four continuously updated signal models with native ImPlot graphs, axes, legend, signal visibility controls, frequency/amplitude/speed sliders and playback controls.
+- **Matplot++ Mathematical Discovery Gallery:** Six selectable native thumbnail scenes, progressive curve animation, zoom and playback controls. Matplot++ provides numeric sample sets; ImGui and SDL2 present them interactively. Optional SVG export remains a separate route for browser or central-server presentation.
+
+Their standalone per-project `build.md` guides use copyable one-line CMake commands and independent Release/Debug build directories. The project manifests and declared CycloneDX inventories now include the respective SDL2 and ImGui runtime dependencies. **[not verified]** The revised GUI execution, frame rate, font quality and rendering output require Windows BCC64X testing before any show-readiness claim.
+
 ## Validation
 
 The three graphics showcases and the standalone documentation-server test have their own versioned manifests in BuildEngine-Tests. The 120 native library FSM integrations are user-confirmed complete; **[not verified]** the newly added graphical demonstrations and central HTTP rendering require Windows host execution after rebuilding BuildEngine-Common and BuildEngine-Server.
