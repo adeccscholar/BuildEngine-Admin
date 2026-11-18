@@ -118,6 +118,15 @@
       <xs:attribute name="homepage" type="xs:anyURI" use="optional">
          <xs:annotation><xs:documentation>Canonical upstream project or product page.</xs:documentation></xs:annotation>
       </xs:attribute>
+      <xs:attribute name="artifactType" use="optional">
+         <xs:annotation><xs:documentation>Native output classification for server presentation; interface packages require headers and consumer smokes but no DLL/import library.</xs:documentation></xs:annotation>
+         <xs:simpleType><xs:restriction base="xs:string">
+            <xs:enumeration value="shared"/>
+            <xs:enumeration value="static"/>
+            <xs:enumeration value="interface"/>
+            <xs:enumeration value="tool"/>
+         </xs:restriction></xs:simpleType>
+      </xs:attribute>
       <xs:attribute name="runtimeDll" type="xs:string" use="optional">
          <xs:annotation><xs:documentation>Optional declared runtime DLL basename for SBOM metadata. This is not independently verified PE import evidence.</xs:documentation></xs:annotation>
       </xs:attribute>
