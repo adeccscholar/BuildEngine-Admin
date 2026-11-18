@@ -1,45 +1,41 @@
-# PostgreSQL-backed BuildEngine catalog: greenfield target model
+# PostgreSQL-backed BuildEngine catalog: simplified greenfield model
 
 ## Scope
 
-The **planned** authoritative server catalog uses a local PostgreSQL database named `BuildEngine` (default localhost:5432). The database schemas live in the `BuildEngine-Server` repository under `internal/postgresql/001-buildengine.sql` and `002-security.sql`. **[not verified]** The new native PostgreSQL importer and HTTP database-only readers are not yet implemented or tested.
+The **planned** central server uses PostgreSQL in the local database `BuildEngine` (default localhost:5432). All tables, value lists, foreign keys and views are defined in **one** file: [BuildEngine-Server/internal/postgresql/buildengine.sql](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/buildengine.sql). Superseded `001-buildengine.sql`, `002-security.sql` and `verify-baseline.sql` have been deleted.
 
-The target model keeps stable BIGINT `library_id` identities and per-library BIGINT `version_no` identities. The XML library code and textual version number remain unique natural keys: `UNIQUE(library_code)` and `UNIQUE(library_id,version_text)`. These fields must never be reconstructed from sort order.
+**[not verified]** PostgreSQL deployment and server read-path migration have not yet been executed.
 
-## Library metadata
+## Normalized library metadata
 
-Each library version retains the XML's original contract timestamp as an immutable historical value and the current XML contract timestamp separately. The database adds creation, last-modification and last-seen timestamps. New supersession, extension, dependency or security associations do not reset the version's original timestamp.
+`library.library_id bigint` is the primary identity; `library.library_code` is the unique natural key. General library name, description, supplier, homepage, category, license signal and license notice are stored **once** in `library`, not duplicated into each version.
 
-Library categories are linked to `dom_category`, which has a code, human label, description and notice. The current inventory has 16 distinct categories. The licensing traffic light is linked to `dom_license_signal`; its green/yellow/red meanings follow the XSD's licensing integration contract. The source's name, description, supplier, homepage, artifact type, runtime DLL and individual license metadata are stored by version. The security repository URL/ref/commit are version-scoped, too.
+`library_version` is identified by `(library_id, version_no)` and also enforces `UNIQUE(library_id,version_text)`. The row holds a genuinely version-specific description, optional license notice and alternate license signal, artifact type, runtime DLL, license evidence, security repository identity, SBOM reference and the raw `components_manifest text` from the versioned `bundled-components.json`. The central server may evaluate the manifest on demand.
 
-## Classified relationships
+Original/current XML contract timestamps are separate from created/modified database timestamps. Source categories not yet present in `dom_category` must be inserted when encountered; descriptions and notes can be supplied separately. The domain tables `dom_category`, `dom_license_signal` and `dom_artifact_type` have real foreign keys and documentation fields.
 
-`library_relation` uses a domain code from `dom_relation_type`: `dependency`, `extended`, `supersededBy`, `direct`, `transitive`, `bundled`. `supersededBy` is an explicit edge from the older version to its exact replacement of the same library. `extended` retains shared-source/package mode and its additional extension metadata. Relationships have their own creation, modification and retirement times and optional source-version ordinal validity ranges.
+## Library relationships
 
-## Effective-dated relationships
+`library_relation` is both the association and its dated history. No relation surrogate ID, extension-shared-path table or separate revision table is necessary. The composite primary key includes exact source library/version, target library and effective date. Target version, relationship type and presence are the state recorded at that effective date. The newest effective relationship replaces the older state in the default server display, with the full chronological data available through a history view.
 
-A library relationship is a stable association between two library identities, classified by its relation type. Each new effective-dated revision identifies the precise source and target versions. **The latest effective revision wins** in the server's default relationship display; a prior version remains accessible in the full history. The date of effective change is separate from the database ingestion timestamp.
+`dom_relation_type` includes `dependency`, `extended`, **`supersededBy`**, `direct`, `transitive`, and `bundled`. Technical build sharing paths are kept in BuildEngine's source/build manifests rather than duplicated into the relational server model.
 
-`supersededBy` retains a distinct history for each superseded source version. Other relation types such as `dependency` and `extended` replace previous target versions for the same library pair and relation type. New versions do not silently create multiple active associations. A dated withdrawn revision removes the relationship from the current view without deleting previous observations.
+## XML import logging
 
-The server model provides `v_library_relationships_current`, `v_library_relationships_history`, and `library_relationships_at(timestamptz)` for current and historical display.
+`catalog_sync` records each import attempt of the entire `build-libraries.xml` with source SHA-256, input counts, change counts, start/end times and `diagnostic_summary`. The integer `status_id` references `dom_catalog_sync_status` (running 10, complete 20, partial 30, failed 40). There is no `catalog_generation` or active-generation pointer. CVE lifecycles do not depend on the XML import log.
 
-## Security and assessments
+## CVE and assessment model
 
-The security model preserves globally unique CVE identities, distinct non-CVE advisory aliases, affected component identities, an exact version-to-CVE table, and time-series OSV/NVD/EPSS/KEV provider observations. It includes scan coverage, failed requests, retry evidence and expiry-aware provider caches. The server's default severity view takes the **maximum historically observed CVSS score** while separate views expose chronological scores.
+`cve` stores the independent global CVE identity and the latest narrative. Updated or expanded title, description or references can be written in place; these texts do **not** require historization.
 
-Assessment history stores the six existing reference dimensions: applicability, exposure, effective risk, decision, reason and publication state, with versioned revisions, reviewer, explanation and evidence fingerprints. Historical security observations and assessment revisions are append-only.
+`version_cve` links individual library versions directly to CVEs. No separate component entity is required. `cve_rating` retains a new dated row only when a provider assessment actually changes (e.g. CVSS score, vector, EPSS or KEV). The server displays the historical maximum CVSS via `v_cve_max_severity` and can display the rating timeline.
 
-## Catalog synchronization and reference-data status
+`cve_assessment` records changes in the six previously established assessment dimensions: applicability, exposure, effective risk, decision, reason and publication state. Each dimension has its own integer `dom_` value list and strict foreign key. The row also holds a reviewer, date, comment and evidence. Unchanged evaluations are not inserted again.
 
-The previous `catalog_generation` / `active_catalog_generation` design has been replaced by the simpler `catalog_sync` history. The table records one attempt to import the **entire** `admin/build-libraries.xml`, including its SHA-256, XML schema version, timestamps, counts of inserted/updated/unchanged/rejected/unprocessed records, and a human-readable `diagnostic_summary`.
+Provider scan attempts, copies of whole JSON documents, component inventories and additional revisions were intentionally omitted as unnecessary for the initial server data model.
 
-`catalog_sync.status_id integer` is a foreign key to `dom_catalog_sync_status`, containing the status code, label, description, notice and ordering. The four seeded statuses are `running` (10), `complete` (20), `partial` (30) and `failed` (40). A run is `complete` when all records were processed, even if nothing changed; it is `partial` when some records were accepted but others could not be processed; `failed` is reserved for a complete failure of file import with zero accepted records.
+## Planned runtime integration
 
-Import timestamps and status suffice to retrieve the latest attempt and latest full success through `v_catalog_sync_latest` and `v_catalog_sync_last_complete`, without a mutable active-pointer table. The SHA-256 is indexed but **not unique** because a previously partial run can retry the identical file. Full and partial import diagnostics stay available in the history.
+BuildEngine remains responsible for reading XML and synchronizing the database using `adecc-core-lib`, `defined_type_list`, `Persistent_Systemdata`, and the existing PostgreSQL libpq/libpqxx package. The server is to read database data exclusively, retaining filesystem access for documents, logs and installed artifacts. No unrelated C++ compiler ecosystem or ORM is introduced.
 
-## Future synchronization
-
-BuildEngine will parse and validate the XML as the import source during the FSM workflow, reconcile stable IDs and typed relations, and record its outcome with a typed synchronization status and a diagnostic summary. The HTTP server must then serve catalog/security content exclusively from PostgreSQL, retaining filesystem reads only for documentation, logs and binary artifacts. The implementation must use existing adecc-core-lib, `defined_type_list`, `Persistent_Systemdata` and managed libpq/libpqxx; no new ORM.
-
-Source schema and read-only verification script: [BuildEngine-Server PostgreSQL baseline](https://github.com/adeccscholar/BuildEngine-Server/tree/main/internal/postgresql).
+The single SQL baseline replaces the earlier draft without trying to migrate its unused schema. Its actual deployment and the new C++ data access require verification.
