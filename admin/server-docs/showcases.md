@@ -6,9 +6,21 @@ The BuildEngine central server exposes **[Showcases & Extended Tests](/showcases
 
 The catalog is grouped by source directory. A project directory is recognized when it contains `Description.md` and either an independent `CMakeLists.txt` or a C++Builder `.cbproj`. Directories `bootstrap`, `cmake`, `cache`, `docs`, `docu-server`, build output and Git metadata are excluded from enumeration. Nested groups such as `database/mssql` remain visible.
 
+## Complete test metadata
+
+All **25 standalone BuildEngine-Tests applications** now declare a `showcase.json` manifest. Group-only `database/` is not an executable, and the dedicated `docu-server/` remains excluded as requested. Every manifest provides a concise functional description and a full list of managed package roots referenced by the test, distinguishing `direct: true` for directly consumed APIs from `direct: false` for supporting runtime closure packages.
+
+A manifest may specify `"version": "active"` when its CMake project uses `adecc_package_current_root`. The central server resolves this value against the **unique, non-superseded catalog version on every request**, then displays a version-specific hyperlink. Explicit pinned CMake versions remain pinned. An absent or ambiguous catalog coordinate is reported as unresolved, **never guessed and never linked to a different version**.
+
+External dependencies such as adecc-core-lib, RAD Studio VCL, database servers, ODBC drivers, the Windows OpenGL driver and online weather services are displayed separately because they are not normal BuildEngine package coordinates.
+
+The central showcase detail page embeds the full project's `Description.md`, in addition to links to `build.md`, `SBOM.md` and `LICENSE.md`. Short test descriptions are also present in the source project's own Markdown pages for the independent documentation server.
+
+Temporary source-project provenance was removed from the OpenXlsxGrid, MSSQL and PostgreSQL descriptions; they now document the actual tests and their prerequisites.
+
 ## Versioned relationship model
 
-Each project may contain a `showcase.json` manifest with the following format:
+Each project contains a `showcase.json` manifest with the following format:
 
 ```json
 {
@@ -26,7 +38,7 @@ Each project may contain a `showcase.json` manifest with the following format:
 
 The central server validates exact `library + version` coordinates against `admin/build-libraries.xml`. It never substitutes the latest available version. A project's declared dependencies are linked to **`/library/<library>/<version>/`**. In the other direction, each matching library version page lists the Showcases and Extended Tests that use that coordinate.
 
-For existing projects without `showcase.json`, the server recognizes simple literal `adecc_package_root(...)` or `adecc_package_current_root(...)` declarations in CMake. Those mappings are shown as **partial evidence**, not a complete dependency graph. Add a manifest for an exact and comprehensive relationship.
+As a fallback for future projects without `showcase.json`, the server recognizes simple literal `adecc_package_root(...)` or `adecc_package_current_root(...)` declarations in CMake. Those mappings are shown as **partial evidence**, not a complete dependency graph. Add a manifest for an exact and comprehensive relationship.
 
 ## Routes and presentation
 
