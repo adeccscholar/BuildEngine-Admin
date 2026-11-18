@@ -40,6 +40,14 @@ The central server validates exact `library + version` coordinates against `admi
 
 As a fallback for future projects without `showcase.json`, the server recognizes simple literal `adecc_package_root(...)` or `adecc_package_current_root(...)` declarations in CMake. Those mappings are shown as **partial evidence**, not a complete dependency graph. Add a manifest for an exact and comprehensive relationship.
 
+## Independent executables and operator controls
+
+A standalone test directory may contain several separately runnable programs. The manifest's optional `applications[]` identifies each executable by `name`, concise `summary`, exact one-line `command`, and `interactive` status. The central showcase detail page renders **Individual applications and viewers**, distinguishing GUI applications from headless numerical tests and exposing a separate copyable CMD launch command for each.
+
+The Mandelbrot group now distinguishes `openmp_mandelbrot_benchmark.exe` from `openmp_mandelbrot_viewer.exe`. Its viewer documentation explicitly covers Mandelbrot/Julia switching, scheduling, zoom, pan, iteration and OpenMP thread controls. Similarly, the Galaxy group separates benchmark from OpenGL viewer, and Geospatial lists its benchmark, 2D Skia viewer and 3D terrain viewer. Other interactive examples including Earth, Skia, Physics Arena, PDFium SDL2 and VTK likewise describe their own controls and entry points.
+
+The standalone `Description.md` remains the full technical and operational explanation, and `build.md` keeps one complete CMD command per copyable code block. Applications are **metadata for locally built binaries**, not remotely executed commands; the central server does not start executables over HTTP.
+
 ## Routes and presentation
 
 | Route | Purpose |
