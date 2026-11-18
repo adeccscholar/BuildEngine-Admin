@@ -22,6 +22,7 @@ int main() {
    bool const bPassed = pImPlot != nullptr && ImGui::GetDrawData() != nullptr;
    ImPlot::DestroyContext(pImPlot);
    ImGui::DestroyContext(pImGui);
+   std::println("SMOKE|CHECK|runtime|{}|ImPlot context and draw data created", bPassed ? "PASS" : "FAIL");
    std::println("SMOKE|RESULT|{}|ImPlot DLL consumer", bPassed ? "PASS" : "FAIL");
    return bPassed ? 0 : 1;
 }
