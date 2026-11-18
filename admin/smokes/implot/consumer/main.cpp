@@ -9,6 +9,7 @@ int main() {
    ImPlotContext* const pImPlot = ImPlot::CreateContext();
    ImGui::GetIO().DisplaySize = ImVec2 { 320.0F, 240.0F };
    ImGui::GetIO().DeltaTime = 1.0F / 60.0F;
+   bool const bFontAtlasBuilt = ImGui::GetIO().Fonts->Build();
    ImGui::NewFrame();
    ImGui::Begin("ImPlot");
    std::array<double, 4> const arrX { 0.0, 1.0, 2.0, 3.0 };
@@ -19,7 +20,7 @@ int main() {
    }
    ImGui::End();
    ImGui::Render();
-   bool const bPassed = pImPlot != nullptr && ImGui::GetDrawData() != nullptr;
+   bool const bPassed = bFontAtlasBuilt && pImPlot != nullptr && ImGui::GetDrawData() != nullptr;
    ImPlot::DestroyContext(pImPlot);
    ImGui::DestroyContext(pImGui);
    std::println("SMOKE|CHECK|runtime|{}|ImPlot context and draw data created", bPassed ? "PASS" : "FAIL");
