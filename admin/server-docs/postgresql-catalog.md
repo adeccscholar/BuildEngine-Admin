@@ -151,6 +151,34 @@ See [configuration](configuration.md) and the
 [PostgreSQL technical README](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/README.md)
 for exact settings and known limitations.
 
+## Versioned library security summary (19 November 2026)
+
+The PostgreSQL-backed library and package detail pages now include an
+explicit **Security and vulnerability status** section ahead of the
+library metadata table. The summary uses the same current PostgreSQL
+security evidence and dependency closure as the detailed Security view:
+direct and transitive CVE counts, highest observed technical severity,
+CISA KEV status, scan gaps, affected dependency links and the current
+reviewed root-version assessment. The existing full Security view,
+CVE catalog, dependency information and package actions remain available.
+
+The license suitability badge is **not** a security verdict. Technical
+severity and the current reviewed risk assessment are distinct. An
+incomplete scan must not be presented as a successfully verified green
+security status, and known transitive CVEs require an explicit review
+warning even where an affected dependency does not expose a numeric
+CVSS. Reviewed root-version assessments must not be misrepresented as
+review of all transitive components.
+
+The PostgreSQL projection uses explicit column aliases for every
+repeated expression or column name. This corrects incorrect supplier,
+homepage and artifact-type display values and incorrect successor and
+dependency coordinates caused by name-based result lookup in the typed
+database API. No XML, project or database-schema changes are required.
+
+Source implementation is committed; native BCC64X compilation and
+browser verification remain **[not verified]**.
+
 ## Standalone CVE catalog and historical charts (19 November 2026)
 
 The existing `/security/` and `/security/check/` pages retain the installed
