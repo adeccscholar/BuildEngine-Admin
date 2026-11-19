@@ -127,3 +127,21 @@ SQL bootstrap, SSPI login or HTTP integration test has yet been verified.
 See [configuration](configuration.md) and the
 [PostgreSQL technical README](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/README.md)
 for exact settings and known limitations.
+
+## Existing-schema migration (19 November 2026)
+
+The synchronized `admin/buildengine.sql` contains an explicitly delimited
+`EXISTING-SCHEMA-UPGRADE` section. On each enabled BuildEngine startup, the
+writer applies that idempotent, transaction-scoped section if schema
+`buildengine` already exists. The migration adds all eight columns introduced
+after the initial library-version baseline (`in_catalog`, `source_file`,
+`sbom_document`, `license_info_document`, `artifact_manifest`,
+`package_present`, `documentation_present`, `cache_checked_at`), the six
+new scope, tool, showcase and security-status domain/cache tables, their
+reference values and supporting views. Original XML contract timestamps,
+version identity and recorded CVE assessments are not intentionally modified.
+
+The code no longer treats the existence of a schema as sufficient proof of
+compatibility. A future incompatible schema change requires another explicit,
+reviewed migration. This migration is source-reviewed but **not yet verified**
+against the user's live PostgreSQL database.
