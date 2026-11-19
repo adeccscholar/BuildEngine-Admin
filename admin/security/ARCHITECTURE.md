@@ -78,9 +78,9 @@ not fictional, synthetic 'toy' security data.
 
 `<assessment operation="...">` accepts `Standard` (implicit default),
 `Replace` and `Delete`. Each operation addresses a single exact
-`library/version/CVE/changedAt` assessment identity. Standard appends dated
-revisions and rejects same-time conflicting content; Replace changes an
-already existing revision; Delete removes the exact dated revision while
+`library/version/CVE/changedAt` assessment identity. Standard inserts or updates timestamp-keyed
+revisions; Replace replaces all prior assessment revisions for the exact
+library/version/CVE; Delete removes all local review revisions for that coordinate while
 keeping CVE/provider and version-relation history intact. This enables
 exceptional repair of incorrect review data without rewriting the global
 vulnerability catalog. The XML/Git history remains the administrative record
