@@ -702,7 +702,7 @@ INSERT INTO buildengine.dom_library_state(state_id,state_code,description,notice
    (60,'metadata','License and SBOM generation completed',''),
    (70,'publish','Publication scope completed',''),
    (80,'documentation','Documentation scope completed','May contain dynamically materialized scopes.'),
-   (90,'ready','Logical library ready state','Derived from the FSM ON CONFLICT DO NOTHING;
+   (90,'ready','Logical library ready state','Derived from the FSM; no separate state file.') ON CONFLICT DO NOTHING;
 
 INSERT INTO buildengine.dom_security_query_status VALUES
    (10,'not-scanned','Version has not yet been checked',''),
