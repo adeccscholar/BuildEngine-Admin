@@ -81,3 +81,44 @@ Every package must provide a reproducible source checksum, CMake/Ninja command, 
 - CGAL: https://github.com/CGAL/cgal/releases
 - libigl: https://github.com/libigl/libigl/releases
 - xtensor: https://github.com/xtensor-stack/xtensor/releases
+
+
+## Further shortlisted game/audio libraries (recovered discussion)
+
+These candidates complement, rather than replace, the original nine-library
+integration plan. They are included in the Server's 19 November brainstorming
+news, where DeckKernel is the common reference project.
+
+| Candidate | Proposed release | Integration relation | DeckKernel value and acceptance |
+| --- | --- | --- | --- |
+| OpenAL Soft | 1.25.2, confirm upstream tag and checksum | Spatial audio backend independent of SDL2/SDL3 and miniaudio; compare alternatives before committing both | Optional positioning and effect feedback; no demonstrated recognition benefit |
+| miniaudio | Pin release after verification | Small native audio engine with documented `ma_sound_set_fade_in_milliseconds` / `ma_sound_set_fade_in_pcm_frames`; no OpenAL dependency implied | Strong candidate for short fade-in/fade-out, accept/reject feedback, rapid event cancellation; profile impact on camera loop |
+| ENet | 1.3.18, confirm source and compatibility | Reliable UDP networking independent of curl's HTTPS API, optional remote-session layer | Low priority until multiplayer or remote tabletop requirement is documented |
+| Recast Navigation / Detour | 1.6.0, verify source/release and parts | Navigation mesh/pathfinding complementary to Jolt/CGAL; not a hard dependency of either | Relevant for 3D tabletop or game showcase, not OCR or database ingestion |
+| Ozz Animation | Pin release after verification | Skeletal animation runtime; optional Assimp-to-engine asset conversion pipeline | Optional polished 3D DeckKernel presentation, no camera detection dependency |
+
+The existing managed `sdl3@3.4.20` and `box2d@3.2.0` are retained as reference
+points, not counted again as candidate packages. OpenAL Soft was in the earlier
+shortlist; **miniaudio is an additional candidate specifically because fading is
+a documented first-class audio operation**. We do not attribute miniaudio's
+function names to OpenAL Soft.
+
+For an independent first feasibility gate, prefer the low-impact miniaudio
+consumer in BuildEngine-Tests and a reference DeckKernel sound-effects proof
+without modifying camera recognition behavior. For 3D showcase integration,
+advance Jolt/Recast and Assimp/Ozz independently, preserving the distinction
+between compile dependencies and optional application pipelines.
+
+## SQL delivery convention
+
+Every future PostgreSQL database change must be accompanied by exactly two
+named SQL deliverables: `admin/BuildEngine.sql` is the updated comprehensive
+greenfield definition and `admin/Update_1.sql` is the incremental update for
+an earlier installation. Subsequent increments use `Update_2.sql`,
+`Update_3.sql` etc. Both are mirrored in the Server's PostgreSQL directory.
+The obsolete lowercase `buildengine.sql` path is maintained as a byte-identical
+compatibility alias until its configuration references are migrated.
+
+Assessment XML remains the only interchange medium; its dated
+`(library, version, CVE, changedAt)` identity and build contract timestamp
+control idempotency, historical changes and stale effective-risk decisions.
