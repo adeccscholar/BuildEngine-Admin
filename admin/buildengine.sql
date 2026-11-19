@@ -760,6 +760,13 @@ COMMIT;
 ALTER TABLE buildengine.cve_assessment
    ADD COLUMN IF NOT EXISTS evaluated_contract_timestamp timestamptz;
 
+-- PostgreSQL expands SELECT * when a view is created; refresh the projection
+-- after the newly added contract column, preserving existing view identity.
+CREATE OR REPLACE VIEW buildengine.v_cve_assessment_current AS
+SELECT DISTINCT ON (library_id,version_no,cve_id) *
+FROM buildengine.cve_assessment
+ORDER BY library_id,version_no,cve_id,changed_at DESC;
+
 CREATE OR REPLACE FUNCTION buildengine.import_cve_assessments_xml(str_document text)
 RETURNS bigint
 LANGUAGE plpgsql
