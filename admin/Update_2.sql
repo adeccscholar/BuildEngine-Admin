@@ -62,14 +62,21 @@ BEGIN
          RAISE EXCEPTION 'Unknown assessment operation: %',str_operation;
       END IF;
       IF the_record.library_code IS NULL OR the_record.version_text IS NULL
-         OR the_record.cve_code IS NULL OR the_record.changed_at IS NULL THEN
-         RAISE EXCEPTION 'Assessment identity (library, version, CVE, changedAt) is required';
+         OR the_record.cve_code IS NULL THEN
+         RAISE EXCEPTION 'Assessment identity (library, version, CVE) is required';
       END IF;
       IF the_record.cve_code !~ '^CVE-[0-9]{4}-[0-9]{4,}$' THEN
          RAISE EXCEPTION 'Invalid CVE code: %',the_record.cve_code;
       END IF;
-      the_timestamp := the_record.changed_at::timestamptz;
-      IF the_timestamp > clock_timestamp() THEN
+      IF str_operation<>'Delete' AND the_record.changed_at IS NULL THEN
+         RAISE EXCEPTION 'Standard and Replace require changedAt';
+      END IF;
+      IF the_record.changed_at IS NOT NULL THEN
+         the_timestamp := the_record.changed_at::timestamptz;
+      ELSE
+         the_timestamp := NULL;
+      END IF;
+      IF the_timestamp IS NOT NULL AND the_timestamp > clock_timestamp() THEN
          RAISE EXCEPTION 'Future-dated assessment is not accepted: %',the_record.changed_at;
       END IF;
       SELECT l.library_id,v.version_no INTO i_library,i_version
@@ -85,11 +92,11 @@ BEGIN
       IF str_operation='Delete' THEN
          -- Delete is idempotent and never inserts a CVE or a provider finding.
          -- A missing assessment is already in the requested final state.
+         -- Delete removes every review revision for this library/version/CVE.
          DELETE FROM buildengine.cve_assessment AS a
          USING buildengine.cve AS c
          WHERE a.library_id=i_library AND a.version_no=i_version
-           AND a.cve_id=c.cve_id AND c.cve_code=the_record.cve_code
-           AND a.changed_at=the_timestamp;
+           AND a.cve_id=c.cve_id AND c.cve_code=the_record.cve_code;
          GET DIAGNOSTICS i_affected=ROW_COUNT;
          i_modified:=i_modified+i_affected;
          CONTINUE;
@@ -121,9 +128,9 @@ BEGIN
             the_record.library_code,the_record.version_text,the_record.cve_code;
       END IF;
 
-      IF str_operation='Standard' THEN
-         -- Provider findings and the historical version/CVE relation survive
-         -- assessment updates and deletes.
+      IF str_operation IN ('Standard','Replace') THEN
+         -- The provider identity and version/CVE relation are always retained.
+         -- Replace intentionally resets historical assessment revisions only.
          INSERT INTO buildengine.cve(cve_code,title)
          VALUES(the_record.cve_code,'Awaiting independent provider record')
          ON CONFLICT(cve_code) DO NOTHING;
@@ -134,18 +141,14 @@ BEGIN
             jsonb_build_object('origin','assessment-xml',
                'assessmentChangedAt',the_timestamp::text)::text)
          ON CONFLICT(library_id,version_no,cve_id) DO NOTHING;
-      ELSE
-         -- Replace is an exceptional correction of an existing assessment:
-         -- do not create an otherwise unknown provider or version-CVE link.
-         SELECT a.cve_id INTO i_cve FROM buildengine.cve_assessment AS a
-         JOIN buildengine.cve AS c USING(cve_id)
-         WHERE a.library_id=i_library AND a.version_no=i_version
-           AND c.cve_code=the_record.cve_code AND a.changed_at=the_timestamp;
-         IF i_cve IS NULL THEN
-            RAISE EXCEPTION 'Replace target assessment not found: %@% % %',
-               the_record.library_code,the_record.version_text,
-               the_record.cve_code,the_timestamp;
-         END IF;
+      END IF;
+      IF str_operation='Replace' THEN
+         -- Exceptional authoritative replacement: remove all old revisions
+         -- for this one CVE/version and install the supplied new review.
+         DELETE FROM buildengine.cve_assessment
+         WHERE library_id=i_library AND version_no=i_version AND cve_id=i_cve;
+         GET DIAGNOSTICS i_affected=ROW_COUNT;
+         i_modified:=i_modified+i_affected;
       END IF;
 
       SELECT applicability_id,exposure_id,effective_risk_id,decision_id,
@@ -168,11 +171,6 @@ BEGIN
                 the_contract_timestamp) THEN
             CONTINUE; -- identical content always remains idempotent
          END IF;
-         IF str_operation='Standard' THEN
-            RAISE EXCEPTION 'Conflicting assessment at %@% % %; use Replace explicitly',
-               the_record.library_code,the_record.version_text,
-               the_record.cve_code,the_timestamp;
-         END IF;
          UPDATE buildengine.cve_assessment
          SET applicability_id=i_applicability,exposure_id=i_exposure,
              effective_risk_id=i_risk,decision_id=i_decision,reason_id=i_reason,
@@ -186,11 +184,6 @@ BEGIN
          CONTINUE;
       END IF;
 
-      IF str_operation='Replace' THEN
-         RAISE EXCEPTION 'Replace target assessment not found: %@% % %',
-            the_record.library_code,the_record.version_text,
-            the_record.cve_code,the_timestamp;
-      END IF;
       INSERT INTO buildengine.cve_assessment(
          library_id,version_no,cve_id,changed_at,reviewer,applicability_id,
          exposure_id,effective_risk_id,decision_id,reason_id,publication_state_id,
@@ -203,7 +196,6 @@ BEGIN
    RETURN i_modified;
 END;
 $assessment_import$;
-
 REVOKE ALL ON FUNCTION buildengine.import_cve_assessments_xml(text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION buildengine.import_cve_assessments_xml(text)
    TO buildengine_user;
