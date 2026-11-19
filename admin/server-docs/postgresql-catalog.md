@@ -4,7 +4,7 @@
 
 The optional central server catalog uses PostgreSQL in the local database `BuildEngine` (default localhost:5432). All tables, value lists, foreign keys and views are defined in **one** file: [BuildEngine-Admin/admin/buildengine.sql](https://github.com/adeccscholar/BuildEngine-Admin/blob/main/admin/buildengine.sql). Superseded `001-buildengine.sql`, `002-security.sql` and `verify-baseline.sql` have been deleted.
 
-**[not verified]** PostgreSQL deployment and full HTTP migration have not been executed. The current source tree contains a PostgreSQL writer and a read-only JSON catalog source, but live execution is unverified and HTML/CVE paths are not yet migrated.
+**[not verified]** The database-backed HTTP pages and PostgreSQL CVE persistence are implemented in source, but the final server binary has not yet been compiled or exercised against the target Windows/BCC64X/PostgreSQL deployment. The writer catalog import has been exercised by the project operator.
 
 ## Normalized library metadata
 
@@ -111,18 +111,41 @@ tool registration and showcase manifests.
 The central server now reads database host, name, role, SSPI and security
 settings from the **same** `BuildEngine.xml` through
 `BuildEngine-Common`. A PostgreSQL reader is wired to the JSON endpoints for
-catalog, versions, dependencies, usage, tools and states. The full HTML
-presentation and CVE findings worker still use the existing filesystem and
-independent memory snapshot. These are outstanding migrations, not completed
-database cache coverage.
+catalog, versions, dependencies, usage, tools, states, stored SBOMs,
+transitive risk and persisted CVE findings. In PostgreSQL mode the server
+also renders its catalog, package, dashboard, status, showcase and security
+HTML directly from SQL queries; the seven filesystem-generated overview
+snapshots are not rebuilt. The PostgreSQL presentation currently uses a
+simpler, table-based renderer rather than the complete interaction set of
+the historical filesystem HTML UI. Generated documentation and binary
+artifacts remain separately served from their original files.
+
+When server security refresh is enabled, the provider scan still runs
+outside HTTP request handling. The completed result is committed through
+a separate typed PostgreSQL **writer** connection before the memory
+snapshot is published. This writes `cve`, `version_cve`,
+`version_security_status` and append-only provider `cve_rating` changes.
+CVSS candidates are retained separately for OSV, CVE.org and NVD;
+EPSS and KEV use their own source identities. A repeated identical
+provider value does not produce a new history row. Multiple library
+versions referencing one CVE do not create additional rating revisions
+within one completed scan. A scan with provider/enrichment failures has
+incomplete rather than successful coverage.
+
+The `cve_assessment` domain is reserved for explicit reviewer judgments:
+the automated provider scan does not invent an applicability, exposure,
+risk, decision or publication judgment. In-memory partial scan progress
+is still a temporary observation and is not committed as a completed
+database scan. Without PostgreSQL the previous filesystem/memory
+compatibility behavior remains available.
 
 The separate private C++ dependencies are rooted at `../adecc` and
 `../ThirdParty/libpq`, `../ThirdParty/libpqxx` at the project root,
 rather than at the package installation controlled by BuildEngine's XML.
 The SQL database and writer/reader login roles require PostgreSQL
 administrator provisioning; the first enabled writer run creates the
-`buildengine` schema and schema contents if absent. No actual BCC64X link,
-SQL bootstrap, SSPI login or HTTP integration test has yet been verified.
+`buildengine` schema and schema contents if absent. The updated server has not yet passed a BCC64X link, SSPI writer/reader
+authentication test or end-to-end HTTP/CVE history integration test.
 
 See [configuration](configuration.md) and the
 [PostgreSQL technical README](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/README.md)
@@ -145,3 +168,33 @@ The code no longer treats the existence of a schema as sufficient proof of
 compatibility. A future incompatible schema change requires another explicit,
 reviewed migration. This migration is source-reviewed but **not yet verified**
 against the user's live PostgreSQL database.
+
+
+### Separate writer identity for CVE collection
+
+The HTTP PostgreSQL reader remains `buildengine_reader` and has no
+write privileges. The automated CVE refresh creates its own connection
+using the configured `databaseWriterUser` (normally `buildengine_user`).
+This connection is instantiated only after a completed scan is available
+for persistence. The writer identity must be authorized separately in
+PostgreSQL. Running a writer connection inside the server process increases
+the privileges available to that process: this is a deployment security
+decision, not an isolation boundary. A separately isolated CVE worker
+under a distinct Windows security principal would offer stronger
+least-privilege separation. No password is committed to the repository.
+
+For an optional database, a failed startup reader connection falls back to
+filesystem compatibility mode. A failure to persist an otherwise completed
+CVE scan must remain visible as an error and must not be silently marked
+as stored in PostgreSQL.
+
+### Rating chronology
+
+`cve_rating` uses the existing key
+`(cve_id, source_id, changed_at)`. On each completed scan, compare
+provider evaluation fields with the latest row for that same CVE and
+provider using null-safe comparisons. Insert only if a value differs;
+a successful refresh with unchanged values updates the CVE's
+`last_checked_at` without making a new rating revision. CVE narrative
+text remains current-state information, while `version_cve` holds
+package-specific evidence and last-seen timestamps.
