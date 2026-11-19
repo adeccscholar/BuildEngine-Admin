@@ -609,4 +609,142 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA buildengine
 -- function individually before granting it to the service role.
 ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 
+-- EXISTING-SCHEMA-UPGRADE-BEGIN
+
+-- Idempotent migration from the original 18 November 2026 catalog baseline.
+
+-- Preserve all library/version identities, original timestamps, and CVE history.
+
+ALTER TABLE buildengine.library_version ADD COLUMN IF NOT EXISTS in_catalog boolean NOT NULL DEFAULT true;
+
+ALTER TABLE buildengine.library_version ADD COLUMN IF NOT EXISTS source_file text;
+
+ALTER TABLE buildengine.library_version ADD COLUMN IF NOT EXISTS sbom_document text;
+
+ALTER TABLE buildengine.library_version ADD COLUMN IF NOT EXISTS license_info_document text;
+
+ALTER TABLE buildengine.library_version ADD COLUMN IF NOT EXISTS artifact_manifest text;
+
+ALTER TABLE buildengine.library_version ADD COLUMN IF NOT EXISTS package_present boolean NOT NULL DEFAULT false;
+
+ALTER TABLE buildengine.library_version ADD COLUMN IF NOT EXISTS documentation_present boolean NOT NULL DEFAULT false;
+
+ALTER TABLE buildengine.library_version ADD COLUMN IF NOT EXISTS cache_checked_at timestamptz;
+
+CREATE TABLE IF NOT EXISTS buildengine.dom_library_state (
+   state_id integer PRIMARY KEY,
+   state_code text NOT NULL UNIQUE,
+   description text NOT NULL,
+   notice text NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS buildengine.dom_security_query_status (
+   status_id integer PRIMARY KEY,
+   status_code text NOT NULL UNIQUE,
+   description text NOT NULL,
+   notice text NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS buildengine.library_scope_state (
+   library_id bigint NOT NULL,
+   version_no bigint NOT NULL,
+   state_id integer NOT NULL
+      REFERENCES buildengine.dom_library_state(state_id),
+   scope_name text NOT NULL,
+   source_contract_timestamp text NOT NULL,
+   evidence_file text NOT NULL,
+   completed_at timestamptz,
+   checked_at timestamptz NOT NULL DEFAULT clock_timestamp(),
+   CONSTRAINT pk_library_scope_state PRIMARY KEY(
+      library_id,version_no,state_id,scope_name),
+   CONSTRAINT fk_library_scope_version FOREIGN KEY(library_id,version_no)
+      REFERENCES buildengine.library_version(library_id,version_no),
+   CONSTRAINT ck_library_scope_name CHECK(length(btrim(scope_name))>0),
+   CONSTRAINT ck_library_scope_timestamp CHECK(length(btrim(source_contract_timestamp))>0),
+   CONSTRAINT ck_library_scope_file CHECK(length(btrim(evidence_file))>0)
+);
+
+CREATE TABLE IF NOT EXISTS buildengine.tool_cache (
+   tool_code text PRIMARY KEY,
+   tool_version text,
+   tool_kind text,
+   registered_path text,
+   is_available boolean NOT NULL DEFAULT false,
+   checked_at timestamptz NOT NULL DEFAULT clock_timestamp()
+);
+
+CREATE TABLE IF NOT EXISTS buildengine.showcase_cache (
+   showcase_path text PRIMARY KEY,
+   showcase_manifest text,
+   is_available boolean NOT NULL DEFAULT false,
+   checked_at timestamptz NOT NULL DEFAULT clock_timestamp(),
+   CONSTRAINT ck_showcase_cache_path CHECK(length(btrim(showcase_path))>0)
+);
+
+CREATE TABLE IF NOT EXISTS buildengine.version_security_status (
+   library_id bigint NOT NULL,
+   version_no bigint NOT NULL,
+   status_id integer NOT NULL DEFAULT 10
+      REFERENCES buildengine.dom_security_query_status(status_id),
+   checked_at timestamptz,
+   diagnostic_summary text NOT NULL DEFAULT '',
+   PRIMARY KEY(library_id,version_no),
+   CONSTRAINT fk_security_status_version FOREIGN KEY(library_id,version_no)
+      REFERENCES buildengine.library_version(library_id,version_no)
+);
+
+INSERT INTO buildengine.dom_library_state(state_id,state_code,description,notice) VALUES
+   (10,'source','Source preparation completed',''),
+   (20,'build','Compilation/link scope completed','Scope can distinguish Debug and Release.'),
+   (30,'test','Library tests completed',''),
+   (40,'validation','Validation scope completed',''),
+   (50,'install','Installation scope completed',''),
+   (60,'metadata','License and SBOM generation completed',''),
+   (70,'publish','Publication scope completed',''),
+   (80,'documentation','Documentation scope completed','May contain dynamically materialized scopes.'),
+   (90,'ready','Logical library ready state','Derived from the FSM ON CONFLICT DO NOTHING;
+
+INSERT INTO buildengine.dom_security_query_status VALUES
+   (10,'not-scanned','Version has not yet been checked',''),
+   (20,'scanned','Version has a complete recorded security check','A zero-CVE result is meaningful only here.'),
+   (30,'incomplete','Not every required source could be evaluated',''),
+   (40,'failed','Version security evaluation failed','') ON CONFLICT DO NOTHING;
+
+CREATE INDEX IF NOT EXISTS ix_library_scope_state_current ON
+   buildengine.library_scope_state(library_id,version_no,state_id,completed_at);
+
+CREATE OR REPLACE VIEW buildengine.v_library_runtime_cache AS
+SELECT v.library_id,v.version_no,v.version_text,
+       v.package_present,v.documentation_present,
+       v.sbom_sha256,v.sbom_path,
+       v.sbom_document IS NOT NULL AS sbom_available,
+       v.license_info_document IS NOT NULL AS license_info_available,
+       v.artifact_manifest IS NOT NULL AS artifact_manifest_available,
+       v.cache_checked_at,
+       ss.status_code AS security_status,
+       sec.checked_at AS security_checked_at,sec.diagnostic_summary AS security_diagnostic
+FROM buildengine.library_version AS v
+LEFT JOIN buildengine.version_security_status AS sec
+   USING(library_id,version_no)
+LEFT JOIN buildengine.dom_security_query_status AS ss
+   ON ss.status_id=sec.status_id;
+
+CREATE OR REPLACE VIEW buildengine.v_library_state_cache AS
+SELECT sc.library_id,sc.version_no,sc.state_id,d.state_code,
+       COUNT(*) AS expected_scopes,
+       COUNT(sc.completed_at) AS completed_scopes,
+       bool_and(sc.completed_at IS NOT NULL) AS is_complete,
+       CASE WHEN bool_and(sc.completed_at IS NOT NULL)
+            THEN MAX(sc.completed_at) ELSE NULL END AS completed_at,
+       MAX(sc.checked_at) AS last_checked_at
+FROM buildengine.library_scope_state AS sc
+JOIN buildengine.dom_library_state AS d USING(state_id)
+GROUP BY sc.library_id,sc.version_no,sc.state_id,d.state_code;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA buildengine TO buildengine_reader;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA buildengine GRANT SELECT ON TABLES TO buildengine_reader;
+
+-- EXISTING-SCHEMA-UPGRADE-END
+
 COMMIT;
