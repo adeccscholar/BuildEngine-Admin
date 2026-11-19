@@ -23,6 +23,54 @@ Related documents:
 - [Server and REST interface](server.md)
 - [Tool contract](build-tools.md)
 
+## Optional PostgreSQL server catalog (November 2026)
+
+The root `BuildEngine.xml` is read through the common
+`BuildEngineConfiguration` by **both** the BuildEngine executable and the
+BuildEngineDocServer. The XML build contract and the filesystem `.state`
+timestamps remain authoritative. PostgreSQL is an optional, independently
+reconstructible server cache and never authorizes FSM work.
+
+All of these optional settings are attributes of the existing
+`<parameters>` element (schema version 5):
+
+| Attribute | Default | Purpose |
+| --- | --- | --- |
+| `databaseEnabled` | `false` | Disable all PostgreSQL operations unless explicitly enabled |
+| `databaseRequired` | `false` | Make connection/cache failures fatal instead of using filesystem compatibility mode |
+| `databaseHost` | `localhost` | Database server hostname |
+| `databasePort` | `5432` | PostgreSQL TCP port |
+| `databaseName` | `BuildEngine` | Target database |
+| `databaseWriterUser` | `buildengine_user` | Writer and schema owner for the BuildEngine executable |
+| `databaseReaderUser` | `buildengine_reader` | Read-only service identity for the HTTP server |
+| `databaseAuth` | `integrated` | `integrated` for Windows SSPI, or `password` |
+| `databasePasswordEnv` | none | Environment-variable name used only for password mode; no XML password |
+| `databaseSslMode` | `prefer` | libpq SSL policy |
+| `databaseGssEncMode` | `disable` | libpq GSS encryption policy |
+| `databaseSchemaFile` | none | Path to the single checked-in SQL baseline, resolved relative to BuildEngine.xml |
+
+For a first enabled run, set `databaseSchemaFile` to the location of
+`BuildEngine-Server/internal/postgresql/buildengine.sql`. The
+**database itself and both PostgreSQL login roles must already exist**;
+the writer creates the `buildengine` schema and schema objects from the
+baseline when missing, then imports the complete source XML. No bootstrap
+depends on the versions of `libpq` and `libpqxx` built by the FSM:
+application dependencies are supplied independently from `../ThirdParty`
+and adecc headers from `../adecc`.
+
+The full source SHA-256 is compared to the latest **completed** XML import.
+Changing the source triggers a complete relational reconciliation of
+libraries, versions and relationships, while filesystem state evidence is
+rechecked on every run. Exact completion timestamps are mirrored only after
+the authoritative `.state` write succeeds. Server JSON APIs for catalog,
+versions, dependencies, usage, tools and scopes have a read-only PostgreSQL
+adapter. HTML page rendering, independent CVE ingestion and security routes
+have **not** yet been migrated.
+
+**[not verified]** BCC64X linking, PostgreSQL first-run initialization,
+SSPI authentication and end-to-end HTTP behavior still require live tests.
+See the [PostgreSQL schema documentation](postgresql-catalog.md).
+
 ## October 2026 local configuration checklist
 
 For the current catalog (**95 library versions / 62 IDs**), keep the
