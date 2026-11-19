@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Authoritative exchange document. Individual decisions are dated and retained in PostgreSQL. -->
+<!--
+ Assessment import operation (optional):
+   operation="Standard" : default when missing; insert a new dated assessment,
+                          replay identical content, reject changed same-time data
+   operation="Replace"  : explicitly correct an existing assessment at the same
+                          library/version/CVE/changedAt key
+   operation="Delete"   : remove the specified assessment at that key; only
+                          identity attributes are required
+ Neither Replace nor Delete alters CVE identities, affected-version relations,
+ or provider CVSS/EPSS/KEV data. Date/time must include timezone offset.
+-->
 <assessments>
    <assessment library="curl" version="8.21.0" contractTimestamp="2026-08-29T23:18:00Z" cve="CVE-2026-92392"
       changedAt="2026-11-19T20:36:00+01:00" reviewer="OpenAI GPT-6"
