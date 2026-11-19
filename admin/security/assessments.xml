@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Authoritative exchange document. Individual decisions are dated and retained in PostgreSQL. -->
+<assessments>
+   <assessment library="curl" version="8.21.0" cve="CVE-2026-92392"
+      changedAt="2026-11-19T20:36:00+01:00" reviewer="OpenAI GPT-6"
+      applicability="not-applicable" exposure="not-included-in-build"
+      effectiveRisk="none" decision="fixed-by-configuration"
+      reason="affected-feature-disabled" publication="shared">
+      <comment>curl upstream 8.21.0 contains an HTTP/2 use-after-free, but the BuildEngine catalog explicitly configures USE_NGHTTP2=OFF. The affected HTTP/2 upload code path is unavailable in the declared BuildEngine build. This assessment is conditioned on the actual native build honoring that flag and must be reopened if HTTP/2 is enabled.</comment>
+      <evidence>catalog=admin/build-libraries.xml;coordinate=curl@8.21.0;flag=-DUSE_NGHTTP2:BOOL=OFF;advisory=https://curl.se/docs/CVE-2026-92392.html;upstreamFix=8b0744af5b1b631da5b938ca31c;runtimeArtifactVerification=outstanding</evidence>
+   </assessment>
+   <assessment library="curl" version="8.23.0" cve="CVE-2026-92392"
+      changedAt="2026-11-19T20:36:00+01:00" reviewer="OpenAI GPT-6"
+      applicability="not-applicable" exposure="not-included-in-build"
+      effectiveRisk="none" decision="fixed-by-update"
+      reason="updated-version" publication="shared">
+      <comment>curl 8.23.0 contains the upstream fix; BuildEngine additionally disables nghttp2. The historic CVE relation is retained for traceability, not interpreted as an unmitigated finding for this source version.</comment>
+      <evidence>catalog=admin/build-libraries.xml;coordinate=curl@8.23.0;flag=-DUSE_NGHTTP2:BOOL=OFF;advisory=https://curl.se/docs/CVE-2026-92392.html;upstreamFix=8b0744af5b1b631da5b938ca31c</evidence>
+   </assessment>
+   <assessment library="openssl" version="3.5.8" cve="CVE-2026-84782"
+      changedAt="2026-11-19T20:36:00+01:00" reviewer="OpenAI GPT-6"
+      applicability="unknown" exposure="unknown"
+      effectiveRisk="unknown" decision="needs-investigation"
+      reason="other" publication="shared">
+      <comment>OpenSSL upstream confirms 3.5.8 is within the affected DTLS retransmission range. The current source contract does not prove DTLS disabled, nor that a DTLS consumer is deployed. Do not neutralize based solely on an assumption that only TLS is used.</comment>
+      <evidence>catalog=admin/build-libraries.xml;coordinate=openssl@3.5.8;advisory=https://openssl-library.org/news/vulnerabilities-3.5/index.html;fixVersion=3.5.9;compiledFeatureApplicability=unverified</evidence>
+   </assessment>
+   <assessment library="openssl" version="3.5.9" cve="CVE-2026-84782"
+      changedAt="2026-11-19T20:36:00+01:00" reviewer="OpenAI GPT-6"
+      applicability="not-applicable" exposure="unknown"
+      effectiveRisk="none" decision="fixed-by-update"
+      reason="updated-version" publication="shared">
+      <comment>OpenSSL 3.5.9 is the upstream security patch release for this CVE. Retain historical association, distinguish the version fix from any local patch, and ensure the expected DLL is the one installed.</comment>
+      <evidence>catalog=admin/build-libraries.xml;coordinate=openssl@3.5.9;advisory=https://openssl-library.org/news/vulnerabilities-3.5/index.html;upstreamFixedVersion=3.5.9</evidence>
+   </assessment>
+   <assessment library="libpng" version="1.6.58" cve="CVE-2026-46675"
+      changedAt="2026-11-19T20:36:00+01:00" reviewer="OpenAI GPT-6"
+      applicability="unknown" exposure="unknown"
+      effectiveRisk="unknown" decision="needs-investigation"
+      reason="other" publication="shared">
+      <comment>The historical version is in the published affected range. No local patch for this CVE is established by the available build evidence; do not mark it fixed. Assess whether the vulnerable compressed ancillary chunk handling is reachable in deployed consumers.</comment>
+      <evidence>catalog=admin/build-libraries.xml;coordinate=libpng@1.6.58;advisory=https://libpng.org/pub/png/libpng.html;upstreamFixedVersion=1.6.59</evidence>
+   </assessment>
+   <assessment library="libpng" version="1.6.59" cve="CVE-2026-46675"
+      changedAt="2026-11-19T20:36:00+01:00" reviewer="OpenAI GPT-6"
+      applicability="not-applicable" exposure="unknown"
+      effectiveRisk="none" decision="fixed-by-update"
+      reason="updated-version" publication="shared">
+      <comment>Upstream 1.6.59 includes the read-after-free correction. This assessment is based on the pinned upstream source release rather than a claim about local patching.</comment>
+      <evidence>catalog=admin/build-libraries.xml;coordinate=libpng@1.6.59;advisory=https://libpng.org/pub/png/libpng.html;fixCommit=aa77ef38c17ab2fc1b41bec09fb973c6a386641d</evidence>
+   </assessment>
+   <assessment library="libjpeg-turbo" version="3.2.0" cve="CVE-2026-75466"
+      changedAt="2026-11-19T20:36:00+01:00" reviewer="OpenAI GPT-6"
+      applicability="unknown" exposure="unknown"
+      effectiveRisk="unknown" decision="needs-investigation"
+      reason="other" publication="shared">
+      <comment>This CVE concerns a specialized high-bit-depth TurboJPEG PNG loading API. Standard JPEG decoding does not reach the vulnerable path, but the BuildEngine artifact and consumer API use have not been checked sufficiently to close the finding.</comment>
+      <evidence>catalog=admin/build-libraries.xml;coordinate=libjpeg-turbo@3.2.0;advisory=https://access.redhat.com/security/cve/cve-2026-75466;upstreamFixedVersion=3.2.1</evidence>
+   </assessment>
+   <assessment library="libjpeg-turbo" version="3.2.1" cve="CVE-2026-75466"
+      changedAt="2026-11-19T20:36:00+01:00" reviewer="OpenAI GPT-6"
+      applicability="not-applicable" exposure="unknown"
+      effectiveRisk="none" decision="fixed-by-update"
+      reason="updated-version" publication="shared">
+      <comment>Upstream release 3.2.1 contains the fix for the specialized TurboJPEG PNG loader. No runtime-disabling claim is needed for the fixed source version.</comment>
+      <evidence>catalog=admin/build-libraries.xml;coordinate=libjpeg-turbo@3.2.1;advisory=https://github.com/libjpeg-turbo/libjpeg-turbo/releases;component=TurboJPEG-PNG-loader</evidence>
+   </assessment>
+</assessments>
