@@ -8,6 +8,8 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
+- **[2026-11-19](/news/2026-11-19/)** — Server/API and CVE presentation review; prioritized security and upstream-version verification across **85 libraries / 120 integrations** (no catalog additions)
+
 - **[2026-11-18](/news/2026-11-18/)** — Dear ImGui, ImPlot, raygui interface and Matplot++ registered; native UI/plot consumers completed and three independent graphics showcases added (**85 libraries / 120 versions**)
 
 - **[2026-11-17](/news/2026-11-17/)** — Live catalog invalidation without stale reads; SDL3 3.4.20 and Box2D 3.2.0 registered (81 libraries / 116 versions)
@@ -62,6 +64,7 @@ Each news item reports **distinct libraries** (unique logical library IDs) and *
 | 16 Nov | 79 | 114 |
 | 17 Nov | 81 | 116 |
 | 18 Nov | 85 | 120 |
+| 19 Nov | 85 | 120 |
 
 The first schema-3 version had just one pugiXML entry earlier on 24 August; the end-of-day schema-4 count was two. The feasibility study examined approximately twenty libraries before the initial Admin library catalog was established.
 
