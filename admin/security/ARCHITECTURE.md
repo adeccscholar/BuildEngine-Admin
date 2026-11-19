@@ -53,7 +53,7 @@ the import. Replaying identical XML produces zero new rows. A new later
 available. No provider score or past assessment row is deleted.
 
 The SQL migration for existing PostgreSQL databases is located at
-`BuildEngine-Server/internal/postgresql/assessment-import.sql`, and
+`BuildEngine-Server/internal/postgresql/Update_1.sql`, and
 the same function is included in the greenfield `buildengine.sql`.
 
 ## Deployment and validation gates
