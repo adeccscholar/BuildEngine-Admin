@@ -95,3 +95,54 @@ from a proven deployed runtime.
 - `assessments.xml`: the sole operational assessment interchange document.
 - Future assessment-editor UI exports this exact structure; it does not
   introduce a parallel exchange format.
+
+
+## XML update operations (19 November 2026)
+
+The optional per-assessment `operation` attribute supports three exact
+values, without introducing a schema version:
+
+| Operation | XML | Behavior |
+| --- | --- | --- |
+| Standard (default) | omitted or `operation="Standard"` | Insert a new version/CVE/timestamp assessment; identical replay is a no-op; conflicting content for the same timestamp is rejected |
+| Replace | `operation="Replace"` | Correct an **existing** assessment at the same library/version/CVE/`changedAt` key. Re-running the correction is idempotent. Missing targets fail the complete import |
+| Delete | `operation="Delete"` | Remove **only** the identified assessment revision; a missing row is a no-op. It does not remove the CVE, provider ratings or version/CVE association |
+
+Example exceptional correction:
+
+```xml
+<assessment library="curl" version="8.21.0" cve="CVE-2026-92392"
+   changedAt="2026-11-19T20:36:00+01:00" operation="Replace"
+   contractTimestamp="2026-09-16T00:00:00Z"
+   reviewer="operator" applicability="not-applicable"
+   exposure="not-included-in-build" effectiveRisk="none"
+   decision="fixed-by-configuration" reason="affected-feature-disabled"
+   publication="shared">
+   <comment>Corrected technical review: actual build contract excludes nghttp2.</comment>
+   <evidence>Verified build configuration and source code reference.</evidence>
+</assessment>
+```
+
+The timestamp in this example is illustrative, and the contract timestamp
+must be taken from the exact catalog rather than copied into live XML.
+
+Example of deleting one erroneous assessment record:
+
+```xml
+<assessment library="curl" version="8.21.0" cve="CVE-2026-92392"
+   changedAt="2026-11-19T20:36:00+01:00" operation="Delete"/>
+```
+
+The Server's configurable hourly XML watcher remains the only runtime
+integration point. The PostgreSQL function performs all operations as one
+transaction. For existing deployments after Update_1.sql, apply
+`admin/Update_2.sql`. `admin/BuildEngine.sql` always contains the complete
+greenfield definition. `Update_1.sql` is preserved unchanged.
+
+**Operational caveat:** Replace modifies the original dated review and Delete
+removes one revision. These are intentionally exceptional administration
+operations rather than routine history append. The provenance of such
+corrections should be retained in the XML exchange/repository commit log,
+which is the reviewable administrative record. A deletion of the latest review
+may reveal an older review again; its build-contract applicability still
+needs to be evaluated.
