@@ -46,7 +46,7 @@ Existing databases apply the additive
 once using `buildengine_user`. This creates the native
 `buildengine.import_cve_assessments_xml(text)` function.
 
-After Admin repository sync, the PostgreSQL-enabled Server starts an independent 60-second polling worker which reads
+After Admin repository sync, the PostgreSQL-enabled Server starts an independent configurable 60-minute-by-default polling worker which reads
 `<ProductionRoot>/admin/security/assessments.xml` and invokes that function only when the complete content has changed
 using the existing typed adecc PostgreSQL connection. The import is transactional. The worker retries failed content and never deletes persisted history if the file is absent. HTTP requests read current PostgreSQL assessments without a restart. Repeated identical rows are ignored; conflicting content with
 the same date/CVE/version is rejected, and previous dated decisions are retained.
