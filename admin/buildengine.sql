@@ -747,10 +747,6 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA buildengine GRANT SELECT ON TABLES TO builden
 
 -- EXISTING-SCHEMA-UPGRADE-END
 
-COMMIT;
-
--- Date-keyed XML assessment import; same content as BuildEngine-Server migration.
-
 -- BuildEngine CVE assessment XML import for existing PostgreSQL installations.
 -- Run once as buildengine_user after the baseline has been provisioned.
 -- No SQLite dependency. No schema/version identifier is imposed on the XML.
@@ -842,11 +838,9 @@ BEGIN
       IF i_library IS NULL THEN
          RAISE EXCEPTION 'Unknown library/version: %@%',the_record.library_code,the_record.version_text;
       END IF;
-      IF the_contract_timestamp IS DISTINCT FROM the_current_contract_timestamp THEN
-         RAISE EXCEPTION 'Stale assessment build contract for %@%: expected %, actual %',
-            the_record.library_code,the_record.version_text,
-            the_contract_timestamp,the_current_contract_timestamp;
-      END IF;
+      -- An assessment for an older contract remains importable as history.
+      -- The reader flags it stale against the current contract; it must not
+      -- silently neutralize a vulnerability in the new build.
       SELECT value_id INTO i_applicability FROM buildengine.dom_applicability WHERE code=the_record.applicability;
       SELECT value_id INTO i_exposure FROM buildengine.dom_exposure WHERE code=the_record.exposure;
       SELECT value_id INTO i_risk FROM buildengine.dom_effective_risk WHERE code=the_record.effective_risk;
@@ -908,3 +902,5 @@ $assessment_import$;
 REVOKE ALL ON FUNCTION buildengine.import_cve_assessments_xml(text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION buildengine.import_cve_assessments_xml(text)
    TO buildengine_user;
+
+COMMIT;
