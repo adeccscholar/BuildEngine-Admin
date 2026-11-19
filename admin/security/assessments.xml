@@ -2,12 +2,12 @@
 <!-- Authoritative exchange document. Individual decisions are dated and retained in PostgreSQL. -->
 <!--
  Assessment import operation (optional):
-   operation="Standard" : default when missing; insert a new dated assessment,
-                          replay identical content, reject changed same-time data
-   operation="Replace"  : explicitly correct an existing assessment at the same
-                          library/version/CVE/changedAt key
-   operation="Delete"   : remove the specified assessment at that key; only
-                          identity attributes are required
+   operation="Standard" : default when missing; insert/update the
+                          library/version/CVE/changedAt assessment, skip identical data
+   operation="Replace"  : exceptionally replace all previously stored reviews
+                          for this library/version/CVE with this one new assessment
+   operation="Delete"   : remove all stored assessments for this
+                          library/version/CVE; only these three identifiers required
  Neither Replace nor Delete alters CVE identities, affected-version relations,
  or provider CVSS/EPSS/KEV data. Date/time must include timezone offset.
 -->
