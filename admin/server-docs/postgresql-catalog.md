@@ -2,9 +2,9 @@
 
 ## Scope
 
-The **planned** central server uses PostgreSQL in the local database `BuildEngine` (default localhost:5432). All tables, value lists, foreign keys and views are defined in **one** file: [BuildEngine-Server/internal/postgresql/buildengine.sql](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/buildengine.sql). Superseded `001-buildengine.sql`, `002-security.sql` and `verify-baseline.sql` have been deleted.
+The optional central server catalog uses PostgreSQL in the local database `BuildEngine` (default localhost:5432). All tables, value lists, foreign keys and views are defined in **one** file: [BuildEngine-Server/internal/postgresql/buildengine.sql](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/buildengine.sql). Superseded `001-buildengine.sql`, `002-security.sql` and `verify-baseline.sql` have been deleted.
 
-**[not verified]** PostgreSQL deployment and server read-path migration have not yet been executed.
+**[not verified]** PostgreSQL deployment and full HTTP migration have not been executed. The current source tree contains a PostgreSQL writer and a read-only JSON catalog source, but live execution is unverified and HTML/CVE paths are not yet migrated.
 
 ## Normalized library metadata
 
@@ -99,15 +99,31 @@ manifest as a single text field with its discovery path and timestamp,
 without inventing relational identities for the contained applications.
 It does not replace the original test manifests.
 
-**Implementation status [not verified]:** The SQL model and audit are
-committed, but the BuildEngine C++ writer, filesystem-state reconciliation
-and PostgreSQL-only HTTP reader are not yet connected. The existing server
-still uses `LibraryCatalog`, `BuildEngineRepository`,
-`SourceToolInventory` and independent memory CVE snapshots. SQL schema
-changes alone do not change those HTTP paths.
+**Implementation status [not verified]:** The BuildEngine writer now uses
+`CatalogDatabase.h` with the adecc `logical_database` PostgreSQL adapter and
+compile-time `defined_type_list`/`PersistentSystemData` metadata. The importer
+hashes each complete original build XML, imports on changed hashes, mirrors
+the filesystem's verified FSM scopes on every run, and writes an identical
+completion timestamp only **after** the authoritative scope state file was
+committed. The writer caches installed SBOM/license/manifest information,
+tool registration and showcase manifests.
 
-## Planned runtime integration
+The central server now reads database host, name, role, SSPI and security
+settings from the **same** `BuildEngine.xml` through
+`BuildEngine-Common`. A PostgreSQL reader is wired to the JSON endpoints for
+catalog, versions, dependencies, usage, tools and states. The full HTML
+presentation and CVE findings worker still use the existing filesystem and
+independent memory snapshot. These are outstanding migrations, not completed
+database cache coverage.
 
-BuildEngine remains responsible for reading XML and synchronizing the database using `adecc-core-lib`, `defined_type_list`, `Persistent_Systemdata`, and the existing PostgreSQL libpq/libpqxx package. The server is to read database data exclusively, retaining filesystem access for documents, logs and installed artifacts. No unrelated C++ compiler ecosystem or ORM is introduced.
+The separate private C++ dependencies are rooted at `../adecc` and
+`../ThirdParty/libpq`, `../ThirdParty/libpqxx` at the project root,
+rather than at the package installation controlled by BuildEngine's XML.
+The SQL database and writer/reader login roles require PostgreSQL
+administrator provisioning; the first enabled writer run creates the
+`buildengine` schema and schema contents if absent. No actual BCC64X link,
+SQL bootstrap, SSPI login or HTTP integration test has yet been verified.
 
-The single SQL baseline replaces the earlier draft without trying to migrate its unused schema. Its actual deployment and the new C++ data access require verification.
+See [configuration](configuration.md) and the
+[PostgreSQL technical README](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/README.md)
+for exact settings and known limitations.
