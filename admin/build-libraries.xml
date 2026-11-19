@@ -511,7 +511,7 @@
       </smoke>
    </library>
    <library id="lz4" version="1.10.0" supersededBy="1.11.0" category="compression" timestamp="2026-11-07T16:00:00Z">
-      <metadata description="Fast lossless LZ4 block and frame compression with BCC64X shared DLL." licenseSignal="green"/>
+      <metadata description="Fast lossless LZ4 block and frame compression with BCC64X shared DLL." licenseSignal="green" name="LZ4" supplier="Yann Collet and contributors" homepage="https://github.com/lz4/lz4"/>
       <source>
          <!-- Git tag archive SHA-256 independently published by Homebrew for v1.10.0. -->
          <download url="https://github.com/lz4/lz4/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="lz4-{LibraryVersion}.tar.gz" sha256="537512904744b35e232912055ccf8ec66d768639ff3abe5788d90d792ec5f48b"/>
@@ -4558,7 +4558,7 @@
 </library>
 
 <library id="bzip2" version="1.0.8" category="compression" timestamp="2026-10-20T20:30:00Z">
-      <metadata name="bzip2" supplier="Julian Seward / sourceware.org" description="Lossless block-sorting compression library implementing the bzip2 format." licenseSignal="green"><license name="bzip2 License" spdx="bzip2-1.0.6" file="LICENSE"/></metadata>
+      <metadata name="bzip2" supplier="Julian Seward / sourceware.org" description="Lossless block-sorting compression library implementing the bzip2 format." licenseSignal="green" homepage="https://sourceware.org/bzip2/"><license name="bzip2 License" spdx="bzip2-1.0.6" file="LICENSE"/></metadata>
       <security>
          <repository url="https://sourceware.org/git/bzip2.git"/>
       </security>
@@ -6726,7 +6726,7 @@
    </library>
    
 <library id="libjpeg-turbo" version="3.2.0" supersededBy="3.2.1" category="image" timestamp="2026-10-15T23:00:00Z">
-   <metadata description="High-performance JPEG codec using SIMD acceleration while remaining API-compatible with libjpeg." licenseSignal="yellow"/>
+   <metadata description="High-performance JPEG codec using SIMD acceleration while remaining API-compatible with libjpeg." licenseSignal="yellow" name="libjpeg-turbo" supplier="libjpeg-turbo project" homepage="https://libjpeg-turbo.org/"/>
    <source>
       <download
          url="https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/{LibraryVersion}/libjpeg-turbo-{LibraryVersion}.tar.gz"
@@ -7933,7 +7933,7 @@
    <dependency library="libpng" version="1.6.59"/>
    <dependency library="harfbuzz" version="14.4.0"/>
 
-   <metadata description="Font rendering library for loading, rasterizing, and querying scalable and bitmap font formats." licenseSignal="yellow"/>
+   <metadata description="Font rendering library for loading, rasterizing, and querying scalable and bitmap font formats." licenseSignal="yellow" name="FreeType" supplier="FreeType Project" homepage="https://freetype.org/"/>
    <source>
       <download
          url="https://sourceforge.net/projects/freetype/files/freetype2/{LibraryVersion}/freetype-{LibraryVersion}.tar.xz/download"
