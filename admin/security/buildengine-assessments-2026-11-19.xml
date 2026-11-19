@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Evidence-limited security review; NOT an import format for admin/security/build-assessments.sqlite. Never publish as approved shared assessments without review. -->
+<buildEngineSecurityReview schemaVersion="1" reviewedOn="2026-11-19" source="admin/build-libraries.xml" catalogSchema="17" distinctLibraries="85" versionRecords="120" assessmentScope="BuildEngine-library-build" publicationState="draft" evidenceState="partial">
+   <methodology>
+      <statement>Catalog-only assessment draft covering all version records. The data does not include actual installed DLL hashes, full provider-feed records, transitive closure, runtime feature evidence or local reviewed revisions.</statement>
+      <statement>Published upstream affected/fixed version ranges are not synonymous with verified BuildEngine exploitability. An upstream source fix is not treated as evidence of the loaded DLL.</statement>
+      <referenceVocabulary applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" reason="other" publicationState="local" referenceData="admin/security/reference-data.sql"/>
+      <importPolicy>Do not import or overwrite review database automatically; map only identified provider_finding/build_finding pairs and append reviewed assessment revisions with evidence fingerprints.</importPolicy>
+   </methodology>
+   <versionAssessments>
+      <libraryAssessment id="pugixml" version="1.16" category="data" active="true" buildTimestamp="2026-08-29T17:38:02Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="zlib" version="1.3.2" category="compression" active="false" buildTimestamp="2026-10-16T01:46:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="zlib" version="1.4" category="compression" active="true" buildTimestamp="2026-11-07T17:24:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libdeflate" version="1.26" category="compression" active="true" buildTimestamp="2026-11-09T14:29:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="lz4" version="1.10.0" category="compression" active="false" buildTimestamp="2026-11-07T16:00:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="lz4" version="1.11.0" category="compression" active="true" buildTimestamp="2026-11-09T12:48:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="brotli" version="1.2.0" category="compression" active="false" buildTimestamp="2026-10-30T18:45:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="brotli" version="1.2.1" category="compression" active="true" buildTimestamp="2026-10-30T19:15:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="zstd" version="1.5.7" category="compression" active="true" buildTimestamp="2026-08-29T17:38:02Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="xz" version="5.8.3" category="compression" active="false" buildTimestamp="2026-10-16T00:56:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="xz" version="5.8.4" category="compression" active="true" buildTimestamp="2026-10-16T00:56:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libzip" version="1.11.4" category="archive" active="false" buildTimestamp="2026-11-07T17:24:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libzip" version="1.12.1" category="archive" active="true" buildTimestamp="2026-11-08T00:00:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libarchive" version="3.8.9" category="archive" active="false" buildTimestamp="2026-10-21T01:10:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libarchive" version="3.8.10" category="archive" active="false" buildTimestamp="2026-10-21T01:10:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libarchive" version="3.8.11" category="archive" active="true" buildTimestamp="2026-11-09T14:30:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="openssl" version="3.5.8" category="security" active="false" buildTimestamp="2026-09-18T02:30:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-84782" sourceStatus="upstream-affected-version" reportedSeverity="high" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="3.5.9">
+            <summary>DTLS handshake retransmission from stale buffer offset. Actual DTLS usage unreviewed.</summary>
+            <source url="https://www.openssl-library.org/news/openssl-3.5-notes/index.html"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="openssl" version="3.5.9" category="security" active="true" buildTimestamp="2026-11-07T17:24:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-84782" sourceStatus="upstream-fixed-version" reportedSeverity="high" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="3.5.9">
+            <summary>DTLS handshake retransmission from stale buffer offset. Actual DTLS usage unreviewed.</summary>
+            <source url="https://www.openssl-library.org/news/openssl-3.5-notes/index.html"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="curl" version="8.21.0" category="network" active="false" buildTimestamp="2026-08-29T23:18:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-92392" sourceStatus="upstream-affected-version" reportedSeverity="high" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="8.23.0">
+            <summary>HTTP/2 upload use-after-free; source fix verified upstream. Build runtime feature applicability unreviewed.</summary>
+            <source url="https://curl.se/mail/lib-2026-10/0004.html"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="curl" version="8.23.0" category="network" active="true" buildTimestamp="2026-11-08T02:00:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-92392" sourceStatus="upstream-fixed-version" reportedSeverity="high" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="8.23.0">
+            <summary>HTTP/2 upload use-after-free; source fix verified upstream. Build runtime feature applicability unreviewed.</summary>
+            <source url="https://curl.se/mail/lib-2026-10/0004.html"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="boost" version="1.92.0" category="foundation" active="true" buildTimestamp="2026-11-07T17:24:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="nlohmann-json" version="3.12.0" category="data" active="true" buildTimestamp="2026-08-29T17:38:02Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="ace" version="8.0.6" category="middleware" active="false" buildTimestamp="2026-11-07T17:24:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="ace" version="8.0.8" category="middleware" active="true" buildTimestamp="2026-11-08T15:43:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="tao" version="4.0.6" category="middleware" active="false" buildTimestamp="2026-11-07T17:24:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="tao" version="4.0.8" category="middleware" active="true" buildTimestamp="2026-11-08T15:43:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="bzip2" version="1.0.8" category="compression" active="true" buildTimestamp="2026-10-20T20:30:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="glew" version="2.3.1" category="graphics" active="true" buildTimestamp="2026-09-01T23:21:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="opengl" version="26.2.1" category="graphics" active="true" buildTimestamp="2026-09-03T03:45:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="raylib" version="6.0" category="graphics" active="false" buildTimestamp="2026-10-20T00:55:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="raylib" version="6.2" category="graphics" active="true" buildTimestamp="2026-11-09T15:36:01Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="sdl2" version="2.32.10" category="graphics" active="true" buildTimestamp="2026-09-01T14:43:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="sqlite" version="3.53.4" category="database" active="false" buildTimestamp="2026-10-20T00:55:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="sqlite" version="3.54.1" category="database" active="true" buildTimestamp="2026-11-08T00:00:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libpq" version="18.6" category="database" active="true" buildTimestamp="2026-11-07T17:24:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libpqxx" version="8.0.2" category="database" active="true" buildTimestamp="2026-11-07T17:24:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="xerces-c" version="3.3.0" category="data" active="true" buildTimestamp="2026-08-31T01:00:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="soil2" version="1.3.0" category="graphics" active="true" buildTimestamp="2026-09-03T15:15:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="vtk" version="9.6.2" category="graphics" active="false" buildTimestamp="2026-11-08T19:45:01Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="vtk" version="9.7.2" category="graphics" active="true" buildTimestamp="2026-11-10T13:35:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="leptonica" version="1.87.0" category="image" active="true" buildTimestamp="2026-11-09T14:30:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="tesseract" version="5.5.3" category="text" active="false" buildTimestamp="2026-10-26T00:05:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="tesseract" version="5.5.4" category="text" active="true" buildTimestamp="2026-11-08T03:30:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="wil" version="1.0.260126.7" category="foundation" active="true" buildTimestamp="2026-10-26T00:00:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="opencv" version="5.0.0" category="graphics" active="false" buildTimestamp="2026-11-08T19:45:01Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="opencv" version="5.1.0" category="graphics" active="true" buildTimestamp="2026-11-15T16:58:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="cmark-gfm" version="0.29.0.gfm.13" category="documentation" active="true" buildTimestamp="2026-09-05T02:46:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="googletest" version="1.17.0" category="testing" active="false" buildTimestamp="2026-09-05T02:46:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="googletest" version="1.18.0" category="testing" active="true" buildTimestamp="2026-11-08T19:45:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="google-benchmark" version="1.10.0" category="testing" active="true" buildTimestamp="2026-11-09T12:48:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="catch2" version="3.16.0" category="testing" active="false" buildTimestamp="2026-09-08T01:20:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="catch2" version="3.16.1" category="testing" active="true" buildTimestamp="2026-11-08T19:45:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="bitmapplusplus" version="1.1.1" category="graphics" active="true" buildTimestamp="2026-09-07T22:22:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libjpeg-turbo" version="3.2.0" category="image" active="false" buildTimestamp="2026-10-15T23:00:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-75466" sourceStatus="upstream-affected-version" reportedSeverity="moderate" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="3.2.1">
+            <summary>Divide-by-zero in TurboJPEG indexed-color PNG loader when pixel format unknown; 3.2.1 release notes explicitly list fix.</summary>
+            <source url="https://github.com/libjpeg-turbo/libjpeg-turbo/releases"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="libjpeg-turbo" version="3.2.1" category="image" active="true" buildTimestamp="2026-11-08T03:45:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-75466" sourceStatus="upstream-fixed-version" reportedSeverity="moderate" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="3.2.1">
+            <summary>Divide-by-zero in TurboJPEG indexed-color PNG loader when pixel format unknown; 3.2.1 release notes explicitly list fix.</summary>
+            <source url="https://github.com/libjpeg-turbo/libjpeg-turbo/releases"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="libpng" version="1.6.58" category="image" active="false" buildTimestamp="2026-09-06T04:30:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-46675" sourceStatus="upstream-affected-version" reportedSeverity="medium" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="1.6.59">
+            <summary>Read-after-free with compressed ancillary chunks and png_read_end; 1.6.59 source fix documented.</summary>
+            <source url="https://libpng.org/pub/png/libpng.html"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="libpng" version="1.6.59" category="image" active="true" buildTimestamp="2026-11-07T17:24:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-46675" sourceStatus="upstream-fixed-version" reportedSeverity="medium" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="1.6.59">
+            <summary>Read-after-free with compressed ancillary chunks and png_read_end; 1.6.59 source fix documented.</summary>
+            <source url="https://libpng.org/pub/png/libpng.html"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="harfbuzz" version="14.4.0" category="text" active="false" buildTimestamp="2026-10-20T20:30:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="harfbuzz" version="15.1.0" category="text" active="true" buildTimestamp="2026-11-08T04:59:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="freetype" version="2.14.3" category="text" active="false" buildTimestamp="2026-11-07T17:24:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="freetype" version="2.15.0" category="text" active="true" buildTimestamp="2026-11-08T05:30:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libtiff" version="4.7.2" category="image" active="true" buildTimestamp="2026-11-09T16:49:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="skia" version="144" category="graphics" active="false" buildTimestamp="2026-11-07T17:24:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>Check provenance of managed dependencies and intentionally bundled D3D12MemoryAllocator.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="piex" version="0.27" category="graphics" active="true" buildTimestamp="2026-11-15T21:00:00Z" priority="P1-provenance" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>Record exact upstream source and parser features in the SBOM.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libgav1" version="0.20.0" category="graphics" active="true" buildTimestamp="2026-11-16T00:00:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libwebp" version="1.6.0" category="graphics" active="true" buildTimestamp="2026-11-15T20:30:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="xmp-toolkit" version="7.0.0" category="data" active="true" buildTimestamp="2026-11-16T14:09:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="dng-sdk" version="1.7.1.2802" category="graphics" active="true" buildTimestamp="2026-11-16T14:01:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="skia" version="153" category="graphics" active="true" buildTimestamp="2026-11-16T17:58:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>Check provenance of managed dependencies and intentionally bundled D3D12MemoryAllocator.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="graphite2" version="1.3.15" category="text" active="true" buildTimestamp="2026-10-16T13:45:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="expat" version="2.8.4" category="data" active="false" buildTimestamp="2026-09-20T18:30:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-93990" sourceStatus="upstream-affected-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.8.5">
+            <summary>Expat 2.8.5 release explicitly documents this CVE fix; fix included in 2.10.0.</summary>
+            <source url="https://github.com/libexpat/libexpat/releases"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="expat" version="2.9.0" category="data" active="false" buildTimestamp="2026-10-15T21:30:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-113351" sourceStatus="upstream-affected-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
+            <summary>Denial of service through XML_ParserReset; source fix in 2.10.0.</summary>
+            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         </cve>
+         <cve id="CVE-2026-115506" sourceStatus="upstream-affected-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
+            <summary>Denial of service from entity expansion attacks; source fix in 2.10.0.</summary>
+            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         </cve>
+         <cve id="CVE-2026-117610" sourceStatus="upstream-affected-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
+            <summary>Initial non-final empty subparser parse issue; fix in 2.10.0.</summary>
+            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="expat" version="2.10.0" category="data" active="true" buildTimestamp="2026-11-08T03:45:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+         <cve id="CVE-2026-113351" sourceStatus="upstream-fixed-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
+            <summary>Denial of service through XML_ParserReset; source fix in 2.10.0.</summary>
+            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         </cve>
+         <cve id="CVE-2026-115506" sourceStatus="upstream-fixed-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
+            <summary>Denial of service from entity expansion attacks; source fix in 2.10.0.</summary>
+            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         </cve>
+         <cve id="CVE-2026-117610" sourceStatus="upstream-fixed-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
+            <summary>Initial non-final empty subparser parse issue; fix in 2.10.0.</summary>
+            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         </cve>
+      </libraryAssessment>
+      <libraryAssessment id="teckit" version="2.5.13" category="text" active="true" buildTimestamp="2026-11-09T14:30:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="icu" version="78.3" category="text" active="false" buildTimestamp="2026-09-20T16:15:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="icu" version="79.1" category="text" active="true" buildTimestamp="2026-11-09T15:36:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libxml2" version="2.15.3" category="data" active="false" buildTimestamp="2026-11-07T17:24:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libxml2" version="2.15.4" category="data" active="true" buildTimestamp="2026-11-15T16:50:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="qpdf" version="12.4.1" category="documentation" active="false" buildTimestamp="2026-11-07T17:24:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="qpdf" version="12.4.2" category="documentation" active="true" buildTimestamp="2026-11-09T14:30:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="podofo" version="1.1.1" category="documentation" active="false" buildTimestamp="2026-11-07T17:24:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="podofo" version="1.1.2" category="documentation" active="true" buildTimestamp="2026-11-09T14:30:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="win-iconv" version="0.0.8" category="text" active="true" buildTimestamp="2026-09-22T22:58:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="poppler" version="26.09.0" category="documentation" active="false" buildTimestamp="2026-11-08T04:59:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="poppler" version="26.11.0" category="documentation" active="true" buildTimestamp="2026-11-09T14:30:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="openxlsx" version="0.5.1" category="data" active="true" buildTimestamp="2026-11-09T15:43:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="fast_float" version="8.2.3" category="data" active="false" buildTimestamp="2026-10-15T12:53:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="fast_float" version="8.3.3" category="data" active="true" buildTimestamp="2026-11-08T15:43:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="abseil" version="20260817.0" category="core" active="true" buildTimestamp="2026-10-15T19:45:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="lcms2" version="2.19.1" category="graphics" active="false" buildTimestamp="2026-10-15T15:20:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="lcms2" version="2.20" category="graphics" active="true" buildTimestamp="2026-11-08T04:59:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="openjpeg" version="2.5.4" category="graphics" active="true" buildTimestamp="2026-10-15T12:53:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="simdutf" version="9.3.0" category="text" active="false" buildTimestamp="2026-10-16T16:34:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="simdutf" version="9.3.3" category="text" active="true" buildTimestamp="2026-11-09T12:48:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="agg" version="2.6" category="graphics" active="true" buildTimestamp="2026-10-16T16:34:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="pdfium" version="2025.11.19" category="documentation" active="true" buildTimestamp="2026-11-09T14:30:00Z" priority="P1-provenance" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>Date-based 2025 snapshot: resolve exact upstream revision and security backports before choosing a newer pinned snapshot.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="onetbb" version="2023.1.0" category="concurrency" active="false" buildTimestamp="2026-10-21T17:45:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="onetbb" version="2023.2.0" category="concurrency" active="true" buildTimestamp="2026-11-08T19:45:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="llvm-openmp" version="20.1.7" category="concurrency" active="true" buildTimestamp="2026-10-22T21:20:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="eigen" version="5.0.1" category="math" active="true" buildTimestamp="2026-10-22T21:55:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="mariadb-connector-c" version="3.4.11" category="database" active="true" buildTimestamp="2026-11-07T17:24:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="vulkan-headers" version="1.4.368" category="graphics" active="true" buildTimestamp="2026-11-15T16:58:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="vulkan-memory-allocator" version="3.4.0" category="graphics" active="true" buildTimestamp="2026-11-15T16:58:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="highway" version="1.4.0" category="math" active="true" buildTimestamp="2026-11-15T16:49:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="wuffs" version="0.3" category="graphics" active="true" buildTimestamp="2026-11-15T16:58:00Z" priority="P1-provenance" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>Coarse 0.3 coordinate: require exact upstream commit and decoder feature closure.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="spirv-headers" version="v1.202609.0" category="graphics" active="true" buildTimestamp="2026-11-15T18:20:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="spirv-cross" version="vulkan-sdk-1.4.363.0" category="graphics" active="true" buildTimestamp="2026-11-15T23:10:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="glslang" version="16.6.0" category="graphics" active="true" buildTimestamp="2026-11-16T12:05:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="spirv-tools" version="2026.4" category="graphics" active="true" buildTimestamp="2026-11-16T17:58:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libjxl" version="0.13.0" category="graphics" active="true" buildTimestamp="2026-11-15T16:49:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libyuv" version="r1924" category="graphics" active="true" buildTimestamp="2026-11-15T18:20:00Z" priority="P1-provenance" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>Revision r1924: require exact source commit for advisory correlation.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libaom" version="3.15.1" category="graphics" active="false" buildTimestamp="2026-11-15T18:32:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libaom" version="3.15.3" category="graphics" active="true" buildTimestamp="2026-11-15T16:50:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="libavif" version="1.4.2" category="graphics" active="true" buildTimestamp="2026-11-15T23:57:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="sdl3" version="3.4.20" category="graphics" active="true" buildTimestamp="2026-11-17T03:40:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="box2d" version="3.2.0" category="graphics" active="true" buildTimestamp="2026-11-17T03:20:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="imgui" version="1.93.0" category="graphics" active="true" buildTimestamp="2026-11-18T09:55:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="implot" version="1.1" category="graphics" active="true" buildTimestamp="2026-11-18T09:55:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="raygui" version="5.0" category="graphics" active="true" buildTimestamp="2026-11-18T09:55:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+      <libraryAssessment id="matplotplusplus" version="1.2.2" category="math" active="true" buildTimestamp="2026-11-18T09:55:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
+         <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
+      </libraryAssessment>
+   </versionAssessments>
+   <cveEvidence>
+      <advisory id="CVE-2026-92392" component="curl" knownAffectedVersion="8.21.0" upstreamFixedVersion="8.23.0" severity="high">
+         <source url="https://curl.se/mail/lib-2026-10/0004.html"/>
+         <note>HTTP/2 upload use-after-free; source fix verified upstream. Build runtime feature applicability unreviewed.</note>
+      </advisory>
+      <advisory id="CVE-2026-84782" component="openssl" knownAffectedVersion="3.5.8" upstreamFixedVersion="3.5.9" severity="high">
+         <source url="https://www.openssl-library.org/news/openssl-3.5-notes/index.html"/>
+         <note>DTLS handshake retransmission from stale buffer offset. Actual DTLS usage unreviewed.</note>
+      </advisory>
+      <advisory id="CVE-2026-75466" component="libjpeg-turbo" knownAffectedVersion="3.2.0" upstreamFixedVersion="3.2.1" severity="moderate">
+         <source url="https://github.com/libjpeg-turbo/libjpeg-turbo/releases"/>
+         <note>Divide-by-zero in TurboJPEG indexed-color PNG loader when pixel format unknown; 3.2.1 release notes explicitly list fix.</note>
+      </advisory>
+      <advisory id="CVE-2026-46675" component="libpng" knownAffectedVersion="1.6.58" upstreamFixedVersion="1.6.59" severity="medium">
+         <source url="https://libpng.org/pub/png/libpng.html"/>
+         <note>Read-after-free with compressed ancillary chunks and png_read_end; 1.6.59 source fix documented.</note>
+      </advisory>
+      <advisory id="CVE-2026-93990" component="expat" knownAffectedVersion="2.8.4" upstreamFixedVersion="2.8.5" severity="unknown">
+         <source url="https://github.com/libexpat/libexpat/releases"/>
+         <note>Expat 2.8.5 release explicitly documents this CVE fix; fix included in 2.10.0.</note>
+      </advisory>
+      <advisory id="CVE-2026-113351" component="expat" knownAffectedVersion="2.9.0" upstreamFixedVersion="2.10.0" severity="unknown">
+         <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         <note>Denial of service through XML_ParserReset; source fix in 2.10.0.</note>
+      </advisory>
+      <advisory id="CVE-2026-115506" component="expat" knownAffectedVersion="2.9.0" upstreamFixedVersion="2.10.0" severity="unknown">
+         <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         <note>Denial of service from entity expansion attacks; source fix in 2.10.0.</note>
+      </advisory>
+      <advisory id="CVE-2026-117610" component="expat" knownAffectedVersion="2.9.0" upstreamFixedVersion="2.10.0" severity="unknown">
+         <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         <note>Initial non-final empty subparser parse issue; fix in 2.10.0.</note>
+      </advisory>
+   </cveEvidence>
+   <candidateLibraries>
+      <candidate id="cgal" version="6.2.1" domain="mathematics" priority="P1" evidence="upstream-release" url="https://github.com/CGAL/cgal/releases" rationale="Computational geometry, exact predicates, triangulation; high dependency complexity and GMP/MPFR licensing to evaluate."/>
+      <candidate id="libigl" version="2.6.4" domain="mathematics" priority="P1" evidence="upstream-release" url="https://github.com/libigl/libigl/releases" rationale="Geometry processing, distances and mesh operations; selected features can reuse managed Eigen 5.0.1."/>
+      <candidate id="ceres-solver" version="unverified" domain="mathematics" priority="P1" evidence="version-not-verified" url="https://github.com/ceres-solver/ceres-solver" rationale="Nonlinear least squares and camera calibration optimization; verify upstream version and solver dependencies."/>
+      <candidate id="xtensor" version="unverified" domain="mathematics" priority="P2" evidence="version-not-verified" url="https://github.com/xtensor-stack/xtensor" rationale="N-dimensional array expressions and numerical algorithms; header-only consumer policy."/>
+      <candidate id="jolt-physics" version="5.6.0" domain="game" priority="P1" evidence="upstream-release" url="https://github.com/jrouwe/JoltPhysics/releases" rationale="3D rigid-body physics alongside Box2D; ensure BCC64X DLL export ABI and feature gates."/>
+      <candidate id="assimp" version="6.0.6" domain="game" priority="P1" evidence="upstream-release" url="https://github.com/assimp/assimp/releases" rationale="3D asset import; disable unneeded bundled libraries and risky format importers explicitly."/>
+      <candidate id="openexr" version="3.5.3" domain="game-graphics" priority="P1" evidence="upstream-security-release" url="https://github.com/AcademySoftwareFoundation/openexr/releases" rationale="HDR imaging; 3.5.3 explicitly includes security fixes; no prior OpenEXR package is present in this catalog."/>
+      <candidate id="hnswlib" version="unverified" domain="deckkernel" priority="P1" evidence="version-not-verified" url="https://github.com/nmslib/hnswlib" rationale="Approximate nearest-neighbor search for artwork feature vectors; optional with PostgreSQL candidate narrowing."/>
+      <candidate id="zxing-cpp" version="unverified" domain="deckkernel" priority="P2" evidence="version-not-verified" url="https://github.com/zxing-cpp/zxing-cpp" rationale="Barcode and 2D-code recognition; verify there is a concrete DeckKernel input use case."/>
+      <candidate id="onnxruntime" version="unverified" domain="deckkernel" priority="P2" evidence="version-not-verified" url="https://github.com/microsoft/onnxruntime" rationale="Optional image embedding/inference backend; native BCC64X source build is a high-complexity separate feasibility gate."/>
+   </candidateLibraries>
+   <upgradePriorities>
+      <upgrade id="pdfium" from="2025.11.19" to="pin-verified-upstream-commit" classification="investigate" rationale="Source snapshot age alone is not a confirmed CVE; verify Chromium/PDFium security ancestry."/>
+      <upgrade id="curl" from="8.21.0" to="8.23.0" classification="historical-vulnerable-version" cve="CVE-2026-92392" rationale="Already catalogued newer version; block vulnerable historical artifacts from distribution until applicability is reviewed."/>
+      <upgrade id="openssl" from="3.5.8" to="3.5.9" classification="historical-vulnerable-version" cve="CVE-2026-84782" rationale="Already catalogued security update on supported LTS branch."/>
+      <upgrade id="libpng" from="1.6.58" to="1.6.59" classification="historical-vulnerable-version" cve="CVE-2026-46675" rationale="Already catalogued fix; review actual parsing path."/>
+      <upgrade id="libjpeg-turbo" from="3.2.0" to="3.2.1" classification="historical-vulnerable-version" cve="CVE-2026-75466" rationale="Already catalogued fix; specialized TurboJPEG API path."/>
+      <upgrade id="expat" from="2.9.0" to="2.10.0" classification="historical-vulnerable-version" cve="CVE-2026-113351" rationale="Already catalogued fix; assess XML parser configuration."/>
+   </upgradePriorities>
+</buildEngineSecurityReview>
