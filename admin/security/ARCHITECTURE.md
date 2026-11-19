@@ -72,3 +72,20 @@ the same function is included in the greenfield `buildengine.sql`.
 The first review provider is OpenAI GPT-6, with operator review before
 production acceptance. This is genuine engineering evidence analysis,
 not fictional, synthetic 'toy' security data.
+
+
+## Exceptional assessment modifications
+
+`<assessment operation="...">` accepts `Standard` (implicit default),
+`Replace` and `Delete`. Each operation addresses a single exact
+`library/version/CVE/changedAt` assessment identity. Standard appends dated
+revisions and rejects same-time conflicting content; Replace changes an
+already existing revision; Delete removes the exact dated revision while
+keeping CVE/provider and version-relation history intact. This enables
+exceptional repair of incorrect review data without rewriting the global
+vulnerability catalog. The XML/Git history remains the administrative record
+of corrections. Existing documents without the attribute retain their
+original Standard behavior.
+
+The greenfield `BuildEngine.sql` and additive `Update_2.sql` both contain
+the updated importer; `Update_1.sql` remains the earlier applied migration.
