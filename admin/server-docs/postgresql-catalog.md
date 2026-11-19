@@ -188,6 +188,28 @@ filesystem compatibility mode. A failure to persist an otherwise completed
 CVE scan must remain visible as an error and must not be silently marked
 as stored in PostgreSQL.
 
+### Library metadata reconciliation
+
+The XML metadata parser maps `name`, `description`, `supplier`,
+`homepage`, `licenseSignal`, `artifactType`, and `runtimeDll` to the
+existing library/version columns. The `security/repository` attributes
+`url`, `ref` and `commit` are now mapped to the version-specific
+`security_repository_url`, `security_repository_ref` and
+`security_repository_commit` columns.
+
+**Changed XML hash:** Run the existing full relational catalog
+reconciliation, including security repository metadata.
+
+**Unchanged XML hash:** Perform a targeted relational metadata
+reconciliation instead of skipping the database entirely. UPDATE
+statements use `IS DISTINCT FROM` to avoid rewriting unchanged
+records. No new `catalog_sync` record is created, and neither the
+original nor the current library contract timestamps are altered.
+The version number and CVE relationships remain stable.
+
+The XML is not modified by this process. Actual BCC64X execution
+and a PostgreSQL backfill verification remain **[not verified]**.
+
 ### Rating chronology
 
 `cve_rating` uses the existing key
