@@ -126,7 +126,7 @@ Example exceptional correction:
 The timestamp in this example is illustrative, and the contract timestamp
 must be taken from the exact catalog rather than copied into live XML.
 
-Example of deleting one erroneous assessment record:
+Example of removing all local assessments for one library/version/CVE:
 
 ```xml
 <assessment library="curl" version="8.21.0" cve="CVE-2026-92392"
