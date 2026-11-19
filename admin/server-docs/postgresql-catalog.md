@@ -115,10 +115,10 @@ catalog, versions, dependencies, usage, tools, states, stored SBOMs,
 transitive risk and persisted CVE findings. In PostgreSQL mode the server
 also renders its catalog, package, dashboard, status, showcase and security
 HTML directly from SQL queries; the seven filesystem-generated overview
-snapshots are not rebuilt. The PostgreSQL presentation currently uses a
-simpler, table-based renderer rather than the complete interaction set of
-the historical filesystem HTML UI. Generated documentation and binary
-artifacts remain separately served from their original files.
+snapshots are not rebuilt. The PostgreSQL presentation preserves the original page chrome,
+library tile/list views, filtering, sorting, package actions, expandable
+security findings and transitive dependency coverage. Generated documentation
+and binary artifacts remain separately served from their original files.
 
 When server security refresh is enabled, the provider scan still runs
 outside HTTP request handling. The completed result is committed through
@@ -134,9 +134,9 @@ incomplete rather than successful coverage.
 
 The `cve_assessment` domain is reserved for explicit reviewer judgments:
 the automated provider scan does not invent an applicability, exposure,
-risk, decision or publication judgment. In-memory partial scan progress
-is still a temporary observation and is not committed as a completed
-database scan. Without PostgreSQL the previous filesystem/memory
+risk, decision or publication judgment. Partial scan progress uses PostgreSQL checkpoints with an incomplete
+coverage status; only fully completed, successful evaluation can establish
+complete coverage. Without PostgreSQL the previous filesystem/memory
 compatibility behavior remains available.
 
 The separate private C++ dependencies are rooted at `../adecc` and
@@ -150,6 +150,37 @@ authentication test or end-to-end HTTP/CVE history integration test.
 See [configuration](configuration.md) and the
 [PostgreSQL technical README](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/README.md)
 for exact settings and known limitations.
+
+## Standalone CVE catalog and historical charts (19 November 2026)
+
+The existing `/security/` and `/security/check/` pages retain the installed
+package and version-level security views. The independent **`/cves/`**
+catalog lists recorded CVEs and links to **`/cve/{CVE-ID}/`**, which displays
+current provider ratings, full recorded rating chronology, CVSS and EPSS
+SVG step charts, affected library versions, package-specific evidence,
+and dated reviewed assessments. The charts use the timestamp at which
+PostgreSQL observed a changed score. They do **not** claim that this is
+the original provider publication timestamp. There is no external charting
+service or provider query during an HTTP request.
+
+Machine-readable endpoints include `/api/v1/cve/{CVE-ID}`,
+`/api/v1/cve/{CVE-ID}/ratings`, and
+`/api/v1/assessment/{library}/{version}/{CVE-ID}/history`.
+
+The security overview and per-package detail now use the same persisted
+security snapshot and dated library dependency graph, including
+superseded library versions still referenced by a current package.
+Direct and transitive findings count distinct library/version/CVE
+observations in the actual closure. A package cannot be labeled green
+when the closure contains known findings. Without a scorable CVSS, a
+visible warning is required instead of inventing a technical severity.
+Transitive findings display the affected dependency coordinates and
+link to their detailed security views. **A warning is not an automated
+reviewed effective-risk judgment.**
+
+The CVE timeline and the warning behavior are implemented in source but
+have not passed the native BCC64X / PostgreSQL / browser integration
+test **[not verified]**. No project or XML configuration changes are required.
 
 ## Existing-schema migration (19 November 2026)
 
