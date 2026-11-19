@@ -186,6 +186,50 @@ over time.
 implemented; the currently deployed server still uses its in-memory CVE
 snapshot. The database is not yet required for normal server operation.
 
+## Active showcase version selectors and latest persisted evidence (19 November 2026)
+
+Showcase manifests may declare a dependency with `"version": "active"`.
+This is a symbolic selector, **not** a concrete library version and not
+a lexicographic "latest" guess. In PostgreSQL catalog mode, the server
+resolves it against exactly one `in_catalog` version without a current
+`supersededBy` relationship. The showcase lists the resolved version
+alongside the `active` designation and links to the concrete library page.
+Existing `/library/{library}/active/` and
+`/package/{library}/active/` links are also resolved by the server.
+If the selection has no unique match, an explicit non-resolved response
+is returned, rather than silently selecting a version.
+
+The REST API publishes two independently meaningful classes of evidence:
+the latest catalog synchronization and mirrored state observation, and
+the current recorded CVE scan evidence. The database has **no persisted
+BuildEngine process-execution run table**; the latest catalog sync must
+not be mislabeled a completed process execution. A real process-run
+history requires a separate explicit data contract and storage.
+
+The PostgreSQL-specific endpoints are:
+
+| Endpoint | Result |
+| --- | --- |
+| `GET /api/v1/runs/latest` | Latest `catalog_sync` record and most recently checked `library_scope_state` record, including status, times, counts, source and diagnostics; either item is `null` if no evidence exists |
+| `GET /api/v1/security` | Current per-version persisted CVE counts, scan status, check time and diagnostic message; **direct findings**, not dependency-closure counts |
+| `GET /api/v1/security/{library}/{version}` | Version-specific security analysis with direct/transitive components, known findings, scan coverage and current reviewed root-version assessment |
+| `GET /api/v1/libraries/{library}/active` | The same version metadata response as for the resolved concrete version, when a unique active version exists |
+| `GET /api/v1/libraries/{library}/{version}/states` | Persisted state-scope evidence for the exact library version |
+| `GET /api/v1/cve/{CVE-ID}` | Full stored CVE record, provider rating history, affected versions and source details |
+| `GET /api/v1/cve/{CVE-ID}/ratings` | Independent provider rating changes with stored observation time |
+| `GET /api/v1/assessment/{library}/{version}/{CVE-ID}/history` | Chronological reviewed assessments for an exact library/version/CVE |
+
+All these endpoints are GET-only and read persisted records. They do not
+start a build or a provider scan. PostgreSQL-only paths return
+`503 Service Unavailable` when PostgreSQL catalog mode is disabled
+(where explicitly routed) or `404` for unavailable/unknown routes or
+unresolved coordinates. No existing library, security or package API
+route has been removed.
+
+**Verification:** Implemented in source. Native BCC64X build,
+PostgreSQL query execution and HTTP integration checks are
+**not verified**.
+
 ## Machine API
 
 The machine API is GET-only. The versioned namespace is `/api/v1`; responses are JSON except for the downloadable ZIP. The server performs no outbound provider requests for an incoming HTTP request. Invalid routes return 404 and non-GET requests are rejected with 405.
