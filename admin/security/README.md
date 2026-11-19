@@ -104,9 +104,9 @@ values, without introducing a schema version:
 
 | Operation | XML | Behavior |
 | --- | --- | --- |
-| Standard (default) | omitted or `operation="Standard"` | Insert a new version/CVE/timestamp assessment; identical replay is a no-op; conflicting content for the same timestamp is rejected |
-| Replace | `operation="Replace"` | Correct an **existing** assessment at the same library/version/CVE/`changedAt` key. Re-running the correction is idempotent. Missing targets fail the complete import |
-| Delete | `operation="Delete"` | Remove **only** the identified assessment revision; a missing row is a no-op. It does not remove the CVE, provider ratings or version/CVE association |
+| Standard (default) | omitted or `operation="Standard"` | Insert or update the dated assessment at the same library/version/CVE/changedAt key; identical replay is a no-op |
+| Replace | `operation="Replace"` | Exceptionally replace all previous assessment revisions for this library/version/CVE with the supplied new dated assessment |
+| Delete | `operation="Delete"` | Remove all local assessment revisions for this library/version/CVE; a missing assessment is a no-op. It does not remove the CVE, provider ratings or version/CVE association |
 
 Example exceptional correction:
 
@@ -130,7 +130,7 @@ Example of deleting one erroneous assessment record:
 
 ```xml
 <assessment library="curl" version="8.21.0" cve="CVE-2026-92392"
-   changedAt="2026-11-19T20:36:00+01:00" operation="Delete"/>
+   operation="Delete"/>
 ```
 
 The Server's configurable hourly XML watcher remains the only runtime
@@ -139,10 +139,9 @@ transaction. For existing deployments after Update_1.sql, apply
 `admin/Update_2.sql`. `admin/BuildEngine.sql` always contains the complete
 greenfield definition. `Update_1.sql` is preserved unchanged.
 
-**Operational caveat:** Replace modifies the original dated review and Delete
-removes one revision. These are intentionally exceptional administration
+**Operational caveat:** Replace resets the stored assessments for the specified CVE/version and
+installs one new dated decision; Delete removes all such local reviews. These are intentionally exceptional administration
 operations rather than routine history append. The provenance of such
 corrections should be retained in the XML exchange/repository commit log,
-which is the reviewable administrative record. A deletion of the latest review
-may reveal an older review again; its build-contract applicability still
-needs to be evaluated.
+which is the reviewable administrative record. Replace and Delete intentionally remove the stored history for that exact
+library/version/CVE. Global provider and CVE-to-version history remain untouched.
