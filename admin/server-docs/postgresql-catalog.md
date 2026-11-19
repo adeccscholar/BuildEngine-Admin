@@ -2,7 +2,7 @@
 
 ## Scope
 
-The optional central server catalog uses PostgreSQL in the local database `BuildEngine` (default localhost:5432). All tables, value lists, foreign keys and views are defined in **one** file: [BuildEngine-Server/internal/postgresql/buildengine.sql](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/buildengine.sql). Superseded `001-buildengine.sql`, `002-security.sql` and `verify-baseline.sql` have been deleted.
+The optional central server catalog uses PostgreSQL in the local database `BuildEngine` (default localhost:5432). All tables, value lists, foreign keys and views are defined in **one** file: [BuildEngine-Admin/admin/buildengine.sql](https://github.com/adeccscholar/BuildEngine-Admin/blob/main/admin/buildengine.sql). Superseded `001-buildengine.sql`, `002-security.sql` and `verify-baseline.sql` have been deleted.
 
 **[not verified]** PostgreSQL deployment and full HTTP migration have not been executed. The current source tree contains a PostgreSQL writer and a read-only JSON catalog source, but live execution is unverified and HTML/CVE paths are not yet migrated.
 
@@ -36,7 +36,7 @@ Provider scan attempts, copies of whole JSON documents, component inventories an
 
 ## Database roles and service access
 
-The single SQL baseline provisions two login roles without embedded passwords: `buildengine_user` owns the `buildengine` schema and its tables/views, can read/write data, create and alter schema objects, and is intended for BuildEngine and administrative UI execution. `buildengine_reader` has only database connection, schema usage, and `SELECT` permission on the current and future catalog tables/views, and is intended for the eventual Windows server service identity.
+The standalone PostgreSQL provisioning script defines two login roles without embedded passwords: `buildengine_user` owns the `buildengine` schema and its tables/views, can read/write data, create and alter schema objects, and is intended for BuildEngine and administrative UI execution. `buildengine_reader` has only database connection, schema usage, and `SELECT` permission on the current and future catalog tables/views, and is intended for the eventual Windows server service identity.
 
 Default read-only grants are applied to future tables/views created by `buildengine_user`. The script must be executed by a PostgreSQL administrator with role-creation privileges. Windows service identity mapping and integrated SSPI authentication are configured separately in PostgreSQL, not by committing credentials to this repository. The roles are **not** independently verified against a deployed server.
 
