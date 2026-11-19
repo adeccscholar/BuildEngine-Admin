@@ -93,8 +93,6 @@ from a proven deployed runtime.
 
 ## Other documents
 
-- `buildengine-assessments-2026-11-19.xml`: earlier inventory-oriented
-  research snapshot, not the operative exchange document.
-- `assessments.xml`: the operational exchange.
+- `assessments.xml`: the sole operational assessment interchange document.
 - Future assessment-editor UI exports this exact structure; it does not
   introduce a parallel exchange format.
