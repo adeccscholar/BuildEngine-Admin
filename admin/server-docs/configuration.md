@@ -47,7 +47,7 @@ All of these optional settings are attributes of the existing
 | `databasePasswordEnv` | none | Environment-variable name used only for password mode; no XML password |
 | `databaseSslMode` | `prefer` | libpq SSL policy |
 | `databaseGssEncMode` | `disable` | libpq GSS encryption policy |
-| `databaseSchemaFile` | `admin/buildengine.sql` | Optional override of the synced admin SQL baseline; resolved relative to BuildEngine.xml |
+| `databaseSchemaFile` | `admin/buildengine.sql` | Optional override of the synchronized admin SQL baseline; resolved relative to the configured production root |
 
 The default SQL baseline is synchronized to `admin/buildengine.sql` with the
 BuildEngine-Admin payload. Override `databaseSchemaFile` only if necessary. The
