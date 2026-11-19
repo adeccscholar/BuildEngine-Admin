@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <buildLibraries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schemas/build-libraries.xsd" schemaVersion="17">
    <library id="pugixml" version="1.16" category="data" timestamp="2026-08-29T17:38:02Z">
-      <metadata description="Lightweight C++ XML processing library with DOM-style parsing, modification, and XPath support." licenseSignal="green"/>
+      <metadata description="Lightweight C++ XML processing library with DOM-style parsing, modification, and XPath support." licenseSignal="green" name="pugixml" supplier="pugixml project" homepage="https://pugixml.org/"/>
       <source>
          <download url="https://github.com/zeux/pugixml/releases/download/v{LibraryVersion}/pugixml-{LibraryVersion}.zip" archive="pugixml-{LibraryVersion}.zip"/>
          <extract format="zip" root="pugixml-{LibraryVersion}">
@@ -103,7 +103,7 @@
       </smoke>
    </library>
    <library id="zlib" version="1.3.2" supersededBy="1.4" category="compression" timestamp="2026-10-16T01:46:00Z">
-      <metadata description="General-purpose DEFLATE compression library used for gzip-compatible data and streams." licenseSignal="green"/>
+      <metadata description="General-purpose DEFLATE compression library used for gzip-compatible data and streams." licenseSignal="green" name="zlib" supplier="Jean-loup Gail and Mark Adler" homepage="https://zlib.net/"/>
       <source>
          <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib132.zip" archive="zlib-{LibraryVersion}.zip" sha256="e8bf55f3017aa181690990cb58a994e77885da140609fc8f94abe9b65d2cae28"/>
          <extract format="zip" root="zlib-{LibraryVersion}">
@@ -243,7 +243,7 @@
       </smoke>
    </library>
    <library id="zlib" version="1.4" category="compression" timestamp="2026-11-07T17:24:00Z">
-      <metadata description="General-purpose DEFLATE compression library used for gzip-compatible data and streams." licenseSignal="green"/>
+      <metadata description="General-purpose DEFLATE compression library used for gzip-compatible data and streams." licenseSignal="green" name="zlib" supplier="Jean-loup Gail and Mark Adler" homepage="https://zlib.net/"/>
       <source>
          <download url="https://github.com/madler/zlib/releases/download/v{LibraryVersion}/zlib14.zip" archive="zlib-{LibraryVersion}.zip" sha256="38bc7ed1c8ac3c870a159623deacf74a46c393ae1ad23f1dca1ed8e272deb058"/>
          <extract format="zip" root="zlib-{LibraryVersion}">
@@ -598,7 +598,7 @@
       </smoke>
    </library>
    <library id="lz4" version="1.11.0" category="compression" timestamp="2026-11-09T12:48:00Z">
-      <metadata description="Fast lossless LZ4 block and frame compression with BCC64X shared DLL." licenseSignal="green"/>
+      <metadata description="Fast lossless LZ4 block and frame compression with BCC64X shared DLL." licenseSignal="green" name="LZ4" supplier="Yann Collet and contributors" homepage="https://github.com/lz4/lz4"/>
       <source>
          <!-- Official upstream release tarball SHA-256 for v1.11.0. -->
          <download url="https://github.com/lz4/lz4/releases/download/v{LibraryVersion}/lz4-{LibraryVersion}.tar.gz" archive="lz4-{LibraryVersion}.tar.gz" sha256="247e5fa64da5f7b75ee3dd3bed484076396c9ebe8254d9ccf693eb62800c5e26"/>
@@ -685,7 +685,7 @@
       </smoke>
    </library>
    <library id="brotli" version="1.2.0" supersededBy="1.2.1" category="compression" timestamp="2026-10-30T18:45:00Z">
-      <metadata description="General-purpose lossless compression library providing Brotli encoder and decoder support." licenseSignal="green"/>
+      <metadata description="General-purpose lossless compression library providing Brotli encoder and decoder support." licenseSignal="green" name="Brotli" supplier="Google" homepage="https://github.com/google/brotli"/>
       <source>
          <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="brotli-{LibraryVersion}.tar.gz" sha256="816c96e8e8f193b40151dad7e8ff37b1221d019dbcb9c35cd3fadbfe6477dfec"/>
          <extract format="libarchive" root="brotli-{LibraryVersion}">
@@ -792,7 +792,7 @@
       </smoke>
    </library>
    <library id="brotli" version="1.2.1" category="compression" timestamp="2026-10-30T19:15:00Z">
-      <metadata description="General-purpose lossless compression library providing Brotli encoder and decoder support." licenseSignal="green"/>
+      <metadata description="General-purpose lossless compression library providing Brotli encoder and decoder support." licenseSignal="green" name="Brotli" supplier="Google" homepage="https://github.com/google/brotli"/>
       <source>
          <download url="https://github.com/google/brotli/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="brotli-{LibraryVersion}.tar.gz" sha256="98d35d11a78dc453aebb7d10c3748f3f73ff78c8267c0dc697b8631f67bf7e8f"/>
          <extract format="libarchive" root="brotli-{LibraryVersion}">
@@ -899,7 +899,7 @@
       </smoke>
    </library>
    <library id="zstd" version="1.5.7" category="compression" timestamp="2026-08-29T17:38:02Z">
-      <metadata description="High-performance lossless compression library implementing the Zstandard format." licenseSignal="green"/>
+      <metadata description="High-performance lossless compression library implementing the Zstandard format." licenseSignal="green" name="Zstandard" supplier="Meta Platforms and contributors" homepage="https://github.com/facebook/zstd"/>
       <source>
          <!-- Official GitHub tag archive.  It represents the unmodified v1.5.7
               source tree while using the already proven ZIP extraction path. -->
@@ -1040,7 +1040,7 @@
       </smoke>
    </library>
    <library id="xz" version="5.8.3" supersededBy="5.8.4" category="compression" timestamp="2026-10-16T00:56:00Z">
-      <metadata description="Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma." licenseSignal="yellow"/>
+      <metadata description="Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma." licenseSignal="yellow" name="XZ Utils" supplier="Tukaani Project" homepage="https://tukaani.org/xz/"/>
       <source>
          <download url="https://github.com/tukaani-project/xz/releases/download/v{LibraryVersion}/xz-{LibraryVersion}.tar.gz" archive="xz-{LibraryVersion}.tar.gz" sha256="3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0"/>
          <extract format="libarchive" root="xz-{LibraryVersion}">
@@ -1180,7 +1180,7 @@
    </library>
 
 <library id="xz" version="5.8.4" category="compression" timestamp="2026-10-16T00:56:00Z">
-      <metadata description="Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma." licenseSignal="yellow"/>
+      <metadata description="Data compression library and tools providing the LZMA and LZMA2 algorithms through liblzma." licenseSignal="yellow" name="XZ Utils" supplier="Tukaani Project" homepage="https://tukaani.org/xz/"/>
       <source>
          <download url="https://github.com/tukaani-project/xz/releases/download/v{LibraryVersion}/xz-{LibraryVersion}.tar.gz" archive="xz-{LibraryVersion}.tar.gz" sha256="0014c7886930454fe8bd4228665b51af55eeae560ea135c9c4cd33f55b2591d9"/>
          <extract format="libarchive" root="xz-{LibraryVersion}">
@@ -1322,7 +1322,7 @@
       <dependency library="zlib" version="1.4"/>
       <dependency library="xz" version="5.8.4"/>
       <dependency library="zstd" version="1.5.7"/>
-      <metadata description="C library for reading, creating, and modifying ZIP archives." licenseSignal="green"/>
+      <metadata description="C library for reading, creating, and modifying ZIP archives." licenseSignal="green" name="libzip" supplier="Dieter Baron and Thomas Klausner" homepage="https://libzip.org/"/>
       <source>
          <!-- Official release asset.  Use tar.gz for bootstrap so libzip does
               not depend on the BuildEngine's not-yet-enabled XZ extraction path. -->
@@ -1528,7 +1528,7 @@
       <dependency library="zlib" version="1.4"/>
       <dependency library="xz" version="5.8.4"/>
       <dependency library="zstd" version="1.5.7"/>
-      <metadata description="C library for reading, creating, and modifying ZIP archives." licenseSignal="green"/>
+      <metadata description="C library for reading, creating, and modifying ZIP archives." licenseSignal="green" name="libzip" supplier="Dieter Baron and Thomas Klausner" homepage="https://libzip.org/"/>
       <source>
          <!-- Official release asset.  Use tar.gz for bootstrap so libzip does
               not depend on the BuildEngine's not-yet-enabled XZ extraction path. -->
@@ -1735,7 +1735,7 @@
       <dependency library="zstd" version="1.5.7"/>
       <dependency library="bzip2" version="1.0.8"/>
       <dependency library="openssl" version="3.5.9"/>
-      <metadata description="Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats." licenseSignal="yellow"/>
+      <metadata description="Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats." licenseSignal="yellow" name="libarchive" supplier="libarchive project" homepage="https://www.libarchive.org/"/>
       <source>
          <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip" archive="libarchive-{LibraryVersion}.zip" sha256="7b20200203d08866b62373dd51417798427ec67852928d71f142bfe578e9ea75"/>
          <extract format="zip" root="libarchive-{LibraryVersion}">
@@ -1973,7 +1973,7 @@
       <dependency library="zstd" version="1.5.7"/>
       <dependency library="bzip2" version="1.0.8"/>
       <dependency library="openssl" version="3.5.9"/>
-      <metadata description="Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats." licenseSignal="yellow"/>
+      <metadata description="Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats." licenseSignal="yellow" name="libarchive" supplier="libarchive project" homepage="https://www.libarchive.org/"/>
       <source>
          <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip" archive="libarchive-{LibraryVersion}.zip" sha256="a15b2890f31c935e5fb5b4026e0c463ed03e87fa6365060659e761e97f401183"/>
          <extract format="zip" root="libarchive-{LibraryVersion}">
@@ -2211,7 +2211,7 @@
       <dependency library="lz4" version="1.11.0"/>
       <dependency library="bzip2" version="1.0.8"/>
       <dependency library="openssl" version="3.5.9"/>
-      <metadata description="Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats." licenseSignal="yellow"/>
+      <metadata description="Multi-format archive and compression library for reading and writing tar, cpio, ZIP, and related formats." licenseSignal="yellow" name="libarchive" supplier="libarchive project" homepage="https://www.libarchive.org/"/>
       <source>
          <download url="https://github.com/libarchive/libarchive/releases/download/v{LibraryVersion}/libarchive-{LibraryVersion}.zip" archive="libarchive-{LibraryVersion}.zip" sha256="647cd02966d99033498955d9f6227cffa6e83899acc11b50afaaea3cbe8861bc"/>
          <extract format="zip" root="libarchive-{LibraryVersion}">
@@ -2472,7 +2472,7 @@
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
       <dependency library="zstd" version="1.5.7"/>
-      <metadata description="Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives." licenseSignal="green"/>
+      <metadata description="Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives." licenseSignal="green" name="OpenSSL" supplier="OpenSSL Project" homepage="https://www.openssl.org/"/>
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz" archive="openssl-{LibraryVersion}.tar.gz" sha256="a8f84a39918ec6415ce765d9b429d313ba97b8143169c172e734b9514464f5b2"/>
          <extract format="libarchive" root="openssl-{LibraryVersion}">
@@ -2829,7 +2829,7 @@
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
       <dependency library="zstd" version="1.5.7"/>
-      <metadata description="Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives." licenseSignal="green"/>
+      <metadata description="Cryptography and TLS toolkit providing secure transport, certificates, and general cryptographic primitives." licenseSignal="green" name="OpenSSL" supplier="OpenSSL Project" homepage="https://www.openssl.org/"/>
       <source>
          <download url="https://github.com/openssl/openssl/releases/download/openssl-{LibraryVersion}/openssl-{LibraryVersion}.tar.gz" archive="openssl-{LibraryVersion}.tar.gz" sha256="603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a"/>
          <extract format="libarchive" root="openssl-{LibraryVersion}">
@@ -3192,7 +3192,7 @@
            but are re-enabled for curl only after this baseline is green. -->
       <dependency library="openssl" version="3.5.8"/>
       <dependency library="zlib" version="1.3.2"/>
-      <metadata description="URL transfer library and command-line client supporting HTTP(S) and numerous network protocols." licenseSignal="green"/>
+      <metadata description="URL transfer library and command-line client supporting HTTP(S) and numerous network protocols." licenseSignal="green" name="curl" supplier="curl project" homepage="https://curl.se/"/>
       <security>
          <repository url="https://github.com/curl/curl.git" ref="curl-8_21_0"/>
       </security>
@@ -3327,7 +3327,7 @@
            validated for this curl version and BCC64X runtime. -->
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="zlib" version="1.4"/>
-      <metadata description="URL transfer library and command-line client supporting HTTP(S) and numerous network protocols." licenseSignal="green"/>
+      <metadata description="URL transfer library and command-line client supporting HTTP(S) and numerous network protocols." licenseSignal="green" name="curl" supplier="curl project" homepage="https://curl.se/"/>
       <security>
          <repository url="https://github.com/curl/curl.git" ref="curl-8_23_0"/>
       </security>
@@ -3487,7 +3487,7 @@
       -->
       <dependency library="openssl" version="3.5.9"/>
       <dependency library="zlib" version="1.4"/>
-      <metadata description="Comprehensive collection of portable C++ libraries covering containers, algorithms, networking, concurrency, and more." licenseSignal="green"/>
+      <metadata description="Comprehensive collection of portable C++ libraries covering containers, algorithms, networking, concurrency, and more." licenseSignal="green" name="Boost" supplier="Boost C++ Libraries community" homepage="https://www.boost.org/"/>
       <source>
          <download url="https://github.com/boostorg/boost/releases/download/boost-{LibraryVersion}/boost-{LibraryVersion}-cmake.zip" archive="boost-{LibraryVersion}-cmake.zip" sha256="f47ee00d5870f006ef95a7be307be6553a769428d48ee98f20e856b9c3dfd3a2"/>
          <extract format="zip" root="boost-{LibraryVersion}">
@@ -3786,7 +3786,7 @@
 	  
    </library>
    <library id="nlohmann-json" version="3.12.0" category="data" timestamp="2026-08-29T17:38:02Z">
-      <metadata artifactType="interface" description="Modern C++ JSON library offering intuitive STL-like parsing, serialization, and data access." licenseSignal="green"/>
+      <metadata artifactType="interface" description="Modern C++ JSON library offering intuitive STL-like parsing, serialization, and data access." licenseSignal="green" name="JSON for Modern C++" supplier="Niels Lohmann and contributors" homepage="https://github.com/nlohmann/json"/>
       <source>
          <download url="https://github.com/nlohmann/json/releases/download/v{LibraryVersion}/include.zip" archive="nlohmann-json-{LibraryVersion}-include.zip" sha256="b8cb0ef2dd7f57f18933997c9934bb1fa962594f701cd5a8d3c2c80541559372"/>
          <extract format="zip" root=".">
@@ -5156,7 +5156,7 @@
       </smoke>
    </library>
 <library id="xerces-c" version="3.3.0" category="data" timestamp="2026-08-31T01:00:00Z">
-      <metadata description="Apache C++ XML parser supporting DOM, SAX, validation, and XML Schema." licenseSignal="green"/>
+      <metadata description="Apache C++ XML parser supporting DOM, SAX, validation, and XML Schema." licenseSignal="green" name="bzip2" supplier="Julian Seward and contributors" homepage="https://sourceware.org/bzip2/"/>
       <security>
          <repository url="https://github.com/apache/xerces-c.git" ref="v{LibraryVersion}"/>
       </security>
@@ -6905,7 +6905,7 @@
 </library>
 
    <library id="libjpeg-turbo" version="3.2.1" category="image" timestamp="2026-11-08T03:45:00Z">
-   <metadata description="High-performance JPEG codec using SIMD acceleration while remaining API-compatible with libjpeg." licenseSignal="yellow"/>
+   <metadata description="High-performance JPEG codec using SIMD acceleration while remaining API-compatible with libjpeg." licenseSignal="yellow" name="libjpeg-turbo" supplier="libjpeg-turbo project" homepage="https://libjpeg-turbo.org/"/>
    <source>
       <download
          url="https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/{LibraryVersion}/libjpeg-turbo-{LibraryVersion}.tar.gz"
@@ -7086,7 +7086,7 @@
 <library id="libpng" version="1.6.58" supersededBy="1.6.59" category="image" timestamp="2026-09-06T04:30:00Z">
    <dependency library="zlib" version="1.3.2"/>
 
-   <metadata description="Reference PNG library for reading, writing, and manipulating Portable Network Graphics images." licenseSignal="green"/>
+   <metadata description="Reference PNG library for reading, writing, and manipulating Portable Network Graphics images." licenseSignal="green" name="libpng" supplier="PNG Development Group" homepage="https://libpng.sourceforge.io/"/>
    <source>
       <download
          url="https://download.sourceforge.net/libpng/libpng-{LibraryVersion}.tar.xz"
@@ -7196,7 +7196,7 @@
 <library id="libpng" version="1.6.59" category="image" timestamp="2026-11-07T17:24:00Z">
    <dependency library="zlib" version="1.4"/>
 
-   <metadata description="Reference PNG library for reading, writing, and manipulating Portable Network Graphics images." licenseSignal="green"/>
+   <metadata description="Reference PNG library for reading, writing, and manipulating Portable Network Graphics images." licenseSignal="green" name="libpng" supplier="PNG Development Group" homepage="https://libpng.sourceforge.io/"/>
    <source>
       <download
          url="https://download.sourceforge.net/libpng/libpng-{LibraryVersion}.tar.xz"
@@ -8117,7 +8117,7 @@
    <dependency library="libpng" version="1.6.59"/>
    <dependency library="harfbuzz" version="15.1.0"/>
 
-   <metadata description="Font rendering library for loading, rasterizing, and querying scalable and bitmap font formats." licenseSignal="yellow"/>
+   <metadata description="Font rendering library for loading, rasterizing, and querying scalable and bitmap font formats." licenseSignal="yellow" name="FreeType" supplier="FreeType Project" homepage="https://freetype.org/"/>
    <source>
       <download
          url="https://sourceforge.net/projects/freetype/files/freetype2/{LibraryVersion}/freetype-{LibraryVersion}.tar.xz/download"
@@ -8301,7 +8301,7 @@
    <dependency library="zlib" version="1.4"/>
    <dependency library="libjpeg-turbo" version="3.2.1"/>
 
-   <metadata description="TIFF image library for reading, writing, and manipulating Tagged Image File Format images." licenseSignal="green"/>
+   <metadata description="TIFF image library for reading, writing, and manipulating Tagged Image File Format images." licenseSignal="green" name="LibTIFF" supplier="LibTIFF project" homepage="https://libtiff.gitlab.io/libtiff/"/>
    <source>
       <download
          url="https://download.osgeo.org/libtiff/tiff-{LibraryVersion}.tar.xz"
