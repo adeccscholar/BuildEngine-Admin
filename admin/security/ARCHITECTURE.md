@@ -1,76 +1,74 @@
-# Central Library Security Assessment
+# Security Assessment Architecture: XML Exchange and PostgreSQL
 
-At this documented stage, BuildEngine has exactly **one** assessment level: a centralized security assessment of the specific libraries built by BuildEngine.
+**19 November 2026.** XML is the sole communications and exchange format for
+library/CVE assessments. PostgreSQL maintains authoritative operating state,
+date-ordered history and provider evidence. The former SQLite process is obsolete.
 
-## Central working database
+## Ownership and trust boundaries
 
-The programs share:
+1. **Upstream providers** independently supply CVE descriptions, applicability
+   ranges, CVSS, EPSS, KEV and observations. Their original data must not be
+   overwritten by local judgments.
+2. **BuildEngine-Admin** distributes `admin/security/assessments.xml`, the
+   reviewable, transportable assessment exchange document. There is no required
+   XML schema-version property at this stage.
+3. **BuildEngine-Server** reads that XML from the synchronized Production Root
+   at startup and uses `PostgresCveStore::ImportAssessmentXml` and the
+   PostgreSQL function `buildengine.import_cve_assessments_xml(text)`.
+4. **PostgreSQL** retains original `cve`, `version_cve`, `cve_rating` and
+   date-keyed `cve_assessment` rows.
+5. **BuildEngine-Common** reads this state through
+   `PostgresCatalogReader`. The Server shows original provider severity
+   and assessment-derived risk, each with its own provenance and chronology.
+6. **Future human assessment editor** modifies PostgreSQL through a managed
+   workflow and exports the same XML structure. The editor does not introduce
+   any alternative data exchange mechanism.
 
-```text
-<ProductionRoot>\admin\security\build-assessments.sqlite
-```
+## Assessment identity
 
-It stores languages, localized reference values, provider findings, build/library findings and centralized assessment revisions.
+A decision is identified by:
 
-`BuildEngine-Manager` reads and writes this database directly. `BuildEngine-Server` opens the same file in read-only mode.
+- logical library ID and exact original library version;
+- CVE identifier;
+- date/time with UTC offset (`changedAt`);
+- reviewer;
+- applicability, exposure, effective risk, decision, reason and publication;
+- technical explanation and evidence.
 
-There is currently **no** second working database under `build`, no separate local assessment tier and no application-specific assessment.
+A fixed upstream release can retain a CVE association with decision
+`fixed-by-update`. A locally patched original version can instead use
+`patched-locally`, provided that the actual patch and evidence are named.
+A disabled feature uses `fixed-by-configuration` only when its exact build
+switch and the vulnerability's prerequisites are known. Missing runtime
+proof must not be silently rewritten into 'not applicable'.
 
-## Repository as the distribution source
+## Import behavior
 
-The versioned reference database lives in `BuildEngine-Admin` at:
+The importer resolves the exact library/version from the catalog and CVE
+code by identity, never from a filesystem path or display name. All rows
+are inserted within the calling transaction; unknown coordinates,
+invalid domain codes and equal-timestamp conflicting assessments fail
+the import. Replaying identical XML produces zero new rows. A new later
+`changedAt` generates a new historical decision, leaving earlier rows
+available. No provider score or past assessment row is deleted.
 
-```text
-admin\security\build-assessments.sqlite
-```
+The SQL migration for existing PostgreSQL databases is located at
+`BuildEngine-Server/internal/postgresql/assessment-import.sql`, and
+the same function is included in the greenfield `buildengine.sql`.
 
-A fresh installation or standard repository synchronization transfers this file into the working directory. When the repository contains an updated copy, the normal Admin synchronization **may and should overwrite** the existing file at the production path. That is how centrally maintained languages, value ranges, provider findings and library assessments are distributed.
+## Deployment and validation gates
 
-Consequently, **do not mark this database as `preserve`** in repository synchronization.
+- The PostgreSQL structure and exact library catalog must exist before importing.
+- Admin sync must copy `assessments.xml` to the Production Root.
+- The reader and writer roles remain separate. The HTTP server never
+  exposes a public write endpoint for assessment imports.
+- Re-run the import after source patches or build-contract changes and
+  create new assessments only when evidence and conclusions warrant revision.
+- Test duplicate imports, same-date conflicts, invalid coordinates,
+  old-version retention, local-patch evidence and browser presentation.
+- Native BCC64X compilation, PostgreSQL execution and complete HTTP tests
+  have **not** yet been independently performed for this new functionality.
 
-## Central editing workflow
-
-Assessments are edited centrally in:
-
-```text
-<ProductionRoot>\admin\security\build-assessments.sqlite
-```
-
-The Manager can import new CVE/provider findings from monitoring, create new library assessments, update existing assessments as new revisions, and use or eventually administer localized languages and value ranges.
-
-After reviewing a change, explicitly copy the working database to the checked-out Admin repository:
-
-```text
-<RepositoriesRoot>\BuildEngine-Admin\admin\security\build-assessments.sqlite
-```
-
-Perform normal Git review, commit and push. The new repository version then becomes the shared reference and is distributed to other BuildEngine installations by the normal Admin sync.
-
-## Distribution cycle
-
-```text
-BuildEngine-Admin repository
-   admin\security\build-assessments.sqlite
-        |
-        | RepositorySync
-        v
-<ProductionRoot>\admin\security\build-assessments.sqlite
-        |
-        | BuildEngine-Manager: monitoring + assessment
-        v
-<ProductionRoot>\admin\security\build-assessments.sqlite
-        |
-        | explicitly copy for distribution
-        v
-<RepositoriesRoot>\BuildEngine-Admin\admin\security\build-assessments.sqlite
-        |
-        | Git review / commit / push
-        v
-BuildEngine-Admin repository
-```
-
-## Current assessment scope
-
-Assess only the concrete BuildEngine library configuration, for example: an affected feature disabled during the build; a vulnerable component not compiled or not shipped; an exploit prerequisite absent from the chosen build profile; a local patch applied; or a newer selected version containing the fix.
-
-Application-specific claims are outside this model and belong to a later extension.
+The first review provider is OpenAI GPT-6, with operator review before
+production acceptance. This is genuine engineering evidence analysis,
+not fictional, synthetic 'toy' security data.
