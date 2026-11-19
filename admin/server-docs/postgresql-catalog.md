@@ -151,6 +151,35 @@ See [configuration](configuration.md) and the
 [PostgreSQL technical README](https://github.com/adeccscholar/BuildEngine-Server/blob/main/internal/postgresql/README.md)
 for exact settings and known limitations.
 
+## Active showcase links and persisted REST evidence (19 November 2026)
+
+Showcase manifests may use the symbolic version `active`. The SQL-backed
+presentation now resolves the selector against a **unique, current,
+non-superseded** catalog version. It links to the concrete version while
+retaining the original `active` intent in the display label. Unresolved
+or ambiguous selectors are labeled explicitly instead of producing a
+broken `/library/{library}/active/` link. Existing browser URLs with
+`active` are independently resolved, and the versioned machine API
+also accepts this selector.
+
+The GET-only API includes `/api/v1/runs/latest` for the last
+`catalog_sync` record and last mirrored `library_scope_state` check,
+`/api/v1/security` for persisted direct per-version CVE and scan-status
+evidence, and `/api/v1/security/{library}/{version}` for the complete
+per-version direct/transitive risk projection. Scan status, diagnostic
+information and check timestamps are returned without querying upstream
+providers. The current `/api/v1/risk/{library}/{version}` route is
+retained. See [the machine API reference](/manual/server.md).
+
+The SQL schema currently does not contain a process execution-run
+entity. A catalog synchronization time or the most recent scope check
+is **not** proof of when a full BuildEngine process started, ended or
+succeeded. This limitation is included in the API response.
+
+All changes here are in shared C++ code and English documentation. No
+database schema, IDE project or XML configuration files were changed.
+Native BCC64X / live PostgreSQL integration remains **not verified**.
+
 ## Versioned library security summary (19 November 2026)
 
 The PostgreSQL-backed library and package detail pages now include an
