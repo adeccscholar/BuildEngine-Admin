@@ -47,10 +47,10 @@ All of these optional settings are attributes of the existing
 | `databasePasswordEnv` | none | Environment-variable name used only for password mode; no XML password |
 | `databaseSslMode` | `prefer` | libpq SSL policy |
 | `databaseGssEncMode` | `disable` | libpq GSS encryption policy |
-| `databaseSchemaFile` | none | Path to the single checked-in SQL baseline, resolved relative to BuildEngine.xml |
+| `databaseSchemaFile` | `admin/buildengine.sql` | Optional override of the synced admin SQL baseline; resolved relative to BuildEngine.xml |
 
-For a first enabled run, set `databaseSchemaFile` to the location of
-`BuildEngine-Server/internal/postgresql/buildengine.sql`. The
+The default SQL baseline is synchronized to `admin/buildengine.sql` with the
+BuildEngine-Admin payload. Override `databaseSchemaFile` only if necessary. The
 **database itself and both PostgreSQL login roles must already exist**;
 the writer creates the `buildengine` schema and schema objects from the
 baseline when missing, then imports the complete source XML. No bootstrap
@@ -67,8 +67,8 @@ versions, dependencies, usage, tools and scopes have a read-only PostgreSQL
 adapter. HTML page rendering, independent CVE ingestion and security routes
 have **not** yet been migrated.
 
-**[not verified]** BCC64X linking, PostgreSQL first-run initialization,
-SSPI authentication and end-to-end HTTP behavior still require live tests.
+**[not verified]** PostgreSQL first-run initialization, SSPI authentication
+and end-to-end HTTP behavior still require live tests.
 See the [PostgreSQL schema documentation](postgresql-catalog.md).
 
 ## October 2026 local configuration checklist
