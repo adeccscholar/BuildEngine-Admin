@@ -42,7 +42,7 @@ patch must trigger fresh applicability review.
 New installs apply the complete
 `BuildEngine-Server/internal/postgresql/buildengine.sql` baseline.
 Existing databases apply the additive
-`BuildEngine-Server/internal/postgresql/assessment-import.sql` migration
+`BuildEngine-Server/internal/postgresql/Update_1.sql` migration
 once using `buildengine_user`. This creates the native
 `buildengine.import_cve_assessments_xml(text)` function.
 
