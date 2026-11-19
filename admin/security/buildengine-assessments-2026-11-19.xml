@@ -74,14 +74,14 @@
          <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
          <cve id="CVE-2026-92392" sourceStatus="upstream-affected-version" reportedSeverity="high" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="8.23.0">
             <summary>HTTP/2 upload use-after-free; source fix verified upstream. Build runtime feature applicability unreviewed.</summary>
-            <source url="https://curl.se/mail/lib-2026-10/0004.html"/>
+            <source url="https://curl.se/docs/CVE-2026-92392.html"/>
          </cve>
       </libraryAssessment>
       <libraryAssessment id="curl" version="8.23.0" category="network" active="true" buildTimestamp="2026-11-08T02:00:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
          <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
          <cve id="CVE-2026-92392" sourceStatus="upstream-fixed-version" reportedSeverity="high" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="8.23.0">
             <summary>HTTP/2 upload use-after-free; source fix verified upstream. Build runtime feature applicability unreviewed.</summary>
-            <source url="https://curl.se/mail/lib-2026-10/0004.html"/>
+            <source url="https://curl.se/docs/CVE-2026-92392.html"/>
          </cve>
       </libraryAssessment>
       <libraryAssessment id="boost" version="1.92.0" category="foundation" active="true" buildTimestamp="2026-11-07T17:24:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
@@ -261,30 +261,30 @@
          <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
          <cve id="CVE-2026-113351" sourceStatus="upstream-affected-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
             <summary>Denial of service through XML_ParserReset; source fix in 2.10.0.</summary>
-            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+            <source url="https://github.com/libexpat/libexpat/releases/tag/R_2_10_0"/>
          </cve>
          <cve id="CVE-2026-115506" sourceStatus="upstream-affected-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
             <summary>Denial of service from entity expansion attacks; source fix in 2.10.0.</summary>
-            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+            <source url="https://github.com/libexpat/libexpat/releases/tag/R_2_10_0"/>
          </cve>
          <cve id="CVE-2026-117610" sourceStatus="upstream-affected-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
             <summary>Initial non-final empty subparser parse issue; fix in 2.10.0.</summary>
-            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+            <source url="https://github.com/libexpat/libexpat/releases/tag/R_2_10_0"/>
          </cve>
       </libraryAssessment>
       <libraryAssessment id="expat" version="2.10.0" category="data" active="true" buildTimestamp="2026-11-08T03:45:00Z" priority="P1-exposure" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
          <comment>No full OSV/NVD/EPSS/KEV per-version enumeration performed; do not interpret this entry as a clean bill of health.</comment>
          <cve id="CVE-2026-113351" sourceStatus="upstream-fixed-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
             <summary>Denial of service through XML_ParserReset; source fix in 2.10.0.</summary>
-            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+            <source url="https://github.com/libexpat/libexpat/releases/tag/R_2_10_0"/>
          </cve>
          <cve id="CVE-2026-115506" sourceStatus="upstream-fixed-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
             <summary>Denial of service from entity expansion attacks; source fix in 2.10.0.</summary>
-            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+            <source url="https://github.com/libexpat/libexpat/releases/tag/R_2_10_0"/>
          </cve>
          <cve id="CVE-2026-117610" sourceStatus="upstream-fixed-version" reportedSeverity="unknown" buildApplicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" recommendedFixedVersion="2.10.0">
             <summary>Initial non-final empty subparser parse issue; fix in 2.10.0.</summary>
-            <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+            <source url="https://github.com/libexpat/libexpat/releases/tag/R_2_10_0"/>
          </cve>
       </libraryAssessment>
       <libraryAssessment id="teckit" version="2.5.13" category="text" active="true" buildTimestamp="2026-11-09T14:30:00Z" priority="P2-feed-review" applicability="unreviewed" exposure="unknown" effectiveRisk="unknown" decision="needs-investigation" publicationState="local" evidenceStatus="incomplete">
@@ -431,7 +431,7 @@
    </versionAssessments>
    <cveEvidence>
       <advisory id="CVE-2026-92392" component="curl" knownAffectedVersion="8.21.0" upstreamFixedVersion="8.23.0" severity="high">
-         <source url="https://curl.se/mail/lib-2026-10/0004.html"/>
+         <source url="https://curl.se/docs/CVE-2026-92392.html"/>
          <note>HTTP/2 upload use-after-free; source fix verified upstream. Build runtime feature applicability unreviewed.</note>
       </advisory>
       <advisory id="CVE-2026-84782" component="openssl" knownAffectedVersion="3.5.8" upstreamFixedVersion="3.5.9" severity="high">
@@ -451,26 +451,26 @@
          <note>Expat 2.8.5 release explicitly documents this CVE fix; fix included in 2.10.0.</note>
       </advisory>
       <advisory id="CVE-2026-113351" component="expat" knownAffectedVersion="2.9.0" upstreamFixedVersion="2.10.0" severity="unknown">
-         <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         <source url="https://github.com/libexpat/libexpat/releases/tag/R_2_10_0"/>
          <note>Denial of service through XML_ParserReset; source fix in 2.10.0.</note>
       </advisory>
       <advisory id="CVE-2026-115506" component="expat" knownAffectedVersion="2.9.0" upstreamFixedVersion="2.10.0" severity="unknown">
-         <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         <source url="https://github.com/libexpat/libexpat/releases/tag/R_2_10_0"/>
          <note>Denial of service from entity expansion attacks; source fix in 2.10.0.</note>
       </advisory>
       <advisory id="CVE-2026-117610" component="expat" knownAffectedVersion="2.9.0" upstreamFixedVersion="2.10.0" severity="unknown">
-         <source url="https://www.xml.com/news/2026-11-expat-2100/"/>
+         <source url="https://github.com/libexpat/libexpat/releases/tag/R_2_10_0"/>
          <note>Initial non-final empty subparser parse issue; fix in 2.10.0.</note>
       </advisory>
    </cveEvidence>
    <candidateLibraries>
       <candidate id="cgal" version="6.2.1" domain="mathematics" priority="P1" evidence="upstream-release" url="https://github.com/CGAL/cgal/releases" rationale="Computational geometry, exact predicates, triangulation; high dependency complexity and GMP/MPFR licensing to evaluate."/>
-      <candidate id="libigl" version="2.6.4" domain="mathematics" priority="P1" evidence="upstream-release" url="https://github.com/libigl/libigl/releases" rationale="Geometry processing, distances and mesh operations; selected features can reuse managed Eigen 5.0.1."/>
+      <candidate id="libigl" version="2.6.0" domain="mathematics" priority="P1" evidence="upstream-release" url="https://github.com/libigl/libigl/releases" rationale="Geometry processing, distances and mesh operations; selected features can reuse managed Eigen 5.0.1."/>
       <candidate id="ceres-solver" version="unverified" domain="mathematics" priority="P1" evidence="version-not-verified" url="https://github.com/ceres-solver/ceres-solver" rationale="Nonlinear least squares and camera calibration optimization; verify upstream version and solver dependencies."/>
       <candidate id="xtensor" version="unverified" domain="mathematics" priority="P2" evidence="version-not-verified" url="https://github.com/xtensor-stack/xtensor" rationale="N-dimensional array expressions and numerical algorithms; header-only consumer policy."/>
       <candidate id="jolt-physics" version="5.6.0" domain="game" priority="P1" evidence="upstream-release" url="https://github.com/jrouwe/JoltPhysics/releases" rationale="3D rigid-body physics alongside Box2D; ensure BCC64X DLL export ABI and feature gates."/>
       <candidate id="assimp" version="6.0.6" domain="game" priority="P1" evidence="upstream-release" url="https://github.com/assimp/assimp/releases" rationale="3D asset import; disable unneeded bundled libraries and risky format importers explicitly."/>
-      <candidate id="openexr" version="3.5.3" domain="game-graphics" priority="P1" evidence="upstream-security-release" url="https://github.com/AcademySoftwareFoundation/openexr/releases" rationale="HDR imaging; 3.5.3 explicitly includes security fixes; no prior OpenEXR package is present in this catalog."/>
+      <candidate id="openexr" version="3.5.2" domain="game-graphics" priority="P1" evidence="upstream-release" url="https://github.com/AcademySoftwareFoundation/openexr/releases" rationale="HDR imaging; 3.5.2 is a verified upstream patch release; no prior OpenEXR package is present in this catalog."/>
       <candidate id="hnswlib" version="unverified" domain="deckkernel" priority="P1" evidence="version-not-verified" url="https://github.com/nmslib/hnswlib" rationale="Approximate nearest-neighbor search for artwork feature vectors; optional with PostgreSQL candidate narrowing."/>
       <candidate id="zxing-cpp" version="unverified" domain="deckkernel" priority="P2" evidence="version-not-verified" url="https://github.com/zxing-cpp/zxing-cpp" rationale="Barcode and 2D-code recognition; verify there is a concrete DeckKernel input use case."/>
       <candidate id="onnxruntime" version="unverified" domain="deckkernel" priority="P2" evidence="version-not-verified" url="https://github.com/microsoft/onnxruntime" rationale="Optional image embedding/inference backend; native BCC64X source build is a high-complexity separate feasibility gate."/>
