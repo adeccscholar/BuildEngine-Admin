@@ -63,20 +63,11 @@ if(IMGUI_BUILD_SDL2_OPENGL3_BACKEND)
       "IMGUI_API=__declspec(dllimport)"
       "IMGUI_IMPL_API=__declspec(dllexport)"
       IMGUI_IMPL_OPENGL_LOADER_CUSTOM)
-   # CMake de-duplicates repeated compiler options. Two "-include" groups
-   # can therefore become one "-include" plus an extra input filename, which
-   # BCC64X rejects when CMake also specifies the output object with "-o".
-   # Use one forced header and keep the BCC64X-required include order.
-   set(_imgui_glew_header "${IMGUI_GLEW_PACKAGE_ROOT}/include/GL/glew.h")
-   if(NOT EXISTS "${_imgui_glew_header}")
-      message(FATAL_ERROR "Managed GLEW header missing: ${_imgui_glew_header}")
+   # GLEW supplies the BCC64X-compatible public header as part of its own
+   # managed package. No per-consumer forced include is permitted.
+   if(NOT EXISTS "${IMGUI_GLEW_PACKAGE_ROOT}/include/GL/glew.h")
+      message(FATAL_ERROR "Managed GLEW public header missing")
    endif()
-   set(_imgui_backend_forced_header
-      "${CMAKE_CURRENT_BINARY_DIR}/imgui-bcc64x-gl-includes.h")
-   file(WRITE "${_imgui_backend_forced_header}"
-      "#pragma once\n#include <stddef.h>\n#include <GL/glew.h>\n")
-   target_compile_options(imgui_sdl2_opengl3 PRIVATE
-      "SHELL:-include \"${_imgui_backend_forced_header}\"")
    target_link_libraries(imgui_sdl2_opengl3 PRIVATE
       imgui SDL2::SDL2 OpenGL::OpenGL GLEW::GLEW)
    set_target_properties(imgui_sdl2_opengl3 PROPERTIES

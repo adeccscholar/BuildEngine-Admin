@@ -47,3 +47,7 @@ The producer's existing Dear ImGui 1.93.0 core DLL remains separate. Its upstrea
 The catalog declares the three dependency identities and exact installed paths. Both DLL and import library are mandatory in each configuration; the installed upstream backend headers are checked as required evidence. The existing core smoke remains intact, while the Navigation Reactor supplies an additional GPU integration and runtime smoke.
 
 **[not verified]** The producer extension must be compiled under BCC64X for both Debug and Release; the current XML registration is not itself passing test evidence. This addition intentionally increases backend functionality instead of disabling it to avoid dependencies.
+
+## Managed GLEW header boundary (20 November 2026)
+
+A consumer compilation failure in Navigation Reactor demonstrated that the native GLEW package's exported header was not self-contained under BCC64X. The GLEW producer now owns the `stddef.h` prerequisite in its public installed `glew.h`. The ImGui SDL2/OpenGL3 producer no longer needs an artificial two-header command-line preload. Rebuild GLEW first; then its downstream backend DLL can consume the standard `GL/glew.h` interface without per-application workarounds. **[not verified]** Until the local Windows builds pass.

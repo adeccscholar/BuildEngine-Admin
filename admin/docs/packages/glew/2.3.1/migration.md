@@ -140,3 +140,11 @@ The contract includes one or more upstream tests, validation actions or consumer
 4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
 **Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.
+
+## Public header self-containment correction (20 November 2026)
+
+The BCC64X consumer reported `unknown type name 'ptrdiff_t'` when `GL/glew.h` was included without a preparatory `stddef.h`. The previous GLEW smoke concealed the contract issue by using a private `-include stddef.h` compiler option. The updated GLEW producer now derives an installed public `glew.h` from the upstream source header, prepending `#include <stddef.h>`, without changing the upstream archive. The remaining official GLEW headers are installed unchanged.
+
+The BuildEngine XML now copies the headers from the producer's installed Release stage, **not from the original workspace source**. This is essential: the old common install copy would otherwise overwrite the corrected public header. The GLEW consumer smoke no longer uses any forced header, so it tests `#include <GL/glew.h>` directly.
+
+**[not verified]** Rebuild and reinstall GLEW 2.3.1, then rebuild the dependent ImGui backend and Navigation Reactor under BCC64X. No PASS is claimed before local FSM evidence.
