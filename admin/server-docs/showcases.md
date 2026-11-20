@@ -95,3 +95,11 @@ The server serves project metadata and Markdown documentation only; launching an
 ## Validation
 
 The established graphics showcases, four newly registered discovery laboratories, and the standalone documentation-server test have their own versioned manifests in BuildEngine-Tests. The 120 native library FSM integrations are user-confirmed complete; **[not verified]** the newly added graphical demonstrations and central HTTP rendering require Windows host execution after rebuilding BuildEngine-Common and BuildEngine-Server.
+
+## Cross-engine physics laboratory: Jolt Physics versus Box2D
+
+The existing **[Neon Physics Arena](/showcase/neon-physics-arena/)** now declares a third native executable, `neon-physics-duel.exe`, in its `showcase.json` and an additional CTest named `NeonPhysicsDifferential`. This test is intentionally deeper than the single-library consumer smokes: it independently creates and advances Jolt Physics 5.7 (3D) and Box2D 3.2 (2D) worlds, with equivalent sphere-on-floor scenarios at 120 Hz for 720 steps.
+
+Both engines are executed twice from independent initial worlds. Assertions check repeatability **within each engine**, correct gravity and floor behaviour, and finite, bounded trajectories. The program outputs six sampled heights per solver and elapsed runtime metrics. It does not require their numerical trajectories or timing results to match each other: different solvers and dimensions have different contact models. `DUEL|CHECK|...`, `DUEL|METRIC|...` and `DUEL|RESULT|...` are visible in CTest output.
+
+The Jolt DLL ABI is checked before any physics registration, and all third-party dependencies resolve from the active BuildEngine package catalog. The operator has confirmed the 126-library FSM completed successfully; nevertheless, **[not verified]** the newly authored differential application must separately pass native CMake/CTest, DLL-closure inspection and the test's own assertions. The Showcase status must never be marked verified by copying the library FSM status.
