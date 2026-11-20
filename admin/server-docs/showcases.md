@@ -78,7 +78,7 @@ Four projects are registered in the existing BuildEngine-Tests tree and are disc
 | Showcase | Core native algorithm | Interactive experience | Project route |
 | --- | --- | --- | --- |
 | **Vector Galaxy — The Shape of Similarity** | `hnswlib@0.9.0` HNSW search over 851 3D feature vectors; `libigl@2.6.4` and `eigen@5.0.1` compute actual triangle-mesh normals | Orbiting luminous starfield, highlighted live nearest-neighbour results, query position, neighbour count and zoom | [Open Vector Galaxy](/showcase/graphics/vector-galaxy/) |
-| **Barcode Signal Lab — Decode the Invisible** | `zxing-cpp@3.1.1` reader DLL decodes a grayscale EAN-13 barcode independently generated from the published parity/checksum rules | Native scan chamber, adjustable barcode data, scan action, quality mode and live decoded output | [Open Barcode Signal Lab](/showcase/graphics/barcode-signal-lab/) |
+| **Barcode Signal Lab — Decode the Invisible** | `zxing-cpp@3.1.1` reader DLL decodes a grayscale EAN-13 barcode independently generated from the published parity/checksum rules | Interactive five-format encode/scan chamber with editable payload and actual decoded output | [Open Barcode Signal Lab](/showcase/graphics/barcode-signal-lab/) |
 | **Navigation Reactor — Terrain Intelligence** | `recastnavigation@1.6.0` classifies triangle walkability and rasterizes a real 3D terrain into `rcHeightfield` spans | Turquoise walkable terrain versus magenta blocked slopes, live agent slope and terrain relief controls | [Open Navigation Reactor](/showcase/graphics/navigation-reactor/) |
 | **Pulse Engine — The Shape of Sound** | `miniaudio@0.11.26` synthesizes actual PCM samples using native `ma_waveform` and optional `ma_device` playback | Four oscillator shapes, glowing oscilloscope, pitch/gain sliders and sound only after the operator presses Play | [Open Pulse Engine](/showcase/graphics/pulse-engine/) |
 
@@ -99,7 +99,7 @@ Every new project carries an explicit `dependencies[]` array in `showcase.json`.
 | Showcase | Direct managed library relationships |
 | --- | --- |
 | [Vector Galaxy](/showcase/graphics/vector-galaxy/) | [hnswlib](/library/hnswlib/0.9.0/), [libigl](/library/libigl/2.6.4/), Eigen, Dear ImGui, SDL2 |
-| [Barcode Signal Lab](/showcase/graphics/barcode-signal-lab/) | [ZXing-C++](/library/zxing-cpp/3.1.1/), Dear ImGui, SDL2 |
+| [Barcode Signal Lab](/showcase/graphics/barcode-signal-lab/) | [ZXing-C++](/library/zxing-cpp/3.1.1/), [Zint](/library/zint/2.16.0/), Dear ImGui, SDL2 |
 | [Navigation Reactor](/showcase/graphics/navigation-reactor/) | [Recast Navigation](/library/recastnavigation/1.6.0/), Dear ImGui, SDL2 |
 | [Pulse Engine](/showcase/graphics/pulse-engine/) | [miniaudio](/library/miniaudio/0.11.26/), Dear ImGui, SDL2 |
 | [Neon Physics Arena](/showcase/neon-physics-arena/) including the differential solver | [Jolt Physics](/library/jolt-physics/5.7.0/), Box2D, SDL3 |
