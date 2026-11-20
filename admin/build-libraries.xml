@@ -16393,16 +16393,16 @@
          <install>
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\Recast{BinarySuffix}.dll"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libRecast.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\Detour{BinarySuffix}.dll"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDetour.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\DetourCrowd{BinarySuffix}.dll"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDetourCrowd.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\DetourTileCache{BinarySuffix}.dll"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDetourTileCache.lib"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\DebugUtils{BinarySuffix}.dll"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDebugUtils.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libRecast{BinarySuffix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libRecast{BinarySuffix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libDetour{BinarySuffix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDetour{BinarySuffix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libDetourCrowd{BinarySuffix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDetourCrowd{BinarySuffix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libDetourTileCache{BinarySuffix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDetourTileCache{BinarySuffix}.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libDebugUtils{BinarySuffix}.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDebugUtils{BinarySuffix}.lib"/>
             </perVariant>
             <common>
                <copy source="{Workspace}\License.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\recastnavigation\License.txt" overwrite="true"/>
@@ -16471,7 +16471,7 @@
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libJolt{BinarySuffix}.dll"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libJolt.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libJolt{BinarySuffix}.lib"/>
             </perVariant>
             <common>
                <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\jolt-physics\LICENSE" overwrite="true"/>
