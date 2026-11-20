@@ -92,6 +92,20 @@ The newly registered Jolt Physics 5.7.0 DLL is intentionally **not** presented a
 
 The server serves project metadata and Markdown documentation only; launching an executable remains an operator action on the local Windows machine.
 
+## Verified bidirectional library relationships for the new applications
+
+Every new project carries an explicit `dependencies[]` array in `showcase.json`. Both rendering backends must resolve **`active` to exactly one non-superseded catalog version** and must produce real versioned library routes, never `/library/<id>/active/`.
+
+| Showcase | Direct managed library relationships |
+| --- | --- |
+| [Vector Galaxy](/showcase/graphics/vector-galaxy/) | [hnswlib](/library/hnswlib/0.9.0/), [libigl](/library/libigl/2.6.4/), Eigen, Dear ImGui, SDL2 |
+| [Barcode Signal Lab](/showcase/graphics/barcode-signal-lab/) | [ZXing-C++](/library/zxing-cpp/3.1.1/), Dear ImGui, SDL2 |
+| [Navigation Reactor](/showcase/graphics/navigation-reactor/) | [Recast Navigation](/library/recastnavigation/1.6.0/), Dear ImGui, SDL2 |
+| [Pulse Engine](/showcase/graphics/pulse-engine/) | [miniaudio](/library/miniaudio/0.11.26/), Dear ImGui, SDL2 |
+| [Neon Physics Arena](/showcase/neon-physics-arena/) including the differential solver | [Jolt Physics](/library/jolt-physics/5.7.0/), Box2D, SDL3 |
+
+In the showcase detail page, each direct dependency links to its concrete library version. In the reverse direction, that exact library-version page lists all matching showcase projects. The file-backed renderer resolves the manifest against the loaded XML catalog; the PostgreSQL renderer resolves both forward and reverse references via `PostgresCatalogReader::ActiveVersion`. An unresolved or ambiguous active coordinate must remain explicitly unresolved and must not point to an invented version. Persisted showcase cache rows must be refreshed after new manifests are synchronized.
+
 ## Validation
 
 The established graphics showcases, four newly registered discovery laboratories, and the standalone documentation-server test have their own versioned manifests in BuildEngine-Tests. The 120 native library FSM integrations are user-confirmed complete; **[not verified]** the newly added graphical demonstrations and central HTTP rendering require Windows host execution after rebuilding BuildEngine-Common and BuildEngine-Server.
