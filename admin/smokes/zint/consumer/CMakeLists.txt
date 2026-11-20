@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.31)
+project(buildengine_zint_consumer LANGUAGES C)
+if(NOT DEFINED ZINT_PACKAGE_ROOT)
+   message(FATAL_ERROR "ZINT_PACKAGE_ROOT is required")
+endif()
+add_executable(zint-consumer main.c)
+target_include_directories(zint-consumer PRIVATE "${ZINT_PACKAGE_ROOT}/include")
+find_library(ZINT_LIBRARY NAMES zint libzint PATHS
+   "${ZINT_PACKAGE_ROOT}/lib/win64/Release" NO_DEFAULT_PATH REQUIRED)
+target_link_libraries(zint-consumer PRIVATE "${ZINT_LIBRARY}")
