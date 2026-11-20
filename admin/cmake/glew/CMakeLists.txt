@@ -21,6 +21,15 @@ set(_patched "${CMAKE_CURRENT_BINARY_DIR}/glew-bcc64x.c")
 file(WRITE "${_patched}" "${_text}")
 add_library(GLEW SHARED "${_patched}")
 add_library(GLEW::GLEW ALIAS GLEW)
+# Preserve upstream sources, but install a BCC64X-compatible public header:
+# the exported API uses global ptrdiff_t, which must be declared before glew.h.
+# This belongs to the GLEW producer, not to individual consumers.
+set(_glew_public_header "${CMAKE_CURRENT_BINARY_DIR}/glew-bcc64x-public.h")
+file(READ "${GLEW_SOURCE_DIR}/include/GL/glew.h" _glew_original_header)
+file(WRITE "${_glew_public_header}"
+   "/* BuildEngine BCC64X packaging: declare ptrdiff_t before upstream GLEW. */\n"
+   "#include <stddef.h>\n"
+   "${_glew_original_header}")
 target_compile_options(GLEW PRIVATE -include stddef.h)
 target_include_directories(GLEW PUBLIC $<BUILD_INTERFACE:${GLEW_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 target_compile_definitions(GLEW PRIVATE GLEW_BUILD)
@@ -31,3 +40,10 @@ write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/GLEWConfigVersion.
 configure_package_config_file("${CMAKE_CURRENT_SOURCE_DIR}/GLEWConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/GLEWConfig.cmake" INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/GLEW")
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/GLEWConfig.cmake" "${CMAKE_CURRENT_BINARY_DIR}/GLEWConfigVersion.cmake" DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/GLEW")
 install(EXPORT GLEWTargets FILE GLEWTargets.cmake NAMESPACE GLEW:: DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/GLEW")
+
+# Install the genuine upstream headers, then replace only glew.h with the
+# producer-owned compatibility variant. Do not modify the source archive.
+install(DIRECTORY "${GLEW_SOURCE_DIR}/include/GL/"
+   DESTINATION "include/GL" FILES_MATCHING PATTERN "*.h")
+install(FILES "${_glew_public_header}" DESTINATION "include/GL"
+   RENAME "glew.h")
