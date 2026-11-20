@@ -98,6 +98,13 @@ set(CMAKE_ASM_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X assembler driver
 set(CMAKE_C_COMPILER   "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C compiler" FORCE)
 set(CMAKE_CXX_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C++ compiler" FORCE)
 
+# CMake 4.x automatically scans C++23 translation units for C++ modules.
+# For BuildEngine's non-module BCC64X consumers this invokes clang-scan-deps,
+# which fails in the compatibility headers before the actual compiler pass.
+# Keep BCC64X as Clang/EMBT and use its regular compilation path.
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF CACHE BOOL
+   "Disable automatic C++ module scanning for BCC64X consumers" FORCE)
+
 set(CMAKE_USER_MAKE_RULES_OVERRIDE
    "${_BCC64X_RULE_OVERRIDE}"
    CACHE FILEPATH "BCC64X CMake rule override" FORCE)
