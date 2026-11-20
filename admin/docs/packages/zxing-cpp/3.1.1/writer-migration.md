@@ -18,3 +18,11 @@ The associated [Barcode Signal Lab](/showcase/graphics/barcode-signal-lab/) is e
 - Use only `main`. Record validated Debug/Release, checksum, SBOM and dependency edges on the server after the real run.
 
 **[not verified]** The updated ZXing writer integration awaits a Windows BCC64X build and full smoke validation.
+
+## Zint export dependency resolution (2026-11-20)
+
+The installed Zint CMake package is consumed through its configuration-specific `zint_DIR`. With PNG enabled, its exported CMake configuration can resolve PNG (and zlib) while processing `find_package(zint CONFIG)`. Therefore the ZXing BuildEngine registration now declares **zint 2.16.0, libpng 1.6.59 and zlib 1.4** and supplies their installed roots using `CMAKE_PREFIX_PATH`, `PNG_ROOT` and `ZLIB_ROOT`. `ZXING_WRITERS=NEW`, `ZXING_USE_BUNDLED_ZINT=OFF` and the PNG-enabled Zint producer remain unchanged.
+
+The ZXing native consumer also receives the required `ZINT_PACKAGE_ROOT` pointing to the installed Zint package. Previously its CMake consumer contract required this variable without the corresponding smoke argument.
+
+**[not verified]** The supplied FSM excerpt exposes only the `FindPackageHandleStandardArgs.cmake` location, not the missing-package diagnostic. The actual reason for the previous ZXing configuration failure and the native BCC64X Debug/Release result require a fresh host run and complete `01-cmake-configure.log` evidence. The changes above correct the package-search contract and the consumer variable; they do not constitute a build PASS.

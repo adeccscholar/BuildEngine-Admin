@@ -16289,8 +16289,10 @@
          <argument value="-DEIGEN_PACKAGE_ROOT:PATH={InstallRoot}\packages\eigen\5.0.1"/>
       </smoke>
    </library>
-   <library id="zxing-cpp" version="3.1.1" category="graphics" timestamp="2026-11-20T05:15:00Z">
+   <library id="zxing-cpp" version="3.1.1" category="graphics" timestamp="2026-11-20T05:40:00Z">
       <dependency library="zint" version="2.16.0"/>
+      <dependency library="libpng" version="1.6.59"/>
+      <dependency library="zlib" version="1.4"/>
       <metadata name="ZXing-C++" supplier="ZXing-C++ contributors" homepage="https://github.com/zxing-cpp/zxing-cpp" description="Native ZXing-C++ barcode reader and writer DLL with externally managed Zint encoder backend." artifactType="shared" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\zxing-cpp\LICENSE"/>
       </metadata>
@@ -16320,6 +16322,9 @@
          <argument value="-DZXING_WRITERS:STRING=NEW"/>
          <argument value="-DZXING_USE_BUNDLED_ZINT:BOOL=OFF"/>
          <argument value="-Dzint_DIR:PATH={DependencyRoot:zint}\lib\win64\{Configuration}\cmake\zint"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:zint};{DependencyRoot:libpng};{DependencyRoot:zlib}"/>
+         <argument value="-DPNG_ROOT:PATH={DependencyRoot:libpng}"/>
+         <argument value="-DZLIB_ROOT:PATH={DependencyRoot:zlib}"/>
          <argument value="-DZXING_C_API:BOOL=OFF"/>
          <argument value="-DZXING_EXAMPLES:BOOL=OFF"/>
          <argument value="-DZXING_EXAMPLES_QT:BOOL=OFF"/>
@@ -16355,6 +16360,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DZXING_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DZINT_PACKAGE_ROOT:PATH={DependencyRoot:zint}"/>
       </smoke>
    </library>
    <library id="recastnavigation" version="1.6.0" category="graphics" timestamp="2026-11-20T01:50:00Z">
