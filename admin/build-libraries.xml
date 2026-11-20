@@ -16195,4 +16195,62 @@
          <argument value="-DMATPLOT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
+   <!-- Reviewed upstream tags; native source-build smoke and archive hashes remain acceptance gates. -->
+   <library id="hnswlib" version="0.9.0" category="math" timestamp="2026-11-20T00:33:00Z">
+      <metadata artifactType="interface" name="hnswlib" supplier="hnswlib contributors" homepage="https://github.com/nmslib/hnswlib" description="Header-only hierarchical navigable small-world nearest-neighbor index; optional DeckKernel artwork feature-vector retrieval." licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\hnswlib\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/nmslib/hnswlib.git" ref="v0.9.0"/></security>
+      <source>
+         <download url="https://github.com/nmslib/hnswlib/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="hnswlib-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="hnswlib-{LibraryVersion}">
+            <require path="hnswlib\hnswlib.h"/>
+            <require path="hnswlib\hnswalg.h"/>
+            <require path="hnswlib\space_l2.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\hnswlib" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\hnswlib" recursive="true" overwrite="true"/>
+         <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\hnswlib\LICENSE" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\hnswlib\hnswlib.h"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\hnswlib\LICENSE"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\hnswlib\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="hnswlib-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DHNSWLIB_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
+   <library id="miniaudio" version="0.11.26" category="graphics" timestamp="2026-11-20T00:34:00Z">
+      <metadata artifactType="interface" name="miniaudio" supplier="David Reid and contributors" homepage="https://miniaud.io/" description="Single-header C audio engine with explicit sound fading; optional DeckKernel accept/reject feedback, compiled inside the consuming project." licenseSignal="green">
+         <license name="MIT or public domain alternative" spdx="MIT" file="licenses\miniaudio\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/mackron/miniaudio.git" ref="0.11.26"/></security>
+      <source>
+         <download url="https://github.com/mackron/miniaudio/archive/refs/tags/{LibraryVersion}.tar.gz" archive="miniaudio-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="miniaudio-{LibraryVersion}">
+            <require path="miniaudio.h"/>
+            <require path="LICENSE"/>
+            <require path="CMakeLists.txt"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\miniaudio.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\miniaudio.h" overwrite="true"/>
+         <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\miniaudio\LICENSE" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\miniaudio.h"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\miniaudio\LICENSE"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\miniaudio\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="miniaudio-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DMINIAUDIO_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
 </buildLibraries>
