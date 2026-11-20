@@ -1,7 +1,7 @@
 #include <hnswlib/hnswlib.h>
 
 #include <array>
-#include <cstdio>
+#include <print>
 #include <exception>
 
 int main() {
@@ -14,13 +14,14 @@ int main() {
       theIndex.addPoint(arrFirst.data(),1U);
       theIndex.addPoint(arrSecond.data(),2U);
       auto theMatches=theIndex.searchKnn(arrQuery.data(),1U);
-      if(theMatches.size()!=1U || theMatches.top().second!=1U) return 2;
-      std::puts("SMOKE|CHECK|hnswlib nearest neighbor");
-      std::puts("SMOKE|RESULT|PASS");
-      return 0;
+      bool const bPassed = theMatches.size()==1U && theMatches.top().second==1U;
+      std::println("SMOKE|CHECK|nearest-neighbor|{}|hnswlib returns the expected nearest label", bPassed ? "PASS" : "FAIL");
+      std::println("SMOKE|RESULT|{}|hnswlib consumer", bPassed ? "PASS" : "FAIL");
+      return bPassed ? 0 : 2;
    }
    catch(std::exception const& theError) {
-      std::fprintf(stderr,"SMOKE|RESULT|FAIL %s\n",theError.what());
+      std::println("SMOKE|CHECK|nearest-neighbor|FAIL|hnswlib threw an exception");
+      std::println("SMOKE|RESULT|FAIL|hnswlib exception: {}", theError.what());
       return 1;
    }
 }
