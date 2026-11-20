@@ -6,7 +6,7 @@
 int main() {
    unsigned int const uMajor=MA_VERSION_MAJOR;
    unsigned int const uMinor=MA_VERSION_MINOR;
-   if(uMajor==0U || uMinor==0U) {
+   if(uMajor!=0U || uMinor<11U) {
       std::puts("SMOKE|RESULT|FAIL");
       return 1;
    }
