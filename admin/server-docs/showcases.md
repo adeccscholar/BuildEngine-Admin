@@ -8,7 +8,7 @@ The catalog is grouped by source directory. A project directory is recognized wh
 
 ## Complete test metadata
 
-All **26 standalone BuildEngine-Tests applications** now declare a `showcase.json` manifest. Group-only `database/` is not an executable. The `docu-server/` documentation application is included as a standalone extended test. Every manifest provides a concise functional description and a full list of managed package roots referenced by the test, distinguishing `direct: true` for directly consumed APIs from `direct: false` for supporting runtime closure packages.
+The previously documented **26 standalone BuildEngine-Tests applications** declare a `showcase.json` manifest. Group-only `database/` is not an executable. The `docu-server/` documentation application is included as a standalone extended test. Every manifest provides a concise functional description and a full list of managed package roots referenced by the test, distinguishing `direct: true` for directly consumed APIs from `direct: false` for supporting runtime closure packages.
 
 A manifest may specify `"version": "active"` when its CMake project uses `adecc_package_current_root`. The central server resolves this value against the **unique, non-superseded catalog version on every request**, then displays a version-specific hyperlink. Explicit pinned CMake versions remain pinned. An absent or ambiguous catalog coordinate is reported as unresolved, **never guessed and never linked to a different version**.
 
@@ -71,6 +71,26 @@ The three graphics examples are now native SDL2 applications rather than static 
 
 Their standalone per-project `build.md` guides use copyable one-line CMake commands and independent Release/Debug build directories. The project manifests and declared CycloneDX inventories now include the respective SDL2 and ImGui runtime dependencies. **[not verified]** The revised GUI execution, frame rate, font quality and rendering output require Windows BCC64X testing before any show-readiness claim.
 
+## New native discovery laboratories (20 November 2026)
+
+Three projects are registered in the existing BuildEngine-Tests tree and are discovered by the **same** `/showcases/` route. They are not browser emulations or static SVG demonstrations. Each project contains an independent CMake target, `showcase.json`, a native interactive executable, a separate `--verify` CTest, `Description.md`, `build.md`, `LICENSE.md` and `SBOM.md`.
+
+| Showcase | Core native algorithm | Interactive experience | Project route |
+| --- | --- | --- | --- |
+| **Vector Galaxy — The Shape of Similarity** | `hnswlib@0.9.0` HNSW search over 851 3D feature vectors; `libigl@2.6.4` and `eigen@5.0.1` compute actual triangle-mesh normals | Orbiting luminous starfield, highlighted live nearest-neighbour results, query position, neighbour count and zoom | [Open Vector Galaxy](/showcase/graphics/vector-galaxy/) |
+| **Barcode Signal Lab — Decode the Invisible** | `zxing-cpp@3.1.1` reader DLL decodes a grayscale EAN-13 barcode independently generated from the published parity/checksum rules | Native scan chamber, adjustable barcode data, scan action, quality mode and live decoded output | [Open Barcode Signal Lab](/showcase/graphics/barcode-signal-lab/) |
+| **Navigation Reactor — Terrain Intelligence** | `recastnavigation@1.6.0` classifies triangle walkability and rasterizes a real 3D terrain into `rcHeightfield` spans | Turquoise walkable terrain versus magenta blocked slopes, live agent slope and terrain relief controls | [Open Navigation Reactor](/showcase/graphics/navigation-reactor/) |
+
+These demos use the already managed **SDL2 + Dear ImGui 1.93** native rendering adapter. Native graphics, input and backend DLLs remain explicitly declared in the manifests. No alternative compiler, prebuilt third-party packages or online rendering service is permitted.
+
+### Verification boundary and terminology
+
+The BuildEngine library FSM and the BuildEngine-Tests showcase verification statuses are different evidence domains. Successful source, build, publish and library consumer tests **do not** prove that a newly written interactive showcase compiles or renders. All three new manifests carry `status: "not-verified"` pending actual native CTest and GUI execution. Their detail pages must preserve that status and display exact active version links resolved against the catalog.
+
+The newly registered Jolt Physics 5.7.0 DLL is intentionally **not** presented as a completed showcase: its last operator-provided test ended in a process failure at runtime. A Jolt-dependent scene would need matching ABI feature definitions, passing native runtime tests and stable per-configuration imports before it could honestly be advertised.
+
+The server serves project metadata and Markdown documentation only; launching an executable remains an operator action on the local Windows machine.
+
 ## Validation
 
-The three graphics showcases and the standalone documentation-server test have their own versioned manifests in BuildEngine-Tests. The 120 native library FSM integrations are user-confirmed complete; **[not verified]** the newly added graphical demonstrations and central HTTP rendering require Windows host execution after rebuilding BuildEngine-Common and BuildEngine-Server.
+The established graphics showcases, three newly registered discovery laboratories, and the standalone documentation-server test have their own versioned manifests in BuildEngine-Tests. The 120 native library FSM integrations are user-confirmed complete; **[not verified]** the newly added graphical demonstrations and central HTTP rendering require Windows host execution after rebuilding BuildEngine-Common and BuildEngine-Server.
