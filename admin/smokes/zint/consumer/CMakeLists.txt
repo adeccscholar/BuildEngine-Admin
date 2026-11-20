@@ -5,6 +5,7 @@ if(NOT DEFINED ZINT_PACKAGE_ROOT)
 endif()
 add_executable(zint-consumer main.c)
 target_include_directories(zint-consumer PRIVATE "${ZINT_PACKAGE_ROOT}/include")
+target_compile_definitions(zint-consumer PRIVATE ZINT_DLL)
 find_library(ZINT_LIBRARY NAMES zint libzint PATHS
    "${ZINT_PACKAGE_ROOT}/lib/win64/Release" NO_DEFAULT_PATH REQUIRED)
 target_link_libraries(zint-consumer PRIVATE "${ZINT_LIBRARY}")
