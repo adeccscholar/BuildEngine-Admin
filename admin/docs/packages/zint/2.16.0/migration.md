@@ -9,19 +9,20 @@
 - Source release: upstream GitHub tag `2.16.0`; directory `zint-2.16.0`.
 - Toolchain: BCC64X Clang 20.1.7, Ninja, CMake 4.x; no MSVC/MinGW compiler.
 - `ZINT_SHARED=ON`, `ZINT_STATIC=OFF`, `CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON`.
-- `ZINT_USE_PNG=OFF`, `ZINT_USE_GS1SE=OFF`, `ZINT_USE_QT=OFF`, `ZINT_FRONTEND=OFF`, `ZINT_TEST=OFF`.
+- `ZINT_USE_PNG=ON` with mandatory managed **libpng 1.6.59**, which itself depends on zlib. `ZINT_FRONTEND=ON` retains the upstream command-line frontend; `ZINT_TEST=ON` retains upstream test targets.
+- `ZINT_USE_GS1SE=ON` and `ZINT_USE_QT=ON` preserve upstream capability discovery. However, GS1 Syntax Engine and Qt are not yet registered BuildEngine packages. Upstream CMake may skip them if the required libraries are not installed. Do not report strict GS1 validation or Qt Barcode Studio as available without actual build evidence.
 - Variant separation: `lib/win64/Release`, `lib/win64/Debug`, matching `bin/win64/<Configuration>`. Inspect the actual DLL and import-library names after the first build.
-- The upstream `zint-config.cmake` is placed adjacent to the installed `zint-targets.cmake` in `lib/win64/<Configuration>/cmake/zint`. This prevents a broken exported-target relative include when consuming the installed package.
+- The upstream install already places `zint-config.cmake` alongside `zint-targets.cmake` in `lib/win64/<Configuration>/cmake/zint`. No file relocation is needed; ZXing uses this installed location via `zint_DIR`.
 - License copied to `licenses/zint/LICENSE`; `zint.h` and CMake exports are mandatory install evidence.
 
-The `ZINT_USE_PNG=OFF` choice removes libpng/zlib from this new package's dependency chain; vector symbols, SVG-related capabilities and in-memory raster output remain in scope. The optional external GS1 Syntax Engine is not bundled or fetched. Support for particular GS1 validation modes must not be assumed.
+The managed libpng dependency enables actual PNG output. The native smoke verifies a generated PNG signature in addition to QR modules and vector output. GS1 Syntax Engine and Qt remain unfulfilled capabilities rather than intentionally excluded features; their proper native packages and integration tests are still required.
 
 ## Acceptance requirements
 
 1. Source integrity and release archive SHA-256 verification.
 2. Native Release and Debug DLL/import-library build and exports.
 3. Installed header, package CMake configuration and license/SBOM checks.
-4. BuildEngine `zint` native smoke: QR encoding and vector output with valid CHECK/RESULT records.
+4. BuildEngine `zint` native smoke: QR encoding, vector output and libpng-backed PNG file output with valid CHECK/RESULT records.
 5. ZXing external writer smoke: Zint DLL symbol, QR creation/rendering/decoding round-trip. Confirm the DLL runtime closure really loads the separately installed Zint artifact.
 6. Barcode Signal Lab with five formats and independent CTest verification.
 
