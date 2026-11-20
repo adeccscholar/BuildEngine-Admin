@@ -16497,6 +16497,7 @@
    </library>
    <library id="zint" version="2.16.0" category="image" timestamp="2026-11-20T05:30:00Z">
       <dependency library="libpng" version="1.6.59"/>
+      <dependency library="zlib" version="1.4"/>
       <metadata name="Zint" supplier="Robin Stuart and Zint contributors" homepage="https://zint.org.uk/" description="Native shared barcode generation library and external ZXing-C++ writer backend." artifactType="shared" licenseSignal="green">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\zint\LICENSE"/>
       </metadata>
