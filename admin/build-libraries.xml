@@ -16542,7 +16542,6 @@
          <install>
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <copy source="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\zint\zint-config.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zint\zint-config.cmake" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libzint.dll"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libzint.lib"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zint\zint-targets.cmake"/>
