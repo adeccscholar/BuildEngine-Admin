@@ -117,3 +117,19 @@ The existing **[Neon Physics Arena](/showcase/neon-physics-arena/)** now declare
 Both engines are executed twice from independent initial worlds. Assertions check repeatability **within each engine**, correct gravity and floor behaviour, and finite, bounded trajectories. The program outputs six sampled heights per solver and elapsed runtime metrics. It does not require their numerical trajectories or timing results to match each other: different solvers and dimensions have different contact models. `DUEL|CHECK|...`, `DUEL|METRIC|...` and `DUEL|RESULT|...` are visible in CTest output.
 
 The Jolt DLL ABI is checked before any physics registration, and all third-party dependencies resolve from the active BuildEngine package catalog. The operator has confirmed the 126-library FSM completed successfully; nevertheless, **[not verified]** the newly authored differential application must separately pass native CMake/CTest, DLL-closure inspection and the test's own assertions. The Showcase status must never be marked verified by copying the library FSM status.
+
+## Discovery and synchronization: missing recently added showcases
+
+The server does **not** discover projects directly from GitHub. It reads the production-local `<production-root>/tests` directory; a project needs both `CMakeLists.txt` (or a `.cbproj`) and `Description.md`. New projects created on the BuildEngine-Tests `main` branch must therefore be checked out or updated **in that exact production tests directory**, not only in a separate Git clone.
+
+With PostgreSQL disabled, `DiscoverShowcases` scans that directory on HTTP requests. With PostgreSQL enabled, `/showcases/` uses `buildengine.showcase_cache`, populated by `CatalogDatabase::RefreshPresentationCache` during a BuildEngine run. The cache key is the relative **project directory** (e.g. `graphics/vector-galaxy`), not `graphics/vector-galaxy/showcase.json`; this key was corrected on 20 November 2026. Cache records with unavailable manifests are omitted from the current list.
+
+### Operational recovery
+
+1. Verify `<production-root>/tests/graphics/vector-galaxy/showcase.json` and `Description.md` exist, likewise `barcode-signal-lab`, `navigation-reactor`, and `pulse-engine`, and the updated `neon-physics-arena/showcase.json` exists. Check the actual `BuildEngine-Tests` checkout commit before declaring synchronization successful.
+2. If the production `tests` directory is a clean Git checkout, fetch and fast-forward **main** there. Do not use `git reset --hard`, overwrite local changes, or replace the current checkout with unrelated files.
+3. Run the BuildEngine catalog/presentation-cache synchronization with its configured PostgreSQL writer. A server restart alone does not copy manifests or populate the PostgreSQL showcase cache.
+4. On PostgreSQL, inspect `SELECT showcase_path, is_available FROM buildengine.showcase_cache WHERE showcase_path LIKE 'graphics/%' ORDER BY showcase_path;`. Expected project paths have no trailing `showcase.json` segment. Old incorrectly keyed rows become unavailable after refresh and are not shown.
+5. Reload `/showcases/`, the new `/showcase/graphics/.../` paths, and each exact library page's **Extended tests and showcases** section. The reverse link implementation resolves `active` selectors against the unique active catalog version, never as a literal URL segment.
+
+When tests are missing from the local workspace, editing the server renderer or the database alone cannot make an absent project into a valid native showcase. When projects are present but the database cache is old, a new authorized cache refresh is required.
