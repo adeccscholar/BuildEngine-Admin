@@ -63,7 +63,12 @@ if(IMGUI_BUILD_SDL2_OPENGL3_BACKEND)
       "IMGUI_API=__declspec(dllimport)"
       "IMGUI_IMPL_API=__declspec(dllexport)"
       IMGUI_IMPL_OPENGL_LOADER_CUSTOM)
-   target_compile_options(imgui_sdl2_opengl3 PRIVATE -include GL/glew.h)
+   # BCC64X's GLEW header uses ptrdiff_t in the global namespace.
+   # Match the already validated GLEW consumer: provide stddef.h first.
+   # The order of the two forced includes is intentional.
+   target_compile_options(imgui_sdl2_opengl3 PRIVATE
+      -include stddef.h
+      -include GL/glew.h)
    target_link_libraries(imgui_sdl2_opengl3 PRIVATE
       imgui SDL2::SDL2 OpenGL::OpenGL GLEW::GLEW)
    set_target_properties(imgui_sdl2_opengl3 PROPERTIES
