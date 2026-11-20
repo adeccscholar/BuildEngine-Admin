@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Planning evidence only. This is NOT an executable BuildEngine build-libraries.xml contract.
+     Registered packages are sourced from admin/build-libraries.xml and still require native
+     BCC64X smoke results; candidate packages are deliberately NOT scheduled by the FSM.
+     Upstream release tags/trees and source-archive assets were inspected through GitHub.
+     Full downloaded archive bytes, checksums and malicious-archive scanning were unavailable.
+     This is a capability limitation, not successful archive verification.
+-->
+<libraryCandidates reviewedAt="2026-11-20T00:33:00Z" toolchain="bcc64x-20.1.7" platform="win64x">
+   <candidate id="hnswlib" version="0.9.0" status="registered">
+      <source url="https://github.com/nmslib/hnswlib/archive/refs/tags/v0.9.0.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="hnswlib/hnswlib.h;LICENSE" inspected="true"/>
+      <dependencies>none</dependencies>
+      <integrationGate>Header-only HNSW. Confirm BCC64X smoke, index serialization and RAM/recall before DeckKernel selection.</integrationGate>
+      <deckKernel>High: artwork feature-vector ANN index.</deckKernel>
+   </candidate>
+   <candidate id="miniaudio" version="0.11.26" status="registered">
+      <source url="https://github.com/mackron/miniaudio/archive/refs/tags/0.11.26.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="miniaudio.h;LICENSE" inspected="true"/>
+      <dependencies>none</dependencies>
+      <integrationGate>Single-header implementation compiles in each consumer. Validate ODR, Windows audio backends, implementation TU and fade API smoke.</integrationGate>
+      <deckKernel>Medium: fade-in/fade-out accept/reject sound cues.</deckKernel>
+   </candidate>
+   <candidate id="libigl" version="2.6.4" status="registered">
+      <source url="https://github.com/libigl/libigl/archive/refs/tags/v2.6.4.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="include/igl/per_vertex_normals.h;LICENSE.MPL2;LICENSE.GPL" inspected="true"/>
+      <dependencies>eigen@5.0.1</dependencies>
+      <integrationGate>Core interface is header-oriented; separate GPL/copyleft optional components and disable all unchecked external modules. BCC64X/Eigen smoke pending.</integrationGate>
+      <deckKernel>Medium: geometry algorithms and mesh calculations.</deckKernel>
+   </candidate>
+   <candidate id="zxing-cpp" version="3.1.1" status="candidate-review">
+      <source url="https://github.com/zxing-cpp/zxing-cpp/releases/download/v3.1.1/zxing-cpp-3.1.1.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;core/CMakeLists.txt;LICENSE" inspected="true"/>
+      <dependencies>none in reader-only mode</dependencies>
+      <integrationGate>Use official release asset, NOT automatically generated GitHub source archive: upstream submodule content may be missing. Configure ZXING_WRITERS=OFF, ZXING_READERS=ON, ZXING_DEPENDENCIES=LOCAL and disable samples/PCH; Windows RC &amp; export testing outstanding.</integrationGate>
+      <deckKernel>Medium: optional barcode scanning in card intake.</deckKernel>
+   </candidate>
+   <candidate id="ceres-solver" version="2.2.0" status="candidate-blocked-dependencies">
+      <source url="https://github.com/ceres-solver/ceres-solver/archive/refs/tags/2.2.0.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;include/ceres/ceres.h;LICENSE" inspected="true"/>
+      <dependencies>eigen@5.0.1;glog/gflags and BLAS/sparse solvers optional depending on build</dependencies>
+      <integrationGate>Upstream 2.2.0 source tag exists; latest appropriate release unverified. Verify Eigen 5 compatibility and external solver backends, DLL ABI and local optimization consumer.</integrationGate>
+      <deckKernel>High: reprojection minimization and camera calibration.</deckKernel>
+   </candidate>
+   <candidate id="openexr" version="3.5.4" status="candidate-blocked-dependencies">
+      <source url="https://github.com/AcademySoftwareFoundation/openexr/releases/download/v3.5.4/openexr-3.5.4.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;LICENSE.md;src/lib/OpenEXR/ImfInputFile.h" inspected="true"/>
+      <dependencies>imath;openjph optional;zlib@1.4;zstd@1.5.7;libdeflate@1.26</dependencies>
+      <integrationGate>Prefer official release archive and external Imath. Review 3.5.3/3.5.4 security fixes, OpenJPH fallback, HDR parser fuzz tests and real BCC64X DLL linking.</integrationGate>
+      <deckKernel>Low/medium: HDR image test assets and scientific visualization.</deckKernel>
+   </candidate>
+   <candidate id="assimp" version="6.0.6" status="candidate-security-review">
+      <source url="https://github.com/assimp/assimp/archive/refs/tags/v6.0.6.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;include/assimp/Importer.hpp;LICENSE" inspected="true"/>
+      <dependencies>zlib@1.4 plus optional format-specific libraries</dependencies>
+      <integrationGate>Do NOT use published windows-x64 binary (foreign ABI). Restrict enabled importers first; audit bundled zlib and parsing libraries and invalid-data attack surface.</integrationGate>
+      <deckKernel>Low: optional 3D tabletop models.</deckKernel>
+   </candidate>
+   <candidate id="jolt-physics" version="5.7.0" status="candidate-build-review">
+      <source url="https://github.com/jrouwe/JoltPhysics/archive/refs/tags/v5.7.0.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="Build/CMakeLists.txt;Jolt/Jolt.h;LICENSE" inspected="true"/>
+      <dependencies>none for core CPU physics; optional platform backends</dependencies>
+      <integrationGate>CMake source is Build/, not root. New 5.7.0 differs from prior 5.6.0 plan; check save-state serialization compatibility, SIMD, symbol exports and DLL packaging under BCC64X.</integrationGate>
+      <deckKernel>Low: game physics showcase, not card OCR.</deckKernel>
+   </candidate>
+   <candidate id="cgal" version="6.2.1" status="candidate-blocked-dependencies">
+      <source url="https://github.com/CGAL/cgal/releases/download/v6.2.1/CGAL-6.2.1-library.zip" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;LICENSE.md" inspected="true"/>
+      <dependencies>boost@1.92.0;gmp;mpfr and conditional backends</dependencies>
+      <integrationGate>Only source/library archive, not precompiled win64 auxiliary GMP/MPFR libraries. Audit module-specific GPL/LGPL/commercial obligations and build GMP/MPFR in toolchain first.</integrationGate>
+      <deckKernel>Medium: robust geometry benchmarks versus OpenCV.</deckKernel>
+   </candidate>
+   <candidate id="xtensor" version="0.27.1" status="candidate-blocked-dependencies">
+      <source url="https://github.com/xtensor-stack/xtensor/archive/refs/tags/0.27.1.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;LICENSE" inspected="true"/>
+      <dependencies>xtl;xsimd optional</dependencies>
+      <integrationGate>Pin and build xtl compatibility first, confirm release tag and install layout. Test C++23 expression lifetime, Eigen comparison and BCC64X consumer.</integrationGate>
+      <deckKernel>Medium: numerical image feature pipelines.</deckKernel>
+   </candidate>
+   <candidate id="openal-soft" version="1.25.2" status="candidate-build-review">
+      <source url="https://github.com/kcat/openal-soft/archive/refs/tags/1.25.2.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;COPYING;include/AL/al.h" inspected="true"/>
+      <dependencies>windows audio native;optional external device/codec libraries</dependencies>
+      <integrationGate>Do not use precompiled openal-soft-1.25.2-bin.zip. Disable utilities/examples/test builds and optional network downloads; check HRTF data licensing, resampler SIMD and Windows Clang C++20.</integrationGate>
+      <deckKernel>Medium: spatial audio feedback; alternative to miniaudio.</deckKernel>
+   </candidate>
+   <candidate id="enet" version="1.3.18" status="candidate-adapter-required">
+      <source url="https://github.com/lsalzman/enet/archive/refs/tags/v1.3.18.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;LICENSE;include/enet/enet.h" inspected="true"/>
+      <dependencies>ws2_32;winmm</dependencies>
+      <integrationGate>Upstream CMake hardcodes STATIC library and handles Windows link deps under MINGW. Requires a native BCC64X DLL-producing adapter if independent dynamic package remains policy.</integrationGate>
+      <deckKernel>Low: optional networked tabletop.</deckKernel>
+   </candidate>
+   <candidate id="recastnavigation" version="1.6.0" status="candidate-build-review">
+      <source url="https://github.com/recastnavigation/recastnavigation/archive/refs/tags/v1.6.0.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;License.txt;Recast/Include/Recast.h;Detour/Include/DetourNavMesh.h" inspected="true"/>
+      <dependencies>no required external libraries in core</dependencies>
+      <integrationGate>Set demos/tests/examples OFF. Explicitly inspect CMake shared export policy (currently checks MSVC) for BCC64X Windows and verify Recast + Detour DLL boundaries.</integrationGate>
+      <deckKernel>Low: navigation/pathfinding game showcase.</deckKernel>
+   </candidate>
+   <candidate id="ozz-animation" version="0.17.0" status="candidate-build-review">
+      <source url="https://github.com/guillaumeblanc/ozz-animation/archive/refs/tags/0.17.0.tar.gz" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;LICENSE.md;include/ozz/animation/runtime/animation.h" inspected="true"/>
+      <dependencies>optional fbx SDK/tools;assimp application integration only</dependencies>
+      <integrationGate>Avoid FBX proprietary SDK and optional offline tools at first; validate C++ ABI, SIMD, DLL exports, separately licensed sample assets.</integrationGate>
+      <deckKernel>Low: animated 3D DeckKernel presentation.</deckKernel>
+   </candidate>
+   <candidate id="onnxruntime" status="candidate-high-cost">
+      <source url="https://github.com/microsoft/onnxruntime" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="build.bat;cmake/CMakeLists.txt" inspected="true"/>
+      <dependencies>protobuf;abseil;numerous transitive packages and provider backends</dependencies>
+      <integrationGate>No version pinned. High-complexity custom build, runtime ABI and transitive dependency audit. Do not register active BuildEngine package yet.</integrationGate>
+      <deckKernel>Experimental: machine-learning artwork embeddings.</deckKernel>
+   </candidate>
+</libraryCandidates>
