@@ -98,6 +98,15 @@ set(CMAKE_ASM_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X assembler driver
 set(CMAKE_C_COMPILER   "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C compiler" FORCE)
 set(CMAKE_CXX_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C++ compiler" FORCE)
 
+# CMake 4.x enables automatic C++20 module dependency scanning for C++23
+# sources when Clang is detected. The published header-only consumers do not
+# use C++ modules. In this environment clang-scan-deps enters the MinGW
+# compatibility header path and fails before the BCC64X compile pass.
+# Keep the compiler identity as Clang/EMBT and compile these consumers through
+# the BCC64X driver directly; do not change predefined compiler macros.
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF CACHE BOOL
+   "Disable automatic C++ module scans in the BCC64X BuildEngine toolchain" FORCE)
+
 set(CMAKE_USER_MAKE_RULES_OVERRIDE
    "${_BCC64X_RULE_OVERRIDE}"
    CACHE FILEPATH "BCC64X CMake rule override" FORCE)
