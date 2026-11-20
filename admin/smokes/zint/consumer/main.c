@@ -23,8 +23,23 @@ int main(void) {
    int const bVector = iVectorResult < ZINT_ERROR &&
       pSymbol->vector != NULL && pSymbol->vector->width > 0;
    Check("vector", bVector, "Native vector barcode representation is available");
+   char const szPng[] = "buildengine-zint-smoke.png";
+   unsigned char arrSignature[8] = { 0 };
+   unsigned char const arrExpected[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
+   (void)snprintf(pSymbol->outfile, sizeof(pSymbol->outfile), "%s", szPng);
+   int const iPngResult = bEncoded ? ZBarcode_Print(pSymbol, 0) : ZINT_ERROR_INVALID_DATA;
+   int bPng = 0;
+   FILE *pFile = fopen(szPng, "rb");
+   if(pFile != NULL) {
+      bPng = fread(arrSignature, 1, sizeof(arrSignature), pFile) == sizeof(arrSignature)
+         && memcmp(arrSignature, arrExpected, sizeof(arrSignature)) == 0;
+      fclose(pFile);
+      (void)remove(szPng);
+   }
+   bPng = bPng && iPngResult < ZINT_ERROR;
+   Check("png-output", bPng, "Zint PNG output uses the managed libpng dependency");
    ZBarcode_Delete(pSymbol);
-   printf("SMOKE|RESULT|%s|Zint QR creation and vector output\n",
-          bEncoded && bVector ? "PASS" : "FAIL");
-   return bEncoded && bVector ? 0 : 1;
+   printf("SMOKE|RESULT|%s|Zint QR creation vector output and PNG encoding\n",
+          bEncoded && bVector && bPng ? "PASS" : "FAIL");
+   return bEncoded && bVector && bPng ? 0 : 1;
 }
