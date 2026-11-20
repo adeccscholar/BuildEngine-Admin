@@ -5503,7 +5503,7 @@
       </smoke>
    </library>
 
-   <library id="tesseract" version="5.5.4" category="text" timestamp="2026-11-08T03:30:00Z">
+   <library id="tesseract" version="5.5.4" category="text" timestamp="2026-11-20T00:00:00Z">
       <dependency library="leptonica" version="1.87.0"/>
       <metadata name="Tesseract OCR" supplier="Tesseract OCR Project" homepage="https://github.com/tesseract-ocr/tesseract" description="Dynamically linked C++ OCR engine; language traineddata is provisioned and licensed separately." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source>
@@ -5513,6 +5513,7 @@
          <copy source="{CurrentArtifact}" target="{Workspace}\tessdata\eng.traineddata" overwrite="true" preserveCurrentArtifact="true"/>
          <download url="https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/87416418657359cb625c412a48b6e1d6d41c29bd/deu.traineddata" archive="tessdata-fast-deu-87416418657359cb625c412a48b6e1d6d41c29bd.traineddata"/>
          <copy source="{CurrentArtifact}" target="{Workspace}\tessdata\deu.traineddata" overwrite="true" preserveCurrentArtifact="true"/>
+         <require path="{Workspace}\tessdata\deu.traineddata"/>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
