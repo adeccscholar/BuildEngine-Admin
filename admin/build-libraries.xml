@@ -16017,8 +16017,11 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="imgui" version="1.93.0" category="graphics" timestamp="2026-11-18T09:55:00Z">
-      <metadata name="Dear ImGui" supplier="Omar Cornut and contributors" homepage="https://github.com/ocornut/imgui" description="Native immediate-mode C++ UI core for custom applications and tools; standalone BCC64X DLL without a fixed platform or renderer backend." artifactType="shared" licenseSignal="green">
+   <library id="imgui" version="1.93.0" category="graphics" timestamp="2026-11-20T11:00:00Z">
+      <dependency library="sdl2" version="2.32.10"/>
+      <dependency library="glew" version="2.3.1"/>
+      <dependency library="opengl" version="26.2.1"/>
+      <metadata name="Dear ImGui" supplier="Omar Cornut and contributors" homepage="https://github.com/ocornut/imgui" description="Native Dear ImGui core and official SDL2/OpenGL3 platform/renderer backend as separate managed shared libraries." artifactType="shared" licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="licenses\imgui\LICENSE.txt"/>
       </metadata>
       <security><repository url="https://github.com/ocornut/imgui.git" ref="v1.93.0"/></security>
@@ -16041,6 +16044,10 @@
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DIMGUI_UPSTREAM_SOURCE_DIR:PATH={Workspace}"/>
+         <argument value="-DIMGUI_BUILD_SDL2_OPENGL3_BACKEND:BOOL=ON"/>
+         <argument value="-DIMGUI_SDL2_PACKAGE_ROOT:PATH={DependencyRoot:sdl2}"/>
+         <argument value="-DIMGUI_GLEW_PACKAGE_ROOT:PATH={DependencyRoot:glew}"/>
+         <argument value="-DIMGUI_OPENGL_PACKAGE_ROOT:PATH={DependencyRoot:opengl}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\adapters\imgui" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><variable name="BinarySuffix" value=""/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
@@ -16049,9 +16056,13 @@
             <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\imgui{BinarySuffix}.dll"/>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libimgui{BinarySuffix}.lib"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\imgui_sdl2_opengl3{BinarySuffix}.dll"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libimgui_sdl2_opengl3{BinarySuffix}.lib"/>
          </perVariant><common>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\imgui\LICENSE.txt"/>
             <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\imgui.h"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\backends\imgui_impl_sdl2.h"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\backends\imgui_impl_opengl3.h"/>
          </common></install>
       </build>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
