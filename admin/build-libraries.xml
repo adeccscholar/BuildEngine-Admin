@@ -16253,4 +16253,40 @@
          <argument value="-DMINIAUDIO_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
+   <library id="libigl" version="2.6.4" category="math" timestamp="2026-11-20T00:35:00Z">
+      <dependency library="eigen" version="5.0.1"/>
+      <metadata artifactType="interface" name="libigl" supplier="libigl contributors" homepage="https://libigl.github.io/" description="Header-oriented geometry processing and mesh algorithms, with Eigen as a managed direct dependency; copyleft modules require individual license review." licenseSignal="yellow">
+         <license name="MPL 2.0 core and separate GPL-licensed optional modules" spdx="MPL-2.0" file="licenses\libigl\LICENSE.MPL2"/>
+      </metadata>
+      <security><repository url="https://github.com/libigl/libigl.git" ref="v2.6.4"/></security>
+      <source>
+         <download url="https://github.com/libigl/libigl/archive/refs/tags/v{LibraryVersion}.tar.gz" archive="libigl-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="libigl-{LibraryVersion}">
+            <require path="include\igl\per_vertex_normals.h"/>
+            <require path="include\igl\per_vertex_normals.cpp"/>
+            <require path="include\igl\igl_inline.h"/>
+            <require path="LICENSE.MPL2"/>
+            <require path="LICENSE.GPL"/>
+         </extract>
+      </source>
+      <install>
+         <!-- The upstream include tree contains optional GPL/copyleft modules.
+              Preserve license evidence and do not enable these consumers by default. -->
+         <copy source="{Workspace}\include\igl" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\igl" recursive="true" overwrite="true"/>
+         <copy source="{Workspace}\LICENSE.MPL2" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libigl\LICENSE.MPL2" overwrite="true"/>
+         <copy source="{Workspace}\LICENSE.GPL" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libigl\LICENSE.GPL" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\igl\per_vertex_normals.h"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libigl\LICENSE.MPL2"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\libigl\LICENSE.GPL"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\libigl\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="libigl-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DLIBIGL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DEIGEN_PACKAGE_ROOT:PATH={InstallRoot}\packages\eigen\5.0.1"/>
+      </smoke>
+   </library>
 </buildLibraries>
