@@ -16510,6 +16510,23 @@
             <require path="backend\zint.h"/>
             <require path="LICENSE"/>
          </extract>
+         <!-- Preserve Qt discovery; quote the env variable so an empty
+              CMAKE_PREFIX_PATH does not produce a malformed CMake if(). -->
+         <copy source="{BuildFileDir}\patches\zint\2.16.0\cmake-quote-qt-prefix-env.patch"
+               target="{Workspace}\.buildengine\patches\cmake-quote-qt-prefix-env.patch"
+               overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="qt-prefix-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\cmake-quote-qt-prefix-env.patch"/>
+         </execute>
+         <execute name="qt-prefix-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\cmake-quote-qt-prefix-env.patch"/>
+         </execute>
+         <execute name="qt-prefix-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\cmake-quote-qt-prefix-env.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
