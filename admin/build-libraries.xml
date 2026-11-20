@@ -16495,7 +16495,8 @@
          <argument value="-DJOLT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="zint" version="2.16.0" category="image" timestamp="2026-11-20T05:15:00Z">
+   <library id="zint" version="2.16.0" category="image" timestamp="2026-11-20T05:30:00Z">
+      <dependency library="libpng" version="1.6.59"/>
       <metadata name="Zint" supplier="Robin Stuart and Zint contributors" homepage="https://zint.org.uk/" description="Native shared barcode generation library and external ZXing-C++ writer backend." artifactType="shared" licenseSignal="green">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\zint\LICENSE"/>
       </metadata>
@@ -16525,11 +16526,14 @@
          <argument value="-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS:BOOL=ON"/>
          <argument value="-DZINT_SHARED:BOOL=ON"/>
          <argument value="-DZINT_STATIC:BOOL=OFF"/>
-         <argument value="-DZINT_USE_PNG:BOOL=OFF"/>
-         <argument value="-DZINT_USE_GS1SE:BOOL=OFF"/>
-         <argument value="-DZINT_USE_QT:BOOL=OFF"/>
-         <argument value="-DZINT_FRONTEND:BOOL=OFF"/>
-         <argument value="-DZINT_TEST:BOOL=OFF"/>
+         <argument value="-DZINT_USE_PNG:BOOL=ON"/>
+         <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:libpng};{DependencyRoot:zlib}"/>
+         <argument value="-DPNG_ROOT:PATH={DependencyRoot:libpng}"/>
+         <argument value="-DZLIB_ROOT:PATH={DependencyRoot:zlib}"/>
+         <argument value="-DZINT_USE_GS1SE:BOOL=ON"/>
+         <argument value="-DZINT_USE_QT:BOOL=ON"/>
+         <argument value="-DZINT_FRONTEND:BOOL=ON"/>
+         <argument value="-DZINT_TEST:BOOL=ON"/>
          <argument value="-DZINT_UNINSTALL:BOOL=OFF"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
