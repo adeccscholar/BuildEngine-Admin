@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Planning evidence only. This is NOT an executable BuildEngine build-libraries.xml contract.
      Registered packages are sourced from admin/build-libraries.xml and still require native
-     BCC64X smoke results; candidate packages are deliberately NOT scheduled by the FSM.
+     BCC64X smoke results; only candidates not promoted into build-libraries.xml remain outside the FSM.
      Upstream release tags/trees and source-archive assets were inspected through GitHub.
      Full downloaded archive bytes, checksums and malicious-archive scanning were unavailable.
      This is a capability limitation, not successful archive verification.
@@ -28,7 +28,7 @@
       <integrationGate>Core interface is header-oriented; separate GPL/copyleft optional components and disable all unchecked external modules. BCC64X/Eigen smoke pending.</integrationGate>
       <deckKernel>Medium: geometry algorithms and mesh calculations.</deckKernel>
    </candidate>
-   <candidate id="zxing-cpp" version="3.1.1" status="candidate-review">
+   <candidate id="zxing-cpp" version="3.1.1" status="registered-pending-native-smoke">
       <source url="https://github.com/zxing-cpp/zxing-cpp/releases/download/v3.1.1/zxing-cpp-3.1.1.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;core/CMakeLists.txt;LICENSE" inspected="true"/>
       <dependencies>none in reader-only mode</dependencies>
@@ -56,7 +56,7 @@
       <integrationGate>Do NOT use published windows-x64 binary (foreign ABI). Restrict enabled importers first; audit bundled zlib and parsing libraries and invalid-data attack surface.</integrationGate>
       <deckKernel>Low: optional 3D tabletop models.</deckKernel>
    </candidate>
-   <candidate id="jolt-physics" version="5.7.0" status="candidate-build-review">
+   <candidate id="jolt-physics" version="5.7.0" status="registered-pending-native-smoke">
       <source url="https://github.com/jrouwe/JoltPhysics/archive/refs/tags/v5.7.0.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="Build/CMakeLists.txt;Jolt/Jolt.h;LICENSE" inspected="true"/>
       <dependencies>none for core CPU physics; optional platform backends</dependencies>
@@ -91,7 +91,7 @@
       <integrationGate>Upstream CMake hardcodes STATIC library and handles Windows link deps under MINGW. Requires a native BCC64X DLL-producing adapter if independent dynamic package remains policy.</integrationGate>
       <deckKernel>Low: optional networked tabletop.</deckKernel>
    </candidate>
-   <candidate id="recastnavigation" version="1.6.0" status="candidate-build-review">
+   <candidate id="recastnavigation" version="1.6.0" status="registered-pending-native-smoke">
       <source url="https://github.com/recastnavigation/recastnavigation/archive/refs/tags/v1.6.0.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;License.txt;Recast/Include/Recast.h;Detour/Include/DetourNavMesh.h" inspected="true"/>
       <dependencies>no required external libraries in core</dependencies>
