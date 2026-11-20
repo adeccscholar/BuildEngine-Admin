@@ -63,12 +63,17 @@ if(IMGUI_BUILD_SDL2_OPENGL3_BACKEND)
       "IMGUI_API=__declspec(dllimport)"
       "IMGUI_IMPL_API=__declspec(dllexport)"
       IMGUI_IMPL_OPENGL_LOADER_CUSTOM)
-   # BCC64X's GLEW header uses ptrdiff_t in the global namespace.
-   # Match the already validated GLEW consumer: provide stddef.h first.
-   # The order of the two forced includes is intentional.
+   # The BCC64X driver treats the argument of -include as a file path;
+   # it does not resolve GL/glew.h through the declared -I search roots.
+   # Force the managed, absolute GLEW header path after stddef.h, because
+   # GLEW's API declarations use global ptrdiff_t on this toolchain.
+   set(_imgui_glew_header "${IMGUI_GLEW_PACKAGE_ROOT}/include/GL/glew.h")
+   if(NOT EXISTS "${_imgui_glew_header}")
+      message(FATAL_ERROR "Managed GLEW header missing: ${_imgui_glew_header}")
+   endif()
    target_compile_options(imgui_sdl2_opengl3 PRIVATE
       -include stddef.h
-      -include GL/glew.h)
+      -include "${_imgui_glew_header}")
    target_link_libraries(imgui_sdl2_opengl3 PRIVATE
       imgui SDL2::SDL2 OpenGL::OpenGL GLEW::GLEW)
    set_target_properties(imgui_sdl2_opengl3 PROPERTIES
