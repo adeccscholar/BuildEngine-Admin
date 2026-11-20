@@ -16289,4 +16289,206 @@
          <argument value="-DEIGEN_PACKAGE_ROOT:PATH={InstallRoot}\packages\eigen\5.0.1"/>
       </smoke>
    </library>
+   <library id="zxing-cpp" version="3.1.1" category="graphics" timestamp="2026-11-20T01:50:00Z">
+      <metadata name="ZXing-C++" supplier="ZXing-C++ contributors" homepage="https://github.com/zxing-cpp/zxing-cpp" description="Barcode and QR-code reader library built from the official upstream release asset; reader-only native DLL." artifactType="shared" licenseSignal="green">
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\zxing-cpp\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/zxing-cpp/zxing-cpp.git" ref="v3.1.1"/></security>
+      <source>
+         <download url="https://github.com/zxing-cpp/zxing-cpp/releases/download/v3.1.1/zxing-cpp-3.1.1.tar.gz" archive="zxing-cpp-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="zxing-cpp-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="core\CMakeLists.txt"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DZXING_READERS:BOOL=ON"/>
+         <argument value="-DZXING_WRITERS:STRING=OFF"/>
+         <argument value="-DZXING_C_API:BOOL=OFF"/>
+         <argument value="-DZXING_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DZXING_EXAMPLES_QT:BOOL=OFF"/>
+         <argument value="-DZXING_BLACKBOX_TESTS:BOOL=OFF"/>
+         <argument value="-DZXING_UNIT_TESTS:BOOL=OFF"/>
+         <argument value="-DZXING_PYTHON_MODULE:BOOL=OFF"/>
+         <argument value="-DZXING_DEPENDENCIES:STRING=LOCAL"/>
+         <argument value="-DZXING_DISABLE_PCH:BOOL=ON"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\ZXing.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libZXing.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\zxing-cpp\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ZXing\ReadBarcode.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\zxing-cpp\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\zxing-cpp\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="zxing-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DZXING_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
+   <library id="recastnavigation" version="1.6.0" category="graphics" timestamp="2026-11-20T01:50:00Z">
+      <metadata name="Recast Navigation" supplier="Recast Navigation contributors" homepage="https://github.com/recastnavigation/recastnavigation" description="Recast and Detour native navigation and pathfinding libraries, with demos and tests disabled." artifactType="shared" licenseSignal="green">
+         <license name="Zlib License" spdx="Zlib" file="licenses\recastnavigation\License.txt"/>
+      </metadata>
+      <security><repository url="https://github.com/recastnavigation/recastnavigation.git" ref="v1.6.0"/></security>
+      <source>
+         <download url="https://github.com/recastnavigation/recastnavigation/archive/refs/tags/v1.6.0.tar.gz" archive="recastnavigation-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="recastnavigation-{LibraryVersion}">
+            <require path="CMakeLists.txt"/>
+            <require path="Recast\Include\Recast.h"/>
+            <require path="Detour\Include\DetourNavMesh.h"/>
+            <require path="License.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS:BOOL=ON"/>
+         <argument value="-DRECASTNAVIGATION_DEMO:BOOL=OFF"/>
+         <argument value="-DRECASTNAVIGATION_TESTS:BOOL=OFF"/>
+         <argument value="-DRECASTNAVIGATION_EXAMPLES:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\Recast.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libRecast.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\Detour.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDetour.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\DetourCrowd.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDetourCrowd.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\DetourTileCache.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDetourTileCache.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\DebugUtils.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libDebugUtils.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\License.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\recastnavigation\License.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\recastnavigation\Recast.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\recastnavigation\DetourNavMesh.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\recastnavigation\License.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\recastnavigation\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="recast-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DRECAST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
+   <library id="jolt-physics" version="5.7.0" category="graphics" timestamp="2026-11-20T01:50:00Z">
+      <metadata name="Jolt Physics" supplier="Jorrit Rouwe and contributors" homepage="https://github.com/jrouwe/JoltPhysics" description="Jolt CPU physics engine built as native BCC64X shared library with optional backends and samples disabled." artifactType="shared" licenseSignal="green">
+         <license name="MIT License" spdx="MIT" file="licenses\jolt-physics\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/jrouwe/JoltPhysics.git" ref="v5.7.0"/></security>
+      <source>
+         <download url="https://github.com/jrouwe/JoltPhysics/archive/refs/tags/v5.7.0.tar.gz" archive="jolt-physics-{LibraryVersion}.tar.gz"/>
+         <extract format="libarchive" root="JoltPhysics-{LibraryVersion}">
+            <require path="Build\CMakeLists.txt"/>
+            <require path="Jolt\Jolt.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/>
+         <argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DJPH_BUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DINTERPROCEDURAL_OPTIMIZATION:BOOL=OFF"/>
+         <argument value="-DOVERRIDE_CXX_FLAGS:BOOL=OFF"/>
+         <argument value="-DENABLE_ALL_WARNINGS:BOOL=OFF"/>
+         <argument value="-DJPH_USE_DX12:BOOL=OFF"/>
+         <argument value="-DJPH_USE_VK:BOOL=OFF"/>
+         <argument value="-DJPH_USE_MTL:BOOL=OFF"/>
+         <argument value="-DJPH_USE_CPU_COMPUTE:BOOL=ON"/>
+         <argument value="-DTARGET_UNIT_TESTS:BOOL=OFF"/>
+         <argument value="-DTARGET_HELLO_WORLD:BOOL=OFF"/>
+         <argument value="-DTARGET_PERFORMANCE_TEST:BOOL=OFF"/>
+         <argument value="-DTARGET_SAMPLES:BOOL=OFF"/>
+         <argument value="-DTARGET_VIEWER:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}\Build" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\Jolt.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libJolt.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\jolt-physics\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\Jolt\Jolt.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\jolt-physics\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\jolt-physics\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="jolt-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DJOLT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
 </buildLibraries>
