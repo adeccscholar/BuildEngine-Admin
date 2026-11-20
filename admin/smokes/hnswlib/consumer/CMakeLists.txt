@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.31)
+project(buildengine_hnswlib_consumer LANGUAGES CXX)
+if(NOT DEFINED HNSWLIB_PACKAGE_ROOT)
+   message(FATAL_ERROR "HNSWLIB_PACKAGE_ROOT must point to the installed BuildEngine package")
+endif()
+add_executable(hnswlib-consumer main.cpp)
+target_compile_features(hnswlib-consumer PRIVATE cxx_std_23)
+target_include_directories(hnswlib-consumer PRIVATE "${HNSWLIB_PACKAGE_ROOT}/include")
