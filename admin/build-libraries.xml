@@ -16319,7 +16319,7 @@
          <argument value="-DZXING_READERS:BOOL=ON"/>
          <argument value="-DZXING_WRITERS:STRING=NEW"/>
          <argument value="-DZXING_USE_BUNDLED_ZINT:BOOL=OFF"/>
-         <argument value="-Dzint_DIR:PATH={DependencyRoot:zint}\\lib\\win64\\{Configuration}\\cmake\\zint"/>
+         <argument value="-Dzint_DIR:PATH={DependencyRoot:zint}\lib\win64\{Configuration}\cmake\zint"/>
          <argument value="-DZXING_C_API:BOOL=OFF"/>
          <argument value="-DZXING_EXAMPLES:BOOL=OFF"/>
          <argument value="-DZXING_EXAMPLES_QT:BOOL=OFF"/>
@@ -16497,15 +16497,15 @@
    </library>
    <library id="zint" version="2.16.0" category="image" timestamp="2026-11-20T05:15:00Z">
       <metadata name="Zint" supplier="Robin Stuart and Zint contributors" homepage="https://zint.org.uk/" description="Native shared barcode generation library and external ZXing-C++ writer backend." artifactType="shared" licenseSignal="green">
-         <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\\zint\\LICENSE"/>
+         <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\zint\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/zint/zint.git" ref="2.16.0"/></security>
       <source>
          <download url="https://github.com/zint/zint/archive/refs/tags/2.16.0.tar.gz" archive="zint-{LibraryVersion}.tar.gz"/>
          <extract format="libarchive" root="zint-{LibraryVersion}">
             <require path="CMakeLists.txt"/>
-            <require path="backend\\CMakeLists.txt"/>
-            <require path="backend\\zint.h"/>
+            <require path="backend\CMakeLists.txt"/>
+            <require path="backend\zint.h"/>
             <require path="LICENSE"/>
          </extract>
       </source>
@@ -16515,9 +16515,9 @@
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <argument value="-G"/>
          <argument value="Ninja"/>
-         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\\cmake\\toolchains\\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
-         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
@@ -16531,36 +16531,36 @@
          <argument value="-DZINT_FRONTEND:BOOL=OFF"/>
          <argument value="-DZINT_TEST:BOOL=OFF"/>
          <argument value="-DZINT_UNINSTALL:BOOL=OFF"/>
-         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
-         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
          <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
          <install>
             <perVariant>
-               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}"/>
-               <copy source="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\share\\zint\\zint-config.cmake" target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\lib\\win64\\{Configuration}\\cmake\\zint\\zint-config.cmake" overwrite="true"/>
-               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\bin\\win64\\{Configuration}\\libzint.dll"/>
-               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\lib\\win64\\{Configuration}\\libzint.lib"/>
-               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\lib\\win64\\{Configuration}\\cmake\\zint\\zint-targets.cmake"/>
-               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\lib\\win64\\{Configuration}\\cmake\\zint\\zint-config.cmake"/>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <copy source="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\zint\zint-config.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zint\zint-config.cmake" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libzint.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libzint.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zint\zint-targets.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\zint\zint-config.cmake"/>
             </perVariant>
             <common>
-               <copy source="{Workspace}\\LICENSE" target="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\licenses\\zint\\LICENSE" overwrite="true"/>
-               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\include\\zint.h"/>
-               <require path="{InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\licenses\\zint\\LICENSE"/>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\zint\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\zint.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\zint\LICENSE"/>
             </common>
          </install>
       </build>
-      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\\cmake\\consumer">
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
          <tree source="include" target="include"/>
-         <files source="lib\\win64\\{Configuration}" target="lib" extensions=".lib" optional="false"/>
-         <files source="bin\\win64\\{Configuration}" target="bin" extensions=".dll" optional="false"/>
-         <cmake source="lib\\win64\\{Configuration}\\cmake" target="lib\\cmake" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="false"/>
       </publish>
-      <smoke id="consumer" scope="package" source="smokes\\zint\\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\\cmake\\toolchains\\bcc64x-buildengine-cxx.cmake" executable="zint-consumer.exe">
+      <smoke id="consumer" scope="package" source="smokes\zint\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="zint-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <argument value="-DZINT_PACKAGE_ROOT:PATH={InstallRoot}\\packages\\{LibraryId}\\{LibraryVersion}"/>
+         <argument value="-DZINT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
 </buildLibraries>
