@@ -17220,18 +17220,18 @@
             <require path="include\xtensor\containers\xarray.hpp"/>
             <require path="LICENSE"/>
          </extract>
-         <copy source="{BuildFileDir}\\patches\\xtensor\\0.27.1\\bcc64x-managed-json-tests.patch" target="{Workspace}\\.buildengine\\patches\\0.27.1\\bcc64x-managed-json-tests.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\xtensor\0.27.1\bcc64x-managed-json-tests.patch" target="{Workspace}\.buildengine\patches\0.27.1\bcc64x-managed-json-tests.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="bcc64x-json-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\\.buildengine\\patches\\0.27.1\\bcc64x-managed-json-tests.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\0.27.1\bcc64x-managed-json-tests.patch"/>
          </execute>
          <execute name="bcc64x-json-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\\.buildengine\\patches\\0.27.1\\bcc64x-managed-json-tests.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\0.27.1\bcc64x-managed-json-tests.patch"/>
          </execute>
          <execute name="bcc64x-json-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\\.buildengine\\patches\\0.27.1\\bcc64x-managed-json-tests.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\0.27.1\bcc64x-managed-json-tests.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="true">
@@ -17447,18 +17447,18 @@
          </extract>
          <!-- BCC64X compatibility: Module scanner fallback selects upstream non-module implementation, retaining audio backends and tests; coherent Windows 10 NTDDI target. -->
          <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-windows-sdk-version.patch" target="{Workspace}\.buildengine\patches\1.25.2\bcc64x-windows-sdk-version.patch" overwrite="true" preserveCurrentArtifact="true"/>
-         <copy source="{BuildFileDir}\\patches\\openal-soft\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch" target="{Workspace}\\.buildengine\\patches\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-wasapi-audioobjecttype-operators.patch" target="{Workspace}\.buildengine\patches\1.25.2\bcc64x-wasapi-audioobjecttype-operators.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="bcc64x-wasapi-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\\.buildengine\\patches\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\1.25.2\bcc64x-wasapi-audioobjecttype-operators.patch"/>
          </execute>
          <execute name="bcc64x-wasapi-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\\.buildengine\\patches\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\1.25.2\bcc64x-wasapi-audioobjecttype-operators.patch"/>
          </execute>
          <execute name="bcc64x-wasapi-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\\.buildengine\\patches\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch"/>
+            <argument value="{Workspace}\.buildengine\patches\1.25.2\bcc64x-wasapi-audioobjecttype-operators.patch"/>
          </execute>
          <execute name="bcc64x-compat-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
