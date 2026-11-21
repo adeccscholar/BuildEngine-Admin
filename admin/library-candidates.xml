@@ -6,7 +6,7 @@
      Full downloaded archive bytes, checksums and malicious-archive scanning were unavailable.
      This is a capability limitation, not successful archive verification.
 -->
-<libraryCandidates reviewedAt="2026-11-21T01:40:00Z" toolchain="bcc64x-20.1.7" platform="win64x">
+<libraryCandidates reviewedAt="2026-11-21T05:30:00Z" toolchain="bcc64x-20.1.7" platform="win64x">
    <candidate id="hnswlib" version="0.9.0" status="registered">
       <source url="https://github.com/nmslib/hnswlib/archive/refs/tags/v0.9.0.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="hnswlib/hnswlib.h;LICENSE" inspected="true"/>
@@ -139,5 +139,12 @@
       <dependencies>none required with TIFF support disabled</dependencies>
       <integrationGate>Build BCC64X native shared package: BUILD_SHARED_LIBS=ON, OJPH_ENABLE_TIFF_SUPPORT=OFF, OJPH_BUILD_EXECUTABLES=OFF, OJPH_BUILD_TESTS=OFF. Verify OpenJPH 0.33.0 CMake config Threads compatibility and JPEG 2000 encode/decode smoke; ensure OpenEXR consumes external target.</integrationGate>
       <deckKernel>Low/medium: optional JPEG 2000 image support via OpenEXR.</deckKernel>
+   </candidate>
+   <candidate id="ceres-solver-2.3" version="2.3.0" status="registered-development-snapshot-pending-native-smoke">
+      <source url="https://github.com/ceres-solver/ceres-solver/archive/c39d3cdced6051690c7992ade0f6566fa822ccd2.zip" archiveSha256Verified="false"/>
+      <treeEvidence requiredPaths="CMakeLists.txt;include/ceres/version.h;LICENSE" inspected="true"/>
+      <dependencies>eigen@5.0.1;abseil@20260817.0;EigenSparse enabled, advanced solvers disabled</dependencies>
+      <integrationGate>Not an official tagged release. Upstream source declares 2.3.0 at pinned commit c39d3cdced6051690c7992ade0f6566fa822ccd2. Build independently beside 2.2.0 with Abseil; verify Eigen 5 CMake API, BCC64X shared ABI, solver convergence and commit provenance before use.</integrationGate>
+      <deckKernel>High: alternative camera/calibration optimization engine without glog and gflags dependency chain.</deckKernel>
    </candidate>
 </libraryCandidates>
