@@ -16900,7 +16900,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/>
       </publish>
-      <smoke id="consumer" scope="package" source="smokes\ceres-solver\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="ceres-solver-consumer.exe">
+      <smoke id="consumer" scope="package" source="smokes\ceres-solver\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="ceres-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="PATH" value="{ENV:PATH}"/>
