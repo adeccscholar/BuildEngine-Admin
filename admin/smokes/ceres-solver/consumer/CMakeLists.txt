@@ -5,6 +5,7 @@ if(NOT DEFINED CERES_PACKAGE_ROOT OR NOT DEFINED EIGEN_PACKAGE_ROOT OR NOT DEFIN
 endif()
 list(PREPEND CMAKE_PREFIX_PATH "${CERES_PACKAGE_ROOT}" "${GLOG_PACKAGE_ROOT}" "${GFLAGS_PACKAGE_ROOT}")
 set(Ceres_DIR "${CERES_PACKAGE_ROOT}/lib/win64/Release/cmake/Ceres")
+set(Eigen3_DIR "${EIGEN_PACKAGE_ROOT}/lib/cmake/Eigen3")
 set(glog_DIR "${GLOG_PACKAGE_ROOT}/lib/win64/Release/cmake/glog")
 set(gflags_DIR "${GFLAGS_PACKAGE_ROOT}/lib/win64/Release/cmake/gflags")
 find_package(Ceres CONFIG REQUIRED)
