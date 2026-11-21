@@ -131,3 +131,29 @@ The five updated/new patch hunks for the three libraries were matched
 against the exact upstream source text. Successful native BCC64X Release and
 Debug builds, subsequent upstream tests, and runtime smoke results remain
 **not verified** until a new Windows run reports their outcomes.
+
+## Native follow-up: successful Assimp/xtensor builds and remaining gates
+
+The subsequent BCC64X run confirms Assimp 6.0.6 and xtensor 0.27.1
+Release and Debug build PASS. xtensor also reports upstream test PASS
+in both configurations, plus install, publish and Doxygen PASS.
+
+- Assimp install: On Windows, upstream CMakeLists.txt uses
+  ASSIMP_LIB_INSTALL_DIR and ASSIMP_BIN_INSTALL_DIR, instead of relying
+  on the CMAKE_INSTALL_LIBDIR and CMAKE_INSTALL_BINDIR settings alone.
+  The XML now specifies the established per-configuration directories.
+- xtensor smoke: A successful numerical result previously omitted the
+  required SMOKE|CHECK records. The consumer now verifies both matrix
+  shape and scalar broadcasting explicitly before the result record.
+- OpenAL Soft WASAPI: Excluding the duplicate bitwise operator exposed
+  an SDK overload that is not constexpr under BCC64X. The pinned patch
+  now computes all channel masks using a constexpr helper operating on
+  the underlying enum values. The helper was checked with Clang C++23;
+  native BCC64X confirmation is still pending.
+- CGAL Doxygen: The library profile retains DOXYGEN_RUNNING and all API
+  and graph categories. It specifies four parser threads, two dot threads
+  and QUIET=NO to make captured progress visible. Wall time alone is not
+  proof of a hang.
+
+No importer, audio backend, JSON test, or documentation category was
+disabled. New producer/consumer acceptance still requires Windows logs.
