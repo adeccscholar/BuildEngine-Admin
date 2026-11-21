@@ -5,6 +5,8 @@ if(NOT DEFINED CERES_PACKAGE_ROOT OR NOT DEFINED EIGEN_PACKAGE_ROOT OR NOT DEFIN
 endif()
 list(PREPEND CMAKE_PREFIX_PATH "${CERES_PACKAGE_ROOT}" "${ABSEIL_PACKAGE_ROOT}" "${EIGEN_PACKAGE_ROOT}")
 set(Ceres_DIR "${CERES_PACKAGE_ROOT}/lib/win64/Release/cmake/Ceres")
+set(Eigen3_DIR "${EIGEN_PACKAGE_ROOT}/lib/cmake/Eigen3")
+set(absl_DIR "${ABSEIL_PACKAGE_ROOT}/lib/win64/Release/cmake/absl")
 find_package(Ceres CONFIG REQUIRED)
 add_executable(ceres-abseil-consumer main.cpp)
 target_compile_features(ceres-abseil-consumer PRIVATE cxx_std_23)
