@@ -1,0 +1,15 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2045,7 +2045,12 @@
+     set(UNICODE_FLAG ${UNICODE_FLAG} -municode)
+ endif()
+ if(ALSOFT_UTILS)
+-    add_executable(openal-info utils/openal-info.c)
++    if(ADECC_BCC64X_WINDOWS10_SDK)
++        # Preserve upstream Unicode wmain; bridge the BCC64X console entry point.
++        add_executable(openal-info utils/openal-info.c utils/adecc-bcc64x-wmain-bridge.c)
++    else()
++        add_executable(openal-info utils/openal-info.c)
++    endif()
+     target_include_directories(openal-info
+         PRIVATE ${OpenAL_BINARY_DIR} ${OpenAL_SOURCE_DIR}/common)
