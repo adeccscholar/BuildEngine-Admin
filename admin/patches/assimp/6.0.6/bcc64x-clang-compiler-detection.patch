@@ -1,0 +1,13 @@
+--- a/include/assimp/defs.h
++++ b/include/assimp/defs.h
+@@ -238,9 +238,9 @@
+ #  define C_ENUM enum
+ #endif
+ #endif
+ 
+-#if (defined(__BORLANDC__) || defined(__BCPLUSPLUS__))
++#if (defined(__BORLANDC__) || defined(__BCPLUSPLUS__)) && !defined(__clang__)
+ #  error Currently, Borland is unsupported. Feel free to port Assimp.
+ #endif
+ 
+ //////////////////////////////////////////////////////////////////////////
