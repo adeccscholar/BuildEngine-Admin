@@ -6,7 +6,13 @@ endif()
 file(READ "${OPENEXR_CACHE}" strCache)
 string(FIND "${strCache}" "OPENEXR_USE_INTERNAL_OPENJPH:INTERNAL=0" iExternalOpenJph)
 if(iExternalOpenJph LESS 0)
-   message(FATAL_ERROR "OpenEXR did not confirm external OpenJPH; bundled fallback is forbidden")
+   file(STRINGS "${OPENEXR_CACHE}" vecEvidence
+      REGEX "^(openjph_DIR|openjph_ROOT|OPENEXR_USE_INTERNAL_OPENJPH|OPENEXR_FORCE_INTERNAL_OPENJPH|CMAKE_PREFIX_PATH):")
+   list(JOIN vecEvidence "\\n  " strEvidence)
+   message(FATAL_ERROR
+      "OpenEXR did not link external OpenJPH. Bundled fallback is forbidden.\\n"
+      "CMake cache evidence:\\n  ${strEvidence}\\n"
+      "Inspect the OpenEXR configure log for the failed find_package(openjph) call.")
 endif()
 foreach(strDependency IN ITEMS Imath libdeflate openjph)
    string(FIND "${strCache}" "${strDependency}_DIR:PATH=" iDependency)
