@@ -26,3 +26,8 @@ The GitHub source tree is *not* a release-qualified package. Check Eigen 5 API c
 ## Build correction (21 November 2026)
 
 Restore `WITH_SCHUR_SPECIALIZATIONS=ON` and request `cmake --fresh` when the FSM invalidates this version. The earlier forced `OFF` reduced the solver configuration and is reverted. The separate configure error at `internal/ceres/CMakeLists.txt:279` concerns the `ceres_static` dependency link interface, including Abseil targets. The provided summary omits the full CMake diagnostic; no speculative removal of targets or solver functionality is permitted. Inspect the full `01-cmake-configure.log` and retain the independent Abseil DLL contract. Status: still requires native verification.
+
+
+## CMake generator recursion correction (21 November 2026)
+
+The complete CMake 4.1.1 configure log proves that `target_link_libraries(ceres_static INTERFACE $<TARGET_PROPERTY:ceres,INTERFACE_LINK_LIBRARIES>)` at `internal/ceres/CMakeLists.txt:279` triggers recursive evaluation of the transitive link interface. The pinned development snapshot now receives a version-bound source patch replacing only that expression with the existing `CERES_LIBRARY_PUBLIC_DEPENDENCIES` plus `Eigen3::Eigen`. Its private dependencies, full Schur specializations, and original solver configuration are preserved. Because both configurations share the constrained Windows commit budget with Ceres 2.2.0, this package also sets `CMAKE_BUILD_PARALLEL_LEVEL=1` for its CMake builds. Clean native DLL/consumer validation is still required.

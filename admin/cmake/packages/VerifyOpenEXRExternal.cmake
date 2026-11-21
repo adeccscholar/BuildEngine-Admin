@@ -16,7 +16,7 @@ if(NOT vecOpenJphExternal)
       "Check the OpenEXR configure log and the installed OpenJPH package.")
 endif()
 
-foreach(strDependency IN ITEMS Imath libdeflate openjph)
+foreach(strDependency IN ITEMS Imath libdeflate openjph zstd)
    file(STRINGS "${OPENEXR_CACHE}" vecPackageEntries REGEX "^${strDependency}_DIR:PATH=")
    if(NOT vecPackageEntries)
       message(FATAL_ERROR "OpenEXR external CMake package not discovered: ${strDependency}")

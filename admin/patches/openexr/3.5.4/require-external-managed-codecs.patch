@@ -1,0 +1,43 @@
+--- a/cmake/OpenEXRSetup.cmake
++++ b/cmake/OpenEXRSetup.cmake
+@@ -219,7 +219,11 @@
+   #TODO: ^^ Release should not clone from main, this is a place holder
+   set(CMAKE_IGNORE_PATH "${CMAKE_CURRENT_BINARY_DIR}/_deps/deflate-src/config;${CMAKE_CURRENT_BINARY_DIR}/_deps/deflate-build/config")
+   # First try cmake config
+-  find_package(libdeflate CONFIG QUIET)
++  if(OPENEXR_REQUIRE_MANAGED_EXTERNAL_DEPS)
++    find_package(libdeflate CONFIG REQUIRED)
++  else()
++    find_package(libdeflate CONFIG QUIET)
++  endif()
+   if(libdeflate_FOUND)
+     if(TARGET libdeflate::libdeflate_shared)
+       set(EXR_DEFLATE_LIB libdeflate::libdeflate_shared)
+@@ -306,7 +310,13 @@
+   # Installed OpenJPH versions that are too old, for the warning below
+   set(_openexr_openjph_rejected)
+ 
+-  find_package(openjph ${OPENEXR_MINIMUM_OPENJPH_VERSION} CONFIG QUIET)
++  if(OPENEXR_MANAGED_OPENJPH_VERSION)
++    # OpenJPH 0.33.x uses SameMinorVersion; a 0.32.x request can reject it.
++    # Require the exact independently installed version instead of falling back.
++    find_package(openjph ${OPENEXR_MANAGED_OPENJPH_VERSION} EXACT CONFIG REQUIRED)
++  else()
++    find_package(openjph ${OPENEXR_MINIMUM_OPENJPH_VERSION} CONFIG QUIET)
++  endif()
+   if(NOT openjph_FOUND)
+     # OpenJPH's config version file accepts only the requested
+     # major.minor version (SameMinorVersion), so the call above rejects
+@@ -490,7 +500,11 @@
+ set(OPENEXR_USE_INTERNAL_ZSTD OFF)
+ 
+ if(NOT OPENEXR_FORCE_INTERNAL_ZSTD)
+-  find_package(zstd ${OPENEXR_MINIMUM_ZSTD_VERSION} CONFIG QUIET)
++  if(OPENEXR_MANAGED_ZSTD_VERSION)
++    find_package(zstd ${OPENEXR_MANAGED_ZSTD_VERSION} EXACT CONFIG REQUIRED)
++  else()
++    find_package(zstd ${OPENEXR_MINIMUM_ZSTD_VERSION} CONFIG QUIET)
++  endif()
+   if(zstd_FOUND)
+     if(TARGET zstd::libzstd_shared)
+       set(EXR_ZSTD_LIB zstd::libzstd_shared)

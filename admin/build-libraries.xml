@@ -16814,7 +16814,7 @@
          <argument value="-DOPENJPH_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T08:00:00Z">
+   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T09:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="glog" version="0.7.1"/>
       <dependency library="gflags" version="2.3.1"/>
@@ -16831,6 +16831,7 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CMAKE_BUILD_PARALLEL_LEVEL" value="1"/>
          <argument value="--fresh"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
@@ -16891,7 +16892,7 @@
          <argument value="-DGFLAGS_PACKAGE_ROOT:PATH={DependencyRoot:gflags}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.3.0" category="math" timestamp="2026-11-21T08:00:00Z">
+   <library id="ceres-solver" version="2.3.0" category="math" timestamp="2026-11-21T09:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="abseil" version="20260817.0"/>
       <metadata name="Ceres Solver" supplier="Ceres Solver contributors" homepage="https://ceres-solver.org/" description="Native C++ nonlinear least-squares optimization library with independently managed dependencies and version-specific solver backends." licenseSignal="yellow">
@@ -16903,10 +16904,20 @@
          <extract format="zip" root="ceres-solver-c39d3cdced6051690c7992ade0f6566fa822ccd2">
             <require path="CMakeLists.txt"/><require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\ceres-solver\2.3.0\avoid-transitive-link-generator-recursion.patch" target="{Workspace}\.buildengine\patches\avoid-transitive-link-generator-recursion.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="source-compat-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\avoid-transitive-link-generator-recursion.patch"/>
+         </execute>
+         <execute name="source-compat-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\avoid-transitive-link-generator-recursion.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CMAKE_BUILD_PARALLEL_LEVEL" value="1"/>
          <argument value="--fresh"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
@@ -16961,10 +16972,11 @@
          <argument value="-DABSEIL_PACKAGE_ROOT:PATH={DependencyRoot:abseil}"/>
       </smoke>
    </library>
-   <library id="openexr" version="3.5.4" category="image" timestamp="2026-11-21T03:10:00Z">
+   <library id="openexr" version="3.5.4" category="image" timestamp="2026-11-21T04:00:00Z">
       <dependency library="imath" version="3.2.3"/>
       <dependency library="openjph" version="0.33.0"/>
       <dependency library="libdeflate" version="1.26"/>
+      <dependency library="zstd" version="1.5.7"/>
       <metadata name="OpenEXR" supplier="Academy Software Foundation" homepage="https://openexr.com/" description="Native dynamic HDR image format libraries with external Imath, OpenJPH and libdeflate; no upstream tools or examples." licenseSignal="yellow">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\openexr\LICENSE.md"/>
       </metadata>
@@ -16974,6 +16986,15 @@
          <extract format="libarchive" root="openexr-3.5.4">
             <require path="CMakeLists.txt"/><require path="LICENSE.md"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\openexr\3.5.4\require-external-managed-codecs.patch" target="{Workspace}\.buildengine\patches\require-external-managed-codecs.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="source-compat-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\require-external-managed-codecs.patch"/>
+         </execute>
+         <execute name="source-compat-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\require-external-managed-codecs.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -16995,10 +17016,15 @@
          <argument value="-DOPENEXR_FORCE_INTERNAL_IMATH:BOOL=OFF"/>
          <argument value="-DOPENEXR_FORCE_INTERNAL_OPENJPH:BOOL=OFF"/>
          <argument value="-DOPENEXR_FORCE_INTERNAL_DEFLATE:BOOL=OFF"/>
-         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:imath};{DependencyRoot:openjph};{DependencyRoot:libdeflate}"/>
+         <argument value="-DOPENEXR_FORCE_INTERNAL_ZSTD:BOOL=OFF"/>
+         <argument value="-DOPENEXR_REQUIRE_MANAGED_EXTERNAL_DEPS:BOOL=ON"/>
+         <argument value="-DOPENEXR_MANAGED_OPENJPH_VERSION:STRING=0.33.0"/>
+         <argument value="-DOPENEXR_MANAGED_ZSTD_VERSION:STRING=1.5.7"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:imath};{DependencyRoot:openjph};{DependencyRoot:libdeflate};{DependencyRoot:zstd}"/>
          <argument value="-DImath_DIR:PATH={DependencyRoot:imath}\lib\win64\{Configuration}\cmake\Imath"/>
          <argument value="-Dopenjph_DIR:PATH={DependencyRoot:openjph}\lib\win64\{Configuration}\cmake\openjph"/>
          <argument value="-Dlibdeflate_DIR:PATH={DependencyRoot:libdeflate}\lib\win64\{Configuration}\cmake\libdeflate"/>
+         <argument value="-Dzstd_DIR:PATH={DependencyRoot:zstd}\lib\win64\{Configuration}\cmake\zstd"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <execute name="external-dependency-audit" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
             <argument value="-DOPENEXR_CACHE:FILEPATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\CMakeCache.txt"/>
@@ -17033,6 +17059,8 @@
          <argument value="-DOPENEXR_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DIMATH_PACKAGE_ROOT:PATH={DependencyRoot:imath}"/>
          <argument value="-DOPENJPH_PACKAGE_ROOT:PATH={DependencyRoot:openjph}"/>
+         <argument value="-DLIBDEFLATE_PACKAGE_ROOT:PATH={DependencyRoot:libdeflate}"/>
+         <argument value="-DZSTD_PACKAGE_ROOT:PATH={DependencyRoot:zstd}"/>
       </smoke>
    </library>
 </buildLibraries>
