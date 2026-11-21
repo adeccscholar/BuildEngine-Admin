@@ -21,3 +21,8 @@ Ceres 2.2.0 remains a separate versioned package using glog 0.7.1 and gflags 2.3
 ## Verification gates
 
 The GitHub source tree is *not* a release-qualified package. Check Eigen 5 API compatibility, CMake imported Abseil targets and installed package exports, DLL ABI, independent numerical consumer, and provenance/SBOM. Mark PASS only after the native FSM run.
+
+
+## Build correction (21 November 2026)
+
+Restore `WITH_SCHUR_SPECIALIZATIONS=ON` and request `cmake --fresh` when the FSM invalidates this version. The earlier forced `OFF` reduced the solver configuration and is reverted. The separate configure error at `internal/ceres/CMakeLists.txt:279` concerns the `ceres_static` dependency link interface, including Abseil targets. The provided summary omits the full CMake diagnostic; no speculative removal of targets or solver functionality is permitted. Inspect the full `01-cmake-configure.log` and retain the independent Abseil DLL contract. Status: still requires native verification.

@@ -16654,7 +16654,7 @@
 
       </smoke>
    </library>
-   <library id="glog" version="0.7.1" category="foundation" timestamp="2026-11-21T04:00:00Z">
+   <library id="glog" version="0.7.1" category="foundation" timestamp="2026-11-21T05:00:00Z">
       <dependency library="gflags" version="2.3.1"/>
       <metadata name="glog" supplier="glog upstream contributors" homepage="https://github.com/google/glog" description="Native BCC64X shared-library integration of glog; independent DLL consumer validation required." licenseSignal="yellow">
          <license name="BSD-style upstream license" file="COPYING"/>
@@ -16669,6 +16669,7 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="--fresh"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -16679,6 +16680,7 @@
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <argument value="-DWITH_GFLAGS:BOOL=ON"/>
+         <argument value="-DGFLAGS_USE_TARGET_NAMESPACE:BOOL=ON"/>
          <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:gflags}"/>
          <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\win64\{Configuration}\cmake\gflags"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -16812,7 +16814,7 @@
          <argument value="-DOPENJPH_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T07:00:00Z">
+   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T08:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="glog" version="0.7.1"/>
       <dependency library="gflags" version="2.3.1"/>
@@ -16829,6 +16831,7 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="--fresh"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -16840,11 +16843,12 @@
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <argument value="-DMINIGLOG:BOOL=OFF"/>
          <argument value="-DGFLAGS:BOOL=ON"/>
+         <argument value="-DGFLAGS_USE_TARGET_NAMESPACE:BOOL=ON"/>
          <argument value="-DSUITESPARSE:BOOL=OFF"/>
          <argument value="-DCXSPARSE:BOOL=OFF"/>
          <argument value="-DLAPACK:BOOL=OFF"/>
          <argument value="-DEIGENSPARSE:BOOL=ON"/>
-         <argument value="-DSCHUR_SPECIALIZATIONS:BOOL=OFF"/>
+         <argument value="-DSCHUR_SPECIALIZATIONS:BOOL=ON"/>
          <argument value="-DEIGENMETIS:BOOL=OFF"/>
          <argument value="-DUSE_CUDA:BOOL=OFF"/>
          <argument value="-DBUILD_DOCUMENTATION:BOOL=OFF"/>
@@ -16887,7 +16891,7 @@
          <argument value="-DGFLAGS_PACKAGE_ROOT:PATH={DependencyRoot:gflags}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.3.0" category="math" timestamp="2026-11-21T07:00:00Z">
+   <library id="ceres-solver" version="2.3.0" category="math" timestamp="2026-11-21T08:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="abseil" version="20260817.0"/>
       <metadata name="Ceres Solver" supplier="Ceres Solver contributors" homepage="https://ceres-solver.org/" description="Native C++ nonlinear least-squares optimization library with independently managed dependencies and version-specific solver backends." licenseSignal="yellow">
@@ -16903,6 +16907,7 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="--fresh"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -16913,7 +16918,7 @@
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <argument value="-DWITH_EIGENSPARSE:BOOL=ON"/>
-         <argument value="-DWITH_SCHUR_SPECIALIZATIONS:BOOL=OFF"/>
+         <argument value="-DWITH_SCHUR_SPECIALIZATIONS:BOOL=ON"/>
          <argument value="-DWITH_EIGENMETIS:BOOL=OFF"/>
          <argument value="-DWITH_SUITESPARSE:BOOL=OFF"/>
          <argument value="-DWITH_LAPACK:BOOL=OFF"/>
@@ -16956,7 +16961,7 @@
          <argument value="-DABSEIL_PACKAGE_ROOT:PATH={DependencyRoot:abseil}"/>
       </smoke>
    </library>
-   <library id="openexr" version="3.5.4" category="image" timestamp="2026-11-21T02:40:00Z">
+   <library id="openexr" version="3.5.4" category="image" timestamp="2026-11-21T03:10:00Z">
       <dependency library="imath" version="3.2.3"/>
       <dependency library="openjph" version="0.33.0"/>
       <dependency library="libdeflate" version="1.26"/>
@@ -16973,6 +16978,7 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="--fresh"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>

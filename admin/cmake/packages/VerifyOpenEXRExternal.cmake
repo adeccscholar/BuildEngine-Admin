@@ -1,23 +1,31 @@
-# Reject an OpenEXR build that silently fell back to bundled codecs.
-# Run after upstream configure and before the native DLL build.
+# Verify that upstream OpenEXR resolved the independent codec packages.
+# This is an evidence gate, not a fallback or a mechanism to disable features.
 if(NOT DEFINED OPENEXR_CACHE OR NOT EXISTS "${OPENEXR_CACHE}")
-   message(FATAL_ERROR "OpenEXR configuration cache is missing")
+   message(FATAL_ERROR "OpenEXR configuration cache is missing: ${OPENEXR_CACHE}")
 endif()
-file(READ "${OPENEXR_CACHE}" strCache)
-string(FIND "${strCache}" "OPENEXR_USE_INTERNAL_OPENJPH:INTERNAL=0" iExternalOpenJph)
-if(iExternalOpenJph LESS 0)
-   file(STRINGS "${OPENEXR_CACHE}" vecEvidence
+
+file(STRINGS "${OPENEXR_CACHE}" vecOpenJphExternal
+   REGEX "^OPENEXR_USE_INTERNAL_OPENJPH:INTERNAL=0$")
+if(NOT vecOpenJphExternal)
+   file(STRINGS "${OPENEXR_CACHE}" vecOpenJphEvidence
       REGEX "^(openjph_DIR|openjph_ROOT|OPENEXR_USE_INTERNAL_OPENJPH|OPENEXR_FORCE_INTERNAL_OPENJPH|CMAKE_PREFIX_PATH):")
-   list(JOIN vecEvidence "\\n  " strEvidence)
+   list(JOIN vecOpenJphEvidence "\n  " strEvidence)
    message(FATAL_ERROR
-      "OpenEXR did not link external OpenJPH. Bundled fallback is forbidden.\\n"
-      "CMake cache evidence:\\n  ${strEvidence}\\n"
-      "Inspect the OpenEXR configure log for the failed find_package(openjph) call.")
+      "OpenEXR did not confirm external OpenJPH; bundled fallback is forbidden.\n"
+      "CMake cache evidence:\n  ${strEvidence}\n"
+      "Check the OpenEXR configure log and the installed OpenJPH package.")
 endif()
+
 foreach(strDependency IN ITEMS Imath libdeflate openjph)
-   string(FIND "${strCache}" "${strDependency}_DIR:PATH=" iDependency)
-   if(iDependency LESS 0)
-      message(FATAL_ERROR "OpenEXR CMake package discovery missing: ${strDependency}")
+   file(STRINGS "${OPENEXR_CACHE}" vecPackageEntries REGEX "^${strDependency}_DIR:PATH=")
+   if(NOT vecPackageEntries)
+      message(FATAL_ERROR "OpenEXR external CMake package not discovered: ${strDependency}")
+   endif()
+   list(GET vecPackageEntries 0 strPackageEntry)
+   string(REGEX REPLACE "^[^=]*=" "" strPackageDirectory "${strPackageEntry}")
+   if(NOT IS_DIRECTORY "${strPackageDirectory}")
+      message(FATAL_ERROR
+         "OpenEXR external package ${strDependency} resolves to an invalid directory: ${strPackageDirectory}")
    endif()
 endforeach()
-message(STATUS "OpenEXR external package discovery verified; native linkage still requires a smoke test")
+message(STATUS "OpenEXR external CMake dependencies verified; native DLL linkage still requires consumer smoke")
