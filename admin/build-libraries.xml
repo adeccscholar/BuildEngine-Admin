@@ -15072,7 +15072,7 @@
       </smoke>
    </library>
 
-   <library id="eigen" version="5.0.1" category="math" timestamp="2026-10-22T21:55:00Z">
+   <library id="eigen" version="5.0.1" category="math" timestamp="2026-11-21T05:00:00Z">
       <metadata artifactType="interface" name="Eigen" supplier="Eigen contributors" homepage="https://eigen.tuxfamily.org/"
                 description="Header-only C++ matrix, geometry and sparse linear algebra templates. No DLL or import archive."
                 licenseSignal="yellow">
@@ -15095,6 +15095,10 @@
          <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\eigen3\Eigen\Core"/>
          <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\eigen3\unsupported\Eigen\CXX11\Tensor"/>
          <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.README"/>
+         <copy source="{BuildFileDir}\cmake\packages\Eigen3Config.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Eigen3\Eigen3Config.cmake" overwrite="true"/>
+         <copy source="{BuildFileDir}\cmake\packages\Eigen3ConfigVersion.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Eigen3\Eigen3ConfigVersion.cmake" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Eigen3\Eigen3Config.cmake"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\Eigen3\Eigen3ConfigVersion.cmake"/>
       </install>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
          <tree source="include" target="include" optional="false"/>
@@ -16808,7 +16812,7 @@
          <argument value="-DOPENJPH_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T04:00:00Z">
+   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T05:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="glog" version="0.7.1"/>
       <dependency library="gflags" version="2.3.1"/>
@@ -16847,6 +16851,7 @@
          <argument value="-DBUILD_BENCHMARKS:BOOL=OFF"/>
          <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:eigen};{DependencyRoot:glog};{DependencyRoot:gflags}"/>
          <argument value="-DEIGEN3_INCLUDE_DIR:PATH={DependencyRoot:eigen}\include\eigen3"/>
+         <argument value="-DEigen3_DIR:PATH={DependencyRoot:eigen}\lib\cmake\Eigen3"/>
          <argument value="-Dglog_DIR:PATH={DependencyRoot:glog}\lib\win64\{Configuration}\cmake\glog"/>
          <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\win64\{Configuration}\cmake\gflags"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -16881,7 +16886,7 @@
          <argument value="-DGFLAGS_PACKAGE_ROOT:PATH={DependencyRoot:gflags}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.3.0" category="math" timestamp="2026-11-21T03:30:00Z">
+   <library id="ceres-solver" version="2.3.0" category="math" timestamp="2026-11-21T05:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="abseil" version="20260817.0"/>
       <metadata name="Ceres Solver 2.3.0 snapshot" supplier="Ceres Solver contributors" homepage="https://ceres-solver.org/" description="Native pinned upstream Ceres 2.3 development snapshot with external managed Abseil and EigenSparse; no glog/gflags." licenseSignal="yellow">
@@ -16917,6 +16922,7 @@
          <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:eigen};{DependencyRoot:abseil}"/>
          <argument value="-Dabsl_DIR:PATH={DependencyRoot:abseil}\lib\win64\{Configuration}\cmake\absl"/>
          <argument value="-DEIGEN3_INCLUDE_DIR:PATH={DependencyRoot:eigen}\include\eigen3"/>
+         <argument value="-DEigen3_DIR:PATH={DependencyRoot:eigen}\lib\cmake\Eigen3"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
