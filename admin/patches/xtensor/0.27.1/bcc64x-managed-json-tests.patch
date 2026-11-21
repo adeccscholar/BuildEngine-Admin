@@ -1,0 +1,18 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -61,6 +61,16 @@
+ find_package(nlohmann_json 3.1.1 QUIET)
+ 
++# BuildEngine manages the header-only JSON dependency independently. The
++# upstream include-based package has no CMake config, so expose its headers
++# to the complete upstream test suite including the PCH and xjson tests.
++if(DEFINED ADECC_NLOHMANN_JSON_INCLUDE_DIR)
++    if(NOT EXISTS "${ADECC_NLOHMANN_JSON_INCLUDE_DIR}/nlohmann/json.hpp")
++        message(FATAL_ERROR "Managed nlohmann/json.hpp is missing")
++    endif()
++    include_directories(BEFORE "${ADECC_NLOHMANN_JSON_INCLUDE_DIR}")
++    set(nlohmann_json_FOUND TRUE)
++endif()
++
+ # Optional dependencies
+ # =====================
