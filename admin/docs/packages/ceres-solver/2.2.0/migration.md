@@ -24,3 +24,8 @@ With all Schur specializations enabled, BCC64X 20.1.7 compiled numerous `partiti
 ## Native link target correction (21 November 2026)
 
 The full Schur specialization compilation now reaches the native DLL link in both configurations. The remaining linker error is `lld: error: unable to find library -lgflags`. Ceres 2.2.0 upstream appends the unqualified string `gflags` to `CERES_LIBRARY_PUBLIC_DEPENDENCIES`, which is wrong for the installed namespaced CMake import. A source-scoped patch makes its package discovery accept `gflags::gflags` and links this actual imported target rather than generating `-lgflags`. The patch does not change Ceres, glog, or gflags functionality. The independent numerical consumer now emits the required `SMOKE|CHECK|...` and `SMOKE|RESULT|...` records; it still verifies a usable solution and the parameter converging to 3. The native Release/Debug DLL link and consumer must be rerun before claiming PASS.
+
+
+## Installed package consumer discovery correction (21 November 2026)
+
+The native Release and Debug DLL builds, installation, publication and documentation have now passed. The remaining independent smoke fails during CMake configure at `CeresConfig.cmake:85`. Upstream `cmake/CeresConfig.cmake.in` still verifies `TARGET gflags`, although the earlier installed-package fix uses `gflags::gflags` as an imported target. The version-scoped source patch now also accepts that namespaced target during package consumption. This preserves the required gflags dependency; it does not bypass the package check or alter the numerical solver. Native installed-package consumer validation remains pending.

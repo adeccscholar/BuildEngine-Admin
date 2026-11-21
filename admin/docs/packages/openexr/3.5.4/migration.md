@@ -20,3 +20,8 @@ The native Release audit showed `openjph_DIR:PATH=openjph_DIR-NOTFOUND` and `OPE
 ## BCC64X runtime CPU detection correction (21 November 2026)
 
 After the external Imath, OpenJPH, libdeflate and zstd dependency audit succeeds, the native C99 build of `src/lib/OpenEXRCore/internal_dwa.c` includes `internal_cpuid.h`. That upstream header currently chooses MSVC's `<intrin.h>` and `__cpuidex` solely because `_WIN32` is defined. BCC64X is Clang targeting Windows GNU and reports an undeclared `__cpuidex` function. The version-bound patch selects the existing `<cpuid.h>` and `__get_cpuid` path for GNU-compatible compilers, including this Clang target, while preserving the original MSVC path and runtime SSE2/AVX/F16C checks. No SIMD or codec capability is disabled. The independent OpenEXR header consumer now emits required SMOKE checks and result records. Native DLL and smoke verification are pending.
+
+
+## Installed CMake consumer location correction (21 November 2026)
+
+Native Release and Debug builds, installs, publication and documentation now pass. The independent consumer configures `OpenEXR_DIR` explicitly to the actual managed `lib/win64/Release/cmake/OpenEXR` installation and checks that `OpenEXRConfig.cmake` exists there before calling `find_package(OpenEXR CONFIG REQUIRED)`. The smoke continues to load external Imath, OpenJPH, libdeflate and zstd package targets, and retains the native header assertion and SMOKE protocol. The provided FSM summary does not include the full `find_package` diagnostic at smoke `CMakeLists.txt:16`, so this directory correction is targeted but still requires native verification.
