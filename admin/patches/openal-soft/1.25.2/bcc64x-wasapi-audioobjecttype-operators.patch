@@ -1,14 +1,59 @@
 --- a/alc/backends/wasapi.cpp
 +++ b/alc/backends/wasapi.cpp
-@@ -156,7 +156,10 @@
+@@ -156,39 +156,22 @@
  constexpr auto X714Mask = MaskFromTopBits(X7DOT1DOT4);
  
  
 -#ifndef _MSC_VER
-+// BCC64X uses the Clang frontend together with the Windows SDK, where
-+// AudioObjectType already has a bitwise operator. Avoid a duplicate overload
-+// while preserving the original fallback for other non-MSVC compilers.
-+#if !defined(_MSC_VER) && !(defined(__clang__) && (defined(__BORLANDC__) || defined(__BCPLUSPLUS__)))
- [[nodiscard]]
- constexpr auto operator|(AudioObjectType const lhs, AudioObjectType const rhs) noexcept
-     -> AudioObjectType
+-[[nodiscard]]
+-constexpr auto operator|(AudioObjectType const lhs, AudioObjectType const rhs) noexcept
+-    -> AudioObjectType
+-{ return static_cast<AudioObjectType>(lhs | al::to_underlying(rhs)); }
+-#endif
+-
+-constexpr auto ChannelMask_Mono = AudioObjectType_FrontCenter;
+-constexpr auto ChannelMask_Stereo = AudioObjectType_FrontLeft | AudioObjectType_FrontRight;
+-constexpr auto ChannelMask_Quad = AudioObjectType_FrontLeft | AudioObjectType_FrontRight
+-    | AudioObjectType_BackLeft | AudioObjectType_BackRight;
+-constexpr auto ChannelMask_X51 = AudioObjectType_FrontLeft | AudioObjectType_FrontRight
+-    | AudioObjectType_FrontCenter | AudioObjectType_LowFrequency | AudioObjectType_SideLeft
+-    | AudioObjectType_SideRight;
+-constexpr auto ChannelMask_X61 = AudioObjectType_FrontLeft | AudioObjectType_FrontRight
+-    | AudioObjectType_FrontCenter | AudioObjectType_LowFrequency | AudioObjectType_SideLeft
+-    | AudioObjectType_SideRight | AudioObjectType_BackCenter;
+-constexpr auto ChannelMask_X71 = AudioObjectType_FrontLeft | AudioObjectType_FrontRight
+-    | AudioObjectType_FrontCenter | AudioObjectType_LowFrequency | AudioObjectType_SideLeft
+-    | AudioObjectType_SideRight | AudioObjectType_BackLeft | AudioObjectType_BackRight;
+-constexpr auto ChannelMask_X714 = AudioObjectType_FrontLeft | AudioObjectType_FrontRight
+-    | AudioObjectType_FrontCenter | AudioObjectType_LowFrequency | AudioObjectType_SideLeft
+-    | AudioObjectType_SideRight | AudioObjectType_BackLeft | AudioObjectType_BackRight
+-    | AudioObjectType_TopFrontLeft | AudioObjectType_TopFrontRight | AudioObjectType_TopBackLeft
+-    | AudioObjectType_TopBackRight;
+-constexpr auto ChannelMask_X7144 = AudioObjectType_FrontLeft | AudioObjectType_FrontRight
+-    | AudioObjectType_FrontCenter | AudioObjectType_LowFrequency | AudioObjectType_SideLeft
+-    | AudioObjectType_SideRight | AudioObjectType_BackLeft | AudioObjectType_BackRight
+-    | AudioObjectType_TopFrontLeft | AudioObjectType_TopFrontRight | AudioObjectType_TopBackLeft
+-    | AudioObjectType_TopBackRight | AudioObjectType_BottomFrontLeft
+-    | AudioObjectType_BottomFrontRight | AudioObjectType_BottomBackLeft
+-    | AudioObjectType_BottomBackRight;
+-
+-
++// Combine SDK channel-bit enumerators by their underlying bits. The Windows
++// SDK operator| overload is not guaranteed to be constexpr with BCC64X.
++template<typename... T>
++[[nodiscard]] constexpr auto MakeAudioObjectMask(AudioObjectType const first, T const... rest) noexcept
++    -> AudioObjectType
++{ return static_cast<AudioObjectType>((al::to_underlying(first) | ... | al::to_underlying(rest))); }
++
++constexpr auto ChannelMask_Mono = AudioObjectType_FrontCenter;
++constexpr auto ChannelMask_Stereo = MakeAudioObjectMask(AudioObjectType_FrontLeft, AudioObjectType_FrontRight);
++constexpr auto ChannelMask_Quad = MakeAudioObjectMask(AudioObjectType_FrontLeft, AudioObjectType_FrontRight, AudioObjectType_BackLeft, AudioObjectType_BackRight);
++constexpr auto ChannelMask_X51 = MakeAudioObjectMask(AudioObjectType_FrontLeft, AudioObjectType_FrontRight, AudioObjectType_FrontCenter, AudioObjectType_LowFrequency, AudioObjectType_SideLeft, AudioObjectType_SideRight);
++constexpr auto ChannelMask_X61 = MakeAudioObjectMask(AudioObjectType_FrontLeft, AudioObjectType_FrontRight, AudioObjectType_FrontCenter, AudioObjectType_LowFrequency, AudioObjectType_SideLeft, AudioObjectType_SideRight, AudioObjectType_BackCenter);
++constexpr auto ChannelMask_X71 = MakeAudioObjectMask(AudioObjectType_FrontLeft, AudioObjectType_FrontRight, AudioObjectType_FrontCenter, AudioObjectType_LowFrequency, AudioObjectType_SideLeft, AudioObjectType_SideRight, AudioObjectType_BackLeft, AudioObjectType_BackRight);
++constexpr auto ChannelMask_X714 = MakeAudioObjectMask(AudioObjectType_FrontLeft, AudioObjectType_FrontRight, AudioObjectType_FrontCenter, AudioObjectType_LowFrequency, AudioObjectType_SideLeft, AudioObjectType_SideRight, AudioObjectType_BackLeft, AudioObjectType_BackRight, AudioObjectType_TopFrontLeft, AudioObjectType_TopFrontRight, AudioObjectType_TopBackLeft, AudioObjectType_TopBackRight);
++constexpr auto ChannelMask_X7144 = MakeAudioObjectMask(AudioObjectType_FrontLeft, AudioObjectType_FrontRight, AudioObjectType_FrontCenter, AudioObjectType_LowFrequency, AudioObjectType_SideLeft, AudioObjectType_SideRight, AudioObjectType_BackLeft, AudioObjectType_BackRight, AudioObjectType_TopFrontLeft, AudioObjectType_TopFrontRight, AudioObjectType_TopBackLeft, AudioObjectType_TopBackRight, AudioObjectType_BottomFrontLeft, AudioObjectType_BottomFrontRight, AudioObjectType_BottomBackLeft, AudioObjectType_BottomBackRight);
++
++
+ template<typename T>
+ using unique_coptr = std::unique_ptr<T, decltype([](T *const ptr) { CoTaskMemFree(ptr); })>;
