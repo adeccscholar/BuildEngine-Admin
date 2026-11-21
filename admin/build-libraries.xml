@@ -16800,4 +16800,145 @@
          <argument value="-DOPENJPH_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
+   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T02:40:00Z">
+      <dependency library="eigen" version="5.0.1"/>
+      <dependency library="glog" version="0.7.1"/>
+      <dependency library="gflags" version="2.3.1"/>
+      <metadata name="Ceres Solver" supplier="Ceres Solver contributors" homepage="https://ceres-solver.org/" description="Native nonlinear least-squares C++ solver, EigenSparse baseline with external glog and gflags; optional LAPACK and SuiteSparse deliberately disabled." licenseSignal="yellow">
+         <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\ceres-solver\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/ceres-solver/ceres-solver.git" ref="2.2.0"/></security>
+      <source>
+         <download url="https://github.com/ceres-solver/ceres-solver/archive/refs/tags/2.2.0.tar.gz" archive="ceres-solver-2.2.0.tar.gz"/>
+         <extract format="libarchive" root="ceres-solver-2.2.0">
+            <require path="CMakeLists.txt"/><require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TESTING:BOOL=OFF"/>
+         <argument value="-DMINIGLOG:BOOL=OFF"/>
+         <argument value="-DGFLAGS:BOOL=ON"/>
+         <argument value="-DSUITESPARSE:BOOL=OFF"/>
+         <argument value="-DCXSPARSE:BOOL=OFF"/>
+         <argument value="-DLAPACK:BOOL=OFF"/>
+         <argument value="-DEIGENSPARSE:BOOL=ON"/>
+         <argument value="-DEIGENMETIS:BOOL=OFF"/>
+         <argument value="-DUSE_CUDA:BOOL=OFF"/>
+         <argument value="-DBUILD_DOCUMENTATION:BOOL=OFF"/>
+         <argument value="-DBUILD_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DBUILD_BENCHMARKS:BOOL=OFF"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:eigen};{DependencyRoot:glog};{DependencyRoot:gflags}"/>
+         <argument value="-DEIGEN3_INCLUDE_DIR:PATH={DependencyRoot:eigen}\include\eigen3"/>
+         <argument value="-Dglog_DIR:PATH={DependencyRoot:glog}\lib\win64\{Configuration}\cmake\glog"/>
+         <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\win64\{Configuration}\cmake\gflags"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\Ceres\CeresConfig.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\ceres-solver\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\ceres-solver\LICENSE"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ceres\ceres.h"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\ceres-solver\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="ceres-solver-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{ENV:PATH}"/>
+         <argument value="-DCERES_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DEIGEN_PACKAGE_ROOT:PATH={DependencyRoot:eigen}"/>
+         <argument value="-DGLOG_PACKAGE_ROOT:PATH={DependencyRoot:glog}"/>
+         <argument value="-DGFLAGS_PACKAGE_ROOT:PATH={DependencyRoot:gflags}"/>
+      </smoke>
+   </library>
+   <library id="openexr" version="3.5.4" category="image" timestamp="2026-11-21T02:40:00Z">
+      <dependency library="imath" version="3.2.3"/>
+      <dependency library="openjph" version="0.33.0"/>
+      <dependency library="libdeflate" version="1.26"/>
+      <metadata name="OpenEXR" supplier="Academy Software Foundation" homepage="https://openexr.com/" description="Native dynamic HDR image format libraries with external Imath, OpenJPH and libdeflate; no upstream tools or examples." licenseSignal="yellow">
+         <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\openexr\LICENSE.md"/>
+      </metadata>
+      <security><repository url="https://github.com/AcademySoftwareFoundation/openexr.git" ref="v3.5.4"/></security>
+      <source>
+         <download url="https://github.com/AcademySoftwareFoundation/openexr/releases/download/v3.5.4/openexr-3.5.4.tar.gz" archive="openexr-3.5.4.tar.gz"/>
+         <extract format="libarchive" root="openexr-3.5.4">
+            <require path="CMakeLists.txt"/><require path="LICENSE.md"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TESTING:BOOL=OFF"/>
+         <argument value="-DOPENEXR_BUILD_LIBS:BOOL=ON"/>
+         <argument value="-DOPENEXR_BUILD_TOOLS:BOOL=OFF"/>
+         <argument value="-DOPENEXR_BUILD_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DOPENEXR_BUILD_PYTHON:BOOL=OFF"/>
+         <argument value="-DOPENEXR_FORCE_INTERNAL_IMATH:BOOL=OFF"/>
+         <argument value="-DOPENEXR_FORCE_INTERNAL_OPENJPH:BOOL=OFF"/>
+         <argument value="-DOPENEXR_FORCE_INTERNAL_DEFLATE:BOOL=OFF"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:imath};{DependencyRoot:openjph};{DependencyRoot:libdeflate}"/>
+         <argument value="-DImath_DIR:PATH={DependencyRoot:imath}\lib\win64\{Configuration}\cmake\Imath"/>
+         <argument value="-Dopenjph_DIR:PATH={DependencyRoot:openjph}\lib\win64\{Configuration}\cmake\openjph"/>
+         <argument value="-Dlibdeflate_DIR:PATH={DependencyRoot:libdeflate}\lib\win64\{Configuration}\cmake\libdeflate"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\OpenEXR\OpenEXRConfig.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.md" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\openexr\LICENSE.md" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\openexr\LICENSE.md"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\OpenEXR\ImfHeader.h"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\openexr\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="openexr-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{ENV:PATH}"/>
+         <argument value="-DOPENEXR_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DIMATH_PACKAGE_ROOT:PATH={DependencyRoot:imath}"/>
+         <argument value="-DOPENJPH_PACKAGE_ROOT:PATH={DependencyRoot:openjph}"/>
+      </smoke>
+   </library>
 </buildLibraries>
