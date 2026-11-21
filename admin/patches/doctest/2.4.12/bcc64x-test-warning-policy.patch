@@ -1,6 +1,6 @@
 --- a/scripts/cmake/common.cmake
 +++ b/scripts/cmake/common.cmake
-@@ -186,7 +186,13 @@
+@@ -186,8 +186,14 @@
      add_compiler_flags(-Wno-c++98-compat-pedantic)
      add_compiler_flags(-Wno-c++98-compat-bind-to-temporary-copy)
      add_compiler_flags(-Wno-c++98-compat-local-type-template-args)
