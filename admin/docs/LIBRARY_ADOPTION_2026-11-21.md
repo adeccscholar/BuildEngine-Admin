@@ -7,9 +7,10 @@ Date: 2026-11-21. Status: registered, native BCC64X builds and product licensing
 | Library version | Upstream licensing | Managed dependencies | Product suitability |
 | --- | --- | --- | --- |
 | Assimp 6.0.6 | BSD-3-Clause and notices for integrated upstream components | zlib 1.4 | Yellow until compiled importer/contrib inventory and notices are reviewed. Nonfree C4D, USD and Draco optional integration is not selected. |
-| xtl 0.8.0 | BSD-3-Clause | none | Green with attribution and license preservation. |
-| xsimd 13.2.0 | BSD-3-Clause | none | Green with attribution and license preservation. |
-| xtensor 0.27.1 | BSD-3-Clause | xtl 0.8.0, xsimd 13.2.0 | Green for core use, including SIMD. |
+| doctest 2.4.12 | MIT | none | Green, independently managed upstream unit-test dependency. |
+| xtl 0.8.0 | BSD-3-Clause | doctest 2.4.12 (test only) | Green with attribution and license preservation. |
+| xsimd 13.2.0 | BSD-3-Clause | doctest 2.4.12 (test only) | Green with attribution and license preservation. |
+| xtensor 0.27.1 | BSD-3-Clause | xtl 0.8.0, xsimd 13.2.0, doctest 2.4.12 (test only) | Green for core use, including SIMD. |
 | CGAL 6.2.1 | Individual files under LGPL-3.0-or-later or GPL-3.0-or-later | Boost 1.92.0 | Yellow: only the explicitly tested LGPL kernel usage may be considered for proprietary software, subject to LGPL obligations and a per-header license review. GPL algorithms require GPL-compliant distribution or a commercial license. |
 | OpenAL Soft 1.25.2 | GNU Library General Public License 2 (upstream COPYING) | Windows platform APIs | Yellow: LGPL-family source, notice and relinking/replacement obligations apply for a proprietary consumer. Distribute as a replaceable DLL, not a monolithic static library. |
 
@@ -17,14 +18,15 @@ This is an engineering suitability assessment, not a legal opinion or a blanket 
 
 ## Declared integration
 
-The authoritative XML registers all six exact library/version coordinates, maintains separate producer and consumer evidence, preserves Release/Debug variants, packages license text and publishes the installed artifacts. No compiler substitutions or foreign-ABI binaries are part of the contract.
+The authoritative XML registers all seven exact library/version coordinates, maintains separate producer and consumer evidence, preserves Release/Debug variants, packages license text and publishes the installed artifacts. No compiler substitutions or foreign-ABI binaries are part of the contract.
 
 - `Assimp` uses the managed `zlib/1.4` package. Its actual compiled format/importer set, minizip and other bundled source must be inventoried from the configured build before redistributable approval. Tests are declared.
-- `xtl`, `xsimd` and `xtensor` use upstream header-only CMake projects with no fabricated DLL. `xtensor` enables its independently managed SIMD layer. Their upstream suites require **doctest**; this separate test prerequisite must be integrated before enabling them. No upstream test result is claimed.
+- `xtl`, `xsimd` and `xtensor` use upstream header-only CMake projects with no fabricated DLL. `xtensor` enables its independently managed SIMD layer. The separate MIT-licensed **doctest 2.4.12** package is registered for their upstream suites; those suites are selected when `TestsEnabled` is true. No upstream test result is claimed.
 - `CGAL` uses the upstream archive, BuildEngine-managed Boost, `CGAL_DISABLE_GMP=ON`, and Boost.Multiprecision enabled. This removes the external GMP/MPFR build dependency for the selected configuration. The smoke only uses `CGAL::Simple_cartesian<double>` and squared-distance computation, not GPL triangulations. The actual compile/installed CMake contract must be checked.
+- `doctest` is an independently installed MIT-licensed interface package, retaining its own native test selection and consumer smoke.
 - `OpenAL Soft` uses its native Windows CMake build, an independently packaged DLL, utilities and upstream tests. Examples are excluded from the distributed SDK because they are separate applications and introduce optional dependencies. HRTF/sample-data rights must be reviewed before packaged redistribution.
 
-All six entries have separate Debug and Release native package consumer smokes under `admin/smokes/`, including actual Assimp OBJ import, numerical xtensor broadcast and CGAL 2D geometry.
+All seven entries have separate Debug and Release native package consumer smokes under `admin/smokes/`, including actual Assimp OBJ import, numerical xtensor broadcast and CGAL 2D geometry.
 
 ## Verification and deployment gates
 
