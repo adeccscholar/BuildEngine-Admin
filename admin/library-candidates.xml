@@ -49,7 +49,7 @@
       <integrationGate>Use official OpenEXR 3.5.4 release archive. Require externally installed Imath, libdeflate and OpenJPH; reject internal/vendored fallback during configure. OpenEXR includes a compatibility workaround for OpenJPH 0.33.0 CMake Threads dependency; test actual imported target. Disable tools, examples, Python and tests initially. Review recent security fixes and HDR parser fuzz tests; verify BCC64X DLL/consumer.</integrationGate>
       <deckKernel>Low/medium: HDR image test assets and scientific visualization.</deckKernel>
    </candidate>
-   <candidate id="assimp" version="6.0.6" status="candidate-security-review">
+   <candidate id="assimp" version="6.0.6" status="registered-pending-native-build-and-licensed-component-audit">
       <source url="https://github.com/assimp/assimp/archive/refs/tags/v6.0.6.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;include/assimp/Importer.hpp;LICENSE" inspected="true"/>
       <dependencies>zlib@1.4 plus optional format-specific libraries</dependencies>
@@ -63,21 +63,21 @@
       <integrationGate>CMake source is Build/, not root. New 5.7.0 differs from prior 5.6.0 plan; check save-state serialization compatibility, SIMD, symbol exports and DLL packaging under BCC64X.</integrationGate>
       <deckKernel>Low: game physics showcase, not card OCR.</deckKernel>
    </candidate>
-   <candidate id="cgal" version="6.2.1" status="candidate-blocked-dependencies">
+   <candidate id="cgal" version="6.2.1" status="registered-lgpl-kernel-only-pending-native-build">
       <source url="https://github.com/CGAL/cgal/releases/download/v6.2.1/CGAL-6.2.1-library.zip" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;LICENSE.md" inspected="true"/>
       <dependencies>boost@1.92.0;gmp;mpfr and conditional backends</dependencies>
       <integrationGate>Only source/library archive, not precompiled win64 auxiliary GMP/MPFR libraries. Audit module-specific GPL/LGPL/commercial obligations and build GMP/MPFR in toolchain first.</integrationGate>
       <deckKernel>Medium: robust geometry benchmarks versus OpenCV.</deckKernel>
    </candidate>
-   <candidate id="xtensor" version="0.27.1" status="candidate-blocked-dependencies">
+   <candidate id="xtensor" version="0.27.1" status="registered-pending-native-smoke">
       <source url="https://github.com/xtensor-stack/xtensor/archive/refs/tags/0.27.1.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;LICENSE" inspected="true"/>
       <dependencies>xtl;xsimd optional</dependencies>
       <integrationGate>Pin and build xtl compatibility first, confirm release tag and install layout. Test C++23 expression lifetime, Eigen comparison and BCC64X consumer.</integrationGate>
       <deckKernel>Medium: numerical image feature pipelines.</deckKernel>
    </candidate>
-   <candidate id="openal-soft" version="1.25.2" status="candidate-build-review">
+   <candidate id="openal-soft" version="1.25.2" status="registered-lgpl-dll-pending-native-smoke">
       <source url="https://github.com/kcat/openal-soft/archive/refs/tags/1.25.2.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;COPYING;include/AL/al.h" inspected="true"/>
       <dependencies>windows audio native;optional external device/codec libraries</dependencies>
