@@ -17409,6 +17409,10 @@
          <install>
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <!-- CGALConfig.cmake needs the actual package root when installed below lib/win64/<configuration>/cmake/CGAL. -->
+               <copy source="{BuildFileDir}\patches\cgal\6.2.1\CGALConfig-installation-dirs.cmake" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CGAL\CGALConfig-installation-dirs.cmake" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CGAL\CGALConfig.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\CGAL\CGALConfig-installation-dirs.cmake"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\CGAL\Simple_cartesian.h"/>
             </perVariant>
             <common>
@@ -17452,17 +17456,15 @@
          <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-wasapi-audioobjecttype-operators.patch" target="{Workspace}\.buildengine\patches\1.25.2\bcc64x-wasapi-audioobjecttype-operators.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-openal-info-main-bridge.c" target="{Workspace}\utils\bcc64x-openal-info-main-bridge.c" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-openal-info-wmain.patch" target="{Workspace}\.buildengine\patches\1.25.2\bcc64x-openal-info-wmain.patch" overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="bcc64x-info-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\1.25.2\bcc64x-openal-info-wmain.patch"/>
-         </execute>
-         <execute name="bcc64x-info-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\1.25.2\bcc64x-openal-info-wmain.patch"/>
-         </execute>
-         <execute name="bcc64x-info-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
-            <argument value="{Workspace}\.buildengine\patches\1.25.2\bcc64x-openal-info-wmain.patch"/>
+         <!-- Persisted extracted sources may already include this exact patch.
+              Check reverse first; otherwise require an exact forward match,
+              apply and reverse-verify. Never silently accept an incompatible source. -->
+         <execute name="bcc64x-info-patch-apply-verified" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DADECC_PATCH_GIT:FILEPATH={Tool:git}"/>
+            <argument value="-DADECC_PATCH_WORKSPACE:PATH={Workspace}"/>
+            <argument value="-DADECC_PATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\1.25.2\bcc64x-openal-info-wmain.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\ApplyManagedPatch.cmake"/>
          </execute>
          <execute name="bcc64x-wasapi-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
