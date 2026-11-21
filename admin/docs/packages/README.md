@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-This catalog links **114 version-specific migration guides** from the public BuildEngine Administration repository. The complete library catalog and configuration are determined by the current `admin/build-libraries.xml`; a documentation page may describe a superseded version or a configuration that has not yet passed native BCC64X builds.
+This catalog links **117 version-specific migration guides** from the public BuildEngine Administration repository. The complete library catalog and configuration are determined by the current `admin/build-libraries.xml`; a documentation page may describe a superseded version or a configuration that has not yet passed native BCC64X builds.
 
 Each versioned guide documents the intended native C++Builder 13/BCC64X build profile, upstream integration, chosen dependencies, CMake or other build settings, patch decisions, installation artifacts, runtime boundaries and consumer evidence. **The contract describes what should happen, not proof that it happened successfully.**
 
@@ -119,6 +119,9 @@ Each versioned guide documents the intended native C++Builder 13/BCC64X build pr
 - [xerces-c 3.3.0](/package/xerces-c/3.3.0/migration)
 - [xz 5.8.3](/package/xz/5.8.3/migration)
 - [xz 5.8.4](/package/xz/5.8.4/migration)
+- [assimp 6.0.6](/package/assimp/6.0.6/migration)
+- [cgal 6.2.1](/package/cgal/6.2.1/migration)
+- [openal-soft 1.25.2](/package/openal-soft/1.25.2/migration)
 - [zlib 1.3.2](/package/zlib/1.3.2/migration)
 - [zlib 1.4](/package/zlib/1.4/migration)
 - [zstd 1.5.7](/package/zstd/1.5.7/migration)
