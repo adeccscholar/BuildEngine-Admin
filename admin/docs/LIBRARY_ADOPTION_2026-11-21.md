@@ -89,3 +89,45 @@ All three diff hunks were compared against their exact upstream-tagged source fi
 
 CGAL 6.2.1 separately passed source, Release/Debug configuration, installation, metadata and publishing in the supplied run; the Doxygen scope was still in progress. No unrelated CGAL work or reconfiguration is warranted by these three failures.
 
+## Follow-up compatibility corrections (2026-11-21, native rerun)
+
+The BCC64X rerun confirms the strict smoke protocol now accepts the doctest,
+xtl and xsimd consumers. All three report `ready` for the tested state.
+CGAL 6.2.1 Doxygen was running when the operator interrupted the run;
+no success, hang or runtime improvement is inferred from that heartbeat.
+
+### Assimp 6.0.6: packed import structures
+
+After the prior `defs.h` fix, Clang still entered a classic Borland branch
+in `include/assimp/Compiler/pushpack1.h` and `poppack1.h`, because
+BCC64X provides the historical Borland macros as well as `__clang__`.
+The existing pinned source patch now guards the classic branch with
+`!defined(__clang__)`, keeping the Clang packed-attribute path for
+MD2, 3DS and all other importers. No importer and no warning category is
+disabled. Check and apply the updated patch during the source state.
+
+### OpenAL Soft 1.25.2: WASAPI bitwise overload
+
+The Windows SDK used with BCC64X exposes an `AudioObjectType` bitwise
+operation while upstream `wasapi.cpp` also declares its fallback overload
+under `#ifndef _MSC_VER`. The result is ambiguous at the audio channel masks.
+The new pinned `bcc64x-wasapi-audioobjecttype-operators.patch` avoids
+declaring the duplicate fallback only for Clang with Borland compatibility
+macros. Other non-MSVC toolchains keep the upstream fallback; WASAPI,
+audio rendering and all test targets remain enabled.
+
+### xtensor 0.27.1: managed JSON test dependency
+
+The upstream CMake test targets precompile the full `XTENSOR_HEADERS` list,
+including `xtensor/io/xjson.hpp`. The independently managed
+`nlohmann-json/3.12.0` package supplies those headers but does not ship
+the CMake package configuration expected by upstream `find_package`.
+The XML now declares the explicit managed dependency, supplies its installed
+include root, and applies a version-pinned source patch to expose the
+header path to the complete upstream test suite, including the PCH and
+JSON-specific tests. Neither the PCH nor the tests are switched off.
+
+The five updated/new patch hunks for the three libraries were matched
+against the exact upstream source text. Successful native BCC64X Release and
+Debug builds, subsequent upstream tests, and runtime smoke results remain
+**not verified** until a new Windows run reports their outcomes.
