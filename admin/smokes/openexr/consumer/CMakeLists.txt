@@ -4,6 +4,8 @@ if(NOT DEFINED OPENEXR_PACKAGE_ROOT OR NOT DEFINED IMATH_PACKAGE_ROOT OR NOT DEF
    message(FATAL_ERROR "OpenEXR, Imath and OpenJPH package roots are required")
 endif()
 list(PREPEND CMAKE_PREFIX_PATH "${OPENEXR_PACKAGE_ROOT}" "${IMATH_PACKAGE_ROOT}" "${OPENJPH_PACKAGE_ROOT}")
+set(Imath_DIR "${IMATH_PACKAGE_ROOT}/lib/win64/Release/cmake/Imath")
+set(openjph_DIR "${OPENJPH_PACKAGE_ROOT}/lib/win64/Release/cmake/openjph")
 find_package(Imath CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 find_package(openjph CONFIG REQUIRED)
