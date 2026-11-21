@@ -133,3 +133,17 @@ With PostgreSQL disabled, `DiscoverShowcases` scans that directory on HTTP reque
 5. Reload `/showcases/`, the new `/showcase/graphics/.../` paths, and each exact library page's **Extended tests and showcases** section. The reverse link implementation resolves `active` selectors against the unique active catalog version, never as a literal URL segment.
 
 When tests are missing from the local workspace, editing the server renderer or the database alone cannot make an absent project into a valid native showcase. When projects are present but the database cache is old, a new authorized cache refresh is required.
+
+## HDR Photon Observatory — native inverse-light laboratory (21 November 2026)
+
+The independent **[HDR Photon Observatory](/showcase/graphics/hdr-photon-observatory/)** is a native SDL2 / Dear ImGui Windows application built against the unique active [Ceres Solver 2.3.0](/library/ceres-solver/2.3.0/) and independently installed [OpenEXR 3.5.4](/library/openexr/3.5.4/), together with Imath 3.2.3. It generates actual floating-point HDR images, writes and reads real OpenEXR RGBA files, and fits a synthetic nonlinear sensor light profile through Ceres automatic differentiation and `ceres::Solve`. A live exposure tone-map, a measured-versus-fitted response curve, and the actual solver costs show where each numerical library contributes.
+
+Supporting libraries remain correctly represented as dependency closure rather than separately invented effects: Abseil/Eigen support Ceres, OpenJPH/libdeflate/zstd support OpenEXR and SDL2/ImGui provide the native UI. The `showcase.json` manifest binds exact versions or resolves `active` to a unique non-superseded catalog coordinate, so Ceres 2.2.0 is not silently substituted.
+
+A separate headless `--verify` / CTest checks Ceres convergence, OpenEXR half-float file round-trip and retained radiance greater than 1.0. **[not verified]** Native BCC64X compilation, runtime import closure, GUI rendering and verification of this newly authored showcase are outstanding. Successful library FSM consumer smokes are not reused as showcase PASS evidence.
+
+## Curved book-page dewarping in OCR Studio
+
+The existing **[Tesseract OCR Studio](/showcase/graphics/tesseract-ocr-studio/)** now adds an opt-in `cv::remap` stage to unbend a manually estimated symmetric text-line bow. This follows the existing flat-page `warpPerspective` extraction and precedes the Leptonica/Tesseract pipeline, retaining full-resolution pixels and the frozen-camera capture workflow. The signed page-height control is explicit; a single image does not establish a physically correct 3D page surface.
+
+The independent `--verify` now checks a synthetic curved ink baseline is reduced from at least 25 pixels to 4 pixels or less, alongside the original exact OCR, confidence and page-detection regression. It does not pretend to measure unknown real-world OCR accuracy without a photographed book and ground-truth transcript. **[not verified]** Native BCC64X and camera image validation pending.

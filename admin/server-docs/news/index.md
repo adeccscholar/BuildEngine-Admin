@@ -8,7 +8,7 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
-- **[2026-11-21](/news/2026-11-21/)** — Ceres Solver with external glog/gflags and OpenEXR with external Imath/OpenJPH registered, native smoke pending (**98 libraries / 134 versions**)
+- **[2026-11-21](/news/2026-11-21/)** — Ceres 2.3.0 and OpenEXR native consumer smokes PASS; Ceres 2.2.0 superseded after portability fixes; HDR Photon Observatory and curved-page OCR showcase work (**98 libraries / 134 versions**)
 
 - **[2026-11-20](/news/2026-11-20/)** — Three interface consumers passed native smoke; ZXing-C++, Recast Navigation and Jolt Physics added as pending native DLL integrations (**91 libraries / 126 versions**)
 

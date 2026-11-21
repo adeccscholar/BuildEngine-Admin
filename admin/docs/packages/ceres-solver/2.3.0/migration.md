@@ -1,6 +1,6 @@
 # Ceres Solver 2.3.0 development snapshot — BCC64X
 
-**Status:** registered for independent native Release/Debug builds. No successful Ceres 2.3 consumer build has been observed.
+**Status:** native BCC64X Release/Debug builds and numerical installed-package consumer smoke PASS in the supplied FSM transcript. This is a pinned development snapshot, not an official upstream 2.3.0 release.
 
 ## Source identity
 
@@ -36,3 +36,9 @@ The complete CMake 4.1.1 configure log proves that `target_link_libraries(ceres_
 ## Installed consumer protocol correction (21 November 2026)
 
 The native 2.3.0 development snapshot completes both Release and Debug compilation and linking, package installation, metadata, publishing and Doxygen. Its independent consumer failed `status=invalid_protocol, checks=0/0` because the test executable only returned an exit code and produced no SMOKE records. The fixed consumer prints separate `SMOKE|CHECK` records for `Summary::IsSolutionUsable()` and the least-squares parameter result, followed by a `SMOKE|RESULT` line. It retains the actual nonlinear solve and both numerical assertions. The consumer protocol must pass on the next native FSM run.
+
+## Native completion — 21 November 2026
+
+**Outcome: native Release and Debug DLL builds, installs, metadata, publish, Doxygen and numerical Ceres consumer smoke PASS in the supplied FSM transcript.** The solver actually minimizes a residual, verifies that the solution is usable, and validates the optimized parameter. The version-scoped correction to the self-referential CMake link interface keeps all Schur specializations and the full Abseil/Eigen dependency chain. Managed BCC64X remains the sole compiler.
+
+Version 2.3.0 is the **active** BuildEngine Ceres coordinate; version 2.2.0 is now superseded but remains available as a historical integration. This is an upstream **development snapshot** pinned to commit `c39d3cdced6051690c7992ade0f6566fa822ccd2`, not an official upstream 2.3.0 release.

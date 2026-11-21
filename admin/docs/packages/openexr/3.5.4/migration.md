@@ -1,6 +1,6 @@
 # OpenEXR 3.5.4: BCC64X integration
 
-Status: registered, native build and consumer smoke pending (21 November 2026).
+Status: native BCC64X Debug/Release DLL builds, install, publish, documentation and independent Release consumer smoke PASS (21 November 2026).
 
 External dependencies: Imath 3.2.3, OpenJPH 0.33.0, libdeflate 1.26. The initial build disables tools, examples, Python and upstream tests. OpenEXR's internal-dependency forcing options are disabled and explicit external package paths are supplied.
 
@@ -30,3 +30,9 @@ Native Release and Debug builds, installs, publication and documentation now pas
 ## Smoke-only recovery (21 November 2026)
 
 Restore the last successfully built library timestamp (2026-11-21T05:00:00Z). The current failure was confined to the independent OpenEXR consumer's CMake configure, so a source/build/install invalidation was not appropriate. The consumer now supplies the explicitly installed OpenEXR config directory; native verification is still required. Both prior OpenEXR source patches use a new idempotent script that recognizes previously applied patches and does not fail simply because a source workspace is reused. Use `BuildEngine --make --refresh=smoke --lib=openexr --libversion=3.5.4` for smoke-only retry when upstream scope evidence remains current.
+
+## Native completion — 21 November 2026
+
+**Outcome: native Release and Debug DLL builds, installs, metadata, publish and documentation PASS.** The supplied FSM transcript additionally records `openexr/3.5.4 smoke:consumer:Release PASS` and terminal `ready PASS`. All external OpenJPH 0.33.0, Imath 3.2.3, libdeflate 1.26 and zstd 1.5.7 package-discovery gates remained enforced. The BCC64X `internal_cpuid.h` patch retains runtime CPU feature detection and corrects selection of the Clang-compatible CPUID intrinsic path instead of the MSVC-only `__cpuidex` API.
+
+The native smoke validates independent consumption of the installed OpenEXR CMake export and its header API. It does **not** yet prove adversarial HDR decoding, every compression codec round-trip or production-grade high-dynamic-range image quality; those remain separate extended-test goals.

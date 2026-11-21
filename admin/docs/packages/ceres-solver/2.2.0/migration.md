@@ -1,6 +1,6 @@
 # Ceres Solver 2.2.0: BCC64X integration
 
-Status: registered, native build and consumer smoke pending (21 November 2026).
+Status: native integration completed (operator-reported); superseded by Ceres Solver 2.3.0 development snapshot (21 November 2026).
 
 External dependencies: Eigen 5.0.1, glog 0.7.1, gflags 2.3.1.
 
@@ -42,3 +42,11 @@ The library's DLLs, installation, publish and Doxygen previously completed succe
 Ceres 2.2.0 retains its complete solver and Schur specialization implementation. A version-specific, idempotent patch is applied **after the normal CMake install** to the package's public `include/ceres/jet.h`. On `_WIN32`, its existing BesselJ0/BesselJ1/BesselJn wrappers call the documented Microsoft/UCRT `_j0`, `_j1`, and `_jn` functions, with explicit `<math.h>`. Other platforms retain the original wrappers. This is a runtime API correction, not a change of compiler identity or disabled functionality.
 
 The published package consumes the patched header, and the independent numerical smoke now checks the original optimization plus Bessel values at zero and parity for negative arguments/orders. Use `BuildEngine --make --lib=ceres-solver --libversion=2.2.0 --refresh=install --config=Release` to reinstall and republish the existing build without recompiling the Ceres DLL; `--refresh=smoke` then targets only the consumer. Native BCC64X compilation, linking and runtime validation of the patched public header remain pending.
+
+## Final native integration and supersession — 21 November 2026
+
+**Outcome: operator-confirmed native BCC64X acceptance.** The numerical installed-package consumer was corrected to use the actual `ceres-consumer.exe` target, after a real Ceres optimization test and public-header Bessel checks had been implemented. The earlier integration gates (source, full Schur specialization build, Debug and Release DLLs, install, license metadata, publish, documentation and smoke) were subsequently reported completed by the operator. The final 134/134 raw FSM result has not been attached to this documentation update, so that statement is recorded explicitly as operator confirmation rather than an independently captured build transcript.
+
+This version is now **supersededBy 2.3.0** in the library catalog. Supersession is descriptive only: Ceres 2.2.0 remains installable, its historical state and its glog/gflags dependency chain are retained, and any explicitly pinned consumer keeps its original dependency. The newer 2.3.0 is an immutable upstream development snapshot, not a published release tag. Its independent Abseil-based integration is the default active Ceres package for new showcases.
+
+The project does not resolve the old BCC64X `j0/j1/jn` mismatch by disabling automatic differentiation or Schur specializations. A version-scoped header patch selects the Windows UCRT `_j0/_j1/_jn` functions, retaining the complete mathematical interface.
