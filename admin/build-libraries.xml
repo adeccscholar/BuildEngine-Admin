@@ -17450,7 +17450,7 @@
          <!-- BCC64X compatibility: Module scanner fallback selects upstream non-module implementation, retaining audio backends and tests; coherent Windows 10 NTDDI target. -->
          <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-windows-sdk-version.patch" target="{Workspace}\.buildengine\patches\1.25.2\bcc64x-windows-sdk-version.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-wasapi-audioobjecttype-operators.patch" target="{Workspace}\.buildengine\patches\1.25.2\bcc64x-wasapi-audioobjecttype-operators.patch" overwrite="true" preserveCurrentArtifact="true"/>
-         <copy source="{BuildFileDir}\patches\libdeflate\1.26\bcc64x-wmain-bridge.c" target="{Workspace}\utils\adecc-bcc64x-wmain-bridge.c" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-openal-info-main-bridge.c" target="{Workspace}\utils\bcc64x-openal-info-main-bridge.c" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-openal-info-wmain.patch" target="{Workspace}\.buildengine\patches\1.25.2\bcc64x-openal-info-wmain.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="bcc64x-info-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
