@@ -17204,8 +17204,9 @@
          <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={DependencyRoot:doctest}"/>
       </smoke>
    </library>
-   <library id="xtensor" version="0.27.1" category="math" timestamp="2026-11-21T14:00:00Z">
+   <library id="xtensor" version="0.27.1" category="math" timestamp="2026-11-21T17:30:00Z">
       <dependency library="doctest" version="2.4.12"/>
+      <dependency library="nlohmann-json" version="3.12.0"/>
       <dependency library="xtl" version="0.8.0"/>
       <dependency library="xsimd" version="13.2.0"/>
       <metadata name="xtensor" supplier="xtensor contributors" homepage="https://github.com/xtensor-stack/xtensor" description="Multidimensional arrays, broadcasting and SIMD using independently managed xtl and xsimd." licenseSignal="green" artifactType="interface">
@@ -17219,6 +17220,19 @@
             <require path="include\xtensor\containers\xarray.hpp"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\\patches\\xtensor\\0.27.1\\bcc64x-managed-json-tests.patch" target="{Workspace}\\.buildengine\\patches\\0.27.1\\bcc64x-managed-json-tests.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="bcc64x-json-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\\.buildengine\\patches\\0.27.1\\bcc64x-managed-json-tests.patch"/>
+         </execute>
+         <execute name="bcc64x-json-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\\.buildengine\\patches\\0.27.1\\bcc64x-managed-json-tests.patch"/>
+         </execute>
+         <execute name="bcc64x-json-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\\.buildengine\\patches\\0.27.1\\bcc64x-managed-json-tests.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -17230,6 +17244,7 @@
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCPP23:BOOL=ON"/>
          <argument value="-DBUILD_TESTS:BOOL={TestsEnabled}"/>
+         <argument value="-DADECC_NLOHMANN_JSON_INCLUDE_DIR:PATH={DependencyRoot:nlohmann-json}\\include"/>
          <argument value="-Ddoctest_DIR:PATH={DependencyRoot:doctest}\lib\cmake\doctest"/>
          <argument value="-DBUILD_BENCHMARK:BOOL=OFF"/>
          <argument value="-DXTENSOR_USE_XSIMD:BOOL=ON"/>
@@ -17273,7 +17288,7 @@
          <argument value="-DXSIMD_PACKAGE_ROOT:PATH={DependencyRoot:xsimd}"/>
       </smoke>
    </library>
-   <library id="assimp" version="6.0.6" category="graphics" timestamp="2026-11-21T15:27:00Z">
+   <library id="assimp" version="6.0.6" category="graphics" timestamp="2026-11-21T17:30:00Z">
       <dependency library="zlib" version="1.4"/>
       <metadata name="Assimp" supplier="Assimp contributors" homepage="https://github.com/assimp/assimp" description="C++ 3D model import library using independently managed zlib, subject to component audit." licenseSignal="yellow" artifactType="shared">
          <license name="BSD 3-Clause License and bundled component notices" spdx="BSD-3-Clause" file="licenses\assimp\LICENSE"/>
@@ -17417,7 +17432,7 @@
          <argument value="-DBOOST_PACKAGE_ROOT:PATH={DependencyRoot:boost}"/>
       </smoke>
    </library>
-   <library id="openal-soft" version="1.25.2" category="graphics" timestamp="2026-11-21T15:28:00Z">
+   <library id="openal-soft" version="1.25.2" category="graphics" timestamp="2026-11-21T17:30:00Z">
       <metadata name="OpenAL Soft" supplier="OpenAL Soft contributors" homepage="https://github.com/kcat/openal-soft" description="Windows OpenAL 3D audio engine, native DLL, LGPL-compliant distribution obligations." licenseSignal="yellow" artifactType="shared">
          <license name="GNU Library General Public License version 2" file="licenses\openal-soft\COPYING"/>
       </metadata>
@@ -17432,6 +17447,19 @@
          </extract>
          <!-- BCC64X compatibility: Module scanner fallback selects upstream non-module implementation, retaining audio backends and tests; coherent Windows 10 NTDDI target. -->
          <copy source="{BuildFileDir}\patches\openal-soft\1.25.2\bcc64x-windows-sdk-version.patch" target="{Workspace}\.buildengine\patches\1.25.2\bcc64x-windows-sdk-version.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\\patches\\openal-soft\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch" target="{Workspace}\\.buildengine\\patches\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="bcc64x-wasapi-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\\.buildengine\\patches\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch"/>
+         </execute>
+         <execute name="bcc64x-wasapi-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\\.buildengine\\patches\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch"/>
+         </execute>
+         <execute name="bcc64x-wasapi-patch-verify" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\\.buildengine\\patches\\1.25.2\\bcc64x-wasapi-audioobjecttype-operators.patch"/>
+         </execute>
          <execute name="bcc64x-compat-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\1.25.2\bcc64x-windows-sdk-version.patch"/>
