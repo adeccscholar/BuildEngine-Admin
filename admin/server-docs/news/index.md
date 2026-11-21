@@ -8,7 +8,7 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
-- **[2026-11-21](/news/2026-11-21/)** — Ceres Solver with external glog/gflags and OpenEXR with external Imath/OpenJPH registered, native smoke pending (**98 libraries / 133 versions**)
+- **[2026-11-21](/news/2026-11-21/)** — Ceres Solver with external glog/gflags and OpenEXR with external Imath/OpenJPH registered, native smoke pending (**98 libraries / 134 versions**)
 
 - **[2026-11-20](/news/2026-11-20/)** — Three interface consumers passed native smoke; ZXing-C++, Recast Navigation and Jolt Physics added as pending native DLL integrations (**91 libraries / 126 versions**)
 
@@ -70,6 +70,7 @@ Each news item reports **distinct libraries** (unique logical library IDs) and *
 | 18 Nov | 85 | 120 |
 | 19 Nov | 88 | 123 |
 | 20 Nov | 91 | 126 |
+| 21 Nov | 98 | 134 |
 
 The first schema-3 version had just one pugiXML entry earlier on 24 August; the end-of-day schema-4 count was two. The feasibility study examined approximately twenty libraries before the initial Admin library catalog was established.
 
