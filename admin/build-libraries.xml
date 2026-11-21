@@ -16873,6 +16873,73 @@
          <argument value="-DGFLAGS_PACKAGE_ROOT:PATH={DependencyRoot:gflags}"/>
       </smoke>
    </library>
+   <library id="ceres-solver" version="2.3.0" category="math" timestamp="2026-11-21T03:30:00Z">
+      <dependency library="eigen" version="5.0.1"/>
+      <dependency library="abseil" version="20260817.0"/>
+      <metadata name="Ceres Solver 2.3.0 snapshot" supplier="Ceres Solver contributors" homepage="https://ceres-solver.org/" description="Native pinned upstream Ceres 2.3 development snapshot with external managed Abseil and EigenSparse; no glog/gflags." licenseSignal="yellow">
+         <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\ceres-solver\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/ceres-solver/ceres-solver.git" commit="c39d3cdced6051690c7992ade0f6566fa822ccd2"/></security>
+      <source>
+         <download url="https://github.com/ceres-solver/ceres-solver/archive/c39d3cdced6051690c7992ade0f6566fa822ccd2.zip" archive="ceres-solver-2.3.0-c39d3cd.zip"/>
+         <extract format="zip" root="ceres-solver-c39d3cdced6051690c7992ade0f6566fa822ccd2">
+            <require path="CMakeLists.txt"/><require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TESTING:BOOL=OFF"/>
+         <argument value="-DWITH_EIGENSPARSE:BOOL=ON"/>
+         <argument value="-DWITH_EIGENMETIS:BOOL=OFF"/>
+         <argument value="-DWITH_SUITESPARSE:BOOL=OFF"/>
+         <argument value="-DWITH_LAPACK:BOOL=OFF"/>
+         <argument value="-DWITH_CUDA:STRING=OFF"/>
+         <argument value="-DBUILD_DOCUMENTATION:BOOL=OFF"/>
+         <argument value="-DBUILD_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DBUILD_BENCHMARKS:BOOL=OFF"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:eigen};{DependencyRoot:abseil}"/>
+         <argument value="-Dabsl_DIR:PATH={DependencyRoot:abseil}\lib\win64\{Configuration}\cmake\absl"/>
+         <argument value="-DEIGEN3_INCLUDE_DIR:PATH={DependencyRoot:eigen}\include\eigen3"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\Ceres\CeresConfig.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\ceres-solver\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\ceres-solver\LICENSE"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ceres\ceres.h"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\ceres-solver\consumer-abseil" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="ceres-abseil-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="PATH" value="{ENV:PATH}"/>
+         <argument value="-DCERES_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DEIGEN_PACKAGE_ROOT:PATH={DependencyRoot:eigen}"/>
+         <argument value="-DABSEIL_PACKAGE_ROOT:PATH={DependencyRoot:abseil}"/>
+      </smoke>
+   </library>
    <library id="openexr" version="3.5.4" category="image" timestamp="2026-11-21T02:40:00Z">
       <dependency library="imath" version="3.2.3"/>
       <dependency library="openjph" version="0.33.0"/>
