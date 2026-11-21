@@ -296,7 +296,7 @@
    <!-- CGAL upstream uses DOXYGEN_RUNNING to expose documentation-only
         declarations and simplify template-heavy implementation signatures.
         This does not affect the compiled library. -->
-   <library id="cgal" publicOnly="true">
+   <library id="cgal">
       <define name="DOXYGEN_RUNNING"/>
       <option name="ENABLE_PREPROCESSING" value="YES"/>
    </library>
@@ -306,10 +306,6 @@
            Deliberately retain the BuildEngine C++ language-version model
            rather than replace __cplusplus with upstream's generic value 1.
            These macros affect Doxygen only, not the BCC64X build. -->
-      <option name="ENABLE_PREPROCESSING" value="YES"/>
-      <option name="MACRO_EXPANSION" value="YES"/>
-      <option name="EXPAND_ONLY_PREDEF" value="NO"/>
-      <option name="SKIP_FUNCTION_MACROS" value="YES"/>
       <define name="CVAPI(x)" value="x"/>
       <define name="CV_API_CALL" value=""/>
       <define name="CV_DOXYGEN" value=""/>
@@ -349,6 +345,10 @@
       <define name="CV__DEBUG_NS_END" value=""/>
       <define name="CV_DEPRECATED_EXTERNAL" value=""/>
       <define name="CV_DEPRECATED" value=""/>
+      <option name="ENABLE_PREPROCESSING" value="YES"/>
+      <option name="MACRO_EXPANSION" value="YES"/>
+      <option name="EXPAND_ONLY_PREDEF" value="NO"/>
+      <option name="SKIP_FUNCTION_MACROS" value="YES"/>
       <exclude pattern="*/modules/*/test/*"/>
       <exclude pattern="*/modules/*/perf/*"/>
       <exclude pattern="*/samples/*"/>
