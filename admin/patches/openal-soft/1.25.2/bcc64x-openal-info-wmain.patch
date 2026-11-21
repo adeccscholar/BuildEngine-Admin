@@ -7,7 +7,7 @@
 -    add_executable(openal-info utils/openal-info.c)
 +    if(ADECC_BCC64X_WINDOWS10_SDK)
 +        # Preserve upstream Unicode wmain; bridge the BCC64X console entry point.
-+        add_executable(openal-info utils/openal-info.c utils/adecc-bcc64x-wmain-bridge.c)
++        add_executable(openal-info utils/openal-info.c utils/bcc64x-openal-info-main-bridge.c)
 +    else()
 +        add_executable(openal-info utils/openal-info.c)
 +    endif()
