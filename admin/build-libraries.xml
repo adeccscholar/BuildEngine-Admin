@@ -17436,7 +17436,7 @@
          <argument value="-DBOOST_PACKAGE_ROOT:PATH={DependencyRoot:boost}"/>
       </smoke>
    </library>
-   <library id="openal-soft" version="1.25.2" category="graphics" timestamp="2026-11-21T22:14:00Z">
+   <library id="openal-soft" version="1.25.2" category="graphics" timestamp="2026-11-21T22:35:00Z">
       <metadata name="OpenAL Soft" supplier="OpenAL Soft contributors" homepage="https://github.com/kcat/openal-soft" description="Windows OpenAL 3D audio engine, native DLL, LGPL-compliant distribution obligations." licenseSignal="yellow" artifactType="shared">
          <license name="GNU Library General Public License version 2" file="licenses\openal-soft\COPYING"/>
       </metadata>
@@ -17489,6 +17489,8 @@
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <!-- Place gtest binaries next to the OpenAL DLL for build-time gtest_discover_tests(). -->
+         <argument value="-DCMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <argument value="-DALSOFT_UTILS:BOOL=ON"/>
          <argument value="-DALSOFT_EXAMPLES:BOOL=OFF"/>
          <argument value="-DALSOFT_TESTS:BOOL={TestsEnabled}"/>
