@@ -17089,6 +17089,7 @@
       </smoke>
    </library>
    <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-21T14:00:00Z">
+      <dependency library="doctest" version="2.4.12"/>
       <metadata name="xtl" supplier="xtl contributors" homepage="https://github.com/xtensor-stack/xtl" description="Header-only C++ building block for the xtensor numerical stack." licenseSignal="green" artifactType="interface">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xtl\LICENSE"/>
       </metadata>
@@ -17101,7 +17102,7 @@
             <require path="LICENSE"/>
          </extract>
       </source>
-      <build testsAffectBuild="false">
+      <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/>
@@ -17109,7 +17110,8 @@
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
-         <argument value="-DBUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTS:BOOL={TestsEnabled}"/>
+         <argument value="-Ddoctest_DIR:PATH={DependencyRoot:doctest}\lib\cmake\doctest"/>
          <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -17117,6 +17119,7 @@
          <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
          <install>
             <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"><argument value="--output-on-failure"/></execute>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xtl\xoptional.hpp"/>
             </perVariant>
@@ -17134,14 +17137,17 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DXTL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={DependencyRoot:doctest}"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\xtl\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xtl-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DXTL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={DependencyRoot:doctest}"/>
       </smoke>
    </library>
    <library id="xsimd" version="13.2.0" category="math" timestamp="2026-11-21T14:00:00Z">
+      <dependency library="doctest" version="2.4.12"/>
       <metadata name="xsimd" supplier="xsimd contributors" homepage="https://github.com/xtensor-stack/xsimd" description="Header-only C++ building block for the xtensor numerical stack." licenseSignal="green" artifactType="interface">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xsimd\LICENSE"/>
       </metadata>
@@ -17154,7 +17160,7 @@
             <require path="LICENSE"/>
          </extract>
       </source>
-      <build testsAffectBuild="false">
+      <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/>
@@ -17162,7 +17168,8 @@
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
-         <argument value="-DBUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTS:BOOL={TestsEnabled}"/>
+         <argument value="-Ddoctest_DIR:PATH={DependencyRoot:doctest}\lib\cmake\doctest"/>
          <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/{Configuration}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -17170,6 +17177,7 @@
          <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
          <install>
             <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"><argument value="--output-on-failure"/></execute>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xsimd\xsimd.hpp"/>
             </perVariant>
@@ -17187,14 +17195,17 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DXSIMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={DependencyRoot:doctest}"/>
       </smoke>
       <smoke id="consumer" scope="package" source="smokes\xsimd\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xsimd-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DXSIMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={DependencyRoot:doctest}"/>
       </smoke>
    </library>
    <library id="xtensor" version="0.27.1" category="math" timestamp="2026-11-21T14:00:00Z">
+      <dependency library="doctest" version="2.4.12"/>
       <dependency library="xtl" version="0.8.0"/>
       <dependency library="xsimd" version="13.2.0"/>
       <metadata name="xtensor" supplier="xtensor contributors" homepage="https://github.com/xtensor-stack/xtensor" description="Multidimensional arrays, broadcasting and SIMD using independently managed xtl and xsimd." licenseSignal="green" artifactType="interface">
@@ -17209,7 +17220,7 @@
             <require path="LICENSE"/>
          </extract>
       </source>
-      <build testsAffectBuild="false">
+      <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-G"/><argument value="Ninja"/>
@@ -17218,7 +17229,8 @@
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCPP23:BOOL=ON"/>
-         <argument value="-DBUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTS:BOOL={TestsEnabled}"/>
+         <argument value="-Ddoctest_DIR:PATH={DependencyRoot:doctest}\lib\cmake\doctest"/>
          <argument value="-DBUILD_BENCHMARK:BOOL=OFF"/>
          <argument value="-DXTENSOR_USE_XSIMD:BOOL=ON"/>
          <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/{Configuration}"/>
@@ -17230,6 +17242,7 @@
          <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
          <install>
             <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"><argument value="--output-on-failure"/></execute>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xtensor\containers\xarray.hpp"/>
             </perVariant>
@@ -17247,6 +17260,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DXTENSOR_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={DependencyRoot:doctest}"/>
          <argument value="-DXTL_PACKAGE_ROOT:PATH={DependencyRoot:xtl}"/>
          <argument value="-DXSIMD_PACKAGE_ROOT:PATH={DependencyRoot:xsimd}"/>
       </smoke>
@@ -17254,6 +17268,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DXTENSOR_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={DependencyRoot:doctest}"/>
          <argument value="-DXTL_PACKAGE_ROOT:PATH={DependencyRoot:xtl}"/>
          <argument value="-DXSIMD_PACKAGE_ROOT:PATH={DependencyRoot:xsimd}"/>
       </smoke>
@@ -17449,6 +17464,52 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-DOPENAL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
+   <library id="doctest" version="2.4.12" category="testing" timestamp="2026-11-21T14:10:00Z">
+      <metadata artifactType="interface" name="doctest" supplier="Viktor Kirilov and contributors" homepage="https://github.com/doctest/doctest" description="Independent MIT-licensed C++ unit test framework for xtl, xsimd and xtensor upstream suites." licenseSignal="green">
+         <license name="MIT License" spdx="MIT" file="licenses\doctest\LICENSE.txt"/>
+      </metadata>
+      <security><repository url="https://github.com/doctest/doctest.git" ref="v2.4.12"/></security>
+      <source>
+         <download url="https://github.com/doctest/doctest/archive/refs/tags/v2.4.12.tar.gz" archive="doctest-2.4.12.tar.gz"/>
+         <extract format="libarchive" root="doctest-2.4.12">
+            <require path="CMakeLists.txt"/><require path="doctest\doctest.h"/><require path="LICENSE.txt"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DDOCTEST_WITH_TESTS:BOOL=OFF"/>
+         <argument value="-DDOCTEST_WITH_MAIN_IN_STATIC_LIB:BOOL=OFF"/>
+         <argument value="-DDOCTEST_NO_INSTALL:BOOL=OFF"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\doctest\doctest.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\doctest\doctestConfig.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\doctest\LICENSE.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\doctest\LICENSE.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <cmake source="lib\cmake" target="lib\cmake" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\doctest\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="doctest-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
 </buildLibraries>
