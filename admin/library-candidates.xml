@@ -35,14 +35,14 @@
       <integrationGate>Use official release asset, NOT automatically generated GitHub source archive: upstream submodule content may be missing. Configure ZXING_WRITERS=OFF, ZXING_READERS=ON, ZXING_DEPENDENCIES=LOCAL and disable samples/PCH; Windows RC &amp; export testing outstanding.</integrationGate>
       <deckKernel>Medium: optional barcode scanning in card intake.</deckKernel>
    </candidate>
-   <candidate id="ceres-solver" version="2.2.0" status="candidate-blocked-dependencies">
+   <candidate id="ceres-solver" version="2.2.0" status="registered-pending-native-smoke">
       <source url="https://github.com/ceres-solver/ceres-solver/archive/refs/tags/2.2.0.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;include/ceres/ceres.h;LICENSE" inspected="true"/>
       <dependencies>eigen@5.0.1;glog@0.7.1;gflags@2.3.1;EigenSparse enabled;LAPACK/SuiteSparse disabled for first DLL integration</dependencies>
       <integrationGate>Pin glog/gflags as independent DLL packages. Ceres 2.2.0 uses glog/gflags; Ceres 2.3 replaces them with Abseil. Disable CUDA, SuiteSparse, LAPACK, examples and benchmarks initially; verify Eigen 5 compatibility, dynamic exports, CMake consumer, and actual nonlinear least-squares result. Add advanced solver backends only after native smoke.</integrationGate>
       <deckKernel>High: reprojection minimization and camera calibration.</deckKernel>
    </candidate>
-   <candidate id="openexr" version="3.5.4" status="candidate-blocked-dependencies">
+   <candidate id="openexr" version="3.5.4" status="registered-pending-native-smoke">
       <source url="https://github.com/AcademySoftwareFoundation/openexr/releases/download/v3.5.4/openexr-3.5.4.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;LICENSE.md;src/lib/OpenEXR/ImfInputFile.h" inspected="true"/>
       <dependencies>imath@3.2.3;openjph@0.33.0;libdeflate@1.26;zlib@1.4;zstd@1.5.7 conditional to selected codecs</dependencies>
@@ -112,28 +112,28 @@
       <integrationGate>No version pinned. High-complexity custom build, runtime ABI and transitive dependency audit. Do not register active BuildEngine package yet.</integrationGate>
       <deckKernel>Experimental: machine-learning artwork embeddings.</deckKernel>
    </candidate>
-   <candidate id="gflags" version="2.3.1" status="candidate-dependency-of-ceres">
+   <candidate id="gflags" version="2.3.1" status="registered-pending-native-smoke">
       <source url="https://github.com/gflags/gflags/archive/refs/tags/v2.3.1.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;COPYING.txt" inspected="true"/>
       <dependencies>none required for C++ library;platform-specific system libraries only</dependencies>
       <integrationGate>Build BCC64X native shared-only package: BUILD_SHARED_LIBS=ON, BUILD_STATIC_LIBS=OFF, BUILD_TESTING=OFF. Inspect exported CMake target, DLL/import library layout and independent consumer; do not accept foreign-ABI artifacts.</integrationGate>
       <deckKernel>Indirect: Ceres 2.2.0 logging/flags configuration.</deckKernel>
    </candidate>
-   <candidate id="glog" version="0.7.1" status="candidate-dependency-of-ceres">
+   <candidate id="glog" version="0.7.1" status="registered-pending-native-smoke">
       <source url="https://github.com/google/glog/archive/refs/tags/v0.7.1.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;COPYING" inspected="true"/>
       <dependencies>gflags@2.3.1</dependencies>
       <integrationGate>Build BCC64X native shared-only package with WITH_GFLAGS=ON, BUILD_SHARED_LIBS=ON and BUILD_TESTING=OFF. Check C++ ABI and exported imported target; add real logging consumer. Validate compatibility with gflags 2.3.1.</integrationGate>
       <deckKernel>Indirect: Ceres 2.2.0 optimization diagnostics.</deckKernel>
    </candidate>
-   <candidate id="imath" version="3.2.3" status="candidate-dependency-of-openexr">
+   <candidate id="imath" version="3.2.3" status="registered-pending-native-smoke">
       <source url="https://github.com/AcademySoftwareFoundation/Imath/releases/download/v3.2.3/Imath-3.2.3.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;LICENSE.md;src/Imath/CMakeLists.txt" inspected="true"/>
       <dependencies>none required for core C++ library</dependencies>
       <integrationGate>Build BCC64X native dynamic package with BUILD_TESTING=OFF, IMATH_INSTALL=ON; disable Python bindings. Verify installed Imath CMake config, DLL export and consumer.</integrationGate>
       <deckKernel>Low/medium: numerical foundations for optional HDR imagery; direct OpenEXR dependency.</deckKernel>
    </candidate>
-   <candidate id="openjph" version="0.33.0" status="candidate-dependency-of-openexr">
+   <candidate id="openjph" version="0.33.0" status="registered-pending-native-smoke">
       <source url="https://github.com/aous72/OpenJPH/archive/refs/tags/0.33.0.tar.gz" archiveSha256Verified="false"/>
       <treeEvidence requiredPaths="CMakeLists.txt;LICENSE;src/core/CMakeLists.txt" inspected="true"/>
       <dependencies>none required with TIFF support disabled</dependencies>
