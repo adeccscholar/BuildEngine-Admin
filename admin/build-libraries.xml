@@ -17195,12 +17195,12 @@
       </smoke>
    </library>
    <library id="xtensor" version="0.27.1" category="math" timestamp="2026-11-21T14:00:00Z">
+      <dependency library="xtl" version="0.8.0"/>
+      <dependency library="xsimd" version="13.2.0"/>
       <metadata name="xtensor" supplier="xtensor contributors" homepage="https://github.com/xtensor-stack/xtensor" description="Multidimensional arrays, broadcasting and SIMD using independently managed xtl and xsimd." licenseSignal="green" artifactType="interface">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xtensor\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/xtensor-stack/xtensor.git" ref="0.27.1"/></security>
-      <dependency library="xtl" version="0.8.0"/>
-      <dependency library="xsimd" version="13.2.0"/>
       <source>
          <download url="https://github.com/xtensor-stack/xtensor/archive/refs/tags/0.27.1.tar.gz" archive="xtensor-0.27.1.tar.gz"/>
          <extract format="libarchive" root="xtensor-0.27.1">
@@ -17259,11 +17259,11 @@
       </smoke>
    </library>
    <library id="assimp" version="6.0.6" category="graphics" timestamp="2026-11-21T14:00:00Z">
+      <dependency library="zlib" version="1.4"/>
       <metadata name="Assimp" supplier="Assimp contributors" homepage="https://github.com/assimp/assimp" description="C++ 3D model import library using independently managed zlib, subject to component audit." licenseSignal="yellow" artifactType="shared">
          <license name="BSD 3-Clause License and bundled component notices" spdx="BSD-3-Clause" file="licenses\assimp\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/assimp/assimp.git" ref="v6.0.6"/></security>
-      <dependency library="zlib" version="1.4"/>
       <source>
          <download url="https://github.com/assimp/assimp/archive/refs/tags/v6.0.6.tar.gz" archive="assimp-6.0.6.tar.gz"/>
          <extract format="libarchive" root="assimp-6.0.6">
@@ -17328,11 +17328,11 @@
       </smoke>
    </library>
    <library id="cgal" version="6.2.1" category="math" timestamp="2026-11-21T14:00:00Z">
+      <dependency library="boost" version="1.92.0"/>
       <metadata name="CGAL" supplier="CGAL contributors" homepage="https://github.com/CGAL/cgal" description="CGAL geometry kernel evaluation only; GPL algorithms require separate commercial or GPL terms." licenseSignal="yellow" artifactType="interface">
          <license name="LGPL-3.0-or-later and GPL-3.0-or-later by source file" file="licenses\cgal\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/CGAL/cgal.git" ref="v6.2.1"/></security>
-      <dependency library="boost" version="1.92.0"/>
       <source>
          <download url="https://github.com/CGAL/cgal/releases/download/v6.2.1/CGAL-6.2.1-library.zip" archive="cgal-6.2.1.zip"/>
          <extract format="zip" root="CGAL-6.2.1">
