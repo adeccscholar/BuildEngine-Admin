@@ -16587,7 +16587,7 @@
          <argument value="-DZINT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="gflags" version="2.3.1" category="foundation" timestamp="2026-11-21T03:00:00Z">
+   <library id="gflags" version="2.3.1" category="foundation" timestamp="2026-11-21T04:00:00Z">
       <metadata name="gflags" supplier="gflags upstream contributors" homepage="https://github.com/gflags/gflags" description="Native BCC64X shared-library integration of gflags; independent DLL consumer validation required." licenseSignal="yellow">
          <license name="BSD-style upstream license" file="COPYING.txt"/>
       </metadata>
@@ -16597,6 +16597,13 @@
             <require path="CMakeLists.txt"/>
             <require path="COPYING.txt"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\gflags\2.3.1\bcc64x-variant-install.patch" target="{Workspace}\.buildengine\patches\bcc64x-variant-install.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="variant-install-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\bcc64x-variant-install.patch"/>
+         </execute>
+         <execute name="variant-install-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/><argument value="{Workspace}\.buildengine\patches\bcc64x-variant-install.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -16609,6 +16616,7 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DGFLAGS_BCC64X_LAYOUT:BOOL=ON"/>
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <argument value="-DBUILD_STATIC_LIBS:BOOL=OFF"/>
          <argument value="-DGFLAGS_BUILD_TESTING:BOOL=OFF"/>
@@ -16619,7 +16627,7 @@
          <install>
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\gflags\gflags-config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\gflags\gflags-config.cmake"/>
             </perVariant>
             <common>
                <copy source="{Workspace}\COPYING.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.txt" overwrite="true"/>
@@ -16642,7 +16650,7 @@
 
       </smoke>
    </library>
-   <library id="glog" version="0.7.1" category="foundation" timestamp="2026-11-21T03:00:00Z">
+   <library id="glog" version="0.7.1" category="foundation" timestamp="2026-11-21T04:00:00Z">
       <dependency library="gflags" version="2.3.1"/>
       <metadata name="glog" supplier="glog upstream contributors" homepage="https://github.com/google/glog" description="Native BCC64X shared-library integration of glog; independent DLL consumer validation required." licenseSignal="yellow">
          <license name="BSD-style upstream license" file="COPYING"/>
@@ -16668,7 +16676,7 @@
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <argument value="-DWITH_GFLAGS:BOOL=ON"/>
          <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:gflags}"/>
-         <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\cmake\gflags"/>
+         <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\win64\{Configuration}\cmake\gflags"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
@@ -16800,7 +16808,7 @@
          <argument value="-DOPENJPH_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T03:00:00Z">
+   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T04:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="glog" version="0.7.1"/>
       <dependency library="gflags" version="2.3.1"/>
@@ -16840,7 +16848,7 @@
          <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:eigen};{DependencyRoot:glog};{DependencyRoot:gflags}"/>
          <argument value="-DEIGEN3_INCLUDE_DIR:PATH={DependencyRoot:eigen}\include\eigen3"/>
          <argument value="-Dglog_DIR:PATH={DependencyRoot:glog}\lib\win64\{Configuration}\cmake\glog"/>
-         <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\cmake\gflags"/>
+         <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\win64\{Configuration}\cmake\gflags"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
