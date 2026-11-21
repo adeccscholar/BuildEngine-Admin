@@ -17504,7 +17504,7 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\AL\al.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\AL\alc.h"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
             </perVariant>
             <common>
                <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\COPYING" overwrite="true"/>
