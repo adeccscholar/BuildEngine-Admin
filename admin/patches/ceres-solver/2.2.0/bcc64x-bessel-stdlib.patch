@@ -1,0 +1,61 @@
+--- a/include/ceres/jet.h
++++ b/include/ceres/jet.h
+@@ -157,7 +157,8 @@
+ #ifndef CERES_PUBLIC_JET_H_
+ #define CERES_PUBLIC_JET_H_
+ 
+-#include <cmath>
++#include <cmath>
++#include <math.h>
+ #include <complex>
+ #include <iosfwd>
+ #include <iostream>  // NOLINT
+@@ -873,21 +874,33 @@
+ // _j[0,1,n]().  Where available on MSVC, use _j[0,1,n]() to avoid deprecated
+ // function errors in client code (the specific warning is suppressed when
+ // Ceres itself is built).
+-inline double BesselJ0(double x) {
+-  CERES_DISABLE_DEPRECATED_WARNING
+-  return j0(x);
+-  CERES_RESTORE_DEPRECATED_WARNING
+-}
+-inline double BesselJ1(double x) {
+-  CERES_DISABLE_DEPRECATED_WARNING
+-  return j1(x);
+-  CERES_RESTORE_DEPRECATED_WARNING
+-}
+-inline double BesselJn(int n, double x) {
+-  CERES_DISABLE_DEPRECATED_WARNING
+-  return jn(n, x);
+-  CERES_RESTORE_DEPRECATED_WARNING
+-}
++inline double BesselJ0(double x) {
++#if defined(_WIN32)
++  return _j0(x);
++#else
++  CERES_DISABLE_DEPRECATED_WARNING
++  return j0(x);
++  CERES_RESTORE_DEPRECATED_WARNING
++#endif
++}
++inline double BesselJ1(double x) {
++#if defined(_WIN32)
++  return _j1(x);
++#else
++  CERES_DISABLE_DEPRECATED_WARNING
++  return j1(x);
++  CERES_RESTORE_DEPRECATED_WARNING
++#endif
++}
++inline double BesselJn(int n, double x) {
++#if defined(_WIN32)
++  return _jn(n, x);
++#else
++  CERES_DISABLE_DEPRECATED_WARNING
++  return jn(n, x);
++  CERES_RESTORE_DEPRECATED_WARNING
++#endif
++}
+ 
+ // For the formulae of the derivatives of the Bessel functions see the book:
+ // Olver, Lozier, Boisvert, Clark, NIST Handbook of Mathematical Functions,

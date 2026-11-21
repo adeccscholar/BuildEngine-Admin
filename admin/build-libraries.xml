@@ -16881,6 +16881,14 @@
                <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\ceres-solver\LICENSE" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\ceres-solver\LICENSE"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ceres\ceres.h"/>
+               <execute name="patch-installed-public-jet-header" executable="{Tool:cmake}" workingDirectory="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}" showOutput="false">
+                  <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+                  <argument value="-DSOURCE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+                  <argument value="-DPATCH_FILE:FILEPATH={BuildFileDir}\patches\ceres-solver\2.2.0\bcc64x-bessel-stdlib.patch"/>
+                  <argument value="-P"/>
+                  <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+               </execute>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\ceres\jet.h"/>
             </common>
          </install>
       </build>
