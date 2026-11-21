@@ -293,7 +293,62 @@
       <importTag library="ace" version="8.0.6" file="ace.tag"/>
    </library>
 
+   <!-- CGAL upstream uses DOXYGEN_RUNNING to expose documentation-only
+        declarations and simplify template-heavy implementation signatures.
+        This does not affect the compiled library. -->
+   <library id="cgal" publicOnly="true">
+      <define name="DOXYGEN_RUNNING"/>
+      <option name="ENABLE_PREPROCESSING" value="YES"/>
+   </library>
+
    <library id="opencv" publicOnly="true">
+      <!-- OpenCV 5.1.0 upstream doc/Doxyfile.in PREDEFINED profile.
+           Deliberately retain the BuildEngine C++ language-version model
+           rather than replace __cplusplus with upstream's generic value 1.
+           These macros affect Doxygen only, not the BCC64X build. -->
+      <option name="ENABLE_PREPROCESSING" value="YES"/>
+      <option name="MACRO_EXPANSION" value="YES"/>
+      <option name="EXPAND_ONLY_PREDEF" value="NO"/>
+      <option name="SKIP_FUNCTION_MACROS" value="YES"/>
+      <define name="CVAPI(x)" value="x"/>
+      <define name="CV_API_CALL" value=""/>
+      <define name="CV_DOXYGEN" value=""/>
+      <define name="CV_EXPORTS" value=""/>
+      <define name="CV_EXPORTS_W" value=""/>
+      <define name="CV_EXPORTS_W_SIMPLE" value=""/>
+      <define name="CV_EXPORTS_AS(x)" value=""/>
+      <define name="CV_EXPORTS_W_MAP" value=""/>
+      <define name="GAPI_EXPORTS" value=""/>
+      <define name="GAPI_EXPORTS_W" value=""/>
+      <define name="CV_IN_OUT" value=""/>
+      <define name="CV_OUT" value=""/>
+      <define name="CV_PROP" value=""/>
+      <define name="CV_PROP_RW" value=""/>
+      <define name="CV_WRAP" value=""/>
+      <define name="CV_WRAP_AS(x)" value=""/>
+      <define name="CV_WRAP_MAPPABLE(x)" value=""/>
+      <define name="CV_WRAP_PHANTOM(x)" value=""/>
+      <define name="CV_WRAP_DEFAULT(x)" value=""/>
+      <define name="CV_CDECL" value=""/>
+      <define name="CV_Func" value=""/>
+      <define name="CV_DO_PRAGMA(x)" value=""/>
+      <define name="CV_SUPPRESS_DEPRECATED_START" value=""/>
+      <define name="CV_SUPPRESS_DEPRECATED_END" value=""/>
+      <define name="CV_INLINE" value=""/>
+      <define name="CV_NORETURN" value=""/>
+      <define name="CV_DEFAULT(x)" value=" = x"/>
+      <define name="CV_NEON" value="1"/>
+      <define name="CV_SSE2" value="1"/>
+      <define name="CV_SIMD128" value="1"/>
+      <define name="CV_SIMD256" value="1"/>
+      <define name="CV_SIMD512" value="1"/>
+      <define name="CV_SIMD128_64F" value="1"/>
+      <define name="CV_SIMD256_64F" value="1"/>
+      <define name="CV_SIMD512_64F" value="1"/>
+      <define name="CV__DEBUG_NS_BEGIN" value=""/>
+      <define name="CV__DEBUG_NS_END" value=""/>
+      <define name="CV_DEPRECATED_EXTERNAL" value=""/>
+      <define name="CV_DEPRECATED" value=""/>
       <exclude pattern="*/modules/*/test/*"/>
       <exclude pattern="*/modules/*/perf/*"/>
       <exclude pattern="*/samples/*"/>
