@@ -22,10 +22,10 @@ flowchart LR
 
 The Release consumer exited with 0xC0000135 before any smoke CHECK. A reported `libzd.dll` request suggests a variant mismatch, but the exit code alone cannot establish which binary imports it.
 
-The XML explicitly supplies ZLIB_LIBRARY, ZLIB_LIBRARY_RELEASE and ZLIB_LIBRARY_DEBUG from the installed zlib package. The consumer stages the exact managed runtime closure. An x64 PE import audit runs before the OBJ smoke and names the importing DLL/EXE if an inappropriate zlib variant is referenced. An incorrect native link must be fixed rather than masked by deploying both DLL variants.
+The XML explicitly supplies ZLIB_LIBRARY, ZLIB_LIBRARY_RELEASE and ZLIB_LIBRARY_DEBUG from the installed zlib package. Because Assimp installs separate CMake exports into `lib/win64/Release/cmake/assimp-6.0` and `lib/win64/Debug/cmake/assimp-6.0`, the consumer now resolves **only** the exact selected configuration. It requires matching `IMPORTED_CONFIGURATIONS`, `IMPORTED_LOCATION_<CONFIG>` and `IMPORTED_IMPLIB_<CONFIG>` values, and checks the imported DLL and library paths against the selected variant. CMake must not silently substitute a Debug import library for Release. The actual imported DLL is staged under its target-defined filename, and an x64 PE import audit checks the smoke executable's import of that exact DLL along with the zlib variant. Incorrect native links fail before the smoke executes; the opposite-variant DLL is never deployed as a workaround.
 
 The version-bound Clang/BCC64X compatibility patch uses the existing idempotent reverse-checked driver. The real model import, upstream tests, compiler and feature set are retained.
 
 ## Acceptance
 
-After re-linking, Release must import `libz.dll` and Debug must import `libzd.dll`. The PE audit and the OBJ scene, mesh and face CHECK records must pass. The production BCC64X run is **[not verified]**.
+After re-linking, Release must import its explicitly exported Release Assimp DLL and `libz.dll`; Debug must use the Debug Assimp DLL and `libzd.dll`. The PE audit must confirm that the consumer imports the selected Assimp target DLL and that no binary imports the opposite zlib variant. The OBJ scene, mesh and face CHECK records must then pass. The production BCC64X run is **[not verified]**.

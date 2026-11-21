@@ -202,16 +202,21 @@ std::string Lower(std::string_view const svValue) {
 /** \brief Audit the exact staged Assimp and zlib DLL variants.
     \details A Release import of libzd.dll is a build/link error, not a staging request.
     \param iArgc Number of command-line arguments.
-    \param pszArgv Arguments: directory, Release or Debug.
+    \param pszArgv Arguments: directory, Release or Debug, and the installed Assimp DLL basename.
     \returns Zero when import closure is configuration-consistent.
     \throw std::runtime_error Caught and reported before process termination. */
 int main(int const iArgc, char const* const* const pszArgv) {
    try {
-      if(iArgc != 3) {
-         throw std::runtime_error { "Usage: assimp-import-audit <application-directory> <Release|Debug>" };
+      if(iArgc != 4) {
+         throw std::runtime_error { "Usage: assimp-import-audit <application-directory> <Release|Debug> <assimp-dll>" };
          }
       fs::path const theDirectory { pszArgv[1] };
       std::string_view const svConfiguration { pszArgv[2] };
+      std::string const strAssimpDll = Lower(pszArgv[3]);
+      if(strAssimpDll.empty() || !strAssimpDll.ends_with(".dll") ||
+         fs::path { strAssimpDll }.filename().string() != strAssimpDll) {
+         throw std::runtime_error { "Invalid imported Assimp DLL basename" };
+         }
       if(svConfiguration != "Release" && svConfiguration != "Debug") {
          throw std::runtime_error { "Configuration must be Release or Debug" };
          }
@@ -222,6 +227,30 @@ int main(int const iArgc, char const* const* const pszArgv) {
          throw std::runtime_error { "Required staged zlib DLL is absent: " +
             (theDirectory / strExpected).string() };
          }
+      fs::path const theAssimpDll = theDirectory / strAssimpDll;
+      if(!fs::exists(theAssimpDll)) {
+         throw std::runtime_error { "The exact imported Assimp DLL is missing from smoke output: " + theAssimpDll.string() };
+         }
+      fs::path const theConsumer = theDirectory / "assimp-consumer.exe";
+      if(!fs::exists(theConsumer)) {
+         throw std::runtime_error { "Assimp smoke executable is missing: " + theConsumer.string() };
+         }
+      std::vector<std::string> const vecConsumerImports = ReadImports(theConsumer);
+      bool const bImportsAssimp = std::ranges::any_of(vecConsumerImports,
+         [&strAssimpDll](std::string const& strImport) {
+            return Lower(strImport) == strAssimpDll;
+            });
+      if(!bImportsAssimp) {
+         std::println("[PE-AUDIT] Consumer imports:");
+         for(std::string const& strImport : vecConsumerImports) {
+            std::println("[PE-AUDIT]   {}", strImport);
+            }
+         throw std::runtime_error { "Consumer is not linked against selected Assimp DLL: " + strAssimpDll };
+         }
+      if(bRelease && strAssimpDll == "libassimpd.dll") {
+         throw std::runtime_error { "Release consumer cannot use libassimpd.dll" };
+         }
+      std::println("[PE-AUDIT] Consumer imports selected Assimp DLL: {}", strAssimpDll);
       std::vector<fs::path> vecFiles;
       for(fs::directory_entry const& theEntry : fs::directory_iterator { theDirectory }) {
          if(!theEntry.is_regular_file()) {
