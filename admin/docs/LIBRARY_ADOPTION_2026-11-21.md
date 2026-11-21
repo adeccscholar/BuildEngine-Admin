@@ -157,3 +157,20 @@ in both configurations, plus install, publish and Doxygen PASS.
 
 No importer, audio backend, JSON test, or documentation category was
 disabled. New producer/consumer acceptance still requires Windows logs.
+
+## Further Windows run: integration corrections
+
+Observed evidence from the later Windows host run:
+
+- xtensor 0.27.1 reached READY, including both smoke consumers.
+- Assimp 6.0.6 built and passed its declared upstream test stages in both configurations. Installation then failed because its XML `require` referred to a directory while the BuildEngine requirement validator expects a regular file.
+- OpenAL Soft 1.25.2 passed the previous WASAPI operator and constexpr compilation problems, but its enabled `openal-info.exe` utility failed linking with an undefined `WinMain`.
+- CGAL 6.2.1 Doxygen progressed through parsing and generated-code stages. No failure is established by this partial log.
+
+Corrections now declared:
+
+1. Assimp installation checks the concrete installed CMake package file `lib/win64/{Configuration}/cmake/assimp-6.0/assimpConfig.cmake` instead of treating the directory itself as a file.
+2. OpenAL keeps `ALSOFT_UTILS=ON`. Upstream `openal-info` includes `common/win_main_utf8.h`, which exposes `wmain` for Windows Unicode arguments. The BCC64X-specific CMake source patch links the managed console-main-to-wmain bridge and Shell32, preserving Unicode argument conversion, the executable and its original behavior. The bridge pattern already exists in the managed libdeflate package.
+3. The Showcase gallery improvements are made in the Tests assets and BuildEngine-Common renderer, independently from these package corrections.
+
+These changes are source and configuration changes. Native BCC64X acceptance of the updated Assimp installation and OpenAL console utility is not yet verified.
