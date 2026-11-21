@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -2045,7 +2045,12 @@
+@@ -2045,10 +2045,19 @@
      set(UNICODE_FLAG ${UNICODE_FLAG} -municode)
  endif()
  if(ALSOFT_UTILS)
@@ -13,3 +13,9 @@
 +    endif()
      target_include_directories(openal-info
          PRIVATE ${OpenAL_BINARY_DIR} ${OpenAL_SOURCE_DIR}/common)
+     target_compile_options(openal-info PRIVATE ${C_FLAGS})
+     target_link_libraries(openal-info PRIVATE Threads::Threads ${LINKER_FLAGS} OpenAL
+         ${UNICODE_FLAG})
++    if(ADECC_BCC64X_WINDOWS10_SDK)
++        target_link_libraries(openal-info PRIVATE shell32)
++    endif()
