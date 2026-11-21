@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.31)
+project(buildengine_doctest_consumer LANGUAGES CXX)
+if(NOT DEFINED DOCTEST_PACKAGE_ROOT)
+   message(FATAL_ERROR "DOCTEST_PACKAGE_ROOT is required")
+endif()
+add_executable(doctest-consumer main.cpp)
+target_compile_features(doctest-consumer PRIVATE cxx_std_23)
+target_include_directories(doctest-consumer PRIVATE "${DOCTEST_PACKAGE_ROOT}/include")
