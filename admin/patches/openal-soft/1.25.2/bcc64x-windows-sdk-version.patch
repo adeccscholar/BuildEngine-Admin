@@ -1,0 +1,23 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -299,11 +299,17 @@
+             {
+                 SHGetKnownFolderPath(&FOLDERID_RoamingAppData, KF_FLAG_DONT_UNEXPAND, NULL, NULL);
+                 return 0;
+             }" HAVE_SHGETKNOWNFOLDERPATH_NO_NTDDI)
+-        if(NOT HAVE_SHGETKNOWNFOLDERPATH_NO_NTDDI)
+-            list(APPEND CPP_DEFS NTDDI_VERSION=NTDDI_VISTA)
+-        endif()
++        if(NOT HAVE_SHGETKNOWNFOLDERPATH_NO_NTDDI)
++            if(ADECC_BCC64X_WINDOWS10_SDK)
++                # Keep the RAD Studio Windows 10 SDK target coherent even when the
++                # SHGetKnownFolderPath compile probe cannot determine the target.
++                list(APPEND CPP_DEFS _WIN32_WINNT=0x0A00 NTDDI_VERSION=NTDDI_WIN10)
++            else()
++                list(APPEND CPP_DEFS NTDDI_VERSION=NTDDI_VISTA)
++            endif()
++        endif()
+     endif()
+ elseif(APPLE)
+     option(ALSOFT_OSX_FRAMEWORK "Build as macOS framework" OFF)
+ endif()
