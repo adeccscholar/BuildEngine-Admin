@@ -1,0 +1,15 @@
+# Reject an OpenEXR build that silently fell back to bundled codecs.
+# Run after upstream configure and before the native DLL build.
+if(NOT DEFINED OPENEXR_CACHE OR NOT EXISTS "${OPENEXR_CACHE}")
+   message(FATAL_ERROR "OpenEXR configuration cache is missing")
+endif()
+file(READ "${OPENEXR_CACHE}" strCache)
+if(NOT strCache MATCHES "OPENEXR_USE_INTERNAL_OPENJPH:INTERNAL=0")
+   message(FATAL_ERROR "OpenEXR did not confirm external OpenJPH; bundled fallback is forbidden")
+endif()
+foreach(strDependency IN ITEMS Imath libdeflate openjph)
+   if(NOT strCache MATCHES "(^|\\n)${strDependency}_DIR:PATH=[^\\n]+")
+      message(FATAL_ERROR "OpenEXR CMake package discovery missing: ${strDependency}")
+   endif()
+endforeach()
+message(STATUS "OpenEXR external package discovery verified; native linkage still requires a smoke test")
