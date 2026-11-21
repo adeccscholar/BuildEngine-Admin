@@ -17088,4 +17088,367 @@
          <argument value="-DZSTD_PACKAGE_ROOT:PATH={DependencyRoot:zstd}"/>
       </smoke>
    </library>
+   <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-21T14:00:00Z">
+      <metadata name="xtl" supplier="xtl contributors" homepage="https://github.com/xtensor-stack/xtl" description="Header-only C++ building block for the xtensor numerical stack." licenseSignal="green" artifactType="interface">
+         <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xtl\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/xtensor-stack/xtl.git" ref="0.8.0"/></security>
+      <source>
+         <download url="https://github.com/xtensor-stack/xtl/archive/refs/tags/0.8.0.tar.gz" archive="xtl-0.8.0.tar.gz"/>
+         <extract format="libarchive" root="xtl-0.8.0">
+            <require path="CMakeLists.txt"/>
+            <require path="include\xtl\xoptional.hpp"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xtl\xoptional.hpp"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\xtl\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xtl-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DXTL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+      <smoke id="consumer" scope="package" source="smokes\xtl\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xtl-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DXTL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
+   <library id="xsimd" version="13.2.0" category="math" timestamp="2026-11-21T14:00:00Z">
+      <metadata name="xsimd" supplier="xsimd contributors" homepage="https://github.com/xtensor-stack/xsimd" description="Header-only C++ building block for the xtensor numerical stack." licenseSignal="green" artifactType="interface">
+         <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xsimd\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/xtensor-stack/xsimd.git" ref="13.2.0"/></security>
+      <source>
+         <download url="https://github.com/xtensor-stack/xsimd/archive/refs/tags/13.2.0.tar.gz" archive="xsimd-13.2.0.tar.gz"/>
+         <extract format="libarchive" root="xsimd-13.2.0">
+            <require path="CMakeLists.txt"/>
+            <require path="include\xsimd\xsimd.hpp"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/{Configuration}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xsimd\xsimd.hpp"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\xsimd\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xsimd-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DXSIMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+      <smoke id="consumer" scope="package" source="smokes\xsimd\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xsimd-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DXSIMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
+   <library id="xtensor" version="0.27.1" category="math" timestamp="2026-11-21T14:00:00Z">
+      <metadata name="xtensor" supplier="xtensor contributors" homepage="https://github.com/xtensor-stack/xtensor" description="Multidimensional arrays, broadcasting and SIMD using independently managed xtl and xsimd." licenseSignal="green" artifactType="interface">
+         <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xtensor\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/xtensor-stack/xtensor.git" ref="0.27.1"/></security>
+      <dependency library="xtl" version="0.8.0"/>
+      <dependency library="xsimd" version="13.2.0"/>
+      <source>
+         <download url="https://github.com/xtensor-stack/xtensor/archive/refs/tags/0.27.1.tar.gz" archive="xtensor-0.27.1.tar.gz"/>
+         <extract format="libarchive" root="xtensor-0.27.1">
+            <require path="CMakeLists.txt"/>
+            <require path="include\xtensor\containers\xarray.hpp"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCPP23:BOOL=ON"/>
+         <argument value="-DBUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_BENCHMARK:BOOL=OFF"/>
+         <argument value="-DXTENSOR_USE_XSIMD:BOOL=ON"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-Dxtl_DIR:PATH={DependencyRoot:xtl}\lib\win64\{Configuration}\cmake\xtl"/>
+         <argument value="-Dxsimd_DIR:PATH={DependencyRoot:xsimd}\lib\win64\{Configuration}\cmake\xsimd"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\xtensor\containers\xarray.hpp"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\xtensor\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xtensor-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DXTENSOR_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DXTL_PACKAGE_ROOT:PATH={DependencyRoot:xtl}"/>
+         <argument value="-DXSIMD_PACKAGE_ROOT:PATH={DependencyRoot:xsimd}"/>
+      </smoke>
+      <smoke id="consumer" scope="package" source="smokes\xtensor\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="xtensor-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DXTENSOR_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DXTL_PACKAGE_ROOT:PATH={DependencyRoot:xtl}"/>
+         <argument value="-DXSIMD_PACKAGE_ROOT:PATH={DependencyRoot:xsimd}"/>
+      </smoke>
+   </library>
+   <library id="assimp" version="6.0.6" category="graphics" timestamp="2026-11-21T14:00:00Z">
+      <metadata name="Assimp" supplier="Assimp contributors" homepage="https://github.com/assimp/assimp" description="C++ 3D model import library using independently managed zlib, subject to component audit." licenseSignal="yellow" artifactType="shared">
+         <license name="BSD 3-Clause License and bundled component notices" spdx="BSD-3-Clause" file="licenses\assimp\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/assimp/assimp.git" ref="v6.0.6"/></security>
+      <dependency library="zlib" version="1.4"/>
+      <source>
+         <download url="https://github.com/assimp/assimp/archive/refs/tags/v6.0.6.tar.gz" archive="assimp-6.0.6.tar.gz"/>
+         <extract format="libarchive" root="assimp-6.0.6">
+            <require path="CMakeLists.txt"/>
+            <require path="include\assimp\Importer.hpp"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DASSIMP_BUILD_ZLIB:BOOL=OFF"/>
+         <argument value="-DZLIB_ROOT:PATH={DependencyRoot:zlib}"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+         <argument value="-DASSIMP_BUILD_NONFREE_C4D_IMPORTER:BOOL=OFF"/>
+         <argument value="-DASSIMP_BUILD_USD_IMPORTER:BOOL=OFF"/>
+         <argument value="-DASSIMP_BUILD_DRACO:BOOL=OFF"/>
+         <argument value="-DASSIMP_BUILD_TESTS:BOOL={TestsEnabled}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"><argument value="--output-on-failure"/></execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\assimp\Importer.hpp"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\assimp\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="assimp-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DASSIMP_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DZLIB_PACKAGE_ROOT:PATH={DependencyRoot:zlib}"/>
+      </smoke>
+      <smoke id="consumer" scope="package" source="smokes\assimp\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="assimp-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DASSIMP_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DZLIB_PACKAGE_ROOT:PATH={DependencyRoot:zlib}"/>
+      </smoke>
+   </library>
+   <library id="cgal" version="6.2.1" category="math" timestamp="2026-11-21T14:00:00Z">
+      <metadata name="CGAL" supplier="CGAL contributors" homepage="https://github.com/CGAL/cgal" description="CGAL geometry kernel evaluation only; GPL algorithms require separate commercial or GPL terms." licenseSignal="yellow" artifactType="interface">
+         <license name="LGPL-3.0-or-later and GPL-3.0-or-later by source file" file="licenses\cgal\LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/CGAL/cgal.git" ref="v6.2.1"/></security>
+      <dependency library="boost" version="1.92.0"/>
+      <source>
+         <download url="https://github.com/CGAL/cgal/releases/download/v6.2.1/CGAL-6.2.1-library.zip" archive="cgal-6.2.1.zip"/>
+         <extract format="zip" root="CGAL-6.2.1">
+            <require path="CMakeLists.txt"/>
+            <require path="LICENSE"/>
+            <require path="LICENSE.GPL"/>
+            <require path="LICENSE.LGPL"/>
+            <require path="include\CGAL\Simple_cartesian.h"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCGAL_DISABLE_GMP:BOOL=ON"/>
+         <argument value="-DCGAL_DO_NOT_USE_BOOST_MP:BOOL=OFF"/>
+         <argument value="-DBOOST_ROOT:PATH={DependencyRoot:boost}"/>
+         <argument value="-DBoost_ROOT:PATH={DependencyRoot:boost}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\CGAL\Simple_cartesian.h"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\cgal\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="cgal-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DCGAL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DBOOST_PACKAGE_ROOT:PATH={DependencyRoot:boost}"/>
+      </smoke>
+      <smoke id="consumer" scope="package" source="smokes\cgal\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="cgal-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DCGAL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DBOOST_PACKAGE_ROOT:PATH={DependencyRoot:boost}"/>
+      </smoke>
+   </library>
+   <library id="openal-soft" version="1.25.2" category="graphics" timestamp="2026-11-21T14:00:00Z">
+      <metadata name="OpenAL Soft" supplier="OpenAL Soft contributors" homepage="https://github.com/kcat/openal-soft" description="Windows OpenAL 3D audio engine, native DLL, LGPL-compliant distribution obligations." licenseSignal="yellow" artifactType="shared">
+         <license name="GNU Library General Public License version 2" file="licenses\openal-soft\COPYING"/>
+      </metadata>
+      <security><repository url="https://github.com/kcat/openal-soft.git" ref="1.25.2"/></security>
+      <source>
+         <download url="https://github.com/kcat/openal-soft/archive/refs/tags/1.25.2.tar.gz" archive="openal-soft-1.25.2.tar.gz"/>
+         <extract format="libarchive" root="openal-soft-1.25.2">
+            <require path="CMakeLists.txt"/>
+            <require path="include\AL\al.h"/>
+            <require path="include\AL\alc.h"/>
+            <require path="COPYING"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DALSOFT_UTILS:BOOL=ON"/>
+         <argument value="-DALSOFT_EXAMPLES:BOOL=OFF"/>
+         <argument value="-DALSOFT_TESTS:BOOL={TestsEnabled}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"><argument value="--output-on-failure"/></execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\AL\al.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\AL\alc.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\COPYING" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\{LibraryId}\COPYING"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\openal-soft\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="openal-soft-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DOPENAL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+      <smoke id="consumer" scope="package" source="smokes\openal-soft\consumer" configuration="Debug" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="openal-soft-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DOPENAL_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
+   </library>
 </buildLibraries>
