@@ -9,6 +9,18 @@ set(Eigen3_DIR "${EIGEN_PACKAGE_ROOT}/lib/cmake/Eigen3")
 set(glog_DIR "${GLOG_PACKAGE_ROOT}/lib/win64/Release/cmake/glog")
 set(gflags_DIR "${GFLAGS_PACKAGE_ROOT}/lib/win64/Release/cmake/gflags")
 set(GFLAGS_USE_TARGET_NAMESPACE TRUE)
+# Ceres 2.2.0's installed CeresConfig expects the legacy gflags target.
+# Restore the legacy imported name as an alias to the managed namespaced target.
+# This is a compatibility bridge for the legacy Ceres 2.2 package consumer;
+# the original gflags::gflags dependency remains required and is still linked.
+find_package(gflags CONFIG REQUIRED)
+if(NOT TARGET gflags::gflags)
+   message(FATAL_ERROR "Managed gflags package does not export gflags::gflags")
+endif()
+if(NOT TARGET gflags)
+   add_library(gflags INTERFACE IMPORTED)
+   set_target_properties(gflags PROPERTIES INTERFACE_LINK_LIBRARIES gflags::gflags)
+endif()
 find_package(Ceres CONFIG REQUIRED)
 add_executable(ceres-consumer main.cpp)
 target_compile_features(ceres-consumer PRIVATE cxx_std_23)

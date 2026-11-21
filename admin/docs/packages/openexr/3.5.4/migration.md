@@ -25,3 +25,8 @@ After the external Imath, OpenJPH, libdeflate and zstd dependency audit succeeds
 ## Installed CMake consumer location correction (21 November 2026)
 
 Native Release and Debug builds, installs, publication and documentation now pass. The independent consumer configures `OpenEXR_DIR` explicitly to the actual managed `lib/win64/Release/cmake/OpenEXR` installation and checks that `OpenEXRConfig.cmake` exists there before calling `find_package(OpenEXR CONFIG REQUIRED)`. The smoke continues to load external Imath, OpenJPH, libdeflate and zstd package targets, and retains the native header assertion and SMOKE protocol. The provided FSM summary does not include the full `find_package` diagnostic at smoke `CMakeLists.txt:16`, so this directory correction is targeted but still requires native verification.
+
+
+## Smoke-only recovery (21 November 2026)
+
+Restore the last successfully built library timestamp (2026-11-21T05:00:00Z). The current failure was confined to the independent OpenEXR consumer's CMake configure, so a source/build/install invalidation was not appropriate. The consumer now supplies the explicitly installed OpenEXR config directory; native verification is still required. Both prior OpenEXR source patches use a new idempotent script that recognizes previously applied patches and does not fail simply because a source workspace is reused. Use `BuildEngine --make --refresh=smoke --lib=openexr --libversion=3.5.4` for smoke-only retry when upstream scope evidence remains current.
