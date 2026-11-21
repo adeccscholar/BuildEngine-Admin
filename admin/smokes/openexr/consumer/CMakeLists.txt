@@ -5,6 +5,7 @@ if(NOT DEFINED OPENEXR_PACKAGE_ROOT OR NOT DEFINED IMATH_PACKAGE_ROOT OR NOT DEF
 endif()
 list(PREPEND CMAKE_PREFIX_PATH "${OPENEXR_PACKAGE_ROOT}" "${IMATH_PACKAGE_ROOT}" "${OPENJPH_PACKAGE_ROOT}")
 find_package(Imath CONFIG REQUIRED)
+find_package(Threads REQUIRED)
 find_package(openjph CONFIG REQUIRED)
 find_package(OpenEXR CONFIG REQUIRED)
 add_executable(openexr-consumer main.cpp)
