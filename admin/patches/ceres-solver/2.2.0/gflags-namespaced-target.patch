@@ -1,0 +1,22 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -397,7 +397,7 @@
+   # Don't search with REQUIRED as we can continue without gflags.
+   find_package(gflags 2.2.0)
+   if (gflags_FOUND)
+-    if (TARGET gflags)
++    if (TARGET gflags::gflags OR TARGET gflags)
+       message("-- Found Google Flags (gflags) version ${gflags_VERSION}: ${gflags_DIR}")
+     else()
+       message("-- Detected version of gflags: ${gflags_VERSION} does not define "
+--- a/internal/ceres/CMakeLists.txt
++++ b/internal/ceres/CMakeLists.txt
+@@ -93,7 +93,7 @@
+     # when gflags is an imported target (as it is in newer versions).
+     # As glog #includes gflags/gflags.h in glog/logging.h if compiled with
+     # gflags, it is thus a public dependency for Ceres in this case.
+-    list(APPEND CERES_LIBRARY_PUBLIC_DEPENDENCIES gflags)
++    list(APPEND CERES_LIBRARY_PUBLIC_DEPENDENCIES gflags::gflags)
+   endif()
+ endif (NOT MINIGLOG AND GLOG_FOUND)
+ 

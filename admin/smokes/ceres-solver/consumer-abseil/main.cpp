@@ -1,5 +1,6 @@
 #include <ceres/ceres.h>
 #include <cmath>
+#include <print>
 
 struct LinearResidual {
    template<typename T>
@@ -15,11 +16,25 @@ int main() {
    theProblem.AddResidualBlock(
       new ceres::AutoDiffCostFunction<LinearResidual, 1, 1>(new LinearResidual),
       nullptr, &flParameter);
+
    ceres::Solver::Options theOptions;
    theOptions.max_num_iterations = 25;
    theOptions.minimizer_progress_to_stdout = false;
    ceres::Solver::Summary theSummary;
    ceres::Solve(theOptions, &theProblem, &theSummary);
-   return theSummary.IsSolutionUsable() &&
-      std::abs(flParameter - 3.0) < 1e-6 ? 0 : 1;
+
+   bool const bUsable = theSummary.IsSolutionUsable();
+   bool const bCorrect = std::abs(flParameter - 3.0) < 1e-6;
+
+   std::println("SMOKE|CHECK|solution-usable|{}|Nonlinear least-squares solution is usable",
+      bUsable ? "PASS" : "FAIL");
+   std::println("SMOKE|CHECK|optimized-parameter|{}|Final parameter {:.8f}; expected 3",
+      bCorrect ? "PASS" : "FAIL", flParameter);
+
+   if(bUsable && bCorrect) {
+      std::println("SMOKE|RESULT|PASS|Ceres nonlinear least-squares solver validated");
+      return 0;
+   }
+   std::println("SMOKE|RESULT|FAIL|Ceres optimization failed numerical validation");
+   return 1;
 }

@@ -31,3 +31,8 @@ Restore `WITH_SCHUR_SPECIALIZATIONS=ON` and request `cmake --fresh` when the FSM
 ## CMake generator recursion correction (21 November 2026)
 
 The complete CMake 4.1.1 configure log proves that `target_link_libraries(ceres_static INTERFACE $<TARGET_PROPERTY:ceres,INTERFACE_LINK_LIBRARIES>)` at `internal/ceres/CMakeLists.txt:279` triggers recursive evaluation of the transitive link interface. The pinned development snapshot now receives a version-bound source patch replacing only that expression with the existing `CERES_LIBRARY_PUBLIC_DEPENDENCIES` plus `Eigen3::Eigen`. Its private dependencies, full Schur specializations, and original solver configuration are preserved. Because both configurations share the constrained Windows commit budget with Ceres 2.2.0, this package also sets `CMAKE_BUILD_PARALLEL_LEVEL=1` for its CMake builds. Clean native DLL/consumer validation is still required.
+
+
+## Installed consumer protocol correction (21 November 2026)
+
+The native 2.3.0 development snapshot completes both Release and Debug compilation and linking, package installation, metadata, publishing and Doxygen. Its independent consumer failed `status=invalid_protocol, checks=0/0` because the test executable only returned an exit code and produced no SMOKE records. The fixed consumer prints separate `SMOKE|CHECK` records for `Summary::IsSolutionUsable()` and the least-squares parameter result, followed by a `SMOKE|RESULT` line. It retains the actual nonlinear solve and both numerical assertions. The consumer protocol must pass on the next native FSM run.

@@ -1,0 +1,20 @@
+--- a/src/lib/OpenEXRCore/internal_cpuid.h
++++ b/src/lib/OpenEXRCore/internal_cpuid.h
+@@ -16,7 +16,7 @@
+ #endif
+ 
+ #if OPENEXR_ENABLE_X86_SIMD_CHECK
+-#    if defined(_WIN32)
++#    if defined(_WIN32) && !defined(__GNUC__)
+ #        include <intrin.h>
+ #    else
+ #        include <cpuid.h>
+@@ -52,7 +52,7 @@
+ 
+ #elif OPENEXR_ENABLE_X86_SIMD_CHECK
+ 
+-#    if defined(_WIN32)
++#    if defined(_WIN32) && !defined(__GNUC__)
+     int regs[4] = {0}, osxsave;
+ 
+     __cpuid (regs, 0);

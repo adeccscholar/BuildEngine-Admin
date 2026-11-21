@@ -16814,7 +16814,7 @@
          <argument value="-DOPENJPH_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T09:00:00Z">
+   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T10:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="glog" version="0.7.1"/>
       <dependency library="gflags" version="2.3.1"/>
@@ -16827,6 +16827,15 @@
          <extract format="libarchive" root="ceres-solver-2.2.0">
             <require path="CMakeLists.txt"/><require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\ceres-solver\2.2.0\gflags-namespaced-target.patch" target="{Workspace}\.buildengine\patches\gflags-namespaced-target.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="gflags-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\gflags-namespaced-target.patch"/>
+         </execute>
+         <execute name="gflags-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\gflags-namespaced-target.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -16892,7 +16901,7 @@
          <argument value="-DGFLAGS_PACKAGE_ROOT:PATH={DependencyRoot:gflags}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.3.0" category="math" timestamp="2026-11-21T09:00:00Z">
+   <library id="ceres-solver" version="2.3.0" category="math" timestamp="2026-11-21T10:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="abseil" version="20260817.0"/>
       <metadata name="Ceres Solver" supplier="Ceres Solver contributors" homepage="https://ceres-solver.org/" description="Native C++ nonlinear least-squares optimization library with independently managed dependencies and version-specific solver backends." licenseSignal="yellow">
@@ -16972,7 +16981,7 @@
          <argument value="-DABSEIL_PACKAGE_ROOT:PATH={DependencyRoot:abseil}"/>
       </smoke>
    </library>
-   <library id="openexr" version="3.5.4" category="image" timestamp="2026-11-21T04:00:00Z">
+   <library id="openexr" version="3.5.4" category="image" timestamp="2026-11-21T05:00:00Z">
       <dependency library="imath" version="3.2.3"/>
       <dependency library="openjph" version="0.33.0"/>
       <dependency library="libdeflate" version="1.26"/>
@@ -16994,6 +17003,15 @@
          <execute name="source-compat-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
             <argument value="{Workspace}\.buildengine\patches\require-external-managed-codecs.patch"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\openexr\3.5.4\bcc64x-cpuid-intrinsics.patch" target="{Workspace}\.buildengine\patches\bcc64x-cpuid-intrinsics.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="cpuid-patch-check" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\bcc64x-cpuid-intrinsics.patch"/>
+         </execute>
+         <execute name="cpuid-patch-apply" executable="{Tool:git}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/><argument value="--whitespace=nowarn"/>
+            <argument value="{Workspace}\.buildengine\patches\bcc64x-cpuid-intrinsics.patch"/>
          </execute>
       </source>
       <build testsAffectBuild="false">
