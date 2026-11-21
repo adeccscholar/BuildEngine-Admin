@@ -297,8 +297,14 @@
         declarations and simplify template-heavy implementation signatures.
         This does not affect the compiled library. -->
    <library id="cgal">
+      <!-- Keep all API documentation and Graphviz diagram categories enabled.
+           Bound parser/Graphviz parallelism and expose real Doxygen progress
+           rather than treating monotonically increasing elapsed time as activity. -->
       <define name="DOXYGEN_RUNNING"/>
       <option name="ENABLE_PREPROCESSING" value="YES"/>
+      <option name="NUM_PROC_THREADS" value="4"/>
+      <option name="DOT_NUM_THREADS" value="2"/>
+      <option name="QUIET" value="NO"/>
    </library>
 
    <library id="opencv" publicOnly="true">
