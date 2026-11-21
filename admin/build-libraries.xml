@@ -16911,6 +16911,11 @@
          <argument value="-Dopenjph_DIR:PATH={DependencyRoot:openjph}\lib\win64\{Configuration}\cmake\openjph"/>
          <argument value="-Dlibdeflate_DIR:PATH={DependencyRoot:libdeflate}\lib\win64\{Configuration}\cmake\libdeflate"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <execute name="external-dependency-audit" executable="{Tool:cmake}" workingDirectory="{BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}" showOutput="false">
+            <argument value="-DOPENEXR_CACHE:FILEPATH={BuildRoot}\\packages\\{LibraryId}\\{LibraryVersion}\\{Configuration}\\CMakeCache.txt"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\\cmake\\packages\\VerifyOpenEXRExternal.cmake"/>
+         </execute>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
          <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
