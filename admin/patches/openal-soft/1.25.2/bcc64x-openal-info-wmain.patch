@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -2045,10 +2045,19 @@
+@@ -2045,9 +2045,17 @@
      set(UNICODE_FLAG ${UNICODE_FLAG} -municode)
  endif()
  if(ALSOFT_UTILS)
