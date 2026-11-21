@@ -16587,7 +16587,7 @@
          <argument value="-DZINT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="gflags" version="2.3.1" category="foundation" timestamp="2026-11-21T02:00:00Z">
+   <library id="gflags" version="2.3.1" category="foundation" timestamp="2026-11-21T03:00:00Z">
       <metadata name="gflags" supplier="gflags upstream contributors" homepage="https://github.com/gflags/gflags" description="Native BCC64X shared-library integration of gflags; independent DLL consumer validation required." licenseSignal="yellow">
          <license name="BSD-style upstream license" file="COPYING.txt"/>
       </metadata>
@@ -16619,7 +16619,7 @@
          <install>
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\cmake\gflags\gflags-config.cmake"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\cmake\gflags\gflags-config.cmake"/>
             </perVariant>
             <common>
                <copy source="{Workspace}\COPYING.txt" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING.txt" overwrite="true"/>
@@ -16642,7 +16642,7 @@
 
       </smoke>
    </library>
-   <library id="glog" version="0.7.1" category="foundation" timestamp="2026-11-21T02:00:00Z">
+   <library id="glog" version="0.7.1" category="foundation" timestamp="2026-11-21T03:00:00Z">
       <dependency library="gflags" version="2.3.1"/>
       <metadata name="glog" supplier="glog upstream contributors" homepage="https://github.com/google/glog" description="Native BCC64X shared-library integration of glog; independent DLL consumer validation required." licenseSignal="yellow">
          <license name="BSD-style upstream license" file="COPYING"/>
@@ -16668,7 +16668,7 @@
          <argument value="-DBUILD_TESTING:BOOL=OFF"/>
          <argument value="-DWITH_GFLAGS:BOOL=ON"/>
          <argument value="-DCMAKE_PREFIX_PATH:PATH={DependencyRoot:gflags}"/>
-         <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\win64\{Configuration}\cmake\gflags"/>
+         <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\cmake\gflags"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
@@ -16800,7 +16800,7 @@
          <argument value="-DOPENJPH_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T02:40:00Z">
+   <library id="ceres-solver" version="2.2.0" category="math" timestamp="2026-11-21T03:00:00Z">
       <dependency library="eigen" version="5.0.1"/>
       <dependency library="glog" version="0.7.1"/>
       <dependency library="gflags" version="2.3.1"/>
@@ -16840,7 +16840,7 @@
          <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:eigen};{DependencyRoot:glog};{DependencyRoot:gflags}"/>
          <argument value="-DEIGEN3_INCLUDE_DIR:PATH={DependencyRoot:eigen}\include\eigen3"/>
          <argument value="-Dglog_DIR:PATH={DependencyRoot:glog}\lib\win64\{Configuration}\cmake\glog"/>
-         <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\win64\{Configuration}\cmake\gflags"/>
+         <argument value="-Dgflags_DIR:PATH={DependencyRoot:gflags}\lib\cmake\gflags"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
