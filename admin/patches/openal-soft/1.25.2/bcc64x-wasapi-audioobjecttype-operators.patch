@@ -1,0 +1,14 @@
+--- a/alc/backends/wasapi.cpp
++++ b/alc/backends/wasapi.cpp
+@@ -156,7 +156,10 @@
+ constexpr auto X714Mask = MaskFromTopBits(X7DOT1DOT4);
+ 
+ 
+-#ifndef _MSC_VER
++// BCC64X uses the Clang frontend together with the Windows SDK, where
++// AudioObjectType already has a bitwise operator. Avoid a duplicate overload
++// while preserving the original fallback for other non-MSVC compilers.
++#if !defined(_MSC_VER) && !(defined(__clang__) && (defined(__BORLANDC__) || defined(__BCPLUSPLUS__)))
+ [[nodiscard]]
+ constexpr auto operator|(AudioObjectType const lhs, AudioObjectType const rhs) noexcept
+     -> AudioObjectType
