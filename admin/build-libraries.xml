@@ -17273,7 +17273,7 @@
          <argument value="-DXSIMD_PACKAGE_ROOT:PATH={DependencyRoot:xsimd}"/>
       </smoke>
    </library>
-   <library id="assimp" version="6.0.6" category="graphics" timestamp="2026-11-21T15:22:33Z">
+   <library id="assimp" version="6.0.6" category="graphics" timestamp="2026-11-21T14:50:00Z">
       <dependency library="zlib" version="1.4"/>
       <metadata name="Assimp" supplier="Assimp contributors" homepage="https://github.com/assimp/assimp" description="C++ 3D model import library using independently managed zlib, subject to component audit." licenseSignal="yellow" artifactType="shared">
          <license name="BSD 3-Clause License and bundled component notices" spdx="BSD-3-Clause" file="licenses\assimp\LICENSE"/>
