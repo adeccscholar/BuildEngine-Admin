@@ -42,7 +42,7 @@ function(adecc_directx_headers_winrt_include)
       "${_adecc_override_root}/wrl/client.h"
       COPYONLY)
 
-   foreach(_adecc_target IN LISTS ARGN)
+   # Upstream installs include/wsl already; install the missing wrl/client.h\n   # forwarder into the versioned package for independent consumers too.\n   get_property(_adecc_install_registered GLOBAL PROPERTY\n      ADECC_DIRECTX_HEADERS_WRL_INSTALL_REGISTERED)\n   if(NOT _adecc_install_registered)\n      install(FILES "${_adecc_forwarder}" DESTINATION include/wrl)\n      set_property(GLOBAL PROPERTY\n         ADECC_DIRECTX_HEADERS_WRL_INSTALL_REGISTERED TRUE)\n   endif()\n\n   foreach(_adecc_target IN LISTS ARGN)
       if(NOT TARGET "${_adecc_target}")
          message(FATAL_ERROR
             "DirectX-Headers upstream test target missing: ${_adecc_target}")
