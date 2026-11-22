@@ -18227,7 +18227,7 @@
          <argument value="-DDXC_SPIRV_HEADERS_DIR:PATH={BuildRoot}\\thirdparty-test\\spirv-headers\\v1.202609.0"/>
          <argument value="-DDXC_SPIRV_TOOLS_DIR:PATH={BuildRoot}\\thirdparty-test\\spirv-tools\\2026.4"/>
          <argument value="-DSPIRV_TOOLS_USE_MIMALLOC:BOOL=OFF"/>
-         <argument value="-DSPIRV_TOOLS_BUILD_STATIC:BOOL=OFF"/>
+         <argument value="-DSPIRV_TOOLS_BUILD_STATIC:BOOL=ON"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
