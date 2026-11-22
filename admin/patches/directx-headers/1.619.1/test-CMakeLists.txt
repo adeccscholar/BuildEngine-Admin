@@ -10,8 +10,9 @@ if(EXISTS "/usr/lib/wsl/lib/")
 else()
 # Fallback to default: let CMake look for libs
   list(APPEND dxlibs d3d12)
-  if (MSVC)
-    # MINGW doesn't have dxcore yet
+  # Native Windows tests must always import the real DXCore runtime.
+  # Do not infer runtime availability from MSVC/MINGW/Clang macros.
+  if(WIN32)
     list(APPEND dxlibs dxcore)
   endif()
 endif()
