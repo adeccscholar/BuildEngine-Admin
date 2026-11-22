@@ -1,0 +1,48 @@
+--- a/src/impl/winmd_reader/signature.h
++++ b/src/impl/winmd_reader/signature.h
+@@ -94,7 +94,12 @@
+ 
+     struct GenericTypeInstSig
+     {
+-        GenericTypeInstSig(table_base const* table, byte_view& data);
++        GenericTypeInstSig(table_base const* table, byte_view& data);
++        GenericTypeInstSig(GenericTypeInstSig const&);
++        GenericTypeInstSig(GenericTypeInstSig&&) noexcept;
++        GenericTypeInstSig& operator=(GenericTypeInstSig const&);
++        GenericTypeInstSig& operator=(GenericTypeInstSig&&) noexcept;
++        ~GenericTypeInstSig();
+ 
+         ElementType ClassOrValueType() const noexcept
+         {
+@@ -111,10 +116,7 @@
+             return m_generic_arg_count;
+         }
+ 
+-        auto GenericArgs() const noexcept
+-        {
+-            return std::pair{ m_generic_args.cbegin(), m_generic_args.cend() };
+-        }
++        auto GenericArgs() const noexcept;
+ 
+     private:
+         ElementType m_class_or_value;
+@@ -266,7 +268,18 @@
+         std::vector<uint32_t> m_array_sizes;
+     };
+ 
+-    inline bool is_by_ref(byte_view& data)
++    inline GenericTypeInstSig::GenericTypeInstSig(GenericTypeInstSig const&) = default;
++    inline GenericTypeInstSig::GenericTypeInstSig(GenericTypeInstSig&&) noexcept = default;
++    inline GenericTypeInstSig& GenericTypeInstSig::operator=(GenericTypeInstSig const&) = default;
++    inline GenericTypeInstSig& GenericTypeInstSig::operator=(GenericTypeInstSig&&) noexcept = default;
++    inline GenericTypeInstSig::~GenericTypeInstSig() = default;
++
++    inline auto GenericTypeInstSig::GenericArgs() const noexcept
++    {
++        return std::pair{ m_generic_args.cbegin(), m_generic_args.cend() };
++    }
++
++    inline bool is_by_ref(byte_view& data)
+     {
+         auto cursor = data;
+         auto element_type = uncompress_enum<ElementType>(cursor);

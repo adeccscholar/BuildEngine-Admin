@@ -23,3 +23,11 @@ Original Microsoft Detours sources use NMAKE. The new CMake adapter is an intent
 Source pin and extraction, Release/Debug compilation, all selected original targets and features, DLL or interface package export, installed license and header ownership, publisher collision check, security and CycloneDX metadata, and native consumer execution remain **[not verified]**.
 
 [Microsoft integration overview](/manual/libraries.md) · [Development news](/news/2026-11-22/)
+
+## BCC64X follow-up, 22 November 2026
+
+The original modules.cpp treated undefined _MSC_VER as a legacy MSVC version and skipped <strsafe.h>; StringCchCopyA and StringCchCatA were therefore unavailable. The new ordered, version-bound patch corrects only that compiler guard, preserving the original build sources and native tests.
+
+Automatic C++ module scanning is disabled centrally by the BCC64X CMake toolchain (`CMAKE_CXX_SCAN_FOR_MODULES=OFF`) without lowering the C++23 language level.
+
+**[not verified]** until native Release, Debug and consumer tests pass.

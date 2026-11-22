@@ -1,0 +1,13 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -27,8 +27,8 @@
+     get_filename_component(_rcbinroot "${_rcversiondir}" DIRECTORY)
+     get_filename_component(_sdkroot "${_rcbinroot}" DIRECTORY)
+     set(_incroot "${_sdkroot}/Include/${_rcversion}")
+-    if(NOT EXISTS "${_incroot}/um/winstring.h")
+-        message(FATAL_ERROR "Registered Windows SDK missing um/winstring.h: ${_incroot}")
++    if(NOT EXISTS "${_incroot}/winrt/winstring.h")
++        message(FATAL_ERROR "Registered Windows SDK missing winrt/winstring.h: ${_incroot}")
+     endif()
+     include_directories(BEFORE "${_incroot}/um" "${_incroot}/shared" "${_incroot}/winrt")
+     message(STATUS "C++/WinRT Windows SDK headers: ${_incroot}")

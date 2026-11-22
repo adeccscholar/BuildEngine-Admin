@@ -1,0 +1,11 @@
+--- a/src/modules.cpp
++++ b/src/modules.cpp
+@@ -20,7 +20,7 @@
+ 
+ #define _ARM_WINAPI_PARTITION_DESKTOP_SDK_AVAILABLE 1
+ #include <windows.h>
+-#if (_MSC_VER < 1310)
++#if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER < 1310)
+ #else
+ #pragma warning(push)
+ #if _MSC_VER > 1400

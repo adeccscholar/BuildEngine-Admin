@@ -16,3 +16,11 @@ Complete Release/Debug, install, metadata, license, SBOM, publish, native test/c
 ## First native run and scoped correction
 
 Original upstream tests failed to include SDK winstring.h. A local CMake patch adds explicit registered Windows SDK um/shared/winrt includes for native BCC64X, with checks and diagnostics. No tests were disabled. **[not verified]** until BCC64X Release and Debug rerun.
+
+## BCC64X follow-up, 22 November 2026
+
+The Windows SDK WinRT header winstring.h is provided in winrt/, rather than the probed um/ path. The new ordered, version-bound patch corrects the probe and failure diagnostic, retaining the registered SDK, the BCC64X toolchain and upstream tests.
+
+Automatic C++ module scanning is disabled centrally by the BCC64X CMake toolchain (`CMAKE_CXX_SCAN_FOR_MODULES=OFF`) without lowering the C++23 language level.
+
+**[not verified]** until native Release, Debug and consumer tests pass.
