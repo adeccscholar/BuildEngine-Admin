@@ -81,6 +81,10 @@
   EXPECT_LT(greater, less) << msg
 #define VERIFY_IS_LESS_THAN(...) MACRO_N(VERIFY_IS_LESS_THAN_, __VA_ARGS__)
 
+#define VERIFY_IS_LESS_THAN_OR_EQUAL_2(A, B) EXPECT_LE(A, B)
+#define VERIFY_IS_LESS_THAN_OR_EQUAL_3(A, B, msg) EXPECT_LE(A, B) << msg
+#define VERIFY_IS_LESS_THAN_OR_EQUAL(...) MACRO_N(VERIFY_IS_LESS_THAN_OR_EQUAL_, __VA_ARGS__)
+
 #define VERIFY_WIN32_BOOL_SUCCEEDED_1(expr) EXPECT_TRUE(expr)
 #define VERIFY_WIN32_BOOL_SUCCEEDED_2(expr, msg) EXPECT_TRUE(expr) << msg
 #define VERIFY_WIN32_BOOL_SUCCEEDED(...)                                       \
