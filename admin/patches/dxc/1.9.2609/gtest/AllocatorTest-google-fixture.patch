@@ -1,0 +1,12 @@
+--- a/tools/clang/unittests/HLSL/AllocatorTest.cpp
++++ b/tools/clang/unittests/HLSL/AllocatorTest.cpp
+@@ -542,9 +542,5 @@
+ // The test fixture.
+-#ifdef _WIN32
+-class AllocatorTest {
+-#else
+ class AllocatorTest : public ::testing::Test {
+ protected:
+-#endif
+   std::vector<Scenario> m_Scenarios;
+ 
