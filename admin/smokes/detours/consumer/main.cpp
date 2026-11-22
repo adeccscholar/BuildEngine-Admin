@@ -19,7 +19,7 @@ int main() {
       lResult = DetourUpdateThread(GetCurrentThread());
    }
    if(lResult == NO_ERROR) {
-      lResult = DetourAttach(reinterpret_cast<PVOID*>(&pfnOriginalSleep), HookedSleep);
+      lResult = DetourAttach(reinterpret_cast<PVOID*>(&pfnOriginalSleep), reinterpret_cast<PVOID>(&HookedSleep));
    }
    if(lResult == NO_ERROR) {
       lResult = DetourTransactionCommit();
@@ -38,7 +38,7 @@ int main() {
       lResult = DetourUpdateThread(GetCurrentThread());
    }
    if(lResult == NO_ERROR) {
-      lResult = DetourDetach(reinterpret_cast<PVOID*>(&pfnOriginalSleep), HookedSleep);
+      lResult = DetourDetach(reinterpret_cast<PVOID*>(&pfnOriginalSleep), reinterpret_cast<PVOID>(&HookedSleep));
    }
    if(lResult == NO_ERROR) {
       lResult = DetourTransactionCommit();
