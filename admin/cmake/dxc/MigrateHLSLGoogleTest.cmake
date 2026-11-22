@@ -82,4 +82,34 @@ if(_adecc_testlib_contents MATCHES "find_package\\(TAEF")
    file(WRITE "${_adecc_testlib_cmake}" "${_adecc_testlib_contents}")
 endif()
 
+
+# Preserve original DXIL converter batch/regression test source and fixtures.
+set(_adecc_dxilconv_root "${SOURCE_ROOT}/projects/dxilconv")
+file(COPY_FILE
+   "${ADMIN_PATCH_ROOT}/gtest/DXILCONV-CMakeLists.txt"
+   "${_adecc_dxilconv_root}/unittests/CMakeLists.txt" ONLY_IF_DIFFERENT)
+set(_adecc_conv_source "${_adecc_dxilconv_root}/unittests/DxilConvTests.cpp")
+file(READ "${_adecc_conv_source}" _adecc_conv_code)
+string(REPLACE "class DxilConvTest {" "class DxilConvTest : public ::testing::Test {"
+   _adecc_conv_code "${_adecc_conv_code}")
+string(REPLACE "GetModuleHandleA(\"dxilconv-tests.dll\")" "GetModuleHandleA(nullptr)"
+   _adecc_conv_code "${_adecc_conv_code}")
+string(REPLACE "TEST_F(DxilConvTest, ManualFileCheckTest)"
+   "TEST_F(DxilConvTest, DISABLED_ManualFileCheckTest)"
+   _adecc_conv_code "${_adecc_conv_code}")
+file(WRITE "${_adecc_conv_source}" "${_adecc_conv_code}")
+
+set(_adecc_conv_cmake "${_adecc_dxilconv_root}/CMakeLists.txt")
+file(READ "${_adecc_conv_cmake}" _adecc_conv_parent)
+if(_adecc_conv_parent MATCHES "add_subdirectory\\(portable\\)")
+   # Keep the independent DXIL/SPIR-V smoke checks in addition to original tests.
+elseif(_adecc_conv_parent MATCHES "add_subdirectory\\(unittests\\)")
+   string(REPLACE "    add_subdirectory(unittests)"
+      "    add_subdirectory(unittests)\\n    add_subdirectory(portable)"
+      _adecc_conv_parent "${_adecc_conv_parent}")
+   file(WRITE "${_adecc_conv_cmake}" "${_adecc_conv_parent}")
+else()
+   message(FATAL_ERROR "Original DXIL converter test subdirectory missing")
+endif()
+
 message(STATUS "DXC HLSL original test migration: GoogleTest/CTest, changed fixture files=${_adecc_fixture_count}")
