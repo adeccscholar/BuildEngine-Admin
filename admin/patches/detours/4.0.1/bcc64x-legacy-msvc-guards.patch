@@ -18,3 +18,36 @@
  #include <imagehlp.h>
  typedef IMAGEHLP_MODULE IMAGEHLP_MODULE64;
  typedef PIMAGEHLP_MODULE PIMAGEHLP_MODULE64;
+--- a/src/creatwth.cpp
++++ b/src/creatwth.cpp
+@@ -948,8 +948,11 @@
+ {
+     LPCSTR * rlpDlls = NULL;
++    HANDLE hProcess = NULL;
++    DWORD cSize = 0;
++    DWORD cOffset = 0;
+     DWORD Result = 9900;
+ 
+     if (s_pHelper == NULL) {
+         DETOUR_TRACE(("DetourFinishHelperProcess called with s_pHelper = NULL.\n"));
+         Result = 9905;
+@@ -956,7 +959,7 @@
+         goto Cleanup;
+     }
+ 
+-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, s_pHelper->pid);
++    hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, s_pHelper->pid);
+     if (hProcess == NULL) {
+         DETOUR_TRACE(("OpenProcess(pid=%d) failed: %d\n",
+                       s_pHelper->pid, GetLastError()));
+@@ -965,9 +968,9 @@
+     }
+ 
+     rlpDlls = new NOTHROW LPCSTR [s_pHelper->nDlls];
+-    DWORD cSize = s_pHelper->cb - sizeof(DETOUR_EXE_HELPER);
+-    DWORD cOffset = 0;
++    cSize = s_pHelper->cb - sizeof(DETOUR_EXE_HELPER);
++    cOffset = 0;
+     for (DWORD n = 0; n < s_pHelper->nDlls; n++) {
+         size_t cchDest = 0;
+         HRESULT hr = StringCchLengthA(&s_pHelper->rDlls[cOffset], cSize - cOffset, &cchDest);
