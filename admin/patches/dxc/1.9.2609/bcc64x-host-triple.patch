@@ -1,0 +1,15 @@
+--- a/cmake/modules/GetHostTriple.cmake
++++ b/cmake/modules/GetHostTriple.cmake
+@@ -3,7 +3,11 @@
+ # Invokes config.guess
+ 
+ function( get_host_triple var )
+-  if( MSVC )
++  if( CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_CXX_SIMULATE_ID STREQUAL "EMBT" )
++    # BCC64X runs on native Windows and has GNU-style Clang arguments.
++    # This triple is an LLVM platform identity, not a MinGW compiler switch.
++    set( value "x86_64-w64-mingw32" )
++  elseif( MSVC )
+     if( CMAKE_CL_64 )
+       set( value "x86_64-pc-win32" )
+     else()

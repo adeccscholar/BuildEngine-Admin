@@ -17998,7 +17998,7 @@
          <argument value="-Ddirectxtex_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxtex"/>
       </smoke>
    </library>
-   <library id="winmd" version="0f1eae3b" category="foundation" timestamp="2026-11-22T05:20:00Z">
+   <library id="winmd" version="0f1eae3b" category="foundation" timestamp="2026-11-22T04:45:00Z">
       <metadata artifactType="interface" name="Microsoft WinMD Reader" supplier="Microsoft" homepage="https://github.com/microsoft/winmd" description="MIT licensed interface-only Windows metadata reader, pinned dependency for the Microsoft C++/WinRT projection generator." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/winmd.git" ref="0f1eae3bfa63fa2ba3c2912cbfe72a01db94cc5a"/></security>
       <source>
@@ -18008,6 +18008,14 @@
             <require path="src\impl\base.h"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\winmd\0f1eae3b\missing-algorithm.patch" target="{Workspace}\.buildengine\patches\missing-algorithm.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-missing-algorithm" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\missing-algorithm.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
       </source>
       <install>
          <copy source="{Workspace}\src" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
@@ -18026,7 +18034,7 @@
          <argument value="-DWINMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-22T05:20:00Z">
+   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-22T04:45:00Z">
       <dependency library="winmd" version="0f1eae3b"/>
       <metadata artifactType="tool" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
@@ -18038,6 +18046,14 @@
             <require path="prebuild\main.cpp"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\sdk-winrt-includes.patch" target="{Workspace}\.buildengine\patches\sdk-winrt-includes.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-sdk-winrt-includes" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\sdk-winrt-includes.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
       </source>
 
       <build testsAffectBuild="true">
@@ -18088,7 +18104,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T05:20:00Z">
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T04:45:00Z">
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18099,6 +18115,14 @@
             <require path="LICENSE.TXT"/>
             <require path="LICENSE.TXT"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\dxc\1.9.2609\bcc64x-host-triple.patch" target="{Workspace}\.buildengine\patches\bcc64x-host-triple.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-bcc64x-host-triple" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-host-triple.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
       </source>
 
       <build testsAffectBuild="true">

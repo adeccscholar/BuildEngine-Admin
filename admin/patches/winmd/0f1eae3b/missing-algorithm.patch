@@ -1,0 +1,10 @@
+--- a/src/impl/base.h
++++ b/src/impl/base.h
+@@ -11,6 +11,7 @@
+ #include <stdexcept>
+ #include <assert.h>
+ #include <array>
++#include <algorithm>
+ #include <bitset>
+ #include <fstream>
+ #include <future>
