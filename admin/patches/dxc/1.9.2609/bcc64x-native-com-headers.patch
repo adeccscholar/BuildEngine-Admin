@@ -1,0 +1,36 @@
+--- a/include/dxc/WinAdapter.h
++++ b/include/dxc/WinAdapter.h
+@@ -12,6 +12,15 @@
+ #ifndef LLVM_SUPPORT_WIN_ADAPTER_H
+ #define LLVM_SUPPORT_WIN_ADAPTER_H
+ 
++// BCC64X targets the native Windows COM ABI, not the non-Windows
++// compatibility implementation of this adapter.
++#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
++#include <windows.h>
++#include <objbase.h>
++#include <objidl.h>
++#include <strsafe.h>
++#endif
++
+ #ifndef _WIN32
+--- a/include/dxc/dxcapi.h
++++ b/include/dxc/dxcapi.h
+@@ -26,6 +26,9 @@
+ 
+ #ifdef _WIN32
+ 
++#if defined(__clang__) && !defined(_MSC_VER)
++#include "dxc/WinAdapter.h"
++#endif
+ #ifndef CROSS_PLATFORM_UUIDOF
+ // Warning: This macro exists in WinAdapter.h as well
+ #define CROSS_PLATFORM_UUIDOF(interface, spec)                                 \
+--- a/include/dxc/Support/Global.h
++++ b/include/dxc/Support/Global.h
+@@ -255,7 +255,7 @@
+-#ifdef _MSC_VER
++#if defined(_MSC_VER) || (defined(_WIN32) && defined(__clang__))
+ 
+ extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(
+     const char *msg);
