@@ -27,3 +27,13 @@ The full `Result:` and `Output:` lines from `GoogleTestAddTests.cmake` were not 
 ## Acceptance
 
 Audio backends, utilities and tests remain enabled. Source patch steps must be idempotent, and both native variants must compile, link, stage and pass the independent smoke. BCC64X results are **[not verified]**.
+
+## Shared SDK publish boundary (22 November 2026)
+
+The previously configured publish operation copied all of the installed `include` tree, all `.lib` files and all DLLs from the Release package. The installed tree also contains GoogleTest/GoogleMock development artifacts required for the upstream test build. Those artifacts belong to their own package, not to the public OpenAL consumer API. Publishing the entire tree led to a collision at `include/gmock/gmock-actions.h`.
+
+The Schema 17 publish declaration now projects `include/AL` only, selects import-library names already searched by the OpenAL package smoke (`OpenAL32.lib`, `libOpenAL32.lib`, `OpenAL.lib`, `libopenal.lib`), and selects `OpenAL32.dll`. A required `files` selector fails if no named artifact is found. Optional CMake configuration forwarding is limited to OpenAL-prefixed configuration files. This is publication filtering, not a change to the native producer or test installation. Actual artifact-name selection remains subject to BCC64X run evidence.
+
+The library timestamp and already completed source/build/test/install scopes were not changed. The unsuccessful publish scope must be retried by the ordinary incremental FSM path; no forced rebuild or manual state manipulation is required. Publish manifests are materialization evidence, not independent library ownership or Current-State authority.
+
+**Verification:** [not verified]. The final acceptance gate is a BCC64X `--make` run reaching `openal-soft/1.25.2:ready` and reporting all 141 libraries finished. No successful native rerun is claimed here.
