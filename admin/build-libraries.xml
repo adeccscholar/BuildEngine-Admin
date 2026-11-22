@@ -18251,7 +18251,7 @@
       </smoke>
    </library>
    <library id="directstorage-gdeflate" version="9352da00" category="compression" timestamp="2026-11-22T05:30:00Z">
-      <dependency library="libdeflate" version="1.26"/>
+      <dependency library="libdeflate-gdeflate" version="1.8-8ba9502f"/>
       <metadata artifactType="shared" name="Microsoft DirectStorage GDeflate Reference" supplier="Microsoft and NVIDIA contributors"
          homepage="https://github.com/microsoft/DirectStorage"
          description="Source-built GDeflate reference compressor and decompressor from Microsoft DirectStorage samples. This is not the closed DirectStorage SDK runtime." licenseSignal="yellow">
@@ -18281,7 +18281,7 @@
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
          <argument value="-DDEFLATE_SOURCE_ROOT:PATH={Workspace}\GDeflate\GDeflate"/>
-         <argument value="-DLIBDEFLATE_PACKAGE_ROOT:PATH={DependencyRoot:libdeflate}"/>
+         <argument value="-DLIBDEFLATE_PACKAGE_ROOT:PATH={DependencyRoot:libdeflate-gdeflate}"/>
          <argument value="-DGDEFLATE_NATIVE_TEST:FILEPATH={BuildFileDir}\smokes\directstorage-gdeflate\consumer\main.cpp"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\directstorage-gdeflate"
             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -18323,4 +18323,39 @@
          <argument value="-DGDeflate_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\gdeflate\cmake"/>
       </smoke>
    </library>
+   <library id="libdeflate-gdeflate" version="1.8-8ba9502f" category="compression" timestamp="2026-11-22T05:05:00Z">
+      <metadata artifactType="shared" name="NVIDIA GDeflate fork" supplier="NVIDIA" homepage="https://github.com/NVIDIA/libdeflate" description="GDeflate-specific libdeflate 1.8 fork from DirectStorage submodule, separate DLL and source ownership." licenseSignal="yellow"><license name="MIT and Apache-2.0" file="COPYING"/></metadata>
+      <security><repository url="https://github.com/NVIDIA/libdeflate.git" commit="8ba9502fb30d2bf728592d121f0d402e40c8cb05"/></security>
+      <source><download url="https://github.com/NVIDIA/libdeflate/archive/8ba9502fb30d2bf728592d121f0d402e40c8cb05.tar.gz" archive="nvidia-libdeflate-8ba9502fb30d2bf728592d121f0d402e40c8cb05.tar.gz"/>
+         <extract format="libarchive" root="libdeflate-8ba9502fb30d2bf728592d121f0d402e40c8cb05"><require path="libdeflate.h"/><require path="lib\gdeflate_compress.c"/><require path="lib\gdeflate_decompress.c"/><require path="COPYING"/></extract></source>
+      <build testsAffectBuild="true"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
+         <argument value="-DNVIDIA_LIBDEFLATE_SOURCE:PATH={Workspace}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\libdeflate-gdeflate" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install><perVariant>
+            <execute name="gdeflate-api-test" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"><argument value="--output-on-failure"/></execute>
+            <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\libdeflate.h"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\libdeflate_gdeflate.dll"/>
+            <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libdeflate_gdeflate.lib"/>
+         </perVariant><common><copy source="{Workspace}\COPYING" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\COPYING" overwrite="true"/></common></install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" names="libdeflate_gdeflate.lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="libdeflate_gdeflate.dll"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\libdeflate-gdeflate\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="libdeflate-gdeflate-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DLibdeflateGDeflate_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\libdeflate-gdeflate\cmake"/>
+      </smoke></library>
 </buildLibraries>
