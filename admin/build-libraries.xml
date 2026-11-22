@@ -17961,11 +17961,12 @@
          <argument value="-Ddirectxmesh_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmesh"/>
       </smoke>
    </library>
-   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-22T20:50:00Z">
+   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-22T21:10:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="openexr" version="3.5.4"/>
       <dependency library="imath" version="3.2.3"/>
+      <dependency library="libdeflate" version="1.26"/>
       <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="llvm-openmp" version="20.1.7"/>
@@ -18011,10 +18012,11 @@
          <argument value="-Ddirectx-headers_DIR:PATH={DependencyRoot:directx-headers}\share\directx-headers\cmake"/>
          <argument value="-DOpenEXR_DIR:PATH={DependencyRoot:openexr}\lib\win64\{Configuration}\cmake\OpenEXR"/>
          <argument value="-DImath_DIR:PATH={DependencyRoot:imath}\lib\win64\{Configuration}\cmake\Imath"/>
+         <argument value="-Dlibdeflate_DIR:PATH={DependencyRoot:libdeflate}\lib\win64\{Configuration}\cmake\libdeflate"/>
          <argument value="-DJPEG_ROOT:PATH={DependencyRoot:libjpeg-turbo}"/>
          <argument value="-DPNG_ROOT:PATH={DependencyRoot:libpng}"/>
          <argument value="-DOpenMP_ROOT:PATH={DependencyRoot:llvm-openmp}"/>
-         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers};{DependencyRoot:openexr};{DependencyRoot:imath};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libpng};{DependencyRoot:llvm-openmp}"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers};{DependencyRoot:openexr};{DependencyRoot:imath};{DependencyRoot:libdeflate};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libpng};{DependencyRoot:llvm-openmp}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
