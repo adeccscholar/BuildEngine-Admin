@@ -83,7 +83,7 @@
          size_t cchDest = 0;
 --- a/src/creatwth.cpp
 +++ b/src/creatwth.cpp
-@@ -1153,7 +1153,8 @@
+@@ -1154,6 +1154,7 @@
      CHAR szCommand[MAX_PATH];
      PDETOUR_EXE_HELPER helper = NULL;
      HRESULT hr;
@@ -100,7 +100,7 @@
      if (nLen == 0 || nLen >= ARRAYSIZE(szExe)) {
          goto Cleanup;
      }
-@@ -1249,7 +1249,8 @@
+@@ -1250,6 +1250,7 @@
      WCHAR szCommand[MAX_PATH];
      PDETOUR_EXE_HELPER helper = NULL;
      HRESULT hr;
