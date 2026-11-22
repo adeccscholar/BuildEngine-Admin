@@ -8,7 +8,7 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
-- **[2026-11-22](/news/2026-11-22/)** — Operator-reported 141/141 clean-room completion; xtl, xsimd, xtensor, Assimp, CGAL, OpenAL Soft and doctest; corrected SDK publishing (**105 libraries / 141 versions**)
+- **[2026-11-22](/news/2026-11-22/)** — Earlier operator-reported 141/141 clean-room completion; extended Microsoft native source catalog includes Detours, DirectXMath, DirectXMesh, DirectXTex, DXC, DirectXTK12, WinMD, C++/WinRT and the open DirectStorage GDeflate reference (**116 declared libraries / 152 versions; new packages not verified**)
 
 - **[2026-11-21](/news/2026-11-21/)** — Ceres 2.3.0 and OpenEXR native consumer smokes PASS; Ceres 2.2.0 superseded after portability fixes; HDR Photon Observatory and curved-page OCR showcase work (**98 libraries / 134 versions**)
 
@@ -73,7 +73,8 @@ Each news item reports **distinct libraries** (unique logical library IDs) and *
 | 19 Nov | 88 | 123 |
 | 20 Nov | 91 | 126 |
 | 21 Nov | 98 | 134 |
-| 22 Nov | 105 | 141 |
+| 22 Nov, prior completed baseline | 105 | 141 |
+| 22 Nov, after Microsoft additions | 116 | 152 |
 
 The first schema-3 version had just one pugiXML entry earlier on 24 August; the end-of-day schema-4 count was two. The feasibility study examined approximately twenty libraries before the initial Admin library catalog was established.
 
