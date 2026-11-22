@@ -69,18 +69,12 @@ foreach(_adecc_file IN LISTS _adecc_test_sources)
    endif()
 endforeach()
 
-# Port the shared test utility target without a TAEF discovery side effect.
+# The original shared HLSL test library retains all source files and
+# dependencies, with GoogleTest headers instead of a TAEF discovery branch.
 set(_adecc_testlib_cmake "${_adecc_testlib}/CMakeLists.txt")
-file(READ "${_adecc_testlib_cmake}" _adecc_testlib_contents)
-if(_adecc_testlib_contents MATCHES "find_package\\(TAEF")
-   string(REPLACE "if(WIN32)\nfind_package(TAEF REQUIRED)\ninclude_directories(\${TAEF_INCLUDE_DIRS})\nelse(WIN32)"
-      "if(TRUE)" _adecc_testlib_contents "${_adecc_testlib_contents}")
-   string(REPLACE "endif(WIN32)" "endif()" _adecc_testlib_contents "${_adecc_testlib_contents}")
-   if(_adecc_testlib_contents MATCHES "find_package\\(TAEF")
-      message(FATAL_ERROR "Not all original HLSLTestLib TAEF references migrated")
-   endif()
-   file(WRITE "${_adecc_testlib_cmake}" "${_adecc_testlib_contents}")
-endif()
+file(COPY_FILE
+   "${ADMIN_PATCH_ROOT}/gtest/HLSLTestLib-CMakeLists.txt"
+   "${_adecc_testlib_cmake}" ONLY_IF_DIFFERENT)
 
 
 # Preserve original DXIL converter batch/regression test source and fixtures.
