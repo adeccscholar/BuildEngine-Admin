@@ -20,7 +20,7 @@
  typedef PIMAGEHLP_MODULE PIMAGEHLP_MODULE64;
 --- a/src/creatwth.cpp
 +++ b/src/creatwth.cpp
-@@ -948,8 +948,11 @@
+@@ -949,7 +949,10 @@
  {
      LPCSTR * rlpDlls = NULL;
 +    HANDLE hProcess = NULL;
@@ -40,7 +40,7 @@
      if (hProcess == NULL) {
          DETOUR_TRACE(("OpenProcess(pid=%d) failed: %d\n",
                        s_pHelper->pid, GetLastError()));
-@@ -965,9 +968,9 @@
+@@ -965,8 +968,8 @@
      }
  
      rlpDlls = new NOTHROW LPCSTR [s_pHelper->nDlls];
