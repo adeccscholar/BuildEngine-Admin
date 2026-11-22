@@ -1,0 +1,20 @@
+--- a/lib/Support/MSFileSystemBasic.cpp
++++ b/lib/Support/MSFileSystemBasic.cpp
+@@ -489,7 +489,7 @@
+   IFC(m_system->OpenStorage(lpFileName, dwDesiredAccess, dwShareMode,
+                             dwCreationDisposition, dwFlagsAndAttributes,
+                             &storage));
+-  IFC(storage.QueryInterface(&stream));
++  IFC(storage.p->QueryInterface(IID_IStream, reinterpret_cast<void **>(&stream.p)));
+   IFC(AddFileHandle(storage, stream, &resultHandle));
+ 
+ Cleanup:
+@@ -781,7 +781,7 @@
+     CComPtr<IStream> stream;
+ 
+     IFC(m_system->OpenStdStorage(fd, &storage));
+-    IFC(storage.QueryInterface(&stream));
++    IFC(storage.p->QueryInterface(IID_IStream, reinterpret_cast<void **>(&stream.p)));
+ 
+     ptr->storage = storage;
+     ptr->stream = stream;
