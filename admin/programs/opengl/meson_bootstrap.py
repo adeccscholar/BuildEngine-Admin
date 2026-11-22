@@ -283,7 +283,14 @@ def configure_windows_sdk_includes() -> None:
 
     # Meson caches CXXFLAGS in the setup configuration and reuses them for
     # compile/install/test; no host INCLUDE or global compiler change needed.
-    flags = " ".join(f'-I"{entry.as_posix()}"' for entry in (um, shared, winrt))
+    # WRL is in the SDK WinRT tree. Put SDK UM/shared at the end of the
+    # compiler's search chain so RAD's ABI-compatible SDK headers win.
+    # The previous -I for all three trees selected incompatible basetsd.h.
+    flags = (
+        f'-I"{winrt.as_posix()}" '
+        f'-idirafter "{um.as_posix()}" '
+        f'-idirafter "{shared.as_posix()}"'
+    )
     os.environ["CXXFLAGS"] = (os.environ.get("CXXFLAGS", "") + " " + flags).strip()
 
 
