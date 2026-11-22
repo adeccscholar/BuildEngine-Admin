@@ -1,6 +1,6 @@
 --- a/projects/dxilconv/CMakeLists.txt
 +++ b/projects/dxilconv/CMakeLists.txt
-@@ -23,8 +23,7 @@
+@@ -22,8 +22,7 @@
  if(WIN32)
    add_subdirectory(lib)
    add_subdirectory(tools)
