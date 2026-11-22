@@ -11,3 +11,8 @@ The generator depends on the separate managed WinMD Reader source to avoid a Fet
 Complete Release/Debug, install, metadata, license, SBOM, publish, native test/consumer and FSM evidence remains **[not verified]**.
 
 [Library catalog](/manual/libraries.md) · [Development news](/news/2026-11-22/)
+
+
+## First native run and scoped correction
+
+Original upstream tests failed to include SDK winstring.h. A local CMake patch adds explicit registered Windows SDK um/shared/winrt includes for native BCC64X, with checks and diagnostics. No tests were disabled. **[not verified]** until BCC64X Release and Debug rerun.

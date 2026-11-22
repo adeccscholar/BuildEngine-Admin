@@ -51,3 +51,10 @@ flowchart TD
 | directstorage-gdeflate | 9352da00 | Apache-2.0 open compressor DLL, not the full DirectStorage SDK |
 
 **[not verified]** All five registrations need Release/Debug BCC64X compile, original test suites where present, install, SBOM, package API and consumer evidence.
+
+
+## GDeflate source contract correction
+
+The first native Microsoft GDeflate Release/Debug builds failed with missing `libdeflate_gdeflate_decompressor` because the originally declared dependency was regular libdeflate 1.26. The exact Microsoft DirectStorage repository uses NVIDIA's libdeflate submodule at commit `8ba9502fb30d2bf728592d121f0d402e40c8cb05`, with GDeflate-specific compression and decompression functions not present in regular libdeflate.
+
+BuildEngine now declares `libdeflate-gdeflate/1.8-8ba9502f` as a separate managed native DLL, built from this upstream source pin, supplying the original `libdeflate_gdeflate_*` functions to Microsoft DirectStorage's GDeflate reference. The existing libdeflate 1.26 package and installed header namespace remain unchanged. The fork includes its own SPDX license and independent consumer. BCC64X build, export and round-trip evidence remain **[not verified]**.

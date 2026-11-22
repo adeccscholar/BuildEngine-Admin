@@ -11,3 +11,8 @@ This is the Apache-2.0 open GDeflate reference implementation from the DirectSto
 Complete Release/Debug, install, metadata, license, SBOM, publish, native test/consumer and FSM evidence remains **[not verified]**.
 
 [Library catalog](/manual/libraries.md) · [Development news](/news/2026-11-22/)
+
+
+## Upstream source mismatch correction
+
+Native Release/Debug builds failed at `GDeflateDecompress.cpp:29` because regular libdeflate 1.26 does not contain `libdeflate_gdeflate_decompressor`. The Microsoft repository's actual Git submodule is NVIDIA libdeflate commit `8ba9502f...`. This package now depends on the independent managed `libdeflate-gdeflate/1.8-8ba9502f`, not regular libdeflate 1.26. Its CMake consumer uses the installed `NVIDIA::libdeflate_gdeflate` exported target. The native build, round-trip and runtime remain **[not verified]**.

@@ -11,3 +11,8 @@ The LLVM-derived compiler must build and run its native tools and HLSL/DXIL/SPIR
 Complete Release/Debug, install, metadata, license, SBOM, publish, native test/consumer and FSM evidence remains **[not verified]**.
 
 [Library catalog](/manual/libraries.md) · [Development news](/news/2026-11-22/)
+
+
+## First native run and scoped correction
+
+LLVM GetHostTriple.cmake previously tried to execute config.guess using sh on native Windows because BCC64X is neither MSVC nor MinGW. The local source patch identifies Clang+EMBT before the shell fallback and sets the Windows LLVM target triple. DXC's LLVM build still needs native verification. **[not verified]** until BCC64X Release and Debug rerun.

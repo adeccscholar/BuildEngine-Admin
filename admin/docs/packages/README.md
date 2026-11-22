@@ -2,11 +2,13 @@
 
 [TOC|Content]
 
-This catalog contains **143 version-specific migration guides** from the public BuildEngine Administration repository. The complete library catalog and configuration are determined by the current `admin/build-libraries.xml`; a documentation page may describe a superseded version or a configuration that has not yet passed native BCC64X builds.
+This catalog contains **144 version-specific migration guides** from the public BuildEngine Administration repository. The complete library catalog and configuration are determined by the current `admin/build-libraries.xml`; a documentation page may describe a superseded version or a configuration that has not yet passed native BCC64X builds.
 
 Each versioned guide documents the intended native C++Builder 13/BCC64X build profile, upstream integration, chosen dependencies, CMake or other build settings, patch decisions, installation artifacts, runtime boundaries and consumer evidence. **The contract describes what should happen, not proof that it happened successfully.**
 
 ## Versioned package guides
+
+- [libdeflate-gdeflate 1.8-8ba9502f](/package/libdeflate-gdeflate/1.8-8ba9502f/migration)
 
 - [winmd 0f1eae3b](/package/winmd/0f1eae3b/migration)
 - [cppwinrt 3.0.260818.1](/package/cppwinrt/3.0.260818.1/migration)
