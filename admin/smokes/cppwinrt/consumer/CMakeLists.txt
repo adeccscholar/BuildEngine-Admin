@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.31)
+project(adecc_cppwinrt_consumer LANGUAGES CXX)
+if(NOT DEFINED CPPWINRT_PACKAGE_ROOT)
+   message(FATAL_ERROR "CPPWINRT_PACKAGE_ROOT required")
+endif()
+add_executable(cppwinrt-consumer main.cpp)
+set_target_properties(cppwinrt-consumer PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF CXX_SCAN_FOR_MODULES OFF)
+target_compile_definitions(cppwinrt-consumer PRIVATE CPPWINRT_PACKAGE_ROOT=\"${CPPWINRT_PACKAGE_ROOT}\")

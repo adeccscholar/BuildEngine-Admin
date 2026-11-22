@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.31)
+project(adecc_directxtk12_consumer LANGUAGES CXX)
+find_package(directxtk12 CONFIG REQUIRED)
+add_executable(directxtk12-consumer main.cpp)
+set_target_properties(directxtk12-consumer PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF CXX_SCAN_FOR_MODULES OFF)
+target_link_libraries(directxtk12-consumer PRIVATE Microsoft::DirectXTK12)

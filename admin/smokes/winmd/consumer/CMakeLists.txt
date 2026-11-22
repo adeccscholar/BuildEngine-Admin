@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.31)
+project(adecc_winmd_consumer LANGUAGES CXX)
+if(NOT DEFINED WINMD_PACKAGE_ROOT)
+   message(FATAL_ERROR "WINMD_PACKAGE_ROOT required")
+endif()
+add_executable(winmd-consumer main.cpp)
+set_target_properties(winmd-consumer PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF CXX_SCAN_FOR_MODULES OFF)
+target_include_directories(winmd-consumer PRIVATE "${WINMD_PACKAGE_ROOT}/include")

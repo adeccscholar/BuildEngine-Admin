@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.31)
+project(adecc_dxc_consumer LANGUAGES CXX)
+if(NOT DEFINED DXC_PACKAGE_ROOT)
+   message(FATAL_ERROR "DXC_PACKAGE_ROOT required")
+endif()
+add_executable(dxc-consumer main.cpp)
+set_target_properties(dxc-consumer PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF CXX_SCAN_FOR_MODULES OFF)
+target_include_directories(dxc-consumer PRIVATE "${DXC_PACKAGE_ROOT}/include")
