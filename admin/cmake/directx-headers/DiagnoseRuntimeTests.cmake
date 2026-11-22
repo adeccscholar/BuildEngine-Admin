@@ -102,4 +102,12 @@ adecc_replace_once("${strSimple}"
 adecc_replace_once("${strFeatures}"
    "    std::cerr << \"Feature-Support-Test: factory created, entering CreateAdapterList\" << std::endl;"
    "    adecc::dxcore_diagnostics::PrintStage(\"before CreateAdapterList\", adapter_factory.Get());\n    std::cerr << \"Feature-Support-Test: factory created, entering CreateAdapterList\" << std::endl;")
+# A successful HRESULT without a COM factory is a hard integration error.
+# Keep the original test outcome and report the failed contract without dereferencing null.
+adecc_replace_once("\${strSimple}"
+   "        std::fprintf(stderr, \"DirectX-Headers-Test: factory created\\n\");"
+   "        if (factory == nullptr) {\n            std::fprintf(stderr, \"DirectX-Headers-Test: S_OK with null DXCore factory\\n\");\n            return -1;\n        }\n        std::fprintf(stderr, \"DirectX-Headers-Test: factory created\\n\");")
+adecc_replace_once("\${strFeatures}"
+   "    adecc::dxcore_diagnostics::PrintStage(\"before CreateAdapterList\", adapter_factory.Get());"
+   "    if (!adapter_factory) {\n        std::cerr << \"Feature-Support-Test: S_OK with null DXCore factory\" << std::endl;\n        return -1;\n    }\n    adecc::dxcore_diagnostics::PrintStage(\"before CreateAdapterList\", adapter_factory.Get());")
 message(STATUS "Applied idempotent DirectX-Headers runtime HRESULT diagnostics")
