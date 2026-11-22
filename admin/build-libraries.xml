@@ -17969,7 +17969,7 @@
          <argument value="-Ddirectxmesh_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmesh"/>
       </smoke>
    </library>
-   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-22T22:20:00Z">
+   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-22T23:10:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="openexr" version="3.5.4"/>
@@ -17979,6 +17979,7 @@
       <dependency library="zstd" version="1.5.7"/>
       <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libpng" version="1.6.59"/>
+      <dependency library="zlib" version="1.4"/>
       <dependency library="llvm-openmp" version="20.1.7"/>
       <metadata artifactType="shared" name="Microsoft DirectXTex" supplier="Microsoft"
          homepage="https://github.com/microsoft/DirectXTex"
@@ -18027,13 +18028,18 @@
          <argument value="-Dzstd_DIR:PATH={DependencyRoot:zstd}\lib\win64\{Configuration}\cmake\zstd"/>
          <argument value="-DJPEG_ROOT:PATH={DependencyRoot:libjpeg-turbo}"/>
          <argument value="-DPNG_ROOT:PATH={DependencyRoot:libpng}"/>
+         <argument value="-DZLIB_ROOT:PATH={DependencyRoot:zlib}"/>
+         <argument value="-DZLIB_INCLUDE_DIR:PATH={DependencyRoot:zlib}\include"/>
+         <argument value="-DPNG_PNG_INCLUDE_DIR:PATH={DependencyRoot:libpng}\include"/>
+         <argument value="-DZLIB_LIBRARY:FILEPATH={DependencyRoot:zlib}\lib\win64\{Configuration}\{ZlibImportLibrary}"/>
+         <argument value="-DPNG_LIBRARY:FILEPATH={DependencyRoot:libpng}\lib\win64\{Configuration}\{PngImportLibrary}"/>
          <argument value="-DOpenMP_ROOT:PATH={DependencyRoot:llvm-openmp}"/>
-         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers};{DependencyRoot:openexr};{DependencyRoot:imath};{DependencyRoot:libdeflate};{DependencyRoot:openjph};{DependencyRoot:zstd};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libpng};{DependencyRoot:llvm-openmp}"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers};{DependencyRoot:openexr};{DependencyRoot:imath};{DependencyRoot:libdeflate};{DependencyRoot:openjph};{DependencyRoot:zstd};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libpng};{DependencyRoot:zlib};{DependencyRoot:llvm-openmp}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
-         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
-         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <variant name="Release"><variable name="ZlibImportLibrary" value="libz.lib"/><variable name="PngImportLibrary" value="libpng16.lib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><variable name="ZlibImportLibrary" value="libzd.lib"/><variable name="PngImportLibrary" value="libpng16d.lib"/><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
          <install>
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -18219,7 +18225,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T22:30:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T23:15:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18235,6 +18241,14 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\AllocatorTest-google-fixture.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\dxc\1.9.2609\bcc64x-dxlib-sample-target.patch" target="{Workspace}\.buildengine\patches\bcc64x-dxlib-sample-target.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-dxlib-sample-target" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-dxlib-sample-target.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
@@ -18294,7 +18308,10 @@
          <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <argument value="-DBUILD_TESTING:BOOL=ON"/>
-         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <!-- DXC products dxcompiler and dxlib_sample declare SHARED explicitly.
+              Internal LLVM/Clang libraries remain link-only archives to avoid
+              cyclic DLL dependencies; no static libraries are published. -->
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=OFF"/>
          <!-- DXC v1.9.2609 removes all conventional LLVM target backends in lib/Target/LLVMBuild.txt; the HLSL/DXIL/SPIR-V functionality is separate and remains enabled. -->
          <argument value="-DLLVM_TARGETS_TO_BUILD:STRING="/>
          <argument value="-DLLVM_ENABLE_PROJECTS:STRING=clang"/>
