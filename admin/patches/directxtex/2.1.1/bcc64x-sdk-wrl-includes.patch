@@ -1,9 +1,10 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -17,4 +17,25 @@
+@@ -19,5 +19,26 @@
    DESCRIPTION "DirectX Texture Library"
    HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkId=248926"
    LANGUAGES CXX)
+ 
 +
 +# BuildEngine BCC64X: preserve upstream DX11/DX12 tools and samples.
 +# Windows SDK WRL is under WinRT, outside the compiler's native include tree.
