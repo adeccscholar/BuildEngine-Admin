@@ -21,7 +21,7 @@
 +  if(NOT EXISTS "${_adecc_sdk_winrt}/wrl/client.h")
 +    message(FATAL_ERROR "The managed Windows SDK lacks WRL: ${_adecc_sdk_winrt}")
 +  endif()
-+  include_directories(BEFORE "${_adecc_sdk_winrt}")
++  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/.buildengine/compat" "${_adecc_sdk_winrt}")
 +  # Embarcadero's Windows SDK winerror.h uses MSVC's __forceinline token.
 +  add_compile_definitions(__forceinline=inline)
 +endif()
