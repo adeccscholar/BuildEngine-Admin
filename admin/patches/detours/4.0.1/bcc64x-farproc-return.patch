@@ -1,0 +1,11 @@
+--- a/src/modules.cpp
++++ b/src/modules.cpp
+@@ -365,7 +365,7 @@
+             }
+ 
+             SetLastError(NO_ERROR);
+-            return GetProcAddress(hClr, "_CorExeMain");
++            return reinterpret_cast<PVOID>(GetProcAddress(hClr, "_CorExeMain"));
+         }
+ 
+         SetLastError(NO_ERROR);

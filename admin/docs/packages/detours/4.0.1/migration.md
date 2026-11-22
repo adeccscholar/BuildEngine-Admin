@@ -31,3 +31,7 @@ The original modules.cpp treated undefined _MSC_VER as a legacy MSVC version and
 Automatic C++ module scanning is disabled centrally by the BCC64X CMake toolchain (`CMAKE_CXX_SCAN_FOR_MODULES=OFF`) without lowering the C++23 language level.
 
 **[not verified]** until native Release, Debug and consumer tests pass.
+
+## Subsequent BCC64X native diagnostic
+
+After the StrSafe guard fix, the original `modules.cpp` CLR entrypoint returns the Win32 function-pointer type `FARPROC` where the Detours API declares `PVOID`. The version-specific patch applies an explicit pointer conversion without changing the CLR branch or disabling tests. Release and Debug results remain **[not verified]**.

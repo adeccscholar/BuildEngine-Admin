@@ -24,3 +24,7 @@ The Windows SDK WinRT header winstring.h is provided in winrt/, rather than the 
 Automatic C++ module scanning is disabled centrally by the BCC64X CMake toolchain (`CMAKE_CXX_SCAN_FOR_MODULES=OFF`) without lowering the C++23 language level.
 
 **[not verified]** until native Release, Debug and consumer tests pass.
+
+## Catch source compatibility in original C++/WinRT tests
+
+The vendored Catch header selects a legacy `std::_isnan` path whenever `__BORLANDC__` is defined. BCC64X is Clang-based and provides standard `std::isnan`; the new version-bound source patch restricts that legacy path to non-Clang Borland compilers. The full upstream test suite stays active. Release and Debug results remain **[not verified]**.

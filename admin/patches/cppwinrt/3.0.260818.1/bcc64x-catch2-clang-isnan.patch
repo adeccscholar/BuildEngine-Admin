@@ -1,0 +1,13 @@
+--- a/test/catch.hpp
++++ b/test/catch.hpp
+@@ -283,8 +283,8 @@
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+ // Embarcadero C++Build
+-#if defined(__BORLANDC__)
+-    #define CATCH_INTERNAL_CONFIG_POLYFILL_ISNAN
++#if defined(__BORLANDC__) && !defined(__clang__)
++    #define CATCH_INTERNAL_CONFIG_POLYFILL_ISNAN
+ #endif
+ 
+ ////////////////////////////////////////////////////////////////////////////////

@@ -17697,7 +17697,7 @@
          <argument value="-Ddirectx-headers_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directx-headers\cmake"/>
       </smoke>
    </library>
-   <library id="detours" version="4.0.1" category="systems" timestamp="2026-11-22T05:10:29Z">
+   <library id="detours" version="4.0.1" category="systems" timestamp="2026-11-22T05:12:00Z">
       <metadata artifactType="shared" name="Microsoft Detours" supplier="Microsoft"
          homepage="https://github.com/microsoft/detours"
          description="Windows API interception and instrumentation, reusable BCC64X DLL and Vulkan Loader test source." licenseSignal="yellow">
@@ -17725,6 +17725,15 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\strsafe-msvc-guard.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\detours\4.0.1\bcc64x-farproc-return.patch"
+            target="{Workspace}\.buildengine\patches\bcc64x-farproc-return.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-farproc-return" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-farproc-return.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
@@ -18052,7 +18061,7 @@
          <argument value="-DWINMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-22T05:10:29Z">
+   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-22T05:12:00Z">
       <dependency library="winmd" version="0f1eae3b"/>
       <metadata artifactType="tool" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
@@ -18078,6 +18087,15 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\fix-winstring-sdk-location.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\bcc64x-catch2-clang-isnan.patch"
+            target="{Workspace}\.buildengine\patches\bcc64x-catch2-clang-isnan.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-catch2-clang-isnan" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-catch2-clang-isnan.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
