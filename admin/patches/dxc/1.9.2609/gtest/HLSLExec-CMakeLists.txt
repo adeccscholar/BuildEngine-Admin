@@ -1,0 +1,31 @@
+# All original DXC Windows shader-execution and algebra sources, GoogleTest driver.
+find_package(D3D12 REQUIRED)
+
+add_clang_unittest(ExecHLSLTests
+  ExecutionTest.cpp
+  ShaderOpTest.cpp
+  TableParameterHandler.cpp
+  LongVectors.cpp
+  LinAlgTests.cpp
+  HlslExecTestUtils.cpp
+  ExecHLSLTests.rc
+  ${LLVM_MAIN_SRC_DIR}/tools/clang/unittests/HLSL/TestMain.cpp
+  ${LLVM_MAIN_SRC_DIR}/tools/clang/unittests/HLSL/HLSLTestOptions.cpp)
+
+target_compile_definitions(ExecHLSLTests PRIVATE
+  ADECC_DXC_GTEST=1 ADECC_DXC_EXEC_TEST=1)
+target_link_libraries(ExecHLSLTests PRIVATE
+  dxcompiler HLSLTestLib ${D3D12_LIBRARIES} gmock shlwapi)
+target_include_directories(ExecHLSLTests PRIVATE
+  ${LLVM_MAIN_SRC_DIR}/tools/clang/unittests/HLSL
+  ${D3D12_INCLUDE_DIRS}
+  ${LLVM_MAIN_INCLUDE_DIR}/dxc/Test
+  ${LLVM_MAIN_INCLUDE_DIR}/dxc/Support)
+add_dependencies(ExecHLSLTests dxcompiler)
+
+# Original non-parametric cases and generated per-row XML cases are both tested.
+add_test(NAME DXC.HLSLExec.GoogleTest
+  COMMAND $<TARGET_FILE:ExecHLSLTests> --HlslDataDir
+    ${PROJECT_SOURCE_DIR}/tools/clang/test/HLSL)
+set_tests_properties(DXC.HLSLExec.GoogleTest
+  PROPERTIES LABELS "BCC64X;DXC;HLSLExec;original" TIMEOUT 1800)
