@@ -1,5 +1,6 @@
 #include <vulkan/vulkan.h>
 #include <print>
+#include <cstdint>
 int main() {
    std::uint32_t uVersion {};
    VkResult const eResult=vkEnumerateInstanceVersion(&uVersion);
