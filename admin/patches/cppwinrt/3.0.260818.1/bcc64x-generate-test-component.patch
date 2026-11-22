@@ -1,6 +1,6 @@
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -84,7 +84,66 @@
+@@ -84,7 +84,71 @@
              "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
      )
  endif()
@@ -35,11 +35,16 @@
 +    if(NOT DEFINED ENV{CB_BCC64X} OR "$ENV{CB_BCC64X}" STREQUAL "")
 +        message(FATAL_ERROR "BCC64X compiler path is required as MIDLRT C preprocessor")
 +    endif()
++    # MIDLRT splits /cpp_cmd values containing spaces, even when quoted.
++    # A workspace-local wrapper preserves the registered BCC64X path as one argument.
++    set(_adecc_midl_cpp "${_adecc_test_component_dir}/bcc64x-midl-preprocess.cmd")
++    file(WRITE "${_adecc_midl_cpp}"
++        "@echo off\r\n\"$ENV{CB_BCC64X}\" %*\r\n")
 +    add_custom_command(
 +        OUTPUT "${_adecc_test_component_winmd}"
 +        COMMAND "${ADECC_CPPWINRT_MIDLRT}"
 +            /winrt /nomidl
-+            /cpp_cmd "$ENV{CB_BCC64X}"
++            /cpp_cmd "${_adecc_midl_cpp}"
 +            /cpp_opt "-E -x c"
 +            /metadata_dir "$ENV{SystemRoot}/System32/WinMetadata"
 +            /I "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}"
