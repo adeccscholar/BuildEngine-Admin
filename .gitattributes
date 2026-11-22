@@ -4,7 +4,7 @@
 *.xml text eol=crlf
 *.xsd text eol=crlf
 *.cmake text eol=crlf
-CMakeLists.txt text eol=crlf
+*CMakeLists.txt text eol=crlf
 *.md text eol=crlf
 *.txt text eol=crlf
 *.patch text eol=lf
