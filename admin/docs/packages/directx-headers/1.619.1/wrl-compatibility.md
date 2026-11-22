@@ -29,3 +29,12 @@ No other WSL stubs are added to the native Windows include path. Win32 types and
 ## Git discipline
 
 The original `test-CMakeLists.txt` and `googletest-CMakeLists.txt` are unchanged by this update. The patch is only in the common CMake adapter and this documentation. Git's clean-worktree/fast-forward contract remains authoritative. Never run `git reset --hard`, `git clean` or disable dirty checking as a response to line-ending changes.
+
+
+## Native BCC64X GUID deduction follow-up
+
+The later native attempt passed the Windows SDK WRL compiler-version guard using the MIT compatibility header and reached `feature_check_test.cpp:696`. BCC64X then rejected `IID_PPV_ARGS(&adapter_factory)`: the Embarcadero `combaseapi.h` defines `_CG_GUID_PPT_Helper(T**)`, which does not accept the `Microsoft::WRL::Details::ComPtrRef<T>` proxy returned by `ComPtr::operator&`.
+
+The isolated compatibility `wrl/client.h` now adds exactly one type-safe template overload of `_CG_GUID_PPT_Helper` for that Microsoft proxy, deriving the COM IID via `__uuidof(**aPtr)`. Microsoft's original forwarder and adapter source are retained, and the same adapted header is installed with the package. No `_MSC_VER` pretense, SDK modifications, feature removal or test-target disabling is involved.
+
+**[not verified]**: BCC64X compilation and CTest results after this follow-up.
