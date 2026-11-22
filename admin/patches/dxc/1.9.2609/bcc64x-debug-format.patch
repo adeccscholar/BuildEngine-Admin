@@ -1,6 +1,6 @@
 --- a/include/dxc/Support/Global.h
 +++ b/include/dxc/Support/Global.h
-@@ -265,7 +265,7 @@
+@@ -265,6 +265,6 @@
  }
  
 -inline void OutputDebugFormatA(const char *pszFormat, ...) {
