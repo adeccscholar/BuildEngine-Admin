@@ -91,6 +91,43 @@ int main() {
    bool const bD3D12 = ContainsInsensitive(strRenderer, "d3d12");
    bool const bConfiguredRenderer = !strRenderer.empty() && (bSoftpipe || bD3D12);
 
+   // GL_VENDOR identifies the OpenGL implementation (often Mesa), not
+   // necessarily the underlying GPU. Use the D3D12 renderer's adapter name
+   // for informational vendor classification without affecting compatibility.
+   std::string_view svAdapterVendor = "unknown";
+   if(bSoftpipe) {
+      svAdapterVendor = "software";
+   }
+   else if(bD3D12) {
+      if(ContainsInsensitive(strRenderer, "nvidia") || ContainsInsensitive(strRenderer, "geforce") ||
+         ContainsInsensitive(strRenderer, "quadro") || ContainsInsensitive(strRenderer, "rtx")) {
+         svAdapterVendor = "NVIDIA";
+      }
+      else if(ContainsInsensitive(strRenderer, "amd") || ContainsInsensitive(strRenderer, "radeon") ||
+              ContainsInsensitive(strRenderer, "advanced micro devices")) {
+         svAdapterVendor = "AMD";
+      }
+      else if(ContainsInsensitive(strRenderer, "intel") || ContainsInsensitive(strRenderer, "iris") ||
+              ContainsInsensitive(strRenderer, "arc graphics") || ContainsInsensitive(strRenderer, "uhd graphics")) {
+         svAdapterVendor = "Intel";
+      }
+      else if(ContainsInsensitive(strRenderer, "qualcomm") || ContainsInsensitive(strRenderer, "adreno")) {
+         svAdapterVendor = "Qualcomm";
+      }
+      else if(ContainsInsensitive(strRenderer, "microsoft") || ContainsInsensitive(strRenderer, "warp")) {
+         svAdapterVendor = "Microsoft software adapter";
+      }
+      else {
+         svAdapterVendor = "other D3D12 adapter";
+      }
+   }
+
+   GLubyte const* const pVersion = bContext ? ::glGetString(GL_VERSION) : nullptr;
+   GLubyte const* const pShadingLanguage = bContext ? ::glGetString(GL_SHADING_LANGUAGE_VERSION) : nullptr;
+   std::string const strVersion = pVersion == nullptr ? std::string {} : reinterpret_cast<char const*>(pVersion);
+   std::string const strShadingLanguage = pShadingLanguage == nullptr ? std::string {} :
+      reinterpret_cast<char const*>(pShadingLanguage);
+
    std::println("SMOKE|CHECK|opengl-module|{}|app-local Mesa opengl32.dll loaded",
                 bAppLocalOpenGL ? "PASS" : "FAIL");
    std::println("SMOKE|CHECK|wgl-context|{}|WGL context creation {}",
@@ -99,6 +136,10 @@ int main() {
                 bAppLocalGallium ? "PASS" : "FAIL");
    std::println("SMOKE|CHECK|renderer|{}|vendor='{}', renderer='{}'",
                 bConfiguredRenderer ? "PASS" : "FAIL", strVendor, strRenderer);
+   std::println("SMOKE|INFO|gpu|backend='{}', adapter-vendor='{}', renderer='{}'",
+                bD3D12 ? "D3D12" : (bSoftpipe ? "softpipe" : "unknown"),
+                svAdapterVendor, strRenderer);
+   std::println("SMOKE|INFO|api|opengl='{}', glsl='{}'", strVersion, strShadingLanguage);
 
    bool const bSuccess = bAppLocalOpenGL && bContext && bAppLocalGallium && bConfiguredRenderer;
    std::println("SMOKE|RESULT|{}|Mesa OpenGL configured Gallium consumer usable", bSuccess ? "PASS" : "FAIL");
