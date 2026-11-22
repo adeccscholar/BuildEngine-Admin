@@ -58,13 +58,22 @@ def Port(srcfile):
                           "class ExecutionTest : public ::testing::Test {")
     patches = []
     registrations = 0
-    for m in re.finditer(r"\bclass\s+(\w+)\s*(?::[^{;]+)?\{", src):
+    # Only original class definitions beginning on a source line are candidates.
+    # Previously, arbitrary "class" text in comments or macros triggered
+    # brace balancing before the original test marker was even considered.
+    for m in re.finditer(r"^[ \t]*class\s+(\w+)\s*(?::[^{;]+)?\{", src, re.MULTILINE):
         cls = m.group(1)
         begin = src.find("{", m.start(), m.end())
-        end = ScopeEnd(src, begin)
-        body = src[begin+1:end]
-        if not re.search(r"BEGIN_TEST_CLASS\s*\(\s*"+re.escape(cls)+r"\s*\)", body[:2000]):
+        marker = re.search(r"\bBEGIN_TEST_CLASS\s*\(\s*"+re.escape(cls)+r"\s*\)",
+                           src[begin+1:begin+2001])
+        if not marker:
             continue
+        try:
+            end = ScopeEnd(src, begin)
+        except ValueError as error:
+            line = src.count("\n", 0, begin) + 1
+            raise ValueError(f"{srcfile}:{line}: class {cls}: {error}") from error
+        body = src[begin+1:end]
         methods = re.findall(r"\bTEST_METHOD\s*\(\s*(\w+)\s*\)", body)
         if srcfile.name == "LongVectors.cpp":
             methods += [op+"_"+dtype for op,dtype in re.findall(
