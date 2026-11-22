@@ -1,12 +1,11 @@
 --- a/src/microsoft/compiler/dxil_validator.cpp
 +++ b/src/microsoft/compiler/dxil_validator.cpp
-@@ -12,2 +12,14 @@
+@@ -12,6 +12,17 @@
  #include <wrl/client.h>
  using Microsoft::WRL::ComPtr;
-+
-+// BCC64X cannot recover DXC's CROSS_PLATFORM_UUIDOF GUIDs through __uuidof.
-+// Use the original DXC interface identifiers and keep the COM ABI unchanged.
+ 
 +#if defined(__BORLANDC__) || defined(__CODEGEARC__)
++// Preserve the original DXC interface GUIDs without relying on __uuidof.
 +static const GUID ADECC_IID_IDxcValidator = {0xA6E82BD2, 0x1FD7, 0x4826, {0x98, 0x11, 0x28, 0x57, 0xE7, 0x97, 0xF4, 0x9A}};
 +static const GUID ADECC_IID_IDxcVersionInfo = {0xB04F5B50, 0x2059, 0x4F12, {0xA8, 0xFF, 0xA1, 0xE0, 0xCD, 0xE1, 0xCC, 0x7E}};
 +static const GUID ADECC_IID_IDxcLibrary = {0xE5204DC7, 0xD18C, 0x4C3C, {0xBD, 0xFB, 0x85, 0x16, 0x73, 0x98, 0x0F, 0xE7}};
@@ -15,20 +14,39 @@
 +#else
 +#define ADECC_DXC_IID_PPV_ARGS(name, pointer) IID_PPV_ARGS(pointer)
 +#endif
-@@ -81,3 +93,3 @@
++
+ struct dxil_validator {
+    HMODULE dxil_mod;
+    HMODULE dxcompiler_mod;
+@@ -80,7 +91,7 @@
+ 
     IDxcValidator *dxc_validator;
     HRESULT hr = dxil_create_func(CLSID_DxcValidator,
 -                                 IID_PPV_ARGS(&dxc_validator));
 +                                 ADECC_DXC_IID_PPV_ARGS(IDxcValidator, &dxc_validator));
-@@ -95,2 +107,2 @@
+    if (FAILED(hr)) {
+       debug_printf("DXIL: Failed to create validator\n");
+       return NULL;
+@@ -93,7 +104,7 @@
+ get_validator_version(IDxcValidator *val)
+ {
     ComPtr<IDxcVersionInfo> version_info;
 -   if (FAILED(val->QueryInterface(version_info.ReleaseAndGetAddressOf())))
 +   if (FAILED(val->QueryInterface(ADECC_DXC_IID_PPV_ARGS(IDxcVersionInfo, version_info.ReleaseAndGetAddressOf()))))
-@@ -217,2 +229,2 @@
+       return NO_DXIL_VALIDATION;
+ 
+    UINT32 major, minor;
+@@ -215,11 +226,11 @@
+                       "dxcompiler.dll\n");
+       } else {
           if (FAILED(compiler_create_func(CLSID_DxcLibrary,
 -                                         IID_PPV_ARGS(&val->dxc_library))))
 +                                         ADECC_DXC_IID_PPV_ARGS(IDxcLibrary, &val->dxc_library))))
-@@ -221,2 +233,2 @@
+             debug_printf("DXIL: Unable to create IDxcLibrary instance\n");
+ 
           if (FAILED(compiler_create_func(CLSID_DxcCompiler,
 -                                         IID_PPV_ARGS(&val->dxc_compiler))))
 +                                         ADECC_DXC_IID_PPV_ARGS(IDxcCompiler, &val->dxc_compiler))))
+             debug_printf("DXIL: Unable to create IDxcCompiler instance\n");
+       }
+    }
