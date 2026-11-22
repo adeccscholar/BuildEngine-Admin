@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -521,6 +521,15 @@
+@@ -518,6 +518,15 @@
    list(APPEND TOOL_EXES texdiag)
  endif()
  
