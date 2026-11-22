@@ -51,3 +51,33 @@
      for (DWORD n = 0; n < s_pHelper->nDlls; n++) {
          size_t cchDest = 0;
          HRESULT hr = StringCchLengthA(&s_pHelper->rDlls[cOffset], cSize - cOffset, &cchDest);
+--- a/src/creatwth.cpp
++++ b/src/creatwth.cpp
+@@ -1027,8 +1027,10 @@
+                             _In_reads_(nDlls) LPCSTR *rlpDlls)
+ {
+     PDETOUR_EXE_HELPER Helper = NULL;
+     BOOL Result = FALSE;
++    DWORD cSize = 0;
++    DWORD cOffset = 0;
+ 
+     if (pHelper == NULL) {
+         goto Cleanup;
+@@ -1040,7 +1042,7 @@
+         goto Cleanup;
+     }
+ 
+-    DWORD cSize = 4;
++    cSize = 4;
+     for (DWORD n = 0; n < nDlls; n++) {
+         HRESULT hr;
+         size_t cchDest = 0;
+@@ -1062,7 +1064,7 @@
+     Helper->pid = dwTargetPid;
+     Helper->nDlls = nDlls;
+ 
+-    _Field_range_(0, cSize - 4) DWORD cOffset = 0;
++    _Analysis_assume_(cOffset <= cSize);
+     for (DWORD n = 0; n < nDlls; n++) {
+         HRESULT hr;
+         size_t cchDest = 0;
