@@ -16,7 +16,7 @@ def write_atomic(path: Path, content: str) -> None:
     temporary_name = None
     try:
         with tempfile.NamedTemporaryFile(
-            mode="w", encoding="utf-8", newline="\\n",
+            mode="w", encoding="utf-8", newline="\n",
             dir=path.parent, prefix=path.name + ".", suffix=".tmp",
             delete=False,
         ) as output:
