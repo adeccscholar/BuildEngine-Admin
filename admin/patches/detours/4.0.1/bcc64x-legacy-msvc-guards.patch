@@ -54,7 +54,7 @@
 --- a/src/creatwth.cpp
 +++ b/src/creatwth.cpp
 @@ -1028,7 +1028,9 @@
-                             _In_reads_(nDlls) LPCSTR *rlpDlls)
+                            _In_reads_(nDlls) LPCSTR *rlpDlls)
  {
      PDETOUR_EXE_HELPER Helper = NULL;
      BOOL Result = FALSE;
