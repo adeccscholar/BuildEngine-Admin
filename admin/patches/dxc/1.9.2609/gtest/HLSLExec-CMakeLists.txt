@@ -14,7 +14,7 @@ add_clang_unittest(ExecHLSLTests
 
 target_compile_definitions(ExecHLSLTests PRIVATE
   ADECC_DXC_GTEST=1 ADECC_DXC_EXEC_TEST=1)
-target_link_libraries(ExecHLSLTests PRIVATE
+target_link_libraries(ExecHLSLTests
   dxcompiler HLSLTestLib ${D3D12_LIBRARIES} gmock shlwapi)
 target_include_directories(ExecHLSLTests PRIVATE
   ${LLVM_MAIN_SRC_DIR}/tools/clang/unittests/HLSL
