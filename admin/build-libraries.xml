@@ -17599,7 +17599,7 @@
          <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directx-headers" version="1.619.1" category="graphics" timestamp="2026-11-22T19:20:00Z">
+   <library id="directx-headers" version="1.619.1" category="graphics" timestamp="2026-11-22T19:30:00Z">
       <dependency library="googletest" version="1.18.0"/>
       <metadata name="Microsoft DirectX-Headers" supplier="Microsoft"
          homepage="https://github.com/microsoft/DirectX-Headers"
