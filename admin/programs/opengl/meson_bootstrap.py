@@ -240,6 +240,35 @@ def patch_mesa_glcpp_test_newlines() -> None:
     test_driver.write_text(text, encoding="utf-8", newline="\n")
 
 
+def configure_windows_sdk_includes() -> None:
+    """Pass the managed Windows SDK's WRL headers to native BCC64X/Meson.
+
+    The RAD compiler searches its own SDK compatibility includes, but Mesa's
+    D3D12 DXIL validator also requires the Windows SDK's wrl/client.h.
+    """
+    if not is_bcc64x() or len(sys.argv) < 3 or sys.argv[2] != "setup":
+        return
+
+    rc_text = os.environ.get("CB_WINDOWS_RC", "").strip().strip('"')
+    if not rc_text:
+        raise SystemExit("Mesa D3D12 requires BuildEngine CB_WINDOWS_RC")
+    rc = Path(rc_text)
+    sdk_root = rc.parents[3]
+    sdk_version = rc.parents[1].name
+    includes = sdk_root / "Include" / sdk_version
+    um = includes / "um"
+    shared = includes / "shared"
+    winrt = includes / "winrt"
+    for required in (um / "wrl" / "client.h", shared / "winerror.h", winrt):
+        if not required.exists():
+            raise SystemExit(f"Managed Windows SDK header directory missing: {required}")
+
+    # Meson caches CXXFLAGS in the setup configuration and reuses them for
+    # compile/install/test; no host INCLUDE or global compiler change needed.
+    flags = " ".join(f'-I"{entry.as_posix()}"' for entry in (um, shared, winrt))
+    os.environ["CXXFLAGS"] = (os.environ.get("CXXFLAGS", "") + " " + flags).strip()
+
+
 def main() -> None:
     if len(sys.argv) < 3:
         raise SystemExit("usage: meson_bootstrap.py <meson-source-root> <meson arguments...>")
@@ -254,6 +283,7 @@ def main() -> None:
     patch_windows_lld_allow_undefined(meson_root)
     patch_bcc64x_vsenv_detection(meson_root)
     patch_mesa_glcpp_test_newlines()
+    configure_windows_sdk_includes()
 
     sys.path.insert(0, str(meson_root))
     sys.argv = [str(meson_entry), *sys.argv[2:]]
