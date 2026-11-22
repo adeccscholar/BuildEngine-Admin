@@ -31,7 +31,7 @@ def write_atomic(path: Path, content: str) -> None:
 def is_bcc64x() -> bool:
     """Return whether the configured compiler is Embarcadero BCC64X."""
     compiler = os.environ.get("CC", "").strip().strip('"')
-    return Path(compiler).name.casefold() in {"bcc64x", "bcc64x.exe"}
+    return (len(sys.argv) >= 3 and sys.argv[2] == "prepare") or Path(compiler).name.casefold() in {"bcc64x", "bcc64x.exe"}
 
 
 def expose_buildengine_tools() -> None:
@@ -214,10 +214,10 @@ def patch_bcc64x_vsenv_detection(meson_root: Path) -> None:
 
 def patch_mesa_glcpp_test_newlines() -> None:
     """Normalize native Windows CRLF in Mesa's byte-exact GLCPP test driver."""
-    if not is_bcc64x() or len(sys.argv) < 5 or sys.argv[2] != "setup":
+    if not is_bcc64x() or len(sys.argv) < 4 or sys.argv[2] != "prepare":
         return
 
-    mesa_root = Path(sys.argv[4]).resolve()
+    mesa_root = Path(sys.argv[3]).resolve()
     test_driver = (
         mesa_root
         / "src"
@@ -306,15 +306,20 @@ def main() -> None:
     if not meson_entry.is_file():
         raise SystemExit(f"Meson entry point not found: {meson_entry}")
 
-    expose_buildengine_tools()
-    # Source preparation is restricted to setup. Build, test and install must
-    # never rewrite the shared Meson sources while another variant imports them.
-    if len(sys.argv) >= 3 and sys.argv[2] == "setup":
+    # The single library Source state owns all mutations to the shared Meson
+    # source tree. Release/Debug setup may run concurrently afterward because
+    # they only read the pinned, fully prepared interpreter sources.
+    if sys.argv[2] == "prepare":
+        if len(sys.argv) != 4:
+            raise SystemExit("usage: meson_bootstrap.py <meson-root> prepare <mesa-root>")
         patch_bcc64x_lld_detection(meson_root)
         patch_windows_lld_allow_undefined(meson_root)
         patch_bcc64x_vsenv_detection(meson_root)
         patch_mesa_glcpp_test_newlines()
-        configure_windows_sdk_includes()
+        return
+
+    expose_buildengine_tools()
+    configure_windows_sdk_includes()
 
     sys.path.insert(0, str(meson_root))
     sys.argv = [str(meson_entry), *sys.argv[2:]]
