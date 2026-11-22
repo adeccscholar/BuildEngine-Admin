@@ -17989,7 +17989,7 @@
          <argument value="-Ddirectxmesh_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmesh"/>
       </smoke>
    </library>
-   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-23T00:26:00Z">
+   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-23T00:31:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="openexr" version="3.5.4"/>
@@ -18023,6 +18023,14 @@
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
          <copy source="{BuildFileDir}\compat\bcc64x\wrl\def.h" target="{Workspace}\.buildengine\compat\wrl\def.h" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\directxtex\2.1.1\bcc64x-wic-d3d11-compat.patch" target="{Workspace}\.buildengine\patches\bcc64x-wic-d3d11-compat.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-bcc64x-wic-d3d11-compat" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-wic-d3d11-compat.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
