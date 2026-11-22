@@ -304,11 +304,14 @@ def main() -> None:
         raise SystemExit(f"Meson entry point not found: {meson_entry}")
 
     expose_buildengine_tools()
-    patch_bcc64x_lld_detection(meson_root)
-    patch_windows_lld_allow_undefined(meson_root)
-    patch_bcc64x_vsenv_detection(meson_root)
-    patch_mesa_glcpp_test_newlines()
-    configure_windows_sdk_includes()
+    # Source preparation is restricted to setup. Build, test and install must
+    # never rewrite the shared Meson sources while another variant imports them.
+    if len(sys.argv) >= 3 and sys.argv[2] == "setup":
+        patch_bcc64x_lld_detection(meson_root)
+        patch_windows_lld_allow_undefined(meson_root)
+        patch_bcc64x_vsenv_detection(meson_root)
+        patch_mesa_glcpp_test_newlines()
+        configure_windows_sdk_includes()
 
     sys.path.insert(0, str(meson_root))
     sys.argv = [str(meson_entry), *sys.argv[2:]]
