@@ -1,0 +1,14 @@
+--- a/include/dxc/Support/WinIncludes.h
++++ b/include/dxc/Support/WinIncludes.h
+@@ -62,6 +62,13 @@
+ #else // _MSC_VER
+ 
++#if defined(_WIN32) && defined(__clang__) && defined(__BORLANDC__)
++// Native BCC64X is Windows, not the non-Windows WinAdapter platform.
++// Import the authoritative Win32 types and enum flag helpers.
++#ifndef WIN32_LEAN_AND_MEAN
++#define WIN32_LEAN_AND_MEAN 1
++#endif
++#include <windows.h>
++#endif
+ #include "dxc/WinAdapter.h"
