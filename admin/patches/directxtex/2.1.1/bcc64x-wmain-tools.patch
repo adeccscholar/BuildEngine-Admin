@@ -1,0 +1,16 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -407,6 +407,13 @@
+   list(APPEND TOOL_EXES texdiag)
+ endif()
+ 
++# BCC64X requires a console main entry point; upstream tools expose wmain.
++# Keep the original Unicode tools intact and adapt only their entry point.
++if(WIN32 AND DEFINED ENV{CB_BCC64X} AND NOT "$ENV{CB_BCC64X}" STREQUAL "")
++  foreach(_adecc_tool IN LISTS TOOL_EXES)
++    target_sources(${_adecc_tool} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/.buildengine/compat/directxtex-wmain.cpp")
++    target_link_libraries(${_adecc_tool} PRIVATE shell32.lib)
++  endforeach()
++endif()
++
+ foreach(t IN LISTS TOOL_EXES ITEMS ${PROJECT_NAME})
