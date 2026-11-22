@@ -1,0 +1,53 @@
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -84,7 +84,50 @@
+             "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
+     )
+ endif()
+ include_directories("${CPPWINRT_PROJECTION_INCLUDE_DIR}")
++# BuildEngine: generate the original test_component projection from its IDL,
++# instead of silently excluding the upstream test that consumes it.
++if(WIN32 AND NOT STANDALONE_TESTING)
++    file(GLOB _adecc_midlrt_candidates
++        "C:/Program Files (x86)/Windows Kits/10/bin/*/x64/midlrt.exe")
++    list(SORT _adecc_midlrt_candidates COMPARE NATURAL ORDER DESCENDING)
++    list(GET _adecc_midlrt_candidates 0 _adecc_midlrt_candidate)
++    find_program(ADECC_CPPWINRT_MIDLRT NAMES midlrt.exe
++        HINTS "${_adecc_midlrt_candidate}" REQUIRED)
++    file(GLOB _adecc_winrt_sdk_dirs
++        "C:/Program Files (x86)/Windows Kits/10/Include/*/winrt")
++    list(SORT _adecc_winrt_sdk_dirs COMPARE NATURAL ORDER DESCENDING)
++    find_path(ADECC_CPPWINRT_WINRT_SDK_INCLUDE
++        NAMES Windows.Foundation.Numerics.idl
++        HINTS ${_adecc_winrt_sdk_dirs} REQUIRED)
++    set(_adecc_test_component_dir "${CMAKE_CURRENT_BINARY_DIR}/test_component")
++    set(_adecc_test_component_winmd "${_adecc_test_component_dir}/test_component.winmd")
++    set(_adecc_test_component_h "${CPPWINRT_PROJECTION_INCLUDE_DIR}/winrt/test_component.h")
++    file(MAKE_DIRECTORY "${_adecc_test_component_dir}")
++    add_custom_command(
++        OUTPUT "${_adecc_test_component_winmd}"
++        COMMAND "${ADECC_CPPWINRT_MIDLRT}"
++            /winrt /nomidl
++            /metadata_dir "$ENV{SystemRoot}/System32/WinMetadata"
++            /I "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}"
++            /winmd "${_adecc_test_component_winmd}"
++            /out "${_adecc_test_component_dir}"
++            "${CMAKE_CURRENT_SOURCE_DIR}/test_component/test_component.idl"
++        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/test_component/test_component.idl"
++        VERBATIM)
++    add_custom_command(
++        OUTPUT "${_adecc_test_component_h}"
++        COMMAND "$<TARGET_FILE:cppwinrt>"
++            -input "${_adecc_test_component_winmd}"
++            -reference local
++            -output "${CPPWINRT_PROJECTION_INCLUDE_DIR}"
++        DEPENDS cppwinrt "${_adecc_test_component_winmd}"
++        VERBATIM)
++    add_custom_target(build-cppwinrt-test-component-projection
++        DEPENDS "${_adecc_test_component_h}")
++    add_dependencies(build-cppwinrt-projection
++        build-cppwinrt-test-component-projection)
++endif()
+ 
+ 
+ set(ENABLE_TEST_SANITIZERS FALSE CACHE BOOL "Enable ASan and UBSan for the tests.")
