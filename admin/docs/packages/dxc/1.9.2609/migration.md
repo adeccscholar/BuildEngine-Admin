@@ -49,3 +49,9 @@ A version-bound source patch recognizes native Win64 using `WIN32`, `CMAKE_SIZEO
 **External dependency:** Windows HLSL unit tests actually use Microsoft's TAEF, supplied by the Windows Driver Kit or a compatible provisioned TAEF package. Upstream `find_package(TAEF REQUIRED)` and its original tests remain intact. If the local WDK/TAEF header, libraries or `te.exe` are absent, configure must still fail with the missing prerequisite rather than falsely reporting success. A further local trace is required to identify any such missing file. Microsoft documents the test dependency in `docs/BuildingAndTestingDXC.rst`.
 
 **[not verified]**: post-patch configure, native test build and test execution.
+
+## TAEF runtime binary is a separately required prerequisite
+
+The 22 November 2026 Release configure log reached `FindTAEF.cmake:80` and reported `Unable to find TAEF binaries.` The native x64 architecture detection patch is effective: discovery now reaches the `find_program(TAEF_EXECUTABLE te.exe ...)` check rather than failing architecture identification. The upstream caller is `projects/dxilconv/unittests/CMakeLists.txt:4`.
+
+This is a missing native Microsoft TAEF test runtime, not a C++ compiler failure or a reason to disable tests. The actual TAEF header `Wex.Common.h`, x64 import libraries `Te.Common.lib`, `Wex.Common.lib` and `Wex.Logger.lib`, and an x64 `te.exe` must be available from an official compatible Microsoft SDK/WDK provision. No package version or source archive has yet been verified for reproducible BuildEngine provisioning, therefore **no unverified TAEF package has been invented or declared ready**.
