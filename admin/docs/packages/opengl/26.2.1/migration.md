@@ -171,3 +171,36 @@ The contract includes one or more upstream tests, validation actions or consumer
 4. Treat pending or unavailable local logs as **[not verified]**, not as historical success.
 
 **Primary sources:** `admin/build-libraries.xml`; active version-bound patches in `admin/patches/`; `admin/server-docs/libraries.md`; `docs/bcc64x-library-integration-findings.md`. The present contract is the authority if a broad historical overview discusses an older release.
+
+
+## Gallium hardware-driver expansion — 22 November 2026
+
+The previously validated Mesa package was configured as `gallium-drivers=softpipe` with LLVM disabled. This proves a native BCC64X Mesa software-rasterization baseline, **not** Intel or NVIDIA GPU use.
+
+### Current experimental source change
+
+The current XML attempts `gallium-drivers=softpipe,d3d12` while retaining all upstream Mesa tests and their original build/install/consumer gates. It now declares a direct dependency on the newly pinned `directx-headers 1.619.1` package, which preserves both upstream DirectX-Headers test suites and consumes the already managed GoogleTest 1.18.0 package. DirectX-Headers provides headers, native helper/Guids libraries, CMake exports, and a pkg-config file through its own isolated installed package. The Mesa Meson process resolves the pinned pkg-config path from that dependency, never a system-wide fallback.
+
+### Zink / Vulkan integration gate
+
+Zink is exposed in the Tensor Nebula demonstration's runtime selection for diagnostic testing but is **not** yet enabled in the Mesa XML. The existing Vulkan-Headers 1.4.368, Vulkan Memory Allocator 3.4.0, SPIRV-Headers, SPIRV-Tools, SPIRV-Cross, and glslang packages are relevant and present. A pinned Vulkan Loader 1.4.368 consumer and Vulkan-Headers CMake adapter have been prepared. Vulkan Loader upstream tests, however, explicitly require GoogleTest source and Microsoft Detours source; the latter is not an installed BuildEngine package. These must be managed and tested rather than silently turning off the loader test suite.
+
+### Windows backend selection and acceptance
+
+Gallium WGL uses `GALLIUM_DRIVER=softpipe`, `GALLIUM_DRIVER=d3d12`, and, when compiled into the same DLL, `GALLIUM_DRIVER=zink`. Runtime selection must precede SDL/WGL context creation. Tensor Nebula now provides a requested-backend selector, restart-on-change, D3D12 adapter-name preference, and the actual `GL_VENDOR`, `GL_RENDERER`, and OpenGL version in its UI and optional GPU smoke. A requested GPU path is not reported as successful when the actual renderer identifies known software-rasterizer fallback.
+
+```mermaid
+flowchart TD
+   A[Managed Mesa 26.2.1] --> B[WGL Gallium DLL]
+   B --> C[Softpipe: existing CPU baseline]
+   B --> D[D3D12: experimental native BCC64X build]
+   B -. Pending Vulkan Loader + tests .-> E[Zink: Vulkan hardware driver]
+   F[DirectX-Headers 1.619.1] --> D
+   G[Windows D3D12 driver: Intel or NVIDIA] --> D
+   H[Vulkan-Headers, glslang, SPIR-V tools] --> E
+   I[Vulkan Loader + GPU ICD] --> E
+```
+
+### Verification status
+
+The D3D12 configuration is committed but **[not verified]** by a local BCC64X build. A configure/build failure is expected to identify remaining API, compiler, linker, shader compiler or package-discovery gaps; it must be resolved as a native BCC64X compatibility issue rather than disabling existing tests or adopting MSVC/MinGW libraries. Zink remains **[not verified]** and cannot be presented as installed. The completed historical Softpipe FSM evidence is not evidence of a GPU backend.
