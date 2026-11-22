@@ -16,7 +16,7 @@
  #ifndef _WIN32
 --- a/include/dxc/dxcapi.h
 +++ b/include/dxc/dxcapi.h
-@@ -26,5 +26,8 @@
+@@ -25,6 +25,9 @@
  
  #ifdef _WIN32
  
@@ -28,7 +28,7 @@
  #define CROSS_PLATFORM_UUIDOF(interface, spec)                                 \
 --- a/include/dxc/Support/Global.h
 +++ b/include/dxc/Support/Global.h
-@@ -233,4 +233,4 @@
+@@ -232,4 +232,4 @@
 -#ifdef _MSC_VER
 +#if defined(_MSC_VER) || (defined(_WIN32) && defined(__clang__))
  
