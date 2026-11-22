@@ -8,13 +8,10 @@
    constexpr size_t bufferSize = 1024;
    char buffer[bufferSize];
  
-@@ -300,7 +300,7 @@
+@@ -300,5 +300,5 @@
  #define DXASSERT_ARGS(exp, fmt, ...)                                           \
    do {                                                                         \
      if (!(exp)) {                                                              \
 -      OutputDebugFormatA(                                                      \
 +      DxcOutputDebugFormatA(                                                   \
            "Error: \t%s\nFile:\n%s(%d)\nFunc:\t%s.\n\t" fmt "\n",               \
--          "!(" #exp ")", __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);       \
-+          "!(" #exp ")", __FILE__, __LINE__, __FUNCTION__ __VA_OPT__(,) __VA_ARGS__); \
-       __debugbreak();                                                          \
