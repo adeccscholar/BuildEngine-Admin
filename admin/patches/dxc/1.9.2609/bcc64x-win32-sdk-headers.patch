@@ -1,6 +1,6 @@
 --- a/include/dxc/Support/WinIncludes.h
 +++ b/include/dxc/Support/WinIncludes.h
-@@ -64,3 +64,10 @@
+@@ -64,3 +64,11 @@
  #else // _MSC_VER
  
 +#if defined(_WIN32) && defined(__clang__)
@@ -14,7 +14,8 @@
  #include "dxc/WinAdapter.h"
 --- a/include/llvm/Support/MSFileSystem.h
 +++ b/include/llvm/Support/MSFileSystem.h
-@@ -15,3 +15,8 @@
+@@ -12,4 +12,9 @@
+ #ifndef LLVM_SUPPORT_MSFILESYSTEM_H
  #define LLVM_SUPPORT_MSFILESYSTEM_H
  
 +#if defined(_WIN32) && defined(__clang__)
