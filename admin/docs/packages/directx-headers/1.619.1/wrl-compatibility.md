@@ -38,3 +38,11 @@ The later native attempt passed the Windows SDK WRL compiler-version guard using
 The isolated compatibility `wrl/client.h` now adds exactly one type-safe template overload of `_CG_GUID_PPT_Helper` for that Microsoft proxy, deriving the COM IID via `__uuidof(**aPtr)`. Microsoft's original forwarder and adapter source are retained, and the same adapted header is installed with the package. No `_MSC_VER` pretense, SDK modifications, feature removal or test-target disabling is involved.
 
 **[not verified]**: BCC64X compilation and CTest results after this follow-up.
+
+## HRESULT diagnostics for original native tests
+
+The next native run compiled all original targets in both Release and Debug. `Feature-Support-Test` passed, but the two GPU-dependent original runtime tests failed without a printed HRESULT. This is insufficient evidence to attribute the failure to the WRL compatibility layer, GPU availability, or COM.
+
+A version-bound idempotent source diagnostic stage now adds `stderr` HRESULT reporting at the existing `DXCoreCreateAdapterFactory`, `CreateAdapterList`, `GetAdapter` and `D3D12CreateDevice` failure paths in `test/test.cpp`, and at both initial DXCore failure paths in `test/feature_check_test.cpp`. The instrumentation does not change the test names, return codes, conditions or upstream test suite; it modifies only isolated extracted test-source copies, never the installed SDK. DirectX-Headers version timestamp was refreshed to ensure source execution.
+
+The next CTest run should report a named failing API plus hexadecimal HRESULT if one of the instrumented branches fails. A crash before any instrumented branch remains possible and would require a debugger or dump. **[not verified]**.
