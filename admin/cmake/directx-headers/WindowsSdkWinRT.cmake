@@ -1,35 +1,57 @@
 # Copyright (c) 2026 adecc Systemhaus GmbH
 # SPDX-License-Identifier: MIT
 #
-# DirectX-Headers upstream D3DX12 state-object helpers require <wrl/client.h>.
-# Unlike the Embarcadero Windows SDK/RTL paths, WRL is supplied by the
-# independently registered Windows SDK WinRT include directory.
-# This is strictly a test-target include contract, not another compiler SDK.
+# BCC64X cannot consume the MSVC-gated WRL implementation from the Windows
+# SDK. DirectX-Headers v1.619.1 carries Microsoft's MIT-licensed ComPtr
+# implementation in include/wsl/wrladapter.h and a <wrl/client.h> forwarder
+# in include/wsl/stubs/wrl/client.h.
+#
+# Only that single forwarder is staged in an isolated include root. Do NOT
+# add include/wsl/stubs wholesale on native Windows: the other WSL stubs
+# substitute Win32 types with different ABIs. winadapter.h itself includes
+# the native <unknwn.h>; the Windows SDK continues to supply COM interfaces.
+#
+# The function name remains compatible with the registered build contract.
 
 function(adecc_directx_headers_winrt_include)
-   if(NOT DEFINED ENV{CB_WINDOWS_RC} OR "$ENV{CB_WINDOWS_RC}" STREQUAL "")
-      message(FATAL_ERROR
-         "DirectX-Headers upstream tests require the registered Windows SDK RC tool")
+   if(NOT WIN32)
+      message(FATAL_ERROR "This BuildEngine WRL adapter is for native Windows only")
    endif()
 
-   get_filename_component(_adecc_rc_bin "$ENV{CB_WINDOWS_RC}" DIRECTORY)
-   get_filename_component(_adecc_rc_version_dir "${_adecc_rc_bin}" DIRECTORY)
-   get_filename_component(_adecc_rc_version "${_adecc_rc_version_dir}" NAME)
-   get_filename_component(_adecc_rc_bin_root "${_adecc_rc_version_dir}" DIRECTORY)
-   get_filename_component(_adecc_sdk_root "${_adecc_rc_bin_root}" DIRECTORY)
-   set(_adecc_sdk_winrt "${_adecc_sdk_root}/Include/${_adecc_rc_version}/winrt")
+   set(_adecc_upstream_root "${CMAKE_SOURCE_DIR}/include")
+   set(_adecc_forwarder
+      "${_adecc_upstream_root}/wsl/stubs/wrl/client.h")
+   set(_adecc_adapter
+      "${_adecc_upstream_root}/wsl/wrladapter.h")
+   set(_adecc_winadapter
+      "${_adecc_upstream_root}/wsl/winadapter.h")
 
-   if(NOT EXISTS "${_adecc_sdk_winrt}/wrl/client.h")
-      message(FATAL_ERROR
-         "Registered Windows SDK lacks the WRL header required by upstream "
-         "DirectX-Headers tests: ${_adecc_sdk_winrt}/wrl/client.h")
-   endif()
+   foreach(_adecc_source IN ITEMS
+      "${_adecc_forwarder}" "${_adecc_adapter}" "${_adecc_winadapter}")
+      if(NOT EXISTS "${_adecc_source}")
+         message(FATAL_ERROR
+            "Pinned Microsoft DirectX-Headers WRL source is missing: ${_adecc_source}")
+      endif()
+   endforeach()
+
+   set(_adecc_override_root
+      "${CMAKE_CURRENT_BINARY_DIR}/adecc-microsoft-wrl-compat")
+   file(MAKE_DIRECTORY "${_adecc_override_root}/wrl")
+   configure_file(
+      "${_adecc_forwarder}"
+      "${_adecc_override_root}/wrl/client.h"
+      COPYONLY)
 
    foreach(_adecc_target IN LISTS ARGN)
       if(NOT TARGET "${_adecc_target}")
-         message(FATAL_ERROR "DirectX-Headers upstream test target missing: ${_adecc_target}")
+         message(FATAL_ERROR
+            "DirectX-Headers upstream test target missing: ${_adecc_target}")
       endif()
-      target_include_directories("${_adecc_target}" BEFORE PRIVATE "${_adecc_sdk_winrt}")
-      message(STATUS "DirectX-Headers WRL for ${_adecc_target}: ${_adecc_sdk_winrt}")
+      target_include_directories("${_adecc_target}" BEFORE PRIVATE
+         "${_adecc_override_root}"
+         "${_adecc_upstream_root}")
+      message(STATUS
+         "DirectX-Headers ${_adecc_target}: pinned MIT WRL adapter; "
+         "native Windows COM types; include root=${_adecc_override_root}")
    endforeach()
 endfunction()
