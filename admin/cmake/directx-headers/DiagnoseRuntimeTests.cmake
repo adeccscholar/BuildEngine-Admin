@@ -79,4 +79,18 @@ adecc_replace_once("${strFeatures}"
 adecc_replace_once("${strFeatures}"
    "    for (uint32_t i = 0; i < adapter_list->GetAdapterCount(); i++)"
    "    std::cerr << \"Feature-Support-Test: adapter list created\" << std::endl;\n    for (uint32_t i = 0; i < adapter_list->GetAdapterCount(); i++)")
+# Factory pointer/vtable snapshots and actual loaded DLL paths before unsafe calls.
+# These diagnostics do not invoke additional COM methods or suppress failures.
+adecc_replace_once("${strSimple}"
+   "#include <cstdio> // BuildEngine: report the failing native DirectX API HRESULT"
+   "#include <cstdio> // BuildEngine: report the failing native DirectX API HRESULT\n#include \"adecc_dxcore_diagnostics.h\"")
+adecc_replace_once("${strFeatures}"
+   "#include <wsl/winadapter.h>"
+   "#include <wsl/winadapter.h>\n#include \"adecc_dxcore_diagnostics.h\"")
+adecc_replace_once("${strSimple}"
+   "        std::fprintf(stderr, \"DirectX-Headers-Test: entering CreateAdapterList\\n\");"
+   "        adecc::dxcore_diagnostics::PrintStage(\"before CreateAdapterList\", factory);\n        std::fprintf(stderr, \"DirectX-Headers-Test: entering CreateAdapterList\\n\");")
+adecc_replace_once("${strFeatures}"
+   "    std::cerr << \"Feature-Support-Test: factory created, entering CreateAdapterList\" << std::endl;"
+   "    adecc::dxcore_diagnostics::PrintStage(\"before CreateAdapterList\", adapter_factory.Get());\n    std::cerr << \"Feature-Support-Test: factory created, entering CreateAdapterList\" << std::endl;")
 message(STATUS "Applied idempotent DirectX-Headers runtime HRESULT diagnostics")
