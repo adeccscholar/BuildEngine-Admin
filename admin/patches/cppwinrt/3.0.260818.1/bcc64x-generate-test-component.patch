@@ -1,6 +1,6 @@
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -84,7 +84,51 @@
+@@ -84,7 +84,56 @@
              "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
      )
  endif()
@@ -25,10 +25,15 @@
 +    set(_adecc_test_component_winmd "${_adecc_test_component_dir}/test_component.winmd")
 +    set(_adecc_test_component_h "${CPPWINRT_PROJECTION_INCLUDE_DIR}/winrt/test_component.h")
 +    file(MAKE_DIRECTORY "${_adecc_test_component_dir}")
++    if(NOT DEFINED ENV{CB_BCC64X} OR "$ENV{CB_BCC64X}" STREQUAL "")
++        message(FATAL_ERROR "BCC64X compiler path is required as MIDLRT C preprocessor")
++    endif()
 +    add_custom_command(
 +        OUTPUT "${_adecc_test_component_winmd}"
 +        COMMAND "${ADECC_CPPWINRT_MIDLRT}"
 +            /winrt /nomidl
++            /cpp_cmd "$ENV{CB_BCC64X}"
++            /cpp_opt "-E -x c"
 +            /metadata_dir "$ENV{SystemRoot}/System32/WinMetadata"
 +            /I "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}"
 +            /winmd "${_adecc_test_component_winmd}"
