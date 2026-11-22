@@ -32,9 +32,26 @@ include("${CGAL_DIR}/CGALConfig-installation-dirs.cmake")
 
 set(CGAL_DISABLE_GMP ON CACHE BOOL "CGAL uses the managed Boost number types" FORCE)
 set(CGAL_DO_NOT_USE_BOOST_MP OFF CACHE BOOL "Use managed Boost.Multiprecision" FORCE)
-list(PREPEND CMAKE_PREFIX_PATH "${BOOST_PACKAGE_ROOT}")
+
+# CGAL_SetupBoost.cmake calls find_package(Boost 1.74 REQUIRED). CMake 4.1
+# must resolve the exact managed BoostConfig, not the RAD Studio provider.
+# Boost installs its CMake package below its selected variant directory.
+get_filename_component(strBoostVersion "${BOOST_PACKAGE_ROOT}" NAME)
+if(NOT strBoostVersion MATCHES "^[0-9]+[.][0-9]+[.][0-9]+$")
+   message(FATAL_ERROR "Managed Boost package root has no semantic version: ${BOOST_PACKAGE_ROOT}")
+endif()
+set(theManagedBoostDir
+   "${BOOST_PACKAGE_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}/cmake/Boost-${strBoostVersion}")
+if(NOT EXISTS "${theManagedBoostDir}/BoostConfig.cmake")
+   message(FATAL_ERROR "Managed Boost ${CMAKE_BUILD_TYPE} package config is missing: ${theManagedBoostDir}/BoostConfig.cmake")
+endif()
+set(Boost_DIR "${theManagedBoostDir}" CACHE PATH "Exact managed Boost CMake package" FORCE)
 set(Boost_ROOT "${BOOST_PACKAGE_ROOT}")
 set(BOOST_ROOT "${BOOST_PACKAGE_ROOT}")
+list(PREPEND CMAKE_PREFIX_PATH "${BOOST_PACKAGE_ROOT}")
+find_package(Boost "${strBoostVersion}" EXACT CONFIG REQUIRED
+   PATHS "${theManagedBoostDir}" NO_DEFAULT_PATH)
+message(STATUS "[CGAL] Managed Boost ${Boost_VERSION}: ${Boost_DIR}")
 
 find_package(CGAL 6.2.1 EXACT CONFIG REQUIRED
    PATHS "${CGAL_DIR}" NO_DEFAULT_PATH)
