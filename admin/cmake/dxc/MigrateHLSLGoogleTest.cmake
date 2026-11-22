@@ -135,4 +135,27 @@ target_compile_definitions(HLSLTestLib PRIVATE ADECC_DXC_GTEST=1)
 ")
 endif()
 
+# Replace historical TAEF-driven LLVM/LIT suites with native GoogleTest.
+set(_adecc_lit_template "${ADMIN_PATCH_ROOT}/gtest/OriginalGoogleTest.lit.cfg.in")
+if(NOT EXISTS "${_adecc_lit_template}")
+   message(FATAL_ERROR "DXC original GoogleTest LIT adapter missing")
+endif()
+file(READ "${_adecc_lit_template}" _adecc_lit_base)
+foreach(_adecc_lit IN ITEMS
+   "tools/clang/test/taef|ClangHLSLTests|tools/clang/test/HLSL"
+   "tools/clang/test/taef_exec|ExecHLSLTests|tools/clang/test/HLSL"
+   "projects/dxilconv/test/taef|dxilconv-tests|projects/dxilconv/test")
+   string(REPLACE "|" ";" _adecc_parts "${_adecc_lit}")
+   list(GET _adecc_parts 0 _adecc_lit_dir)
+   list(GET _adecc_parts 1 _adecc_lit_binary)
+   list(GET _adecc_parts 2 _adecc_lit_fixtures)
+   set(_adecc_lit_text "${_adecc_lit_base}")
+   string(REPLACE "ADECC_EXECUTABLE" "${_adecc_lit_binary}"
+      _adecc_lit_text "${_adecc_lit_text}")
+   string(REPLACE "ADECC_SUITE_ROOT" "${_adecc_lit_fixtures}"
+      _adecc_lit_text "${_adecc_lit_text}")
+   file(WRITE "${SOURCE_ROOT}/${_adecc_lit_dir}/lit.cfg"
+      "${_adecc_lit_text}")
+endforeach()
+
 message(STATUS "DXC HLSL original test migration: GoogleTest/CTest, changed fixture files=${_adecc_fixture_count}")
