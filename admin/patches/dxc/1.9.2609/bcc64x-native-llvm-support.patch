@@ -16,7 +16,7 @@
 +#include <memory>
 +// BCC64X has the native Win32 COM ABI but does not ship MSVC's ATL.
 +// Preserve this translation unit's CComPtr ownership contract locally.
-+#if defined(_CODEGEARC_)
++#if (defined(__CODEGEARC__) || defined(__BORLANDC__))
 +template <typename T> class CComPtr {
 +public:
 +  T *p = nullptr;
@@ -73,7 +73,7 @@
  // #include <shellapi.h>  // HLSL Change
  
 -#ifdef __MINGW32__
-+#if defined(__MINGW32__) && !defined(_CODEGEARC_)
++#if defined(__MINGW32__) && !(defined(__CODEGEARC__) || defined(__BORLANDC__))
   #if (HAVE_LIBPSAPI != 1)
    #error "libpsapi.a should be present"
   #endif
