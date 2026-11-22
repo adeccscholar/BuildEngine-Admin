@@ -17696,4 +17696,289 @@
          <argument value="-Ddirectx-headers_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directx-headers\cmake"/>
       </smoke>
    </library>
+   <library id="detours" version="4.0.1" category="systems" timestamp="2026-11-22T05:00:00Z">
+      <metadata artifactType="shared" name="Microsoft Detours" supplier="Microsoft"
+         homepage="https://github.com/microsoft/detours"
+         description="Windows API interception and instrumentation, reusable BCC64X DLL and Vulkan Loader test source." licenseSignal="yellow">
+         <license name="MIT License" spdx="MIT" file="LICENSE.md"/>
+      </metadata>
+      <security><repository url="https://github.com/microsoft/detours.git" ref="v4.0.1"/></security>
+      <source>
+         <download url="https://github.com/microsoft/detours/archive/refs/tags/v4.0.1.tar.gz" archive="detours-v4.0.1.tar.gz"/>
+         <extract format="libarchive" root="Detours-4.0.1">
+            <require path="src\detours.h"/>
+            <require path="src\detours.cpp"/>
+            <require path="LICENSE.md"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DDETOURS_UPSTREAM_SOURCE:PATH={Workspace}"/>
+         <argument value="-DDETOURS_TEST_SOURCE:FILEPATH={BuildFileDir}\smokes\detours\consumer\main.cpp"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{BuildFileDir}\cmake\detours"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <execute name="native-transaction-test" test="true"
+                  executable="{ToolDir:cmake}\ctest.exe"
+                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\detours.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\detours.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\detours.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.md" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.md"/>
+               <copy source="{Workspace}\src" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\detours\upstream\src" recursive="true" overwrite="true"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" names="detours.lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="detours.dll"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\detours\consumer"
+         configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="detours-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DDetours_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\detours\cmake"/>
+      </smoke>
+   </library>
+   <library id="directxmath" version="3.21" category="math" timestamp="2026-11-22T05:00:00Z">
+      <metadata artifactType="interface" name="Microsoft DirectXMath" supplier="Microsoft"
+         homepage="https://github.com/microsoft/DirectXMath"
+         description="Header-only SIMD math and DirectXCollision geometry from the original Microsoft June 2026 source." licenseSignal="yellow">
+         <license name="MIT License" spdx="MIT" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/microsoft/DirectXMath.git" ref="jun2026"/></security>
+      <source>
+         <download url="https://github.com/microsoft/DirectXMath/archive/refs/tags/jun2026.tar.gz" archive="directxmath-jun2026.tar.gz"/>
+         <extract format="libarchive" root="DirectXMath-jun2026">
+            <require path="Inc\DirectXMath.h"/>
+            <require path="Inc\DirectXCollision.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DBUILD_XDSP:BOOL=ON"/>
+         <argument value="-DBUILD_SHMATH:BOOL=ON"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\DirectXMath.h"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\directxmath\consumer"
+         configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="directxmath-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Ddirectxmath_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmath"/>
+      </smoke>
+   </library>
+   <library id="directxmesh" version="1.7.2" category="graphics" timestamp="2026-11-22T05:00:00Z">
+      <dependency library="directxmath" version="3.21"/>
+      <dependency library="directx-headers" version="1.619.1"/>
+      <metadata artifactType="shared" name="Microsoft DirectXMesh" supplier="Microsoft"
+         homepage="https://github.com/microsoft/DirectXMesh"
+         description="Native D3D12 mesh processing DLL, adjacency, normals, optimization and meshconvert." licenseSignal="yellow">
+         <license name="MIT License" spdx="MIT" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/microsoft/DirectXMesh.git" ref="may2026"/></security>
+      <source>
+         <download url="https://github.com/microsoft/DirectXMesh/archive/refs/tags/may2026.tar.gz" archive="directxmesh-may2026.tar.gz"/>
+         <extract format="libarchive" root="DirectXMesh-may2026">
+            <require path="CMakeLists.txt"/>
+            <require path="DirectXMesh\DirectXMesh.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TOOLS:BOOL=ON"/>
+         <argument value="-DBUILD_DX12:BOOL=ON"/>
+         <argument value="-Ddirectxmath_DIR:PATH={DependencyRoot:directxmath}\share\directxmath"/>
+         <argument value="-Ddirectx-headers_DIR:PATH={DependencyRoot:directx-headers}\share\directx-headers\cmake"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\DirectXMesh.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\DirectXMesh.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\DirectXMesh.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" names="DirectXMesh.lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="DirectXMesh.dll"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\directxmesh\consumer"
+         configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="directxmesh-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Ddirectxmesh_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmesh"/>
+      </smoke>
+   </library>
+   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-22T05:00:00Z">
+      <dependency library="directxmath" version="3.21"/>
+      <dependency library="directx-headers" version="1.619.1"/>
+      <dependency library="openexr" version="3.5.4"/>
+      <dependency library="libjpeg-turbo" version="3.2.1"/>
+      <dependency library="libpng" version="1.6.59"/>
+      <dependency library="llvm-openmp" version="20.1.7"/>
+      <metadata artifactType="shared" name="Microsoft DirectXTex" supplier="Microsoft"
+         homepage="https://github.com/microsoft/DirectXTex"
+         description="Native DirectX texture DLL, all upstream tools and samples, D3D11/12, codecs, mipmaps, and OpenMP." licenseSignal="yellow">
+         <license name="MIT License" spdx="MIT" file="LICENSE"/>
+      </metadata>
+      <security><repository url="https://github.com/microsoft/DirectXTex.git" ref="may2026"/></security>
+      <source>
+         <download url="https://github.com/microsoft/DirectXTex/archive/refs/tags/may2026.tar.gz" archive="directxtex-may2026.tar.gz"/>
+         <extract format="libarchive" root="DirectXTex-may2026">
+            <require path="CMakeLists.txt"/>
+            <require path="DirectXTex\DirectXTex.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_TOOLS:BOOL=ON"/>
+         <argument value="-DBUILD_SAMPLE:BOOL=ON"/>
+         <argument value="-DBUILD_DX11:BOOL=ON"/>
+         <argument value="-DBUILD_DX12:BOOL=ON"/>
+         <argument value="-DBC_USE_OPENMP:BOOL=ON"/>
+         <argument value="-DENABLE_OPENEXR_SUPPORT:BOOL=ON"/>
+         <argument value="-DENABLE_LIBJPEG_SUPPORT:BOOL=ON"/>
+         <argument value="-DENABLE_LIBPNG_SUPPORT:BOOL=ON"/>
+         <argument value="-Ddirectxmath_DIR:PATH={DependencyRoot:directxmath}\share\directxmath"/>
+         <argument value="-Ddirectx-headers_DIR:PATH={DependencyRoot:directx-headers}\share\directx-headers\cmake"/>
+         <argument value="-DOpenEXR_DIR:PATH={DependencyRoot:openexr}\lib\win64\{Configuration}\cmake\OpenEXR"/>
+         <argument value="-DJPEG_ROOT:PATH={DependencyRoot:libjpeg-turbo}"/>
+         <argument value="-DPNG_ROOT:PATH={DependencyRoot:libpng}"/>
+         <argument value="-DOpenMP_ROOT:PATH={DependencyRoot:llvm-openmp}"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers};{DependencyRoot:openexr};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libpng};{DependencyRoot:llvm-openmp}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\DirectXTex.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\DirectXTex.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\DirectXTex.lib"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" names="DirectXTex.lib"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="DirectXTex.dll"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\directxtex\consumer"
+         configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="directxtex-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Ddirectxtex_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxtex"/>
+      </smoke>
+   </library>
 </buildLibraries>
