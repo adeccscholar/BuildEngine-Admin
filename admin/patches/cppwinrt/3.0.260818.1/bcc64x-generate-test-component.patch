@@ -1,6 +1,6 @@
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -84,7 +84,71 @@
+@@ -84,7 +84,73 @@
              "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
      )
  endif()
@@ -36,7 +36,7 @@
 +        message(FATAL_ERROR "BCC64X compiler path is required as MIDLRT C preprocessor")
 +    endif()
 +    # MIDLRT splits /cpp_cmd values containing spaces, even when quoted.
-+    # A workspace-local wrapper preserves the registered BCC64X path as one argument.
++    # A workspace-local wrapper preserves the registered BCC64X path as one argument.\n+    # In SDK IDL, __stdcall is calling-convention syntax for MIDLRT, not a\n+    # Clang __attribute__((stdcall)) expression. Strip only for IDL preprocessing.
 +    set(_adecc_midl_cpp "${_adecc_test_component_dir}/bcc64x-midl-preprocess.cmd")
 +    file(WRITE "${_adecc_midl_cpp}"
 +        "@echo off\r\n\"$ENV{CB_BCC64X}\" %*\r\n")
@@ -45,7 +45,7 @@
 +        COMMAND "${ADECC_CPPWINRT_MIDLRT}"
 +            /winrt /nomidl /savePP
 +            /cpp_cmd "${_adecc_midl_cpp}"
-+            /cpp_opt "-E -x c"
++            /cpp_opt "-E -x c -D__stdcall="
 +            /metadata_dir "$ENV{SystemRoot}/System32/WinMetadata"
 +            /I "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}"
 +            /I "${ADECC_CPPWINRT_MIDL_UM_INCLUDE}"
