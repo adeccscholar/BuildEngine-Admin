@@ -17891,7 +17891,7 @@
          <argument value="-Ddirectxmath_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmath"/>
       </smoke>
    </library>
-   <library id="directxmesh" version="1.7.2" category="graphics" timestamp="2026-11-22T21:55:00Z">
+   <library id="directxmesh" version="1.7.2" category="graphics" timestamp="2026-11-22T22:10:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <metadata artifactType="shared" name="Microsoft DirectXMesh" supplier="Microsoft"
