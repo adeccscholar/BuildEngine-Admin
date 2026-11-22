@@ -52,3 +52,15 @@ The next CTest run should report a named failing API plus hexadecimal HRESULT if
 The 22 November 2026 verbose CTest output confirms both GPU-dependent original executables enter `main()`, and all 74 cases of the independent GoogleTest `Feature-Support-Test` pass. The first GPU runtime test exits unsuccessfully and the second can crash with SegFault. Neither produces a failing HRESULT from the existing failure-only diagnostics. The cause is **not established** by these logs.
 
 To isolate the location without changing assertions or disabling a test, the versioned diagnostic script now prints flushed checkpoints before and after factory creation, before adapter-list creation and adapter access, and before D3D12 device creation. The next full verbose CTest log should expose the last completed checkpoint even if the process crashes inside an API call. A native debugger/Minidump may be needed after that. **[not verified]** until rerun.
+
+## Native DLL-only contract (22 November 2026)
+
+BuildEngine requires dynamic runtime components. The upstream DirectX-Headers v1.619.1 CMake defines both `DirectX-Headers` and `DirectX-Guids` as STATIC targets; this is incompatible with the BuildEngine package contract. A version-bound source transformation in `admin/cmake/directx-headers/ConfigureSharedRuntime.cmake` converts the two original targets to SHARED, enables Windows symbol exports, and keeps their original CMake target identities and test consumers.
+
+Expected package artifacts for both Release and Debug:
+- `bin/win64/<variant>/DirectX-Headers.dll` and `DirectX-Guids.dll`
+- `lib/win64/<variant>/DirectX-Headers.lib` and `DirectX-Guids.lib` (**import libraries**, never static implementation archives)
+
+The XML installation contract requires all four artifacts and publishing includes both DLLs and the import libraries. The original upstream tests remain configured. The external Windows `dxcore.dll` and `d3d12.dll` remain operating-system runtimes and are not reimplemented.
+
+**[not verified]**: native BCC64X Release/Debug shared builds, symbol exports, correct CMake imported targets and consumer runtime DLL loading. These must pass before declaring integration successful.
