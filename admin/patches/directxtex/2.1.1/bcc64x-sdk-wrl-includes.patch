@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -17,6 +17,29 @@
+@@ -17,6 +17,27 @@
    DESCRIPTION "DirectX Texture Library"
    HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkId=248926"
    LANGUAGES CXX)
