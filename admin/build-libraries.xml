@@ -4599,7 +4599,7 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\glew\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="glew-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
-<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-23T00:25:00Z">
+<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-23T00:30:00Z">
       <dependency library="directx-headers" version="1.619.1"/>
       <metadata name="Mesa OpenGL" supplier="Mesa project" homepage="https://mesa3d.org/" description="Mesa-based OpenGL runtime and development package for hardware-accelerated graphics on Windows." licenseSignal="yellow">
          <license name="Mesa component licenses" file="LICENSE-MESA.rst"/>
@@ -4685,6 +4685,8 @@
          <environment name="CC" value="{Tool:bcc64x}"/>
          <environment name="CXX" value="{Tool:bcc64x}"/>
          <environment name="CXXFLAGS" value="-I{Workspace}/.buildengine/compat"/>
+         <!-- Meson consumes the DirectX-Headers pkg-config link names; provide its actual BCC64X import-library directory. -->
+         <environment name="LDFLAGS" value="-L{DependencyRoot:directx-headers}/lib/win64/{Configuration}"/>
          <environment name="AR" value="{Tool:llvm-ar}"/>
          <environment name="WINDRES" value="{Tool:bcc64x-windres}"/>
          <!-- Native pinned DirectX-Headers package, no Meson wrap fallback. -->
@@ -18254,7 +18256,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-23T00:24:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-23T00:29:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18355,6 +18357,8 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <!-- MC.EXE is the Windows SDK message compiler used by the original ETW generation. -->
+         <environment name="PATH" value="{ToolDir:windows-rc};{ENV:PATH}"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
