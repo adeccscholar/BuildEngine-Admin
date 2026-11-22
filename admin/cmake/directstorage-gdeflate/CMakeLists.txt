@@ -26,6 +26,12 @@ install(TARGETS GDeflate EXPORT GDeflateTargets
    ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 install(FILES "${DEFLATE_SOURCE_ROOT}/GDeflate.h" "${DEFLATE_SOURCE_ROOT}/config.h"
    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
+# Retain the Microsoft GDeflate license at the originally declared SBOM path.
+# BuildEngine also copies it into licenses/gdeflate/LICENSE during common install.
+if(NOT EXISTS "${DEFLATE_SOURCE_ROOT}/LICENSE")
+   message(FATAL_ERROR "Microsoft GDeflate source license missing: ${DEFLATE_SOURCE_ROOT}/LICENSE")
+endif()
+install(FILES "${DEFLATE_SOURCE_ROOT}/LICENSE" DESTINATION "GDeflate/GDeflate")
 configure_package_config_file(
    "${CMAKE_CURRENT_LIST_DIR}/GDeflateConfig.cmake.in"
    "${CMAKE_CURRENT_BINARY_DIR}/GDeflateConfig.cmake"
