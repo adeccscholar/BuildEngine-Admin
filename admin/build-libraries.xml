@@ -17591,4 +17591,98 @@
          <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
+   <library id="directx-headers" version="1.619.1" category="graphics" timestamp="2026-11-22T04:40:00Z">
+      <dependency library="googletest" version="1.18.0"/>
+      <metadata name="Microsoft DirectX-Headers" supplier="Microsoft"
+         homepage="https://github.com/microsoft/DirectX-Headers"
+         description="Pinned D3D12 API headers, supporting helper libraries and native BCC64X upstream tests; required by Mesa Gallium D3D12."
+         licenseSignal="green">
+         <license name="MIT License" spdx="MIT" file="LICENSE"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/microsoft/DirectX-Headers.git" ref="v1.619.1"
+            commit="9e393d6d8a3b30dcc6f2806ef604ec16a27b0d7e"/>
+      </security>
+      <source>
+         <download url="https://github.com/microsoft/DirectX-Headers/archive/refs/tags/v1.619.1.tar.gz"
+            archive="directx-headers-1.619.1.tar.gz"/>
+         <extract format="libarchive" root="DirectX-Headers-1.619.1">
+            <require path="CMakeLists.txt"/>
+            <require path="include\directx\d3d12.h"/>
+            <require path="googletest\CMakeLists.txt"/>
+            <require path="test\CMakeLists.txt"/>
+            <require path="LICENSE"/>
+         </extract>
+         <!-- Keep both upstream test suites. Resolve their GoogleTest dependency
+              from our already built, pinned BCC64X GTest package rather than
+              allowing upstream FetchContent to download Google's live main. -->
+         <copy source="{BuildFileDir}\patches\directx-headers\1.619.1\googletest-CMakeLists.txt"
+            target="{Workspace}\googletest\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
+      </source>
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-Wno-dev"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DDXHEADERS_BUILD_TEST:BOOL=ON"/>
+         <argument value="-DDXHEADERS_BUILD_GOOGLE_TEST:BOOL=ON"/>
+         <argument value="-DDXHEADERS_INSTALL:BOOL=ON"/>
+         <argument value="-DGTest_DIR:PATH={DependencyRoot:googletest}\lib\win64\{Configuration}\cmake\GTest"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}"
+            build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/>
+            <argument value="-DCMAKE_CXX_FLAGS_RELEASE:STRING=-O2 -DNDEBUG"/>
+         </variant>
+         <variant name="Debug">
+            <argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/>
+            <argument value="-DCMAKE_CXX_FLAGS_DEBUG:STRING=-O0"/>
+         </variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
+                  workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+                  <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
+                  <argument value="--output-on-failure"/>
+               </execute>
+               <cmake mode="install" executable="{Tool:cmake}"
+                  build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\directx\d3d12.h"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\DirectX-Headers.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\DirectX-Guids.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\pkgconfig\DirectX-Headers.pc"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directx-headers\cmake\directx-headers-config.cmake"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include\directx" target="include\directx" optional="false"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"
+            names="DirectX-Headers.lib;DirectX-Guids.lib"/>
+      </publish>
+      <smoke id="consumer" scope="package" source="smokes\directx-headers\consumer"
+         configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="directx-headers-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Ddirectx-headers_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directx-headers\cmake"/>
+      </smoke>
+   </library>
 </buildLibraries>
