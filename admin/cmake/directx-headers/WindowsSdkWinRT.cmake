@@ -55,17 +55,6 @@ GUID const& _CG_GUID_PPT_Helper(
 }
 ]=])
 
-   # The native package contract names these static COFF archives exactly
-   # DirectX-Headers.lib and DirectX-Guids.lib. CMake's GNU-style frontend
-   # otherwise may add a 'lib' prefix despite the .lib suffix.
-   # Preserve both original static targets and their exported CMake package.
-   foreach(_adecc_archive IN ITEMS DirectX-Headers DirectX-Guids)
-      if(NOT TARGET "${_adecc_archive}")
-         message(FATAL_ERROR "Required upstream DirectX archive target missing: ${_adecc_archive}")
-      endif()
-      set_target_properties("${_adecc_archive}" PROPERTIES PREFIX "" SUFFIX ".lib")
-   endforeach()
-
    # Upstream installs include/wsl already; install the missing wrl/client.h
    # forwarder into the versioned package for independent consumers too.
    get_property(_adecc_install_registered GLOBAL PROPERTY
