@@ -1,14 +1,25 @@
 --- a/include/dxc/Support/WinIncludes.h
 +++ b/include/dxc/Support/WinIncludes.h
-@@ -62,6 +62,13 @@
+@@ -64,3 +64,10 @@
  #else // _MSC_VER
  
-+#if defined(_WIN32) && defined(__clang__) && defined(__BORLANDC__)
-+// Native BCC64X is Windows, not the non-Windows WinAdapter platform.
-+// Import the authoritative Win32 types and enum flag helpers.
++#if defined(_WIN32) && defined(__clang__)
++// BCC64X is a native Windows compiler. Load SDK definitions before
++// the non-MSVC adapter to avoid competing enum flag declarations.
 +#ifndef WIN32_LEAN_AND_MEAN
 +#define WIN32_LEAN_AND_MEAN 1
 +#endif
 +#include <windows.h>
 +#endif
  #include "dxc/WinAdapter.h"
+--- a/include/llvm/Support/MSFileSystem.h
++++ b/include/llvm/Support/MSFileSystem.h
+@@ -15,3 +15,8 @@
+ #define LLVM_SUPPORT_MSFILESYSTEM_H
+ 
++#if defined(_WIN32) && defined(__clang__)
++// Win32 ABI types (HANDLE, BOOL, HRESULT, ...), not portable emulations.
++#include <windows.h>
++#endif
++
+ ///////////////////////////////////////////////////////////////////////////////////////////////////
