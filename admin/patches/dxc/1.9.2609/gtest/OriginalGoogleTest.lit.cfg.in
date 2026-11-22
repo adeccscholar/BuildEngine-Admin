@@ -40,7 +40,7 @@ class DXCOriginalTestFormat(lit.formats.GoogleTest):
     def execute(self, test, lit_config):
         if lit_config.noExecute:
             return lit.Test.PASS, ""
-        exe = test.getFilePath()
+        exe = test.getSourcePath()
         test_name = test.path_in_suite[-1]
         if test_name.startswith("DISABLED_"):
             return lit.Test.UNSUPPORTED, "Originally disabled manual test"
