@@ -17969,7 +17969,7 @@
          <argument value="-Ddirectxmesh_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmesh"/>
       </smoke>
    </library>
-   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-22T23:10:00Z">
+   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-22T23:45:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="openexr" version="3.5.4"/>
@@ -18014,6 +18014,8 @@
          <argument value="-DBUILD_TOOLS:BOOL=ON"/>
          <argument value="-DBUILD_SAMPLE:BOOL=ON"/>
          <argument value="-DBUILD_DX11:BOOL=ON"/>
+         <!-- FXC is an SDK tool beside the already registered windows-rc executable. -->
+         <argument value="-DDIRECTX_FXC_TOOL:FILEPATH={ToolDir:windows-rc}\fxc.exe"/>
          <argument value="-DBUILD_DX12:BOOL=ON"/>
          <argument value="-DBC_USE_OPENMP:BOOL=ON"/>
          <argument value="-DENABLE_OPENEXR_SUPPORT:BOOL=ON"/>
@@ -18225,7 +18227,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T23:15:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T23:50:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18249,6 +18251,14 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-dxlib-sample-target.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\dxc\1.9.2609\bcc64x-win32-sdk-headers.patch" target="{Workspace}\.buildengine\patches\bcc64x-win32-sdk-headers.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-native-win32-sdk-headers" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-win32-sdk-headers.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
@@ -18306,6 +18316,8 @@
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
          <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_FLAGS:STRING=-D_AMD64_"/>
+         <argument value="-DCMAKE_C_FLAGS:STRING=-D_AMD64_"/>
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <argument value="-DBUILD_TESTING:BOOL=ON"/>
          <!-- DXC products dxcompiler and dxlib_sample declare SHARED explicitly.
