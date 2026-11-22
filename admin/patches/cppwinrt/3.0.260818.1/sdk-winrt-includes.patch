@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -15,6 +15,29 @@
+@@ -15,5 +15,21 @@
  set(CPPWINRT_BUILD_VERSION "999.999.999.999" CACHE STRING "The version string used for cppwinrt.")
  if(CPPWINRT_BUILD_VERSION STREQUAL "999.999.999.999" OR CPPWINRT_BUILD_VERSION STREQUAL "0.0.0.0")
      message(WARNING "CPPWINRT_BUILD_VERSION has been set to a dummy version string. Do not use in production!")
