@@ -167,7 +167,10 @@ def patch_windows_lld_allow_undefined(meson_root: Path) -> None:
         text = text.replace(previous_method, original_method, 1)
 
     if patched_probe in text:
-        write_atomic(linkers, text)
+        # An unchanged patched source must remain read-only: another variant
+        # may already have imported this Python module on Windows.
+        if previous_method in linkers.read_text(encoding="utf-8"):
+            write_atomic(linkers, text)
         return
 
     if text.count(original_probe) != 1:
