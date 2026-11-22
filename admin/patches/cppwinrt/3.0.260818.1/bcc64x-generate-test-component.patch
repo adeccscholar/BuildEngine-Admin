@@ -1,6 +1,6 @@
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -84,7 +84,73 @@
+@@ -84,7 +84,78 @@
              "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
      )
  endif()
@@ -30,6 +30,10 @@
 +        HINTS "${_adecc_sdk_inc_root}/um" REQUIRED)
 +    set(_adecc_test_component_dir "${CMAKE_CURRENT_BINARY_DIR}/test_component")
 +    set(_adecc_test_component_winmd "${_adecc_test_component_dir}/test_component.winmd")
++    # MIDLRT is a Windows-native tool; its /winmd and /out output parameters
++    # must not be supplied as CMake forward-slash paths.
++    file(TO_NATIVE_PATH "${_adecc_test_component_winmd}" _adecc_test_component_winmd_native)
++    file(TO_NATIVE_PATH "${_adecc_test_component_dir}" _adecc_test_component_dir_native)
 +    set(_adecc_test_component_h "${CPPWINRT_PROJECTION_INCLUDE_DIR}/winrt/test_component.h")
 +    file(MAKE_DIRECTORY "${_adecc_test_component_dir}")
 +    if(NOT DEFINED ENV{CB_BCC64X} OR "$ENV{CB_BCC64X}" STREQUAL "")
@@ -52,8 +56,8 @@
 +            /I "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}"
 +            /I "${ADECC_CPPWINRT_MIDL_UM_INCLUDE}"
 +            /I "${ADECC_CPPWINRT_MIDL_SHARED_INCLUDE}"
-+            /winmd "${_adecc_test_component_winmd}"
-+            /out "${_adecc_test_component_dir}"
++            /winmd "${_adecc_test_component_winmd_native}"
++            /out "${_adecc_test_component_dir_native}"
 +            "test_component/test_component.idl"
 +        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 +        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/test_component/test_component.idl"
