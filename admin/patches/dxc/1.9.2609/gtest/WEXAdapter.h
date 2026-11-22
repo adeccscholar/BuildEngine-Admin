@@ -6,6 +6,10 @@
 #include <cwctype>
 #include <cstdio>
 #include <string>
+#include <sstream>
+#include <type_traits>
+#include <vector>
+#include <stdexcept>
 #include "dxc/WinAdapter.h"
 #include "gtest/gtest.h"
 #ifndef _WIN32
@@ -83,19 +87,27 @@
 
 #define VERIFY_FAIL(...) ADD_FAILURE() << __VA_ARGS__ ""
 
+#if defined(ADECC_DXC_EXEC_TEST)
+#define TEST_CLASS_SETUP(method) bool method()
+#define TEST_METHOD_SETUP(method) bool method()
+#define TEST_CLASS_CLEANUP(method) bool method()
+#else
 #define TEST_CLASS_SETUP(method)                                               \
   bool method();                                                               \
   virtual void SetUp() { EXPECT_TRUE(method()); }
 #define TEST_CLASS_CLEANUP(method)                                             \
   bool method();                                                               \
   virtual void TearDown() { EXPECT_TRUE(method()); }
+#endif
 #define BEGIN_TEST_CLASS(test)
 #define TEST_CLASS_PROPERTY(str1, str2)
 #define TEST_METHOD_PROPERTY(str1, str2)
 #define END_TEST_CLASS()
-#define TEST_METHOD(method)
+#define TEST_METHOD(method) void method()
 #define BEGIN_TEST_METHOD(method)
 #define END_TEST_METHOD()
+#define BEGIN_TEST_METHOD_PROPERTIES()
+#define END_TEST_METHOD_PROPERTIES()
 
 // gtest lacks any module setup/cleanup. These functions are called by the
 // main() function before and after tests are run. This approximates the
@@ -181,9 +193,88 @@ public:
 namespace RuntimeParameters {
 HRESULT TryGetValue(const wchar_t *param, Common::String &retStr);
 } // namespace RuntimeParameters
+
+template<class T>
+class TestDataArray {
+public:
+  size_t GetSize() const noexcept { return m_vec.size(); }
+  decltype(auto) operator[](size_t i) const { return m_vec[i]; }
+  void SetValues(std::vector<T> vecValues) { m_vec = std::move(vecValues); }
+private:
+  std::vector<T> m_vec;
+};
+
+// Implemented with the original pinned Microsoft XML data, not a dummy return.
+std::vector<std::wstring> LookupTestDataValues(
+    wchar_t const* szField, bool& bFound);
+
+namespace PortableData {
+template<class T>
+bool Parse(std::wstring const& strValue, T& aValue) {
+  try {
+    if constexpr (std::is_base_of_v<std::wstring, T>) {
+      aValue.assign(strValue);
+      return true;
+    } else if constexpr (std::is_same_v<T, bool>) {
+      if (strValue == L"true" || strValue == L"1") { aValue = true; return true; }
+      if (strValue == L"false" || strValue == L"0") { aValue = false; return true; }
+      return false;
+    } else if constexpr (std::is_integral_v<T>) {
+      if constexpr (std::is_signed_v<T>) aValue = static_cast<T>(std::stoll(strValue, nullptr, 0));
+      else aValue = static_cast<T>(std::stoull(strValue, nullptr, 0));
+      return true;
+    } else if constexpr (std::is_floating_point_v<T>) {
+      aValue = static_cast<T>(std::stod(strValue));
+      return true;
+    }
+  } catch (std::exception const&) {
+    return false;
+  }
+  return false;
+}
+} // namespace PortableData
+
+namespace TestData {
+template<class T>
+HRESULT TryGetValue(wchar_t const* szName, T& aResult) {
+  bool bFound = false;
+  std::vector<std::wstring> vecValues = LookupTestDataValues(szName, bFound);
+  if (!bFound || vecValues.empty()) return E_FAIL;
+  return PortableData::Parse(vecValues.front(), aResult) ? S_OK : E_FAIL;
+}
+template<class T>
+HRESULT TryGetValue(wchar_t const* szName, TestDataArray<T>& aResult) {
+  bool bFound = false;
+  std::vector<std::wstring> vecValues = LookupTestDataValues(szName, bFound);
+  if (!bFound) return E_FAIL;
+  std::vector<T> vecParsed;
+  vecParsed.reserve(vecValues.size());
+  for (auto const& strValue : vecValues) {
+    T aParsed {};
+    if (!PortableData::Parse(strValue, aParsed)) return E_FAIL;
+    vecParsed.push_back(std::move(aParsed));
+  }
+  aResult.SetValues(std::move(vecParsed));
+  return S_OK;
+}
+} // namespace TestData
+
 } // namespace TestExecution
 namespace Logging {
+enum class TestResults { Skipped, Passed, Failed };
 namespace Log {
+inline void Result(TestResults aStatus) {
+  if (aStatus == TestResults::Skipped) {
+#ifdef GTEST_SKIP
+    GTEST_SKIP() << "GPU or shader model capability unavailable";
+#else
+    ADD_FAILURE() << "Skipped capability could not be represented by bundled GoogleTest";
+#endif
+  } else if (aStatus == TestResults::Failed) {
+    ADD_FAILURE() << "Execution test reported failure";
+  }
+}
+
 inline void StartGroup(const wchar_t *name) {
   wprintf(L"BEGIN TEST(S): <%ls>\n", name);
 }
