@@ -259,7 +259,7 @@ def configure_windows_sdk_includes() -> None:
     um = includes / "um"
     shared = includes / "shared"
     winrt = includes / "winrt"
-    for required in (um / "wrl" / "client.h", shared / "winerror.h", winrt):
+    for required in (winrt / "wrl" / "client.h", shared / "winerror.h", winrt):
         if not required.exists():
             raise SystemExit(f"Managed Windows SDK header directory missing: {required}")
 
