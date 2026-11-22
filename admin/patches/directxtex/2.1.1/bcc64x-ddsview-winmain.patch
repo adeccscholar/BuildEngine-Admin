@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -568,8 +568,14 @@
+@@ -568,6 +568,11 @@
    target_link_libraries(ddsview PRIVATE ${PROJECT_NAME} d3d11.lib ole32.lib)
    source_group(ddsview REGULAR_EXPRESSION DDSView/*.*)
  
