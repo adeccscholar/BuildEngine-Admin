@@ -1,9 +1,7 @@
 # Portable CTest coverage for the DXC and dxilconv toolchain.
 # Microsoft-specific DxilConvTests.cpp has not yet been completely ported.
 # Do not report these tests as equivalent to all historical TAEF test cases.
-if(NOT TARGET dxc)
-  message(FATAL_ERROR "DXC portable tests require the original dxc target")
-endif()
+# The dxc target is declared later; generator expressions resolve at generation time.
 
 add_test(NAME DXC.Portable.DXIL
   COMMAND "${CMAKE_COMMAND}"

@@ -1,6 +1,6 @@
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -84,7 +84,57 @@
+@@ -84,7 +84,62 @@
              "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
      )
  endif()
@@ -21,6 +21,10 @@
 +    find_path(ADECC_CPPWINRT_WINRT_SDK_INCLUDE
 +        NAMES Windows.Foundation.Numerics.idl
 +        HINTS ${_adecc_winrt_sdk_dirs} REQUIRED)
++    get_filename_component(_adecc_sdk_inc_root "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}" DIRECTORY)
++    find_path(ADECC_CPPWINRT_MIDL_UM_INCLUDE
++        NAMES wtypes.idl
++        HINTS "${_adecc_sdk_inc_root}/um" REQUIRED)
 +    set(_adecc_test_component_dir "${CMAKE_CURRENT_BINARY_DIR}/test_component")
 +    set(_adecc_test_component_winmd "${_adecc_test_component_dir}/test_component.winmd")
 +    set(_adecc_test_component_h "${CPPWINRT_PROJECTION_INCLUDE_DIR}/winrt/test_component.h")
@@ -36,6 +40,7 @@
 +            /cpp_opt "-E -x c"
 +            /metadata_dir "$ENV{SystemRoot}/System32/WinMetadata"
 +            /I "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}"
++            /I "${ADECC_CPPWINRT_MIDL_UM_INCLUDE}"
 +            /winmd "${_adecc_test_component_winmd}"
 +            /out "${_adecc_test_component_dir}"
 +            "test_component/test_component.idl"
