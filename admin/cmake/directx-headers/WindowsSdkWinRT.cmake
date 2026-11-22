@@ -47,6 +47,7 @@ function(adecc_directx_headers_winrt_include)
    # reference proxy already supports IID_PPV_ARGS_Helper; provide only the
    # missing GUID deduction overload, without impersonating MSVC.
    file(APPEND "${_adecc_override_root}/wrl/client.h" [=[
+
 template<class T>
 GUID const& _CG_GUID_PPT_Helper(
    Microsoft::WRL::Details::ComPtrRef<T> aPtr) noexcept {
