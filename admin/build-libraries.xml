@@ -4599,7 +4599,8 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\glew\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="glew-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
-<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-09-03T03:45:00Z">
+<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-22T04:50:00Z">
+      <dependency library="directx-headers" version="1.619.1"/>
       <metadata name="Mesa OpenGL" supplier="Mesa project" homepage="https://mesa3d.org/" description="Mesa-based OpenGL runtime and development package for hardware-accelerated graphics on Windows." licenseSignal="yellow">
          <license name="Mesa component licenses" file="LICENSE-MESA.rst"/>
       </metadata>
@@ -4668,6 +4669,8 @@
          <environment name="CXX" value="{Tool:bcc64x}"/>
          <environment name="AR" value="{Tool:llvm-ar}"/>
          <environment name="WINDRES" value="{Tool:bcc64x-windres}"/>
+         <!-- Native pinned DirectX-Headers package, no Meson wrap fallback. -->
+         <environment name="PKG_CONFIG_PATH" value="{DependencyRoot:directx-headers}\lib\win64\{Configuration}\pkgconfig;{ENV:PKG_CONFIG_PATH}"/>
          <environment name="PYTHONPATH" value="{Workspace}\packaging-26.3\src;{Workspace}\markupsafe-3.0.3\src;{Workspace}\mako-1.4.1;{Workspace}\pyyaml-6.0.3\lib"/>
          <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ENV:PATH}"/>
 
@@ -4687,7 +4690,12 @@
             <argument value="--includedir=include"/>
             <argument value="--buildtype={MesonBuildType}"/>
             <argument value="-Dplatforms=windows"/>
-            <argument value="-Dgallium-drivers=softpipe"/>
+            <!-- The softpipe reference remains available. The D3D12 path is an
+                 intentionally experimental BCC64X build gate and must pass
+                 upstream Mesa tests before GPU support is reported. Zink
+                 follows after managed Vulkan loader availability. -->
+            <argument value="-Dgallium-drivers=softpipe,d3d12"/>
+            <argument value="-Dgallium-d3d12-video=disabled"/>
             <argument value="-Dgallium-wgl-dll-name=libgallium_wgl"/>
             <argument value="-Dopengl=true"/>
             <argument value="-Dgles1=disabled"/>
