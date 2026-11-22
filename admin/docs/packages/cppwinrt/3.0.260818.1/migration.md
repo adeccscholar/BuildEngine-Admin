@@ -28,3 +28,9 @@ Automatic C++ module scanning is disabled centrally by the BCC64X CMake toolchai
 ## Catch source compatibility in original C++/WinRT tests
 
 The vendored Catch header selects a legacy `std::_isnan` path whenever `__BORLANDC__` is defined. BCC64X is Clang-based and provides standard `std::isnan`; the new version-bound source patch restricts that legacy path to non-Clang Borland compilers. The full upstream test suite stays active. Release and Debug results remain **[not verified]**.
+
+## Original test_nocoro fatal handler (native BCC64X)
+
+`test/test_nocoro/main.cpp` invokes Catch's `reportFatal` but omits `CATCH_CONFIG_WINDOWS_SEH`; other upstream test executables set that macro. A version-bound patch enables the same original SEH handler in test_nocoro. This preserves upstream test execution, rather than replacing or skipping the fatal error test path.
+
+**[not verified]** until Release and Debug CTest passes.

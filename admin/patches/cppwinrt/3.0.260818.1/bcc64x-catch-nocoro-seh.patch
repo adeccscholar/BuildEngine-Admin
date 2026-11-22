@@ -1,0 +1,13 @@
+--- a/test/test_nocoro/main.cpp
++++ b/test/test_nocoro/main.cpp
+@@ -1,6 +1,8 @@
+ #include <crtdbg.h>
+-#define CATCH_CONFIG_RUNNER
+-#include "catch.hpp"
++#define CATCH_CONFIG_RUNNER
++// Match the Catch2 fatal error configuration in the other upstream test mains.
++#define CATCH_CONFIG_WINDOWS_SEH
++#include "catch.hpp"
+ #include "winrt/base.h"
+ 
+ using namespace winrt;

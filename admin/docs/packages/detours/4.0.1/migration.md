@@ -35,3 +35,9 @@ Automatic C++ module scanning is disabled centrally by the BCC64X CMake toolchai
 ## Subsequent BCC64X native diagnostic
 
 After the StrSafe guard fix, the original `modules.cpp` CLR entrypoint returns the Win32 function-pointer type `FARPROC` where the Detours API declares `PVOID`. The version-specific patch applies an explicit pointer conversion without changing the CLR branch or disabling tests. Release and Debug results remain **[not verified]**.
+
+## Image import declaration (native BCC64X)
+
+The original `src/image.cpp` refers to `CImageImportName*` inside `CImageImportFile` before the type is declared. A version-bound patch adds only the forward declaration. Import parsing, PE functionality, the original DLL and the native transaction test remain enabled.
+
+**[not verified]** until Release and Debug builds pass.
