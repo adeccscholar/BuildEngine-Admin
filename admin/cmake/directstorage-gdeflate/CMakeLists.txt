@@ -8,7 +8,7 @@ endif()
 if(NOT EXISTS "${LIBDEFLATE_PACKAGE_ROOT}/include/libdeflate.h")
    message(FATAL_ERROR "Managed libdeflate package missing")
 endif()
-find_library(LIBDEFLATE_LIB NAMES deflate libdeflate libdeflate_shared
+find_library(LIBDEFLATE_LIB NAMES libdeflate libdeflated deflate libdeflate_shared
    PATHS "${LIBDEFLATE_PACKAGE_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
 add_library(GDeflate SHARED
    "${DEFLATE_SOURCE_ROOT}/GDeflateCompress.cpp"

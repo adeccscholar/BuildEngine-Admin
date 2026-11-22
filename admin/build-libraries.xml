@@ -17999,6 +17999,15 @@
       </install>
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/></publish>
 
+   
+      <smoke id="consumer" scope="package" source="smokes\winmd\consumer"
+         configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="winmd-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DWINMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
    </library>
    <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-22T05:20:00Z">
       <dependency library="winmd" version="0f1eae3b"/>
@@ -18052,6 +18061,15 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe" optional="true"/>
          <cmake source="share" target="share" optional="true"/>
       </publish>
+   
+      <smoke id="consumer" scope="package" source="smokes\cppwinrt\consumer"
+         configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="cppwinrt-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
    </library>
    <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T05:20:00Z">
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
@@ -18110,6 +18128,15 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe" optional="true"/>
          <cmake source="share" target="share" optional="true"/>
       </publish>
+   
+      <smoke id="consumer" scope="package" source="smokes\dxc\consumer"
+         configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="dxc-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-DDXC_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+      </smoke>
    </library>
    <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-22T05:20:00Z">
       <dependency library="directxmath" version="3.21"/>
@@ -18172,6 +18199,15 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe" optional="true"/>
          <cmake source="share" target="share" optional="true"/>
       </publish>
+   
+      <smoke id="consumer" scope="package" source="smokes\directxtk12\consumer"
+         configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}"
+         toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"
+         executable="directxtk12-consumer.exe">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-Ddirectxtk12_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxtk12"/>
+      </smoke>
    </library>
    <library id="directstorage-gdeflate" version="9352da00" category="compression" timestamp="2026-11-22T05:30:00Z">
       <dependency library="libdeflate" version="1.26"/>
