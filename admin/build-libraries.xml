@@ -18227,7 +18227,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T23:50:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-23T00:00:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18327,6 +18327,7 @@
          <!-- DXC v1.9.2609 removes all conventional LLVM target backends in lib/Target/LLVMBuild.txt; the HLSL/DXIL/SPIR-V functionality is separate and remains enabled. -->
          <argument value="-DLLVM_TARGETS_TO_BUILD:STRING="/>
          <argument value="-DLLVM_ENABLE_PROJECTS:STRING=clang"/>
+         <argument value="-DLLVM_ENABLE_EH:BOOL=ON"/>
          <argument value="-DLLVM_INCLUDE_TESTS:BOOL=ON"/>
          <argument value="-DLLVM_BUILD_TESTS:BOOL=ON"/>
          <argument value="-DHLSL_BUILD_DXILCONV:BOOL=ON"/>
