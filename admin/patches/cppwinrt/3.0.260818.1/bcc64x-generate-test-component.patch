@@ -47,7 +47,7 @@
 +        COMMAND "${ADECC_CPPWINRT_MIDLRT}"
 +            /winrt /nomidl /savePP
 +            /cpp_cmd "${_adecc_midl_cpp}"
-+            /cpp_opt "-E -x c -D__stdcall="
++            /cpp_opt "-E -x c -D__stdcall= -D_stdcall="
 +            /metadata_dir "$ENV{SystemRoot}/System32/WinMetadata"
 +            /I "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}"
 +            /I "${ADECC_CPPWINRT_MIDL_UM_INCLUDE}"
