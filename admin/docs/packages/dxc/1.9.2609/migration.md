@@ -55,3 +55,20 @@ A version-bound source patch recognizes native Win64 using `WIN32`, `CMAKE_SIZEO
 The 22 November 2026 Release configure log reached `FindTAEF.cmake:80` and reported `Unable to find TAEF binaries.` The native x64 architecture detection patch is effective: discovery now reaches the `find_program(TAEF_EXECUTABLE te.exe ...)` check rather than failing architecture identification. The upstream caller is `projects/dxilconv/unittests/CMakeLists.txt:4`.
 
 This is a missing native Microsoft TAEF test runtime, not a C++ compiler failure or a reason to disable tests. The actual TAEF header `Wex.Common.h`, x64 import libraries `Te.Common.lib`, `Wex.Common.lib` and `Wex.Logger.lib`, and an x64 `te.exe` must be available from an official compatible Microsoft SDK/WDK provision. No package version or source archive has yet been verified for reproducible BuildEngine provisioning, therefore **no unverified TAEF package has been invented or declared ready**.
+
+## TAEF-to-GoogleTest native test migration (22 November 2026)
+
+**Status: [not verified].** The pinned Microsoft DXC v1.9.2609 TAEF discovery and runner dependency is removed from the active BuildEngine source contract. This is an authored migration, **not** yet evidence that the native Release/Debug builds or all original test cases pass.
+
+The active version-bound source action runs `admin/cmake/dxc/MigrateHLSLGoogleTest.cmake` and then `gtest/MigrateDXCOriginalTests.py` with the managed Python interpreter. The migration uses original test translation units and methods rather than substituting only smoke tests:
+
+- `ClangHLSLTests`: original Windows HLSL sources, GoogleTest driver, GoogleMock and CTest.
+- `HLSLTestLib`: existing original helper sources, GoogleTest headers instead of `find_package(TAEF REQUIRED)`.
+- `dxilconv-tests`: the six original batch/regression groups compiled as a GoogleTest executable. The original manual test remains explicitly disabled. The independent portable DXIL/SPIR-V smoke checks remain additive.
+- `ExecHLSLTests`: original native Windows D3D12 execution, long-vector and linear-algebra sources, including dynamic test method registration. Both the original source-level GPU capability checks and failures remain in place.
+- `ShaderOpArithTable.xml` and other pinned original execution XML test tables: generated standard C++ typed data access and per-row CTest test names. Original parameter values are extracted directly from XML, not replaced with dummy values.
+- Existing historical TAEF LLVM/LIT suite configurations are adapted to discover and execute the corresponding GoogleTest binaries, while parameterized XML rows are owned by CTest to prevent incorrect unparameterized repetition.
+
+The old native-TAEF architecture patch and the old DXIL converter patch that **replaced** original regression tests with two smoke cases are not applied in the current source contract. No `te.exe`, TAEF headers or TAEF import libraries should be required by the migrated test CMake targets.
+
+**Native acceptance gates**: original BCC64X Release and Debug configure/build, all generated GoogleTest/CTest targets, LLVM/LIT discovery, D3D12 execution capability reporting, XML row/value count comparison, independently executed original six DXIL converter groups, actual DLL/COFF import-library runtime validation, and zero active TAEF lookups. If any original test cannot be compiled or executed, retain an explicit INCOMPLETE/FAIL state rather than counting it as a pass.
