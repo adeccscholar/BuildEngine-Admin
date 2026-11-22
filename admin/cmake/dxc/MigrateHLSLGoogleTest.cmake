@@ -105,7 +105,7 @@ if(_adecc_conv_parent MATCHES "add_subdirectory\\(portable\\)")
    # Keep the independent DXIL/SPIR-V smoke checks in addition to original tests.
 elseif(_adecc_conv_parent MATCHES "add_subdirectory\\(unittests\\)")
    string(REPLACE "    add_subdirectory(unittests)"
-      "    add_subdirectory(unittests)\\n    add_subdirectory(portable)"
+      "    add_subdirectory(unittests)\n    add_subdirectory(portable)"
       _adecc_conv_parent "${_adecc_conv_parent}")
    file(WRITE "${_adecc_conv_cmake}" "${_adecc_conv_parent}")
 else()
