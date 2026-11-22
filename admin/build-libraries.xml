@@ -17599,7 +17599,7 @@
          <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directx-headers" version="1.619.1" category="graphics" timestamp="2026-11-22T14:08:03Z">
+   <library id="directx-headers" version="1.619.1" category="graphics" timestamp="2026-11-22T14:20:12Z">
       <dependency library="googletest" version="1.18.0"/>
       <metadata name="Microsoft DirectX-Headers" supplier="Microsoft"
          homepage="https://github.com/microsoft/DirectX-Headers"
@@ -17673,7 +17673,7 @@
                <execute name="upstream-tests" test="true" executable="{ToolDir:cmake}\ctest.exe"
                   workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
                   <environment name="CTEST_PARALLEL_LEVEL" value="{TestJobs}"/>
-                  <argument value="--output-on-failure"/>
+                  <argument value="--verbose"/><argument value="--output-on-failure"/>
                </execute>
                <cmake mode="install" executable="{Tool:cmake}"
                   build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
