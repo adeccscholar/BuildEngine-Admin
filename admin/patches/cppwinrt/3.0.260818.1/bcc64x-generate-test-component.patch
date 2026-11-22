@@ -1,6 +1,6 @@
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -84,7 +84,56 @@
+@@ -84,7 +84,57 @@
              "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
      )
  endif()
@@ -38,7 +38,8 @@
 +            /I "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}"
 +            /winmd "${_adecc_test_component_winmd}"
 +            /out "${_adecc_test_component_dir}"
-+            "${CMAKE_CURRENT_SOURCE_DIR}/test_component/test_component.idl"
++            "test_component/test_component.idl"
++        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 +        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/test_component/test_component.idl"
 +        VERBATIM)
 +    add_custom_command(

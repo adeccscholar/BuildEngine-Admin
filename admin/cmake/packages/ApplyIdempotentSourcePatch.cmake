@@ -10,15 +10,21 @@ if(NOT EXISTS "${PATCH_FILE}" OR NOT IS_DIRECTORY "${SOURCE_ROOT}")
    message(FATAL_ERROR "Patch file or source directory does not exist: ${PATCH_FILE}; ${SOURCE_ROOT}")
 endif()
 
+# Opt in only for source archives with platform-specific line endings.
+set(vecWhitespaceArguments)
+if(DEFINED PATCH_IGNORE_SPACE_CHANGE AND PATCH_IGNORE_SPACE_CHANGE)
+   list(APPEND vecWhitespaceArguments --ignore-space-change)
+endif()
+
 execute_process(
-   COMMAND "${GIT_EXECUTABLE}" apply --check --no-index --whitespace=nowarn "${PATCH_FILE}"
+   COMMAND "${GIT_EXECUTABLE}" apply ${vecWhitespaceArguments} --check --no-index --whitespace=nowarn "${PATCH_FILE}"
    WORKING_DIRECTORY "${SOURCE_ROOT}"
    RESULT_VARIABLE iCheck
    OUTPUT_VARIABLE strCheckOutput
    ERROR_VARIABLE strCheckError)
 if(iCheck EQUAL 0)
    execute_process(
-      COMMAND "${GIT_EXECUTABLE}" apply --no-index --whitespace=nowarn "${PATCH_FILE}"
+      COMMAND "${GIT_EXECUTABLE}" apply ${vecWhitespaceArguments} --no-index --whitespace=nowarn "${PATCH_FILE}"
       WORKING_DIRECTORY "${SOURCE_ROOT}"
       RESULT_VARIABLE iApply
       OUTPUT_VARIABLE strApplyOutput
@@ -31,7 +37,7 @@ if(iCheck EQUAL 0)
 endif()
 
 execute_process(
-   COMMAND "${GIT_EXECUTABLE}" apply --reverse --check --no-index --whitespace=nowarn "${PATCH_FILE}"
+   COMMAND "${GIT_EXECUTABLE}" apply ${vecWhitespaceArguments} --reverse --check --no-index --whitespace=nowarn "${PATCH_FILE}"
    WORKING_DIRECTORY "${SOURCE_ROOT}"
    RESULT_VARIABLE iReverse
    OUTPUT_VARIABLE strReverseOutput
