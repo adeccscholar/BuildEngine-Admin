@@ -1,11 +1,18 @@
 --- a/lib/Support/MSFileSystemBasic.cpp
 +++ b/lib/Support/MSFileSystemBasic.cpp
-@@ -18,6 +18,8 @@
+@@ -18,6 +18,15 @@
  
  #include <assert.h>
  #include <d3dcommon.h>
 +#include <strsafe.h>
 +#include <cstdio>
++#if defined(__CODEGEARC__) || defined(__BORLANDC__)
++// Source adapters may call DXC's non-Windows formatting helper while using
++// the native Windows API. Keep the diagnostics instead of dropping them.
++#ifndef OutputDebugFormatA
++#define OutputDebugFormatA(...) std::fprintf(stderr, __VA_ARGS__)
++#endif
++#endif
  #include <errno.h>
  #include <fcntl.h>
  #include <io.h>
