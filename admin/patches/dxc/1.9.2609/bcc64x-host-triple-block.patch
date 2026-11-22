@@ -1,0 +1,20 @@
+--- a/cmake/modules/GetHostTriple.cmake
++++ b/cmake/modules/GetHostTriple.cmake
+@@ -18,7 +18,7 @@
+     else()
+       set( value "i686-pc-mingw32" )
+     endif()
+-  else( MSVC )
++  else()
+     set(config_guess ${LLVM_MAIN_SRC_DIR}/autoconf/config.guess)
+     execute_process(COMMAND sh ${config_guess}
+       RESULT_VARIABLE TT_RV
+@@ -28,7 +28,7 @@
+       message(FATAL_ERROR "Failed to execute ${config_guess}")
+     endif( NOT TT_RV EQUAL 0 )
+     set( value ${TT_OUT} )
+-  endif( MSVC )
++  endif()
+   set( ${var} ${value} PARENT_SCOPE )
+   message(STATUS "Target triple: ${value}")
+ endfunction( get_host_triple var )

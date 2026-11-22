@@ -1,0 +1,24 @@
+--- a/lib/lib_common.h
++++ b/lib/lib_common.h
+@@ -10,9 +10,18 @@
+    /* because BUILDING_LIBDEFLATE must be set first */
+ #endif
+ 
+-#define BUILDING_LIBDEFLATE
+-
+-#include "../common/common_defs.h"
++#define BUILDING_LIBDEFLATE
++
++/*
++ * BCC64X's Windows CRT declares _rotr64 in <stdlib.h>.  Parse that declaration
++ * before compiler_gcc.h provides the libdeflate rotation macro.
++ * Keep the optimized rotation and SIMD implementations enabled.
++ */
++#if defined(_WIN32) && defined(__clang__) && defined(__BORLANDC__) && !defined(FREESTANDING)
++#  include <stdlib.h>
++#endif
++
++#include "../common/common_defs.h"
+ 
+ /*
+  * Prefix with "_libdeflate_" all global symbols which are not part of the API

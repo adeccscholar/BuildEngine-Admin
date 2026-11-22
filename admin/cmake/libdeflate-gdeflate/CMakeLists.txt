@@ -13,7 +13,7 @@ set(_sources
    lib/zlib_compress.c lib/zlib_decompress.c lib/x86/cpu_features.c)
 list(TRANSFORM _sources PREPEND "${_root}/")
 add_library(libdeflate_gdeflate SHARED ${_sources})
-target_compile_definitions(libdeflate_gdeflate PRIVATE BUILDING_LIBDEFLATE LIBDEFLATE_DLL)
+target_compile_definitions(libdeflate_gdeflate PRIVATE LIBDEFLATE_DLL)
 target_include_directories(libdeflate_gdeflate PUBLIC
    "$<BUILD_INTERFACE:${_root}>"
    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
