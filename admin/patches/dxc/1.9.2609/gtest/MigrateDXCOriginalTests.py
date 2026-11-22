@@ -172,6 +172,7 @@ def Data(root, generated):
             counter += 1
     if not counter: raise ValueError("No data-driven DXC tests discovered")
     cm.insert(1, 'set(_adecc_xml_exclusions "'+':'.join(exclude)+'")')
+    Save(generated/"OriginalXmlMethods.txt", "\n".join(exclude)+"\n")
     Save(generated/"OriginalXmlCTest.cmake", "\n".join(cm)+"\n")
     return counter,len(values)
 
