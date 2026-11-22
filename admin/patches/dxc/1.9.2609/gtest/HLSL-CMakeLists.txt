@@ -35,7 +35,7 @@ add_clang_unittest(ClangHLSLTests
   ValidationTest.cpp
   VerifierTest.cpp)
 
-target_link_libraries(ClangHLSLTests PRIVATE
+target_link_libraries(ClangHLSLTests
   dxcompiler HLSLTestLib LLVMDxilContainer LLVMDxilDia gmock
   ${DIASDK_LIBRARIES} ${D3D12_LIBRARIES} shlwapi)
 target_include_directories(ClangHLSLTests PRIVATE
