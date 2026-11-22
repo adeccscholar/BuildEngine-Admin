@@ -1,0 +1,55 @@
+--- a/test/test/iid_ppv_args.cpp
++++ b/test/test/iid_ppv_args.cpp
+@@ -1,6 +1,14 @@
+ #include "pch.h"
+ #include <windows.foundation.h>
+ 
++#if defined(__clang__) && defined(__CODEGEARC__)
++// SDK combaseapi.h expects T**, while winrt::com_ptr supplies a COM proxy.
++template<class T> GUID const& _CG_GUID_PPT_Helper(winrt::com_ptr<T>* aPtr) noexcept
++{
++    return __uuidof(T);
++}
++#endif
++
+ namespace
+ {
+     struct Stringable : winrt::implements<Stringable, winrt::Windows::Foundation::IStringable>
+--- a/test/old_tests/UnitTests/com_ptr.cpp
++++ b/test/old_tests/UnitTests/com_ptr.cpp
+@@ -48,7 +48,7 @@
+     com_ptr<::IUnknown> a; // default ctor
+     com_ptr<::IUnknown> b = nullptr; // nullptr_t ctor
+ 
+-    REQUIRE(S_OK == get_unknown(stringable)->QueryInterface(b.put())); // attach
++    REQUIRE(S_OK == get_unknown(stringable)->QueryInterface(__uuidof(::IUnknown), b.put_void())); // attach
+ 
+     com_ptr<::IUnknown> c = b; // copy ctor, AddRef
+     b = nullptr;
+@@ -210,7 +210,7 @@
+     REQUIRE(a);
+ 
+     com_ptr<::IUnknown> c;
+-    b->QueryInterface(c.put()); // put
++    b->QueryInterface(__uuidof(::IUnknown), c.put_void()); // put
+     REQUIRE(c);
+ 
+     b = nullptr;
+@@ -250,7 +250,7 @@
+     IStringable s = make<Stringable>(L"Hello world!");
+ 
+     com_ptr<::IUnknown> result;
+-    REQUIRE(S_OK == get_unknown(s)->QueryInterface(result.put()));
++    REQUIRE(S_OK == get_unknown(s)->QueryInterface(__uuidof(::IUnknown), result.put_void()));
+     return result;
+ }
+ 
+@@ -292,7 +292,7 @@
+     IStringable s = make<Stringable>(L"Hello world!");
+ 
+     com_ptr<::IInspectable> result;
+-    REQUIRE(S_OK == get_unknown(s)->QueryInterface(result.put()));
++    REQUIRE(S_OK == get_unknown(s)->QueryInterface(__uuidof(::IInspectable), result.put_void()));
+     return result;
+ }
+ 
