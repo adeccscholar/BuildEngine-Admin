@@ -10,6 +10,7 @@
 #include <type_traits>
 #include <vector>
 #include <stdexcept>
+#include <utility>
 #include "dxc/WinAdapter.h"
 #include "gtest/gtest.h"
 #ifndef _WIN32
