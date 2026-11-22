@@ -1,0 +1,12 @@
+--- a/projects/dxilconv/CMakeLists.txt
++++ b/projects/dxilconv/CMakeLists.txt
+@@ -23,8 +23,7 @@
+ if(WIN32)
+   add_subdirectory(lib)
+   add_subdirectory(tools)
+   if (HLSL_INCLUDE_TESTS)
+-    add_subdirectory(unittests)
+-    add_subdirectory(test)
++    add_subdirectory(portable)
+   endif (HLSL_INCLUDE_TESTS)
+ endif()

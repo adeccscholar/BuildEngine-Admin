@@ -246,17 +246,6 @@
       </managed>
    </tool>
 
-   <!-- TAEF is a Microsoft WDK host test framework, not a BCC64X-built library.
-        The DXC test integration must additionally validate Wex headers, import
-        libraries and runtime DLLs before using this discovered executable. -->
-   <tool id="taef" version="WDK" required="when-used">
-      <discover executable="te.exe" path="false">
-         <candidate path="{ProgramFilesX86}\\Windows Kits\\10\\Testing\\Runtimes\\TAEF\\x64\\te.exe"/>
-         <candidate path="{ProgramFilesX86}\\Windows Kits\\10\\Testing\\Runtimes\\TAEF\\amd64\\te.exe"/>
-         <candidate path="{ProgramFiles}\\Windows Kits\\10\\Testing\\Runtimes\\TAEF\\x64\\te.exe"/>
-      </discover>
-   </tool>
-
    <tool id="windows-rc" version="Windows-SDK" required="always">
       <discover executable="rc.exe" path="true"><candidate path="{ProgramFilesX86}\Windows Kits\10\bin\*\x64\rc.exe"/></discover>
    </tool>
