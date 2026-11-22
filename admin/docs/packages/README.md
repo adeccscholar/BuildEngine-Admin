@@ -8,6 +8,11 @@ Each versioned guide documents the intended native C++Builder 13/BCC64X build pr
 
 ## Versioned package guides
 
+- [detours 4.0.1](/package/detours/4.0.1/migration)
+- [directxmath 3.21](/package/directxmath/3.21/migration)
+- [directxmesh 1.7.2](/package/directxmesh/1.7.2/migration)
+- [directxtex 2.1.1](/package/directxtex/2.1.1/migration)
+
 - [dng-sdk 1.7.1.2802](/package/dng-sdk/1.7.1.2802/migration)
 - [xmp-toolkit 7.0.0](/package/xmp-toolkit/7.0.0/migration)
 - [abseil 20260817.0](/package/abseil/20260817.0/migration)
