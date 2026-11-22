@@ -31,3 +31,11 @@ The 22 November Release configuration log now identifies the precise failure at 
 The BuildEngine now passes `LLVM_TARGETS_TO_BUILD=` explicitly. The pinned `llvm-build` implementation handles the empty string as an empty target list (rather than an invalid name). This does **not** disable any backend present in this upstream archive; the named backends have no corresponding source directories. HLSL DXIL conversion, SPIR-V code generation and upstream testing options remain enabled and must be validated by the next native build.
 
 **[not verified]**: successful configure/build, shader tests or SPIR-V runtime output.
+
+## Managed Khronos SPIR-V source integration
+
+The detailed CMake configure log reported that `external/SPIRV-Headers` did not contain a `CMakeLists.txt` (CMake `external/CMakeLists.txt:31`). DXC's original SPIR-V code generator calls `add_subdirectory` for both SPIRV-Headers and SPIRV-Tools and requires actual `SPIRV-Tools-static` and `SPIRV-Tools-opt` build targets. Merely passing installed include directories would not satisfy the original upstream contract.
+
+The library now declares dependencies on managed `spirv-headers/v1.202609.0` and `spirv-tools/2026.4` and passes their versioned extracted source directories under `build/thirdparty-test`. A global `SPIRV-Headers_SOURCE_DIR` also permits the nested SPIRV-Tools CMake project to reuse the same headers. `SPIRV_TOOLS_BUILD_STATIC=ON` retains the upstream targets and `SPIRV_TOOLS_USE_MIMALLOC=OFF` avoids an unrelated undeclared allocator requirement. DXC's HLSL/DXIL/SPIR-V functionality and its original CTest suite remain enabled. The two Khronos libraries remain separately managed and versioned; DXC does not download uncontrolled copies.
+
+The source-root path contract and the cross-version API compatibility still require native BCC64X Release/Debug evidence. **[not verified]**.
