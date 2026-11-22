@@ -17599,7 +17599,7 @@
          <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directx-headers" version="1.619.1" category="graphics" timestamp="2026-11-22T03:35:00Z">
+   <library id="directx-headers" version="1.619.1" category="graphics" timestamp="2026-11-22T04:35:00Z">
       <dependency library="googletest" version="1.18.0"/>
       <metadata name="Microsoft DirectX-Headers" supplier="Microsoft"
          homepage="https://github.com/microsoft/DirectX-Headers"
@@ -17633,6 +17633,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="--fresh"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-Wno-dev"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
@@ -17696,7 +17697,7 @@
          <argument value="-Ddirectx-headers_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directx-headers\cmake"/>
       </smoke>
    </library>
-   <library id="detours" version="4.0.1" category="systems" timestamp="2026-11-22T05:00:00Z">
+   <library id="detours" version="4.0.1" category="systems" timestamp="2026-11-22T04:35:00Z">
       <metadata artifactType="shared" name="Microsoft Detours" supplier="Microsoft"
          homepage="https://github.com/microsoft/detours"
          description="Windows API interception and instrumentation, reusable BCC64X DLL and Vulkan Loader test source." licenseSignal="yellow">
@@ -17710,6 +17711,14 @@
             <require path="src\detours.cpp"/>
             <require path="LICENSE.md"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\detours\4.0.1\bcc64x-legacy-msvc-guards.patch" target="{Workspace}\.buildengine\patches\bcc64x-legacy-msvc-guards.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-bcc64x-legacy-msvc-guards" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-legacy-msvc-guards.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -17767,7 +17776,7 @@
          <argument value="-DDetours_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\detours\cmake"/>
       </smoke>
    </library>
-   <library id="directxmath" version="3.21" category="math" timestamp="2026-11-22T05:00:00Z">
+   <library id="directxmath" version="3.21" category="math" timestamp="2026-11-22T04:35:00Z">
       <metadata artifactType="interface" name="Microsoft DirectXMath" supplier="Microsoft"
          homepage="https://github.com/microsoft/DirectXMath"
          description="Header-only SIMD math and DirectXCollision geometry from the original Microsoft June 2026 source." licenseSignal="yellow">
@@ -17781,6 +17790,14 @@
             <require path="Inc\DirectXCollision.h"/>
             <require path="LICENSE"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\directxmath\3.21\bcc64x-shmath-clang-options.patch" target="{Workspace}\.buildengine\patches\bcc64x-shmath-clang-options.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-bcc64x-shmath-clang-options" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-shmath-clang-options.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
       </source>
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>

@@ -1,0 +1,20 @@
+--- a/src/detours.h
++++ b/src/detours.h
+@@ -66,7 +66,7 @@
+ //////////////////////////////////////////////////////////////////////////////
+ //
+ 
+-#if (_MSC_VER < 1299)
++#if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER < 1299)
+ typedef LONG LONG_PTR;
+ typedef ULONG ULONG_PTR;
+ #endif
+@@ -773,7 +773,7 @@
+ 
+ //////////////////////////////////////////////////////////////////////////////
+ //
+-#if (_MSC_VER < 1299)
++#if defined(_MSC_VER) && !defined(__clang__) && (_MSC_VER < 1299)
+ #include <imagehlp.h>
+ typedef IMAGEHLP_MODULE IMAGEHLP_MODULE64;
+ typedef PIMAGEHLP_MODULE PIMAGEHLP_MODULE64;
