@@ -46,3 +46,9 @@ The next native run compiled all original targets in both Release and Debug. `Fe
 A version-bound idempotent source diagnostic stage now adds `stderr` HRESULT reporting at the existing `DXCoreCreateAdapterFactory`, `CreateAdapterList`, `GetAdapter` and `D3D12CreateDevice` failure paths in `test/test.cpp`, and at both initial DXCore failure paths in `test/feature_check_test.cpp`. The instrumentation does not change the test names, return codes, conditions or upstream test suite; it modifies only isolated extracted test-source copies, never the installed SDK. DirectX-Headers version timestamp was refreshed to ensure source execution.
 
 The next CTest run should report a named failing API plus hexadecimal HRESULT if one of the instrumented branches fails. A crash before any instrumented branch remains possible and would require a debugger or dump. **[not verified]**.
+
+## Native test entry confirmed, checkpoint instrumentation refined
+
+The 22 November 2026 verbose CTest output confirms both GPU-dependent original executables enter `main()`, and all 74 cases of the independent GoogleTest `Feature-Support-Test` pass. The first GPU runtime test exits unsuccessfully and the second can crash with SegFault. Neither produces a failing HRESULT from the existing failure-only diagnostics. The cause is **not established** by these logs.
+
+To isolate the location without changing assertions or disabling a test, the versioned diagnostic script now prints flushed checkpoints before and after factory creation, before adapter-list creation and adapter access, and before D3D12 device creation. The next full verbose CTest log should expose the last completed checkpoint even if the process crashes inside an API call. A native debugger/Minidump may be needed after that. **[not verified]** until rerun.
