@@ -1,0 +1,109 @@
+--- a/src/gallium/drivers/d3d12/d3d12_dxgi_screen.cpp
++++ b/src/gallium/drivers/d3d12/d3d12_dxgi_screen.cpp
+@@ -92,7 +92,7 @@
+    // The first adapter is the default
+    IDXGIAdapter1 *adapter1;
+    if (SUCCEEDED(factory->EnumAdapters1(0, &adapter1))) {
+-      HRESULT hr = adapter1->QueryInterface(&ret);
++      HRESULT hr = adapter1->QueryInterface(IID_PPV_ARGS(&ret));
+       adapter1->Release();
+       if (SUCCEEDED(hr))
+          return ret;
+--- a/src/gallium/drivers/d3d12/d3d12_context_common.cpp
++++ b/src/gallium/drivers/d3d12/d3d12_context_common.cpp
+@@ -571,7 +571,7 @@
+ #ifdef HAVE_GALLIUM_D3D12_GRAPHICS
+    if ((screen->max_feature_level >= D3D_FEATURE_LEVEL_11_0) && !(flags & PIPE_CONTEXT_MEDIA_ONLY)) {
+ #ifndef _GAMING_XBOX
+-      (void)screen->dev->QueryInterface(&ctx->dev_config);
++      (void)screen->dev->QueryInterface(IID_PPV_ARGS(&ctx->dev_config));
+ #endif
+ 
+       d3d12_context_blit_init(&ctx->base);
+--- a/src/gallium/drivers/d3d12/d3d12_resource.cpp
++++ b/src/gallium/drivers/d3d12/d3d12_resource.cpp
+@@ -582,7 +582,7 @@
+    if (handle->type == WINSYS_HANDLE_TYPE_D3D12_RES) {
+       ComPtr<IUnknown> screen_device;
+       ComPtr<IUnknown> res_device;
+-      screen->dev->QueryInterface(screen_device.GetAddressOf());
++      screen->dev->QueryInterface(IID_PPV_ARGS(screen_device.GetAddressOf()));
+       ((ID3D12DeviceChild *)handle->com_obj)->GetDevice(IID_PPV_ARGS(res_device.GetAddressOf()));
+ 
+       if (screen_device.Get() != res_device.Get()) {
+@@ -627,8 +627,8 @@
+       }
+ #else
+       IUnknown *obj = (IUnknown *) handle->com_obj;
+-      (void)obj->QueryInterface(&d3d12_res);
++      (void)obj->QueryInterface(IID_PPV_ARGS(&d3d12_res));
+-      (void)obj->QueryInterface(&d3d12_heap);
++      (void)obj->QueryInterface(IID_PPV_ARGS(&d3d12_heap));
+       obj->Release();
+ #endif
+    } else {
+@@ -1100,8 +1100,8 @@
+       memobj->res = (ID3D12Resource *) obj;
+    }
+ #else
+-   (void)obj->QueryInterface(&memobj->heap);
++   (void)obj->QueryInterface(IID_PPV_ARGS(&memobj->heap));
+-   (void)obj->QueryInterface(&memobj->res);
++   (void)obj->QueryInterface(IID_PPV_ARGS(&memobj->res));
+ #endif
+ 
+    obj->Release();
+--- a/src/gallium/drivers/d3d12/d3d12_screen.cpp
++++ b/src/gallium/drivers/d3d12/d3d12_screen.cpp
+@@ -1445,7 +1445,7 @@
+    ID3D12SDKConfiguration *sdk_config = nullptr;
+    if (SUCCEEDED(D3D12GetInterface(CLSID_D3D12SDKConfiguration, IID_PPV_ARGS(&sdk_config)))) {
+       ID3D12SDKConfiguration1 *sdk_config1 = nullptr;
+-      if (SUCCEEDED(sdk_config->QueryInterface(&sdk_config1))) {
++      if (SUCCEEDED(sdk_config->QueryInterface(IID_PPV_ARGS(&sdk_config1)))) {
+          char self_path[MAX_PATH];
+          const char *d3d12core_path = try_find_d3d12core_next_to_self(self_path, sizeof(self_path));
+          if (d3d12core_path) {
+@@ -1489,7 +1489,7 @@
+ 
+ #ifndef _GAMING_XBOX
+    ID3D12Device9 *device9 = NULL;
+-   if (SUCCEEDED(screen->dev->QueryInterface(&device9))) {
++   if (SUCCEEDED(screen->dev->QueryInterface(IID_PPV_ARGS(&device9)))) {
+       if (FAILED(device9->CreateCommandQueue1(&queue_desc, OpenGLOn12CreatorID,
+                                               IID_PPV_ARGS(&screen->cmdqueue)))) {
+          device9->Release();
+@@ -1672,7 +1672,7 @@
+    if (FAILED(screen->dev->CreateFence(0, D3D12_FENCE_FLAG_SHARED, IID_PPV_ARGS(&screen->fence))))
+       return false;
+ 
+-   screen->dev->QueryInterface(&screen->dev15);
++   screen->dev->QueryInterface(IID_PPV_ARGS(&screen->dev15));
+ 
+    // Uses screen->dev15 so QI must be before this
+    if (!d3d12_init_residency(screen))
+@@ -1758,11 +1758,11 @@
+ 
+ #ifndef _GAMING_XBOX
+       ID3D12Device8 *dev8;
+-      if (SUCCEEDED(screen->dev->QueryInterface(&dev8))) {
++      if (SUCCEEDED(screen->dev->QueryInterface(IID_PPV_ARGS(&dev8)))) {
+          dev8->Release();
+          screen->support_create_not_resident = true;
+       }
+-      screen->dev->QueryInterface(&screen->dev10);
++      screen->dev->QueryInterface(IID_PPV_ARGS(&screen->dev10));
+ #endif
+ 
+    const char *mesa_version = "Mesa " PACKAGE_VERSION MESA_GIT_SHA1;
+--- a/src/gallium/winsys/d3d12/wgl/d3d12_wgl_framebuffer.cpp
++++ b/src/gallium/winsys/d3d12/wgl/d3d12_wgl_framebuffer.cpp
+@@ -28,7 +28,7 @@
+ #include <windows.h>
+ #include <dxgi1_4.h>
+ #include <directx/d3d12.h>
+-#include <wrl.h>
++#include <wrl/client.h>
+ #include <dxguids/dxguids.h>
+ 
+ #include "util/u_memory.h"
