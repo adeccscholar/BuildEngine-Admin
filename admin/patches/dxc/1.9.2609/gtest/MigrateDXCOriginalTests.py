@@ -167,7 +167,7 @@ def Data(root, generated):
         for idx,row in enumerate(tables[key]):
             test = "DXC.HLSLExec."+method+"."+str(idx).zfill(5)
             cleanrow = row.replace("\\","/").replace('"','\\"').replace(";","\\;")
-            cm.append('add_test(NAME "'+test+'" COMMAND "$<TARGET_FILE:ExecHLSLTests>" --gtest_filter=ExecutionTest.'+method+')')
+            cm.append('add_test(NAME "'+test+'" COMMAND "$<TARGET_FILE:ExecHLSLTests>" --HlslDataDir "${PROJECT_SOURCE_DIR}/tools/clang/test/HLSL" --gtest_filter=ExecutionTest.'+method+')')
             cm.append('set_tests_properties("'+test+'" PROPERTIES ENVIRONMENT "ADECC_DXC_TEST_TABLE='+key+';ADECC_DXC_TEST_ROW='+cleanrow+'" LABELS "BCC64X;DXC;original;xml" TIMEOUT 600)')
             counter += 1
     if not counter: raise ValueError("No data-driven DXC tests discovered")
