@@ -235,6 +235,16 @@ bool Parse(std::wstring const& strValue, T& aValue) {
 }
 } // namespace PortableData
 
+namespace RuntimeParameters {
+template<class T>
+HRESULT TryGetValue(wchar_t const* szName, T& aValue) {
+  WEX::Common::String strValue;
+  HRESULT const hr = TryGetValue(szName, strValue);
+  if (FAILED(hr)) return hr;
+  return PortableData::Parse(strValue, aValue) ? S_OK : E_FAIL;
+}
+} // namespace RuntimeParameters
+
 namespace TestData {
 template<class T>
 HRESULT TryGetValue(wchar_t const* szName, T& aResult) {
