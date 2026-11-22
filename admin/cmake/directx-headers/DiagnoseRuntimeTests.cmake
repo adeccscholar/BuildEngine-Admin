@@ -50,4 +50,33 @@ adecc_replace_once("${strFeatures}"
 adecc_replace_once("${strFeatures}"
    "if(FAILED(adapter_factory->CreateAdapterList(_countof(dx_must_attr), dx_must_attr, IID_PPV_ARGS(&adapter_list))))\n    {\n        return -1;\n    }"
    "if(HRESULT const hr = adapter_factory->CreateAdapterList(_countof(dx_must_attr), dx_must_attr, IID_PPV_ARGS(&adapter_list)); FAILED(hr))\n    {\n        std::cerr << \"IDXCoreAdapterFactory::CreateAdapterList: HRESULT=0x\" << std::hex << static_cast<unsigned long>(hr) << std::endl;\n        return -1;\n    }")
+# Checkpoints before the calls, not only in their FAILED() branches:
+# a crash during COM argument preparation or DXCore factory entry must be visible.
+adecc_replace_once("${strSimple}"
+   "    check_uuid_linkage();"
+   "    check_uuid_linkage();\n    std::fprintf(stderr, \"DirectX-Headers-Test: UUID linkage verified\\n\");\n    std::fflush(stderr);")
+adecc_replace_once("${strSimple}"
+   "        if (HRESULT const hr = DXCoreCreateAdapterFactory(&factory); FAILED(hr))"
+   "        std::fprintf(stderr, \"DirectX-Headers-Test: entering DXCoreCreateAdapterFactory\\n\");\n        std::fflush(stderr);\n        if (HRESULT const hr = DXCoreCreateAdapterFactory(&factory); FAILED(hr))")
+adecc_replace_once("${strSimple}"
+   "        IDXCoreAdapterList *list = nullptr;"
+   "        std::fprintf(stderr, \"DirectX-Headers-Test: factory created\\n\");\n        std::fflush(stderr);\n        IDXCoreAdapterList *list = nullptr;")
+adecc_replace_once("${strSimple}"
+   "        if (HRESULT const hr = factory->CreateAdapterList"
+   "        std::fprintf(stderr, \"DirectX-Headers-Test: entering CreateAdapterList\\n\");\n        std::fflush(stderr);\n        if (HRESULT const hr = factory->CreateAdapterList")
+adecc_replace_once("${strSimple}"
+   "        if (HRESULT const hr = list->GetAdapter(0, &adapter); FAILED(hr))"
+   "        std::fprintf(stderr, \"DirectX-Headers-Test: entering GetAdapter\\n\");\n        std::fflush(stderr);\n        if (HRESULT const hr = list->GetAdapter(0, &adapter); FAILED(hr))")
+adecc_replace_once("${strSimple}"
+   "    HRESULT const hr = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device));"
+   "    std::fprintf(stderr, \"DirectX-Headers-Test: entering D3D12CreateDevice\\n\");\n    std::fflush(stderr);\n    HRESULT const hr = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device));")
+adecc_replace_once("${strFeatures}"
+   "    if(HRESULT const hr = DXCoreCreateAdapterFactory(IID_PPV_ARGS(&adapter_factory)); FAILED(hr))"
+   "    std::cerr << \"Feature-Support-Test: entering DXCoreCreateAdapterFactory\" << std::endl;\n    if(HRESULT const hr = DXCoreCreateAdapterFactory(IID_PPV_ARGS(&adapter_factory)); FAILED(hr))")
+adecc_replace_once("${strFeatures}"
+   "    if(HRESULT const hr = adapter_factory->CreateAdapterList"
+   "    std::cerr << \"Feature-Support-Test: factory created, entering CreateAdapterList\" << std::endl;\n    if(HRESULT const hr = adapter_factory->CreateAdapterList")
+adecc_replace_once("${strFeatures}"
+   "    for (uint32_t i = 0; i < adapter_list->GetAdapterCount(); i++)"
+   "    std::cerr << \"Feature-Support-Test: adapter list created\" << std::endl;\n    for (uint32_t i = 0; i < adapter_list->GetAdapterCount(); i++)")
 message(STATUS "Applied idempotent DirectX-Headers runtime HRESULT diagnostics")
