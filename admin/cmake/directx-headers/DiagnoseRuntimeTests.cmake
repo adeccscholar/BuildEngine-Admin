@@ -7,9 +7,9 @@ if(NOT DEFINED SOURCE_ROOT OR NOT IS_DIRECTORY "${SOURCE_ROOT}/test")
 endif()
 function(adecc_replace_once strFile strBefore strAfter)
    file(READ "${strFile}" strOriginal)
-   if(strOriginal MATCHES "\\r\\n")
-      string(REPLACE "\r\n" "\n" strOriginal "${strOriginal}")
-   endif()
+   # The Microsoft test.cpp file is CRLF in the pinned archive.
+   # Normalize line endings in the isolated versioned build workspace only.
+   string(REPLACE "\r\n" "\n" strOriginal "${strOriginal}")
    string(FIND "${strOriginal}" "${strAfter}" iAlready)
    if(NOT iAlready EQUAL -1)
       return()
