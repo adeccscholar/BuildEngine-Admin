@@ -6,7 +6,7 @@
 +# BCC64X uses the lib prefix for DLL targets unless explicitly suppressed.
 +# Preserve the upstream DirectXMesh DLL/import-library package names.
 +if(WIN32 AND BUILD_SHARED_LIBS AND DEFINED ENV{CB_BCC64X})
-+  set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
++  set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" IMPORT_PREFIX "")
 +endif()
  target_sources(${PROJECT_NAME} PRIVATE ${LIBRARY_HEADERS} ${LIBRARY_SOURCES})
 @@ -251,2 +256,8 @@
