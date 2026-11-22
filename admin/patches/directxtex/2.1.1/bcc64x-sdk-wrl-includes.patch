@@ -1,0 +1,30 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -17,6 +17,29 @@
+   DESCRIPTION "DirectX Texture Library"
+   HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkId=248926"
+   LANGUAGES CXX)
++
++# BuildEngine BCC64X: preserve upstream DX11/DX12 tools and samples.
++# Windows SDK WRL is under WinRT, outside the compiler's native include tree.
++if(WIN32 AND DEFINED ENV{CB_BCC64X} AND NOT "$ENV{CB_BCC64X}" STREQUAL "")
++  if(NOT DEFINED ENV{CB_WINDOWS_RC} OR "$ENV{CB_WINDOWS_RC}" STREQUAL "")
++    message(FATAL_ERROR "BuildEngine BCC64X requires CB_WINDOWS_RC for the pinned Windows SDK")
++  endif()
++  get_filename_component(_adecc_rc_bin "$ENV{CB_WINDOWS_RC}" DIRECTORY)
++  get_filename_component(_adecc_sdk_version_dir "${_adecc_rc_bin}" DIRECTORY)
++  get_filename_component(_adecc_sdk_bin_dir "${_adecc_sdk_version_dir}" DIRECTORY)
++  get_filename_component(_adecc_sdk_root "${_adecc_sdk_bin_dir}" DIRECTORY)
++  get_filename_component(_adecc_sdk_version "${_adecc_sdk_version_dir}" NAME)
++  set(_adecc_sdk_winrt "${_adecc_sdk_root}/Include/${_adecc_sdk_version}/winrt")
++  if(NOT EXISTS "${_adecc_sdk_winrt}/wrl/client.h")
++    message(FATAL_ERROR "The managed Windows SDK lacks WRL: ${_adecc_sdk_winrt}")
++  endif()
++  include_directories(BEFORE "${_adecc_sdk_winrt}")
++  # Embarcadero's Windows SDK winerror.h uses MSVC's __forceinline token.
++  add_compile_definitions(__forceinline=inline)
++endif()
++
+ if(DEFINED XBOX_CONSOLE_TARGET)
+   set(CMAKE_CXX_STANDARD_LIBRARIES "")
+ endif()
