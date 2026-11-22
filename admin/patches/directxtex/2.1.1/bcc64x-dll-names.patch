@@ -1,0 +1,12 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -242,4 +242,9 @@
+ if(WIN32 AND BUILD_SHARED_LIBS)
+   message(STATUS "Build library as a DLL")
+ 
++  # Native BCC64X DLL/import-library names must match the package contract.
++  # Retain all upstream components and preserve DLL/shared linkage.
++  if(DEFINED ENV{CB_BCC64X} AND NOT "$ENV{CB_BCC64X}" STREQUAL "")
++    set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" IMPORT_PREFIX "")
++  endif()
+   configure_file(
