@@ -17599,7 +17599,7 @@
          <argument value="-DDOCTEST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directx-headers" version="1.619.1" category="graphics" timestamp="2026-11-22T04:35:00Z">
+   <library id="directx-headers" version="1.619.1" category="graphics" timestamp="2026-11-22T14:08:03Z">
       <dependency library="googletest" version="1.18.0"/>
       <metadata name="Microsoft DirectX-Headers" supplier="Microsoft"
          homepage="https://github.com/microsoft/DirectX-Headers"
@@ -17628,6 +17628,12 @@
             target="{Workspace}\googletest\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\patches\directx-headers\1.619.1\test-CMakeLists.txt"
             target="{Workspace}\test\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
+         <!-- Keep all original CTest cases and record native API HRESULTs. -->
+         <execute name="diagnose-directx-runtime" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\directx-headers\DiagnoseRuntimeTests.cmake"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
