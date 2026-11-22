@@ -17891,7 +17891,7 @@
          <argument value="-Ddirectxmath_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmath"/>
       </smoke>
    </library>
-   <library id="directxmesh" version="1.7.2" category="graphics" timestamp="2026-11-22T21:40:00Z">
+   <library id="directxmesh" version="1.7.2" category="graphics" timestamp="2026-11-22T21:55:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <metadata artifactType="shared" name="Microsoft DirectXMesh" supplier="Microsoft"
@@ -17969,12 +17969,13 @@
          <argument value="-Ddirectxmesh_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmesh"/>
       </smoke>
    </library>
-   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-22T21:10:00Z">
+   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-22T21:50:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="openexr" version="3.5.4"/>
       <dependency library="imath" version="3.2.3"/>
       <dependency library="libdeflate" version="1.26"/>
+      <dependency library="openjph" version="0.33.0"/>
       <dependency library="libjpeg-turbo" version="3.2.1"/>
       <dependency library="libpng" version="1.6.59"/>
       <dependency library="llvm-openmp" version="20.1.7"/>
@@ -18021,10 +18022,11 @@
          <argument value="-DOpenEXR_DIR:PATH={DependencyRoot:openexr}\lib\win64\{Configuration}\cmake\OpenEXR"/>
          <argument value="-DImath_DIR:PATH={DependencyRoot:imath}\lib\win64\{Configuration}\cmake\Imath"/>
          <argument value="-Dlibdeflate_DIR:PATH={DependencyRoot:libdeflate}\lib\win64\{Configuration}\cmake\libdeflate"/>
+         <argument value="-Dopenjph_DIR:PATH={DependencyRoot:openjph}\lib\win64\{Configuration}\cmake\openjph"/>
          <argument value="-DJPEG_ROOT:PATH={DependencyRoot:libjpeg-turbo}"/>
          <argument value="-DPNG_ROOT:PATH={DependencyRoot:libpng}"/>
          <argument value="-DOpenMP_ROOT:PATH={DependencyRoot:llvm-openmp}"/>
-         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers};{DependencyRoot:openexr};{DependencyRoot:imath};{DependencyRoot:libdeflate};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libpng};{DependencyRoot:llvm-openmp}"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers};{DependencyRoot:openexr};{DependencyRoot:imath};{DependencyRoot:libdeflate};{DependencyRoot:openjph};{DependencyRoot:libjpeg-turbo};{DependencyRoot:libpng};{DependencyRoot:llvm-openmp}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
@@ -18215,7 +18217,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T21:25:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T22:00:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18226,6 +18228,14 @@
             <require path="LICENSE.TXT"/>
             <require path="LICENSE.TXT"/>
          </extract>
+         <copy source="{BuildFileDir}\patches\dxc\1.9.2609\gtest\AllocatorTest-google-fixture.patch" target="{Workspace}\.buildengine\patches\AllocatorTest-google-fixture.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-original-allocator-fixture" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\AllocatorTest-google-fixture.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
          <!-- TAEF-free original HLSL tests: source conversion and GoogleTest registration. -->
          <execute name="migrate-hlsl-gtest" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
