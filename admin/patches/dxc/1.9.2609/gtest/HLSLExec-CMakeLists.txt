@@ -24,8 +24,10 @@ target_include_directories(ExecHLSLTests PRIVATE
 add_dependencies(ExecHLSLTests dxcompiler)
 
 # Original non-parametric cases and generated per-row XML cases are both tested.
+include("${CMAKE_CURRENT_SOURCE_DIR}/OriginalXmlCTest.cmake")
 add_test(NAME DXC.HLSLExec.GoogleTest
   COMMAND $<TARGET_FILE:ExecHLSLTests> --HlslDataDir
-    ${PROJECT_SOURCE_DIR}/tools/clang/test/HLSL)
+    ${PROJECT_SOURCE_DIR}/tools/clang/test/HLSL
+    "--gtest_filter=-${_adecc_xml_exclusions}")
 set_tests_properties(DXC.HLSLExec.GoogleTest
   PROPERTIES LABELS "BCC64X;DXC;HLSLExec;original" TIMEOUT 1800)
