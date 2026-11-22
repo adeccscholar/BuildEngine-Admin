@@ -1,13 +1,11 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -284,6 +284,12 @@
- target_link_libraries(meshconvert PRIVATE ${PROJECT_NAME} version.lib)
- 
-+# meshconvert uses the original Unicode console entry point wmain.
-+# Select the Unicode CRT startup with BCC64X, leaving every original
-+# tool source and the upstream tests active.
-+if(DEFINED ENV{CB_BCC64X} AND NOT "$ENV{CB_BCC64X}" STREQUAL "")
+@@ -251,2 +251,8 @@
+   target_link_libraries(meshconvert PRIVATE ${PROJECT_NAME} version.lib)
++  # meshconvert implements wmain; use the Unicode CRT startup with BCC64X.
++  # Keep the original command-line tool and all its source files enabled.
++  if(DEFINED ENV{CB_BCC64X} AND NOT "$ENV{CB_BCC64X}" STREQUAL "")
 +    target_link_options(meshconvert PRIVATE -municode)
-+endif()
++  endif()
 +
- source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
+   source_group(meshconvert REGULAR_EXPRESSION meshconvert/*.*)
