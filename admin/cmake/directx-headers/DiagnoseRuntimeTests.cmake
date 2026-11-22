@@ -23,6 +23,15 @@ function(adecc_replace_once strFile strBefore strAfter)
 endfunction()
 set(strSimple "${SOURCE_ROOT}/test/test.cpp")
 set(strFeatures "${SOURCE_ROOT}/test/feature_check_test.cpp")
+# BCC64X is Clang on native Windows even when its headers define __MINGW32__.
+# Remove the upstream zero-return factory stub from the active compilation
+# by means of the explicit native Windows contract, not compiler identity.
+foreach(strTest IN ITEMS "${strSimple}" "${strFeatures}")
+   adecc_replace_once("${strTest}"
+      "#ifdef __MINGW32__\nSTDAPI\nDXCoreCreateAdapterFactory("
+      "#if defined(__MINGW32__) && !defined(ADECC_NATIVE_WINDOWS_DXCORE)\nSTDAPI\nDXCoreCreateAdapterFactory(")
+endforeach()
+
 adecc_replace_once("${strSimple}"
    "#include <wsl/winadapter.h>"
    "#include <wsl/winadapter.h>\n#include <cstdio> // BuildEngine: report the failing native DirectX API HRESULT")
