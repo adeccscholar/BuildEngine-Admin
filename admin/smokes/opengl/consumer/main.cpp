@@ -84,7 +84,12 @@ int main() {
    std::filesystem::path const theGalliumPath = ModulePath(theGalliumModule);
    bool const bAppLocalGallium = theGalliumModule != nullptr && !theExecutable.empty() && !theGalliumPath.empty() &&
       SamePath(theExecutable.parent_path(), theGalliumPath.parent_path());
-   bool const bSoftpipe = !strRenderer.empty() && ContainsInsensitive(strRenderer, "softpipe");
+   // The package builds both Mesa softpipe and the D3D12 Gallium driver.
+   // Validate that the active renderer belongs to one of those configured
+   // backends, rather than requiring the software fallback on every host.
+   bool const bSoftpipe = ContainsInsensitive(strRenderer, "softpipe");
+   bool const bD3D12 = ContainsInsensitive(strRenderer, "d3d12");
+   bool const bConfiguredRenderer = !strRenderer.empty() && (bSoftpipe || bD3D12);
 
    std::println("SMOKE|CHECK|opengl-module|{}|app-local Mesa opengl32.dll loaded",
                 bAppLocalOpenGL ? "PASS" : "FAIL");
@@ -93,10 +98,10 @@ int main() {
    std::println("SMOKE|CHECK|gallium-module|{}|app-local libgallium_wgl.dll loaded",
                 bAppLocalGallium ? "PASS" : "FAIL");
    std::println("SMOKE|CHECK|renderer|{}|vendor='{}', renderer='{}'",
-                bSoftpipe ? "PASS" : "FAIL", strVendor, strRenderer);
+                bConfiguredRenderer ? "PASS" : "FAIL", strVendor, strRenderer);
 
-   bool const bSuccess = bAppLocalOpenGL && bContext && bAppLocalGallium && bSoftpipe;
-   std::println("SMOKE|RESULT|{}|Mesa OpenGL softpipe consumer usable", bSuccess ? "PASS" : "FAIL");
+   bool const bSuccess = bAppLocalOpenGL && bContext && bAppLocalGallium && bConfiguredRenderer;
+   std::println("SMOKE|RESULT|{}|Mesa OpenGL configured Gallium consumer usable", bSuccess ? "PASS" : "FAIL");
 
    if(bContext) ::wglMakeCurrent(nullptr, nullptr);
    if(theContext != nullptr) ::wglDeleteContext(theContext);
