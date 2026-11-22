@@ -1,0 +1,66 @@
+--- a/DirectXTex/DirectXTexWIC.cpp
++++ b/DirectXTex/DirectXTexWIC.cpp
+@@ -10,6 +10,7 @@
+ //-------------------------------------------------------------------------------------
+ 
+ #include "DirectXTexP.h"
++#include <atomic>
+ 
+ using namespace DirectX;
+ using namespace DirectX::Internal;
+@@ -232,7 +233,7 @@
+ 
+         ULONG STDMETHODCALLTYPE AddRef() override
+         {
+-            return InterlockedIncrement(&mRefCount);
++            return mRefCount.fetch_add(1, std::memory_order_relaxed) + 1;
+         }
+ 
+         ULONG STDMETHODCALLTYPE Release() override
+@@ -237,7 +238,7 @@
+ 
+         ULONG STDMETHODCALLTYPE Release() override
+         {
+-            const ULONG res = InterlockedDecrement(&mRefCount);
++            const ULONG res = mRefCount.fetch_sub(1, std::memory_order_acq_rel) - 1;
+             if (res == 0)
+             {
+                 delete this;
+@@ -492,7 +493,7 @@
+         Blob& mBlob;
+         size_t m_streamPosition;
+         size_t m_streamEOF;
+-        ULONG mRefCount;
++        std::atomic<ULONG> mRefCount;
+ 
+         static HRESULT ComputeGrowSize(uint64_t& newSize, const uint64_t targetSize) noexcept
+         {
+--- a/DirectXTex/DirectXTexD3D11.cpp
++++ b/DirectXTex/DirectXTexD3D11.cpp
+@@ -76,7 +76,7 @@
+ 
+             for (size_t level = 0; level < metadata.mipLevels; ++level)
+             {
+-                const UINT dindex = D3D11CalcSubresource(static_cast<UINT>(level), 0, static_cast<UINT>(metadata.mipLevels));
++                const UINT dindex = D3D10CalcSubresource(static_cast<UINT>(level), 0, static_cast<UINT>(metadata.mipLevels));
+ 
+                 D3D11_MAPPED_SUBRESOURCE mapped;
+                 HRESULT hr = pContext->Map(pSource, dindex, D3D11_MAP_READ, 0, &mapped);
+@@ -144,7 +144,7 @@
+ 
+                 for (size_t level = 0; level < metadata.mipLevels; ++level)
+                 {
+-                    const UINT dindex = D3D11CalcSubresource(static_cast<UINT>(level), static_cast<UINT>(item), static_cast<UINT>(metadata.mipLevels));
++                    const UINT dindex = D3D10CalcSubresource(static_cast<UINT>(level), static_cast<UINT>(item), static_cast<UINT>(metadata.mipLevels));
+ 
+                     D3D11_MAPPED_SUBRESOURCE mapped;
+                     HRESULT hr = pContext->Map(pSource, dindex, D3D11_MAP_READ, 0, &mapped);
+@@ -908,7 +908,7 @@
+                 {
+                     for (UINT level = 0; level < desc.MipLevels; ++level)
+                     {
+-                        const UINT index = D3D11CalcSubresource(level, item, desc.MipLevels);
++                        const UINT index = D3D10CalcSubresource(level, item, desc.MipLevels);
+                         pContext->ResolveSubresource(pTemp.Get(), index, pSource, index, fmt);
+                     }
+                 }
