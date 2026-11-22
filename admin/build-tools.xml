@@ -53,6 +53,17 @@
       <probe contains="1.13.2"><argument value="--version"/></probe>
    </tool>
 
+   <!-- Pinned Microsoft NuGet CLI, used for reproducible package acquisition.
+        Managed download validates SHA-256 before the executable is made ready. -->
+   <tool id="nuget" version="6.14.0" required="when-used">
+      <managed root="nuget\\6.14.0" executable="nuget.exe">
+         <download url="https://dist.nuget.org/win-x86-commandline/v6.14.0/nuget.exe"
+                   archive="nuget.exe"
+                   sha256="92dbed160ddee0f64b901e907439e021211b428e57c089ecc12fc38dcc4bd9a5"/>
+      </managed>
+      <probe contains="6.14.0"><argument value="help"/></probe>
+   </tool>
+
    <tool id="perl" version="5.42.2.1" runtimeVersion="5.42.2" required="always">
       <managed root="perl\5.42.2.1" executable="perl\bin\perl.exe">
          <download url="https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_54221_64bit/strawberry-perl-5.42.2.1-64bit-portable.zip"
