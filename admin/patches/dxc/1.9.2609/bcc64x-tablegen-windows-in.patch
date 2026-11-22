@@ -1,6 +1,6 @@
 --- a/utils/TableGen/CodeEmitterGen.cpp
 +++ b/utils/TableGen/CodeEmitterGen.cpp
-@@ -239,11 +239,9 @@
+@@ -239,10 +239,7 @@
    // Emit instruction base values
    o << "  static const uint64_t InstBits[] = {\n";
 -  for (std::vector<const CodeGenInstruction*>::const_iterator
