@@ -39,3 +39,13 @@ The detailed CMake configure log reported that `external/SPIRV-Headers` did not 
 The library now declares dependencies on managed `spirv-headers/v1.202609.0` and `spirv-tools/2026.4` and passes their versioned extracted source directories under `build/thirdparty-test`. A global `SPIRV-Headers_SOURCE_DIR` also permits the nested SPIRV-Tools CMake project to reuse the same headers. `SPIRV_TOOLS_BUILD_STATIC=ON` retains the upstream targets and `SPIRV_TOOLS_USE_MIMALLOC=OFF` avoids an unrelated undeclared allocator requirement. DXC's HLSL/DXIL/SPIR-V functionality and its original CTest suite remain enabled. The two Khronos libraries remain separately managed and versioned; DXC does not download uncontrolled copies.
 
 The source-root path contract and the cross-version API compatibility still require native BCC64X Release/Debug evidence. **[not verified]**.
+
+## Native Ninja TAEF discovery
+
+The next BCC64X configure progressed past the managed SPIR-V sources and reached `cmake/modules/FindTAEF.cmake:57`. The pinned upstream module assumes `CMAKE_C_COMPILER_ARCHITECTURE_ID` or `CMAKE_GENERATOR_PLATFORM` is populated by an MSVC/Visual Studio generator; neither is necessarily set with BCC64X + Ninja.
+
+A version-bound source patch recognizes native Win64 using `WIN32`, `CMAKE_SIZEOF_VOID_P=8`, and the empty compiler architecture ID. It selects the original x64 TAEF header/library directories and amd64 runner path. It does not redefine compiler identity, skip Windows tests, or substitute a different test framework.
+
+**External dependency:** Windows HLSL unit tests actually use Microsoft's TAEF, supplied by the Windows Driver Kit or a compatible provisioned TAEF package. Upstream `find_package(TAEF REQUIRED)` and its original tests remain intact. If the local WDK/TAEF header, libraries or `te.exe` are absent, configure must still fail with the missing prerequisite rather than falsely reporting success. A further local trace is required to identify any such missing file. Microsoft documents the test dependency in `docs/BuildingAndTestingDXC.rst`.
+
+**[not verified]**: post-patch configure, native test build and test execution.
