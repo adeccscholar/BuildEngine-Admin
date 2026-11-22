@@ -1,0 +1,12 @@
+# DXC v1.9.2609 original shared HLSL test helpers.
+# Portable GoogleTest is used on native Windows.
+include_directories(${LLVM_MAIN_SRC_DIR}/utils/unittest/googletest/include)
+include_directories(${LLVM_MAIN_SRC_DIR}/utils/unittest/googlemock/include)
+
+add_clang_library(HLSLTestLib
+  DxcTestUtils.cpp
+  FileCheckerTest.cpp
+  FileCheckForTest.cpp
+)
+add_dependencies(HLSLTestLib TablegenHLSLOptions)
+set_target_properties(HLSLTestLib PROPERTIES FOLDER "Clang tests")
