@@ -356,11 +356,13 @@
       <xs:attribute name="source" type="xs:string" use="required"/>
       <xs:attribute name="target" type="xs:string" use="required"/>
       <xs:attribute name="extensions" type="xs:string" use="required"/>
+      <xs:attribute name="names" type="xs:string" use="optional"/>
       <xs:attribute name="optional" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
    <xs:complexType name="publishCMakeType">
       <xs:attribute name="source" type="xs:string" use="required"/>
       <xs:attribute name="target" type="xs:string" use="required"/>
+      <xs:attribute name="prefixes" type="xs:string" use="optional"/>
       <xs:attribute name="optional" type="booleanTextType" use="optional" default="false"/>
    </xs:complexType>
    <xs:complexType name="publishType">
