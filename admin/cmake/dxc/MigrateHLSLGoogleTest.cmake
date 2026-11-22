@@ -73,7 +73,7 @@ endforeach()
 set(_adecc_testlib_cmake "${_adecc_testlib}/CMakeLists.txt")
 file(READ "${_adecc_testlib_cmake}" _adecc_testlib_contents)
 if(_adecc_testlib_contents MATCHES "find_package\\(TAEF")
-   string(REPLACE "if(WIN32)\nfind_package(TAEF REQUIRED)\ninclude_directories(${TAEF_INCLUDE_DIRS})\nelse(WIN32)"
+   string(REPLACE "if(WIN32)\nfind_package(TAEF REQUIRED)\ninclude_directories(\${TAEF_INCLUDE_DIRS})\nelse(WIN32)"
       "if(TRUE)" _adecc_testlib_contents "${_adecc_testlib_contents}")
    string(REPLACE "endif(WIN32)" "endif()" _adecc_testlib_contents "${_adecc_testlib_contents}")
    if(_adecc_testlib_contents MATCHES "find_package\\(TAEF")
@@ -123,6 +123,8 @@ file(COPY_FILE
 file(COPY_FILE
    "${ADMIN_PATCH_ROOT}/gtest/PortableTestData.cpp"
    "${_adecc_exec_dir}/PortableTestData.cpp" ONLY_IF_DIFFERENT)
+file(READ "${_adecc_testlib_cmake}" _adecc_testlib_contents)
+if(NOT _adecc_testlib_contents MATCHES "PortableTestData\\.cpp")
 file(APPEND "${_adecc_testlib_cmake}" "
 # BuildEngine: original XML test parameter values, no TAEF runtime.
 target_sources(HLSLTestLib PRIVATE
@@ -131,5 +133,6 @@ target_include_directories(HLSLTestLib PRIVATE
   ${_adecc_exec_dir})
 target_compile_definitions(HLSLTestLib PRIVATE ADECC_DXC_GTEST=1)
 ")
+endif()
 
 message(STATUS "DXC HLSL original test migration: GoogleTest/CTest, changed fixture files=${_adecc_fixture_count}")
