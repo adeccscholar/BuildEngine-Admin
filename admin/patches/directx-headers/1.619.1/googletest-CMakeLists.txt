@@ -23,6 +23,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(Feature-Support-Test feature_support_test.cpp)
+include("${CB_DIRECTX_WINRT_HELPER}")
+adecc_directx_headers_winrt_include(Feature-Support-Test)
 target_link_libraries(Feature-Support-Test DirectX-Headers DirectX-Guids ${dxlibs} GTest::gtest_main)
 add_test(Feature-Support-Test Feature-Support-Test)
 
