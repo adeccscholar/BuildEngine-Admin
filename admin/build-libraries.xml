@@ -18076,7 +18076,7 @@
          <argument value="-DWINMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-22T12:30:00Z">
+   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-22T14:28:00Z">
       <dependency library="winmd" version="0f1eae3b"/>
       <metadata artifactType="tool" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
@@ -18120,6 +18120,14 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-catch-nocoro-seh.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\bcc64x-com-interface-test-signatures.patch" target="{Workspace}\.buildengine\patches\bcc64x-com-interface-test-signatures.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-com-test-signatures" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-com-interface-test-signatures.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
