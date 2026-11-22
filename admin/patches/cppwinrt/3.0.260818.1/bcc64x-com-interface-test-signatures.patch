@@ -1,16 +1,14 @@
 --- a/test/test/iid_ppv_args.cpp
 +++ b/test/test/iid_ppv_args.cpp
-@@ -1,6 +1,14 @@
+@@ -1,6 +1,12 @@
  #include "pch.h"
  #include <windows.foundation.h>
  
-+#if defined(__clang__) && defined(__CODEGEARC__)
 +// SDK combaseapi.h expects T**, while winrt::com_ptr supplies a COM proxy.
 +template<class T> GUID const& _CG_GUID_PPT_Helper(winrt::com_ptr<T>* aPtr) noexcept
 +{
 +    return __uuidof(T);
 +}
-+#endif
 +
  namespace
  {
