@@ -37,6 +37,9 @@ add_test(NAME DirectX-Headers-Check-Feature-Support-Test COMMAND DirectX-Headers
 
 foreach(t IN LISTS TEST_EXES)
   target_link_libraries(${t} DirectX-Headers DirectX-Guids ${dxlibs})
+  if(WIN32)
+    target_compile_definitions(${t} PRIVATE ADECC_NATIVE_WINDOWS_DXCORE=1)
+  endif()
 endforeach()
 
 if(DXHEADERS_BUILD_COM_ATL)
