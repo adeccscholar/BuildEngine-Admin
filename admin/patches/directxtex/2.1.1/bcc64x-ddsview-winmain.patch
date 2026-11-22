@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -527,6 +527,12 @@
+   target_link_libraries(ddsview PRIVATE ${PROJECT_NAME} d3d11.lib ole32.lib)
+   source_group(ddsview REGULAR_EXPRESSION DDSView/*.*)
+   target_include_directories(ddsview PRIVATE ${COMPILED_SHADERS})
++  if(DEFINED ENV{CB_BCC64X} AND NOT "$ENV{CB_BCC64X}" STREQUAL "")
++    # BCC64X links a WinMain startup while DDSView provides wWinMain.
++    target_sources(ddsview PRIVATE
++      "${CMAKE_CURRENT_SOURCE_DIR}/.buildengine/compat/directxtex-ddsview-winmain.cpp")
++  endif()
