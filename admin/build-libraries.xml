@@ -17981,4 +17981,196 @@
          <argument value="-Ddirectxtex_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxtex"/>
       </smoke>
    </library>
+   <library id="winmd" version="0f1eae3b" category="foundation" timestamp="2026-11-22T05:20:00Z">
+      <metadata artifactType="interface" name="Microsoft WinMD Reader" supplier="Microsoft" homepage="https://github.com/microsoft/winmd" description="MIT licensed interface-only Windows metadata reader, pinned dependency for the Microsoft C++/WinRT projection generator." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
+      <security><repository url="https://github.com/microsoft/winmd.git" ref="0f1eae3bfa63fa2ba3c2912cbfe72a01db94cc5a"/></security>
+      <source>
+         <download url="https://github.com/microsoft/winmd/archive/0f1eae3bfa63fa2ba3c2912cbfe72a01db94cc5a.tar.gz" archive="winmd-0f1eae3bfa63fa2ba3c2912cbfe72a01db94cc5a.tar.gz"/>
+         <extract format="libarchive" root="winmd-0f1eae3bfa63fa2ba3c2912cbfe72a01db94cc5a">
+            <require path="src\winmd_reader.h"/>
+            <require path="src\impl\base.h"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+      <install>
+         <copy source="{Workspace}\src" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include" recursive="true" overwrite="true"/>
+         <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\winmd_reader.h"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/></publish>
+
+   </library>
+   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-22T05:20:00Z">
+      <dependency library="winmd" version="0f1eae3b"/>
+      <metadata artifactType="executable" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
+      <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
+      <source>
+         <download url="https://github.com/microsoft/cppwinrt/archive/3.0.260818.1.tar.gz" archive="cppwinrt-3.0.260818.1.tar.gz"/>
+         <extract format="libarchive" root="cppwinrt-3.0.260818.1">
+            <require path="CMakeLists.txt"/>
+            <require path="cppwinrt\main.cpp"/>
+            <require path="prebuild\main.cpp"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DEXTERNAL_WINMD_INCLUDE_DIR:PATH={DependencyRoot:winmd}\include"/>
+         <argument value="-DCPPWINRT_BUILD_VERSION:STRING=3.0.260818.1"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-ctest" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"><argument value="--output-on-failure"/></execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe" optional="true"/>
+         <cmake source="share" target="share" optional="true"/>
+      </publish>
+   </library>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T05:20:00Z">
+      <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
+      <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
+      <source>
+         <download url="https://github.com/microsoft/DirectXShaderCompiler/archive/v1.9.2609.tar.gz" archive="dxc-v1.9.2609.tar.gz"/>
+         <extract format="libarchive" root="DirectXShaderCompiler-1.9.2609">
+            <require path="CMakeLists.txt"/>
+            <require path="include\dxc\dxcapi.h"/>
+            <require path="LICENSE.TXT"/>
+            <require path="LICENSE.TXT"/>
+         </extract>
+      </source>
+
+      <build testsAffectBuild="true">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DLLVM_TARGETS_TO_BUILD:STRING=AMDGPU;NVPTX"/>
+         <argument value="-DLLVM_ENABLE_PROJECTS:STRING=clang"/>
+         <argument value="-DLLVM_INCLUDE_TESTS:BOOL=ON"/>
+         <argument value="-DLLVM_BUILD_TESTS:BOOL=ON"/>
+         <argument value="-DHLSL_BUILD_DXILCONV:BOOL=ON"/>
+         <argument value="-DENABLE_SPIRV_CODEGEN:BOOL=ON"/>
+         <argument value="-DSPIRV_BUILD_TESTS:BOOL=ON"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <execute name="upstream-ctest" test="true" executable="{ToolDir:cmake}\ctest.exe" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false"><argument value="--output-on-failure"/></execute>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.TXT" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe" optional="true"/>
+         <cmake source="share" target="share" optional="true"/>
+      </publish>
+   </library>
+   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-22T05:20:00Z">
+      <dependency library="directxmath" version="3.21"/>
+      <dependency library="directx-headers" version="1.619.1"/>
+      <dependency library="dxc" version="1.9.2609"/>
+      <metadata artifactType="shared" name="Microsoft DirectX Tool Kit 12" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXTK12" description="Native Direct3D 12 rendering utilities, effects, shaders and input support, with managed DXC and DirectX dependencies." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
+      <security><repository url="https://github.com/microsoft/DirectXTK12.git" ref="may2026"/></security>
+      <source>
+         <download url="https://github.com/microsoft/DirectXTK12/archive/may2026.tar.gz" archive="directxtk12-may2026.tar.gz"/>
+         <extract format="libarchive" root="DirectXTK12-may2026">
+            <require path="CMakeLists.txt"/>
+            <require path="Inc\SpriteBatch.h"/>
+            <require path="Src\Shaders\CompileShaders.cmd"/>
+            <require path="LICENSE"/>
+         </extract>
+      </source>
+
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
+         <environment name="PATH" value="{DependencyRoot:dxc}\bin\win64\{Configuration};{ENV:PATH}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_DATAROOTDIR:STRING=share"/>
+         <argument value="-DCMAKE_CXX_STANDARD:STRING=23"/>
+         <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
+         <argument value="-DBUILD_TESTING:BOOL=ON"/>
+         <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
+         <argument value="-DBUILD_DXIL_SHADERS:BOOL=ON"/>
+         <argument value="-DBUILD_XAUDIO_WIN10:BOOL=ON"/>
+         <argument value="-DBUILD_XINPUT:BOOL=ON"/>
+         <argument value="-DBUILD_WGI:BOOL=ON"/>
+         <argument value="-Ddirectxmath_DIR:PATH={DependencyRoot:directxmath}\share\directxmath"/>
+         <argument value="-Ddirectx-headers_DIR:PATH={DependencyRoot:directx-headers}\share\directx-headers\cmake"/>
+         <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers}"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
+         <variant name="Debug"><argument value="-DCMAKE_BUILD_TYPE:STRING=Debug"/></variant>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\directxtk12\SpriteBatch.h"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <tree source="include" target="include" optional="true"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="true"/>
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe" optional="true"/>
+         <cmake source="share" target="share" optional="true"/>
+      </publish>
+   </library>
 </buildLibraries>
