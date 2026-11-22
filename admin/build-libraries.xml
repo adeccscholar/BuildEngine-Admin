@@ -18215,7 +18215,8 @@
          <argument value="-DCMAKE_CXX_SCAN_FOR_MODULES:BOOL=OFF"/>
          <argument value="-DBUILD_TESTING:BOOL=ON"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
-         <argument value="-DLLVM_TARGETS_TO_BUILD:STRING=AMDGPU;NVPTX"/>
+         <!-- DXC v1.9.2609 removes all conventional LLVM target backends in lib/Target/LLVMBuild.txt; the HLSL/DXIL/SPIR-V functionality is separate and remains enabled. -->
+         <argument value="-DLLVM_TARGETS_TO_BUILD:STRING="/>
          <argument value="-DLLVM_ENABLE_PROJECTS:STRING=clang"/>
          <argument value="-DLLVM_INCLUDE_TESTS:BOOL=ON"/>
          <argument value="-DLLVM_BUILD_TESTS:BOOL=ON"/>
@@ -18329,7 +18330,7 @@
       <metadata artifactType="shared" name="Microsoft DirectStorage GDeflate Reference" supplier="Microsoft and NVIDIA contributors"
          homepage="https://github.com/microsoft/DirectStorage"
          description="Source-built GDeflate reference compressor and decompressor from Microsoft DirectStorage samples. This is not the closed DirectStorage SDK runtime." licenseSignal="yellow">
-         <license name="Apache License 2.0" spdx="Apache-2.0" file="GDeflate\GDeflate\LICENSE"/>
+         <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\gdeflate\LICENSE"/>
       </metadata>
       <security><repository url="https://github.com/microsoft/DirectStorage.git" commit="9352da00f98764ac9f2768e424dacc2cac7cd66d"/></security>
       <source>
