@@ -38,3 +38,16 @@ flowchart TD
 **Acceptance:** reproducible source, original CMake/Ninja where possible, BCC64X Release and Debug, native DLL runtime or true header-only ABI, all available upstream tests, package install, independent consumers, licensing, SBOM and final FSM state. Failure must not be hidden by disabling original features.
 
 [Gallium D3D12 and Zink investigation](mesa-gallium-backends-2026-11-22.md).
+
+
+## Second Microsoft integration wave
+
+| Package | Version | Scope |
+| --- | --- | --- |
+| winmd | 0f1eae3b | Reader source for C++/WinRT |
+| cppwinrt | 3.0.260818.1 | WinRT projection generator |
+| dxc | 1.9.2609 | LLVM-derived HLSL/DXIL compiler |
+| directxtk12 | 1.6.6 | D3D12 toolkit DLL and shaders |
+| directstorage-gdeflate | 9352da00 | Apache-2.0 open compressor DLL, not the full DirectStorage SDK |
+
+**[not verified]** All five registrations need Release/Debug BCC64X compile, original test suites where present, install, SBOM, package API and consumer evidence.

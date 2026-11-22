@@ -8,6 +8,12 @@ Each versioned guide documents the intended native C++Builder 13/BCC64X build pr
 
 ## Versioned package guides
 
+- [winmd 0f1eae3b](/package/winmd/0f1eae3b/migration)
+- [cppwinrt 3.0.260818.1](/package/cppwinrt/3.0.260818.1/migration)
+- [dxc 1.9.2609](/package/dxc/1.9.2609/migration)
+- [directxtk12 1.6.6](/package/directxtk12/1.6.6/migration)
+- [directstorage-gdeflate 9352da00](/package/directstorage-gdeflate/9352da00/migration)
+
 - [detours 4.0.1](/package/detours/4.0.1/migration)
 - [directxmath 3.21](/package/directxmath/3.21/migration)
 - [directxmesh 1.7.2](/package/directxmesh/1.7.2/migration)

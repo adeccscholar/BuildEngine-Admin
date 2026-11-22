@@ -18002,7 +18002,7 @@
    </library>
    <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-22T05:20:00Z">
       <dependency library="winmd" version="0f1eae3b"/>
-      <metadata artifactType="executable" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
+      <metadata artifactType="tool" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
       <source>
          <download url="https://github.com/microsoft/cppwinrt/archive/3.0.260818.1.tar.gz" archive="cppwinrt-3.0.260818.1.tar.gz"/>
