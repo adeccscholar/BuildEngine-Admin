@@ -17891,7 +17891,7 @@
          <argument value="-Ddirectxmath_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmath"/>
       </smoke>
    </library>
-   <library id="directxmesh" version="1.7.2" category="graphics" timestamp="2026-11-22T21:35:00Z">
+   <library id="directxmesh" version="1.7.2" category="graphics" timestamp="2026-11-22T21:40:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <metadata artifactType="shared" name="Microsoft DirectXMesh" supplier="Microsoft"
@@ -17907,13 +17907,13 @@
             <require path="DirectXMesh\DirectXMesh.h"/>
             <require path="LICENSE"/>
          </extract>
-         <copy source="{BuildFileDir}\\patches\\directxmesh\\1.7.2\\bcc64x-meshconvert-unicode.patch" target="{Workspace}\\.buildengine\\patches\\bcc64x-meshconvert-unicode.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\directxmesh\1.7.2\bcc64x-meshconvert-unicode.patch" target="{Workspace}\.buildengine\patches\bcc64x-meshconvert-unicode.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="apply-meshconvert-unicode-entrypoint" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
-            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\\.buildengine\\patches\\bcc64x-meshconvert-unicode.patch"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-meshconvert-unicode.patch"/>
             <argument value="-P"/>
-            <argument value="{BuildFileDir}\\cmake\\packages\\ApplyIdempotentSourcePatch.cmake"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
       </source>
       <build testsAffectBuild="false">
