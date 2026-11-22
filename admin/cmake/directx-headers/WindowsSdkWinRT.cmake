@@ -42,6 +42,18 @@ function(adecc_directx_headers_winrt_include)
       "${_adecc_override_root}/wrl/client.h"
       COPYONLY)
 
+   # BCC64X's combaseapi.h uses _CG_GUID_PPT_Helper(T**) rather than the
+   # MSVC-friendly __uuidof(**ppType) expression. Microsoft's WSL ComPtr
+   # reference proxy already supports IID_PPV_ARGS_Helper; provide only the
+   # missing GUID deduction overload, without impersonating MSVC.
+   file(APPEND "${_adecc_override_root}/wrl/client.h" [=[
+template<class T>
+GUID const& _CG_GUID_PPT_Helper(
+   Microsoft::WRL::Details::ComPtrRef<T> aPtr) noexcept {
+   return __uuidof(**aPtr);
+}
+]=])
+
    # Upstream installs include/wsl already; install the missing wrl/client.h
    # forwarder into the versioned package for independent consumers too.
    get_property(_adecc_install_registered GLOBAL PROPERTY
