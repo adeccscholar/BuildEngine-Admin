@@ -27,6 +27,12 @@ adecc_replace_once("${strSimple}"
    "#include <wsl/winadapter.h>"
    "#include <wsl/winadapter.h>\n#include <cstdio> // BuildEngine: report the failing native DirectX API HRESULT")
 adecc_replace_once("${strSimple}"
+   "int main()\n{"
+   "int main()\n{\n    std::fprintf(stderr, \"DirectX-Headers-Test: entered main\\n\");\n    std::fflush(stderr);")
+adecc_replace_once("${strFeatures}"
+   "int main()\n{"
+   "int main()\n{\n    std::cerr << \"DirectX-Headers-Check-Feature-Support-Test: entered main\" << std::endl;")
+adecc_replace_once("${strSimple}"
    "if (FAILED(DXCoreCreateAdapterFactory(&factory)))\n            return -1;"
    "if (HRESULT const hr = DXCoreCreateAdapterFactory(&factory); FAILED(hr)) {\n            std::fprintf(stderr, \"DXCoreCreateAdapterFactory: HRESULT=0x%08lX\\n\", static_cast<unsigned long>(hr));\n            return -1;\n        }")
 adecc_replace_once("${strSimple}"
