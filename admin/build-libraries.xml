@@ -17626,6 +17626,8 @@
               allowing upstream FetchContent to download Google's live main. -->
          <copy source="{BuildFileDir}\patches\directx-headers\1.619.1\googletest-CMakeLists.txt"
             target="{Workspace}\googletest\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\directx-headers\1.619.1\test-CMakeLists.txt"
+            target="{Workspace}\test\CMakeLists.txt" overwrite="true" preserveCurrentArtifact="true"/>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
@@ -17646,6 +17648,7 @@
          <argument value="-DDXHEADERS_BUILD_GOOGLE_TEST:BOOL=ON"/>
          <argument value="-DDXHEADERS_INSTALL:BOOL=ON"/>
          <argument value="-DGTest_DIR:PATH={DependencyRoot:googletest}\lib\win64\{Configuration}\cmake\GTest"/>
+         <argument value="-DCB_DIRECTX_WINRT_HELPER:FILEPATH={BuildFileDir}\cmake\directx-headers\WindowsSdkWinRT.cmake"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}"
             build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}"
