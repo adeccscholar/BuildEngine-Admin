@@ -32,10 +32,21 @@ class DXCOriginalTestFormat(lit.formats.GoogleTest):
             lit_config.error("DXC original GoogleTest binary missing: " +
                              ", ".join(candidates))
             return
+        xml_methods = set()
+        if "ADECC_EXECUTABLE" == "ExecHLSLTests":
+            inventory = os.path.join(
+                config.llvm_src_root, "tools", "clang", "unittests",
+                "HLSLExec", "OriginalXmlMethods.txt")
+            if not os.path.isfile(inventory):
+                lit_config.fatal("Missing generated DXC XML test method inventory")
+            with open(inventory, encoding="utf-8") as stream:
+                xml_methods = set(stream.read().splitlines())
         for test in self.getTestsInExecutable(
             suite, path, executable, lit_config, local_config
         ):
-            yield test
+            # These methods are executed once per original XML row in CTest.
+            if test.path_in_suite[-1] not in xml_methods:
+                yield test
 
     def execute(self, test, lit_config):
         if lit_config.noExecute:
