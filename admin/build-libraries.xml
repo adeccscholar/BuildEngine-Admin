@@ -4599,7 +4599,7 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\glew\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="glew-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
-<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-23T00:51:00Z">
+<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-23T01:12:00Z">
       <dependency library="directx-headers" version="1.619.1"/>
       <metadata name="Mesa OpenGL" supplier="Mesa project" homepage="https://mesa3d.org/" description="Mesa-based OpenGL runtime and development package for hardware-accelerated graphics on Windows." licenseSignal="yellow">
          <license name="Mesa component licenses" file="LICENSE-MESA.rst"/>
@@ -4678,6 +4678,13 @@
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-d3d12-com-abi.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <!-- Prepare the shared Meson runtime exactly once in the library Source state. -->
+         <execute name="prepare-meson-bcc64x" executable="{Tool:python}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="{Workspace}\.buildengine\meson_bootstrap.py"/>
+            <argument value="{Workspace}\meson-1.12.0"/>
+            <argument value="prepare"/>
+            <argument value="{Workspace}"/>
          </execute>
       </source>
       <build testsAffectBuild="true">
@@ -17989,7 +17996,7 @@
          <argument value="-Ddirectxmesh_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmesh"/>
       </smoke>
    </library>
-   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-23T00:48:00Z">
+   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-23T01:11:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="openexr" version="3.5.4"/>
@@ -18046,6 +18053,14 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-ddsview-winmain.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\directxtex\2.1.1\bcc64x-dll-names.patch" target="{Workspace}\.buildengine\patches\bcc64x-dll-names.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-bcc64x-dll-names" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-dll-names.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
@@ -18282,7 +18297,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-23T00:49:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-23T01:10:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18390,6 +18405,14 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-debug-format.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\dxc\1.9.2609\bcc64x-tablegen-windows-in.patch" target="{Workspace}\.buildengine\patches\bcc64x-tablegen-windows-in.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-bcc64x-tablegen-windows-in" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-tablegen-windows-in.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
