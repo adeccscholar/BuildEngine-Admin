@@ -1,0 +1,13 @@
+--- a/tools/clang/tools/CMakeLists.txt
++++ b/tools/clang/tools/CMakeLists.txt
+@@ -32,7 +32,11 @@
+ add_subdirectory(dxrfallbackcompiler)
+-add_subdirectory(dxlib-sample)
+ # UI powered by .NET.
+ add_subdirectory(dotnetc)
+ endif (MSVC)
++if(MSVC OR (WIN32 AND DEFINED ENV{CB_BCC64X} AND NOT "$ENV{CB_BCC64X}" STREQUAL ""))
++  # dxc_batch requires the original dxlib_sample DLL on native BCC64X.
++  add_subdirectory(dxlib-sample)
++endif()
+ # HLSL Change Ends
