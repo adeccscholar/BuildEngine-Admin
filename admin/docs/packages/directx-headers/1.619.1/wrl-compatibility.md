@@ -1,0 +1,31 @@
+# Native BCC64X WRL compatibility for DirectX-Headers 1.619.1
+
+**Status:** [not verified] until native BCC64X Release/Debug build, install and original upstream CTest execution.
+
+## Rationale
+
+The Windows SDK 10.0.26100.0 WRL implementation rejects BCC64X at `winrt/wrl/def.h:33` with `WRL requires compiler version 16.00 or greater`. Do not impersonate MSVC with `_MSC_VER` and do not disable upstream tests.
+
+The exact Microsoft DirectX-Headers tag `v1.619.1` includes MIT-licensed sources:
+
+- `include/wsl/stubs/wrl/client.h`: original forwarding header, includes `wsl/wrladapter.h`;
+- `include/wsl/wrladapter.h`: Microsoft's `Microsoft::WRL::ComPtr` implementation;
+- `include/wsl/winadapter.h`: includes native `unknwn.h`.
+
+The compatibility adapter `admin/cmake/directx-headers/WindowsSdkWinRT.cmake` installs a copy of the upstream forwarding header into the build tree's separate include root and places that root before the Windows SDK for the original CTest targets. It also installs `include/wrl/client.h` in the versioned DirectX-Headers package. The upstream install already copies `include/wsl/`.
+
+No other WSL stubs are added to the native Windows include path. Win32 types and COM interfaces still come from the real native Windows SDK. The selected WRL class implementation is the pinned Microsoft MIT source, not SDK WRL. This is not a claim of general SDK independence.
+
+## Verification requirements
+
+1. Re-run the actual original upstream `DirectX-Headers-Test`, `DirectX-Headers-Check-Feature-Support-Test`, and `Feature-Support-Test` for both configurations with BCC64X.
+2. Inspect the compiler's include-resolution trace to ensure `wrl/client.h` comes from `adecc-microsoft-wrl-compat`, while `unknwn.h` comes from the native Windows toolchain.
+3. Check that the versioned installed package contains `include/wrl/client.h`, `include/wsl/wrladapter.h`, `include/wsl/winadapter.h`, all original DirectX headers and unchanged upstream tests.
+4. Run an independent consumer from the installed package (not the source tree), including basic `ComPtr` AddRef/Release and D3D12 state-object helper compilation.
+5. Follow with DirectXMesh, DirectXTex and DirectXTK12 consumers. Do not promote unsupported WRL facilities (e.g. weak-reference semantics) as verified.
+
+**Static evidence:** the pinned Microsoft sources and original CMake target structure were inspected. A separate CMake 3.31 mock check of include overlay and package install succeeded, but it is not a native BCC64X verification.
+
+## Git discipline
+
+The original `test-CMakeLists.txt` and `googletest-CMakeLists.txt` are unchanged by this update. The patch is only in the common CMake adapter and this documentation. Git's clean-worktree/fast-forward contract remains authoritative. Never run `git reset --hard`, `git clean` or disable dirty checking as a response to line-ending changes.
