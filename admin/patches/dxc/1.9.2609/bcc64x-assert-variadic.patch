@@ -1,0 +1,13 @@
+--- a/include/dxc/Support/Global.h
++++ b/include/dxc/Support/Global.h
+@@ -300,9 +300,9 @@
+ #define DXASSERT_ARGS(exp, fmt, ...)                                           \
+   do {                                                                         \
+     if (!(exp)) {                                                              \
+       OutputDebugFormatA(                                                      \
+           "Error: \t%s\nFile:\n%s(%d)\nFunc:\t%s.\n\t" fmt "\n",               \
+-          "!(" #exp ")", __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__);       \
++          "!(" #exp ")", __FILE__, __LINE__, __FUNCTION__ __VA_OPT__(,) __VA_ARGS__); \
+       __debugbreak();                                                          \
+     }                                                                          \
+   } while (0)
