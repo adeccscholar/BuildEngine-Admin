@@ -17703,7 +17703,7 @@
          <argument value="-Ddirectx-headers_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directx-headers\cmake"/>
       </smoke>
    </library>
-   <library id="detours" version="4.0.1" category="systems" timestamp="2026-11-22T14:01:28Z">
+   <library id="detours" version="4.0.1" category="systems" timestamp="2026-11-22T14:14:49Z">
       <metadata artifactType="shared" name="Microsoft Detours" supplier="Microsoft"
          homepage="https://github.com/microsoft/detours"
          description="Windows API interception and instrumentation, reusable BCC64X DLL and Vulkan Loader test source." licenseSignal="yellow">
