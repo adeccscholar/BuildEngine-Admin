@@ -1,0 +1,21 @@
+# Original DXIL converter assertions, moved to GoogleTest + CTest on native Win64.
+# ManualFileCheckTest remains explicitly disabled, as it was under TAEF.
+add_dxilconv_project_executable(dxilconv-tests
+  DxilConvTests.cpp
+  ${LLVM_MAIN_SRC_DIR}/tools/clang/unittests/HLSL/TestMain.cpp
+  ${LLVM_MAIN_SRC_DIR}/tools/clang/unittests/HLSL/HLSLTestOptions.cpp)
+target_compile_definitions(dxilconv-tests PRIVATE ADECC_DXC_GTEST=1)
+target_include_directories(dxilconv-tests PRIVATE
+  ${LLVM_MAIN_SRC_DIR}/tools/clang/unittests/HLSL
+  ${LLVM_MAIN_SRC_DIR}/include/dxc/Test
+  ${LLVM_MAIN_SRC_DIR}/utils/unittest/googletest/include
+  ${LLVM_MAIN_SRC_DIR}/utils/unittest/googlemock/include)
+target_link_libraries(dxilconv-tests PRIVATE
+  HLSLTestLib LLVMDxilContainer LLVMDxcSupport LLVMMSSupport
+  LLVMSupport LLVMOption gtest gmock shlwapi)
+add_dependencies(dxilconv-tests dxilconv HLSLTestLib dxbc2dxil dxa opt)
+add_test(NAME DXC.DxilConv.Original
+  COMMAND $<TARGET_FILE:dxilconv-tests>
+    --HlslDataDir ${DXILCONV_PROJECT_SOURCE_DIR}/test)
+set_tests_properties(DXC.DxilConv.Original
+  PROPERTIES LABELS "BCC64X;DXC;DXILCONV;original" TIMEOUT 1800)
