@@ -39,7 +39,7 @@ adecc_replace_required(
    "add_library(Microsoft::DirectX-Guids ALIAS DirectX-Guids)"
    "add_library(Microsoft::DirectX-Guids ALIAS DirectX-Guids)\n${_adecc_shared_properties}")
 adecc_replace_required(
-   "            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})"
-   "            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}\n            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})")
+   [=[            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})]=]
+   [=[            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}\n            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})]=])
 file(WRITE "${_adecc_file}" "${_adecc_source}")
 message(STATUS "DirectX-Headers 1.619.1: native DLL and import-library contract applied")
