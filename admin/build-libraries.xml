@@ -18173,7 +18173,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T14:15:23Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-22T14:19:49Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18220,6 +18220,7 @@
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <!-- Use the verified BuildEngine Python interpreter, not a global host search. -->
          <argument value="-DPython3_EXECUTABLE:FILEPATH={Tool:python}"/>
+         <argument value="-DADECC_BCC64X_NATIVE_X64:BOOL=ON"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
