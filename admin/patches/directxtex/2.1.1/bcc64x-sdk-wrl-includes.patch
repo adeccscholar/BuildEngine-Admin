@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -19,5 +19,26 @@
+@@ -19,5 +19,27 @@
    DESCRIPTION "DirectX Texture Library"
    HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkId=248926"
    LANGUAGES CXX)
@@ -21,7 +21,8 @@
 +  if(NOT EXISTS "${_adecc_sdk_winrt}/wrl/client.h")
 +    message(FATAL_ERROR "The managed Windows SDK lacks WRL: ${_adecc_sdk_winrt}")
 +  endif()
-+  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/.buildengine/compat" "${_adecc_sdk_winrt}")
++  include_directories(BEFORE "${_adecc_sdk_winrt}")
++  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/.buildengine/compat")
 +  # Embarcadero's Windows SDK winerror.h uses MSVC's __forceinline token.
 +  add_compile_definitions(__forceinline=inline)
 +endif()
