@@ -1,0 +1,20 @@
+--- a/include/dxc/Support/Global.h
++++ b/include/dxc/Support/Global.h
+@@ -267,7 +267,7 @@
+-inline void OutputDebugFormatA(const char *pszFormat, ...) {
++inline void DxcOutputDebugFormatA(const char *pszFormat, ...) {
+   constexpr size_t bufferSize = 1024;
+   char buffer[bufferSize];
+ 
+@@ -273,7 +273,7 @@
+-  int count = vsnprintf_s(buffer, bufferSize, pszFormat, argList);
++  int count = vsnprintf(buffer, bufferSize, pszFormat, argList);
+   va_end(argList);
+ 
+   OutputDebugStringA(buffer);
+@@ -300,7 +300,7 @@
+ #define DXASSERT_ARGS(exp, fmt, ...)                                           \
+   do {                                                                         \
+     if (!(exp)) {                                                               \
+-      OutputDebugFormatA(                                                      \
++      DxcOutputDebugFormatA(                                                   \
