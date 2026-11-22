@@ -49,6 +49,17 @@ set(Boost_DIR "${theManagedBoostDir}" CACHE PATH "Exact managed Boost CMake pack
 set(Boost_ROOT "${BOOST_PACKAGE_ROOT}")
 set(BOOST_ROOT "${BOOST_PACKAGE_ROOT}")
 list(PREPEND CMAKE_PREFIX_PATH "${BOOST_PACKAGE_ROOT}")
+
+# Keep the proven BCC64X Clang-specific Boost.Config override first in
+# every native compiler invocation, ahead of the installed Boost headers.
+set(theBoostClangConfigDir
+   "${CMAKE_CURRENT_LIST_DIR}/../../../cmake/consumer/boost/bcc64x-native-clang")
+if(NOT EXISTS "${theBoostClangConfigDir}/boost/config/user.hpp")
+   message(FATAL_ERROR "Managed BCC64X Clang Boost.Config user.hpp missing: ${theBoostClangConfigDir}")
+endif()
+set(ADECC_BOOST_MANAGED_INCLUDE_DIR "${BOOST_PACKAGE_ROOT}/include")
+include("${theBoostClangConfigDir}/project-include.cmake")
+
 find_package(Boost "${strBoostVersion}" EXACT CONFIG REQUIRED
    PATHS "${theManagedBoostDir}" NO_DEFAULT_PATH)
 message(STATUS "[CGAL] Managed Boost ${Boost_VERSION}: ${Boost_DIR}")
@@ -61,7 +72,11 @@ endif()
 add_executable(cgal-consumer main.cpp)
 target_compile_features(cgal-consumer PRIVATE cxx_std_23)
 target_link_libraries(cgal-consumer PRIVATE CGAL::CGAL)
-target_include_directories(cgal-consumer PRIVATE "${BOOST_PACKAGE_ROOT}/include")
+# The Clang-specific boost/config/user.hpp overlay must be the first
+# non-system include directory, before the managed Boost 1.92.0 headers.
+target_include_directories(cgal-consumer BEFORE PRIVATE
+   "${theBoostClangConfigDir}"
+   "${BOOST_PACKAGE_ROOT}/include")
 
 # CGAL is header-only, but its independent consumer still needs the exact
 # managed BCC64X runtime closure if imported Boost dependencies require DLLs.
