@@ -1,6 +1,7 @@
 --- a/tools/clang/tools/CMakeLists.txt
 +++ b/tools/clang/tools/CMakeLists.txt
-@@ -32,7 +32,11 @@
+@@ -38,8 +38,11 @@
+ add_subdirectory(d3dcomp)
  add_subdirectory(dxrfallbackcompiler)
 -add_subdirectory(dxlib-sample)
  # UI powered by .NET.
