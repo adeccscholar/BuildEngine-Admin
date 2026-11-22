@@ -59,7 +59,7 @@ GUID const& _CG_GUID_PPT_Helper(
    get_property(_adecc_install_registered GLOBAL PROPERTY
       ADECC_DIRECTX_HEADERS_WRL_INSTALL_REGISTERED)
    if(NOT _adecc_install_registered)
-      install(FILES "${_adecc_forwarder}" DESTINATION include/wrl)
+      install(FILES "${_adecc_override_root}/wrl/client.h" DESTINATION include/wrl)
       set_property(GLOBAL PROPERTY
          ADECC_DIRECTX_HEADERS_WRL_INSTALL_REGISTERED TRUE)
    endif()
