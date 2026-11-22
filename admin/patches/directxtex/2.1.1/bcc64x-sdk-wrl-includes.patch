@@ -1,6 +1,6 @@
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -17,6 +17,27 @@
+@@ -17,4 +17,25 @@
    DESCRIPTION "DirectX Texture Library"
    HOMEPAGE_URL "https://go.microsoft.com/fwlink/?LinkId=248926"
    LANGUAGES CXX)
@@ -26,5 +26,3 @@
 +endif()
 +
  if(DEFINED XBOX_CONSOLE_TARGET)
-   set(CMAKE_CXX_STANDARD_LIBRARIES "")
- endif()
