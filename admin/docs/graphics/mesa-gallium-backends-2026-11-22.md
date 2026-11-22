@@ -62,3 +62,10 @@ flowchart TD
 4. Only after a fully native Vulkan Loader with its complete upstream tests and managed dependencies is available, enable Zink in Mesa and add separate native GPU verification.
 
 **Current limits:** No local Windows build, GPU vendor/renderer transcript, Mesa Gallium D3D12 shader compilation, Vulkan Loader CTest result or Zink binary has been verified. The fact that a dropdown allows a backend selection is not equivalent to a successfully built driver.
+## DirectX-Headers WRL test-header compatibility (22 November 2026)
+
+The first native BCC64X attempt for DirectX-Headers 1.619.1 reached both Release and Debug compilation and failed in the upstream `Feature-Support-Test` with `Fatal F1129: 'wrl/client.h' file not found`, originating from `include/directx/d3dx12_state_object.h`. Upstream also includes WRL in the ordinary `DirectX-Headers-Check-Feature-Support-Test` target. The defect is a missing **Windows SDK WinRT include directory**, not evidence that D3D12 itself or the installed Windows SDK is absent.
+
+The correction retains both upstream test suites and adds `admin/cmake/directx-headers/WindowsSdkWinRT.cmake`. It derives the SDK version/root from the **registered** `CB_WINDOWS_RC` tool by the same path traversal used by the shared BCC64X toolchain, requires `Include/<version>/winrt/wrl/client.h` to exist, and attaches that directory only to the actual upstream test targets through `target_include_directories(... SYSTEM PRIVATE ...)`. The upstream GoogleTest build remains pinned to managed GoogleTest 1.18.0, and the original ordinary test CMakeLists is retained with just the necessary include adapter. No test targets or test execution are disabled; no alternate compiler toolchain is selected.
+
+This change has been committed on `main`, but the repaired Release/Debug builds and tests remain **[not verified]** until the next native BuildEngine run. A subsequent WRL, COM or SDK-ABI error must be handled using its actual diagnostic rather than preemptively disabling test coverage.
