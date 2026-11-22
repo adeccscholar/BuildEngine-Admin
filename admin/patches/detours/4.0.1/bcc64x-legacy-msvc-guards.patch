@@ -81,3 +81,39 @@
      for (DWORD n = 0; n < nDlls; n++) {
          HRESULT hr;
          size_t cchDest = 0;
+--- a/src/creatwth.cpp
++++ b/src/creatwth.cpp
+@@ -1153,7 +1153,8 @@
+     CHAR szCommand[MAX_PATH];
+     PDETOUR_EXE_HELPER helper = NULL;
+     HRESULT hr;
++    DWORD nLen = 0;
+ 
+     DETOUR_TRACE(("DetourProcessViaHelperDlls(pid=%d,dlls=%d)\n", dwTargetPid, nDlls));
+     if (nDlls < 1 || nDlls > 4096) {
+@@ -1164,7 +1165,7 @@
+         goto Cleanup;
+     }
+ 
+-    DWORD nLen = GetEnvironmentVariableA("WINDIR", szExe, ARRAYSIZE(szExe));
++    nLen = GetEnvironmentVariableA("WINDIR", szExe, ARRAYSIZE(szExe));
+     if (nLen == 0 || nLen >= ARRAYSIZE(szExe)) {
+         goto Cleanup;
+     }
+@@ -1249,7 +1249,8 @@
+     WCHAR szCommand[MAX_PATH];
+     PDETOUR_EXE_HELPER helper = NULL;
+     HRESULT hr;
++    DWORD nLen = 0;
+ 
+     DETOUR_TRACE(("DetourProcessViaHelperDlls(pid=%d,dlls=%d)\n", dwTargetPid, nDlls));
+     if (nDlls < 1 || nDlls > 4096) {
+@@ -1260,7 +1261,7 @@
+         goto Cleanup;
+     }
+ 
+-    DWORD nLen = GetEnvironmentVariableW(L"WINDIR", szExe, ARRAYSIZE(szExe));
++    nLen = GetEnvironmentVariableW(L"WINDIR", szExe, ARRAYSIZE(szExe));
+     if (nLen == 0 || nLen >= ARRAYSIZE(szExe)) {
+         goto Cleanup;
+     }
