@@ -8,8 +8,8 @@ endif()
 if(NOT EXISTS "${LIBDEFLATE_PACKAGE_ROOT}/include/libdeflate.h")
    message(FATAL_ERROR "Managed libdeflate package missing")
 endif()
-find_library(LIBDEFLATE_LIB NAMES libdeflate libdeflated deflate libdeflate_shared
-   PATHS "${LIBDEFLATE_PACKAGE_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}" NO_DEFAULT_PATH REQUIRED)
+find_package(LibdeflateGDeflate CONFIG REQUIRED
+   PATHS "${LIBDEFLATE_PACKAGE_ROOT}/share/libdeflate-gdeflate/cmake" NO_DEFAULT_PATH)
 add_library(GDeflate SHARED
    "${DEFLATE_SOURCE_ROOT}/GDeflateCompress.cpp"
    "${DEFLATE_SOURCE_ROOT}/GDeflateDecompress.cpp")
@@ -17,7 +17,7 @@ target_include_directories(GDeflate PUBLIC
    "$<BUILD_INTERFACE:${DEFLATE_SOURCE_ROOT}>"
    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 target_include_directories(GDeflate PRIVATE "${LIBDEFLATE_PACKAGE_ROOT}/include")
-target_link_libraries(GDeflate PRIVATE "${LIBDEFLATE_LIB}" runtimeobject)
+target_link_libraries(GDeflate PRIVATE NVIDIA::libdeflate_gdeflate runtimeobject)
 set_target_properties(GDeflate PROPERTIES PREFIX "" IMPORT_PREFIX ""
    WINDOWS_EXPORT_ALL_SYMBOLS ON)
 install(TARGETS GDeflate EXPORT GDeflateTargets

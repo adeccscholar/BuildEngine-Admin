@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.31)
+project(adecc_GDeflateForkConsumer LANGUAGES C)
+find_package(LibdeflateGDeflate CONFIG REQUIRED)
+add_executable(libdeflate-gdeflate-consumer main.c)
+target_link_libraries(libdeflate-gdeflate-consumer PRIVATE NVIDIA::libdeflate_gdeflate)
