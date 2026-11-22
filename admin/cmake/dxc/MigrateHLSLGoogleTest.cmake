@@ -112,4 +112,24 @@ else()
    message(FATAL_ERROR "Original DXIL converter test subdirectory missing")
 endif()
 
+
+# Preserve all Windows GPU/HLK source translation units under GoogleTest.
+set(_adecc_exec_dir "${SOURCE_ROOT}/tools/clang/unittests/HLSLExec")
+file(COPY_FILE
+   "${ADMIN_PATCH_ROOT}/gtest/HLSLExec-CMakeLists.txt"
+   "${_adecc_exec_dir}/CMakeLists.txt" ONLY_IF_DIFFERENT)
+
+# The original TAEF TestData API is backed by generated pinned XML data.
+file(COPY_FILE
+   "${ADMIN_PATCH_ROOT}/gtest/PortableTestData.cpp"
+   "${_adecc_exec_dir}/PortableTestData.cpp" ONLY_IF_DIFFERENT)
+file(APPEND "${_adecc_testlib_cmake}" "
+# BuildEngine: original XML test parameter values, no TAEF runtime.
+target_sources(HLSLTestLib PRIVATE
+  ${_adecc_exec_dir}/PortableTestData.cpp)
+target_include_directories(HLSLTestLib PRIVATE
+  ${_adecc_exec_dir})
+target_compile_definitions(HLSLTestLib PRIVATE ADECC_DXC_GTEST=1)
+")
+
 message(STATUS "DXC HLSL original test migration: GoogleTest/CTest, changed fixture files=${_adecc_fixture_count}")
