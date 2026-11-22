@@ -22,3 +22,12 @@ LLVM GetHostTriple.cmake previously tried to execute config.guess using sh on na
 The complete CMake configure log identified `Could NOT find Python3 (missing: Python3_EXECUTABLE Interpreter)` at the original LLVM root `CMakeLists.txt:451`. BuildEngine already validates Python 3.14.7. The DXC package now passes `Python3_EXECUTABLE={Tool:python}` explicitly into both Release and Debug configuration. The existing BCC64X host-triple patch remains active; a version-bound follow-up normalizes the corresponding CMake `else()` and `endif()` block keywords, resolving the recorded developer warning instead of suppressing it.
 
 Upstream LLVM/DXC targets, SPIR-V features and CTest gates stay enabled. Native configure/build/test results are **[not verified]** until rerun.
+
+
+## LLVMBuild target registry mismatch in the pinned DXC release
+
+The 22 November Release configuration log now identifies the precise failure at root CMakeLists.txt:503: `llvm-build: error: invalid target to enable: 'AMDGPU' (not in project)`. The pinned source's `lib/Target/LLVMBuild.txt` has an empty target subdirectory registry, and neither `lib/Target/AMDGPU/CMakeLists.txt` nor `lib/Target/NVPTX/CMakeLists.txt` exists in `v1.9.2609`. Its root `CMakeLists.txt` nevertheless lists AMDGPU and NVPTX as default targets. This is an upstream internal configuration inconsistency, **not** a Python interpreter failure.
+
+The BuildEngine now passes `LLVM_TARGETS_TO_BUILD=` explicitly. The pinned `llvm-build` implementation handles the empty string as an empty target list (rather than an invalid name). This does **not** disable any backend present in this upstream archive; the named backends have no corresponding source directories. HLSL DXIL conversion, SPIR-V code generation and upstream testing options remain enabled and must be validated by the next native build.
+
+**[not verified]**: successful configure/build, shader tests or SPIR-V runtime output.
