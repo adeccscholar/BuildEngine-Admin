@@ -1,0 +1,59 @@
+# -*- Python -*-
+# Native DXC original test suite, executed through GoogleTest and LLVM/LIT.
+# PLACEHOLDERS: ADECC_EXECUTABLE and ADECC_SUITE_ROOT
+import os
+import sys
+import lit.Test
+import lit.formats
+import lit.util
+
+config.name = "dxc-original-ADECC_EXECUTABLE"
+
+if getattr(config, "llvm_obj_root", None) is None:
+    site_name = lit_config.params.get("ADECC_SITE_CONFIG", None)
+    if site_name and os.path.isfile(site_name):
+        lit_config.load_config(config, site_name)
+        raise SystemExit
+    lit_config.fatal("DXC original GoogleTest site configuration unavailable")
+
+class DXCOriginalTestFormat(lit.formats.GoogleTest):
+    def __init__(self):
+        super().__init__(".", ".exe")
+
+    def getTestsInDirectory(self, suite, path, lit_config, local_config):
+        candidates = [
+            os.path.join(config.llvm_obj_root, config.llvm_build_mode,
+                         "bin", "ADECC_EXECUTABLE.exe"),
+            os.path.join(config.llvm_obj_root, "bin",
+                         "ADECC_EXECUTABLE.exe"),
+        ]
+        executable = next((p for p in candidates if os.path.isfile(p)), None)
+        if executable is None:
+            lit_config.error("DXC original GoogleTest binary missing: " +
+                             ", ".join(candidates))
+            return
+        for test in self.getTestsInExecutable(
+            suite, path, executable, lit_config, local_config
+        ):
+            yield test
+
+    def execute(self, test, lit_config):
+        if lit_config.noExecute:
+            return lit.Test.PASS, ""
+        exe = test.getFilePath()
+        test_name = test.path_in_suite[-1]
+        if test_name.startswith("DISABLED_"):
+            return lit.Test.UNSUPPORTED, "Originally disabled manual test"
+        hlsl_dir = os.path.join(config.llvm_src_root,
+                               "ADECC_SUITE_ROOT")
+        cmd = [exe, "--gtest_filter=" + test_name,
+               "--HlslDataDir", hlsl_dir]
+        stdout, stderr, result = lit.util.executeCommand(
+            cmd, env=test.config.environment)
+        if result:
+            return lit.Test.FAIL, stdout + stderr
+        if "[  PASSED  ] 1 test." not in stdout:
+            return lit.Test.UNRESOLVED, stdout + stderr
+        return lit.Test.PASS, stdout
+
+config.test_format = DXCOriginalTestFormat()
