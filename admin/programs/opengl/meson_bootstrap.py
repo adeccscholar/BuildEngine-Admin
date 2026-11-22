@@ -10,6 +10,24 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
+def write_atomic(path: Path, content: str) -> None:
+    """Publish a complete patched source file for concurrent build variants."""
+    import tempfile
+    temporary_name = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", newline="\\n",
+            dir=path.parent, prefix=path.name + ".", suffix=".tmp",
+            delete=False,
+        ) as output:
+            output.write(content)
+            temporary_name = output.name
+        os.replace(temporary_name, path)
+    finally:
+        if temporary_name is not None:
+            Path(temporary_name).unlink(missing_ok=True)
+
+
 def is_bcc64x() -> bool:
     """Return whether the configured compiler is Embarcadero BCC64X."""
     compiler = os.environ.get("CC", "").strip().strip('"')
@@ -108,7 +126,7 @@ def patch_bcc64x_lld_detection(meson_root: Path) -> None:
             )
         text = text.replace(original_nix, patched_nix, 1)
 
-    detect.write_text(text, encoding="utf-8", newline="\n")
+    write_atomic(detect, text)
 
 
 def patch_windows_lld_allow_undefined(meson_root: Path) -> None:
@@ -149,7 +167,7 @@ def patch_windows_lld_allow_undefined(meson_root: Path) -> None:
         text = text.replace(previous_method, original_method, 1)
 
     if patched_probe in text:
-        linkers.write_text(text, encoding="utf-8", newline="\n")
+        write_atomic(linkers, text)
         return
 
     if text.count(original_probe) != 1:
@@ -158,7 +176,7 @@ def patch_windows_lld_allow_undefined(meson_root: Path) -> None:
         )
 
     text = text.replace(original_probe, patched_probe, 1)
-    linkers.write_text(text, encoding="utf-8", newline="\n")
+    write_atomic(linkers, text)
 
 
 def patch_bcc64x_vsenv_detection(meson_root: Path) -> None:
@@ -188,7 +206,7 @@ def patch_bcc64x_vsenv_detection(meson_root: Path) -> None:
         )
 
     text = text.replace(original, patched, 1)
-    vsenv.write_text(text, encoding="utf-8", newline="\n")
+    write_atomic(vsenv, text)
 
 
 def patch_mesa_glcpp_test_newlines() -> None:
@@ -237,7 +255,7 @@ def patch_mesa_glcpp_test_newlines() -> None:
         )
 
     text = text.replace(original, patched, 1)
-    test_driver.write_text(text, encoding="utf-8", newline="\n")
+    write_atomic(test_driver, text)
 
 
 def configure_windows_sdk_includes() -> None:
