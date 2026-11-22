@@ -1,6 +1,10 @@
 # All original DXC Windows shader-execution and algebra sources, GoogleTest driver.
 find_package(D3D12 REQUIRED)
 
+# PortableTestData.cpp is compiled by HLSLTestLib. LLVM's legacy
+# directory-wide source scanner must not treat it as an unlisted ExecHLSLTests source.
+list(APPEND HLSL_IGNORE_SOURCES PortableTestData.cpp)
+
 add_clang_unittest(ExecHLSLTests
   ExecutionTest.cpp
   ShaderOpTest.cpp
