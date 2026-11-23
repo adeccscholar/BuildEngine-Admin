@@ -10,14 +10,14 @@
  
 +// Preserve DXC's portable one-argument COM helper calls on native Windows.
 +#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
-+#define DXC_NATIVE_QUERY_INTERFACE(pSource, ppTarget) \\
++#define DXC_NATIVE_QUERY_INTERFACE(pSource, ppTarget) \
 +  ::DxcBcc64xQueryInterface((pSource), (ppTarget))
-+#define DXC_NATIVE_SIZE_T_TO_INT(nValue, pResult) \\
++#define DXC_NATIVE_SIZE_T_TO_INT(nValue, pResult) \
 +  ::DxcBcc64xSizeTToInt((nValue), (pResult))
 +#else
-+#define DXC_NATIVE_QUERY_INTERFACE(pSource, ppTarget) \\
++#define DXC_NATIVE_QUERY_INTERFACE(pSource, ppTarget) \
 +  (pSource)->QueryInterface(ppTarget)
-+#define DXC_NATIVE_SIZE_T_TO_INT(nValue, pResult) \\
++#define DXC_NATIVE_SIZE_T_TO_INT(nValue, pResult) \
 +  SizeTToInt((nValue), (pResult))
 +#endif
 +
