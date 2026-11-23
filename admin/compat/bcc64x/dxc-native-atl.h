@@ -5,6 +5,7 @@
 // It deliberately uses the Windows COM ABI and does not emulate Windows APIs.
 #include <windows.h>
 #include <objbase.h>
+#include <oleauto.h>
 #include <cassert>
 #include <climits>
 #include <intsafe.h>
