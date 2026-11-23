@@ -1,0 +1,39 @@
+--- a/projects/dxilconv/tools/dxbc2dxil/CMakeLists.txt
++++ b/projects/dxilconv/tools/dxbc2dxil/CMakeLists.txt
+@@ -3,7 +3,8 @@
+ find_package(D3D12 REQUIRED)
+ 
+ add_dxilconv_project_executable(dxbc2dxil
+   dxbc2dxil.cpp
++  $<$<BOOL:${ADECC_BCC64X_NATIVE_X64}>:${CMAKE_CURRENT_SOURCE_DIR}/bcc64x-wmain.cpp>
+ )
+ 
+ target_link_libraries(dxbc2dxil PRIVATE
+--- a/tools/clang/include/clang/Rewrite/Core/Rewriter.h
++++ b/tools/clang/include/clang/Rewrite/Core/Rewriter.h
+@@ -19,7 +19,14 @@
+ #include "clang/Rewrite/Core/RewriteBuffer.h"
+ #include <cstring>
+ #include <map>
+ #include <string>
++
++// Prevent Windows commdlg.h from renaming Clang's Rewriter API.
++#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
++#ifdef ReplaceText
++#undef ReplaceText
++#endif
++#endif
+ 
+ namespace clang {
+   class LangOptions;
+--- a/tools/clang/lib/Basic/LangOptions.cpp
++++ b/tools/clang/lib/Basic/LangOptions.cpp
+@@ -16,7 +16,7 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ using namespace clang;
+ 
+-#ifdef LLVM_ON_UNIX
++#if defined(LLVM_ON_UNIX) || (defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER))
+ #ifndef MS_SUPPORT_VARIABLE_LANGOPTS
+ #define LANGOPT(Name, Bits, Default, Description) const unsigned LangOptionsBase::Name;
+ #define LANGOPT_BOOL(Name, Default, Description) const bool LangOptionsBase::Name;
