@@ -1,0 +1,56 @@
+diff --git a/include/dxc/Support/d3dx12.h b/include/dxc/Support/d3dx12.h
+--- a/include/dxc/Support/d3dx12.h
++++ b/include/dxc/Support/d3dx12.h
+@@ -61,7 +61,8 @@
+                             FLOAT topLeftX = 0.0f, FLOAT topLeftY = 0.0f,
+                             FLOAT minDepth = D3D12_MIN_DEPTH,
+                             FLOAT maxDepth = D3D12_MAX_DEPTH) {
+-    auto Desc = pResource->GetDesc();
++    D3D12_RESOURCE_DESC Desc;
++    pResource->GetDesc(&Desc);
+     const UINT64 SubresourceWidth = Desc.Width >> mipSlice;
+     const UINT64 SubresourceHeight = Desc.Height >> mipSlice;
+     switch (Desc.Dimension) {
+@@ -1590,7 +1591,8 @@
+     _In_range_(0, D3D12_REQ_SUBRESOURCES) UINT FirstSubresource,
+     _In_range_(0, D3D12_REQ_SUBRESOURCES - FirstSubresource)
+         UINT NumSubresources) {
+-  auto Desc = pDestinationResource->GetDesc();
++  D3D12_RESOURCE_DESC Desc;
++  pDestinationResource->GetDesc(&Desc);
+   UINT64 RequiredSize = 0;
+ 
+   ID3D12Device *pDevice = nullptr;
+@@ -1620,8 +1622,10 @@
+                    _In_reads_(NumSubresources)
+                        const D3D12_SUBRESOURCE_DATA *pSrcData) {
+   // Minor validation
+-  auto IntermediateDesc = pIntermediate->GetDesc();
++  D3D12_RESOURCE_DESC IntermediateDesc;
++  pIntermediate->GetDesc(&IntermediateDesc);
+-  auto DestinationDesc = pDestinationResource->GetDesc();
++  D3D12_RESOURCE_DESC DestinationDesc;
++  pDestinationResource->GetDesc(&DestinationDesc);
+   if (IntermediateDesc.Dimension != D3D12_RESOURCE_DIMENSION_BUFFER ||
+       IntermediateDesc.Width < RequiredSize + pLayouts[0].Offset ||
+       RequiredSize > SIZE_T(-1) ||
+@@ -1690,7 +1694,8 @@
+       reinterpret_cast<UINT64 *>(pLayouts + NumSubresources);
+   UINT *pNumRows = reinterpret_cast<UINT *>(pRowSizesInBytes + NumSubresources);
+ 
+-  auto Desc = pDestinationResource->GetDesc();
++  D3D12_RESOURCE_DESC Desc;
++  pDestinationResource->GetDesc(&Desc);
+   ID3D12Device *pDevice = nullptr;
+   pDestinationResource->GetDevice(IID_ID3D12Device,
+                                   reinterpret_cast<void **>(&pDevice));
+@@ -1722,7 +1727,8 @@
+   UINT NumRows[MaxSubresources];
+   UINT64 RowSizesInBytes[MaxSubresources];
+ 
+-  auto Desc = pDestinationResource->GetDesc();
++  D3D12_RESOURCE_DESC Desc;
++  pDestinationResource->GetDesc(&Desc);
+   ID3D12Device *pDevice = nullptr;
+   pDestinationResource->GetDevice(IID_ID3D12Device,
+                                   reinterpret_cast<void **>(&pDevice));
