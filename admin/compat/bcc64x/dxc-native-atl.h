@@ -234,9 +234,16 @@ public:
 };
 
 // UTF-8 to native UTF-16 conversion for DXC's Windows API call sites.
+// The published m_psz is a non-owning alias of the private conversion
+// buffer. Copy/move are disabled to prevent dangling internal pointers.
 class AdeccDxcCA2W {
    std::wstring strWide;
 public:
+   LPWSTR m_psz {};
+   AdeccDxcCA2W(AdeccDxcCA2W const&) = delete;
+   AdeccDxcCA2W& operator=(AdeccDxcCA2W const&) = delete;
+   AdeccDxcCA2W(AdeccDxcCA2W&&) = delete;
+   AdeccDxcCA2W& operator=(AdeccDxcCA2W&&) = delete;
    explicit AdeccDxcCA2W(LPCSTR pUtf8) {
       if(!pUtf8) return;
       int const iLength = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
@@ -244,10 +251,13 @@ public:
       if(iLength <= 0) return;
       strWide.resize(static_cast<std::size_t>(iLength));
       if(::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, pUtf8, -1,
-         strWide.data(), iLength) == 0)
+         strWide.data(), iLength) != 0)
+         m_psz = strWide.data();
+      else
          strWide.clear();
    }
-   [[nodiscard]] operator LPCWSTR() const noexcept { return strWide.c_str(); }
+   [[nodiscard]] operator LPWSTR() noexcept { return m_psz; }
+   [[nodiscard]] operator LPCWSTR() const noexcept { return m_psz; }
 };
 
 // Owns a BSTR and exposes BSTR* for COM [out] parameters.
@@ -336,9 +346,16 @@ public:
    }
 };
 
+// DXC still accesses m_psz in unmodified upstream translation units.
+// Keep the field compatible while using Win32 UTF-8 conversion internally.
 class AdeccDxcCW2A {
    std::string strUtf8;
 public:
+   LPSTR m_psz {};
+   AdeccDxcCW2A(AdeccDxcCW2A const&) = delete;
+   AdeccDxcCW2A& operator=(AdeccDxcCW2A const&) = delete;
+   AdeccDxcCW2A(AdeccDxcCW2A&&) = delete;
+   AdeccDxcCW2A& operator=(AdeccDxcCW2A&&) = delete;
    explicit AdeccDxcCW2A(LPCWSTR pWide) {
       if(!pWide) return;
       int const iLength = ::WideCharToMultiByte(
@@ -346,11 +363,13 @@ public:
       if(iLength <= 0) return;
       strUtf8.resize(static_cast<std::size_t>(iLength));
       if(::WideCharToMultiByte(CP_UTF8, 0, pWide, -1,
-         strUtf8.data(), iLength, nullptr, nullptr) == 0)
+         strUtf8.data(), iLength, nullptr, nullptr) != 0)
+         m_psz = strUtf8.data();
+      else
          strUtf8.clear();
    }
-   [[nodiscard]] operator LPSTR() noexcept { return strUtf8.data(); }
-   [[nodiscard]] operator LPCSTR() const noexcept { return strUtf8.c_str(); }
+   [[nodiscard]] operator LPSTR() noexcept { return m_psz; }
+   [[nodiscard]] operator LPCSTR() const noexcept { return m_psz; }
 };
 
 // Compatibility aliases required by the pinned upstream DXC sources.
@@ -388,3 +407,7 @@ static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>().Append(L"test"))
 static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>().Append("test")), HRESULT>);
 static_assert(std::is_same_v<decltype(std::declval<CComPtr<IUnknown>&>().operator*()), IUnknown&>);
 static_assert(std::is_same_v<decltype(std::declval<CSimpleArray<int>&>().GetData()), int*>);
+static_assert(std::is_same_v<decltype(std::declval<CA2W&>().m_psz), LPWSTR>);
+static_assert(std::is_same_v<decltype(std::declval<CW2A&>().m_psz), LPSTR>);
+static_assert(!std::is_copy_constructible_v<CA2W> && !std::is_move_constructible_v<CA2W>);
+static_assert(!std::is_copy_constructible_v<CW2A> && !std::is_move_constructible_v<CW2A>);
