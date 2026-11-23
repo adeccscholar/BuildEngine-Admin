@@ -1,0 +1,65 @@
+diff --git a/tools/clang/lib/Sema/SemaChecking.cpp b/tools/clang/lib/Sema/SemaChecking.cpp
+--- a/tools/clang/lib/Sema/SemaChecking.cpp
++++ b/tools/clang/lib/Sema/SemaChecking.cpp
+@@ -250,5 +250,9 @@
+   }
+   
+-  switch (BuiltinID) {
++  // Retain setjmp argument validation without requiring a missing enum value.
++  if (FDecl->getName() == "setjmp" && checkArgCount(*this, TheCall, 1))
++    return true;
++
++  switch (BuiltinID) {
+   case Builtin::BI__builtin___CFStringMakeConstantString:
+     assert(TheCall->getNumArgs() == 1 &&
+@@ -326,6 +330,5 @@
+       return ExprError();
+     break;
+-  case Builtin::BI_setjmp:
+-  case Builtin::BI_setjmpex:
++  case Builtin::BI_setjmpex:
+     if (checkArgCount(*this, TheCall, 1))
+       return true;
+diff --git a/tools/clang/lib/Sema/SemaHLSL.cpp b/tools/clang/lib/Sema/SemaHLSL.cpp
+--- a/tools/clang/lib/Sema/SemaHLSL.cpp
++++ b/tools/clang/lib/Sema/SemaHLSL.cpp
+@@ -21,5 +21,6 @@
+ #include "dxc/HlslIntrinsicOp.h"
+ #include "dxc/Support/Global.h"
+-#include "dxc/Support/WinIncludes.h"
++#include "dxc/Support/WinIncludes.h"
++#include "dxc/Support/Unicode.h"
+ #include "dxc/dxcapi.internal.h"
+ #include "gen_intrin_main_tables_15.h"
+@@ -2766,9 +2767,12 @@
+ 
+     // TODO: review this - this will allocate at least once per string
+-    CA2WEX<> typeName(_typeName.str().c_str());
+-    CA2WEX<> functionName(_functionName.str().c_str());
++    std::wstring typeName =
++        Unicode::UTF8ToWideStringOrThrow(_typeName.str().c_str());
++    std::wstring functionName =
++        Unicode::UTF8ToWideStringOrThrow(_functionName.str().c_str());
+ 
+     if (FAILED(_tables[_tableIndex]->LookupIntrinsic(
+-            typeName, functionName, &_tableIntrinsic, &_tableLookupCookie))) {
++            typeName.c_str(), functionName.c_str(), &_tableIntrinsic,
++            &_tableLookupCookie))) {
+       _tableLookupCookie = 0;
+       _tableIntrinsic = nullptr;
+@@ -4944,6 +4948,6 @@
+       const HLSL_INTRINSIC *pPrior = nullptr;
+       UINT64 lookupCookie = 0;
+-      CA2W wideTypeName(typeName);
++      std::wstring wideTypeName = Unicode::UTF8ToWideStringOrThrow(typeName);
+-      HRESULT found = table->LookupIntrinsic(wideTypeName, L"*", &pIntrinsic,
++      HRESULT found = table->LookupIntrinsic(wideTypeName.c_str(), L"*", &pIntrinsic,
+                                              &lookupCookie);
+       while (pIntrinsic != nullptr && SUCCEEDED(found)) {
+@@ -4954,5 +4958,5 @@
+           pPrior = pIntrinsic;
+         }
+-        found = table->LookupIntrinsic(wideTypeName, L"*", &pIntrinsic,
++        found = table->LookupIntrinsic(wideTypeName.c_str(), L"*", &pIntrinsic,
+                                        &lookupCookie);
+       }
