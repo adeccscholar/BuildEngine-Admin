@@ -1,0 +1,59 @@
+diff --git a/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp b/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp
+--- a/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp
++++ b/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp
+@@ -7,7 +7,8 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
+-#include "clang/CodeGen/ObjectFilePCHContainerOperations.h"
++#include "llvm/Support/COFF.h" // Parse LLVM constants before Win32 macro declarations.
++#include "clang/CodeGen/ObjectFilePCHContainerOperations.h"
+ #include "CGDebugInfo.h"
+ #include "CodeGenModule.h"
+ #include "clang/AST/ASTContext.h"
+diff --git a/tools/clang/lib/Rewrite/Rewriter.cpp b/tools/clang/lib/Rewrite/Rewriter.cpp
+--- a/tools/clang/lib/Rewrite/Rewriter.cpp
++++ b/tools/clang/lib/Rewrite/Rewriter.cpp
+@@ -22,7 +22,11 @@
+ #include "llvm/Config/llvm-config.h"
+ #include "llvm/Support/FileSystem.h"
+ #include "llvm/Support/raw_ostream.h"
+-using namespace clang;
++// commdlg.h maps ReplaceText to ReplaceTextA, shadowing the Clang method.
++#ifdef ReplaceText
++#undef ReplaceText
++#endif
++using namespace clang;
+ 
+ raw_ostream &RewriteBuffer::write(raw_ostream &os) const {
+   // Walk RewriteRope chunks efficiently using MoveToNextPiece() instead of the
+diff --git a/tools/clang/lib/Analysis/UninitializedValues.cpp b/tools/clang/lib/Analysis/UninitializedValues.cpp
+--- a/tools/clang/lib/Analysis/UninitializedValues.cpp
++++ b/tools/clang/lib/Analysis/UninitializedValues.cpp
+@@ -116,7 +116,7 @@
+ 
+ // These values are defined in such a way that a merge can be done using
+ // a bitwise OR.
+-enum Value { Unknown = 0x0,         /* 00 */
++enum Value { UnknownValue = 0x0,         /* 00 */
+              Initialized = 0x1,     /* 01 */
+              Uninitialized = 0x2,   /* 10 */
+              MayUninitialized = 0x3 /* 11 */ };
+@@ -777,7 +777,7 @@
+       // suppressing branch-specific false positives when we call one of these
+       // functions but keep pretending the path continues (when in reality the
+       // user doesn't care).
+-      vals.setAllScratchValues(Unknown);
++      vals.setAllScratchValues(UnknownValue);
+     }
+   }
+ }
+@@ -863,7 +863,7 @@
+   // If the Objective-C message expression is an implicit no-return that
+   // is not modeled in the CFG, set the tracked dataflow values to Unknown.
+   if (objCNoRet.isImplicitNoReturn(ME)) {
+-    vals.setAllScratchValues(Unknown);
++    vals.setAllScratchValues(UnknownValue);
+   }
+ }
+ 
