@@ -1,7 +1,6 @@
 --- a/projects/dxilconv/tools/dxbc2dxil/CMakeLists.txt
 +++ b/projects/dxilconv/tools/dxbc2dxil/CMakeLists.txt
-@@ -3,7 +3,8 @@
- find_package(D3D12 REQUIRED)
+@@ -4,6 +4,7 @@
  
  add_dxilconv_project_executable(dxbc2dxil
    dxbc2dxil.cpp
@@ -11,35 +10,34 @@
  target_link_libraries(dxbc2dxil PRIVATE
 --- a/tools/clang/include/clang/Rewrite/Core/Rewriter.h
 +++ b/tools/clang/include/clang/Rewrite/Core/Rewriter.h
-@@ -19,7 +19,14 @@
- #include "clang/Rewrite/Core/RewriteBuffer.h"
- #include <cstring>
+@@ -21,6 +21,13 @@
  #include <map>
  #include <string>
-+
+ 
 +// Prevent Windows commdlg.h from renaming Clang's Rewriter API.
 +#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
 +#ifdef ReplaceText
 +#undef ReplaceText
 +#endif
 +#endif
- 
++
  namespace clang {
    class LangOptions;
+   class SourceManager;
 --- a/tools/clang/lib/Basic/LangOptions.cpp
 +++ b/tools/clang/lib/Basic/LangOptions.cpp
 @@ -16,7 +16,7 @@
  ///////////////////////////////////////////////////////////////////////////////
  using namespace clang;
  
--#ifdef LLVM_ON_UNIX
 +#if defined(LLVM_ON_UNIX) || (defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER))
+-#ifdef LLVM_ON_UNIX
  #ifndef MS_SUPPORT_VARIABLE_LANGOPTS
  #define LANGOPT(Name, Bits, Default, Description) const unsigned LangOptionsBase::Name;
  #define LANGOPT_BOOL(Name, Default, Description) const bool LangOptionsBase::Name;
 --- a/include/llvm/Config/abi-breaking.h.cmake
 +++ b/include/llvm/Config/abi-breaking.h.cmake
-@@ -28,10 +28,18 @@
+@@ -28,11 +28,19 @@
  namespace llvm {
  #if LLVM_ENABLE_ABI_BREAKING_CHECKS
  extern int EnableABIBreakingChecks;
@@ -54,6 +52,8 @@
 +inline int *VerifyDisableABIBreakingChecks = &DisableABIBreakingChecks;
 +#else
  __attribute__((weak, visibility ("hidden"))) int *VerifyDisableABIBreakingChecks = &DisableABIBreakingChecks;
-+#endif
  #endif
++#endif
  }
+ #endif // _MSC_VER
+ 
