@@ -1,0 +1,13 @@
+--- a/include/dxc/Support/WinIncludes.h
++++ b/include/dxc/Support/WinIncludes.h
+@@ -61,6 +61,11 @@
+ #else // _MSC_VER
+ 
+ #include "dxc/WinAdapter.h"
++#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
++// Native COM ABI; DXC requires only a small subset of ATL helper wrappers.
++#include "dxc/Support/Bcc64xNativeAtl.h"
++#endif
+ 
+ #ifdef __cplusplus
+ #if !defined(DEFINE_ENUM_FLAG_OPERATORS)
