@@ -201,9 +201,10 @@ unset(_bcc64x_dynamic_rtl_var)
 
 # Windows resource compiler.
 #
-# CMake uses the Windows SDK rc.exe directly (absolute path from the toolchain).
-# Keep CMake's stock Microsoft RC command line; no CGRC/BRCC32 translation rule
-# is required here.
+# The BCC64X toolchain selects bcc64x-windres by default.  A library may
+# explicitly request the Windows SDK rc.exe with CB_WINDOWS_RC.  Preserve
+# CMake's compiler-specific RC command rules; never impose Microsoft's /fo
+# flags on windres or windres -o flags on the SDK compiler.
 
 # Static COFF archives. llvm-ar is part of the LLVM toolchain used by BCC64X.
 if(DEFINED ENV{CB_LLVM_AR} AND NOT "$ENV{CB_LLVM_AR}" STREQUAL "")
