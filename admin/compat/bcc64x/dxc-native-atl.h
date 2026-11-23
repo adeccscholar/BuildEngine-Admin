@@ -283,3 +283,19 @@ using CHandle = AdeccDxcCHandle;
 using CA2W = AdeccDxcCA2W;
 using CComBSTR = AdeccDxcCComBSTR;
 using CW2A = AdeccDxcCW2A;
+
+// Compile-time contracts for the historical DXC ATL-facing API surface.
+// These checks are compiled in every native DXC translation unit that
+// includes the compatibility header, not merely in a separate smoke test.
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>().Detach()), BSTR>);
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>().operator&()), BSTR*>);
+static_assert(std::is_nothrow_move_constructible_v<CComBSTR>);
+static_assert(std::is_nothrow_move_assignable_v<CComBSTR>);
+static_assert(!std::is_copy_constructible_v<CComBSTR>);
+static_assert(std::is_same_v<decltype(std::declval<CComPtr<IUnknown>&>().Detach()), IUnknown*>);
+static_assert(std::is_same_v<decltype(std::declval<CComPtr<IUnknown>&>().GetAddressOf()), IUnknown**>);
+static_assert(std::is_same_v<decltype(std::declval<CComPtr<IUnknown> const&>().Get()), IUnknown*>);
+static_assert(std::is_same_v<decltype(std::declval<CHeapPtr<char>&>().Detach()), char*>);
+static_assert(std::is_same_v<decltype(std::declval<CSimpleArray<int>&>().GetSize()), int>);
+static_assert(std::is_same_v<decltype(std::declval<CA2W const&>().operator LPCWSTR()), LPCWSTR>);
+static_assert(std::is_same_v<decltype(std::declval<CW2A const&>().operator LPCSTR()), LPCSTR>);
