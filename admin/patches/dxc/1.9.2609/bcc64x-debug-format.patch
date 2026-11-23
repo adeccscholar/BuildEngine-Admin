@@ -15,3 +15,14 @@
 -      OutputDebugFormatA(                                                      \
 +      DxcOutputDebugFormatA(                                                   \
            "Error: \t%s\nFile:\n%s(%d)\nFunc:\t%s.\n\t" fmt "\n",               \
+--- a/lib/HLSL/DxilContainerReflection.cpp
++++ b/lib/HLSL/DxilContainerReflection.cpp
+@@ -859,7 +859,7 @@
+   // Don't actually make this a hard error, but instead report the problem using
+   // a suitable debug message.
+ #ifndef NDEBUG
+-  OutputDebugFormatA(
++  DxcOutputDebugFormatA(
+       "DxilContainerReflection.cpp: error: unhandled object type '%s'.\n",
+       structType->getName().str().c_str());
+ #endif
