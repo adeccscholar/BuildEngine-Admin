@@ -10,7 +10,7 @@ diff --git a/lib/HLSL/DxcOptimizer.cpp b/lib/HLSL/DxcOptimizer.cpp
            Banner += "\n";
          }
          if (pPassManager == &ModulePasses)
-@@ -465,9 +465,9 @@
+@@ -465,10 +465,10 @@
        CW2A optName(ppOptions[i]);
        // The option syntax is
        const char ArgDelim = ',';
@@ -25,7 +25,7 @@ diff --git a/lib/HLSL/DxcOptimizer.cpp b/lib/HLSL/DxcOptimizer.cpp
 diff --git a/tools/clang/tools/libclang/dxcrewriteunused.cpp b/tools/clang/tools/libclang/dxcrewriteunused.cpp
 --- a/tools/clang/tools/libclang/dxcrewriteunused.cpp
 +++ b/tools/clang/tools/libclang/dxcrewriteunused.cpp
-@@ -627,9 +627,9 @@
+@@ -627,8 +627,8 @@
      for (size_t i = 0; i < defineCount; ++i) {
        CW2A utf8Name(pDefines[i].Name);
        CW2A utf8Value(pDefines[i].Value);
@@ -36,7 +36,7 @@ diff --git a/tools/clang/tools/libclang/dxcrewriteunused.cpp b/tools/clang/tools
 +      val += (pDefines[i].Value) ? static_cast<LPCSTR>(utf8Value) : "1";
        PPOpts.addMacroDef(val);
      }
-@@ -643,7 +643,7 @@
+@@ -643,6 +643,6 @@
      defineStr += "#define ";
      defineStr += utf8Name;
      defineStr += " ";
@@ -44,7 +44,7 @@ diff --git a/tools/clang/tools/libclang/dxcrewriteunused.cpp b/tools/clang/tools
 +    defineStr += utf8Value ? static_cast<LPCSTR>(utf8Value) : "1";
      defineStr += "\n";
    }
-@@ -1679,7 +1679,7 @@
+@@ -1679,6 +1679,6 @@
      IFR(hlsl::DxcGetBlobAsUtf8(pSource, m_pMalloc, &utf8Source));
  
      CW2A utf8SourceName(pSourceName);
@@ -52,7 +52,7 @@ diff --git a/tools/clang/tools/libclang/dxcrewriteunused.cpp b/tools/clang/tools
 +    LPCSTR fName = static_cast<LPCSTR>(utf8SourceName);
  
      try {
-@@ -1747,7 +1747,7 @@
+@@ -1747,6 +1747,6 @@
      IFR(hlsl::DxcGetBlobAsUtf8(pSource, m_pMalloc, &utf8Source));
  
      CW2A utf8SourceName(pSourceName);
