@@ -6,7 +6,7 @@ diff --git a/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp b/tool
  //===----------------------------------------------------------------------===//
  
 -#include "clang/CodeGen/ObjectFilePCHContainerOperations.h"
-+#include "llvm/Support/COFF.h" // Parse LLVM constants before Win32 macro declarations.
++#include "llvm/Object/RelocVisitor.h" // Parse LLVM COFF and relocation helpers before Win32 macros.
 +#include "clang/CodeGen/ObjectFilePCHContainerOperations.h"
  #include "CGDebugInfo.h"
  #include "CodeGenModule.h"
