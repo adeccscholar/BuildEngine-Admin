@@ -10,7 +10,7 @@ diff --git a/lib/HLSL/DxcOptimizer.cpp b/lib/HLSL/DxcOptimizer.cpp
            Banner += "\n";
          }
          if (pPassManager == &ModulePasses)
-@@ -465,10 +465,10 @@
+@@ -465,9 +465,9 @@
        CW2A optName(ppOptions[i]);
        // The option syntax is
        const char ArgDelim = ',';
