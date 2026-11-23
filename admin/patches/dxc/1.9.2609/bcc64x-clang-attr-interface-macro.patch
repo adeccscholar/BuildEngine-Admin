@@ -18,7 +18,7 @@ diff --git a/tools/clang/include/clang/AST/Attr.h b/tools/clang/include/clang/AS
 diff --git a/tools/clang/lib/AST/AttrImpl.cpp b/tools/clang/lib/AST/AttrImpl.cpp
 --- a/tools/clang/lib/AST/AttrImpl.cpp
 +++ b/tools/clang/lib/AST/AttrImpl.cpp
-@@ -18,5 +18,10 @@
+@@ -18,4 +18,9 @@
  #include "llvm/ADT/StringSwitch.h"
  using namespace clang;
  
@@ -29,4 +29,3 @@ diff --git a/tools/clang/lib/AST/AttrImpl.cpp b/tools/clang/lib/AST/AttrImpl.cpp
 +#endif
 +#include "clang/AST/AttrImpl.inc"
 +#pragma pop_macro("interface")
- 
