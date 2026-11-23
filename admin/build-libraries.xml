@@ -17996,7 +17996,7 @@
          <argument value="-Ddirectxmesh_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxmesh"/>
       </smoke>
    </library>
-   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-23T01:11:00Z">
+   <library id="directxtex" version="2.1.1" category="image" timestamp="2026-11-23T01:33:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="openexr" version="3.5.4"/>
@@ -18137,6 +18137,15 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <argument value="-Ddirectxtex_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\directxtex"/>
+         <argument value="-DDIRECTXTEX_OPENEXR_ROOT:PATH={DependencyRoot:openexr}"/>
+         <argument value="-DDIRECTXTEX_IMATH_ROOT:PATH={DependencyRoot:imath}"/>
+         <argument value="-DDIRECTXTEX_OPENJPH_ROOT:PATH={DependencyRoot:openjph}"/>
+         <argument value="-DDIRECTXTEX_LIBDEFLATE_ROOT:PATH={DependencyRoot:libdeflate}"/>
+         <argument value="-DDIRECTXTEX_ZSTD_ROOT:PATH={DependencyRoot:zstd}"/>
+         <argument value="-DDIRECTXTEX_JPEG_ROOT:PATH={DependencyRoot:libjpeg-turbo}"/>
+         <argument value="-DDIRECTXTEX_PNG_ROOT:PATH={DependencyRoot:libpng}"/>
+         <argument value="-DDIRECTXTEX_ZLIB_ROOT:PATH={DependencyRoot:zlib}"/>
+         <argument value="-DDIRECTXTEX_OPENMP_ROOT:PATH={DependencyRoot:llvm-openmp}"/>
       </smoke>
    </library>
    <library id="winmd" version="0f1eae3b" category="foundation" timestamp="2026-11-22T05:10:29Z">
@@ -18297,7 +18306,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-23T01:10:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-23T01:32:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18413,6 +18422,14 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-tablegen-windows-in.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <copy source="{BuildFileDir}\patches\dxc\1.9.2609\bcc64x-pass-registry-win32-api.patch" target="{Workspace}\.buildengine\patches\bcc64x-pass-registry-win32-api.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-bcc64x-pass-registry-win32-api" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-pass-registry-win32-api.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
