@@ -60,3 +60,59 @@ diff --git a/tools/clang/tools/libclang/dxcrewriteunused.cpp b/tools/clang/tools
 +    LPCSTR fName = static_cast<LPCSTR>(utf8SourceName);
  
      try {
+diff --git a/tools/clang/tools/dxcompiler/dxclinker.cpp b/tools/clang/tools/dxcompiler/dxclinker.cpp
+--- a/tools/clang/tools/dxcompiler/dxclinker.cpp
++++ b/tools/clang/tools/dxcompiler/dxclinker.cpp
+@@ -190,3 +190,3 @@
+   // Already exist lib with same name.
+-  if (m_pLinker->HasLibNameRegistered(pUtf8LibName.m_psz))
++  if (m_pLinker->HasLibNameRegistered(static_cast<LPCSTR>(pUtf8LibName)))
+     return E_INVALIDARG;
+@@ -220,3 +220,3 @@
+ 
+-    if (m_pLinker->RegisterLib(pUtf8LibName.m_psz, std::move(pModule),
++    if (m_pLinker->RegisterLib(static_cast<LPCSTR>(pUtf8LibName), std::move(pModule),
+                                std::move(pDebugModule))) {
+@@ -270,3 +270,3 @@
+     // Set target profile before reading options and validate
+-    opts.TargetProfile = pUtf8TargetProfile.m_psz;
++    opts.TargetProfile = static_cast<LPCSTR>(pUtf8TargetProfile);
+     bool finished;
+@@ -275,3 +275,3 @@
+     if (pEntryName)
+-      opts.EntryPoint = pUtf8EntryPoint.m_psz;
++      opts.EntryPoint = static_cast<LPCSTR>(pUtf8EntryPoint);
+     if (finished) {
+@@ -332,3 +332,3 @@
+       CW2A pUtf8LibName(pLibNames[i]);
+-      bSuccess &= m_pLinker->AttachLib(pUtf8LibName.m_psz);
++      bSuccess &= m_pLinker->AttachLib(static_cast<LPCSTR>(pUtf8LibName));
+ 
+@@ -378,3 +378,3 @@
+       std::unique_ptr<Module> pM =
+-          m_pLinker->Link(opts.EntryPoint, pUtf8TargetProfile.m_psz, exportMap);
++          m_pLinker->Link(opts.EntryPoint, static_cast<LPCSTR>(pUtf8TargetProfile), exportMap);
+       if (pM) {
+diff --git a/tools/clang/tools/dxcompiler/dxcompilerobj.cpp b/tools/clang/tools/dxcompiler/dxcompilerobj.cpp
+--- a/tools/clang/tools/dxcompiler/dxcompilerobj.cpp
++++ b/tools/clang/tools/dxcompiler/dxcompilerobj.cpp
+@@ -439,3 +439,3 @@
+     CW2A utf8Value(pDefines[i].Value);
+-    std::string val(utf8Name.m_psz);
++    std::string val(static_cast<LPCSTR>(utf8Name));
+     val += "=";
+@@ -441,3 +441,3 @@
+     val += "=";
+-    val += (pDefines[i].Value) ? utf8Value.m_psz : "1";
++    val += (pDefines[i].Value) ? static_cast<LPCSTR>(utf8Value) : "1";
+     defines.push_back(val);
+@@ -600,3 +600,3 @@
+                                 ? nullptr
+-                                : pWideOutputName.m_psz;
++                                : static_cast<LPCWSTR>(pWideOutputName);
+       IFT(primaryOutput.SetName(pObjectName));
+@@ -649,3 +649,3 @@
+       dxcutil::DxcArgsFileSystem *msfPtr = dxcutil::CreateDxcArgsFileSystem(
+-          utf8Source, pWideSourceName.m_psz, pIncludeHandler,
++          utf8Source, static_cast<LPCWSTR>(pWideSourceName), pIncludeHandler,
+           opts.DefaultTextCodePage);
