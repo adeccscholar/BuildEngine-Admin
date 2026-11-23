@@ -122,3 +122,15 @@ The build log `BuildLog_20261123_165510_295.zip` independently identified (Debug
 - `dxcompiler.dll`: `CreateDxcDiaDataSource` remains unresolved; determine the true producer and target linkage instead of inserting a stub.
 
 The first three changes are authored in `bcc64x-linkage-compat.patch` and `dxc-wmain.cpp`, with the DXC source XML actions and timestamp updated. Successful BCC64X builds and runtime tests remain **[not verified]**.
+
+## Full native DIA/PIX implementation restored, 23 November 2026
+
+**Status: [not verified]** until native BCC64X Debug/Release compilation, linking and runtime verification.
+
+The `CreateDxcDiaDataSource` undefined reference was traced to an upstream CMake source-selection error, **not** to a missing Windows API or an unavailable vendor runtime DLL. Its real implementation exists in `lib/DxilDia/DxilDiaDataSource.cpp` at the top-level function `HRESULT CreateDxcDiaDataSource(REFIID, LPVOID *)`. `tools/clang/tools/dxcompiler/dxcapi.cpp` calls it for `CLSID_DxcDiaDataSource`; `dxcompiler` already links `LLVMDxilDia`.
+
+The pinned `lib/DxilDia/CMakeLists.txt` formerly selected **all** original DIA and PIX implementation translation units only for `MSVC`. Its non-MSVC path built **only** `DxcPixLiveVariables_FragmentIterator.cpp`, thus creating a nearly empty `LLVMDxilDia` archive for BCC64X despite the real native Windows COM and DIA dependencies. This would also omit other original DIA and PIX entrypoints, not merely the one visible unresolved symbol.
+
+The new version-bound `bcc64x-native-dia-implementation.patch` selects the full original source list when `MSVC OR (WIN32 AND ADECC_BCC64X_NATIVE_X64)` and retains the restricted fallback on other platforms. Native Windows BCC64X requires the real Microsoft DIA SDK `dia2.h`; the patch resolves its include directory from the same candidate paths as the existing `dxcompiler` setup and fails explicitly if unavailable. The original MSVC path, DIA and PIX sources, and the native COM ABI remain intact. No stubs, disabled methods or alternate compiler builds are introduced.
+
+The new patch is registered as an idempotent source action in `admin/build-libraries.xml` and the `dxc/1.9.2609` library timestamp is advanced. Its three unified-diff hunks were checked against the complete pinned upstream CMake file and found to match. The remaining native acceptance gates are compile and link of all included DIA and PIX translation units, correct `LLVMDxilDia` linkage, release/debug `dxcompiler.dll`, `CLSID_DxcDiaDataSource` creation, and actual PDB / PIX consumer tests.
