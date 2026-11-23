@@ -99,7 +99,15 @@
  
 --- a/include/dxc/Support/dxcapi.impl.h
 +++ b/include/dxc/Support/dxcapi.impl.h
-@@ -65,7 +65,7 @@
+@@ -13,7 +13,8 @@
+ #define __DXCAPI_IMPL__
+ 
++#include "dxc/Support/WinIncludes.h"
+ #include "dxc/Support/microcom.h"
+ #include "dxc/dxcapi.h"
+ #include "llvm/ADT/ArrayRef.h"
+ #include "llvm/Support/raw_ostream.h"
+@@ -65,7 +66,7 @@
  HRESULT TranslateStringBlobForOutput(IDxcBlob *pBlob, UINT32 codePage,
                                       IDxcBlobEncoding **ppBlobEncoding) {
    CComPtr<IDxcBlobEncoding> pEncoding;
@@ -108,7 +116,7 @@
    BOOL known;
    UINT32 inputCP;
    IFR(pEncoding->GetEncoding(&known, &inputCP));
-@@ -132,7 +132,7 @@
+@@ -132,7 +133,7 @@
        return S_OK;
      if (codePage && DxcGetOutputType(kind) == DxcOutputType_Text) {
        CComPtr<IDxcBlob> pBlob;
@@ -117,7 +125,7 @@
        CComPtr<IDxcBlobEncoding> pEncoding;
        // If not blob encoding, assume utf-8 text
        if (FAILED(TranslateStringBlobForOutput(pBlob, codePage, &pEncoding)))
-@@ -189,7 +189,7 @@
+@@ -189,7 +190,7 @@
      IFR(hlsl::DxcCreateBlobWithEncodingOnHeapCopy(
          pName, (wcslen(pName) + 1) * sizeof(wchar_t), DXC_CP_WIDE,
          &pBlobEncoding));
@@ -126,7 +134,7 @@
    }
    HRESULT SetName(LPCSTR pName) {
      DXASSERT_NOMSG(!name);
-@@ -198,7 +198,7 @@
+@@ -198,7 +199,7 @@
      CComPtr<IDxcBlobEncoding> pBlobEncoding;
      IFR(TranslateUtf8StringForOutput(pName, strlen(pName) + 1, DXC_CP_WIDE,
                                       &pBlobEncoding));
@@ -135,7 +143,7 @@
    }
    HRESULT SetName(llvm::StringRef Name) {
      DXASSERT_NOMSG(!name);
-@@ -207,7 +207,7 @@
+@@ -207,7 +208,7 @@
      CComPtr<IDxcBlobEncoding> pBlobEncoding;
      IFR(TranslateUtf8StringForOutput(Name.data(), Name.size(), DXC_CP_WIDE,
                                       &pBlobEncoding));
@@ -144,7 +152,7 @@
    }
  
    /////////////////////////////
-@@ -408,7 +408,7 @@
+@@ -408,7 +409,7 @@
        return S_OK;
      DxcOutputObject *pObject = Output(m_resultType);
      if (pObject && pObject->object)
@@ -153,7 +161,7 @@
      return S_OK;
    }
  
-@@ -417,7 +417,7 @@
+@@ -417,7 +418,7 @@
      *ppErrors = nullptr;
      DxcOutputObject *pObject = Output(DXC_OUT_ERRORS);
      if (pObject && pObject->object)
