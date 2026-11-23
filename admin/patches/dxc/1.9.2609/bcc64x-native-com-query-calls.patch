@@ -99,7 +99,7 @@
  
 --- a/include/dxc/Support/dxcapi.impl.h
 +++ b/include/dxc/Support/dxcapi.impl.h
-@@ -13,7 +13,8 @@
+@@ -13,6 +13,7 @@
  #define __DXCAPI_IMPL__
  
 +#include "dxc/Support/WinIncludes.h"
