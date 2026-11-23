@@ -11,6 +11,7 @@
 #include <intsafe.h>
 #include <cstddef>
 #include <memory>
+#include <limits>
 #include <new>
 #include <type_traits>
 #include <string>
@@ -226,30 +227,88 @@ public:
 };
 
 // Owns a BSTR and exposes BSTR* for COM [out] parameters.
+// Explicit BuildEngine-owned BSTR type with the DXC/ATL source contract.
+// Ownership transfers only through Attach/Detach; Copy always allocates.
 class AdeccDxcCComBSTR {
-   BSTR pValue {};
 public:
+   BSTR m_str {};
+
    AdeccDxcCComBSTR() noexcept = default;
+   explicit AdeccDxcCComBSTR(LPCWSTR pText)
+      : m_str { ::SysAllocString(pText) } {}
    AdeccDxcCComBSTR(unsigned int uLength, LPCWSTR pText)
-      : pValue { ::SysAllocStringLen(pText, uLength) } {}
+      : m_str { ::SysAllocStringLen(pText, uLength) } {}
    AdeccDxcCComBSTR(AdeccDxcCComBSTR const&) = delete;
    AdeccDxcCComBSTR& operator=(AdeccDxcCComBSTR const&) = delete;
    AdeccDxcCComBSTR(AdeccDxcCComBSTR&& theOther) noexcept
-      : pValue { std::exchange(theOther.pValue, nullptr) } {}
+      : m_str { std::exchange(theOther.m_str, nullptr) } {}
    AdeccDxcCComBSTR& operator=(AdeccDxcCComBSTR&& theOther) noexcept {
-      if(this != std::addressof(theOther)) {
-         ::SysFreeString(pValue);
-         pValue = std::exchange(theOther.pValue, nullptr);
-      }
+      if(this != std::addressof(theOther))
+         Attach(theOther.Detach());
       return *this;
    }
-   ~AdeccDxcCComBSTR() noexcept { ::SysFreeString(pValue); }
-   [[nodiscard]] BSTR Detach() noexcept { return std::exchange(pValue, nullptr); }
-   [[nodiscard]] BSTR Get() const noexcept { return pValue; }
-   [[nodiscard]] operator BSTR() const noexcept { return pValue; }
+   ~AdeccDxcCComBSTR() noexcept { Empty(); }
+
+   [[nodiscard]] unsigned int Length() const noexcept { return ::SysStringLen(m_str); }
+   [[nodiscard]] operator BSTR() const noexcept { return m_str; }
    [[nodiscard]] BSTR* operator&() noexcept {
-      ATLASSERT(pValue == nullptr);
-      return &pValue;
+      ATLASSERT(m_str == nullptr);
+      return &m_str;
+   }
+   [[nodiscard]] wchar_t& operator[](std::size_t uIndex) noexcept {
+      ATLASSERT(uIndex < Length());
+      return m_str[uIndex];
+   }
+   [[nodiscard]] wchar_t const& operator[](std::size_t uIndex) const noexcept {
+      ATLASSERT(uIndex < Length());
+      return m_str[uIndex];
+   }
+   [[nodiscard]] bool operator==(AdeccDxcCComBSTR const& theOther) const noexcept {
+      return Length() == theOther.Length() &&
+         (Length() == 0 || std::char_traits<wchar_t>::compare(m_str, theOther.m_str, Length()) == 0);
+   }
+   void Empty() noexcept {
+      ::SysFreeString(std::exchange(m_str, nullptr));
+   }
+   void Attach(BSTR pNew) noexcept {
+      if(m_str != pNew) {
+         Empty();
+         m_str = pNew;
+      }
+   }
+   [[nodiscard]] BSTR Detach() noexcept { return std::exchange(m_str, nullptr); }
+   [[nodiscard]] BSTR Get() const noexcept { return m_str; }
+   [[nodiscard]] BSTR Copy() const noexcept {
+      return m_str ? ::SysAllocStringLen(m_str, Length()) : nullptr;
+   }
+   [[nodiscard]] HRESULT Copy(BSTR* ppValue) const noexcept {
+      if(!ppValue) return E_POINTER;
+      *ppValue = Copy();
+      return m_str && !*ppValue ? E_OUTOFMEMORY : S_OK;
+   }
+   [[nodiscard]] HRESULT Append(LPCWSTR pText, unsigned int uLength) {
+      if(uLength == 0) return S_OK;
+      if(!pText) return E_POINTER;
+      unsigned int const uOldLength = Length();
+      if(uLength > (std::numeric_limits<unsigned int>::max)() - uOldLength)
+         return E_OUTOFMEMORY;
+      BSTR pNew = ::SysAllocStringLen(nullptr, uOldLength + uLength);
+      if(!pNew) return E_OUTOFMEMORY;
+      if(uOldLength != 0) std::char_traits<wchar_t>::copy(pNew, m_str, uOldLength);
+      std::char_traits<wchar_t>::copy(pNew + uOldLength, pText, uLength);
+      ::SysFreeString(m_str);
+      m_str = pNew;
+      return S_OK;
+   }
+   [[nodiscard]] HRESULT Append(LPCWSTR pText) {
+      return pText ? Append(pText, static_cast<unsigned int>(std::char_traits<wchar_t>::length(pText))) : S_OK;
+   }
+   [[nodiscard]] HRESULT Append(LPCSTR pUtf8) {
+      if(!pUtf8) return S_OK;
+      AdeccDxcCA2W theText(pUtf8);
+      LPCWSTR const pWide = static_cast<LPCWSTR>(theText);
+      if(*pUtf8 != '\0' && (!pWide || *pWide == L'\0')) return E_INVALIDARG;
+      return Append(pWide);
    }
 };
 
