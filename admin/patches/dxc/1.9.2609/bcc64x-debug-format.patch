@@ -26,3 +26,40 @@
        "DxilContainerReflection.cpp: error: unhandled object type '%s'.\n",
        structType->getName().str().c_str());
  #endif
+--- a/lib/DxilPIXPasses/PixPassHelpers.cpp
++++ b/lib/DxilPIXPasses/PixPassHelpers.cpp
+@@ -610,10 +610,10 @@
+   vsnprintf(buffer, _countof(buffer), format, argumentPointer);
+   va_end(argumentPointer);
+   for (int i = 0; i < g_logIndent; ++i) {
+-    OutputDebugFormatA("    ");
++    DxcOutputDebugFormatA("    ");
+   }
+-  OutputDebugFormatA(buffer);
+-  OutputDebugFormatA("\n");
++  DxcOutputDebugFormatA("%s", buffer);
++  DxcOutputDebugFormatA("\n");
+ }
+ 
+@@ -623,9 +623,9 @@
+   vsnprintf(buffer, _countof(buffer), format, argumentPointer);
+   va_end(argumentPointer);
+   for (int i = 0; i < g_logIndent; ++i) {
+-    OutputDebugFormatA("    ");
++    DxcOutputDebugFormatA("    ");
+   }
+-  OutputDebugFormatA(buffer);
++  DxcOutputDebugFormatA("%s", buffer);
+ }
+ 
+--- a/tools/clang/tools/dxcompiler/dxcfilesystem.cpp
++++ b/tools/clang/tools/dxcompiler/dxcfilesystem.cpp
+@@ -56,7 +56,7 @@
+ #define DXTRACE_FMT(subsystem, fmt, ...)                                       \
+   do {                                                                         \
+     if (DXTRACE_ENABLED(subsystem))                                            \
+-      OutputDebugFormatA(fmt, __VA_ARGS__);                                    \
++      DxcOutputDebugFormatA(fmt, __VA_ARGS__);                                 \
+   } while (0)
+ /// DXTRACE_FMT_APIFS is used by the API-based virtual filesystem.
+ #define DXTRACE_FMT_APIFS(fmt, ...)                                            \
