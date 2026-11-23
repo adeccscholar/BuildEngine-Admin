@@ -97,7 +97,13 @@ if(DEFINED CACHE{CMAKE_RC_COMPILER} AND NOT "${CMAKE_RC_COMPILER}" STREQUAL "")
 else()
    set(CMAKE_RC_COMPILER "${_CB_RC_EXECUTABLE}" CACHE FILEPATH "BuildEngine Windows SDK RC")
 endif()
-message(STATUS "BuildEngine resource compiler: ${CMAKE_RC_COMPILER} (Windows SDK rc.exe)")
+if("${CMAKE_RC_COMPILER}" STREQUAL "${_CB_RC_EXECUTABLE}")
+   set(_CB_RC_USES_SDK TRUE)
+   message(STATUS "BuildEngine resource compiler: ${CMAKE_RC_COMPILER} (Windows SDK rc.exe)")
+else()
+   set(_CB_RC_USES_SDK FALSE)
+   message(STATUS "BuildEngine resource compiler: ${CMAKE_RC_COMPILER} (preserved existing CMake selection)")
+endif()
 get_filename_component(_CB_RC_BIN_DIR "${_CB_RC_EXECUTABLE}" DIRECTORY)
 get_filename_component(_CB_RC_VERSION_DIR "${_CB_RC_BIN_DIR}" DIRECTORY)
 get_filename_component(_CB_RC_VERSION "${_CB_RC_VERSION_DIR}" NAME)
@@ -112,17 +118,19 @@ endforeach()
 if(NOT EXISTS "${_CB_RC_INCLUDE_ROOT}/um/windows.h")
    message(FATAL_ERROR "Registered Windows RC SDK windows.h is missing: ${_CB_RC_INCLUDE_ROOT}/um/windows.h")
 endif()
-# CMake's RC language does not inherit C/C++ or find_* include paths.
-# These directories are emitted in Ninja's RC INCLUDES for every .rc source.
-set(CMAKE_RC_STANDARD_INCLUDE_DIRECTORIES
-   "${_CB_RC_INCLUDE_ROOT}/um"
-   "${_CB_RC_INCLUDE_ROOT}/shared"
-   "${_CB_RC_INCLUDE_ROOT}/ucrt"
-   CACHE STRING "Registered Windows SDK standard RC include directories" FORCE)
-# RC cache values survive CMake reconfiguration: keep registered SDK includes authoritative.
-set(CMAKE_RC_FLAGS_INIT "/I\"${_CB_RC_INCLUDE_ROOT}/um\" /I\"${_CB_RC_INCLUDE_ROOT}/shared\"")
-set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS_INIT}"
-   CACHE STRING "BuildEngine Windows SDK RC include directories" FORCE)
+# SDK-only flags must not be imposed on an existing non-SDK RC compiler.
+# Preserve both compiler identity and its existing language-specific flags.
+if(_CB_RC_USES_SDK)
+   set(CMAKE_RC_STANDARD_INCLUDE_DIRECTORIES
+      "${_CB_RC_INCLUDE_ROOT}/um"
+      "${_CB_RC_INCLUDE_ROOT}/shared"
+      "${_CB_RC_INCLUDE_ROOT}/ucrt"
+      CACHE STRING "Registered Windows SDK standard RC include directories" FORCE)
+   set(CMAKE_RC_FLAGS_INIT "/I\\\"${_CB_RC_INCLUDE_ROOT}/um\\\" /I\\\"${_CB_RC_INCLUDE_ROOT}/shared\\\"")
+   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS_INIT}"
+      CACHE STRING "BuildEngine Windows SDK RC include directories" FORCE)
+endif()
+unset(_CB_RC_USES_SDK)
 unset(_CB_RC_BIN_DIR)
 unset(_CB_RC_VERSION_DIR)
 unset(_CB_RC_VERSION)
