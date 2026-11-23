@@ -1,7 +1,7 @@
 diff --git a/win32/zlib1.rc b/win32/zlib1.rc
 --- a/win32/zlib1.rc
 +++ b/win32/zlib1.rc
-@@ -1,5 +1,11 @@
+@@ -1,5 +1,10 @@
  #include <winver.h>
 -#include "../zlib.h"
 +/* Windows RC requires version metadata, not the C API declarations in
