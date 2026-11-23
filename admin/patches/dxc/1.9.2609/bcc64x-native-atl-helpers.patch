@@ -84,3 +84,31 @@ diff --git a/tools/clang/tools/dxcvalidator/CMakeLists.txt b/tools/clang/tools/d
  if (MINGW)
    target_link_options(dxcvalidator PUBLIC -mconsole -municode)
    target_link_libraries(dxcvalidator PRIVATE version)
+diff --git a/projects/dxilconv/lib/DxbcConverter/DxbcConverterImpl.h b/projects/dxilconv/lib/DxbcConverter/DxbcConverterImpl.h
+--- a/projects/dxilconv/lib/DxbcConverter/DxbcConverterImpl.h
++++ b/projects/dxilconv/lib/DxbcConverter/DxbcConverterImpl.h
+@@ -46,5 +46,9 @@
+ #include "Support/DXIncludes.h"
+ #include "dxc/Support/microcom.h"
+-#include <atlbase.h>
++#if (defined(__CODEGEARC__) || defined(__BORLANDC__)) && !defined(_MSC_VER)
++#include "dxc/Support/Bcc64xNativeAtl.h"
++#else
++#include <atlbase.h>
++#endif
+ 
+ #include "dxc/Support/FileIOHelper.h"
+diff --git a/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp b/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp
+--- a/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp
++++ b/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp
+@@ -26,5 +26,9 @@
+ #include "Support/DXIncludes.h"
+ #include "dxc/Support/microcom.h"
+-#include <atlbase.h>
++#if (defined(__CODEGEARC__) || defined(__BORLANDC__)) && !defined(_MSC_VER)
++#include "dxc/Support/Bcc64xNativeAtl.h"
++#else
++#include <atlbase.h>
++#endif
+ 
+ #include "dxc/Support/FileIOHelper.h"
