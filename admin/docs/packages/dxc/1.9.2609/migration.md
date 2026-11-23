@@ -110,3 +110,15 @@ An overloaded `operator&` is reserved for COM output parameters; self-comparison
 The build log `BuildLog_20261123_165510_295.zip` independently identified (Debug and Release): missing `CComBSTR::Detach`, `std::ofstream(std::wstring)` not supported by the BCC64X libc++ implementation and the C++17 removal of `std::const_mem_fun_t`. The source-scoped patches now use `std::filesystem::path` for Unicode output and `std::mem_fn` for the Clang static analyzer; neither feature is disabled.
 
 **Remaining acceptance requirements:** real BCC64X header compilation, COM reference-count and BSTR memory-ownership runtime checks, embedded-null BSTR append/copy, Unicode filenames, all DXC original tests and Release/Debug DLL consumers. The compile-time checks do not substitute for runtime proof, and the helper is deliberately limited to DXC's observed ATL surface rather than claiming a complete replacement of Microsoft ATL.
+
+## Native BCC64X linker follow-up, 23 November 2026
+
+**Status: [not verified].** BuildLog_20261123_175931_777.zip shows Release/Debug link failures of dxbc2dxil, opt and dxcompiler:
+
+- `dxbc2dxil.exe`: `WinMain` unresolved with upstream `wmain`. The native Unicode adapter forwards the Windows command line to the unchanged original entry point.
+- `dxcompiler.dll`: `Rewriter::ReplaceTextA` unresolved due to a Windows macro. Isolate `ReplaceText` before the class declarations in `Rewriter.h`, not only the implementation.
+- `dxcompiler.dll`: `LangOptionsBase` members unresolved. Their out-of-class definitions in `LangOptions.cpp` are currently guarded by `LLVM_ON_UNIX`; extend this to native Windows Clang/BCC64X.
+- `opt.exe`: duplicate LLVM `.weak` ABI-check symbols remain open; preserve real link-time ABI diagnostics.
+- `dxcompiler.dll`: `CreateDxcDiaDataSource` remains unresolved; determine the true producer and target linkage instead of inserting a stub.
+
+The first three changes are authored in `bcc64x-linkage-compat.patch` and `dxc-wmain.cpp`, with the DXC source XML actions and timestamp updated. Successful BCC64X builds and runtime tests remain **[not verified]**.
