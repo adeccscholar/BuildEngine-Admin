@@ -11,6 +11,8 @@
 #include <intsafe.h>
 #include <cstddef>
 #include <memory>
+#include <new>
+#include <type_traits>
 #include <string>
 #include <vector>
 #include <utility>
@@ -19,7 +21,7 @@
 #define ATLASSERT(expression) assert(expression)
 #endif
 
-class CAllocator {
+class AdeccDxcCAllocator {
 public:
    static void* Allocate(std::size_t nBytes) noexcept {
       return ::CoTaskMemAlloc(nBytes);
@@ -32,25 +34,25 @@ public:
    }
 };
 
-template<class T> class CComPtr {
+template<class T> class AdeccDxcCComPtr {
 public:
    T* p {};
 
-   CComPtr() noexcept = default;
-   CComPtr(T* pValue) noexcept : p {pValue} {
+   AdeccDxcCComPtr() noexcept = default;
+   AdeccDxcCComPtr(T* pValue) noexcept : p {pValue} {
       if(p) p->AddRef();
    }
-   CComPtr(CComPtr const& theOther) noexcept : CComPtr(theOther.p) {}
-   template<class U> CComPtr(CComPtr<U> const& theOther) noexcept
-      : CComPtr(static_cast<T*>(theOther.p)) {}
-   CComPtr(CComPtr&& theOther) noexcept : p {std::exchange(theOther.p, nullptr)} {}
-   ~CComPtr() noexcept { Release(); }
+   AdeccDxcCComPtr(AdeccDxcCComPtr const& theOther) noexcept : AdeccDxcCComPtr(theOther.p) {}
+   template<class U> AdeccDxcCComPtr(AdeccDxcCComPtr<U> const& theOther) noexcept
+      : AdeccDxcCComPtr(static_cast<T*>(theOther.p)) {}
+   AdeccDxcCComPtr(AdeccDxcCComPtr&& theOther) noexcept : p {std::exchange(theOther.p, nullptr)} {}
+   ~AdeccDxcCComPtr() noexcept { Release(); }
 
-   CComPtr& operator=(CComPtr const& theOther) noexcept {
+   AdeccDxcCComPtr& operator=(AdeccDxcCComPtr const& theOther) noexcept {
       if(this != std::addressof(theOther)) Assign(theOther.p);
       return *this;
    }
-   CComPtr& operator=(CComPtr&& theOther) noexcept {
+   AdeccDxcCComPtr& operator=(AdeccDxcCComPtr&& theOther) noexcept {
       if(this != std::addressof(theOther)) {
          Release();
          p = std::exchange(theOther.p, nullptr);
@@ -58,7 +60,7 @@ public:
       return *this;
    }
    T* operator=(T* pValue) noexcept { Assign(pValue); return p; }
-   template<class U> CComPtr& operator=(CComPtr<U> const& theOther) noexcept {
+   template<class U> AdeccDxcCComPtr& operator=(AdeccDxcCComPtr<U> const& theOther) noexcept {
       Assign(static_cast<T*>(theOther.p));
       return *this;
    }
@@ -112,7 +114,7 @@ HRESULT DxcBcc64xQueryInterface(T* pSource, U** ppTarget) noexcept {
 }
 
 template<class T, class U>
-HRESULT DxcBcc64xQueryInterface(CComPtr<T> const& theSource, U** ppTarget) noexcept {
+HRESULT DxcBcc64xQueryInterface(AdeccDxcCComPtr<T> const& theSource, U** ppTarget) noexcept {
    return DxcBcc64xQueryInterface(theSource.p, ppTarget);
 }
 
@@ -124,21 +126,21 @@ inline HRESULT DxcBcc64xSizeTToInt(std::size_t nValue, int* pResult) noexcept {
    return S_OK;
 }
 
-template<class T, class Allocator = CAllocator> class CHeapPtr {
+template<class T, class Allocator = AdeccDxcCAllocator> class AdeccDxcCHeapPtr {
 public:
    T* m_pData {};
 
-   CHeapPtr() noexcept = default;
-   explicit CHeapPtr(T* pValue) noexcept : m_pData {pValue} {}
-   CHeapPtr(CHeapPtr const&) = delete;
-   CHeapPtr& operator=(CHeapPtr const&) = delete;
-   CHeapPtr(CHeapPtr&& theOther) noexcept
+   AdeccDxcCHeapPtr() noexcept = default;
+   explicit AdeccDxcCHeapPtr(T* pValue) noexcept : m_pData {pValue} {}
+   AdeccDxcCHeapPtr(AdeccDxcCHeapPtr const&) = delete;
+   AdeccDxcCHeapPtr& operator=(AdeccDxcCHeapPtr const&) = delete;
+   AdeccDxcCHeapPtr(AdeccDxcCHeapPtr&& theOther) noexcept
       : m_pData {std::exchange(theOther.m_pData, nullptr)} {}
-   CHeapPtr& operator=(CHeapPtr&& theOther) noexcept {
+   AdeccDxcCHeapPtr& operator=(AdeccDxcCHeapPtr&& theOther) noexcept {
       if(this != std::addressof(theOther)) Attach(theOther.Detach());
       return *this;
    }
-   ~CHeapPtr() noexcept { Free(); }
+   ~AdeccDxcCHeapPtr() noexcept { Free(); }
 
    [[nodiscard]] operator T*() const noexcept { return m_pData; }
    [[nodiscard]] T* operator->() const noexcept { return m_pData; }
@@ -172,9 +174,9 @@ public:
    }
 };
 
-// Minimal ATL CSimpleArray surface required by DXC IntelliSense.
+// Minimal ATL AdeccDxcCSimpleArray surface required by DXC IntelliSense.
 // Preserve Add's boolean allocation-failure contract and indexed access.
-template<class T> class CSimpleArray {
+template<class T> class AdeccDxcCSimpleArray {
    std::vector<T> vecElements;
 public:
    [[nodiscard]] bool Add(T const& theValue) {
@@ -192,25 +194,25 @@ public:
    }
 };
 
-template<class T> using CComHeapPtr = CHeapPtr<T>;
+template<class T> using AdeccDxcCComHeapPtr = AdeccDxcCHeapPtr<T>;
 
-class CHandle {
+class AdeccDxcCHandle {
    HANDLE hHandle {};
 public:
-   explicit CHandle(HANDLE hNew) noexcept : hHandle {hNew} {}
-   CHandle(CHandle const&) = delete;
-   CHandle& operator=(CHandle const&) = delete;
-   ~CHandle() noexcept {
+   explicit AdeccDxcCHandle(HANDLE hNew) noexcept : hHandle {hNew} {}
+   AdeccDxcCHandle(AdeccDxcCHandle const&) = delete;
+   AdeccDxcCHandle& operator=(AdeccDxcCHandle const&) = delete;
+   ~AdeccDxcCHandle() noexcept {
       if(hHandle && hHandle != INVALID_HANDLE_VALUE) ::CloseHandle(hHandle);
    }
    [[nodiscard]] operator HANDLE() const noexcept { return hHandle; }
 };
 
 // UTF-8 to native UTF-16 conversion for DXC's Windows API call sites.
-class CA2W {
+class AdeccDxcCA2W {
    std::wstring strWide;
 public:
-   explicit CA2W(LPCSTR pUtf8) {
+   explicit AdeccDxcCA2W(LPCSTR pUtf8) {
       if(!pUtf8) return;
       int const iLength = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
          pUtf8, -1, nullptr, 0);
@@ -224,24 +226,26 @@ public:
 };
 
 // Owns a BSTR and exposes BSTR* for COM [out] parameters.
-class CComBSTR {
+class AdeccDxcCComBSTR {
    BSTR pValue {};
 public:
-   CComBSTR() noexcept = default;
-   CComBSTR(unsigned int uLength, LPCWSTR pText)
+   AdeccDxcCComBSTR() noexcept = default;
+   AdeccDxcCComBSTR(unsigned int uLength, LPCWSTR pText)
       : pValue { ::SysAllocStringLen(pText, uLength) } {}
-   CComBSTR(CComBSTR const&) = delete;
-   CComBSTR& operator=(CComBSTR const&) = delete;
-   CComBSTR(CComBSTR&& theOther) noexcept
+   AdeccDxcCComBSTR(AdeccDxcCComBSTR const&) = delete;
+   AdeccDxcCComBSTR& operator=(AdeccDxcCComBSTR const&) = delete;
+   AdeccDxcCComBSTR(AdeccDxcCComBSTR&& theOther) noexcept
       : pValue { std::exchange(theOther.pValue, nullptr) } {}
-   CComBSTR& operator=(CComBSTR&& theOther) noexcept {
+   AdeccDxcCComBSTR& operator=(AdeccDxcCComBSTR&& theOther) noexcept {
       if(this != std::addressof(theOther)) {
          ::SysFreeString(pValue);
          pValue = std::exchange(theOther.pValue, nullptr);
       }
       return *this;
    }
-   ~CComBSTR() noexcept { ::SysFreeString(pValue); }
+   ~AdeccDxcCComBSTR() noexcept { ::SysFreeString(pValue); }
+   [[nodiscard]] BSTR Detach() noexcept { return std::exchange(pValue, nullptr); }
+   [[nodiscard]] BSTR Get() const noexcept { return pValue; }
    [[nodiscard]] operator BSTR() const noexcept { return pValue; }
    [[nodiscard]] BSTR* operator&() noexcept {
       ATLASSERT(pValue == nullptr);
@@ -249,10 +253,10 @@ public:
    }
 };
 
-class CW2A {
+class AdeccDxcCW2A {
    std::string strUtf8;
 public:
-   explicit CW2A(LPCWSTR pWide) {
+   explicit AdeccDxcCW2A(LPCWSTR pWide) {
       if(!pWide) return;
       int const iLength = ::WideCharToMultiByte(
          CP_UTF8, 0, pWide, -1, nullptr, 0, nullptr, nullptr);
@@ -265,3 +269,17 @@ public:
    [[nodiscard]] operator LPSTR() noexcept { return strUtf8.data(); }
    [[nodiscard]] operator LPCSTR() const noexcept { return strUtf8.c_str(); }
 };
+
+// Compatibility aliases required by the pinned upstream DXC sources.
+// These are NOT Microsoft ATL implementations. The concrete types above
+// are owned by BuildEngine and intentionally carry the AdeccDxc prefix.
+using CAllocator = AdeccDxcCAllocator;
+template<class T> using CComPtr = AdeccDxcCComPtr<T>;
+template<class T, class Allocator = CAllocator>
+using CHeapPtr = AdeccDxcCHeapPtr<T, Allocator>;
+template<class T> using CSimpleArray = AdeccDxcCSimpleArray<T>;
+template<class T> using CComHeapPtr = AdeccDxcCComHeapPtr<T>;
+using CHandle = AdeccDxcCHandle;
+using CA2W = AdeccDxcCA2W;
+using CComBSTR = AdeccDxcCComBSTR;
+using CW2A = AdeccDxcCW2A;
