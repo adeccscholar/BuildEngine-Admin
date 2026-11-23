@@ -1,15 +1,18 @@
 diff --git a/projects/dxilconv/lib/ShaderBinary/ShaderBinary.cpp b/projects/dxilconv/lib/ShaderBinary/ShaderBinary.cpp
 --- a/projects/dxilconv/lib/ShaderBinary/ShaderBinary.cpp
 +++ b/projects/dxilconv/lib/ShaderBinary/ShaderBinary.cpp
-@@ -10,6 +10,7 @@
+@@ -10,7 +10,8 @@
  ///////////////////////////////////////////////////////////////////////////////
  
  // HLSL change start
+-#include "ShaderBinaryIncludes.h"
 +#include <algorithm>
- #include "ShaderBinaryIncludes.h"
++#include "ShaderBinaryIncludes.h"
  #include "llvm/Support/Compiler.h" // for LLVM_FALLTHROUGH
  // HLSL change end
+ 
 @@ -811,7 +812,7 @@
+     m_pCurrentToken++;
      pInstruction->m_IndexableTempDecl.NumRegisters = (UINT)(*m_pCurrentToken);
      m_pCurrentToken++;
 -    switch (min(4u, max(1u, (UINT)(*m_pCurrentToken)))) {
@@ -18,6 +21,7 @@ diff --git a/projects/dxilconv/lib/ShaderBinary/ShaderBinary.cpp b/projects/dxil
        pInstruction->m_IndexableTempDecl.Mask =
            D3D10_SB_OPERAND_4_COMPONENT_MASK_X;
 @@ -1267,7 +1268,7 @@
+       ENCODE_D3D11_SB_INSTRUCTION_PRECISE_VALUES(instruction.m_PreciseMask);
    OPCODE(OpCode);
  
 -  for (UINT i = 0; i < min(instruction.m_ExtendedOpCodeCount,
@@ -36,3 +40,4 @@ diff --git a/include/dxc/Support/Global.h b/include/dxc/Support/Global.h
 +#define DXASSERT(exp, msg) DXASSERT_ARGS(exp, msg, )
  
  #define DXASSERT_LOCALVAR(local, exp, msg) DXASSERT(exp, msg)
+ 
