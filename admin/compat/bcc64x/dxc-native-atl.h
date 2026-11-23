@@ -11,6 +11,7 @@
 #include <cstddef>
 #include <memory>
 #include <string>
+#include <vector>
 #include <utility>
 
 #ifndef ATLASSERT
@@ -62,6 +63,9 @@ public:
    }
    [[nodiscard]] operator T*() const noexcept { return p; }
    [[nodiscard]] T* operator->() const noexcept { return p; }
+   [[nodiscard]] T* Get() const noexcept { return p; }
+   [[nodiscard]] T** GetAddressOf() noexcept { return &p; }
+   [[nodiscard]] T* const* GetAddressOf() const noexcept { return &p; }
    [[nodiscard]] T** operator&() noexcept {
       ATLASSERT(p == nullptr);
       return &p;
@@ -164,6 +168,26 @@ public:
    [[nodiscard]] T* Detach() noexcept { return std::exchange(m_pData, nullptr); }
    void Free() noexcept {
       if(T* pOld = std::exchange(m_pData, nullptr)) Allocator::Free(pOld);
+   }
+};
+
+// Minimal ATL CSimpleArray surface required by DXC IntelliSense.
+// Preserve Add's boolean allocation-failure contract and indexed access.
+template<class T> class CSimpleArray {
+   std::vector<T> vecElements;
+public:
+   [[nodiscard]] bool Add(T const& theValue) {
+      try { vecElements.push_back(theValue); return true; }
+      catch(std::bad_alloc const&) { return false; }
+   }
+   [[nodiscard]] int GetSize() const noexcept {
+      return static_cast<int>(vecElements.size());
+   }
+   [[nodiscard]] T& operator[](int iIndex) noexcept {
+      return vecElements[static_cast<std::size_t>(iIndex)];
+   }
+   [[nodiscard]] T const& operator[](int iIndex) const noexcept {
+      return vecElements[static_cast<std::size_t>(iIndex)];
    }
 };
 
