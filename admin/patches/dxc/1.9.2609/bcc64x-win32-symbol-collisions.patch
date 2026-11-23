@@ -1,17 +1,74 @@
 diff --git a/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp b/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp
 --- a/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp
 +++ b/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp
-@@ -7,7 +7,9 @@
+@@ -7,7 +7,8 @@
  //
  //===----------------------------------------------------------------------===//
  
 -#include "clang/CodeGen/ObjectFilePCHContainerOperations.h"
-+#include "llvm/Support/COFF.h" // Declare LLVM COFF identifiers before Windows SDK macro definitions.
-+#include "llvm/Object/RelocVisitor.h" // Keep relocation helpers ahead of Win32 headers.
++#include "llvm/Support/COFF.h" // LLVM enum declarations must precede the Win32 macro namespace.
 +#include "clang/CodeGen/ObjectFilePCHContainerOperations.h"
  #include "CGDebugInfo.h"
  #include "CodeGenModule.h"
  #include "clang/AST/ASTContext.h"
+@@ -26,7 +27,57 @@
+ #include "llvm/IR/DataLayout.h"
+ #include "llvm/IR/LLVMContext.h"
+ #include "llvm/IR/Module.h"
++// Prevent Win32 macro expansion in qualified LLVM COFF expressions.
++// The SDK uses these names as macros; LLVM uses them as enum members.
++#ifdef IMAGE_SYM_CLASS_EXTERNAL
++#undef IMAGE_SYM_CLASS_EXTERNAL
++#endif
++#ifdef IMAGE_SYM_UNDEFINED
++#undef IMAGE_SYM_UNDEFINED
++#endif
++#ifdef IMAGE_SYM_CLASS_WEAK_EXTERNAL
++#undef IMAGE_SYM_CLASS_WEAK_EXTERNAL
++#endif
++#ifdef IMAGE_SYM_TYPE_NULL
++#undef IMAGE_SYM_TYPE_NULL
++#endif
++#ifdef IMAGE_SYM_DTYPE_FUNCTION
++#undef IMAGE_SYM_DTYPE_FUNCTION
++#endif
++#ifdef IMAGE_SYM_CLASS_FUNCTION
++#undef IMAGE_SYM_CLASS_FUNCTION
++#endif
++#ifdef IMAGE_SYM_CLASS_FILE
++#undef IMAGE_SYM_CLASS_FILE
++#endif
++#ifdef IMAGE_SYM_CLASS_SECTION
++#undef IMAGE_SYM_CLASS_SECTION
++#endif
++#ifdef IMAGE_SYM_ABSOLUTE
++#undef IMAGE_SYM_ABSOLUTE
++#endif
++#ifdef IMAGE_SYM_CLASS_STATIC
++#undef IMAGE_SYM_CLASS_STATIC
++#endif
++#ifdef IMAGE_SYM_CLASS_CLR_TOKEN
++#undef IMAGE_SYM_CLASS_CLR_TOKEN
++#endif
++#ifdef IMAGE_SCN_LNK_NRELOC_OVFL
++#undef IMAGE_SCN_LNK_NRELOC_OVFL
++#endif
++#ifdef IMAGE_REL_I386_SECREL
++#undef IMAGE_REL_I386_SECREL
++#endif
++#ifdef IMAGE_REL_I386_DIR32
++#undef IMAGE_REL_I386_DIR32
++#endif
++#ifdef IMAGE_REL_AMD64_SECREL
++#undef IMAGE_REL_AMD64_SECREL
++#endif
++#ifdef IMAGE_REL_AMD64_ADDR64
++#undef IMAGE_REL_AMD64_ADDR64
++#endif
+ #include "llvm/Object/COFF.h"
+ #include "llvm/Object/ObjectFile.h"
+ #include "llvm/Support/TargetRegistry.h"
+ #include <memory>
 diff --git a/tools/clang/lib/Rewrite/Rewriter.cpp b/tools/clang/lib/Rewrite/Rewriter.cpp
 --- a/tools/clang/lib/Rewrite/Rewriter.cpp
 +++ b/tools/clang/lib/Rewrite/Rewriter.cpp
