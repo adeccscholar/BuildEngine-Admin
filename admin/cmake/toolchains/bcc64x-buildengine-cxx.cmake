@@ -56,81 +56,63 @@ list(PREPEND CMAKE_INCLUDE_PATH ${_BCC64X_RAD_INCLUDE_PATHS})
 unset(_BCC64X_RAD_LIBRARY_PATHS)
 unset(_BCC64X_RAD_INCLUDE_PATHS)
 
-# Select one Windows SDK RC implementation for every BCC64X CMake project.
-# Some library definitions do not explicitly pass CB_WINDOWS_RC. Resolve the
-# same versioned SDK layout as the BuildEngine windows-rc tool instead of
-# permitting CMake to select a resource compiler from PATH.
-set(_CB_RC_EXECUTABLE "")
+# BCC64X ships its own windres implementation.  That is the default for
+# CMake projects that do not explicitly request the Windows SDK resource
+# compiler.  CB_WINDOWS_RC selects the SDK implementation for the few upstream
+# projects that actually require Microsoft's RC and SDK include conventions.
+#
+# Never FORCE a new compiler into an existing CMake cache.  A change of RC
+# language identity needs an explicit, per-library --fresh migration.
+set(_CB_RC_KIND "bcc64x-windres")
+set(_CB_RC_EXECUTABLE "$ENV{CB_BDS}/bin64/bcc64x-windres.exe")
 if(DEFINED ENV{CB_WINDOWS_RC} AND NOT "$ENV{CB_WINDOWS_RC}" STREQUAL "")
+   set(_CB_RC_KIND "windows-sdk-rc")
    set(_CB_RC_EXECUTABLE "$ENV{CB_WINDOWS_RC}")
-else()
-   if(DEFINED ENV{ProgramFiles} AND NOT "$ENV{ProgramFiles}" STREQUAL "")
-      # ProgramFiles(x86) cannot be expanded as a CMake environment reference.
-      # Windows installs Program Files and Program Files (x86) side by side.
-      get_filename_component(_CB_RC_PROGRAMFILES_PARENT "$ENV{ProgramFiles}" DIRECTORY)
-      file(GLOB _CB_RC_CANDIDATES
-         "${_CB_RC_PROGRAMFILES_PARENT}/Program Files (x86)/Windows Kits/10/bin/*/x64/rc.exe")
-      if(_CB_RC_CANDIDATES)
-         list(SORT _CB_RC_CANDIDATES COMPARE NATURAL ORDER DESCENDING)
-         list(GET _CB_RC_CANDIDATES 0 _CB_RC_EXECUTABLE)
-      endif()
-      unset(_CB_RC_CANDIDATES)
-      unset(_CB_RC_PROGRAMFILES_PARENT)
-   endif()
 endif()
 if(NOT EXISTS "${_CB_RC_EXECUTABLE}")
    message(FATAL_ERROR
-      "BuildEngine Windows SDK RC is unavailable: CB_WINDOWS_RC='$ENV{CB_WINDOWS_RC}'. "
-      "Install the Windows 10 SDK x64 Resource Compiler; never use PATH fallback.")
+      "BuildEngine resource compiler not found (${_CB_RC_KIND}): ${_CB_RC_EXECUTABLE}")
 endif()
-# Do not replace the resource compiler in an existing CMake cache. CMake
-# treats RC compiler identity as immutable and clears the configured generator,
-# make program and compiler state when it changes during configure.
-# New build directories use the pinned SDK compiler. Existing directories
-# retain their compiler until an explicitly managed, per-package migration.
 if(DEFINED CACHE{CMAKE_RC_COMPILER} AND NOT "${CMAKE_RC_COMPILER}" STREQUAL "")
    if(NOT "${CMAKE_RC_COMPILER}" STREQUAL "${_CB_RC_EXECUTABLE}")
       message(STATUS
-         "BuildEngine RC cache preserved: ${CMAKE_RC_COMPILER}; "
-         "pinned SDK RC for new build trees: ${_CB_RC_EXECUTABLE}")
+         "BuildEngine existing RC cache retained: ${CMAKE_RC_COMPILER}; "
+         "contract preference: ${_CB_RC_EXECUTABLE}. "
+         "Use per-library --fresh only when migrating this build tree.")
    endif()
 else()
-   set(CMAKE_RC_COMPILER "${_CB_RC_EXECUTABLE}" CACHE FILEPATH "BuildEngine Windows SDK RC")
+   set(CMAKE_RC_COMPILER "${_CB_RC_EXECUTABLE}"
+      CACHE FILEPATH "BuildEngine resource compiler" )
 endif()
-if("${CMAKE_RC_COMPILER}" STREQUAL "${_CB_RC_EXECUTABLE}")
-   set(_CB_RC_USES_SDK TRUE)
-   message(STATUS "BuildEngine resource compiler: ${CMAKE_RC_COMPILER} (Windows SDK rc.exe)")
-else()
-   set(_CB_RC_USES_SDK FALSE)
-   message(STATUS "BuildEngine resource compiler: ${CMAKE_RC_COMPILER} (preserved existing CMake selection)")
-endif()
-get_filename_component(_CB_RC_BIN_DIR "${_CB_RC_EXECUTABLE}" DIRECTORY)
-get_filename_component(_CB_RC_VERSION_DIR "${_CB_RC_BIN_DIR}" DIRECTORY)
-get_filename_component(_CB_RC_VERSION "${_CB_RC_VERSION_DIR}" NAME)
-get_filename_component(_CB_RC_BIN_ROOT "${_CB_RC_VERSION_DIR}" DIRECTORY)
-get_filename_component(_CB_RC_SDK_ROOT "${_CB_RC_BIN_ROOT}" DIRECTORY)
-set(_CB_RC_INCLUDE_ROOT "${_CB_RC_SDK_ROOT}/Include/${_CB_RC_VERSION}")
-foreach(_CB_RC_INCLUDE um shared ucrt)
-   if(NOT IS_DIRECTORY "${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
-      message(FATAL_ERROR "Registered Windows RC SDK include path missing: ${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
-   endif()
-endforeach()
-if(NOT EXISTS "${_CB_RC_INCLUDE_ROOT}/um/windows.h")
-   message(FATAL_ERROR "Registered Windows RC SDK windows.h is missing: ${_CB_RC_INCLUDE_ROOT}/um/windows.h")
-endif()
-# SDK-only flags must not be imposed on an existing non-SDK RC compiler.
-# Preserve both compiler identity and its existing language-specific flags.
-if(_CB_RC_USES_SDK)
+message(STATUS "BuildEngine active resource compiler: ${CMAKE_RC_COMPILER}")
+
+# SDK header paths and Microsoft /I flags must never reach BCC64X windres.
+# They are only valid when the actual selected compiler is the SDK rc.exe.
+if(_CB_RC_KIND STREQUAL "windows-sdk-rc" AND
+   "${CMAKE_RC_COMPILER}" STREQUAL "${_CB_RC_EXECUTABLE}")
+   get_filename_component(_CB_RC_BIN_DIR "${_CB_RC_EXECUTABLE}" DIRECTORY)
+   get_filename_component(_CB_RC_VERSION_DIR "${_CB_RC_BIN_DIR}" DIRECTORY)
+   get_filename_component(_CB_RC_VERSION "${_CB_RC_VERSION_DIR}" NAME)
+   get_filename_component(_CB_RC_BIN_ROOT "${_CB_RC_VERSION_DIR}" DIRECTORY)
+   get_filename_component(_CB_RC_SDK_ROOT "${_CB_RC_BIN_ROOT}" DIRECTORY)
+   set(_CB_RC_INCLUDE_ROOT "${_CB_RC_SDK_ROOT}/Include/${_CB_RC_VERSION}")
+   foreach(_CB_RC_INCLUDE um shared ucrt)
+      if(NOT IS_DIRECTORY "${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
+         message(FATAL_ERROR
+            "Windows SDK RC include directory missing: ${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
+      endif()
+   endforeach()
    set(CMAKE_RC_STANDARD_INCLUDE_DIRECTORIES
       "${_CB_RC_INCLUDE_ROOT}/um"
       "${_CB_RC_INCLUDE_ROOT}/shared"
       "${_CB_RC_INCLUDE_ROOT}/ucrt"
-      CACHE STRING "Registered Windows SDK standard RC include directories" FORCE)
+      CACHE STRING "Registered Windows SDK RC standard includes" FORCE)
    set(CMAKE_RC_FLAGS_INIT "/I\\\"${_CB_RC_INCLUDE_ROOT}/um\\\" /I\\\"${_CB_RC_INCLUDE_ROOT}/shared\\\"")
    set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS_INIT}"
-      CACHE STRING "BuildEngine Windows SDK RC include directories" FORCE)
+      CACHE STRING "Windows SDK RC include arguments" FORCE)
 endif()
-unset(_CB_RC_USES_SDK)
+unset(_CB_RC_KIND)
+unset(_CB_RC_EXECUTABLE)
 unset(_CB_RC_BIN_DIR)
 unset(_CB_RC_VERSION_DIR)
 unset(_CB_RC_VERSION)
@@ -138,7 +120,6 @@ unset(_CB_RC_BIN_ROOT)
 unset(_CB_RC_SDK_ROOT)
 unset(_CB_RC_INCLUDE_ROOT)
 unset(_CB_RC_INCLUDE)
-unset(_CB_RC_EXECUTABLE)
 
 set(CMAKE_ASM_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X assembler driver" FORCE)
 set(CMAKE_C_COMPILER   "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C compiler" FORCE)
