@@ -235,7 +235,7 @@ public:
    CComBSTR(CComBSTR&& theOther) noexcept
       : pValue { std::exchange(theOther.pValue, nullptr) } {}
    CComBSTR& operator=(CComBSTR&& theOther) noexcept {
-      if(this != &theOther) {
+      if(this != std::addressof(theOther)) {
          ::SysFreeString(pValue);
          pValue = std::exchange(theOther.pValue, nullptr);
       }
