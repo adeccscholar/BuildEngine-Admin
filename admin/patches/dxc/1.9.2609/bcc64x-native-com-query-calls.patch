@@ -330,3 +330,131 @@
 +    IFT(DXC_NATIVE_QUERY_INTERFACE(pOutputStream, &pErrorBlob));
      outStream.flush();
      IFT(DxcResult::Create(
+--- a/tools/clang/tools/dxcompiler/dxcompilerobj.cpp
++++ b/tools/clang/tools/dxcompiler/dxcompilerobj.cpp
+@@ -1091,10 +1091,10 @@
+                 pReflectionStream->GetPtrSize()) {
+               CComPtr<IDxcBlob> pReflection;
+-              IFT(pReflectionStream->QueryInterface(&pReflection));
++              IFT(DXC_NATIVE_QUERY_INTERFACE(pReflectionStream, &pReflection));
+               IFT(pResult->SetOutputObject(DXC_OUT_REFLECTION, pReflection));
+             }
+             if (pRootSigStream && pRootSigStream->GetPtrSize()) {
+               CComPtr<IDxcBlob> pRootSignature;
+-              IFT(pRootSigStream->QueryInterface(&pRootSignature));
++              IFT(DXC_NATIVE_QUERY_INTERFACE(pRootSigStream, &pRootSignature));
+               if (validateRootSigContainer && needsValidation) {
+                 CComPtr<IDxcBlobEncoding> pValErrors;
+@@ -1887,5 +1887,5 @@
+                         CP_ACP};
+     CComPtr<IDxcBlobEncoding> pSourceEncoding;
+-    if (SUCCEEDED(pSource->QueryInterface(&pSourceEncoding))) {
++    if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pSource, &pSourceEncoding))) {
+       BOOL sourceEncodingKnown = false;
+       IFT(pSourceEncoding->GetEncoding(&sourceEncodingKnown, &buffer.Encoding));
+@@ -1907,5 +1907,5 @@
+       llvm::timeTraceProfilerInitialize(opts.TimeTraceGranularity);
+     if (finished) {
+-      IFT(pOperationResult->QueryInterface(ppResult));
++      IFT(DXC_NATIVE_QUERY_INTERFACE(pOperationResult, ppResult));
+       return S_OK;
+     }
+--- a/tools/clang/tools/dxcompiler/dxcpdbutils.cpp
++++ b/tools/clang/tools/dxcompiler/dxcpdbutils.cpp
+@@ -378,5 +378,5 @@
+       return S_OK;
+ 
+-    return pBlob->QueryInterface(ppResult);
++    return DXC_NATIVE_QUERY_INTERFACE(pBlob, ppResult);
+   }
+ 
+--- a/tools/clang/tools/dxclib/dxc.cpp
++++ b/tools/clang/tools/dxclib/dxc.cpp
+@@ -612,5 +612,5 @@
+   // Return Result
+   CComPtr<IDxcBlob> pResult;
+-  IFT(pMemoryStream->QueryInterface(&pResult));
++  IFT(DXC_NATIVE_QUERY_INTERFACE(pMemoryStream, &pResult));
+   *ppResult = pResult.Detach();
+ }
+@@ -792,5 +792,5 @@
+     CComHeapPtr<WCHAR> pDebugName;
+     Unicode::UTF8ToWideString(m_Opts.DebugFile.str().c_str(), &outputPDBPath);
+-    IFT(pCompiler->QueryInterface(&pCompiler2));
++    IFT(DXC_NATIVE_QUERY_INTERFACE(pCompiler, &pCompiler2));
+     IFT(pCompiler2->CompileWithDebug(
+         pCompileSource, pMainFileName, pEntryPoint, pTargetProfile,
+@@ -915,5 +915,5 @@
+       // Now write out extra parts
+       CComPtr<IDxcResult> pResult;
+-      if (SUCCEEDED(pCompileResult->QueryInterface(&pResult))) {
++      if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pCompileResult, &pResult))) {
+         WriteDxcOutputToConsole(pResult, DXC_OUT_REMARKS);
+         WriteDxcOutputToConsole(pResult, DXC_OUT_TIME_REPORT);
+@@ -1056,5 +1056,5 @@
+     // Don't fail if this QI doesn't succeed (older dll, perhaps)
+     CComPtr<IDxcBlobUtf8> pDisasmUtf8;
+-    pDisasmEncoding->QueryInterface(&pDisasmUtf8);
++    DXC_NATIVE_QUERY_INTERFACE(pDisasmEncoding, &pDisasmUtf8);
+ 
+     LPCSTR pBytes = pDisasmUtf8 ? pDisasmUtf8->GetStringPointer()
+@@ -1264,7 +1264,7 @@
+   if (SUCCEEDED(DxcSupport.CreateInstance(CLSID_DxcCompiler, &VerInfo))) {
+     VerInfo->GetVersion(&VersionMajor, &VersionMinor);
+-    if (SUCCEEDED(VerInfo->QueryInterface(&VerInfo2)))
++    if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(VerInfo, &VerInfo2)))
+       VerInfo2->GetCommitInfo(&CommitCount, &CommitHash);
+-    if (SUCCEEDED(VerInfo->QueryInterface(&VerInfo3)))
++    if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(VerInfo, &VerInfo3)))
+       VerInfo3->GetCustomVersionString(&CustomVersionString);
+     OS << CompilerName << ": " << VersionMajor << "." << VersionMinor;
+@@ -1308,5 +1308,5 @@
+   if (SUCCEEDED(DxilSupport.CreateInstance(CLSID_DxcValidator, &VerInfo))) {
+     VerInfo->GetVersion(&VersionMajor, &VersionMinor);
+-    if (SUCCEEDED(VerInfo->QueryInterface(&VerInfo2)))
++    if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(VerInfo, &VerInfo2)))
+       VerInfo2->GetCommitInfo(&CommitCount, &CommitHash);
+   }
+--- a/tools/clang/tools/dxopt/dxopt.cpp
++++ b/tools/clang/tools/dxopt/dxopt.cpp
+@@ -206,5 +206,5 @@
+   *pOptArgs = passes.data();
+   *pOptArgCount = passes.size();
+-  pPassOpts->QueryInterface(ppPassOpts);
++  DXC_NATIVE_QUERY_INTERFACE(pPassOpts, ppPassOpts);
+ }
+ 
+--- a/tools/clang/tools/dxlib-sample/lib_share_compile.cpp
++++ b/tools/clang/tools/dxlib-sample/lib_share_compile.cpp
+@@ -85,5 +85,5 @@
+                                       mainArgs, opts, outStream)) {
+     CComPtr<IDxcBlob> pErrorBlob;
+-    IFT(pOutputStream->QueryInterface(&pErrorBlob));
++    IFT(DXC_NATIVE_QUERY_INTERFACE(pOutputStream, &pErrorBlob));
+     outStream.flush();
+     IFT(DxcResult::Create(
+--- a/tools/clang/tools/libclang/dxcrewriteunused.cpp
++++ b/tools/clang/tools/libclang/dxcrewriteunused.cpp
+@@ -837,5 +837,5 @@
+                                       mainArgs, opts, outStream)) {
+     CComPtr<IDxcBlob> pErrorBlob;
+-    IFT(pOutputStream->QueryInterface(&pErrorBlob));
++    IFT(DXC_NATIVE_QUERY_INTERFACE(pOutputStream, &pErrorBlob));
+     outStream.flush();
+     IFT(DxcResult::Create(
+--- a/tools/clang/tools/dxrfallbackcompiler/dxcutil.cpp
++++ b/tools/clang/tools/dxrfallbackcompiler/dxcutil.cpp
+@@ -114,5 +114,5 @@
+                                       mainArgs, opts, outStream)) {
+     CComPtr<IDxcBlob> pErrorBlob;
+-    IFT(pOutputStream->QueryInterface(&pErrorBlob));
++    IFT(DXC_NATIVE_QUERY_INTERFACE(pOutputStream, &pErrorBlob));
+     outStream.flush();
+     IFT(DxcResult::Create(
+@@ -155,5 +155,5 @@
+   // Verify validator version can validate this module
+   CComPtr<IDxcVersionInfo> pValidatorVersion;
+-  IFT(pValidator->QueryInterface(&pValidatorVersion));
++  IFT(DXC_NATIVE_QUERY_INTERFACE(pValidator, &pValidatorVersion));
+   UINT32 ValMajor, ValMinor;
+   IFT(pValidatorVersion->GetVersion(&ValMajor, &ValMinor));
