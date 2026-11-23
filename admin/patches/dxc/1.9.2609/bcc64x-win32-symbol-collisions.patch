@@ -79,6 +79,19 @@ diff --git a/tools/clang/lib/Frontend/Rewrite/RewriteObjC.cpp b/tools/clang/lib/
      }
  
      // Helper function: create a CStyleCastExpr with trivial type source info.
+diff --git a/tools/clang/lib/SPIRV/SpirvEmitter.cpp b/tools/clang/lib/SPIRV/SpirvEmitter.cpp
+--- a/tools/clang/lib/SPIRV/SpirvEmitter.cpp
++++ b/tools/clang/lib/SPIRV/SpirvEmitter.cpp
+@@ -731,7 +731,7 @@
+   }
+   std::vector<SpirvVariableLike *> interfacesInVector;
+   interfacesInVector.reserve(interfaces.size());
+-  for (auto *interface : interfaces) {
+-    interfacesInVector.push_back(interface);
++  for (auto *pInterface : interfaces) {
++    interfacesInVector.push_back(pInterface);
+   }
+   return interfacesInVector;
 diff --git a/tools/clang/lib/Rewrite/Rewriter.cpp b/tools/clang/lib/Rewrite/Rewriter.cpp
 --- a/tools/clang/lib/Rewrite/Rewriter.cpp
 +++ b/tools/clang/lib/Rewrite/Rewriter.cpp
