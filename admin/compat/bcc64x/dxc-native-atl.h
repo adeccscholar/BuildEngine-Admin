@@ -106,6 +106,11 @@ HRESULT DxcBcc64xQueryInterface(T* pSource, U** ppTarget) noexcept {
    return pSource->QueryInterface(__uuidof(U), reinterpret_cast<void**>(ppTarget));
 }
 
+template<class T, class U>
+HRESULT DxcBcc64xQueryInterface(CComPtr<T> const& theSource, U** ppTarget) noexcept {
+   return DxcBcc64xQueryInterface(theSource.p, ppTarget);
+}
+
 // The BCC64X SDK does not expose SizeTToInt in the active header configuration.
 inline HRESULT DxcBcc64xSizeTToInt(std::size_t nValue, int* pResult) noexcept {
    if(!pResult) return E_POINTER;
