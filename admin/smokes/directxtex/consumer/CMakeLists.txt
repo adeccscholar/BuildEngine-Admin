@@ -28,6 +28,27 @@ set(JPEG_ROOT "${DIRECTXTEX_JPEG_ROOT}")
 set(PNG_ROOT "${DIRECTXTEX_PNG_ROOT}")
 set(ZLIB_ROOT "${DIRECTXTEX_ZLIB_ROOT}")
 
+# Pin the native Release import libraries in the actual BuildEngine package.
+# The smoke must not silently succeed against system installations.
+set(JPEG_INCLUDE_DIR "${DIRECTXTEX_JPEG_ROOT}/include")
+set(PNG_PNG_INCLUDE_DIR "${DIRECTXTEX_PNG_ROOT}/include")
+set(ZLIB_INCLUDE_DIR "${DIRECTXTEX_ZLIB_ROOT}/include")
+set(ZLIB_LIBRARY "${DIRECTXTEX_ZLIB_ROOT}/lib/win64/Release/libz.lib")
+set(PNG_LIBRARY "${DIRECTXTEX_PNG_ROOT}/lib/win64/Release/libpng16.lib")
+find_library(JPEG_LIBRARY NAMES jpeg libjpeg
+   PATHS "${DIRECTXTEX_JPEG_ROOT}/lib/win64/Release"
+   NO_DEFAULT_PATH)
+foreach(_required IN ITEMS ZLIB_LIBRARY PNG_LIBRARY JPEG_LIBRARY)
+   if(NOT EXISTS "${${_required}}")
+      message(FATAL_ERROR "DirectXTex consumer missing import library ${_required}: ${${_required}}")
+   endif()
+endforeach()
+foreach(_required IN ITEMS JPEG_INCLUDE_DIR PNG_PNG_INCLUDE_DIR ZLIB_INCLUDE_DIR)
+   if(NOT IS_DIRECTORY "${${_required}}")
+      message(FATAL_ERROR "DirectXTex consumer missing header directory ${_required}: ${${_required}}")
+   endif()
+endforeach()
+
 # The BCC64X toolchain is Clang/EMBT; CMake's generic OpenMP probe is not
 # sufficient to locate the separately built LLVM OpenMP runtime. Supply the
 # actual dependency artifact and let the upstream CONFIG package run its
@@ -39,6 +60,17 @@ if(NOT EXISTS "${OpenMP_omp_LIBRARY}")
    message(FATAL_ERROR "BuildEngine LLVM OpenMP import library missing: ${OpenMP_omp_LIBRARY}")
 endif()
 
+# Resolve the enabled upstream CONFIG dependencies explicitly first.
+# Errors now name the actual missing dependency rather than ending solely at
+# CMakeFindDependencyMacro.cmake:78.
+find_package(Imath CONFIG REQUIRED)
+find_package(openjph CONFIG REQUIRED)
+find_package(libdeflate CONFIG REQUIRED)
+find_package(zstd CONFIG REQUIRED)
+find_package(OpenEXR CONFIG REQUIRED)
+find_package(JPEG REQUIRED)
+find_package(PNG REQUIRED)
+find_package(OpenMP REQUIRED COMPONENTS CXX)
 find_package(directxtex CONFIG REQUIRED)
 add_executable(directxtex-consumer main.cpp)
 set_target_properties(directxtex-consumer PROPERTIES
