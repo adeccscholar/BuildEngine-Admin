@@ -67,6 +67,23 @@ public:
    }
    [[nodiscard]] operator T*() const noexcept { return p; }
    [[nodiscard]] T* operator->() const noexcept { return p; }
+   [[nodiscard]] T& operator*() const noexcept { ATLASSERT(p != nullptr); return *p; }
+   [[nodiscard]] bool operator<(T const* pOther) const noexcept { return p < pOther; }
+   void Swap(AdeccDxcCComPtr& theOther) noexcept { std::swap(p, theOther.p); }
+   [[nodiscard]] bool IsEqualObject(IUnknown* pOther) const noexcept {
+      if(!p && !pOther) return true;
+      if(!p || !pOther) return false;
+      AdeccDxcCComPtr<IUnknown> theLeft;
+      AdeccDxcCComPtr<IUnknown> theRight;
+      if(FAILED(p->QueryInterface(__uuidof(IUnknown),
+         reinterpret_cast<void**>(theLeft.GetAddressOf()))))
+         return false;
+      if(FAILED(pOther->QueryInterface(__uuidof(IUnknown),
+         reinterpret_cast<void**>(theRight.GetAddressOf()))))
+         return false;
+      return theLeft.Get() == theRight.Get();
+   }
+
    [[nodiscard]] T* Get() const noexcept { return p; }
    [[nodiscard]] T** GetAddressOf() noexcept { return &p; }
    [[nodiscard]] T* const* GetAddressOf() const noexcept { return &p; }
@@ -181,9 +198,16 @@ template<class T> class AdeccDxcCSimpleArray {
    std::vector<T> vecElements;
 public:
    [[nodiscard]] bool Add(T const& theValue) {
-      try { vecElements.push_back(theValue); return true; }
+      try {
+         if(vecElements.size() >= static_cast<std::size_t>(INT_MAX)) return false;
+         vecElements.push_back(theValue);
+         return true;
+      }
       catch(std::bad_alloc const&) { return false; }
    }
+   [[nodiscard]] T* GetData() noexcept { return vecElements.data(); }
+   [[nodiscard]] T const* GetData() const noexcept { return vecElements.data(); }
+   void RemoveAll() noexcept { vecElements.clear(); }
    [[nodiscard]] int GetSize() const noexcept {
       return static_cast<int>(vecElements.size());
    }
@@ -358,3 +382,9 @@ static_assert(std::is_same_v<decltype(std::declval<CHeapPtr<char>&>().Detach()),
 static_assert(std::is_same_v<decltype(std::declval<CSimpleArray<int>&>().GetSize()), int>);
 static_assert(std::is_same_v<decltype(std::declval<CA2W const&>().operator LPCWSTR()), LPCWSTR>);
 static_assert(std::is_same_v<decltype(std::declval<CW2A const&>().operator LPCSTR()), LPCSTR>);
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR const&>().Copy()), BSTR>);
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR const&>().Length()), unsigned int>);
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>().Append(L"test")), HRESULT>);
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>().Append("test")), HRESULT>);
+static_assert(std::is_same_v<decltype(std::declval<CComPtr<IUnknown>&>().operator*()), IUnknown&>);
+static_assert(std::is_same_v<decltype(std::declval<CSimpleArray<int>&>().GetData()), int*>);
