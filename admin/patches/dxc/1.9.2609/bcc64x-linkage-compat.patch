@@ -37,3 +37,23 @@
  #ifndef MS_SUPPORT_VARIABLE_LANGOPTS
  #define LANGOPT(Name, Bits, Default, Description) const unsigned LangOptionsBase::Name;
  #define LANGOPT_BOOL(Name, Default, Description) const bool LangOptionsBase::Name;
+--- a/include/llvm/Config/abi-breaking.h.cmake
++++ b/include/llvm/Config/abi-breaking.h.cmake
+@@ -28,10 +28,18 @@
+ namespace llvm {
+ #if LLVM_ENABLE_ABI_BREAKING_CHECKS
+ extern int EnableABIBreakingChecks;
++#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
++inline int *VerifyEnableABIBreakingChecks = &EnableABIBreakingChecks;
++#else
+ __attribute__((weak, visibility ("hidden"))) int *VerifyEnableABIBreakingChecks = &EnableABIBreakingChecks;
++#endif
+ #else
+ extern int DisableABIBreakingChecks;
++#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
++inline int *VerifyDisableABIBreakingChecks = &DisableABIBreakingChecks;
++#else
+ __attribute__((weak, visibility ("hidden"))) int *VerifyDisableABIBreakingChecks = &DisableABIBreakingChecks;
++#endif
+ #endif
+ }
