@@ -28,7 +28,7 @@
  #endif
 --- a/lib/DxilPIXPasses/PixPassHelpers.cpp
 +++ b/lib/DxilPIXPasses/PixPassHelpers.cpp
-@@ -610,10 +610,10 @@
+@@ -610,9 +610,9 @@
    vsnprintf(buffer, _countof(buffer), format, argumentPointer);
    va_end(argumentPointer);
    for (int i = 0; i < g_logIndent; ++i) {
@@ -41,7 +41,7 @@
 +  DxcOutputDebugFormatA("\n");
  }
  
-@@ -623,9 +623,9 @@
+@@ -623,8 +623,8 @@
    vsnprintf(buffer, _countof(buffer), format, argumentPointer);
    va_end(argumentPointer);
    for (int i = 0; i < g_logIndent; ++i) {
