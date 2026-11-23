@@ -115,7 +115,7 @@ diff --git a/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp b/projects/dxilconv
 diff --git a/tools/clang/tools/dxcompiler/CMakeLists.txt b/tools/clang/tools/dxcompiler/CMakeLists.txt
 --- a/tools/clang/tools/dxcompiler/CMakeLists.txt
 +++ b/tools/clang/tools/dxcompiler/CMakeLists.txt
-@@ -123,6 +123,25 @@
+@@ -123,5 +123,24 @@
  if (MSVC)
    find_package(DiaSDK REQUIRED) # Used for constants and declarations.
  endif (MSVC)
