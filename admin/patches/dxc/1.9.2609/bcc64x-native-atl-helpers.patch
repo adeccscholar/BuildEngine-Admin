@@ -1,6 +1,6 @@
 --- a/include/dxc/Support/WinIncludes.h
 +++ b/include/dxc/Support/WinIncludes.h
-@@ -61,6 +61,11 @@
+@@ -64,6 +64,11 @@
  #else // _MSC_VER
  
  #include "dxc/WinAdapter.h"
