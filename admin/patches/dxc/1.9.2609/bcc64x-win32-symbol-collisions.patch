@@ -67,6 +67,18 @@ diff --git a/tools/clang/lib/CodeGen/ObjectFilePCHContainerOperations.cpp b/tool
  #include "llvm/Bitcode/BitstreamReader.h"
  #include "llvm/DebugInfo/DWARF/DWARFContext.h"
  #include "llvm/IR/Constants.h"
+diff --git a/tools/clang/lib/Frontend/Rewrite/RewriteObjC.cpp b/tools/clang/lib/Frontend/Rewrite/RewriteObjC.cpp
+--- a/tools/clang/lib/Frontend/Rewrite/RewriteObjC.cpp
++++ b/tools/clang/lib/Frontend/Rewrite/RewriteObjC.cpp
+@@ -483,7 +483,7 @@
+         result =  Context->getObjCIdType();
+       FunctionProtoType::ExtProtoInfo fpi;
+       fpi.Variadic = variadic;
+-      return Context->getFunctionType(result, args, fpi);
++      return Context->getFunctionType(result, args, fpi, {});
+     }
+ 
+     // Helper function: create a CStyleCastExpr with trivial type source info.
 diff --git a/tools/clang/lib/Rewrite/Rewriter.cpp b/tools/clang/lib/Rewrite/Rewriter.cpp
 --- a/tools/clang/lib/Rewrite/Rewriter.cpp
 +++ b/tools/clang/lib/Rewrite/Rewriter.cpp
