@@ -164,6 +164,8 @@
          <!-- Recover only this library from the previously forced SDK RC CMake cache. -->
          <argument value="--fresh"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <!-- Bypass CMake platform rediscovery: use the Embarcadero RC explicitly. -->
+         <argument value="-DCMAKE_RC_COMPILER:FILEPATH={Tool:bcc64x-windres}"/>
          <!-- Clear obsolete static-artifact project include cached by the previous zlib configuration. -->
          <argument value="-DCMAKE_PROJECT_INCLUDE:FILEPATH="/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -1116,6 +1118,8 @@
          <!-- Recover only this library from the previously forced SDK RC CMake cache. -->
          <argument value="--fresh"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <!-- Bypass CMake platform rediscovery: use the Embarcadero RC explicitly. -->
+         <argument value="-DCMAKE_RC_COMPILER:FILEPATH={Tool:bcc64x-windres}"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
@@ -1258,6 +1262,8 @@
          <!-- Recover only this library from the previously forced SDK RC CMake cache. -->
          <argument value="--fresh"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <!-- Bypass CMake platform rediscovery: use the Embarcadero RC explicitly. -->
+         <argument value="-DCMAKE_RC_COMPILER:FILEPATH={Tool:bcc64x-windres}"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
