@@ -92,6 +92,36 @@ diff --git a/tools/clang/lib/SPIRV/SpirvEmitter.cpp b/tools/clang/lib/SPIRV/Spir
 +    interfacesInVector.push_back(pInterface);
    }
    return interfacesInVector;
+diff --git a/tools/clang/include/clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h b/tools/clang/include/clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h
+--- a/tools/clang/include/clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h
++++ b/tools/clang/include/clang/StaticAnalyzer/Core/PathSensitive/CallEvent.h
+@@ -26,6 +26,7 @@
+ #include "llvm/ADT/PointerIntPair.h"
++#include <functional>
+ 
+ namespace clang {
+ class ProgramPoint;
+@@ -342,7 +343,7 @@
+   // Iterator access to formal parameters and their types.
+ private:
+-  typedef std::const_mem_fun_t<QualType, ParmVarDecl> get_type_fun;
++  using get_type_fun = decltype(std::mem_fn(&ParmVarDecl::getType));
+ 
+ public:
+@@ -361,13 +362,13 @@
+   /// more annotations.
+   param_type_iterator param_type_begin() const {
+     return llvm::map_iterator(parameters().begin(),
+-                              get_type_fun(&ParmVarDecl::getType));
++                              std::mem_fn(&ParmVarDecl::getType));
+   }
+   /// \sa param_type_begin()
+   param_type_iterator param_type_end() const {
+     return llvm::map_iterator(parameters().end(),
+-                              get_type_fun(&ParmVarDecl::getType));
++                              std::mem_fn(&ParmVarDecl::getType));
+   }
+ 
 diff --git a/tools/clang/lib/Rewrite/Rewriter.cpp b/tools/clang/lib/Rewrite/Rewriter.cpp
 --- a/tools/clang/lib/Rewrite/Rewriter.cpp
 +++ b/tools/clang/lib/Rewrite/Rewriter.cpp
