@@ -136,7 +136,7 @@ diff --git a/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp b/projects/dxilconv
          printf("%s", StreamStr.c_str());
        else {
 -        std::ofstream ofs(m_OutputFile);
-+        std::ofstream ofs(std::filesystem::path(m_OutputFile));
++        std::ofstream ofs { std::filesystem::path(m_OutputFile) };
          if (!ofs)
            throw hlsl::Exception(E_ABORT, "unable to open output file");
          ofs << StreamStr;
