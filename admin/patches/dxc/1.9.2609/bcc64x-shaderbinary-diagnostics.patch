@@ -1,0 +1,38 @@
+diff --git a/projects/dxilconv/lib/ShaderBinary/ShaderBinary.cpp b/projects/dxilconv/lib/ShaderBinary/ShaderBinary.cpp
+--- a/projects/dxilconv/lib/ShaderBinary/ShaderBinary.cpp
++++ b/projects/dxilconv/lib/ShaderBinary/ShaderBinary.cpp
+@@ -10,6 +10,7 @@
+ ///////////////////////////////////////////////////////////////////////////////
+ 
+ // HLSL change start
++#include <algorithm>
+ #include "ShaderBinaryIncludes.h"
+ #include "llvm/Support/Compiler.h" // for LLVM_FALLTHROUGH
+ // HLSL change end
+@@ -811,7 +812,7 @@
+     pInstruction->m_IndexableTempDecl.NumRegisters = (UINT)(*m_pCurrentToken);
+     m_pCurrentToken++;
+-    switch (min(4u, max(1u, (UINT)(*m_pCurrentToken)))) {
++    switch (std::min(4u, std::max(1u, (UINT)(*m_pCurrentToken)))) {
+     case 1:
+       pInstruction->m_IndexableTempDecl.Mask =
+           D3D10_SB_OPERAND_4_COMPONENT_MASK_X;
+@@ -1267,7 +1268,7 @@
+   OPCODE(OpCode);
+ 
+-  for (UINT i = 0; i < min(instruction.m_ExtendedOpCodeCount,
++  for (UINT i = 0; i < std::min(instruction.m_ExtendedOpCodeCount,
+                            (UINT)D3D11_SB_MAX_SIMULTANEOUS_EXTENDED_OPCODES);
+        i++) {
+     UINT Extended =
+diff --git a/include/dxc/Support/Global.h b/include/dxc/Support/Global.h
+--- a/include/dxc/Support/Global.h
++++ b/include/dxc/Support/Global.h
+@@ -306,7 +306,7 @@
+       __debugbreak();                                                          \
+     }                                                                          \
+   } while (0)
+-#define DXASSERT(exp, msg) DXASSERT_ARGS(exp, msg)
++#define DXASSERT(exp, msg) DXASSERT_ARGS(exp, msg, )
+ 
+ #define DXASSERT_LOCALVAR(local, exp, msg) DXASSERT(exp, msg)
