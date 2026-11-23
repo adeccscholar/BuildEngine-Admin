@@ -112,3 +112,31 @@ diff --git a/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp b/projects/dxilconv
 +#endif
  
  #include "dxc/Support/FileIOHelper.h"
+diff --git a/tools/clang/tools/dxcompiler/CMakeLists.txt b/tools/clang/tools/dxcompiler/CMakeLists.txt
+--- a/tools/clang/tools/dxcompiler/CMakeLists.txt
++++ b/tools/clang/tools/dxcompiler/CMakeLists.txt
+@@ -123,6 +123,25 @@
+ if (MSVC)
+   find_package(DiaSDK REQUIRED) # Used for constants and declarations.
+ endif (MSVC)
+ 
++# Native Windows BCC64X still builds DXC's DIA/PDB implementation. The
++# original DiaSDK finder runs only under MSVC and can leave a bogus include
++# directory in a Ninja build. Validate the real dependency at configure time.
++if (WIN32 AND NOT MSVC)
++  find_path(ADECC_DXC_DIA_INCLUDE_DIR dia2.h
++    HINTS
++      "$ENV{VSINSTALLDIR}/DIA SDK/include"
++      "$ENV{MSVC_DIA_SDK_DIR}/include"
++      "$ENV{DIA_SDK_DIR}/include"
++      "C:/Program Files/Microsoft Visual Studio/2022/Professional/DIA SDK/include"
++      "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/DIA SDK/include"
++      "C:/Program Files/Microsoft Visual Studio/2022/Community/DIA SDK/include"
++      "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/DIA SDK/include")
++  if (NOT ADECC_DXC_DIA_INCLUDE_DIR)
++    message(FATAL_ERROR "DXC requires genuine Microsoft DIA SDK dia2.h; set ADECC_DXC_DIA_INCLUDE_DIR to its include directory")
++  endif()
++  set(DIASDK_INCLUDE_DIRS "${ADECC_DXC_DIA_INCLUDE_DIR}")
++endif()
++
+ add_clang_library(dxcompiler SHARED ${SOURCES})
