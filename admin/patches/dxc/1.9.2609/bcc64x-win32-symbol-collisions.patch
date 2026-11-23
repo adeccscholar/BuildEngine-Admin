@@ -122,6 +122,24 @@ diff --git a/tools/clang/include/clang/StaticAnalyzer/Core/PathSensitive/CallEve
 +                              std::mem_fn(&ParmVarDecl::getType));
    }
  
+diff --git a/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp b/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp
+--- a/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp
++++ b/projects/dxilconv/tools/dxbc2dxil/dxbc2dxil.cpp
+@@ -35,6 +35,7 @@
+ 
+ #include <fstream>
++#include <filesystem>
+ 
+ using namespace llvm;
+@@ -288,7 +289,7 @@
+       if (m_OutputFile.empty())
+         printf("%s", StreamStr.c_str());
+       else {
+-        std::ofstream ofs(m_OutputFile);
++        std::ofstream ofs(std::filesystem::path(m_OutputFile));
+         if (!ofs)
+           throw hlsl::Exception(E_ABORT, "unable to open output file");
+         ofs << StreamStr;
 diff --git a/tools/clang/lib/Rewrite/Rewriter.cpp b/tools/clang/lib/Rewrite/Rewriter.cpp
 --- a/tools/clang/lib/Rewrite/Rewriter.cpp
 +++ b/tools/clang/lib/Rewrite/Rewriter.cpp
