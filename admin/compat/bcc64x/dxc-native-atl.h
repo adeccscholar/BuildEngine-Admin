@@ -205,6 +205,49 @@ public:
    [[nodiscard]] operator HANDLE() const noexcept { return hHandle; }
 };
 
+// UTF-8 to native UTF-16 conversion for DXC's Windows API call sites.
+class CA2W {
+   std::wstring strWide;
+public:
+   explicit CA2W(LPCSTR pUtf8) {
+      if(!pUtf8) return;
+      int const iLength = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
+         pUtf8, -1, nullptr, 0);
+      if(iLength <= 0) return;
+      strWide.resize(static_cast<std::size_t>(iLength));
+      if(::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, pUtf8, -1,
+         strWide.data(), iLength) == 0)
+         strWide.clear();
+   }
+   [[nodiscard]] operator LPCWSTR() const noexcept { return strWide.c_str(); }
+};
+
+// Owns a BSTR and exposes BSTR* for COM [out] parameters.
+class CComBSTR {
+   BSTR pValue {};
+public:
+   CComBSTR() noexcept = default;
+   CComBSTR(unsigned int uLength, LPCWSTR pText)
+      : pValue { ::SysAllocStringLen(pText, uLength) } {}
+   CComBSTR(CComBSTR const&) = delete;
+   CComBSTR& operator=(CComBSTR const&) = delete;
+   CComBSTR(CComBSTR&& theOther) noexcept
+      : pValue { std::exchange(theOther.pValue, nullptr) } {}
+   CComBSTR& operator=(CComBSTR&& theOther) noexcept {
+      if(this != &theOther) {
+         ::SysFreeString(pValue);
+         pValue = std::exchange(theOther.pValue, nullptr);
+      }
+      return *this;
+   }
+   ~CComBSTR() noexcept { ::SysFreeString(pValue); }
+   [[nodiscard]] operator BSTR() const noexcept { return pValue; }
+   [[nodiscard]] BSTR* operator&() noexcept {
+      ATLASSERT(pValue == nullptr);
+      return &pValue;
+   }
+};
+
 class CW2A {
    std::string strUtf8;
 public:
