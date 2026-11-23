@@ -86,3 +86,27 @@ Windows SDK names in this LLVM-derived source tree have two distinct collision c
 Never apply broad `#undef` directives to the entire project via compiler flags, never rename upstream LLVM enum members, and never disable an upstream feature to evade a macro collision. An include-order-only fix cannot prevent later macro expansion in `llvm::COFF::...` expressions.
 
 The version-bound `bcc64x-win32-symbol-collisions.patch` currently isolates `ReplaceText` in `Rewriter.cpp` and the COFF macros in `ObjectFilePCHContainerOperations.cpp`. The existing `bcc64x-clang-attr-interface-macro.patch` uses a scoped push/undef/pop around generated Clang attribute declarations. The required acceptance gate is native Debug/Release compilation and verification that real Win32 call sites still reference the correct `A`/`W` exports. Do not claim that all transitive header collisions have been eliminated without that evidence.
+
+
+## Native ATL contract audit, 23 November 2026
+
+**Status: [not verified]** until BCC64X Debug and Release builds and the upstream DXC consumers/tests pass.
+
+The native BCC64X adaptation lives in `admin/compat/bcc64x/dxc-native-atl.h`. Its concrete classes now use the explicit `AdeccDxc` prefix. Historic ATL names are source-compatibility aliases in the same header, not claims of Microsoft ATL identity or ABI equivalence.
+
+The interface audit compared the actual native DXC uses with its upstream `include/dxc/WinAdapter.h` adapter and a source search for ATL usage. The audited contracts are:
+
+| BuildEngine implementation | Source-compatible name | Audited functionality |
+| --- | --- | --- |
+| `AdeccDxcCComPtr<T>` | `CComPtr<T>` | AddRef/Release ownership, copy/move, Attach/Detach, QueryInterface, CopyTo, Get/GetAddressOf, overloaded address-of, Swap and COM identity |
+| `AdeccDxcCHeapPtr<T>` | `CHeapPtr<T>` and `CComHeapPtr<T>` | CoTaskMem allocation/reallocation, Attach/Detach, transfer and cleanup |
+| `AdeccDxcCSimpleArray<T>` | `CSimpleArray<T>` | Add, GetSize, GetData, RemoveAll, indexing and ownership of stored COM pointers |
+| `AdeccDxcCComBSTR` | `CComBSTR` | SysAllocString/SysFreeString ownership, move, Attach/Detach, Copy, Length, Empty, Append (UTF-8/UTF-16 and counted strings), indexing, `m_str`, COM output address |
+| `AdeccDxcCA2W`, `AdeccDxcCW2A` | `CA2W`, `CW2A` | Explicit UTF-8/UTF-16 Windows conversion, pointer conversion and upstream `m_psz` compatibility |
+| `AdeccDxcCHandle`, `AdeccDxcCAllocator` | `CHandle`, `CAllocator` | CloseHandle and CoTaskMem allocation contracts |
+
+An overloaded `operator&` is reserved for COM output parameters; self-comparison and other object address operations must use `std::addressof`. UTF conversion buffer aliases are non-owning; the wrappers are neither copyable nor movable, preventing aliases to invalidated internal storage. `CComBSTR` remains move-only, and `Copy` creates a distinct BSTR. Compile-time `static_assert` checks cover signatures, ownership traits, conversion types and indexed container access.
+
+The build log `BuildLog_20261123_165510_295.zip` independently identified (Debug and Release): missing `CComBSTR::Detach`, `std::ofstream(std::wstring)` not supported by the BCC64X libc++ implementation and the C++17 removal of `std::const_mem_fun_t`. The source-scoped patches now use `std::filesystem::path` for Unicode output and `std::mem_fn` for the Clang static analyzer; neither feature is disabled.
+
+**Remaining acceptance requirements:** real BCC64X header compilation, COM reference-count and BSTR memory-ownership runtime checks, embedded-null BSTR append/copy, Unicode filenames, all DXC original tests and Release/Debug DLL consumers. The compile-time checks do not substitute for runtime proof, and the helper is deliberately limited to DXC's observed ATL surface rather than claiming a complete replacement of Microsoft ATL.
