@@ -6,6 +6,8 @@
 #include <windows.h>
 #include <objbase.h>
 #include <cassert>
+#include <climits>
+#include <intsafe.h>
 #include <cstddef>
 #include <memory>
 #include <string>
@@ -33,7 +35,7 @@ public:
    T* p {};
 
    CComPtr() noexcept = default;
-   explicit CComPtr(T* pValue) noexcept : p {pValue} {
+   CComPtr(T* pValue) noexcept : p {pValue} {
       if(p) p->AddRef();
    }
    CComPtr(CComPtr const& theOther) noexcept : CComPtr(theOther.p) {}
@@ -93,6 +95,24 @@ private:
       if(pOld) pOld->Release();
    }
 };
+
+// DXC's portable COM sources use a one-argument QueryInterface helper.
+// Translate it to the native Windows COM ABI without modifying IUnknown.
+template<class T, class U>
+HRESULT DxcBcc64xQueryInterface(T* pSource, U** ppTarget) noexcept {
+   if(!ppTarget) return E_POINTER;
+   *ppTarget = nullptr;
+   if(!pSource) return E_POINTER;
+   return pSource->QueryInterface(__uuidof(U), reinterpret_cast<void**>(ppTarget));
+}
+
+// The BCC64X SDK does not expose SizeTToInt in the active header configuration.
+inline HRESULT DxcBcc64xSizeTToInt(std::size_t nValue, int* pResult) noexcept {
+   if(!pResult) return E_POINTER;
+   if(nValue > static_cast<std::size_t>(INT_MAX)) return INTSAFE_E_ARITHMETIC_OVERFLOW;
+   *pResult = static_cast<int>(nValue);
+   return S_OK;
+}
 
 template<class T, class Allocator = CAllocator> class CHeapPtr {
 public:
