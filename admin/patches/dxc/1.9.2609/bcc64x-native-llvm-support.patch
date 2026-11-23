@@ -16,45 +16,6 @@
  #include <errno.h>
  #include <fcntl.h>
  #include <io.h>
-@@ -31,7 +33,38 @@
- #include "llvm/Support/MSFileSystem.h"
- 
- #include "dxc/dxcapi.internal.h"
-+#include <memory>
-+// BCC64X has the native Win32 COM ABI but does not ship MSVC's ATL.
-+// Preserve this translation unit's CComPtr ownership contract locally.
-+#if (defined(__CODEGEARC__) || defined(__BORLANDC__))
-+template <typename T> class CComPtr {
-+public:
-+  T *p = nullptr;
-+  CComPtr() noexcept = default;
-+  CComPtr(T *value) noexcept : p(value) { if (p) p->AddRef(); }
-+  CComPtr(const CComPtr &other) noexcept : CComPtr(other.p) {}
-+  CComPtr(CComPtr &&other) noexcept : p(other.Detach()) {}
-+  ~CComPtr() { Release(); }
-+  void Release() noexcept { T *value = p; p = nullptr; if (value) value->Release(); }
-+  T *Detach() noexcept { T *value = p; p = nullptr; return value; }
-+  CComPtr &operator=(T *value) noexcept {
-+    if (value) value->AddRef();
-+    Release();
-+    p = value;
-+    return *this;
-+  }
-+  CComPtr &operator=(const CComPtr &other) noexcept { return *this = other.p; }
-+  CComPtr &operator=(CComPtr &&other) noexcept {
-+    if (this != std::addressof(other)) { Release(); p = other.Detach(); }
-+    return *this;
-+  }
-+  operator T *() const noexcept { return p; }
-+  T *operator->() const noexcept { return p; }
-+  T **operator&() noexcept { Release(); return std::addressof(p); }
-+};
-+#endif
- 
-+
- ///////////////////////////////////////////////////////////////////////////////////////////////////
- // Externally visible functions.
- 
 --- a/lib/Support/assert.cpp
 +++ b/lib/Support/assert.cpp
 @@ -25,13 +25,14 @@
