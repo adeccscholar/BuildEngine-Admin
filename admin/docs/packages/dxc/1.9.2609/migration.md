@@ -72,3 +72,17 @@ The active version-bound source action runs `admin/cmake/dxc/MigrateHLSLGoogleTe
 The old native-TAEF architecture patch and the old DXIL converter patch that **replaced** original regression tests with two smoke cases are not applied in the current source contract. No `te.exe`, TAEF headers or TAEF import libraries should be required by the migrated test CMake targets.
 
 **Native acceptance gates**: original BCC64X Release and Debug configure/build, all generated GoogleTest/CTest targets, LLVM/LIT discovery, D3D12 execution capability reporting, XML row/value count comparison, independently executed original six DXIL converter groups, actual DLL/COFF import-library runtime validation, and zero active TAEF lookups. If any original test cannot be compiled or executed, retain an explicit INCOMPLETE/FAIL state rather than counting it as a pass.
+
+
+## Native Windows macro isolation contract (23 November 2026)
+
+**Status: [not verified]** until a full BCC64X Debug/Release build and consumer test.
+
+Windows SDK names in this LLVM-derived source tree have two distinct collision classes:
+
+1. **A/W API aliases** (for example `CreateFile`, `GetModuleFileName`, `ReplaceText`): use the concrete Win32 `...W` / `...A` entry point only for actual Windows API invocations, matching the pointer encoding and signature. Do not let an SDK macro silently rewrite a Clang/LLVM class method such as `Rewriter::ReplaceText`. Undefine that alias locally where the C++ method is declared or defined.
+2. **PE/COFF constants** (`IMAGE_...`): the SDK defines preprocessor macros with the same spelling as `llvm::COFF` enumeration members. The C++ namespace qualifier does not suppress macro expansion. Keep the LLVM enum declarations ahead of SDK macros where required, and undefine only the conflicting macro names at the narrowest stable integration boundary before parsing or using qualified LLVM identifiers. In LLVM code, use `llvm::COFF::...`; in actual Windows API code, use explicitly named Win32 functions and suitably typed SDK constants.
+
+Never apply broad `#undef` directives to the entire project via compiler flags, never rename upstream LLVM enum members, and never disable an upstream feature to evade a macro collision. An include-order-only fix cannot prevent later macro expansion in `llvm::COFF::...` expressions.
+
+The version-bound `bcc64x-win32-symbol-collisions.patch` currently isolates `ReplaceText` in `Rewriter.cpp` and the COFF macros in `ObjectFilePCHContainerOperations.cpp`. The existing `bcc64x-clang-attr-interface-macro.patch` uses a scoped push/undef/pop around generated Clang attribute declarations. The required acceptance gate is native Debug/Release compilation and verification that real Win32 call sites still reference the correct `A`/`W` exports. Do not claim that all transitive header collisions have been eliminated without that evidence.
