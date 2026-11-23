@@ -25,7 +25,7 @@
 diff --git a/include/dxc/Support/d3dx12.h b/include/dxc/Support/d3dx12.h
 --- a/include/dxc/Support/d3dx12.h
 +++ b/include/dxc/Support/d3dx12.h
-@@ -2638,7 +2638,15 @@
+@@ -2632,7 +2632,13 @@
  #include <memory>
  #include <string>
  #include <vector>
@@ -39,7 +39,7 @@ diff --git a/include/dxc/Support/d3dx12.h b/include/dxc/Support/d3dx12.h
  
  //------------------------------------------------------------------------------------------------
  class CD3DX12_STATE_OBJECT_DESC {
-@@ -2919,7 +2927,7 @@
+@@ -2919,7 +2925,7 @@
    }
    void *Data() { return &m_Desc; }
    D3D12_EXISTING_COLLECTION_DESC m_Desc;
@@ -48,26 +48,29 @@ diff --git a/include/dxc/Support/d3dx12.h b/include/dxc/Support/d3dx12.h
    CD3DX12_STATE_OBJECT_DESC::StringContainer m_Strings;
    std::vector<D3D12_EXPORT_DESC> m_Exports;
  };
-@@ -3154,7 +3162,7 @@
+@@ -3153,7 +3159,7 @@
+     SUBOBJECT_HELPER_BASE::Init();
+     m_pRootSig = nullptr;
    }
    void *Data() { return m_pRootSig.GetAddressOf(); }
 -  Microsoft::WRL::ComPtr<ID3D12RootSignature> m_pRootSig;
 +  DxcD3dx12ComPtr<ID3D12RootSignature> m_pRootSig;
  };
  
- //------------------------------------------------------------------------------------------------
-@@ -3182,7 +3190,7 @@
+@@ -3181,7 +3187,7 @@
+     SUBOBJECT_HELPER_BASE::Init();
+     m_pRootSig = nullptr;
    }
    void *Data() { return m_pRootSig.GetAddressOf(); }
 -  Microsoft::WRL::ComPtr<ID3D12RootSignature> m_pRootSig;
 +  DxcD3dx12ComPtr<ID3D12RootSignature> m_pRootSig;
  };
  
- //------------------------------------------------------------------------------------------------
 diff --git a/tools/clang/tools/dxcvalidator/CMakeLists.txt b/tools/clang/tools/dxcvalidator/CMakeLists.txt
 --- a/tools/clang/tools/dxcvalidator/CMakeLists.txt
 +++ b/tools/clang/tools/dxcvalidator/CMakeLists.txt
-@@ -16,6 +16,13 @@
+@@ -18,7 +18,14 @@
+ add_clang_library(dxcvalidator
    dxcvalidator.cpp
    )
  
