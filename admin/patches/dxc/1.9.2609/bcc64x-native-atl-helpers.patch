@@ -22,3 +22,62 @@
 +#endif
 +
  #ifdef __cplusplus
+diff --git a/include/dxc/Support/d3dx12.h b/include/dxc/Support/d3dx12.h
+--- a/include/dxc/Support/d3dx12.h
++++ b/include/dxc/Support/d3dx12.h
+@@ -2638,7 +2638,15 @@
+ #include <memory>
+ #include <string>
+ #include <vector>
++#if (defined(__CODEGEARC__) || defined(__BORLANDC__)) && !defined(_MSC_VER)
++#include "dxc/Support/WinIncludes.h"
++template<class T> using DxcD3dx12ComPtr = CComPtr<T>;
++#else
+ #include <wrl/client.h>
++template<class T> using DxcD3dx12ComPtr = Microsoft::WRL::ComPtr<T>;
++#endif
+ 
+ //------------------------------------------------------------------------------------------------
+ class CD3DX12_STATE_OBJECT_DESC {
+@@ -2919,7 +2927,7 @@
+   }
+   void *Data() { return &m_Desc; }
+   D3D12_EXISTING_COLLECTION_DESC m_Desc;
+-  Microsoft::WRL::ComPtr<ID3D12StateObject> m_CollectionRef;
++  DxcD3dx12ComPtr<ID3D12StateObject> m_CollectionRef;
+   CD3DX12_STATE_OBJECT_DESC::StringContainer m_Strings;
+   std::vector<D3D12_EXPORT_DESC> m_Exports;
+ };
+@@ -3154,7 +3162,7 @@
+   }
+   void *Data() { return m_pRootSig.GetAddressOf(); }
+-  Microsoft::WRL::ComPtr<ID3D12RootSignature> m_pRootSig;
++  DxcD3dx12ComPtr<ID3D12RootSignature> m_pRootSig;
+ };
+ 
+ //------------------------------------------------------------------------------------------------
+@@ -3182,7 +3190,7 @@
+   }
+   void *Data() { return m_pRootSig.GetAddressOf(); }
+-  Microsoft::WRL::ComPtr<ID3D12RootSignature> m_pRootSig;
++  DxcD3dx12ComPtr<ID3D12RootSignature> m_pRootSig;
+ };
+ 
+ //------------------------------------------------------------------------------------------------
+diff --git a/tools/clang/tools/dxcvalidator/CMakeLists.txt b/tools/clang/tools/dxcvalidator/CMakeLists.txt
+--- a/tools/clang/tools/dxcvalidator/CMakeLists.txt
++++ b/tools/clang/tools/dxcvalidator/CMakeLists.txt
+@@ -16,6 +16,13 @@
+   dxcvalidator.cpp
+   )
+ 
++# The generated ETW header is included by dxcvalidator.cpp. The include path
++# alone does not establish the required Ninja build-order dependency.
++if(WIN32)
++  add_dependencies(dxcvalidator DxcEtw)
++  target_include_directories(dxcvalidator PRIVATE "${LLVM_BINARY_DIR}/include/dxc/Tracing")
++endif()
++
+ if (MINGW)
+   target_link_options(dxcvalidator PUBLIC -mconsole -municode)
+   target_link_libraries(dxcvalidator PRIVATE version)
