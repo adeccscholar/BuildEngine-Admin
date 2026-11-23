@@ -1,0 +1,202 @@
+--- a/lib/DxcSupport/FileIOHelper.cpp
++++ b/lib/DxcSupport/FileIOHelper.cpp
+@@ -730,7 +730,7 @@
+ 
+   if (!encodingKnown || codePage == CP_UTF8) {
+     IDxcBlobUtf8 *pBlobUtf8;
+-    if (SUCCEEDED(pFromBlob->QueryInterface(&pBlobUtf8))) {
++    if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pFromBlob, &pBlobUtf8))) {
+       *ppBlobEncoding = pBlobUtf8;
+       return S_OK;
+     }
+@@ -737,13 +737,13 @@
+   }
+   if (!encodingKnown || codePage == DXC_CP_WIDE) {
+     IDxcBlobWide *pBlobWide;
+-    if (SUCCEEDED(pFromBlob->QueryInterface(&pBlobWide))) {
++    if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pFromBlob, &pBlobWide))) {
+       *ppBlobEncoding = pBlobWide;
+       return S_OK;
+     }
+   }
+   CComPtr<IDxcBlobEncoding> pBlobEncoding;
+-  if (SUCCEEDED(pFromBlob->QueryInterface(&pBlobEncoding))) {
++  if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pFromBlob, &pBlobEncoding))) {
+     BOOL thisEncodingKnown;
+     UINT32 thisEncoding;
+     IFR(pBlobEncoding->GetEncoding(&thisEncodingKnown, &thisEncoding));
+@@ -894,7 +894,7 @@
+   // Try to reuse the existing stream.
+   if (!newInstanceAlways) {
+     CComPtr<IDxcBlobEncoding> blobEncoding;
+-    if (SUCCEEDED(pStream->QueryInterface(&blobEncoding))) {
++    if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pStream, &blobEncoding))) {
+       *ppBlobEncoding = blobEncoding.Detach();
+       return S_OK;
+     }
+@@ -902,7 +902,7 @@
+ 
+   // Layer over the blob if possible.
+   CComPtr<IDxcBlob> blob;
+-  if (SUCCEEDED(pStream->QueryInterface(&blob))) {
++  if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pStream, &blob))) {
+     return DxcCreateBlobWithEncodingSet(blob, codePage, ppBlobEncoding);
+   }
+ 
+@@ -941,7 +941,7 @@
+   IFRBOOL(pBlobEncoding, E_POINTER);
+   *pBlobEncoding = nullptr;
+ 
+-  if (SUCCEEDED(pBlob->QueryInterface(pBlobEncoding)))
++  if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pBlob, pBlobEncoding)))
+     return S_OK;
+ 
+   HRESULT hr;
+@@ -948,7 +948,7 @@
+   CComPtr<IDxcBlobEncoding> pSourceBlob;
+   UINT32 codePage = CP_ACP;
+   BOOL known = FALSE;
+-  if (SUCCEEDED(pBlob->QueryInterface(&pSourceBlob))) {
++  if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pBlob, &pSourceBlob))) {
+     if (FAILED(hr = pSourceBlob->GetEncoding(&known, &codePage)))
+       return hr;
+   }
+@@ -1033,7 +1033,7 @@
+ 
+   CComPtr<IDxcBlobUtf8> pConverted;
+   IFR(DxcGetBlobAsUtf8(pBlob, DxcGetThreadMallocNoRef(), &pConverted));
+-  pConverted->QueryInterface(ppBlobEncoding);
++  DXC_NATIVE_QUERY_INTERFACE(pConverted, ppBlobEncoding);
+   return S_OK;
+ }
+ 
+@@ -1043,7 +1043,7 @@
+   IFRBOOL(pBlobEncoding, E_POINTER);
+   *pBlobEncoding = nullptr;
+ 
+-  if (SUCCEEDED(pBlob->QueryInterface(pBlobEncoding)))
++  if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pBlob, pBlobEncoding)))
+     return S_OK;
+ 
+   HRESULT hr;
+@@ -1051,7 +1051,7 @@
+   CComPtr<IDxcBlobEncoding> pSourceBlob;
+   UINT32 codePage = CP_ACP;
+   BOOL known = FALSE;
+-  if (SUCCEEDED(pBlob->QueryInterface(&pSourceBlob))) {
++  if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pBlob, &pSourceBlob))) {
+     if (FAILED(hr = pSourceBlob->GetEncoding(&known, &codePage)))
+       return hr;
+   }
+@@ -1363,7 +1363,7 @@
+     m_pMemory = (LPBYTE)m_pSource->GetBufferPointer();
+     // If Utf8Blob, exclude terminating null character
+     CComPtr<IDxcBlobUtf8> utf8Source;
+-    if (m_size && SUCCEEDED(pSource->QueryInterface(&utf8Source)))
++    if (m_size && SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pSource, &utf8Source)))
+       m_size = utf8Source->GetStringLength();
+   }
+ 
+--- a/include/dxc/Support/dxcapi.impl.h
++++ b/include/dxc/Support/dxcapi.impl.h
+@@ -65,7 +65,7 @@
+ HRESULT TranslateStringBlobForOutput(IDxcBlob *pBlob, UINT32 codePage,
+                                      IDxcBlobEncoding **ppBlobEncoding) {
+   CComPtr<IDxcBlobEncoding> pEncoding;
+-  IFR(pBlob->QueryInterface(&pEncoding));
++  IFR(DXC_NATIVE_QUERY_INTERFACE(pBlob, &pEncoding));
+   BOOL known;
+   UINT32 inputCP;
+   IFR(pEncoding->GetEncoding(&known, &inputCP));
+@@ -132,7 +132,7 @@
+       return S_OK;
+     if (codePage && DxcGetOutputType(kind) == DxcOutputType_Text) {
+       CComPtr<IDxcBlob> pBlob;
+-      IFR(pUnknown->QueryInterface(&pBlob));
++      IFR(DXC_NATIVE_QUERY_INTERFACE(pUnknown, &pBlob));
+       CComPtr<IDxcBlobEncoding> pEncoding;
+       // If not blob encoding, assume utf-8 text
+       if (FAILED(TranslateStringBlobForOutput(pBlob, codePage, &pEncoding)))
+@@ -189,7 +189,7 @@
+     IFR(hlsl::DxcCreateBlobWithEncodingOnHeapCopy(
+         pName, (wcslen(pName) + 1) * sizeof(wchar_t), DXC_CP_WIDE,
+         &pBlobEncoding));
+-    return pBlobEncoding->QueryInterface(&name);
++    return DXC_NATIVE_QUERY_INTERFACE(pBlobEncoding, &name);
+   }
+   HRESULT SetName(LPCSTR pName) {
+     DXASSERT_NOMSG(!name);
+@@ -198,7 +198,7 @@
+     CComPtr<IDxcBlobEncoding> pBlobEncoding;
+     IFR(TranslateUtf8StringForOutput(pName, strlen(pName) + 1, DXC_CP_WIDE,
+                                      &pBlobEncoding));
+-    return pBlobEncoding->QueryInterface(&name);
++    return DXC_NATIVE_QUERY_INTERFACE(pBlobEncoding, &name);
+   }
+   HRESULT SetName(llvm::StringRef Name) {
+     DXASSERT_NOMSG(!name);
+@@ -207,7 +207,7 @@
+     CComPtr<IDxcBlobEncoding> pBlobEncoding;
+     IFR(TranslateUtf8StringForOutput(Name.data(), Name.size(), DXC_CP_WIDE,
+                                      &pBlobEncoding));
+-    return pBlobEncoding->QueryInterface(&name);
++    return DXC_NATIVE_QUERY_INTERFACE(pBlobEncoding, &name);
+   }
+ 
+   /////////////////////////////
+@@ -408,7 +408,7 @@
+       return S_OK;
+     DxcOutputObject *pObject = Output(m_resultType);
+     if (pObject && pObject->object)
+-      return pObject->object->QueryInterface(ppResult);
++      return DXC_NATIVE_QUERY_INTERFACE(pObject->object, ppResult);
+     return S_OK;
+   }
+ 
+@@ -417,7 +417,7 @@
+     *ppErrors = nullptr;
+     DxcOutputObject *pObject = Output(DXC_OUT_ERRORS);
+     if (pObject && pObject->object)
+-      return pObject->object->QueryInterface(ppErrors);
++      return DXC_NATIVE_QUERY_INTERFACE(pObject->object, ppErrors);
+     return S_OK;
+   }
+ 
+--- a/lib/DxcSupport/dxcapi.use.cpp
++++ b/lib/DxcSupport/dxcapi.use.cpp
+@@ -128,7 +128,7 @@
+ 
+ static HRESULT BlobToUtf8IfText(IDxcBlob *pBlob, IDxcBlobUtf8 **ppBlobUtf8) {
+   CComPtr<IDxcBlobEncoding> pBlobEncoding;
+-  if (SUCCEEDED(pBlob->QueryInterface(&pBlobEncoding))) {
++  if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pBlob, &pBlobEncoding))) {
+     BOOL known;
+     UINT32 cp = 0;
+     IFT(pBlobEncoding->GetEncoding(&known, &cp));
+@@ -141,7 +141,7 @@
+ 
+ static HRESULT BlobToWideIfText(IDxcBlob *pBlob, IDxcBlobWide **ppBlobWide) {
+   CComPtr<IDxcBlobEncoding> pBlobEncoding;
+-  if (SUCCEEDED(pBlob->QueryInterface(&pBlobEncoding))) {
++  if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pBlob, &pBlobEncoding))) {
+     BOOL known;
+     UINT32 cp = 0;
+     IFT(pBlobEncoding->GetEncoding(&known, &cp));
+@@ -161,7 +161,7 @@
+   BOOL known;
+   UINT32 cp = 0;
+   CComPtr<IDxcBlobEncoding> pBlobEncoding;
+-  IFT(pBlob->QueryInterface(&pBlobEncoding));
++  IFT(DXC_NATIVE_QUERY_INTERFACE(pBlob, &pBlobEncoding));
+   IFT(pBlobEncoding->GetEncoding(&known, &cp));
+ 
+   if (cp == DXC_CP_WIDE) {
+@@ -258,7 +258,7 @@
+   }
+ 
+   int charCountInt = 0;
+-  IFT(SizeTToInt(charCount, &charCountInt));
++  IFT(DXC_NATIVE_SIZE_T_TO_INT(charCount, &charCountInt));
+   WriteUtf8ToConsole(pText, charCountInt, streamType);
+ }
+ 
