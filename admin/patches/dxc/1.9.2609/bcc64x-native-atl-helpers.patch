@@ -1,6 +1,6 @@
 --- a/include/dxc/Support/WinIncludes.h
 +++ b/include/dxc/Support/WinIncludes.h
-@@ -73,4 +73,8 @@
+@@ -73,4 +73,20 @@
  #endif
  #include "dxc/WinAdapter.h"
 +#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
@@ -8,4 +8,17 @@
 +#include "dxc/Support/Bcc64xNativeAtl.h"
 +#endif
  
++// Preserve DXC's portable one-argument COM helper calls on native Windows.
++#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
++#define DXC_NATIVE_QUERY_INTERFACE(pSource, ppTarget) \\
++  ::DxcBcc64xQueryInterface((pSource), (ppTarget))
++#define DXC_NATIVE_SIZE_T_TO_INT(nValue, pResult) \\
++  ::DxcBcc64xSizeTToInt((nValue), (pResult))
++#else
++#define DXC_NATIVE_QUERY_INTERFACE(pSource, ppTarget) \\
++  (pSource)->QueryInterface(ppTarget)
++#define DXC_NATIVE_SIZE_T_TO_INT(nValue, pResult) \\
++  SizeTToInt((nValue), (pResult))
++#endif
++
  #ifdef __cplusplus
