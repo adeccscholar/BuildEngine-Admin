@@ -7,6 +7,7 @@
 #include <objbase.h>
 #include <cassert>
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -42,11 +43,11 @@ public:
    ~CComPtr() noexcept { Release(); }
 
    CComPtr& operator=(CComPtr const& theOther) noexcept {
-      if(this != &theOther) Assign(theOther.p);
+      if(this != std::addressof(theOther)) Assign(theOther.p);
       return *this;
    }
    CComPtr& operator=(CComPtr&& theOther) noexcept {
-      if(this != &theOther) {
+      if(this != std::addressof(theOther)) {
          Release();
          p = std::exchange(theOther.p, nullptr);
       }
@@ -104,7 +105,7 @@ public:
    CHeapPtr(CHeapPtr&& theOther) noexcept
       : m_pData {std::exchange(theOther.m_pData, nullptr)} {}
    CHeapPtr& operator=(CHeapPtr&& theOther) noexcept {
-      if(this != &theOther) Attach(theOther.Detach());
+      if(this != std::addressof(theOther)) Attach(theOther.Detach());
       return *this;
    }
    ~CHeapPtr() noexcept { Free(); }
