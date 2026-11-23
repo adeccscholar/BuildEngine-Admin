@@ -1,0 +1,24 @@
+diff --git a/lib/HLSL/DxcOptimizer.cpp b/lib/HLSL/DxcOptimizer.cpp
+--- a/lib/HLSL/DxcOptimizer.cpp
++++ b/lib/HLSL/DxcOptimizer.cpp
+@@ -443,7 +443,7 @@
+           ++pName;
+           CW2A name8(pName);
+           Banner = "MODULE-PRINT ";
+-          Banner += name8.m_psz;
++          Banner += static_cast<char *>(name8);
+           Banner += "\n";
+         }
+         if (pPassManager == &ModulePasses)
+@@ -465,9 +465,9 @@
+       CW2A optName(ppOptions[i]);
+       // The option syntax is
+       const char ArgDelim = ',';
+       // '-' OPTION_NAME (',' ARG_NAME ('=' ARG_VALUE)?)*
+-      char *pCursor = optName.m_psz;
+-      const char *pEnd = optName.m_psz + strlen(optName.m_psz);
++      char *pCursor = static_cast<char *>(optName);
++      const char *pEnd = pCursor + strlen(pCursor);
+       if (*pCursor != '-' && *pCursor != '/') {
+         return E_INVALIDARG;
+       }
