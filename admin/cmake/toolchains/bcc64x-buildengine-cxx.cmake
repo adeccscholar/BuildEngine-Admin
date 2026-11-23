@@ -83,7 +83,20 @@ if(NOT EXISTS "${_CB_RC_EXECUTABLE}")
       "BuildEngine Windows SDK RC is unavailable: CB_WINDOWS_RC='$ENV{CB_WINDOWS_RC}'. "
       "Install the Windows 10 SDK x64 Resource Compiler; never use PATH fallback.")
 endif()
-set(CMAKE_RC_COMPILER "${_CB_RC_EXECUTABLE}" CACHE FILEPATH "BuildEngine Windows SDK RC" FORCE)
+# Do not replace the resource compiler in an existing CMake cache. CMake
+# treats RC compiler identity as immutable and clears the configured generator,
+# make program and compiler state when it changes during configure.
+# New build directories use the pinned SDK compiler. Existing directories
+# retain their compiler until an explicitly managed, per-package migration.
+if(DEFINED CACHE{CMAKE_RC_COMPILER} AND NOT "${CMAKE_RC_COMPILER}" STREQUAL "")
+   if(NOT "${CMAKE_RC_COMPILER}" STREQUAL "${_CB_RC_EXECUTABLE}")
+      message(STATUS
+         "BuildEngine RC cache preserved: ${CMAKE_RC_COMPILER}; "
+         "pinned SDK RC for new build trees: ${_CB_RC_EXECUTABLE}")
+   endif()
+else()
+   set(CMAKE_RC_COMPILER "${_CB_RC_EXECUTABLE}" CACHE FILEPATH "BuildEngine Windows SDK RC")
+endif()
 message(STATUS "BuildEngine resource compiler: ${CMAKE_RC_COMPILER} (Windows SDK rc.exe)")
 get_filename_component(_CB_RC_BIN_DIR "${_CB_RC_EXECUTABLE}" DIRECTORY)
 get_filename_component(_CB_RC_VERSION_DIR "${_CB_RC_BIN_DIR}" DIRECTORY)
