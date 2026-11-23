@@ -56,43 +56,62 @@ list(PREPEND CMAKE_INCLUDE_PATH ${_BCC64X_RAD_INCLUDE_PATHS})
 unset(_BCC64X_RAD_LIBRARY_PATHS)
 unset(_BCC64X_RAD_INCLUDE_PATHS)
 
-# Resource compiler and SDK include roots come from the registered BuildEngine
-# windows-rc tool. Do not depend on an interactive Visual Studio INCLUDE env.
+# Select one Windows SDK RC implementation for every BCC64X CMake project.
+# Some library definitions do not explicitly pass CB_WINDOWS_RC. Resolve the
+# same versioned SDK layout as the BuildEngine windows-rc tool instead of
+# permitting CMake to select a resource compiler from PATH.
+set(_CB_RC_EXECUTABLE "")
 if(DEFINED ENV{CB_WINDOWS_RC} AND NOT "$ENV{CB_WINDOWS_RC}" STREQUAL "")
-   set(CMAKE_RC_COMPILER "$ENV{CB_WINDOWS_RC}" CACHE FILEPATH "BuildEngine Windows SDK RC" FORCE)
-   get_filename_component(_CB_RC_BIN_DIR "$ENV{CB_WINDOWS_RC}" DIRECTORY)
-   get_filename_component(_CB_RC_VERSION_DIR "${_CB_RC_BIN_DIR}" DIRECTORY)
-   get_filename_component(_CB_RC_VERSION "${_CB_RC_VERSION_DIR}" NAME)
-   get_filename_component(_CB_RC_BIN_ROOT "${_CB_RC_VERSION_DIR}" DIRECTORY)
-   get_filename_component(_CB_RC_SDK_ROOT "${_CB_RC_BIN_ROOT}" DIRECTORY)
-   set(_CB_RC_INCLUDE_ROOT "${_CB_RC_SDK_ROOT}/Include/${_CB_RC_VERSION}")
-   foreach(_CB_RC_INCLUDE um shared ucrt)
-      if(NOT IS_DIRECTORY "${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
-         message(FATAL_ERROR "Registered Windows RC SDK include path missing: ${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
+   set(_CB_RC_EXECUTABLE "$ENV{CB_WINDOWS_RC}")
+else()
+   if(DEFINED ENV{ProgramFiles(x86)} AND NOT "$ENV{ProgramFiles(x86)}" STREQUAL "")
+      file(GLOB _CB_RC_CANDIDATES
+         "$ENV{ProgramFiles(x86)}/Windows Kits/10/bin/*/x64/rc.exe")
+      if(_CB_RC_CANDIDATES)
+         list(SORT _CB_RC_CANDIDATES COMPARE NATURAL ORDER DESCENDING)
+         list(GET _CB_RC_CANDIDATES 0 _CB_RC_EXECUTABLE)
       endif()
-   endforeach()
-   if(NOT EXISTS "${_CB_RC_INCLUDE_ROOT}/um/windows.h")
-      message(FATAL_ERROR "Registered Windows RC SDK windows.h is missing: ${_CB_RC_INCLUDE_ROOT}/um/windows.h")
+      unset(_CB_RC_CANDIDATES)
    endif()
-   # CMake's RC language does not inherit C/C++ or find_* include paths.
-   # These directories are emitted in Ninja's RC INCLUDES for every .rc source.
-   set(CMAKE_RC_STANDARD_INCLUDE_DIRECTORIES
-      "${_CB_RC_INCLUDE_ROOT}/um"
-      "${_CB_RC_INCLUDE_ROOT}/shared"
-      "${_CB_RC_INCLUDE_ROOT}/ucrt"
-      CACHE STRING "Registered Windows SDK standard RC include directories" FORCE)
-   # RC cache values survive CMake reconfiguration: keep registered SDK includes authoritative.
-   set(CMAKE_RC_FLAGS_INIT "/I\"${_CB_RC_INCLUDE_ROOT}/um\" /I\"${_CB_RC_INCLUDE_ROOT}/shared\"")
-   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS_INIT}"
-      CACHE STRING "BuildEngine Windows SDK RC include directories" FORCE)
-   unset(_CB_RC_BIN_DIR)
-   unset(_CB_RC_VERSION_DIR)
-   unset(_CB_RC_VERSION)
-   unset(_CB_RC_BIN_ROOT)
-   unset(_CB_RC_SDK_ROOT)
-   unset(_CB_RC_INCLUDE_ROOT)
-   unset(_CB_RC_INCLUDE)
 endif()
+if(NOT EXISTS "${_CB_RC_EXECUTABLE}")
+   message(FATAL_ERROR
+      "BuildEngine Windows SDK RC is unavailable: CB_WINDOWS_RC='$ENV{CB_WINDOWS_RC}'. "
+      "Install the Windows 10 SDK x64 Resource Compiler; never use PATH fallback.")
+endif()
+set(CMAKE_RC_COMPILER "${_CB_RC_EXECUTABLE}" CACHE FILEPATH "BuildEngine Windows SDK RC" FORCE)
+get_filename_component(_CB_RC_BIN_DIR "${_CB_RC_EXECUTABLE}" DIRECTORY)
+get_filename_component(_CB_RC_VERSION_DIR "${_CB_RC_BIN_DIR}" DIRECTORY)
+get_filename_component(_CB_RC_VERSION "${_CB_RC_VERSION_DIR}" NAME)
+get_filename_component(_CB_RC_BIN_ROOT "${_CB_RC_VERSION_DIR}" DIRECTORY)
+get_filename_component(_CB_RC_SDK_ROOT "${_CB_RC_BIN_ROOT}" DIRECTORY)
+set(_CB_RC_INCLUDE_ROOT "${_CB_RC_SDK_ROOT}/Include/${_CB_RC_VERSION}")
+foreach(_CB_RC_INCLUDE um shared ucrt)
+   if(NOT IS_DIRECTORY "${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
+      message(FATAL_ERROR "Registered Windows RC SDK include path missing: ${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
+   endif()
+endforeach()
+if(NOT EXISTS "${_CB_RC_INCLUDE_ROOT}/um/windows.h")
+   message(FATAL_ERROR "Registered Windows RC SDK windows.h is missing: ${_CB_RC_INCLUDE_ROOT}/um/windows.h")
+endif()
+# CMake's RC language does not inherit C/C++ or find_* include paths.
+# These directories are emitted in Ninja's RC INCLUDES for every .rc source.
+set(CMAKE_RC_STANDARD_INCLUDE_DIRECTORIES
+   "${_CB_RC_INCLUDE_ROOT}/um"
+   "${_CB_RC_INCLUDE_ROOT}/shared"
+   "${_CB_RC_INCLUDE_ROOT}/ucrt"
+   CACHE STRING "Registered Windows SDK standard RC include directories" FORCE)
+# RC cache values survive CMake reconfiguration: keep registered SDK includes authoritative.
+set(CMAKE_RC_FLAGS_INIT "/I\"${_CB_RC_INCLUDE_ROOT}/um\" /I\"${_CB_RC_INCLUDE_ROOT}/shared\"")
+set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS_INIT}"
+   CACHE STRING "BuildEngine Windows SDK RC include directories" FORCE)
+unset(_CB_RC_BIN_DIR)
+unset(_CB_RC_VERSION_DIR)
+unset(_CB_RC_VERSION)
+unset(_CB_RC_BIN_ROOT)
+unset(_CB_RC_SDK_ROOT)
+unset(_CB_RC_INCLUDE_ROOT)
+unset(_CB_RC_INCLUDE))
 
 set(CMAKE_ASM_COMPILER "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X assembler driver" FORCE)
 set(CMAKE_C_COMPILER   "$ENV{CB_BCC64X}" CACHE FILEPATH "BCC64X C compiler" FORCE)
