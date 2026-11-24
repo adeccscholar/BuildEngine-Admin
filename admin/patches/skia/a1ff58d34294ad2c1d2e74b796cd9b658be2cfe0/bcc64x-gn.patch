@@ -1,6 +1,14 @@
 diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
 --- a/gn/BUILDCONFIG.gn
 +++ b/gn/BUILDCONFIG.gn
+@@ -25,6 +25,7 @@
+   win_sdk = "C:/Program Files (x86)/Windows Kits/10"
+   win_sdk_version = ""
+ 
+   win_vc = ""
++  skia_use_bcc64x = false
+   win_toolchain_version = ""
+ 
 @@ -131,4 +131,4 @@
 -if (target_os == "win") {
 +if (target_os == "win" && !skia_use_bcc64x) {
@@ -13,14 +21,6 @@ diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
    if (win_toolchain_version == "") {
      win_toolchain_version = exec_script("//gn/highest_version_dir.py",
                                          [
-@@ -25,6 +25,7 @@
-   win_sdk = "C:/Program Files (x86)/Windows Kits/10"
-   win_sdk_version = ""
- 
-   win_vc = ""
-+  skia_use_bcc64x = false
-   win_toolchain_version = ""
- 
 @@ -233,7 +234,11 @@
        [ "//gn/skia:warnings_for_public_headers" ]
  }
