@@ -1,0 +1,10 @@
+--- a/unittests/DxcSupport/CMakeLists.txt
++++ b/unittests/DxcSupport/CMakeLists.txt
+@@ -3,6 +3,6 @@
+   dxcSupport
+   )
+ 
+-add_clang_unittest(DxcSupportTests
++add_llvm_unittest(DxcSupportTests
+   WinAdapterTest.cpp
+   )
