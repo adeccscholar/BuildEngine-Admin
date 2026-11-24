@@ -142,3 +142,15 @@ The DXC source stage now calls the reusable `admin/cmake/packages/PreflightSourc
 This early check is **syntax validation only**: source-context and patch-order compatibility still require `git apply --check` against the actual workspace, as already enforced by `ApplyIdempotentSourcePatch.cmake` immediately before each apply. Patches following generated-source transformations are necessarily checked at their actual application point. Never claim an entire source patch series has applied successfully based on the early syntax preflight alone.
 
 The preflight was exercised locally with both valid and deliberately malformed unified diffs. All 24 pinned DXC patch files were additionally inspected for matching hunk counts. Native Windows invocation remains **[not verified]**.
+
+## Native DIA/PIX compilation fixes from BuildLog_20261124_012949_447.zip
+
+The 24 November 2026 build successfully completed source patching and Debug/Release CMake configuration. Both native BCC64X variants then failed while compiling the full original `LLVMDxilDia` implementation, with the same eight root compiler diagnostic sites. The failures are clustered into three native Windows COM compatibility categories:
+
+- `comdef.h` is a Microsoft C++ helper header unavailable in the pinned BCC64X environment. The original `DxilDiaSymbolManager.cpp` and `DxilDiaTableSymbols.cpp` now conditionally exclude this header only for native Windows non-MSVC Clang; the one concrete `_bstr_t` expression uses the owned native `CComBSTR` contract instead.
+- DXC's BCC64X-owned `CComBSTR` lacked ATL-compatible wide-string assignment and `CopyTo(BSTR*)`. These are implemented using genuine `SysAllocString`, `SysFreeString`, and allocation-safe ownership transfer. The `CA2W` adapter remains UTF-8 to UTF-16. The newly needed `CComVariant` implements the original DIA value setters with native `VARIANT`, `VariantInit`, `VariantCopy`, `VariantClear`, and `VT_UI4`/`VT_BSTR` values, rather than an empty placeholder.
+- DIA-derived `Symbol*` and generic `TObject*` interfaces are converted explicitly to their actual native COM interface base before writing interface out-parameters. The generic `DoBasicQueryInterface_recurse` stores the converted interface address in `void**` rather than assuming unadjusted object pointers. All original COM reference count operations are preserved.
+
+The source corrections are supplied as `bcc64x-native-dia-source-compat.patch`, applied after the existing native COM query-call patch in the library's source contract. The native helpers are updated at `admin/compat/bcc64x/dxc-native-atl.h`. All ten patch hunks were checked against the complete pinned original source files.
+
+**Acceptance [not verified]:** BCC64X Release/Debug compile and link, COM reference ownership, DIA factory activation, interface round-trips, BSTR/VARIANT memory management and all original tests still require an actual build and runtime verification.
