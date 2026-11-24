@@ -23,7 +23,7 @@ if(NOT DEFINED REPORT_FILE OR "${REPORT_FILE}" STREQUAL "")
 endif()
 get_filename_component(strReportDir "${REPORT_FILE}" DIRECTORY)
 file(MAKE_DIRECTORY "${strReportDir}")
-file(WRITE "${REPORT_FILE}" "DXC source patch preflight\\nPatch root: ${PATCH_ROOT}\\n")
+file(WRITE "${REPORT_FILE}" "DXC source patch preflight\nPatch root: ${PATCH_ROOT}\n")
 
 foreach(strPatch IN LISTS vecPatches)
    # git apply --numstat parses complete hunks and validates line counts
@@ -34,17 +34,17 @@ foreach(strPatch IN LISTS vecPatches)
       OUTPUT_VARIABLE strStat
       ERROR_VARIABLE strError)
    if(NOT iResult EQUAL 0)
-      file(APPEND "${REPORT_FILE}" "FAIL: ${strPatch} (git exit ${iResult})\\n${strError}\\n")
+      file(APPEND "${REPORT_FILE}" "FAIL: ${strPatch} (git exit ${iResult})\n${strError}\n")
       message(FATAL_ERROR
-         "SOURCE PATCH PREFLIGHT FAILED: ${strPatch}\\n"
-         "git apply --numstat returned ${iResult}\\n${strError}")
+         "SOURCE PATCH PREFLIGHT FAILED: ${strPatch}\n"
+         "git apply --numstat returned ${iResult}\n${strError}")
    endif()
    if("${strStat}" STREQUAL "")
-      file(APPEND "${REPORT_FILE}" "FAIL: empty patch ${strPatch}\\n")
+      file(APPEND "${REPORT_FILE}" "FAIL: empty patch ${strPatch}\n")
       message(FATAL_ERROR "Source patch contains no applicable file changes: ${strPatch}")
    endif()
-   file(APPEND "${REPORT_FILE}" "PASS: ${strPatch}\\n${strStat}")
+   file(APPEND "${REPORT_FILE}" "PASS: ${strPatch}\n${strStat}")
 
 endforeach()
 list(LENGTH vecPatches iTotal)
-file(APPEND "${REPORT_FILE}" "PASS: ${iTotal} patches parsed and verified\\n")
+file(APPEND "${REPORT_FILE}" "PASS: ${iTotal} patches parsed and verified\n")
