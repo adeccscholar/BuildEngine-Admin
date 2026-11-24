@@ -19,3 +19,18 @@ endfunction()
 adecc_add_dxc_behavior_test(DXC.Behavior.DXIL DXIL main behavioral-dxil.bin)
 adecc_add_dxc_behavior_test(DXC.Behavior.SPIRV SPIRV main behavioral-spirv.spv)
 adecc_add_dxc_behavior_test(DXC.Behavior.MissingEntry REJECT nonexistent_entry behavioral-invalid.bin)
+
+# The compiler factory is COM-shaped but does not use COM activation.
+# Link the real DXC shared library; no ATL, WEX, WRL, te.exe or mocks.
+add_executable(adecc-dxc-api-behavior DxcApiBehavior.cpp)
+set_target_properties(adecc-dxc-api-behavior PROPERTIES
+  CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF
+  CXX_SCAN_FOR_MODULES OFF)
+target_include_directories(adecc-dxc-api-behavior PRIVATE
+  "${PROJECT_SOURCE_DIR}/include")
+target_link_libraries(adecc-dxc-api-behavior PRIVATE dxcompiler)
+add_dependencies(adecc-dxc-api-behavior dxcompiler)
+add_test(NAME DXC.Behavior.NativeApi
+  COMMAND "$<TARGET_FILE:adecc-dxc-api-behavior>")
+set_tests_properties(DXC.Behavior.NativeApi PROPERTIES
+  LABELS "BCC64X;DXC;behavior;API" TIMEOUT 120)
