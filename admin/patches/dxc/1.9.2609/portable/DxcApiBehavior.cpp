@@ -54,6 +54,16 @@ bool CheckCompilation(IDxcCompiler3& aCompiler, bool bValid) {
          std::fputs("DXC accepted invalid entry or omitted diagnostics\n", stderr);
          return false;
       }
+      IDxcBlobUtf8* pErrors = nullptr;
+      HRESULT const hrErrors = theResult->GetOutput(
+         DXC_OUT_ERRORS, __uuidof(IDxcBlobUtf8),
+         reinterpret_cast<void**>(&pErrors), nullptr);
+      ComHandle<IDxcBlobUtf8> theErrors(pErrors);
+      if(FAILED(hrErrors) || theErrors == nullptr ||
+         theErrors->GetStringLength() == 0) {
+         std::fputs("DXC returned an empty error diagnostic\n", stderr);
+         return false;
+      }
       return true;
    }
    if(FAILED(hrStatus) || !theResult->HasOutput(DXC_OUT_OBJECT)) {
