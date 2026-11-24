@@ -1,0 +1,10 @@
+--- a/unittests/DxilHash/CMakeLists.txt
++++ b/unittests/DxilHash/CMakeLists.txt
+@@ -3,6 +3,6 @@
+   DxilHash
+   )
+ 
+-add_clang_unittest(DxilHashTests
++add_llvm_unittest(DxilHashTests
+   DxilHashTest.cpp
+   )
