@@ -283,6 +283,16 @@ public:
    }
    ~AdeccDxcCComBSTR() noexcept { Empty(); }
 
+   AdeccDxcCComBSTR& operator=(LPCWSTR pText) {
+      // SysAllocString must run before Empty(): the source may alias m_str.
+      BSTR pNew = pText ? ::SysAllocString(pText) : nullptr;
+      if(pText && !pNew) throw std::bad_alloc {};
+      Attach(pNew);
+      return *this;
+   }
+   [[nodiscard]] HRESULT CopyTo(BSTR* ppValue) const noexcept {
+      return Copy(ppValue);
+   }
    [[nodiscard]] unsigned int Length() const noexcept { return ::SysStringLen(m_str); }
    [[nodiscard]] operator BSTR() const noexcept { return m_str; }
    [[nodiscard]] BSTR* operator&() noexcept {
@@ -383,7 +393,50 @@ template<class T> using CSimpleArray = AdeccDxcCSimpleArray<T>;
 template<class T> using CComHeapPtr = AdeccDxcCComHeapPtr<T>;
 using CHandle = AdeccDxcCHandle;
 using CA2W = AdeccDxcCA2W;
+// Original DXC DIA Symbol::SetValue requires the ATL CComVariant value
+// contract, backed by the native Windows VARIANT and Automation allocator.
+class AdeccDxcCComVariant : public VARIANT {
+public:
+   AdeccDxcCComVariant() noexcept { ::VariantInit(this); }
+   AdeccDxcCComVariant(AdeccDxcCComVariant const& theOther) : AdeccDxcCComVariant() {
+      HRESULT const hr = ::VariantCopy(this, const_cast<VARIANT*>(static_cast<VARIANT const*>(&theOther)));
+      if(FAILED(hr)) throw std::bad_alloc {};
+   }
+   AdeccDxcCComVariant& operator=(AdeccDxcCComVariant const& theOther) {
+      if(this != std::addressof(theOther)) {
+         HRESULT const hr = Copy(const_cast<VARIANT*>(static_cast<VARIANT const*>(&theOther)));
+         if(FAILED(hr)) throw std::bad_alloc {};
+      }
+      return *this;
+   }
+   ~AdeccDxcCComVariant() noexcept { ::VariantClear(this); }
+
+   [[nodiscard]] HRESULT Copy(VARIANT const* pSource) noexcept {
+      if(!pSource) return E_POINTER;
+      if(static_cast<VARIANT const*>(this) == pSource) return S_OK;
+      return ::VariantCopy(this, const_cast<VARIANT*>(pSource));
+   }
+   AdeccDxcCComVariant& operator=(unsigned int uValue) {
+      ::VariantClear(this);
+      vt = VT_UI4;
+      ulVal = uValue;
+      return *this;
+   }
+   AdeccDxcCComVariant& operator=(LPCSTR pUtf8) {
+      AdeccDxcCA2W theWide(pUtf8);
+      LPCWSTR pWide = static_cast<LPCWSTR>(theWide);
+      if(pUtf8 && !pWide) throw std::bad_alloc {};
+      BSTR pNew = pWide ? ::SysAllocString(pWide) : nullptr;
+      if(pWide && !pNew) throw std::bad_alloc {};
+      ::VariantClear(this);
+      vt = VT_BSTR;
+      bstrVal = pNew;
+      return *this;
+   }
+};
+
 using CComBSTR = AdeccDxcCComBSTR;
+using CComVariant = AdeccDxcCComVariant;
 using CW2A = AdeccDxcCW2A;
 
 // Compile-time contracts for the historical DXC ATL-facing API surface.
@@ -411,3 +464,7 @@ static_assert(std::is_same_v<decltype(std::declval<CA2W&>().m_psz), LPWSTR>);
 static_assert(std::is_same_v<decltype(std::declval<CW2A&>().m_psz), LPSTR>);
 static_assert(!std::is_copy_constructible_v<CA2W> && !std::is_move_constructible_v<CA2W>);
 static_assert(!std::is_copy_constructible_v<CW2A> && !std::is_move_constructible_v<CW2A>);
+
+static_assert(std::is_base_of_v<VARIANT, CComVariant>);
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>().CopyTo(static_cast<BSTR*>(nullptr))), HRESULT>);
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>() = static_cast<LPCWSTR>(nullptr)), CComBSTR&>);
