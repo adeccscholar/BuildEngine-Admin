@@ -14,8 +14,10 @@ The retired original-test translation assets were removed from the
 BuildEngine-Admin repository. The original upstream DXC sources are not
 modified to pretend that their Windows test fixtures are portable.
 
-The original Windows HLSL test groups are not enabled in this BuildEngine
-integration: `HLSL_INCLUDE_TESTS=OFF` deliberately replaces those suites.
+The historical Windows HLSL and Clang LIT test groups are not enabled in this
+BuildEngine integration: `HLSL_INCLUDE_TESTS=OFF` and
+`CLANG_INCLUDE_TESTS=OFF` prevent their old runners, TAEF configurations and
+uncontrolled test-time downloads from being registered.
 This is not a test success or an assertion of original test coverage parity.
 The independent C++23 suite is registered unconditionally from
 `projects/dxilconv/portable` by `PrepareNativeBehaviorTests.cmake`.
