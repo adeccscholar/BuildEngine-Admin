@@ -173,7 +173,7 @@ public:
     }
     return size() == str.size() ? 0 : (size() < str.size() ? -1 : 1);
   }
-  operator const wchar_t *() { return c_str(); }
+  operator const wchar_t *() const noexcept { return c_str(); }
   const wchar_t *GetBuffer() const { return c_str(); }
   wchar_t *Format(const wchar_t *fmt, ...) {
     static thread_local wchar_t msg[512];
