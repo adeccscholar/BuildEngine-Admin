@@ -562,3 +562,11 @@ static_assert(!std::is_copy_constructible_v<CW2A> && !std::is_move_constructible
 static_assert(std::is_base_of_v<VARIANT, CComVariant>);
 static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>().CopyTo(static_cast<BSTR*>(nullptr))), HRESULT>);
 static_assert(std::is_same_v<decltype(std::declval<CComBSTR&>() = static_cast<LPCWSTR>(nullptr)), CComBSTR&>);
+
+static_assert(std::is_same_v<decltype(std::declval<CAtlArray<BYTE>&>().GetCount()), std::size_t>);
+static_assert(std::is_same_v<decltype(std::declval<CAtlArray<BYTE>&>().GetData()), BYTE*>);
+static_assert(std::is_same_v<decltype(std::declval<CAtlArray<BYTE>&>().SetCount(3)), bool>);
+static_assert(std::is_same_v<decltype(std::declval<CComVariant&>().ChangeType(VT_BSTR)), HRESULT>);
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR const&>() == "DXC"), bool>);
+static_assert(std::is_same_v<decltype(std::declval<CComBSTR const&>() == L"DXC"), bool>);
+static_assert(std::is_same_v<decltype(std::declval<CAtlException>().m_hr), HRESULT>);
