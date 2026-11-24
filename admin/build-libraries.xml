@@ -2498,7 +2498,7 @@
          <environment name="PATH" value="{DependencyRoot:lz4}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xz}\bin\win64\Release;{DependencyRoot:zstd}\bin\win64\Release;{DependencyRoot:bzip2}\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-   <library id="openssl" version="3.5.8" supersededBy="3.5.9" category="security" timestamp="2026-11-24T23:04:06Z">
+   <library id="openssl" version="3.5.8" supersededBy="3.5.9" category="security" timestamp="2026-11-24T23:22:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -2603,6 +2603,19 @@
             <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-quic-winsock-inline.patch"/>
          </execute>
          <copy source="{BuildFileDir}\patches\openssl\3.5.8\bcc64x-pdb-platform.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-pdb-platform.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\patches\openssl\3.5.8\bcc64x-resource-compiler.patch" target="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-resource-compiler.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="openssl-rc-template-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-resource-compiler.patch"/>
+         </execute>
+         <execute name="openssl-rc-template-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-resource-compiler.patch"/>
+         </execute>
+         <execute name="openssl-rc-template-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" showOutput="false">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{Workspace}\.buildengine\patches\{LibraryVersion}\bcc64x-resource-compiler.patch"/>
+         </execute>
          <!--
             OpenSSL's Windows::cppbuilder platform still models the legacy
             C++Builder debug sidecar as .tds. BCC64X is the modern COFF/LLD
@@ -17179,7 +17192,7 @@
          <argument value="-DZSTD_PACKAGE_ROOT:PATH={DependencyRoot:zstd}"/>
       </smoke>
    </library>
-   <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-24T23:04:06Z">
+   <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-24T23:22:00Z">
       <dependency library="doctest" version="2.4.12"/>
       <metadata name="xtl" supplier="xtl contributors" homepage="https://github.com/xtensor-stack/xtl" description="Header-only C++ building block for the xtensor numerical stack." licenseSignal="green" artifactType="interface">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xtl\LICENSE"/>
@@ -17192,6 +17205,18 @@
             <require path="include\xtl\xoptional.hpp"/>
             <require path="LICENSE"/>
          </extract>
+         <execute name="xtl-exception-header-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\xtl\0.8.0\bcc64x-exception-declaration.patch"/>
+         </execute>
+         <execute name="xtl-exception-header-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\xtl\0.8.0\bcc64x-exception-declaration.patch"/>
+         </execute>
+         <execute name="xtl-exception-header-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\xtl\0.8.0\bcc64x-exception-declaration.patch"/>
+         </execute>
          <execute name="xtl-bcc64x-clang-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
             <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
             <argument value="{BuildFileDir}\patches\xtl\0.8.0\bcc64x-clang-gnu-flags.patch"/>
