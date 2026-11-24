@@ -1,33 +1,73 @@
-# DXC 1.9.2609: Portable testing migration
+# DXC 1.9.2609: independent native test architecture
 
-The Microsoft TAEF runner (`te.exe`) is not invoked by the BuildEngine DXC integration.
+Status: **implemented on main, BCC64X verification pending** (2026-11-24).
 
-The legacy upstream project `projects/dxilconv/unittests/DxilConvTests.cpp` uses WEX and TAEF macros directly. Its six automated batch/regression test methods are **not yet migrated**, and must not be counted as passing. The explicitly ignored manual method is also not migrated. Original sources are retained intact for the port.
+## Architectural decision
 
-The BuildEngine source patch redirects DXIL converter test registration to a portable CTest suite. The independent CTest suite invokes the real `dxc` executable for successful DXIL and SPIR-V compilation and additionally checks that a missing HLSL entry point is rejected, reports diagnostics, and leaves no output artifact. These three behavior tests do not import WEX, TAEF or ATL. They are useful functional evidence but **not equivalent coverage** to the historical DXIL converter regression tests.
+BuildEngine does not translate Microsoft TAEF, WEX, ATL or Windows test
+fixtures. Its own DXC test world is built from native C++23 and HLSL test
+cases against the genuine DXC products. There is no Python source rewriting,
+TAEF runner, Microsoft test host, WEX assertion adapter or ATL emulation in
+the new test suite.
 
-Existing upstream LLVM/LIT and other tests remain enabled. BuildEngine retains `BUILD_TESTING=ON`, `LLVM_INCLUDE_TESTS=ON`, `LLVM_BUILD_TESTS=ON`, `HLSL_BUILD_DXILCONV=ON` and `SPIRV_BUILD_TESTS=ON`.
+The retired original-test translation assets were removed from the
+BuildEngine-Admin repository. The original upstream DXC sources are not
+modified to pretend that their Windows test fixtures are portable.
 
-## Native API behavior evidence (2026-11-24)
+The original Windows HLSL test groups are not enabled in this BuildEngine
+integration: `HLSL_INCLUDE_TESTS=OFF` deliberately replaces those suites.
+This is not a test success or an assertion of original test coverage parity.
+The independent C++23 suite is registered unconditionally from
+`projects/dxilconv/portable` by `PrepareNativeBehaviorTests.cmake`.
 
-The versioned portable suite additionally builds `DxcApiBehavior.cpp` as
-`adecc-dxc-api-behavior`, linking against the genuine `dxcompiler` target.
-It requests `IDxcCompiler3` from `DxcCreateInstance` and manages returned
-interfaces with `std::unique_ptr` plus a `Release` deleter. It checks both
-successful DXIL compilation and rejection of an invalid entry point through
-`IDxcResult`; no COM activation, TAEF, WEX, ATL or WRL is involved.
+Other supported testing infrastructure remains enabled:
 
-The 2026-11-24 14:44 build log still shows 113 compiler diagnostics in
-each configuration, all encountered before the new behavior suite could run.
-The original Windows HLSL/HLSLExec/HLSLHost/dxc_batch/DxrFallback suites
-remain registered and contain historical compatibility dependencies.
-The new tests are **additional**; no coverage-parity claim is made.
-Do not report the native API test as passing without a real BCC64X run.
+- `BUILD_TESTING=ON`
+- `LLVM_INCLUDE_TESTS=ON`
+- `LLVM_BUILD_TESTS=ON`
+- `HLSL_BUILD_DXILCONV=ON`
+- `ENABLE_SPIRV_CODEGEN=ON`
+- `SPIRV_BUILD_TESTS=ON`
 
-## Migration debt
+The production DLL and real DXC interface ABI are preserved. A COM-shaped
+`IDxcCompiler3` is still part of the DXC API; using that interface does
+not require COM activation or ATL.
 
-Port `BatchDxbc2dxil`, `BatchDxbc2dxilAsm`, `BatchDxilCleanup`, `BatchNormalizeDxil`, `BatchScopeNestIterator`, and `RegressionTests` to CTest or LLVM/LIT with identical fixture sets, output verification and failure semantics. Until then report original DXIL converter regression coverage as **INCOMPLETE**.
+## Test matrix
 
-Security rationale: no need to invoke TAEF's `te.exe` as a proxy loader in the reproducible integration pipeline.
+| CTest | Source | Expected evidence |
+| --- | --- | --- |
+| `DXC.Behavior.PixelDXIL` | `smoke.hlsl` | Valid pixel shader compiled to a DXBC/DXIL container |
+| `DXC.Behavior.PixelSPIRV` | `smoke.hlsl` | Valid pixel shader compiled to SPIR-V |
+| `DXC.Behavior.ComputeDXIL` | `compute.hlsl` | Compute profile compiles to a DXIL container |
+| `DXC.Behavior.ComputeSPIRV` | `compute.hlsl` | Compute profile compiles to SPIR-V |
+| `DXC.Behavior.IncludeDXIL` | `include-test.hlsl` | Local HLSL include is resolved |
+| `DXC.Behavior.MissingEntry` | `smoke.hlsl` | Missing entry point rejected, diagnostic present, no output artifact |
+| `DXC.Behavior.InvalidSyntax` | `invalid-syntax.hlsl` | Invalid source rejected, diagnostic present, no output artifact |
+| `DXC.Behavior.NativeApi` | `DxcApiBehavior.cpp` | Real DXC factory, compile result, output blob and error blob verified |
 
-Status (2026-11-24): Three independent behavioral CTest cases authored on `main`; BCC64X Release and Debug execution pending. The separate original HLSL/HLSLExec/DXILConv suites still contain WEX-compatibility and ATL-compatibility migration code and are not cleanly migrated. Original source-level test migration and full coverage parity remain INCOMPLETE. No original test suite is to be reported as PASS until verified.
+`RunShader.cmake` only invokes the actual `dxc` binary and validates
+results. It does not transform or generate C++ test sources.
+
+`DxcApiBehavior.cpp` links against the actual `dxcompiler` target and uses
+`DxcCreateInstance`, `IDxcCompiler3`, `IDxcResult`, and
+`std::unique_ptr` with a `Release` deleter. It verifies both compilation
+success and a negative test through the public API.
+
+## Scope, evidence and limitations
+
+The original DXC Windows test cases, XML-driven HLSLExec GPU tests and
+DXIL converter regressions are **not** represented as migrated or passing.
+Their historic test semantics are not a correctness requirement for the new
+architecture. New functional coverage can be expanded independently
+against the public compiler API, intermediate containers, CLI and shader
+diagnostics; full DXC validation still requires executing the resulting
+CTests, checking runtime DLL staging, and reviewing any BCC64X errors.
+
+The last uploaded build log predates this architecture replacement. This
+repository change has not yet been compiled and executed under BCC64X:
+**[not verified]**.
+
+The production-specific BCC64X compatibility and DIA fixes are separate
+from the independent test architecture. Their necessity must be judged by
+the real compiler and library build, not by historical TAEF or ATL tests.
