@@ -63,6 +63,11 @@ if(IMGUI_BUILD_SDL2_OPENGL3_BACKEND)
       "IMGUI_API=__declspec(dllimport)"
       "IMGUI_IMPL_API=__declspec(dllexport)"
       IMGUI_IMPL_OPENGL_LOADER_CUSTOM)
+   # The custom loader deliberately does not include the bundled OpenGL loader.
+   # Supply the managed GLEW types to the official OpenGL backend translation
+   # unit only; SDL2 and the public headers are not changed.
+   set_source_files_properties("${IMGUI_UPSTREAM_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
+      PROPERTIES COMPILE_OPTIONS "-include;${IMGUI_GLEW_PACKAGE_ROOT}/include/GL/glew.h")
    # GLEW supplies the BCC64X-compatible public header as part of its own
    # managed package. No per-consumer forced include is permitted.
    if(NOT EXISTS "${IMGUI_GLEW_PACKAGE_ROOT}/include/GL/glew.h")
