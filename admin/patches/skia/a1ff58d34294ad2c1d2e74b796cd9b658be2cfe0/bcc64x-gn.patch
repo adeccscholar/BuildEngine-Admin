@@ -1,13 +1,13 @@
 diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
 --- a/gn/BUILDCONFIG.gn
 +++ b/gn/BUILDCONFIG.gn
-@@ -131,7 +131,7 @@
+@@ -131,4 +131,4 @@
 -if (target_os == "win") {
 +if (target_os == "win" && !skia_use_bcc64x) {
    # By default we look for 2017 (Enterprise, Pro, and Community), then 2015. If MSVC is installed in a
    # non-default location, you can set win_vc to inform us where it is.
  
-@@ -142,7 +142,7 @@
+@@ -142,4 +142,4 @@
 -if (target_os == "win") {
 +if (target_os == "win" && !skia_use_bcc64x) {
    if (win_toolchain_version == "") {
