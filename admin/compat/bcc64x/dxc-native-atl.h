@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <system_error>
+#include <cstdint>
 
 #ifndef ATLASSERT
 #define ATLASSERT(expression) assert(expression)
@@ -219,6 +221,69 @@ public:
    }
 };
 
+// Native replacements for the CAtlArray contract used by the original tests.
+// Keep allocation-failure reporting, indexed storage and contiguous layout.
+template<class T> class AdeccDxcArray {
+   std::vector<T> vecElements;
+public:
+   [[nodiscard]] std::size_t GetCount() const noexcept { return vecElements.size(); }
+   [[nodiscard]] bool SetCount(std::size_t uCount) noexcept {
+      try { vecElements.resize(uCount); return true; }
+      catch(std::bad_alloc const&) { return false; }
+      catch(std::length_error const&) { return false; }
+   }
+   [[nodiscard]] T* GetData() noexcept { return vecElements.data(); }
+   [[nodiscard]] T const* GetData() const noexcept { return vecElements.data(); }
+};
+
+template<class T> using CAtlArray = AdeccDxcArray<T>;
+
+[[noreturn]] inline void AtlThrow(HRESULT hr) {
+   throw std::system_error(static_cast<int>(hr), std::system_category(),
+      "DXC native Windows operation failed");
+}
+
+// Portable Base64 decoding for original DXC GPU shader tests, without ATL.
+[[nodiscard]] inline int Base64DecodeGetRequiredLength(int iLength) noexcept {
+   return iLength >= 0 && iLength <= (INT_MAX / 3) - 4
+      ? ((iLength + 3) / 4) * 3 : -1;
+}
+
+[[nodiscard]] inline bool Base64Decode(
+   char const* szInput, int iLength, BYTE* pOutput, int* pOutputLength) noexcept {
+   if(!szInput || iLength < 0 || !pOutputLength || *pOutputLength < 0)
+      return false;
+   int iWritten = 0;
+   unsigned uAccumulator = 0;
+   int iBits = 0;
+   bool bPadding = false;
+   for(int i = 0; i < iLength; ++i) {
+      unsigned char const uChar = static_cast<unsigned char>(szInput[i]);
+      if(uChar == '=' ) { bPadding = true; continue; }
+      if(uChar == ' ' || uChar == '\n' || uChar == '\r' || uChar == '\t')
+         continue;
+      if(bPadding) return false;
+      int iValue = -1;
+      if(uChar >= 'A' && uChar <= 'Z') iValue = uChar - 'A';
+      else if(uChar >= 'a' && uChar <= 'z') iValue = uChar - 'a' + 26;
+      else if(uChar >= '0' && uChar <= '9') iValue = uChar - '0' + 52;
+      else if(uChar == '+') iValue = 62;
+      else if(uChar == '/') iValue = 63;
+      if(iValue < 0) return false;
+      uAccumulator = (uAccumulator << 6) | static_cast<unsigned>(iValue);
+      iBits += 6;
+      if(iBits >= 8) {
+         iBits -= 8;
+         if(iWritten >= *pOutputLength || !pOutput) return false;
+         pOutput[iWritten++] = static_cast<BYTE>((uAccumulator >> iBits) & 0xff);
+      }
+   }
+   if(iBits != 0 && (uAccumulator & ((1u << iBits) - 1u)) != 0)
+      return false;
+   *pOutputLength = iWritten;
+   return true;
+}
+
 template<class T> using AdeccDxcCComHeapPtr = AdeccDxcCHeapPtr<T>;
 
 class AdeccDxcCHandle {
@@ -255,6 +320,9 @@ public:
          m_psz = strWide.data();
       else
          strWide.clear();
+   }
+   AdeccDxcCA2W(LPCSTR pUtf8, unsigned int uCodePage) : AdeccDxcCA2W(pUtf8) {
+      if(uCodePage != CP_UTF8) throw std::invalid_argument("DXC native converter requires UTF-8");
    }
    [[nodiscard]] operator LPWSTR() noexcept { return m_psz; }
    [[nodiscard]] operator LPCWSTR() const noexcept { return m_psz; }
@@ -310,6 +378,12 @@ public:
    [[nodiscard]] bool operator==(AdeccDxcCComBSTR const& theOther) const noexcept {
       return Length() == theOther.Length() &&
          (Length() == 0 || std::char_traits<wchar_t>::compare(m_str, theOther.m_str, Length()) == 0);
+   }
+   [[nodiscard]] bool operator==(LPCSTR pUtf8) const {
+      if(!pUtf8) return m_str == nullptr;
+      AdeccDxcCA2W theWide(pUtf8);
+      LPCWSTR const pText = static_cast<LPCWSTR>(theWide);
+      return pText && m_str && std::wcscmp(m_str, pText) == 0;
    }
    void Empty() noexcept {
       ::SysFreeString(std::exchange(m_str, nullptr));
@@ -411,6 +485,15 @@ public:
    }
    ~AdeccDxcCComVariant() noexcept { ::VariantClear(this); }
 
+   [[nodiscard]] HRESULT ChangeType(VARTYPE theType) noexcept {
+      VARIANT theConverted {};
+      ::VariantInit(&theConverted);
+      HRESULT const hr = ::VariantChangeType(&theConverted, this, 0, theType);
+      if(FAILED(hr)) return hr;
+      ::VariantClear(this);
+      *static_cast<VARIANT*>(this) = theConverted;
+      return S_OK;
+   }
    [[nodiscard]] HRESULT Copy(VARIANT const* pSource) noexcept {
       if(!pSource) return E_POINTER;
       if(static_cast<VARIANT const*>(this) == pSource) return S_OK;
