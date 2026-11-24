@@ -1,0 +1,10 @@
+diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
+--- a/test/CMakeLists.txt
++++ b/test/CMakeLists.txt
+@@ -61,5 +61,5 @@
+ if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+-  if(NOT WIN32)
++  if(NOT WIN32 OR NOT CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")
+     add_compile_options(-Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion)
+ 
+     if(NOT CMAKE_CXX_FLAGS MATCHES "-march")
