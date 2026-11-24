@@ -1,0 +1,45 @@
+diff --git a/tools/clang/lib/FrontendTool/ExecuteCompilerInvocation.cpp b/tools/clang/lib/FrontendTool/ExecuteCompilerInvocation.cpp
+--- a/tools/clang/lib/FrontendTool/ExecuteCompilerInvocation.cpp
++++ b/tools/clang/lib/FrontendTool/ExecuteCompilerInvocation.cpp
+@@ -13,7 +13,7 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "clang/FrontendTool/Utils.h"
+-// #include "clang/ARCMigrate/ARCMTActions.h" // HLSL Change
++#include "clang/ARCMigrate/ARCMTActions.h" // ARC migration is enabled by the DXC build
+ #include "clang/CodeGen/CodeGenAction.h"
+ #include "clang/Driver/Options.h"
+ #include "clang/Frontend/CompilerInstance.h"
+diff --git a/tools/clang/tools/clang-check/ClangCheck.cpp b/tools/clang/tools/clang-check/ClangCheck.cpp
+--- a/tools/clang/tools/clang-check/ClangCheck.cpp
++++ b/tools/clang/tools/clang-check/ClangCheck.cpp
+@@ -139,7 +139,7 @@
+     if (ASTList)
+       return clang::CreateASTDeclNodeLister();
+     if (ASTDump)
+-      return clang::CreateASTDumper(ASTDumpFilter, /*DumpDecls=*/true,
++      return clang::CreateASTDumper(&llvm::outs(), ASTDumpFilter, /*DumpDecls=*/true,
+                                     /*DumpLookups=*/false);
+     if (ASTPrint)
+       return clang::CreateASTPrinter(&llvm::outs(), ASTDumpFilter);
+diff --git a/tools/clang/tools/dxlib-sample/lib_share_compile.cpp b/tools/clang/tools/dxlib-sample/lib_share_compile.cpp
+--- a/tools/clang/tools/dxlib-sample/lib_share_compile.cpp
++++ b/tools/clang/tools/dxlib-sample/lib_share_compile.cpp
+@@ -221,7 +221,7 @@
+   return hr;
+ }
+ 
+-HRESULT WINAPI DxilD3DCompile(LPCVOID pSrcData, SIZE_T SrcDataSize,
++extern "C" HRESULT WINAPI DxilD3DCompile(LPCVOID pSrcData, SIZE_T SrcDataSize,
+                               LPCSTR pSourceName,
+                               const D3D_SHADER_MACRO *pDefines,
+                               IDxcIncludeHandler *pInclude, LPCSTR pEntrypoint,
+@@ -323,7 +323,7 @@
+   return hr;
+ }
+ 
+-HRESULT WINAPI DxilD3DCompile2(
++extern "C" HRESULT WINAPI DxilD3DCompile2(
+     LPCVOID pSrcData, SIZE_T SrcDataSize, LPCSTR pSourceName,
+     LPCSTR pEntrypoint, LPCSTR pTarget,
+     const DxcDefine *pDefines, // Array of defines
