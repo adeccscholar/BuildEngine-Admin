@@ -188,10 +188,15 @@ _adecc_dxc_replace_once("tools/clang/unittests/HLSL/HLSLTestOptions.cpp"
    "#include \"dxc/WinAdapter.h\""
    "#include \"dxc/WinAdapter.h\"\n#if (defined(__CODEGEARC__) || defined(__BORLANDC__)) && !defined(_MSC_VER)\n#include \"dxc/Support/Bcc64xNativeAtl.h\"\n#endif")
 
-# Restore upstream PCH operations access for original Clang components.
+# Restore the original PCH accessor instead of adding a second class method.
+# Only this accessor is enabled; unsupported module and PCH writer methods
+# remain inside the upstream disabled region.
 _adecc_dxc_replace_once("tools/clang/include/clang/Frontend/CompilerInstance.h"
-   "#endif // HLSL Change Ends - no support for modules or PCH"
-   "#endif // HLSL Change Ends - no support for modules or PCH\n  std::shared_ptr<PCHContainerOperations> getPCHContainerOperations() const {\n    return ThePCHContainerOperations;\n  }")
+   "  std::shared_ptr<PCHContainerOperations> getPCHContainerOperations() const {"
+   "#endif // ADECC: restore original accessor\n  std::shared_ptr<PCHContainerOperations> getPCHContainerOperations() const {")
+_adecc_dxc_replace_once("tools/clang/include/clang/Frontend/CompilerInstance.h"
+   "  /// Return the appropriate PCHContainerWriter depending on the"
+   "#if 0 // ADECC: keep original PCH writer disabled\n  /// Return the appropriate PCHContainerWriter depending on the")
 
 # IN collides with a Windows SDK annotation macro.
 _adecc_dxc_replace_once("tools/llvm-diff/DiffConsumer.cpp"
