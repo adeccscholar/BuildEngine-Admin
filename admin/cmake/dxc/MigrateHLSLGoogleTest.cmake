@@ -216,4 +216,12 @@ _adecc_dxc_replace_once("tools/clang/tools/dxclib/CMakeLists.txt"
    "add_clang_library(dxclib\n  dxc.cpp\n  )"
    "add_clang_library(dxclib\n  dxc.cpp\n  )\n\nif (WIN32 AND NOT MSVC)\n  find_path(ADECC_DXC_DIA_INCLUDE_DIR dia2.h\n    HINTS\n      \"$ENV{VSINSTALLDIR}/DIA SDK/include\"\n      \"$ENV{MSVC_DIA_SDK_DIR}/include\"\n      \"$ENV{DIA_SDK_DIR}/include\"\n      \"C:/Program Files/Microsoft Visual Studio/2022/Professional/DIA SDK/include\"\n      \"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/DIA SDK/include\"\n      \"C:/Program Files/Microsoft Visual Studio/2022/Community/DIA SDK/include\")\n  if (NOT ADECC_DXC_DIA_INCLUDE_DIR)\n    message(FATAL_ERROR \"DXC dxclib requires DIA SDK dia2.h\")\n  endif()\n  target_include_directories(dxclib PRIVATE \"${ADECC_DXC_DIA_INCLUDE_DIR}\")\nendif()")
 
+# DXC's fixed LangOptions profile declares most flags immutable. ARC migration,
+# however, must mutate these two per-invocation flags. Shadow only those two
+# fixed defaults with per-instance state on BCC64X; do not globally switch
+# to the unrelated variable LangOptions configuration.
+_adecc_dxc_replace_once("tools/clang/include/clang/Basic/LangOptions.h"
+   "class LangOptions : public LangOptionsBase {\npublic:"
+   "class LangOptions : public LangOptionsBase {\npublic:\n#if defined(__CODEGEARC__) || defined(__BORLANDC__)\n  bool ObjCAutoRefCount = false;\n  bool ObjCARCWeak = false;\n#endif")
+
 message(STATUS "DXC HLSL original test migration: GoogleTest/CTest, changed fixture files=${_adecc_fixture_count}")
