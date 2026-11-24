@@ -74,7 +74,7 @@ def Port(srcfile):
             line = src.count("\n", 0, begin) + 1
             raise ValueError(f"{srcfile}:{line}: class {cls}: {error}") from error
         body = src[begin+1:end]
-        methods = re.findall(r"\bTEST_METHOD\s*\(\s*(\w+)\s*\)", body)
+        methods = re.findall(r"(?m)^[ \t]*TEST_METHOD[ \t]*\([ \t\r\n]*(\w+)[ \t\r\n]*\)", body)
         if srcfile.name == "LongVectors.cpp":
             methods += [op+"_"+dtype for op,dtype in re.findall(
                 r"\bHLK_(?:WAVEOP_)?TEST\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)", body)]
