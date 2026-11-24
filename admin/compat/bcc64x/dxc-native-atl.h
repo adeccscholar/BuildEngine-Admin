@@ -18,6 +18,8 @@
 #include <vector>
 #include <utility>
 #include <system_error>
+#include <stdexcept>
+#include <cwchar>
 #include <cstdint>
 
 #ifndef ATLASSERT
@@ -378,6 +380,9 @@ public:
    [[nodiscard]] bool operator==(AdeccDxcCComBSTR const& theOther) const noexcept {
       return Length() == theOther.Length() &&
          (Length() == 0 || std::char_traits<wchar_t>::compare(m_str, theOther.m_str, Length()) == 0);
+   }
+   [[nodiscard]] bool operator==(LPCWSTR pWide) const noexcept {
+      return pWide && m_str && std::wcscmp(m_str, pWide) == 0;
    }
    [[nodiscard]] bool operator==(LPCSTR pUtf8) const {
       if(!pUtf8) return m_str == nullptr;
