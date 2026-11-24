@@ -229,4 +229,10 @@ _adecc_dxc_replace_once("tools/clang/include/clang/Basic/LangOptions.h"
    "class LangOptions : public LangOptionsBase {\npublic:"
    "class LangOptions : public LangOptionsBase {\npublic:\n#if defined(__CODEGEARC__) || defined(__BORLANDC__)\n  bool ObjCAutoRefCount = false;\n  bool ObjCARCWeak = false;\n#endif")
 
+# The target compiler may report MSVC simulation. Select BCC64X by the
+# explicit BuildEngine toolchain contract, never by NOT MSVC.
+_adecc_dxc_replace_once("tools/clang/tools/dxclib/CMakeLists.txt"
+   "if (WIN32 AND NOT MSVC)\\n  find_path(ADECC_DXC_DIA_INCLUDE_DIR"
+   "if (ADECC_BCC64X_NATIVE_X64)\\n  find_path(ADECC_DXC_DIA_INCLUDE_DIR")
+
 message(STATUS "DXC HLSL original test migration: GoogleTest/CTest, changed fixture files=${_adecc_fixture_count}")
