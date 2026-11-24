@@ -26,7 +26,7 @@ using ComHandle = std::unique_ptr<T, ReleaseInterface>;
 bool CheckCompilation(IDxcCompiler3& aCompiler, bool bValid) {
    constexpr std::string_view svShader =
       "float4 main() : SV_Target { return float4(0.125, 0.25, 0.5, 1.0); }";
-   std::array<LPCWSTR, 4> const arrArgs = {
+   std::array<LPCWSTR, 4> arrArgs = {
       L"-T", L"ps_6_0", L"-E", bValid ? L"main" : L"missing_entry"
    };
    DxcBuffer const aSource {
