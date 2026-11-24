@@ -1,10 +1,15 @@
 --- a/projects/dxilconv/tools/dxbc2dxil/CMakeLists.txt
 +++ b/projects/dxilconv/tools/dxbc2dxil/CMakeLists.txt
-@@ -4,6 +4,7 @@
+@@ -3,7 +3,12 @@
+ find_package(D3D12 REQUIRED)
  
++if(ADECC_BCC64X_NATIVE_X64)
++  set(DXC_NATIVE_WMAIN_SOURCE bcc64x-wmain.cpp)
++endif()
++
  add_dxilconv_project_executable(dxbc2dxil
    dxbc2dxil.cpp
-+  $<$<BOOL:${ADECC_BCC64X_NATIVE_X64}>:${CMAKE_CURRENT_SOURCE_DIR}/bcc64x-wmain.cpp>
++  ${DXC_NATIVE_WMAIN_SOURCE}
  )
  
  target_link_libraries(dxbc2dxil PRIVATE
