@@ -240,9 +240,15 @@ public:
 
 template<class T> using CAtlArray = AdeccDxcArray<T>;
 
+// Preserve the original HRESULT exception contract for DXC GPU tests.
+struct AdeccDxcComException {
+   HRESULT m_hr {};
+   explicit AdeccDxcComException(HRESULT hr) noexcept : m_hr {hr} {}
+};
+using CAtlException = AdeccDxcComException;
+
 [[noreturn]] inline void AtlThrow(HRESULT hr) {
-   throw std::system_error(static_cast<int>(hr), std::system_category(),
-      "DXC native Windows operation failed");
+   throw AdeccDxcComException(hr);
 }
 
 // Portable Base64 decoding for original DXC GPU shader tests, without ATL.
