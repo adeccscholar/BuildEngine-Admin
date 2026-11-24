@@ -8483,7 +8483,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-11-07T17:24:00Z">
+   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-11-25T00:45:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
@@ -15570,7 +15570,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-16T17:58:00Z">
+   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-25T00:45:00Z">
       <dependency library="spirv-headers" version="v1.202609.0"/>
       <metadata name="SPIRV-Tools" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Tools" description="SPIR-V assembler, validator, optimizer and associated libraries" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\spirv-tools\LICENSE"/>
@@ -15596,6 +15596,7 @@
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
          <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
          <argument value="-DSPIRV-Headers_DIR:PATH={DependencyRoot:spirv-headers}\share\cmake\SPIRV-Headers"/>
+         <argument value="-DSPIRV-Headers_SOURCE_DIR:PATH={DependencyRoot:spirv-headers}"/>
          <argument value="-DSPIRV_SKIP_TESTS:BOOL=ON"/>
          <argument value="-DSPIRV_SKIP_EXECUTABLES:BOOL=ON"/>
          <argument value="-DSPIRV_WERROR:BOOL=OFF"/>
@@ -16107,7 +16108,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="imgui" version="1.93.0" category="graphics" timestamp="2026-11-20T11:00:00Z">
+   <library id="imgui" version="1.93.0" category="graphics" timestamp="2026-11-25T00:45:00Z">
       <dependency library="sdl2" version="2.32.10"/>
       <dependency library="glew" version="2.3.1"/>
       <dependency library="opengl" version="26.2.1"/>
@@ -17171,7 +17172,7 @@
          <argument value="-DZSTD_PACKAGE_ROOT:PATH={DependencyRoot:zstd}"/>
       </smoke>
    </library>
-   <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-21T14:00:00Z">
+   <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-25T00:45:00Z">
       <dependency library="doctest" version="2.4.12"/>
       <metadata name="xtl" supplier="xtl contributors" homepage="https://github.com/xtensor-stack/xtl" description="Header-only C++ building block for the xtensor numerical stack." licenseSignal="green" artifactType="interface">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xtl\LICENSE"/>
@@ -17184,6 +17185,18 @@
             <require path="include\xtl\xoptional.hpp"/>
             <require path="LICENSE"/>
          </extract>
+         <execute name="xtl-bcc64x-clang-patch-check" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\xtl\0.8.0\bcc64x-clang-gnu-flags.patch"/>
+         </execute>
+         <execute name="xtl-bcc64x-clang-patch-apply" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\xtl\0.8.0\bcc64x-clang-gnu-flags.patch"/>
+         </execute>
+         <execute name="xtl-bcc64x-clang-patch-verify" executable="{Tool:git}" workingDirectory="{CurrentArtifact}" outputMode="errors">
+            <argument value="apply"/><argument value="--reverse"/><argument value="--check"/><argument value="--no-index"/>
+            <argument value="{BuildFileDir}\patches\xtl\0.8.0\bcc64x-clang-gnu-flags.patch"/>
+         </execute>
       </source>
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
