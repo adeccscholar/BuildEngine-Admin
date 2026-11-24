@@ -77,3 +77,66 @@ if(_adecc_unconverted)
    message(FATAL_ERROR "DXC ATL-free test migration incomplete:\n  ${_adecc_report}")
 endif()
 message(STATUS "DXC ATL-free source preflight passed; files normalized=${_adecc_count}")
+
+# Version-pinned source-level removal of MSVC-only declarations.
+# These original test sources do not use _com_error, _bstr_t or _variant_t.
+function(_adecc_replace_test_source _relative _before _after)
+   set(_path "${SOURCE_ROOT}/${_relative}")
+   file(READ "${_path}" _contents)
+   if(_contents MATCHES "ADECC_NATIVE_SOURCE_MARKER_DO_NOT_MATCH")
+      message(FATAL_ERROR "Unexpected DXC native source marker")
+   endif()
+   string(FIND "${_contents}" "${_before}" _position)
+   if(_position EQUAL -1)
+      string(FIND "${_contents}" "${_after}" _already)
+      if(_already EQUAL -1)
+         message(FATAL_ERROR "DXC source migration anchor missing: ${_relative}")
+      endif()
+      return()
+   endif()
+   string(REPLACE "${_before}" "${_after}" _updated "${_contents}")
+   file(WRITE "${_path}" "${_updated}")
+endfunction()
+
+# Neither source uses COM compiler-support classes from comdef.h.
+_adecc_replace_test_source("tools/clang/unittests/HLSLHost/HLSLHost.cpp"
+   "#include <comdef.h>" "// Native Windows COM ABI: no MSVC comdef.h dependency.")
+_adecc_replace_test_source("tools/clang/unittests/dxc_batch/dxc_batch.cpp"
+   "#include <comdef.h>" "// Native DXC COM API: no MSVC comdef.h dependency.")
+
+# Preserve QueryInterface's real two-parameter ABI. Smart-pointer overloads
+# operate on the wrapper, while raw interface pointers require an explicit IID.
+_adecc_replace_test_source("tools/clang/unittests/HLSL/CompilerTest.cpp"
+   "pCompiler->QueryInterface(&pCompilerVersion)"
+   "pCompiler.QueryInterface(&pCompilerVersion)")
+_adecc_replace_test_source("tools/clang/unittests/HLSL/CompilerTest.cpp"
+   "pCompiler->QueryInterface(&pCompilerVersion2)"
+   "pCompiler.QueryInterface(&pCompilerVersion2)")
+_adecc_replace_test_source("tools/clang/unittests/HLSL/RewriterTest.cpp"
+   "(*pRewriter)->QueryInterface(&pLangExtensions)"
+   "(*pRewriter)->QueryInterface(__uuidof(IDxcLangExtensions), reinterpret_cast<void**>(&pLangExtensions))")
+
+# Explicitly compare native COM identity pointers, not wrapper conversions.
+_adecc_replace_test_source("tools/clang/unittests/HLSL/CompilerTest.cpp"
+   "VERIFY_ARE_EQUAL(pPdbUtils2_Again, pPdbUtils2);"
+   "EXPECT_EQ(pPdbUtils2_Again.Get(), pPdbUtils2.Get());")
+_adecc_replace_test_source("tools/clang/unittests/HLSL/CompilerTest.cpp"
+   "VERIFY_ARE_EQUAL(pPdbUtils_Again, pPdbUtils);"
+   "EXPECT_EQ(pPdbUtils_Again.Get(), pPdbUtils.Get());")
+
+# The upstream hash depended on a private MSVC STL symbol.
+_adecc_replace_test_source("tools/clang/unittests/HLSLExec/ShaderOpTest.h"
+   "#include <unordered_set>"
+   "#include <unordered_set>\n#include <string_view>")
+_adecc_replace_test_source("tools/clang/unittests/HLSLExec/ShaderOpTest.h"
+   "std::_Hash_array_representation((const unsigned char *)a,\n                                             strlen(a))"
+   "std::hash<std::string_view>{}(a)")
+
+# The released D3D12_FEATURE enum has a restricted range. Future preview
+# feature values 77 and 78 are valid runtime integral casts, not constexpr.
+_adecc_replace_test_source("tools/clang/unittests/HLSLExec/HlslExecTestUtils.h"
+   "constexpr D3D12_FEATURE D3D12_FEATURE_LINEAR_ALGEBRA_SUPPORT"
+   "inline D3D12_FEATURE const D3D12_FEATURE_LINEAR_ALGEBRA_SUPPORT")
+_adecc_replace_test_source("tools/clang/unittests/HLSLExec/HlslExecTestUtils.h"
+   "constexpr D3D12_FEATURE D3D12_FEATURE_LINEAR_ALGEBRA_MATRIX_OPERATION_SUPPORT"
+   "inline D3D12_FEATURE const D3D12_FEATURE_LINEAR_ALGEBRA_MATRIX_OPERATION_SUPPORT")
