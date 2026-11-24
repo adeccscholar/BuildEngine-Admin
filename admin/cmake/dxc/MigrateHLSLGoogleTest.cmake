@@ -191,7 +191,7 @@ _adecc_dxc_replace_once("tools/clang/unittests/HLSL/HLSLTestOptions.cpp"
 # Restore upstream PCH operations access for original Clang components.
 _adecc_dxc_replace_once("tools/clang/include/clang/Frontend/CompilerInstance.h"
    "#endif // HLSL Change Ends - no support for modules or PCH"
-   "std::shared_ptr<PCHContainerOperations> getPCHContainerOperations() const {\n    return ThePCHContainerOperations;\n  }\n\n#endif // HLSL Change Ends - no support for modules or PCH")
+   "#endif // HLSL Change Ends - no support for modules or PCH\n  std::shared_ptr<PCHContainerOperations> getPCHContainerOperations() const {\n    return ThePCHContainerOperations;\n  }")
 
 # IN collides with a Windows SDK annotation macro.
 _adecc_dxc_replace_once("tools/llvm-diff/DiffConsumer.cpp"
