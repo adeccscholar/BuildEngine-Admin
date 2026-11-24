@@ -13,6 +13,23 @@
  )
  
  target_link_libraries(dxbc2dxil PRIVATE
+--- a/tools/clang/include/clang/Rewrite/Core/RewriteBuffer.h
++++ b/tools/clang/include/clang/Rewrite/Core/RewriteBuffer.h
+@@ -13,6 +13,13 @@
+ #include "clang/Basic/LLVM.h"
+ #include "clang/Rewrite/Core/DeltaTree.h"
+ #include "clang/Rewrite/Core/RewriteRope.h"
+ #include "llvm/ADT/StringRef.h"
+ 
++// Windows commdlg.h defines ReplaceText as ReplaceTextA; prevent this
++// from rewriting the class declaration before Rewriter.h is included.
++#if defined(_WIN32) && defined(__clang__) && !defined(_MSC_VER)
++#ifdef ReplaceText
++#undef ReplaceText
++#endif
++#endif
+ namespace clang {
+   class Rewriter;
 --- a/tools/clang/include/clang/Rewrite/Core/Rewriter.h
 +++ b/tools/clang/include/clang/Rewrite/Core/Rewriter.h
 @@ -21,6 +21,13 @@
