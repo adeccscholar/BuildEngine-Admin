@@ -2498,7 +2498,7 @@
          <environment name="PATH" value="{DependencyRoot:lz4}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xz}\bin\win64\Release;{DependencyRoot:zstd}\bin\win64\Release;{DependencyRoot:bzip2}\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-   <library id="openssl" version="3.5.8" supersededBy="3.5.9" category="security" timestamp="2026-09-18T02:30:00Z">
+   <library id="openssl" version="3.5.8" supersededBy="3.5.9" category="security" timestamp="2026-11-25T01:10:00Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -2773,6 +2773,7 @@
             <argument value="--libdir=lib"/>
          </target>
          <target name="build" type="jom" executable="{Tool:jom}" parallel="true" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+            <argument value="RC={ToolShort:bcc64x-windres}"/>
             <argument value="build_sw"/>
          </target>
          <variant name="Release">
@@ -2796,10 +2797,12 @@
                   Scheduler-level Release/Debug test parallelism remains a separate generic change.
                -->
                <target name="test" test="true" type="jom" executable="{Tool:jom}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+            <argument value="RC={ToolShort:bcc64x-windres}"/>
                   <environment name="HARNESS_JOBS" value="{TestJobs}"/>
                   <argument value="test"/>
                </target>
                <target name="install-upstream" type="jom" executable="{Tool:jom}" workingDirectory="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}" showOutput="false">
+            <argument value="RC={ToolShort:bcc64x-windres}"/>
                   <argument value="install_sw"/>
                </target>
                <copy source="{BuildRoot}\stage\packages\{LibraryId}\{LibraryVersion}\{Configuration}\bin" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}" recursive="true" overwrite="true"/>
@@ -5523,7 +5526,7 @@
          <argument value="-DLeptonica_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\leptonica"/>
       </smoke>
    </library>
-   <library id="tesseract" version="5.5.3" supersededBy="5.5.4" category="text" timestamp="2026-10-26T00:05:00Z">
+   <library id="tesseract" version="5.5.3" supersededBy="5.5.4" category="text" timestamp="2026-11-25T01:10:00Z">
       <dependency library="leptonica" version="1.87.0"/>
       <metadata name="Tesseract OCR" supplier="Tesseract OCR Project" homepage="https://github.com/tesseract-ocr/tesseract" description="Dynamically linked C++ OCR engine; language traineddata is provisioned and licensed separately." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source>
@@ -5554,7 +5557,7 @@
             <common><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tesseract\baseapi.h"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><copy source="{Workspace}\tessdata\eng.traineddata" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata\eng.traineddata" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata\eng.traineddata"/></common>
          </install>
       </build>
-      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin" target="bin" extensions=".dll;.exe"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" scope="package" source="smokes\tesseract\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="tesseract-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{ENV:PATH}"/>
          <argument value="-DLeptonica_DIR:PATH={DependencyRoot:leptonica}\lib\win64\Release\cmake\leptonica"/>
@@ -5568,7 +5571,7 @@
       </smoke>
    </library>
 
-   <library id="tesseract" version="5.5.4" category="text" timestamp="2026-11-20T00:00:00Z">
+   <library id="tesseract" version="5.5.4" category="text" timestamp="2026-11-25T01:10:00Z">
       <dependency library="leptonica" version="1.87.0"/>
       <metadata name="Tesseract OCR" supplier="Tesseract OCR Project" homepage="https://github.com/tesseract-ocr/tesseract" description="Dynamically linked C++ OCR engine; language traineddata is provisioned and licensed separately." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source>
@@ -5602,7 +5605,7 @@
             <common><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\tesseract\baseapi.h"/><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE" overwrite="true"/><copy source="{Workspace}\tessdata\eng.traineddata" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata\eng.traineddata" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata\eng.traineddata"/><copy source="{Workspace}\tessdata\deu.traineddata" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata\deu.traineddata" overwrite="true"/><require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\share\tessdata\deu.traineddata"/></common>
          </install>
       </build>
-      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin" target="bin" extensions=".dll;.exe"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll;.exe"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" scope="package" source="smokes\tesseract\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="tesseract-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/><environment name="PATH" value="{ENV:PATH}"/>
          <argument value="-DLeptonica_DIR:PATH={DependencyRoot:leptonica}\lib\win64\Release\cmake\leptonica"/>
@@ -11320,7 +11323,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" supersededBy="79.1" category="text" timestamp="2026-11-23T06:20:00Z">
+   <library id="icu" version="78.3" supersededBy="79.1" category="text" timestamp="2026-11-25T01:10:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services." licenseSignal="yellow"/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -11375,6 +11378,7 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <environment name="CB_LLVM_AR" value="{Tool:llvm-ar}"/>
          <environment name="CB_LLVM_RANLIB" value="{Tool:llvm-ranlib}"/>
 
