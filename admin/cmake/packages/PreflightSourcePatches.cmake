@@ -17,6 +17,14 @@ if(NOT vecPatches)
 endif()
 list(SORT vecPatches)
 
+# Success details belong exclusively to the file protocol, never stdout.
+if(NOT DEFINED REPORT_FILE OR "${REPORT_FILE}" STREQUAL "")
+   message(FATAL_ERROR "Missing REPORT_FILE for source patch preflight")
+endif()
+get_filename_component(strReportDir "${REPORT_FILE}" DIRECTORY)
+file(MAKE_DIRECTORY "${strReportDir}")
+file(WRITE "${REPORT_FILE}" "DXC source patch preflight\\nPatch root: ${PATCH_ROOT}\\n")
+
 foreach(strPatch IN LISTS vecPatches)
    # git apply --numstat parses complete hunks and validates line counts
    # without requiring source files or changing the workspace.
@@ -26,14 +34,17 @@ foreach(strPatch IN LISTS vecPatches)
       OUTPUT_VARIABLE strStat
       ERROR_VARIABLE strError)
    if(NOT iResult EQUAL 0)
+      file(APPEND "${REPORT_FILE}" "FAIL: ${strPatch} (git exit ${iResult})\\n${strError}\\n")
       message(FATAL_ERROR
-         "SOURCE PATCH PREFLIGHT FAILED: ${strPatch}\n"
-         "git apply --numstat returned ${iResult}\n${strError}")
+         "SOURCE PATCH PREFLIGHT FAILED: ${strPatch}\\n"
+         "git apply --numstat returned ${iResult}\\n${strError}")
    endif()
    if("${strStat}" STREQUAL "")
+      file(APPEND "${REPORT_FILE}" "FAIL: empty patch ${strPatch}\\n")
       message(FATAL_ERROR "Source patch contains no applicable file changes: ${strPatch}")
    endif()
-   message(STATUS "SOURCE PATCH PREFLIGHT PASS: ${strPatch}")
+   file(APPEND "${REPORT_FILE}" "PASS: ${strPatch}\\n${strStat}")
+
 endforeach()
 list(LENGTH vecPatches iTotal)
-message(STATUS "SOURCE PATCH PREFLIGHT PASS: ${iTotal} patches parsed and verified")
+file(APPEND "${REPORT_FILE}" "PASS: ${iTotal} patches parsed and verified\\n")
