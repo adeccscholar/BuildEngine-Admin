@@ -18354,7 +18354,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-24T15:20:04Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-24T16:05:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18373,14 +18373,7 @@
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\PreflightSourcePatches.cmake"/>
          </execute>
-         <copy source="{BuildFileDir}\patches\dxc\1.9.2609\gtest\AllocatorTest-google-fixture.patch" target="{Workspace}\.buildengine\patches\AllocatorTest-google-fixture.patch" overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="apply-original-allocator-fixture" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
-            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
-            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\AllocatorTest-google-fixture.patch"/>
-            <argument value="-P"/>
-            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
-         </execute>
+
          <copy source="{BuildFileDir}\patches\dxc\1.9.2609\bcc64x-dxlib-sample-target.patch" target="{Workspace}\.buildengine\patches\bcc64x-dxlib-sample-target.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="apply-dxlib-sample-target" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
@@ -18397,26 +18390,7 @@
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
-         <!-- TAEF-free original HLSL tests: source conversion and GoogleTest registration. -->
-         <execute name="migrate-hlsl-gtest" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
-            <argument value="-DADMIN_PATCH_ROOT:PATH={BuildFileDir}\patches\dxc\1.9.2609"/>
-            <argument value="-P"/>
-            <argument value="{BuildFileDir}\cmake\dxc\MigrateHLSLGoogleTest.cmake"/>
-         </execute>
-         <execute name="generate-dxc-original-gtest-cases" executable="{Tool:python}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="{BuildFileDir}\patches\dxc\1.9.2609\gtest\MigrateDXCOriginalTests.py"/>
-            <argument value="--source-root"/>
-            <argument value="{Workspace}"/>
-            <argument value="--generated-root"/>
-            <argument value="{Workspace}\tools\clang\unittests\HLSLExec"/>
-         </execute>
-         <!-- Complete ATL-free native test source migration before Ninja. -->
-         <execute name="migrate-dxc-native-tests" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
-            <argument value="-P"/>
-            <argument value="{BuildFileDir}\cmake\dxc\MigrateNativeTests.cmake"/>
-         </execute>
+
          <copy source="{BuildFileDir}\patches\dxc\1.9.2609\bcc64x-host-triple.patch" target="{Workspace}\.buildengine\patches\bcc64x-host-triple.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="apply-bcc64x-host-triple" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
@@ -18439,6 +18413,12 @@
          <copy source="{BuildFileDir}\\patches\\dxc\\1.9.2609\\portable\\RunShader.cmake" target="{Workspace}\\projects\\dxilconv\\portable\\RunShader.cmake" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\\patches\\dxc\\1.9.2609\\portable\\smoke.hlsl" target="{Workspace}\\projects\\dxilconv\\portable\\smoke.hlsl" overwrite="true" preserveCurrentArtifact="true"/>
          <copy source="{BuildFileDir}\\patches\\dxc\\1.9.2609\\portable\\DxcApiBehavior.cpp" target="{Workspace}\\projects\\dxilconv\\portable\\DxcApiBehavior.cpp" overwrite="true" preserveCurrentArtifact="true"/>
+         <!-- New DXC test world: C++23 behavior checks, no original TAEF/WEX sources. -->
+         <execute name="prepare-native-dxc-behavior-tests" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\\cmake\\dxc\\PrepareNativeBehaviorTests.cmake"/>
+         </execute>
          <!-- Preserve ARC migration, AST dumping and the original dxlib_sample exports. -->
          <copy source="{BuildFileDir}\patches\dxc\1.9.2609\bcc64x-final-frontend-linkage.patch" target="{Workspace}\.buildengine\patches\bcc64x-final-frontend-linkage.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="apply-bcc64x-final-frontend-linkage" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
@@ -18635,6 +18615,9 @@
          <argument value="-DLLVM_ENABLE_EH:BOOL=ON"/>
          <argument value="-DLLVM_ENABLE_RTTI:BOOL=ON"/>
          <argument value="-DHLSL_AUTOCRLF:BOOL=OFF"/>
+         <!-- Historical HLSL Windows unit suites are superseded by the independent
+              C++23 DXC behavior suite, not translated through WEX/TAEF. -->
+         <argument value="-DHLSL_INCLUDE_TESTS:BOOL=OFF"/>
          <argument value="-DLLVM_INCLUDE_TESTS:BOOL=ON"/>
          <argument value="-DLLVM_BUILD_TESTS:BOOL=ON"/>
          <argument value="-DHLSL_BUILD_DXILCONV:BOOL=ON"/>
