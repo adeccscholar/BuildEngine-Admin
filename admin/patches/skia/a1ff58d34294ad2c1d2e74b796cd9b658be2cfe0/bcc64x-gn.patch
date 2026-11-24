@@ -13,18 +13,15 @@ diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
    if (win_toolchain_version == "") {
      win_toolchain_version = exec_script("//gn/highest_version_dir.py",
                                          [
-@@ -178,6 +178,10 @@
-   }
- }
+@@ -25,6 +25,7 @@
+   win_sdk = "C:/Program Files (x86)/Windows Kits/10"
+   win_sdk_version = ""
  
-+declare_args() {
+   win_vc = ""
 +  skia_use_bcc64x = false
-+}
-+
- # Default configs
- default_configs = [
-   "//gn/skia:default",
-@@ -233,7 +237,11 @@
+   win_toolchain_version = ""
+ 
+@@ -233,7 +234,11 @@
        [ "//gn/skia:warnings_for_public_headers" ]
  }
  
