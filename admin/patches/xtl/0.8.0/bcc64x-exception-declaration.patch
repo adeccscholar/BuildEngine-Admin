@@ -1,0 +1,11 @@
+diff --git a/include/xtl/xhalf_float_impl.hpp b/include/xtl/xhalf_float_impl.hpp
+--- a/include/xtl/xhalf_float_impl.hpp
++++ b/include/xtl/xhalf_float_impl.hpp
+@@ -52,6 +52,7 @@
+ #include <ostream>
+ #include <limits>
+ #include <stdexcept>
++#include <exception>
+ #include <climits>
+ #include <cmath>
+ #include <cstring>
