@@ -92,7 +92,7 @@
    if (ppvObject == nullptr)
      return E_POINTER;
    if (IsEqualIID(iid, __uuidof(TInterface))) {
-+    *static_cast<TInterface**>(ppvObject) = static_cast<TInterface*>(self);
++    *ppvObject = static_cast<TInterface*>(self);
 -    *(TInterface **)ppvObject = self;
      self->AddRef();
      return S_OK;
