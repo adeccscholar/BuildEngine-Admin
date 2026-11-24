@@ -77,17 +77,17 @@ def Port(srcfile):
         # Retain original compile-time guards for every generated test.
         # A registration emitted outside its method's #if block is invalid,
         # even when the source method was correctly excluded by the SDK.
-        method_pattern = r"(?m)^[ \\t]*TEST_METHOD[ \\t]*\\([ \\t\\r\\n]*(\\w+)[ \\t\\r\\n]*\\)"
+        method_pattern = r"(?m)^[ \t]*TEST_METHOD[ \t]*\([ \t\r\n]*(\w+)[ \t\r\n]*\)"
         method_matches = list(re.finditer(method_pattern, body))
         directives = iter(re.finditer(
-            r"(?m)^[ \\t]*#[ \\t]*(?:if|ifdef|ifndef|elif|else|endif)\\b[^\\n]*", body))
+            r"(?m)^[ \t]*#[ \t]*(?:if|ifdef|ifndef|elif|else|endif)\b[^\n]*", body))
         directive = next(directives, None)
         guard_stack = []
         method_guards = {}
         for method in method_matches:
             while directive is not None and directive.start() < method.start():
                 line = directive.group(0).strip()
-                kind = re.match(r"#\\s*(\\w+)", line).group(1)
+                kind = re.match(r"#\s*(\w+)", line).group(1)
                 if kind in ("if", "ifdef", "ifndef"):
                     guard_stack.append([line])
                 elif kind in ("elif", "else"):
@@ -113,9 +113,9 @@ def Port(srcfile):
             registration = "TEST_F("+cls+", "+name+") { this->"+name+"(); }"
             guards = method_guards.get(name, [])
             if guards:
-                registration = "\\n".join(guards + [registration] +
+                registration = "\n".join(guards + [registration] +
                                          ["#endif"] * sum(
-                                             re.match(r"#\\s*(\\w+)", x).group(1)
+                                             re.match(r"#\s*(\w+)", x).group(1)
                                              in ("if", "ifdef", "ifndef")
                                              for x in guards))
             newtests.append(registration)
