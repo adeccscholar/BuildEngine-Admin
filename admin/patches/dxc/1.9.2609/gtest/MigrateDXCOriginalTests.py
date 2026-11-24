@@ -74,7 +74,35 @@ def Port(srcfile):
             line = src.count("\n", 0, begin) + 1
             raise ValueError(f"{srcfile}:{line}: class {cls}: {error}") from error
         body = src[begin+1:end]
-        methods = re.findall(r"(?m)^[ \t]*TEST_METHOD[ \t]*\([ \t\r\n]*(\w+)[ \t\r\n]*\)", body)
+        # Retain original compile-time guards for every generated test.
+        # A registration emitted outside its method's #if block is invalid,
+        # even when the source method was correctly excluded by the SDK.
+        method_pattern = r"(?m)^[ \\t]*TEST_METHOD[ \\t]*\\([ \\t\\r\\n]*(\\w+)[ \\t\\r\\n]*\\)"
+        method_matches = list(re.finditer(method_pattern, body))
+        directives = iter(re.finditer(
+            r"(?m)^[ \\t]*#[ \\t]*(?:if|ifdef|ifndef|elif|else|endif)\\b[^\\n]*", body))
+        directive = next(directives, None)
+        guard_stack = []
+        method_guards = {}
+        for method in method_matches:
+            while directive is not None and directive.start() < method.start():
+                line = directive.group(0).strip()
+                kind = re.match(r"#\\s*(\\w+)", line).group(1)
+                if kind in ("if", "ifdef", "ifndef"):
+                    guard_stack.append([line])
+                elif kind in ("elif", "else"):
+                    if not guard_stack:
+                        raise ValueError(f"{srcfile}: unmatched {line}")
+                    guard_stack[-1].append(line)
+                elif kind == "endif":
+                    if not guard_stack:
+                        raise ValueError(f"{srcfile}: unmatched #endif")
+                    guard_stack.pop()
+                directive = next(directives, None)
+            method_guards[method.group(1)] = [
+                line for frame in guard_stack for line in frame
+            ]
+        methods = [method.group(1) for method in method_matches]
         if srcfile.name == "LongVectors.cpp":
             methods += [op+"_"+dtype for op,dtype in re.findall(
                 r"\bHLK_(?:WAVEOP_)?TEST\s*\(\s*(\w+)\s*,\s*(\w+)\s*\)", body)]
@@ -82,7 +110,15 @@ def Port(srcfile):
         for name in dict.fromkeys(methods):
             if re.search(r"TEST_F\s*\(\s*"+cls+r"\s*,\s*"+name+r"\s*\)", src):
                 continue
-            newtests.append("TEST_F("+cls+", "+name+") { this->"+name+"(); }")
+            registration = "TEST_F("+cls+", "+name+") { this->"+name+"(); }"
+            guards = method_guards.get(name, [])
+            if guards:
+                registration = "\\n".join(guards + [registration] +
+                                         ["#endif"] * sum(
+                                             re.match(r"#\\s*(\\w+)", x).group(1)
+                                             in ("if", "ifdef", "ifndef")
+                                             for x in guards))
+            newtests.append(registration)
             registrations += 1
         setups = re.findall(r"\bTEST_(?:CLASS|METHOD)_SETUP\s*\(\s*(\w+)\s*\)", body)
         cleanups = re.findall(r"\bTEST_CLASS_CLEANUP\s*\(\s*(\w+)\s*\)", body)
@@ -97,13 +133,17 @@ def Port(srcfile):
                 inside += " void TearDown() override {\n"
                 inside += "\n".join("  EXPECT_TRUE("+x+"());" for x in dict.fromkeys(cleanups))
                 inside += "\n }\n"
-        patches.append((end, inside, newtests))
-    for end,inside,newtests in sorted(patches, reverse=True):
+        patches.append((begin, end, inside, newtests, ":" not in src[m.start():begin]))
+    for begin,end,inside,newtests,needs_fixture in sorted(patches, reverse=True):
         src = src[:end]+inside+src[end:]
         if newtests:
             p = src.find(";", end+len(inside))
             if p < 0: raise ValueError("Missing class terminator")
             src = src[:p+1]+"\n"+"\n".join(newtests)+"\n"+src[p+1:]
+        # Every TEST_F fixture must inherit GoogleTest's Test, including
+        # the original CPU-oracle and algebra fixtures without setup methods.
+        if needs_fixture:
+            src = src[:begin]+" : public ::testing::Test "+src[begin:]
     def Method(m):
         suffix = src[m.end():].lstrip()
         return "void "+m.group(1)+"()" + ("" if suffix.startswith("{") else ";")
