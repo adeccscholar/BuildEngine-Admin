@@ -2498,7 +2498,7 @@
          <environment name="PATH" value="{DependencyRoot:lz4}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xz}\bin\win64\Release;{DependencyRoot:zstd}\bin\win64\Release;{DependencyRoot:bzip2}\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-   <library id="openssl" version="3.5.8" supersededBy="3.5.9" category="security" timestamp="2026-11-24T23:22:00Z">
+   <library id="openssl" version="3.5.8" supersededBy="3.5.9" category="security" timestamp="2026-11-24T23:54:50Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -11339,7 +11339,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" supersededBy="79.1" category="text" timestamp="2026-11-24T23:25:00Z">
+   <library id="icu" version="78.3" supersededBy="79.1" category="text" timestamp="2026-11-24T23:54:50Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services." licenseSignal="yellow"/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -17194,7 +17194,7 @@
          <argument value="-DZSTD_PACKAGE_ROOT:PATH={DependencyRoot:zstd}"/>
       </smoke>
    </library>
-   <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-24T23:22:00Z">
+   <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-24T23:54:50Z">
       <dependency library="doctest" version="2.4.12"/>
       <metadata name="xtl" supplier="xtl contributors" homepage="https://github.com/xtensor-stack/xtl" description="Header-only C++ building block for the xtensor numerical stack." licenseSignal="green" artifactType="interface">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xtl\LICENSE"/>
