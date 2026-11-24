@@ -152,4 +152,40 @@ foreach(_adecc_lit IN ITEMS
       "${_adecc_lit_text}")
 endforeach()
 
+# Complete the pinned native Windows header migration before compiling any
+# original DXC unit or command-line target. Keep the upstream MSVC includes
+# intact; the BCC64X path consumes the existing native COM/UTF-8 adapter.
+# Fail on changed upstream anchors rather than silently missing a source edit.
+function(_adecc_dxc_replace_once _relative _original _replacement)
+   set(_path "${SOURCE_ROOT}/${_relative}")
+   file(READ "${_path}" _source)
+   string(FIND "${_source}" "${_replacement}" _already)
+   if(NOT _already EQUAL -1)
+      return()
+   endif()
+   string(FIND "${_source}" "${_original}" _position)
+   if(_position EQUAL -1)
+      message(FATAL_ERROR "DXC native header migration anchor missing: ${_relative}")
+   endif()
+   string(REPLACE "${_original}" "${_replacement}" _updated "${_source}")
+   file(WRITE "${_path}" "${_updated}")
+endfunction()
+
+set(_adecc_native_com_guard
+   "#if !defined(__CODEGEARC__) && !defined(__BORLANDC__)\\n#include <comdef.h>\\n#endif")
+set(_adecc_native_atl_guard
+   "#if !defined(__CODEGEARC__) && !defined(__BORLANDC__)\\n#include <atlfile.h>\\n#endif")
+# CMake quoted strings above intentionally encode newlines; expand only here.
+string(REPLACE "\\n" "\n" _adecc_native_com_guard "${_adecc_native_com_guard}")
+string(REPLACE "\\n" "\n" _adecc_native_atl_guard "${_adecc_native_atl_guard}")
+_adecc_dxc_replace_once("tools/clang/tools/dxclib/dxc.cpp"
+   "#include <comdef.h>" "${_adecc_native_com_guard}")
+_adecc_dxc_replace_once("tools/clang/unittests/HLSLTestLib/FileCheckerTest.cpp"
+   "#include <atlfile.h>" "${_adecc_native_atl_guard}")
+_adecc_dxc_replace_once("projects/dxilconv/unittests/DxilConvTests.cpp"
+   "#include <atlfile.h>" "${_adecc_native_atl_guard}")
+_adecc_dxc_replace_once("tools/clang/unittests/HLSL/HLSLTestOptions.cpp"
+   "#include \"dxc/WinAdapter.h\""
+   "#include \"dxc/WinAdapter.h\"\n#if (defined(__CODEGEARC__) || defined(__BORLANDC__)) && !defined(_MSC_VER)\n#include \"dxc/Support/Bcc64xNativeAtl.h\"\n#endif")
+
 message(STATUS "DXC HLSL original test migration: GoogleTest/CTest, changed fixture files=${_adecc_fixture_count}")
