@@ -3,6 +3,14 @@
 # No legacy TAEF/WEX/ATL test registration or test translation.
 # All tests exercise production dxcompiler or the production dxc executable.
 
+if(NOT BUILD_TESTING)
+  message(FATAL_ERROR "DXC native behavior suite requires BUILD_TESTING=ON")
+endif()
+if(HLSL_INCLUDE_TESTS OR CLANG_INCLUDE_TESTS)
+  message(FATAL_ERROR
+    "DXC independent native tests must not register historical HLSL/Clang TAEF or LIT suites")
+endif()
+
 function(adecc_add_dxc_shader_test name mode shader profile entry)
   add_test(NAME "DXC.Behavior.${name}"
     COMMAND "${CMAKE_COMMAND}"
