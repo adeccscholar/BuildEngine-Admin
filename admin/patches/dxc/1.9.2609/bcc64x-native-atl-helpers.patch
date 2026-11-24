@@ -123,7 +123,7 @@ diff --git a/tools/clang/tools/dxcompiler/CMakeLists.txt b/tools/clang/tools/dxc
 +# Native Windows BCC64X still builds DXC's DIA/PDB implementation. The
 +# original DiaSDK finder runs only under MSVC and can leave a bogus include
 +# directory in a Ninja build. Validate the real dependency at configure time.
-+if (WIN32 AND NOT MSVC)
++if (ADECC_BCC64X_NATIVE_X64)
 +  find_path(ADECC_DXC_DIA_INCLUDE_DIR dia2.h
 +    HINTS
 +      "$ENV{VSINSTALLDIR}/DIA SDK/include"
