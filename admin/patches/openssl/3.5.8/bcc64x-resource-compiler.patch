@@ -1,7 +1,7 @@
 diff --git a/Configurations/windows-makefile.tmpl b/Configurations/windows-makefile.tmpl
 --- a/Configurations/windows-makefile.tmpl
 +++ b/Configurations/windows-makefile.tmpl
-@@ -282,7 +282,7 @@
+@@ -281,7 +281,7 @@
  AS="{- $config{AS} -}"
  ASFLAGS={- join(' ', @{$config{ASFLAGS}}) -}
  
