@@ -238,15 +238,15 @@ _adecc_dxc_replace_once("tools/clang/tools/dxclib/CMakeLists.txt"
 # Confirm the DIA include contract at CMake configure time, not after compiling
 # thousands of LLVM translation units. This postcondition is deliberately
 # independent of the historical WIN32/NOT MSVC compiler classification.
-set(_adecc_dxclib_cmake "\${SOURCE_ROOT}/tools/clang/tools/dxclib/CMakeLists.txt")
-file(READ "\${_adecc_dxclib_cmake}" _adecc_dxclib_contents)
+set(_adecc_dxclib_cmake "${SOURCE_ROOT}/tools/clang/tools/dxclib/CMakeLists.txt")
+file(READ "${_adecc_dxclib_cmake}" _adecc_dxclib_contents)
 if(NOT _adecc_dxclib_contents MATCHES "ADECC_DXC_DIA_TARGET_CHECK")
-   file(APPEND "\${_adecc_dxclib_cmake}" [=[
+   file(APPEND "${_adecc_dxclib_cmake}" [=[
 
 # ADECC_DXC_DIA_TARGET_CHECK: required Windows DIA SDK contract for dxclib.
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   if(NOT ADECC_DXC_DIA_INCLUDE_DIR OR
-     NOT EXISTS "\${ADECC_DXC_DIA_INCLUDE_DIR}/dia2.h")
+     NOT EXISTS "${ADECC_DXC_DIA_INCLUDE_DIR}/dia2.h")
     unset(ADECC_DXC_DIA_INCLUDE_DIR CACHE)
     find_path(ADECC_DXC_DIA_INCLUDE_DIR NAMES dia2.h
       HINTS
@@ -259,17 +259,17 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/DIA SDK/include")
   endif()
   if(NOT ADECC_DXC_DIA_INCLUDE_DIR OR
-     NOT EXISTS "\${ADECC_DXC_DIA_INCLUDE_DIR}/dia2.h")
+     NOT EXISTS "${ADECC_DXC_DIA_INCLUDE_DIR}/dia2.h")
     message(FATAL_ERROR
       "DXC dxclib requires the genuine Microsoft DIA SDK dia2.h. "
       "Set ADECC_DXC_DIA_INCLUDE_DIR to a verified DIA SDK include directory.")
   endif()
-  target_include_directories(dxclib PRIVATE "\${ADECC_DXC_DIA_INCLUDE_DIR}")
+  target_include_directories(dxclib PRIVATE "${ADECC_DXC_DIA_INCLUDE_DIR}")
   get_target_property(_adecc_dia_target_includes dxclib INCLUDE_DIRECTORIES)
   if(NOT _adecc_dia_target_includes)
     message(FATAL_ERROR "DXC dxclib DIA include contract was not attached")
   endif()
-  message(STATUS "DXC dxclib DIA SDK: \${ADECC_DXC_DIA_INCLUDE_DIR}")
+  message(STATUS "DXC dxclib DIA SDK: ${ADECC_DXC_DIA_INCLUDE_DIR}")
 endif()
 ]=])
 endif()
