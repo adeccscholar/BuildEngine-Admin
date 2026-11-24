@@ -8486,7 +8486,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-11-25T00:45:00Z">
+   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-11-25T01:15:00Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
@@ -8594,6 +8594,9 @@
          <target name="gn-gen" type="generic" executable="{Tool:gn}" workingDirectory="{Workspace}" outputMode="errors">
             <temporaryFile id="gn-args" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\args.gn">
                <line value="skia_use_bcc64x = true"/>
+               <line value="cc = &quot;bcc64x&quot;"/>
+               <line value="cxx = &quot;bcc64x&quot;"/>
+               <line value="ar = &quot;llvm-ar&quot;"/>
                <line value="target_cpu = &quot;x64&quot;"/>
                <line value="target_cc = &quot;bcc64x&quot;"/>
                <line value="target_cxx = &quot;bcc64x&quot;"/>
