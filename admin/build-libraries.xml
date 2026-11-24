@@ -2498,7 +2498,7 @@
          <environment name="PATH" value="{DependencyRoot:lz4}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xz}\bin\win64\Release;{DependencyRoot:zstd}\bin\win64\Release;{DependencyRoot:bzip2}\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-   <library id="openssl" version="3.5.8" supersededBy="3.5.9" category="security" timestamp="2026-11-25T01:10:00Z">
+   <library id="openssl" version="3.5.8" supersededBy="3.5.9" category="security" timestamp="2026-11-24T23:04:06Z">
       <dependency library="zlib" version="1.3.2"/>
       <dependency library="brotli" version="1.2.0"/>
       <dependency library="zstd" version="1.5.7"/>
@@ -5526,7 +5526,7 @@
          <argument value="-DLeptonica_DIR:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\Release\cmake\leptonica"/>
       </smoke>
    </library>
-   <library id="tesseract" version="5.5.3" supersededBy="5.5.4" category="text" timestamp="2026-11-25T01:10:00Z">
+   <library id="tesseract" version="5.5.3" supersededBy="5.5.4" category="text" timestamp="2026-11-24T23:04:06Z">
       <dependency library="leptonica" version="1.87.0"/>
       <metadata name="Tesseract OCR" supplier="Tesseract OCR Project" homepage="https://github.com/tesseract-ocr/tesseract" description="Dynamically linked C++ OCR engine; language traineddata is provisioned and licensed separately." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source>
@@ -5571,7 +5571,7 @@
       </smoke>
    </library>
 
-   <library id="tesseract" version="5.5.4" category="text" timestamp="2026-11-25T01:10:00Z">
+   <library id="tesseract" version="5.5.4" category="text" timestamp="2026-11-24T23:04:06Z">
       <dependency library="leptonica" version="1.87.0"/>
       <metadata name="Tesseract OCR" supplier="Tesseract OCR Project" homepage="https://github.com/tesseract-ocr/tesseract" description="Dynamically linked C++ OCR engine; language traineddata is provisioned and licensed separately." licenseSignal="yellow"><license name="Apache License 2.0" spdx="Apache-2.0" file="LICENSE"/></metadata>
       <source>
@@ -8486,7 +8486,7 @@
    </smoke>
 </library>
 
-   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-11-25T01:15:00Z">
+   <library id="skia" version="144" supersededBy="153" category="graphics" timestamp="2026-11-24T23:04:06Z">
       <dependency library="zlib" version="1.4"/>
       <dependency library="libjpeg-turbo" version="3.2.0"/>
       <dependency library="libpng" version="1.6.59"/>
@@ -11326,7 +11326,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" supersededBy="79.1" category="text" timestamp="2026-11-25T01:10:00Z">
+   <library id="icu" version="78.3" supersededBy="79.1" category="text" timestamp="2026-11-24T23:04:06Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services." licenseSignal="yellow"/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -15577,7 +15577,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-25T00:45:00Z">
+   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-24T23:04:06Z">
       <dependency library="spirv-headers" version="v1.202609.0"/>
       <metadata name="SPIRV-Tools" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Tools" description="SPIR-V assembler, validator, optimizer and associated libraries" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\spirv-tools\LICENSE"/>
@@ -16115,7 +16115,7 @@
          <environment name="CB_BDS" value="{BDS}"/>
       </smoke>
    </library>
-   <library id="imgui" version="1.93.0" category="graphics" timestamp="2026-11-25T00:45:00Z">
+   <library id="imgui" version="1.93.0" category="graphics" timestamp="2026-11-24T23:04:06Z">
       <dependency library="sdl2" version="2.32.10"/>
       <dependency library="glew" version="2.3.1"/>
       <dependency library="opengl" version="26.2.1"/>
@@ -17179,7 +17179,7 @@
          <argument value="-DZSTD_PACKAGE_ROOT:PATH={DependencyRoot:zstd}"/>
       </smoke>
    </library>
-   <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-25T00:45:00Z">
+   <library id="xtl" version="0.8.0" category="foundation" timestamp="2026-11-24T23:04:06Z">
       <dependency library="doctest" version="2.4.12"/>
       <metadata name="xtl" supplier="xtl contributors" homepage="https://github.com/xtensor-stack/xtl" description="Header-only C++ building block for the xtensor numerical stack." licenseSignal="green" artifactType="interface">
          <license name="BSD 3-Clause License" spdx="BSD-3-Clause" file="licenses\xtl\LICENSE"/>
