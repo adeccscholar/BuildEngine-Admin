@@ -8,6 +8,22 @@ The BuildEngine source patch redirects DXIL converter test registration to a por
 
 Existing upstream LLVM/LIT and other tests remain enabled. BuildEngine retains `BUILD_TESTING=ON`, `LLVM_INCLUDE_TESTS=ON`, `LLVM_BUILD_TESTS=ON`, `HLSL_BUILD_DXILCONV=ON` and `SPIRV_BUILD_TESTS=ON`.
 
+## Native API behavior evidence (2026-11-24)
+
+The versioned portable suite additionally builds `DxcApiBehavior.cpp` as
+`adecc-dxc-api-behavior`, linking against the genuine `dxcompiler` target.
+It requests `IDxcCompiler3` from `DxcCreateInstance` and manages returned
+interfaces with `std::unique_ptr` plus a `Release` deleter. It checks both
+successful DXIL compilation and rejection of an invalid entry point through
+`IDxcResult`; no COM activation, TAEF, WEX, ATL or WRL is involved.
+
+The 2026-11-24 14:44 build log still shows 113 compiler diagnostics in
+each configuration, all encountered before the new behavior suite could run.
+The original Windows HLSL/HLSLExec/HLSLHost/dxc_batch/DxrFallback suites
+remain registered and contain historical compatibility dependencies.
+The new tests are **additional**; no coverage-parity claim is made.
+Do not report the native API test as passing without a real BCC64X run.
+
 ## Migration debt
 
 Port `BatchDxbc2dxil`, `BatchDxbc2dxilAsm`, `BatchDxilCleanup`, `BatchNormalizeDxil`, `BatchScopeNestIterator`, and `RegressionTests` to CTest or LLVM/LIT with identical fixture sets, output verification and failure semantics. Until then report original DXIL converter regression coverage as **INCOMPLETE**.
