@@ -15,7 +15,7 @@
  target_link_libraries(dxbc2dxil PRIVATE
 --- a/tools/clang/include/clang/Rewrite/Core/RewriteBuffer.h
 +++ b/tools/clang/include/clang/Rewrite/Core/RewriteBuffer.h
-@@ -13,6 +13,13 @@
+@@ -13,7 +13,14 @@
  #include "clang/Basic/LLVM.h"
  #include "clang/Rewrite/Core/DeltaTree.h"
  #include "clang/Rewrite/Core/RewriteRope.h"
