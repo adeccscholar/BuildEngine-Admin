@@ -188,4 +188,32 @@ _adecc_dxc_replace_once("tools/clang/unittests/HLSL/HLSLTestOptions.cpp"
    "#include \"dxc/WinAdapter.h\""
    "#include \"dxc/WinAdapter.h\"\n#if (defined(__CODEGEARC__) || defined(__BORLANDC__)) && !defined(_MSC_VER)\n#include \"dxc/Support/Bcc64xNativeAtl.h\"\n#endif")
 
+# Restore upstream PCH operations access for original Clang components.
+_adecc_dxc_replace_once("tools/clang/include/clang/Frontend/CompilerInstance.h"
+   "#endif // HLSL Change Ends - no support for modules or PCH"
+   "std::shared_ptr<PCHContainerOperations> getPCHContainerOperations() const {\n    return ThePCHContainerOperations;\n  }\n\n#endif // HLSL Change Ends - no support for modules or PCH")
+
+# IN collides with a Windows SDK annotation macro.
+_adecc_dxc_replace_once("tools/llvm-diff/DiffConsumer.cpp"
+   "unsigned IN = 0;" "unsigned iNextNumber = 0;")
+_adecc_dxc_replace_once("tools/llvm-diff/DiffConsumer.cpp"
+   "IN++" "iNextNumber++")
+
+# The BCC64X standard library accepts wchar_t const* for wide paths.
+_adecc_dxc_replace_once("include/dxc/Test/HlslTestUtils.h"
+   "std::ifstream infile(path);" "std::ifstream infile(path.c_str());")
+
+# GoogleTest TEST_F methods derive from their test fixture.
+_adecc_dxc_replace_once("projects/dxilconv/unittests/DxilConvTests.cpp"
+   "private:\n  // this loader only loads dxilconv.dll"
+   "protected:\n  // this loader only loads dxilconv.dll")
+_adecc_dxc_replace_once("projects/dxilconv/unittests/DxilConvTests.cpp"
+   "::PathFileExistsA(loc.c_str())"
+   "(::GetFileAttributesA(loc.c_str()) != INVALID_FILE_ATTRIBUTES)")
+
+# DXC already discovers the DIA SDK for dxcompiler; attach it to dxclib too.
+_adecc_dxc_replace_once("tools/clang/tools/dxclib/CMakeLists.txt"
+   "add_clang_library(dxclib\n  dxc.cpp\n  )"
+   "add_clang_library(dxclib\n  dxc.cpp\n  )\n\nif (WIN32 AND NOT MSVC)\n  find_path(ADECC_DXC_DIA_INCLUDE_DIR dia2.h\n    HINTS\n      \"$ENV{VSINSTALLDIR}/DIA SDK/include\"\n      \"$ENV{MSVC_DIA_SDK_DIR}/include\"\n      \"$ENV{DIA_SDK_DIR}/include\"\n      \"C:/Program Files/Microsoft Visual Studio/2022/Professional/DIA SDK/include\"\n      \"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/DIA SDK/include\"\n      \"C:/Program Files/Microsoft Visual Studio/2022/Community/DIA SDK/include\")\n  if (NOT ADECC_DXC_DIA_INCLUDE_DIR)\n    message(FATAL_ERROR \"DXC dxclib requires DIA SDK dia2.h\")\n  endif()\n  target_include_directories(dxclib PRIVATE \"${ADECC_DXC_DIA_INCLUDE_DIR}\")\nendif()")
+
 message(STATUS "DXC HLSL original test migration: GoogleTest/CTest, changed fixture files=${_adecc_fixture_count}")
