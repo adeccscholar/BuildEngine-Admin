@@ -37,6 +37,15 @@ execute_process(
   ERROR_VARIABLE _stderr
   TIMEOUT 45)
 
+# Loader failures are infrastructure errors, not shader compilation results.
+# In particular, ERROR_MOD_NOT_FOUND (0x8007007E) must never count as
+# successful rejection of an intentionally invalid shader.
+if("${_stdout}\n${_stderr}" MATCHES "dxcompiler[.]dll failed to load" OR
+   "${_result}" STREQUAL "-2147024770")
+  message(FATAL_ERROR
+    "DXC runtime failed to load dxcompiler.dll or a dependent DLL: ${_result}\n${_stdout}\n${_stderr}")
+endif()
+
 if(MODE STREQUAL "REJECT")
   if("${_result}" STREQUAL "0")
     message(FATAL_ERROR "DXC accepted an intentionally invalid shader: ${SHADER}")
