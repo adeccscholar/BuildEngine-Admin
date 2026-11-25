@@ -22,18 +22,27 @@ diff --git a/BUILD.gn b/BUILD.gn
 diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
 --- a/gn/BUILDCONFIG.gn
 +++ b/gn/BUILDCONFIG.gn
-@@ -189,6 +189,10 @@ template("component") {
-   }
- }
+@@ -25,6 +25,7 @@
+   win_sdk = "C:/Program Files (x86)/Windows Kits/10"
+   win_sdk_version = ""
  
-+declare_args() {
+   win_vc = ""
 +  skia_use_bcc64x = false
-+}
-+
- # Default configs
- default_configs = [
-   "//gn/skia:default",
-@@ -247,7 +251,13 @@ if (!is_official_build) {
+   win_toolchain_version = ""
+ 
+@@ -142,4 +143,4 @@
+-if (target_os == "win") {
++if (target_os == "win" && !skia_use_bcc64x) {
+   # By default we look for 2017 (Enterprise, Pro, and Community), then 2015. If MSVC is installed in a
+   # non-default location, you can set win_vc to inform us where it is.
+ 
+@@ -153,4 +154,4 @@
+-if (target_os == "win") {
++if (target_os == "win" && !skia_use_bcc64x) {
+   if (win_toolchain_version == "") {
+     win_toolchain_version = exec_script("//gn/highest_version_dir.py",
+                                         [
+@@ -247,7 +248,13 @@ if (!is_official_build) {
        [ "//gn/skia:warnings_for_public_headers" ]
  }
  
@@ -43,7 +52,7 @@ diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
 +  # native Windows host toolchain.
 +  set_default_toolchain("//gn/toolchain:gcc_like")
 +  default_toolchain_name = "gcc_like"
-+  host_toolchain = "msvc_host"
++  host_toolchain = "gcc_like_host"
 +} else if (is_win) {
    # Windows tool chain
    set_default_toolchain("//gn/toolchain:msvc")
