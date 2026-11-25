@@ -117,16 +117,18 @@ namespace {
 }
 
 int main() {
-   std::array<wchar_t, 32768> arrDirectory {};
-   DWORD const uLength = GetEnvironmentVariableW(L"JOLT_SMOKE_DLL_DIR",
-      arrDirectory.data(), static_cast<DWORD>(arrDirectory.size()));
-   if(uLength == 0 || uLength >= arrDirectory.size()) {
-      std::puts("SMOKE|CHECK|jolt-loader|FAIL|JOLT_SMOKE_DLL_DIR missing");
+   std::array<wchar_t, 32768> arrExecutable {};
+   DWORD const uExeLength = GetModuleFileNameW(nullptr, arrExecutable.data(),
+      static_cast<DWORD>(arrExecutable.size()));
+   if(uExeLength == 0 || uExeLength >= arrExecutable.size()) {
+      PrintWindowsError("GetModuleFileNameW", GetLastError());
+      std::puts("SMOKE|CHECK|jolt-loader|FAIL|Cannot resolve executable directory");
       std::puts("SMOKE|RESULT|FAIL|Jolt runtime environment");
       return 1;
    }
-   std::filesystem::path const aDll =
-      std::filesystem::path(arrDirectory.data()) / L"libJolt.dll";
+   std::filesystem::path const aDirectory =
+      std::filesystem::path(arrExecutable.data()).parent_path();
+   std::filesystem::path const aDll = aDirectory / L"libJolt.dll";
    std::fprintf(stderr, "DIAG|jolt-dll|%ls\n", aDll.c_str());
    if(!std::filesystem::exists(aDll)) {
       std::puts("SMOKE|CHECK|jolt-loader|FAIL|Expected DLL not found");
@@ -147,13 +149,6 @@ int main() {
    if(uLoadedChars > 0 && uLoadedChars < arrLoadedPath.size())
       std::fprintf(stderr, "DIAG|jolt-loaded|%ls\n", arrLoadedPath.data());
    FreeLibrary(hJolt);
-   std::array<wchar_t, 32768> arrExecutable {};
-   DWORD const uExeLength = GetModuleFileNameW(nullptr, arrExecutable.data(),
-      static_cast<DWORD>(arrExecutable.size()));
-   if(uExeLength == 0 || uExeLength >= arrExecutable.size()) {
-      PrintWindowsError("GetModuleFileNameW", GetLastError());
-      return 1;
-   }
    std::filesystem::path aConsumer(arrExecutable.data());
    aConsumer.replace_filename(L"jolt-consumer-real.exe");
    std::wstring strCommand = L"\"" + aConsumer.wstring() + L"\"";
