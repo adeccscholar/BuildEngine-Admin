@@ -27,3 +27,17 @@ target_compile_definitions(jolt-consumer-real PRIVATE
 target_include_directories(jolt-consumer-real PRIVATE "${JOLT_PACKAGE_ROOT}/include")
 find_library(JOLT_LIBRARY NAMES Jolt libJolt PATHS "${JOLT_PACKAGE_ROOT}/lib/win64/Release" NO_DEFAULT_PATH REQUIRED)
 target_link_libraries(jolt-consumer-real PRIVATE "${JOLT_LIBRARY}")
+
+# The smoke is an application deployment, not a PATH-based probe.
+# Stage the declared package closure and the exact BCC64X C++ runtime
+# beside the executable, as in the other BuildEngine consumers.
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/consumer/BuildEngineRuntime.cmake")
+if(DEFINED ADECC_RUNTIME_PACKAGE_ROOTS AND
+   NOT "${ADECC_RUNTIME_PACKAGE_ROOTS}" STREQUAL "")
+   set(vecJoltRuntimeRoots ${ADECC_RUNTIME_PACKAGE_ROOTS})
+else()
+   set(vecJoltRuntimeRoots "${JOLT_PACKAGE_ROOT}")
+endif()
+adecc_stage_runtime(jolt-consumer
+   PACKAGE_ROOTS ${vecJoltRuntimeRoots}
+   TOOLCHAIN_DLLS libc++-370.dll)
