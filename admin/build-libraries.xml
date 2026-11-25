@@ -16564,7 +16564,7 @@
          <argument value="-DRECAST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="jolt-physics" version="5.7.0" category="graphics" timestamp="2026-11-25T13:58:00Z">
+   <library id="jolt-physics" version="5.7.0" category="graphics" timestamp="2026-11-25T15:10:00Z">
       <metadata name="Jolt Physics" supplier="Jorrit Rouwe and contributors" homepage="https://github.com/jrouwe/JoltPhysics" description="Jolt CPU physics engine built as native BCC64X shared library with optional backends and samples disabled." artifactType="shared" licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="licenses\jolt-physics\LICENSE"/>
       </metadata>
@@ -18411,7 +18411,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-25T12:59:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-25T15:10:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
