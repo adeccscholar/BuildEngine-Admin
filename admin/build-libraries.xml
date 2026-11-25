@@ -11342,7 +11342,7 @@
       </publish>
    </library>
 
-   <library id="icu" version="78.3" supersededBy="79.1" category="text" timestamp="2026-11-25T01:52:53Z">
+   <library id="icu" version="78.3" supersededBy="79.1" category="text" timestamp="2026-11-25T02:10:00Z">
       <metadata name="ICU4C" supplier="Unicode Consortium" homepage="https://icu.unicode.org/" description="Unicode and globalization library providing text, locale, normalization, collation, and conversion services." licenseSignal="yellow"/>
       <security>
          <repository url="https://github.com/unicode-org/icu.git" ref="release-{LibraryVersion}"/>
@@ -11430,9 +11430,6 @@
                     runtimeOutput="icudt78"
                     archiveOutput="icudt">
                <include path="{Workspace}\source\common"/>
-               <!-- SDK RC reads winresrc.h directly; target-local RC include only. -->
-               <include path="{ToolDir:windows-rc}\..\..\..\Include\10.0.26100.0\um"/>
-               <include path="{ToolDir:windows-rc}\..\..\..\Include\10.0.26100.0\shared"/>
                <define value="WIN32"/>
                <define value="WIN64"/>
                <define value="WINVER=0x0601"/>
