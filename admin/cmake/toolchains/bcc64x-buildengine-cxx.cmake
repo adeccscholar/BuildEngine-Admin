@@ -86,11 +86,14 @@ else()
 endif()
 message(STATUS "BuildEngine active resource compiler: ${CMAKE_RC_COMPILER}")
 
-# SDK header paths and Microsoft /I flags must never reach BCC64X windres.
-# They are only valid when the actual selected compiler is the SDK rc.exe.
-if(_CB_RC_KIND STREQUAL "windows-sdk-rc" AND
-   "${CMAKE_RC_COMPILER}" STREQUAL "${_CB_RC_EXECUTABLE}")
-   get_filename_component(_CB_RC_BIN_DIR "${_CB_RC_EXECUTABLE}" DIRECTORY)
+# Derive SDK RC identity from the compiler actually selected by CMake.
+# Compare the compiler basename, not CB_WINDOWS_RC's spelling: Windows 8.3
+# aliases and different path normalization must not suppress SDK includes.
+# A retained bcc64x-windres cache must never receive Microsoft /I arguments.
+get_filename_component(_CB_RC_ACTIVE_NAME "${CMAKE_RC_COMPILER}" NAME)
+string(TOLOWER "${_CB_RC_ACTIVE_NAME}" _CB_RC_ACTIVE_NAME)
+if(_CB_RC_ACTIVE_NAME STREQUAL "rc.exe")
+   get_filename_component(_CB_RC_BIN_DIR "${CMAKE_RC_COMPILER}" DIRECTORY)
    get_filename_component(_CB_RC_VERSION_DIR "${_CB_RC_BIN_DIR}" DIRECTORY)
    get_filename_component(_CB_RC_VERSION "${_CB_RC_VERSION_DIR}" NAME)
    get_filename_component(_CB_RC_BIN_ROOT "${_CB_RC_VERSION_DIR}" DIRECTORY)
@@ -99,18 +102,21 @@ if(_CB_RC_KIND STREQUAL "windows-sdk-rc" AND
    foreach(_CB_RC_INCLUDE um shared ucrt)
       if(NOT IS_DIRECTORY "${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
          message(FATAL_ERROR
-            "Windows SDK RC include directory missing: ${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
+            "Selected SDK rc.exe requires its complete SDK include contract: ${_CB_RC_INCLUDE_ROOT}/${_CB_RC_INCLUDE}")
       endif()
    endforeach()
    set(CMAKE_RC_STANDARD_INCLUDE_DIRECTORIES
       "${_CB_RC_INCLUDE_ROOT}/um"
       "${_CB_RC_INCLUDE_ROOT}/shared"
       "${_CB_RC_INCLUDE_ROOT}/ucrt"
-      CACHE STRING "Registered Windows SDK RC standard includes" FORCE)
-   set(CMAKE_RC_FLAGS_INIT "/I\\\"${_CB_RC_INCLUDE_ROOT}/um\\\" /I\\\"${_CB_RC_INCLUDE_ROOT}/shared\\\"")
+      CACHE STRING "Selected Windows SDK RC standard include directories" FORCE)
+   # RC flags are cached across reconfiguration; restore all three include
+   # directories for an actual SDK rc.exe, even with an existing CMake cache.
+   set(CMAKE_RC_FLAGS_INIT "/I\\\"${_CB_RC_INCLUDE_ROOT}/um\\\" /I\\\"${_CB_RC_INCLUDE_ROOT}/shared\\\" /I\\\"${_CB_RC_INCLUDE_ROOT}/ucrt\\\"")
    set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS_INIT}"
-      CACHE STRING "Windows SDK RC include arguments" FORCE)
+      CACHE STRING "Selected Windows SDK RC include arguments" FORCE)
 endif()
+unset(_CB_RC_ACTIVE_NAME)
 unset(_CB_RC_KIND)
 unset(_CB_RC_EXECUTABLE)
 unset(_CB_RC_BIN_DIR)
