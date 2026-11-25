@@ -23,3 +23,14 @@ diff --git a/tools/clang/tools/CMakeLists.txt b/tools/clang/tools/CMakeLists.txt
  endif()
  
  # We support checking out the clang-tools-extra repository into the 'extra'
+@@ -44,2 +46,10 @@
+ endif (MSVC)
+ # HLSL Change Ends
++
++# Native BCC64X links the upstream Windows wmain executables through the
++# MinGW-derived Unicode CRT startup, without changing global compiler identity.
++if(ADECC_BCC64X_NATIVE_X64)
++  foreach(_adecc_dxc_wmain_target dxc dxopt dxl dxr)
++    target_link_options(${_adecc_dxc_wmain_target} PRIVATE -municode)
++  endforeach()
++endif()
