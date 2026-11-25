@@ -46,9 +46,6 @@ add_custom_command(TARGET skia-consumer POST_BUILD
       $<TARGET_FILE:Skia::skottie>
       $<TARGET_FILE_DIR:skia-consumer>
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      $<TARGET_FILE_DIR:Skia::skunicode_icu>/icudtl.dat
-      $<TARGET_FILE_DIR:skia-consumer>/icudtl.dat
-   COMMAND ${CMAKE_COMMAND} -E copy_if_different
       ${SKIA_OPENGL_RUNTIME_DIR}/opengl32.dll
       $<TARGET_FILE_DIR:skia-consumer>/opengl32.dll
    COMMAND ${CMAKE_COMMAND} -E copy_if_different
