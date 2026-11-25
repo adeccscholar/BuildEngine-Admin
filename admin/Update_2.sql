@@ -81,7 +81,7 @@ BEGIN
       END IF;
       SELECT l.library_id,v.version_no INTO i_library,i_version
       FROM buildengine.library AS l
-      JOIN buildengine.library_version AS v USING(library_id)
+      JOIN buildengine.library_version AS v ON v.library_id=l.library_id
       WHERE l.library_code=the_record.library_code
         AND v.version_text=the_record.version_text;
       IF i_library IS NULL THEN
