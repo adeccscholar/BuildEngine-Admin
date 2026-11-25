@@ -23,8 +23,11 @@ diff --git a/tools/clang/tools/CMakeLists.txt b/tools/clang/tools/CMakeLists.txt
  endif()
  
  # We support checking out the clang-tools-extra repository into the 'extra'
-@@ -44,2 +46,10 @@
- endif (MSVC)
+@@ -44,5 +46,13 @@
+ if(MSVC OR (WIN32 AND DEFINED ENV{CB_BCC64X} AND NOT "$ENV{CB_BCC64X}" STREQUAL ""))
+   # dxc_batch requires the original dxlib_sample DLL on native BCC64X.
+   add_subdirectory(dxlib-sample)
+ endif()
  # HLSL Change Ends
 +
 +# Native BCC64X links the upstream Windows wmain executables through the
