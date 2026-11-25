@@ -1,6 +1,6 @@
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -84,7 +84,81 @@
+@@ -84,7 +84,94 @@
              "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
      )
  endif()
@@ -30,6 +30,19 @@
 +    set(ADECC_CPPWINRT_WINRT_SDK_INCLUDE "${ADECC_CPPWINRT_IDL_ROOT}/winrt")
 +    set(ADECC_CPPWINRT_MIDL_SHARED_INCLUDE "${ADECC_CPPWINRT_IDL_ROOT}/shared")
 +    set(ADECC_CPPWINRT_MIDL_UM_INCLUDE "${ADECC_CPPWINRT_IDL_ROOT}/um")
++    # Only the upstream test tree receives these two WinRT interfaces.
++    # Never introduce Microsoft SDK um/shared headers into BCC64X.
++    set(_adecc_test_headers "${CMAKE_CURRENT_BINARY_DIR}/adecc-winrt-headers")
++    file(MAKE_DIRECTORY "${_adecc_test_headers}")
++    foreach(_adecc_header IN ITEMS winstring.h windows.foundation.h)
++        if(NOT EXISTS "${ADECC_CPPWINRT_IDL_ROOT}/winrt/${_adecc_header}")
++            message(FATAL_ERROR
++                "Pinned Windows SDK WinRT header missing: ${ADECC_CPPWINRT_IDL_ROOT}/winrt/${_adecc_header}")
++        endif()
++        configure_file("${ADECC_CPPWINRT_IDL_ROOT}/winrt/${_adecc_header}"
++            "${_adecc_test_headers}/${_adecc_header}" COPYONLY)
++    endforeach()
++    include_directories(BEFORE "${_adecc_test_headers}")
 +    set(_adecc_test_component_dir "${CMAKE_CURRENT_BINARY_DIR}/test_component")
 +    set(_adecc_test_component_winmd "${_adecc_test_component_dir}/test_component.winmd")
 +    # MIDLRT is a Windows-native tool; its /winmd and /out output parameters
