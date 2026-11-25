@@ -18298,7 +18298,7 @@
          <argument value="-DWINMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-25T17:52:00Z">
+   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-25T18:47:00Z">
       <dependency library="winmd" version="0f1eae3b"/>
       <metadata artifactType="tool" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
@@ -18342,6 +18342,19 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-generate-test-component.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <!-- Stage only Windows SDK winstring.h for the original PCH test.
+              The patch was checked with git apply --check against upstream. -->
+         <copy source="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\bcc64x-winstring-isolated.patch"
+            target="{Workspace}\.buildengine\patches\bcc64x-winstring-isolated.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-isolated-winstring-header" executable="{Tool:cmake}"
+            workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-winstring-isolated.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
