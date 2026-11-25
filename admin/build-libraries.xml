@@ -9179,7 +9179,7 @@
          <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libjxl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xmp-toolkit}\bin\win64\Release;{DependencyRoot:expat}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-25T01:31:27Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-25T18:59:00Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -10554,7 +10554,6 @@
          <tree source="include" target="include" optional="false"/>
          <files source="lib\win64\{Configuration}" target="lib" extensions=".lib" optional="false"/>
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" optional="false"/>
-         <files source="bin\win64\{Configuration}" target="bin" extensions=".dat" optional="false"/>
          <cmake source="lib\cmake" target="lib\cmake" optional="false"/>
 
          <!-- Preserve bundled-component evidence in the published package. -->
@@ -14280,7 +14279,7 @@
         No implicit DEPS synchronization; only BuildEngine-controlled source inputs.
         PDFium BCC64X and external-Skia adapters remain required before it can pass.
         Never mark this package ready merely because its source was downloaded. -->
-   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-09T14:30:00Z">
+   <library id="pdfium" version="2025.11.19" category="documentation" timestamp="2026-11-25T19:00:00Z">
       <dependency library="abseil" version="20260817.0"/>
        <dependency library="fast_float" version="8.3.3"/>
       <dependency library="skia" version="153"/>
@@ -14630,6 +14629,14 @@
             <argument value="-DABSEIL_INCLUDE_VERIFY_ONLY:BOOL=ON"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\abseil-installed-includes.cmake"/>
+         </execute>
+         <!-- Preflight the exact Chromium GN script and bypass VS lookup only
+               when the explicitly selected toolchain is native BCC64X. -->
+         <execute name="patch-pdfium-bcc64x-vs-discovery" executable="{Tool:cmake}"
+                  workingDirectory="{Workspace}" outputMode="errors">
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\pdfium\BypassMsvcDiscoveryForBcc64x.cmake"/>
          </execute>
          <target name="gn-gen" type="gn"
                  executable="{Tool:gn}"
