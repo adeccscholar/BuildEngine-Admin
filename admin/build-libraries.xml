@@ -14319,7 +14319,15 @@
             <argument value="-E"/><argument value="tar"/><argument value="xzf"/>
             <argument value="{DownloadsRoot}\pdfium-deps\build-371ecb089d96d60e5208ec2d25c9b4f0860e556c.tar.gz"/>
          </execute>
-         <execute name="prepare-chromium-buildtools-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
+         <!-- Preflight the exact Chromium GN script and bypass VS lookup only
+               when the explicitly selected toolchain is native BCC64X. -->
+         <execute name="patch-pdfium-bcc64x-vs-discovery" executable="{Tool:cmake}"
+                  workingDirectory="{Workspace}" outputMode="errors">
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\pdfium\BypassMsvcDiscoveryForBcc64x.cmake"/>
+         </execute>
+                  <execute name="prepare-chromium-buildtools-dir" executable="{Tool:cmake}" workingDirectory="{CurrentArtifact}">
             <argument value="-E"/><argument value="make_directory"/>
             <argument value="{CurrentArtifact}\buildtools"/>
          </execute>
@@ -14630,15 +14638,7 @@
             <argument value="-P"/>
             <argument value="{BuildFileDir}\patches\pdfium\2025.11.19\abseil-installed-includes.cmake"/>
          </execute>
-         <!-- Preflight the exact Chromium GN script and bypass VS lookup only
-               when the explicitly selected toolchain is native BCC64X. -->
-         <execute name="patch-pdfium-bcc64x-vs-discovery" executable="{Tool:cmake}"
-                  workingDirectory="{Workspace}" outputMode="errors">
-            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
-            <argument value="-P"/>
-            <argument value="{BuildFileDir}\cmake\pdfium\BypassMsvcDiscoveryForBcc64x.cmake"/>
-         </execute>
-         <target name="gn-gen" type="gn"
+<target name="gn-gen" type="gn"
                  executable="{Tool:gn}"
                  workingDirectory="{Workspace}" outputMode="errors">
             <temporaryFile id="gn-args" path="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\args.gn">
