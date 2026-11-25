@@ -1,6 +1,6 @@
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -84,7 +84,79 @@
+@@ -84,7 +84,73 @@
              "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
      )
  endif()
@@ -8,27 +8,21 @@
 +# BuildEngine: generate the original test_component projection from its IDL,
 +# instead of silently excluding the upstream test that consumes it.
 +if(WIN32 AND NOT STANDALONE_TESTING)
-+    file(GLOB _adecc_midlrt_candidates
-+        "C:/Program Files (x86)/Windows Kits/10/bin/*/x64/midlrt.exe")
-+    list(SORT _adecc_midlrt_candidates COMPARE NATURAL ORDER DESCENDING)
-+    if(NOT _adecc_midlrt_candidates)
-+        message(FATAL_ERROR "Windows SDK MIDLRT not found: required for original cppwinrt test_component.idl")
++    # These are managed dependencies, never searched in Windows Kits or PATH.
++    if(NOT DEFINED ADECC_CPPWINRT_MIDLRT OR
++       NOT EXISTS "${ADECC_CPPWINRT_MIDLRT}")
++        message(FATAL_ERROR "C++/WinRT tests require explicitly provisioned ADECC_CPPWINRT_MIDLRT")
 +    endif()
-+    list(GET _adecc_midlrt_candidates 0 ADECC_CPPWINRT_MIDLRT)
-+    file(GLOB _adecc_winrt_sdk_dirs
-+        "C:/Program Files (x86)/Windows Kits/10/Include/*/winrt")
-+    list(SORT _adecc_winrt_sdk_dirs COMPARE NATURAL ORDER DESCENDING)
-+    find_path(ADECC_CPPWINRT_WINRT_SDK_INCLUDE
-+        NAMES Windows.Foundation.Numerics.idl
-+        HINTS ${_adecc_winrt_sdk_dirs} REQUIRED)
-+    get_filename_component(_adecc_sdk_inc_root "${ADECC_CPPWINRT_WINRT_SDK_INCLUDE}" DIRECTORY)
-+    find_path(ADECC_CPPWINRT_MIDL_SHARED_INCLUDE
-+        NAMES wtypes.idl
-+        HINTS "${_adecc_sdk_inc_root}/shared" REQUIRED)
-+    find_path(ADECC_CPPWINRT_MIDL_UM_INCLUDE
-+        NAMES unknwn.idl
-+        HINTS "${_adecc_sdk_inc_root}/um" REQUIRED)
-+    set(_adecc_test_component_dir "${CMAKE_CURRENT_BINARY_DIR}/test_component")
++    if(NOT DEFINED ADECC_CPPWINRT_IDL_ROOT OR
++       NOT IS_DIRECTORY "${ADECC_CPPWINRT_IDL_ROOT}/winrt" OR
++       NOT IS_DIRECTORY "${ADECC_CPPWINRT_IDL_ROOT}/shared" OR
++       NOT IS_DIRECTORY "${ADECC_CPPWINRT_IDL_ROOT}/um")
++        message(FATAL_ERROR "C++/WinRT tests require explicitly provisioned ADECC_CPPWINRT_IDL_ROOT with winrt/shared/um")
++    endif()
++    set(ADECC_CPPWINRT_WINRT_SDK_INCLUDE "${ADECC_CPPWINRT_IDL_ROOT}/winrt")
++    set(ADECC_CPPWINRT_MIDL_SHARED_INCLUDE "${ADECC_CPPWINRT_IDL_ROOT}/shared")
++    set(ADECC_CPPWINRT_MIDL_UM_INCLUDE "${ADECC_CPPWINRT_IDL_ROOT}/um")
+++    set(_adecc_test_component_dir "${CMAKE_CURRENT_BINARY_DIR}/test_component")
 +    set(_adecc_test_component_winmd "${_adecc_test_component_dir}/test_component.winmd")
 +    # MIDLRT is a Windows-native tool; its /winmd and /out output parameters
 +    # must not be supplied as CMake forward-slash paths.
