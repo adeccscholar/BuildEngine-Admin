@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 # Exercise the actual DXC compiler and validate successful AND rejected input.
 # No WEX, ATL, TAEF, fake COM or test-framework adapter is involved.
-foreach(_required DXC_EXE SHADER OUTPUT MODE)
+foreach(_required DXC_EXE DXC_DLL SHADER OUTPUT MODE)
   if(NOT DEFINED ${_required} OR "${${_required}}" STREQUAL "")
     message(FATAL_ERROR "Missing DXC behavioral test argument: ${_required}")
   endif()
@@ -17,7 +17,14 @@ if(NOT DEFINED ENTRY)
   set(ENTRY main)
 endif()
 file(REMOVE "${OUTPUT}")
-set(_args -T "${PROFILE}" -E "${ENTRY}")
+# Use the exact build product instead of searching for a same-name host DLL.
+if(NOT EXISTS "${DXC_DLL}")
+  message(FATAL_ERROR "DXC compiler DLL missing: ${DXC_DLL}")
+endif()
+get_filename_component(_dxc_dll_path "${DXC_DLL}" REALPATH)
+message(STATUS "DXC test runtime: ${_dxc_dll_path}")
+set(_args -external "${_dxc_dll_path}" -external-fn DxcCreateInstance
+  -T "${PROFILE}" -E "${ENTRY}")
 if(DEFINED INCLUDE_DIR AND NOT "${INCLUDE_DIR}" STREQUAL "")
   if(NOT IS_DIRECTORY "${INCLUDE_DIR}")
     message(FATAL_ERROR "DXC include directory not found: ${INCLUDE_DIR}")
