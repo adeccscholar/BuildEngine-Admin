@@ -141,6 +141,11 @@ int main() {
       std::fputs("SMOKE|RESULT|FAIL|Jolt DLL loader\n", stderr);
       return 1;
    }
+   std::array<wchar_t, 32768> arrLoadedPath {};
+   DWORD const uLoadedChars = GetModuleFileNameW(hJolt, arrLoadedPath.data(),
+      static_cast<DWORD>(arrLoadedPath.size()));
+   if(uLoadedChars > 0 && uLoadedChars < arrLoadedPath.size())
+      std::fprintf(stderr, "SMOKE|INFO|jolt-loaded|%ls\n", arrLoadedPath.data());
    std::puts("SMOKE|CHECK|jolt-loader|PASS|Installed Jolt DLL initialized");
    FreeLibrary(hJolt);
    std::array<wchar_t, 32768> arrExecutable {};
