@@ -22,8 +22,13 @@ function(adecc_add_dxc_shader_test name mode shader profile entry)
       "-DENTRY=${entry}"
       "-DINCLUDE_DIR=${CMAKE_CURRENT_SOURCE_DIR}"
       -P "${CMAKE_CURRENT_SOURCE_DIR}/RunShader.cmake")
+  # dxc.exe loads dxcompiler.dll at runtime rather than linking to it.
+  # Scope DLL lookup to this single test: no global PATH or toolchain change.
   set_tests_properties("DXC.Behavior.${name}"
-    PROPERTIES LABELS "BCC64X;DXC;native;HLSL" TIMEOUT 60)
+    PROPERTIES
+      LABELS "BCC64X;DXC;native;HLSL"
+      TIMEOUT 60
+      ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:$<TARGET_FILE_DIR:dxcompiler>")
 endfunction()
 
 adecc_add_dxc_shader_test(PixelDXIL DXIL smoke.hlsl ps_6_0 main)
