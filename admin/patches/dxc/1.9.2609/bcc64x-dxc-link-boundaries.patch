@@ -1,0 +1,25 @@
+diff --git a/tools/clang/tools/dxildll/CMakeLists.txt b/tools/clang/tools/dxildll/CMakeLists.txt
+--- a/tools/clang/tools/dxildll/CMakeLists.txt
++++ b/tools/clang/tools/dxildll/CMakeLists.txt
+@@ -43,7 +43,6 @@
+ add_clang_library(dxildll SHARED ${sources})
+ list(APPEND DXCLibs
+   kernel32.lib
+-  atls.lib
+   advapi32.lib
+   ole32.lib)
+ else()
+diff --git a/tools/clang/tools/CMakeLists.txt b/tools/clang/tools/CMakeLists.txt
+--- a/tools/clang/tools/CMakeLists.txt
++++ b/tools/clang/tools/CMakeLists.txt
+@@ -11,7 +11,9 @@
+ endif()
+ 
+ if(CLANG_ENABLE_STATIC_ANALYZER)
+-  add_subdirectory(clang-check)
++  if(NOT ADECC_BCC64X_NATIVE_X64)
++    add_subdirectory(clang-check)
++  endif()
+ endif()
+ 
+ # We support checking out the clang-tools-extra repository into the 'extra'
