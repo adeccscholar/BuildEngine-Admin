@@ -18298,7 +18298,7 @@
          <argument value="-DWINMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-23T00:22:00Z">
+   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-25T15:45:00Z">
       <dependency library="winmd" version="0f1eae3b"/>
       <metadata artifactType="tool" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
@@ -18310,23 +18310,7 @@
             <require path="prebuild\main.cpp"/>
             <require path="LICENSE"/>
          </extract>
-         <copy source="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\sdk-winrt-includes.patch" target="{Workspace}\.buildengine\patches\sdk-winrt-includes.patch" overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="apply-sdk-winrt-includes" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
-            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
-            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\sdk-winrt-includes.patch"/>
-            <argument value="-P"/>
-            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
-         </execute>
-         <copy source="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\fix-winstring-sdk-location.patch"
-            target="{Workspace}\.buildengine\patches\fix-winstring-sdk-location.patch" overwrite="true" preserveCurrentArtifact="true"/>
-         <execute name="apply-winstring-sdk-location" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
-            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
-            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
-            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\fix-winstring-sdk-location.patch"/>
-            <argument value="-P"/>
-            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
-         </execute>
+         <!-- BCC64X uses Embarcadero Windows headers; never inject Windows Kits um/shared/winrt. -->
          <copy source="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\bcc64x-catch2-clang-isnan.patch"
             target="{Workspace}\.buildengine\patches\bcc64x-catch2-clang-isnan.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="apply-catch2-clang-isnan" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
@@ -18366,7 +18350,6 @@
       <build testsAffectBuild="true">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
