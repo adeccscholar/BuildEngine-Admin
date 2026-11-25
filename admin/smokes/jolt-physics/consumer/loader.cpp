@@ -20,7 +20,7 @@ namespace {
          FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
          FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, uCode, 0,
          reinterpret_cast<LPSTR>(&szMessage), 0, nullptr);
-      std::fprintf(stderr, "SMOKE|INFO|loader|%s: Win32=%lu (0x%08lX): %.*s\n",
+      std::fprintf(stderr, "DIAG|loader|%s: Win32=%lu (0x%08lX): %.*s\n",
          szOperation, static_cast<unsigned long>(uCode),
          static_cast<unsigned long>(uCode),
          static_cast<int>(uLength), szMessage ? szMessage : "");
@@ -50,7 +50,7 @@ namespace {
    void ShowImports(std::filesystem::path const& aPath) {
       FILE* pFile = nullptr;
       if(_wfopen_s(&pFile, aPath.c_str(), L"rb") != 0 || !pFile) {
-         std::fprintf(stderr, "SMOKE|INFO|imports|Cannot inspect Jolt DLL\n");
+         std::fprintf(stderr, "DIAG|imports|Cannot inspect Jolt DLL\n");
          return;
       }
       if(_fseeki64(pFile, 0, SEEK_END) != 0) {
@@ -97,14 +97,14 @@ namespace {
             static_cast<std::size_t>(reinterpret_cast<BYTE const*>(szName) - pBase);
          std::size_t const uLength = strnlen_s(szName, uMax);
          if(uLength == uMax || uLength >= 260) continue;
-         std::fprintf(stderr, "SMOKE|INFO|import|%.*s\n",
+         std::fprintf(stderr, "DIAG|import|%.*s\n",
             static_cast<int>(uLength), szName);
          // Diagnose each direct import only after the primary LoadLibrary failed.
          if(HMODULE const hModule = LoadLibraryA(szName)) {
             std::array<char, 32768> arrResolved {};
             DWORD const uChars = GetModuleFileNameA(hModule,
                arrResolved.data(), static_cast<DWORD>(arrResolved.size()));
-            std::fprintf(stderr, "SMOKE|INFO|import-resolved|%.*s => %.*s\n",
+            std::fprintf(stderr, "DIAG|import-resolved|%.*s => %.*s\n",
                static_cast<int>(uLength), szName, static_cast<int>(uChars),
                arrResolved.data());
             FreeLibrary(hModule);
@@ -121,32 +121,31 @@ int main() {
    DWORD const uLength = GetEnvironmentVariableW(L"JOLT_SMOKE_DLL_DIR",
       arrDirectory.data(), static_cast<DWORD>(arrDirectory.size()));
    if(uLength == 0 || uLength >= arrDirectory.size()) {
-      std::fputs("SMOKE|CHECK|jolt-loader|FAIL|JOLT_SMOKE_DLL_DIR missing\n", stderr);
-      std::fputs("SMOKE|RESULT|FAIL|Jolt runtime environment\n", stderr);
+      std::puts("SMOKE|CHECK|jolt-loader|FAIL|JOLT_SMOKE_DLL_DIR missing");
+      std::puts("SMOKE|RESULT|FAIL|Jolt runtime environment");
       return 1;
    }
    std::filesystem::path const aDll =
       std::filesystem::path(arrDirectory.data()) / L"libJolt.dll";
-   std::fprintf(stderr, "SMOKE|INFO|jolt-dll|%ls\n", aDll.c_str());
+   std::fprintf(stderr, "DIAG|jolt-dll|%ls\n", aDll.c_str());
    if(!std::filesystem::exists(aDll)) {
-      std::fputs("SMOKE|CHECK|jolt-loader|FAIL|Expected DLL not found\n", stderr);
-      std::fputs("SMOKE|RESULT|FAIL|Jolt DLL missing\n", stderr);
+      std::puts("SMOKE|CHECK|jolt-loader|FAIL|Expected DLL not found");
+      std::puts("SMOKE|RESULT|FAIL|Jolt DLL missing");
       return 1;
    }
    HMODULE const hJolt = LoadLibraryW(aDll.c_str());
    if(!hJolt) {
       PrintWindowsError("LoadLibraryW(libJolt.dll)", GetLastError());
       ShowImports(aDll);
-      std::fputs("SMOKE|CHECK|jolt-loader|FAIL|DLL loading or initialization\n", stderr);
-      std::fputs("SMOKE|RESULT|FAIL|Jolt DLL loader\n", stderr);
+      std::puts("SMOKE|CHECK|jolt-loader|FAIL|DLL loading or initialization");
+      std::puts("SMOKE|RESULT|FAIL|Jolt DLL loader");
       return 1;
    }
    std::array<wchar_t, 32768> arrLoadedPath {};
    DWORD const uLoadedChars = GetModuleFileNameW(hJolt, arrLoadedPath.data(),
       static_cast<DWORD>(arrLoadedPath.size()));
    if(uLoadedChars > 0 && uLoadedChars < arrLoadedPath.size())
-      std::fprintf(stderr, "SMOKE|INFO|jolt-loaded|%ls\n", arrLoadedPath.data());
-   std::puts("SMOKE|CHECK|jolt-loader|PASS|Installed Jolt DLL initialized");
+      std::fprintf(stderr, "DIAG|jolt-loaded|%ls\n", arrLoadedPath.data());
    FreeLibrary(hJolt);
    std::array<wchar_t, 32768> arrExecutable {};
    DWORD const uExeLength = GetModuleFileNameW(nullptr, arrExecutable.data(),
@@ -163,10 +162,13 @@ int main() {
    STARTUPINFOW aStartup {};
    aStartup.cb = sizeof(aStartup);
    PROCESS_INFORMATION aProcess {};
+   // Emit our CHECK before forwarding the child CHECKs and final RESULT.
+   std::puts("SMOKE|CHECK|jolt-loader|PASS|Installed Jolt DLL initialized");
+   std::fflush(stdout);
    if(!CreateProcessW(aConsumer.c_str(), vecCommand.data(), nullptr, nullptr,
       TRUE, 0, nullptr, nullptr, &aStartup, &aProcess)) {
       PrintWindowsError("CreateProcessW(jolt-consumer-real.exe)", GetLastError());
-      std::fputs("SMOKE|RESULT|FAIL|Jolt consumer process startup\n", stderr);
+      std::puts("SMOKE|RESULT|FAIL|Jolt consumer process startup");
       return 1;
    }
    WaitForSingleObject(aProcess.hProcess, INFINITE);
@@ -175,7 +177,7 @@ int main() {
    CloseHandle(aProcess.hThread);
    CloseHandle(aProcess.hProcess);
    if(uExit != 0)
-      std::fprintf(stderr, "SMOKE|INFO|child-exit|0x%08lX\n",
+      std::fprintf(stderr, "DIAG|child-exit|0x%08lX\n",
          static_cast<unsigned long>(uExit));
    return static_cast<int>(uExit);
 }
