@@ -110,11 +110,12 @@ if(_CB_RC_ACTIVE_NAME STREQUAL "rc.exe")
       "${_CB_RC_INCLUDE_ROOT}/shared"
       "${_CB_RC_INCLUDE_ROOT}/ucrt"
       CACHE STRING "Selected Windows SDK RC standard include directories" FORCE)
-   # RC flags are cached across reconfiguration; restore all three include
-   # directories for an actual SDK rc.exe, even with an existing CMake cache.
-   set(CMAKE_RC_FLAGS_INIT "/I\\\"${_CB_RC_INCLUDE_ROOT}/um\\\" /I\\\"${_CB_RC_INCLUDE_ROOT}/shared\\\" /I\\\"${_CB_RC_INCLUDE_ROOT}/ucrt\\\"")
-   set(CMAKE_RC_FLAGS "${CMAKE_RC_FLAGS_INIT}"
-      CACHE STRING "Selected Windows SDK RC include arguments" FORCE)
+   # CMake emits the SDK include paths from its language-specific standard
+   # include directories. Do not embed escaped quotes in CMAKE_RC_FLAGS.
+   # Clear the malformed cached command-line arguments from the prior revision.
+   set(CMAKE_RC_FLAGS_INIT "")
+   set(CMAKE_RC_FLAGS "" CACHE STRING
+      "SDK RC flags; standard include directories are emitted by CMake" FORCE)
 endif()
 unset(_CB_RC_ACTIVE_NAME)
 unset(_CB_RC_KIND)
