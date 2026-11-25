@@ -308,3 +308,8 @@ a successful refresh with unchanged values updates the CVE's
 `last_checked_at` without making a new rating revision. CVE narrative
 text remains current-state information, while `version_cve` holds
 package-specific evidence and last-seen timestamps.
+
+
+## PostgreSQL Update_3 (25 November 2026)
+
+Existing installations must apply `admin/Update_3.sql` after `Update_2.sql` as the schema owner (`buildengine_user`). This refreshes five affected PostgreSQL views with explicitly qualified `ON` joins. Fresh databases use the latest `admin/BuildEngine.sql` instead. Both migration and baseline are mirrored into BuildEngine-Server. Merely synchronizing the SQL files does not execute the database upgrade. SQL reader aggregate column aliases and the HTML/JSON HTTP error handling are implemented in BuildEngine-Common, not in the schema migration. Native BCC64X/live PostgreSQL deployment: **[not verified]**.
