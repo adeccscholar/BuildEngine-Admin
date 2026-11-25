@@ -1,20 +1,52 @@
 cmake_minimum_required(VERSION 3.25)
 project(BuildEngineSmokeAceTao LANGUAGES CXX)
 
-find_path(ACE_TAO_INCLUDE_DIR NAMES ace/ACE.h REQUIRED)
-if(NOT EXISTS "${ACE_TAO_INCLUDE_DIR}/tao/corba.h")
-   message(FATAL_ERROR "TAO public headers are missing below ${ACE_TAO_INCLUDE_DIR}")
+# The ACE/TAO versions share a physical extension package. Resolve every
+# build input inside that exact package, never through the machine PATH,
+# system registry, other installed ACE/TAO versions, or previous CMake caches.
+if(NOT DEFINED ACE_TAO_PACKAGE_ROOT OR NOT IS_DIRECTORY "${ACE_TAO_PACKAGE_ROOT}")
+   message(FATAL_ERROR "ACE_TAO_PACKAGE_ROOT must select the installed ACE/TAO package")
 endif()
-if(NOT EXISTS "${ACE_TAO_INCLUDE_DIR}/orbsvcs/CosNamingC.h")
-   message(FATAL_ERROR "TAO CosNaming public headers are missing below ${ACE_TAO_INCLUDE_DIR}")
-endif()
-
-find_library(ACE_LIBRARY NAMES ACE_br ACE REQUIRED)
-find_library(TAO_LIBRARY NAMES TAO_br TAO REQUIRED)
-find_library(TAO_ANYTYPECODE_LIBRARY NAMES TAO_AnyTypeCode_br TAO_AnyTypeCode REQUIRED)
-find_library(TAO_PORTABLESERVER_LIBRARY NAMES TAO_PortableServer_br TAO_PortableServer REQUIRED)
-find_library(TAO_COSNAMING_LIBRARY NAMES TAO_CosNaming_br TAO_CosNaming REQUIRED)
-find_program(TAO_IDL_EXECUTABLE NAMES tao_idl.exe tao_idl REQUIRED)
+get_filename_component(ACE_TAO_PACKAGE_ROOT "${ACE_TAO_PACKAGE_ROOT}" REALPATH)
+set(_ace_tao_include "${ACE_TAO_PACKAGE_ROOT}/include")
+set(_ace_tao_lib "${ACE_TAO_PACKAGE_ROOT}/lib/win64/Release")
+set(_ace_tao_tool "${ACE_TAO_PACKAGE_ROOT}/tools/bin/win64/Release")
+set(_ace_tao_service "${ACE_TAO_PACKAGE_ROOT}/services/bin/win64/Release/tao_cosnaming.exe")
+foreach(_ace_tao_required
+   "${_ace_tao_include}/ace/ACE.h"
+   "${_ace_tao_include}/tao/corba.h"
+   "${_ace_tao_include}/orbsvcs/CosNamingC.h"
+   "${_ace_tao_service}")
+   if(NOT EXISTS "${_ace_tao_required}")
+      message(FATAL_ERROR "ACE/TAO package file missing: ${_ace_tao_required}")
+   endif()
+endforeach()
+set(ACE_TAO_INCLUDE_DIR "${_ace_tao_include}")
+foreach(_ace_tao_variable
+   ACE_LIBRARY TAO_LIBRARY TAO_ANYTYPECODE_LIBRARY
+   TAO_PORTABLESERVER_LIBRARY TAO_COSNAMING_LIBRARY TAO_IDL_EXECUTABLE)
+   unset(${_ace_tao_variable} CACHE)
+endforeach()
+find_library(ACE_LIBRARY NAMES ACE_br ACE
+   PATHS "${_ace_tao_lib}" NO_DEFAULT_PATH REQUIRED)
+find_library(TAO_LIBRARY NAMES TAO_br TAO
+   PATHS "${_ace_tao_lib}" NO_DEFAULT_PATH REQUIRED)
+find_library(TAO_ANYTYPECODE_LIBRARY NAMES TAO_AnyTypeCode_br TAO_AnyTypeCode
+   PATHS "${_ace_tao_lib}" NO_DEFAULT_PATH REQUIRED)
+find_library(TAO_PORTABLESERVER_LIBRARY NAMES TAO_PortableServer_br TAO_PortableServer
+   PATHS "${_ace_tao_lib}" NO_DEFAULT_PATH REQUIRED)
+find_library(TAO_COSNAMING_LIBRARY NAMES TAO_CosNaming_br TAO_CosNaming
+   PATHS "${_ace_tao_lib}" NO_DEFAULT_PATH REQUIRED)
+find_program(TAO_IDL_EXECUTABLE NAMES tao_idl.exe
+   PATHS "${_ace_tao_tool}" NO_DEFAULT_PATH REQUIRED)
+message(STATUS "ACE/TAO package: ${ACE_TAO_PACKAGE_ROOT}")
+message(STATUS "ACE/TAO IDL tool: ${TAO_IDL_EXECUTABLE}")
+message(STATUS "ACE/TAO naming service: ${_ace_tao_service}")
+foreach(_ace_tao_library
+   ACE_LIBRARY TAO_LIBRARY TAO_ANYTYPECODE_LIBRARY
+   TAO_PORTABLESERVER_LIBRARY TAO_COSNAMING_LIBRARY)
+   message(STATUS "ACE/TAO import: ${${_ace_tao_library}}")
+endforeach()
 
 set(TAO_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")
 file(MAKE_DIRECTORY "${TAO_GENERATED_DIR}")
