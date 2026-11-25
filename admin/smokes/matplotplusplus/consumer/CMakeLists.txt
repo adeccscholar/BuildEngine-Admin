@@ -18,15 +18,19 @@ find_library(MATPLOT_IMPORT
       "${MATPLOT_PACKAGE_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}"
    NO_DEFAULT_PATH REQUIRED)
 
-# nodesoup is installed as a separate static archive in the Matplot++ package.
-# It must follow matplot on the linker command line to resolve its symbols.
+# Some upstream builds install a separate nodesoup archive; other shared
+# builds embed it in the Matplot++ DLL. Do not require an independently
+# published archive when the managed package does not contain one.
 find_library(MATPLOT_NODESOUP
    NAMES nodesoup libnodesoup
    PATHS
       "${MATPLOT_PACKAGE_ROOT}/lib/Matplot++"
       "${MATPLOT_PACKAGE_ROOT}/lib"
-   NO_DEFAULT_PATH REQUIRED)
+      "${MATPLOT_PACKAGE_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}"
+      "${MATPLOT_PACKAGE_ROOT}/lib/win64/${CMAKE_BUILD_TYPE}/Matplot++"
+   NO_DEFAULT_PATH)
 
-target_link_libraries(matplotplusplus-consumer PRIVATE
-   "${MATPLOT_IMPORT}"
-   "${MATPLOT_NODESOUP}")
+target_link_libraries(matplotplusplus-consumer PRIVATE "${MATPLOT_IMPORT}")
+if(MATPLOT_NODESOUP)
+   target_link_libraries(matplotplusplus-consumer PRIVATE "${MATPLOT_NODESOUP}")
+endif()
