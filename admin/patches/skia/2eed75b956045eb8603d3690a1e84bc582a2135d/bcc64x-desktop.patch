@@ -1,16 +1,16 @@
 diff --git a/gn/BUILDCONFIG.gn b/gn/BUILDCONFIG.gn
 --- a/gn/BUILDCONFIG.gn
 +++ b/gn/BUILDCONFIG.gn
-@@ -192,6 +192,9 @@ template("component") {
- 
- declare_args() {
+@@ -28,6 +28,9 @@
+   win_vc = ""
    skia_use_bcc64x = false
 +  bcc64x_opengl_lib = ""
 +  bcc64x_zlib_include = ""
 +  bcc64x_zlib_lib = ""
- }
+   win_toolchain_version = ""
  
- # Default configs
+   clang_win = ""
+   clang_win_version = ""
 diff --git a/BUILD.gn b/BUILD.gn
 --- a/BUILD.gn
 +++ b/BUILD.gn
