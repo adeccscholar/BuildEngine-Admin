@@ -22,7 +22,7 @@
 +    set(ADECC_CPPWINRT_WINRT_SDK_INCLUDE "${ADECC_CPPWINRT_IDL_ROOT}/winrt")
 +    set(ADECC_CPPWINRT_MIDL_SHARED_INCLUDE "${ADECC_CPPWINRT_IDL_ROOT}/shared")
 +    set(ADECC_CPPWINRT_MIDL_UM_INCLUDE "${ADECC_CPPWINRT_IDL_ROOT}/um")
-++    set(_adecc_test_component_dir "${CMAKE_CURRENT_BINARY_DIR}/test_component")
++    set(_adecc_test_component_dir "${CMAKE_CURRENT_BINARY_DIR}/test_component")
 +    set(_adecc_test_component_winmd "${_adecc_test_component_dir}/test_component.winmd")
 +    # MIDLRT is a Windows-native tool; its /winmd and /out output parameters
 +    # must not be supplied as CMake forward-slash paths.
