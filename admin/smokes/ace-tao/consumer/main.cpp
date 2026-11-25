@@ -66,10 +66,17 @@ public:
 }
 
 [[nodiscard]] std::wstring FindNamingService() {
+   // The selected versioned extension package owns the service executable.
+   // Never resolve it through PATH, which may contain another TAO version.
    std::array<wchar_t, 32768> arrPath {};
-   DWORD const uLength = ::SearchPathW(nullptr, L"tao_cosnaming.exe", nullptr,
-                                       static_cast<DWORD>(arrPath.size()), arrPath.data(), nullptr);
+   DWORD const uLength = ::GetEnvironmentVariableW(
+      L"ACE_TAO_NAMING_SERVICE", arrPath.data(),
+      static_cast<DWORD>(arrPath.size()));
    if(uLength == 0U || uLength >= arrPath.size()) return {};
+   DWORD const uAttributes = ::GetFileAttributesW(arrPath.data());
+   if(uAttributes == INVALID_FILE_ATTRIBUTES ||
+      (uAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0U)
+      return {};
    return std::wstring { arrPath.data(), uLength };
 }
 
