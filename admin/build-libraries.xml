@@ -16571,7 +16571,7 @@
          <argument value="-DRECAST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="jolt-physics" version="5.7.0" category="graphics" timestamp="2026-11-25T15:10:00Z">
+   <library id="jolt-physics" version="5.7.0" category="graphics" timestamp="2026-11-25T22:20:00Z">
       <metadata name="Jolt Physics" supplier="Jorrit Rouwe and contributors" homepage="https://github.com/jrouwe/JoltPhysics" description="Jolt CPU physics engine built as native BCC64X shared library with optional backends and samples disabled." artifactType="shared" licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="licenses\jolt-physics\LICENSE"/>
       </metadata>
@@ -16636,9 +16636,7 @@
       <smoke id="consumer" scope="package" source="smokes\jolt-physics\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="jolt-consumer.exe">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
-         <!-- Resolve the packaged Jolt DLL before any host-installed same-name DLL. -->
-         <environment name="JOLT_SMOKE_DLL_DIR" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release"/>
-         <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{ToolDir:bcc64x};{ENV:PATH}"/>
+         <!-- Stage exact Jolt package DLLs and BCC64X runtime beside the smoke executables. -->
          <argument value="-DJOLT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
