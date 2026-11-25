@@ -5,6 +5,8 @@
 #include <winnt.h>
 
 #include <array>
+#include <cstdint>
+#include <cstring>
 #include <cstdio>
 #include <filesystem>
 #include <string>
