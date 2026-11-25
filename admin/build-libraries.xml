@@ -9173,7 +9173,7 @@
          <environment name="PATH" value="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release;{DependencyRoot:libjpeg-turbo}\bin\win64\Release;{DependencyRoot:libjxl}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{DependencyRoot:xmp-toolkit}\bin\win64\Release;{DependencyRoot:expat}\bin\win64\Release;{ENV:PATH}"/>
       </smoke>
    </library>
-   <library id="skia" version="153" category="graphics" timestamp="2026-11-25T00:42:23Z">
+   <library id="skia" version="153" category="graphics" timestamp="2026-11-25T00:42:34Z">
       <dependency library="opengl" version="26.2.1"/>
       <dependency library="zlib" version="1.4"/>
       <dependency library="brotli" version="1.2.1"/>
@@ -10049,6 +10049,9 @@
 
                <!-- BCC64X target toolchain. -->
                <line value="skia_use_bcc64x = true"/>
+               <line value="cc = getenv(&quot;CB_BCC64X&quot;)"/>
+               <line value="cxx = getenv(&quot;CB_BCC64X&quot;)"/>
+               <line value="ar = getenv(&quot;CB_LLVM_AR&quot;)"/>
 
                <line value="target_cpu = &quot;x64&quot;"/>
                <line value="target_cc = &quot;bcc64x&quot;"/>
