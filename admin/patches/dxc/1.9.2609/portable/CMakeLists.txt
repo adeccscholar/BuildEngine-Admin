@@ -15,6 +15,7 @@ function(adecc_add_dxc_shader_test name mode shader profile entry)
   add_test(NAME "DXC.Behavior.${name}"
     COMMAND "${CMAKE_COMMAND}"
       "-DDXC_EXE=$<TARGET_FILE:dxc>"
+      "-DDXC_DLL=$<TARGET_FILE:dxcompiler>"
       "-DSHADER=${CMAKE_CURRENT_SOURCE_DIR}/${shader}"
       "-DOUTPUT=${CMAKE_CURRENT_BINARY_DIR}/${name}.bin"
       "-DMODE=${mode}"
