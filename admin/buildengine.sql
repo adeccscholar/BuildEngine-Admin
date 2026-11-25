@@ -506,7 +506,7 @@ SELECT l.library_id,l.library_code,l.name,l.description AS library_description,
        v.original_contract_timestamp,v.current_contract_timestamp,
        v.created_at AS version_created_at,v.modified_at AS version_modified_at
 FROM buildengine.library AS l
-JOIN buildengine.library_version AS v USING(library_id)
+JOIN buildengine.library_version AS v ON v.library_id=l.library_id
 JOIN buildengine.dom_category AS cat ON cat.category_id=l.category_id
 JOIN buildengine.dom_license_signal AS sig
    ON sig.license_signal_id=COALESCE(v.license_signal_id,l.license_signal_id)
@@ -525,7 +525,7 @@ SELECT v.library_id,v.version_no,v.version_text,
        sec.checked_at AS security_checked_at,sec.diagnostic_summary AS security_diagnostic
 FROM buildengine.library_version AS v
 LEFT JOIN buildengine.version_security_status AS sec
-   USING(library_id,version_no)
+   ON sec.library_id=v.library_id AND sec.version_no=v.version_no
 LEFT JOIN buildengine.dom_security_query_status AS ss
    ON ss.status_id=sec.status_id;
 
@@ -558,13 +558,13 @@ SELECT sc.library_id,sc.version_no,sc.state_id,d.state_code,
             THEN MAX(sc.completed_at) ELSE NULL END AS completed_at,
        MAX(sc.checked_at) AS last_checked_at
 FROM buildengine.library_scope_state AS sc
-JOIN buildengine.dom_library_state AS d USING(state_id)
+JOIN buildengine.dom_library_state AS d ON d.state_id=sc.state_id
 GROUP BY sc.library_id,sc.version_no,sc.state_id,d.state_code;
 
 CREATE VIEW buildengine.v_catalog_sync_history AS
 SELECT s.*,d.status_code,d.description AS status_description
 FROM buildengine.catalog_sync AS s
-JOIN buildengine.dom_catalog_sync_status AS d USING(status_id);
+JOIN buildengine.dom_catalog_sync_status AS d ON d.status_id=s.status_id;
 
 CREATE VIEW buildengine.v_catalog_sync_latest AS
 SELECT * FROM buildengine.v_catalog_sync_history
@@ -579,7 +579,7 @@ CREATE VIEW buildengine.v_cve_max_severity AS
 SELECT c.cve_id,c.cve_code,MAX(r.cvss_score) AS max_cvss,
        MAX(r.epss_score) AS max_epss
 FROM buildengine.cve AS c
-LEFT JOIN buildengine.cve_rating AS r USING(cve_id)
+LEFT JOIN buildengine.cve_rating AS r ON r.cve_id=c.cve_id
 GROUP BY c.cve_id,c.cve_code;
 
 CREATE VIEW buildengine.v_cve_rating_current AS
@@ -725,7 +725,7 @@ SELECT v.library_id,v.version_no,v.version_text,
        sec.checked_at AS security_checked_at,sec.diagnostic_summary AS security_diagnostic
 FROM buildengine.library_version AS v
 LEFT JOIN buildengine.version_security_status AS sec
-   USING(library_id,version_no)
+   ON sec.library_id=v.library_id AND sec.version_no=v.version_no
 LEFT JOIN buildengine.dom_security_query_status AS ss
    ON ss.status_id=sec.status_id;
 
@@ -738,7 +738,7 @@ SELECT sc.library_id,sc.version_no,sc.state_id,d.state_code,
             THEN MAX(sc.completed_at) ELSE NULL END AS completed_at,
        MAX(sc.checked_at) AS last_checked_at
 FROM buildengine.library_scope_state AS sc
-JOIN buildengine.dom_library_state AS d USING(state_id)
+JOIN buildengine.dom_library_state AS d ON d.state_id=sc.state_id
 GROUP BY sc.library_id,sc.version_no,sc.state_id,d.state_code;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA buildengine TO buildengine_reader;
@@ -839,7 +839,7 @@ BEGIN
       END IF;
       SELECT l.library_id,v.version_no INTO i_library,i_version
       FROM buildengine.library AS l
-      JOIN buildengine.library_version AS v USING(library_id)
+      JOIN buildengine.library_version AS v ON v.library_id=l.library_id
       WHERE l.library_code=the_record.library_code
         AND v.version_text=the_record.version_text;
       IF i_library IS NULL THEN
