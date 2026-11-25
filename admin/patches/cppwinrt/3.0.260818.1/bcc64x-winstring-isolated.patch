@@ -1,0 +1,26 @@
+--- a/test/test_cpp20_no_sourcelocation/CMakeLists.txt
++++ b/test/test_cpp20_no_sourcelocation/CMakeLists.txt
+@@ -34,6 +34,23 @@
+ 
+ target_compile_definitions(test_cpp20_no_sourcelocation PRIVATE WINRT_NO_SOURCE_LOCATION)
+ 
++# Stage only winstring.h from the SDK version of the registered MIDLRT.
++# Do not expose Windows Kits um/shared/winrt headers to BCC64X or other targets.
++if(WIN32 AND NOT STANDALONE_TESTING)
++    if(NOT DEFINED ADECC_CPPWINRT_IDL_ROOT OR
++       NOT EXISTS "${ADECC_CPPWINRT_IDL_ROOT}/winrt/winstring.h")
++        message(FATAL_ERROR
++            "C++/WinRT test requires winrt/winstring.h from the registered MIDLRT SDK: ${ADECC_CPPWINRT_IDL_ROOT}")
++    endif()
++    set(_adecc_winstring_include "${CMAKE_CURRENT_BINARY_DIR}/adecc-winstring")
++    file(MAKE_DIRECTORY "${_adecc_winstring_include}")
++    configure_file("${ADECC_CPPWINRT_IDL_ROOT}/winrt/winstring.h"
++        "${_adecc_winstring_include}/winstring.h" COPYONLY)
++    target_include_directories(test_cpp20_no_sourcelocation BEFORE PRIVATE
++        "${_adecc_winstring_include}")
++    message(STATUS "C++/WinRT isolated winstring.h: ${ADECC_CPPWINRT_IDL_ROOT}/winrt/winstring.h")
++endif()
++
+ target_precompile_headers(test_cpp20_no_sourcelocation PRIVATE pch.h)
+ set_source_files_properties(
+     main.cpp
