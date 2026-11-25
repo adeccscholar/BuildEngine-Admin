@@ -1,6 +1,6 @@
 --- a/test/CMakeLists.txt
 +++ b/test/CMakeLists.txt
-@@ -84,7 +84,73 @@
+@@ -84,7 +84,82 @@
              "${CMAKE_CURRENT_BINARY_DIR}/cppwinrt/winrt/base.h"
      )
  endif()
@@ -13,8 +13,16 @@
 +       NOT EXISTS "${ADECC_CPPWINRT_MIDLRT}")
 +        message(FATAL_ERROR "C++/WinRT tests require explicitly provisioned ADECC_CPPWINRT_MIDLRT")
 +    endif()
-+    if(NOT DEFINED ADECC_CPPWINRT_IDL_ROOT OR
-+       NOT IS_DIRECTORY "${ADECC_CPPWINRT_IDL_ROOT}/winrt" OR
++    # Match IDL inputs to the exact selected MIDLRT SDK version.
++    if(NOT DEFINED ADECC_CPPWINRT_IDL_ROOT)
++        get_filename_component(_adecc_midlrt_bin "${ADECC_CPPWINRT_MIDLRT}" DIRECTORY)
++        get_filename_component(_adecc_midlrt_version_dir "${_adecc_midlrt_bin}" DIRECTORY)
++        get_filename_component(_adecc_midlrt_version "${_adecc_midlrt_version_dir}" NAME)
++        get_filename_component(_adecc_midlrt_bin_root "${_adecc_midlrt_version_dir}" DIRECTORY)
++        get_filename_component(_adecc_midlrt_sdk_root "${_adecc_midlrt_bin_root}" DIRECTORY)
++        set(ADECC_CPPWINRT_IDL_ROOT "${_adecc_midlrt_sdk_root}/Include/${_adecc_midlrt_version}")
++    endif()
++    if(NOT IS_DIRECTORY "${ADECC_CPPWINRT_IDL_ROOT}/winrt" OR
 +       NOT IS_DIRECTORY "${ADECC_CPPWINRT_IDL_ROOT}/shared" OR
 +       NOT IS_DIRECTORY "${ADECC_CPPWINRT_IDL_ROOT}/um")
 +        message(FATAL_ERROR "C++/WinRT tests require explicitly provisioned ADECC_CPPWINRT_IDL_ROOT with winrt/shared/um")
