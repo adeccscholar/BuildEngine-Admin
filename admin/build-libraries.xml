@@ -4324,7 +4324,7 @@
    
 </library>
 
-<library id="tao" version="4.0.6" supersededBy="4.0.8" category="middleware" timestamp="2026-11-07T17:24:00Z">
+<library id="tao" version="4.0.6" supersededBy="4.0.8" category="middleware" timestamp="2026-11-25T14:30:00Z">
    <extension library="ace" version="8.0.6" source="TAO" producer="ACE_wrappers" install=".">
       <shared path="bin"/>
       <shared path="lib"/>
@@ -4459,11 +4459,14 @@
    <smoke id="consumer" source="smokes\ace-tao\consumer" configuration="Release" scope="package" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="ace-tao-consumer.exe">
       <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
       <environment name="CB_BDS" value="{BDS}"/>
-      <environment name="PATH" value="{ExtensionInstallRoot}\tools\bin\win64\Release;{ExtensionInstallRoot}\services\bin\win64\Release;{ExtensionInstallRoot}\bin\win64\Release;{ENV:PATH}"/>
+      <!-- Isolate this version's ACE/TAO DLLs and tools from globally installed versions. -->
+      <environment name="ACE_TAO_NAMING_SERVICE" value="{ExtensionInstallRoot}\services\bin\win64\Release\tao_cosnaming.exe"/>
+      <environment name="PATH" value="{ExtensionInstallRoot}\bin\win64\Release;{ExtensionInstallRoot}\tools\bin\win64\Release;{ExtensionInstallRoot}\services\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{DependencyRoot:xerces-c}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{BDS}\bin64;{ENV:SystemRoot}\System32;{ENV:SystemRoot}"/>
+      <argument value="-DACE_TAO_PACKAGE_ROOT:PATH={ExtensionInstallRoot}"/>
    </smoke>
    
 </library>
-<library id="tao" version="4.0.8" category="middleware" timestamp="2026-11-08T15:43:00Z">
+<library id="tao" version="4.0.8" category="middleware" timestamp="2026-11-25T14:30:00Z">
    <extension library="ace" version="8.0.8" source="TAO" producer="ACE_wrappers" install=".">
       <shared path="bin"/>
       <shared path="lib"/>
@@ -4598,7 +4601,10 @@
    <smoke id="consumer" source="smokes\ace-tao\consumer" configuration="Release" scope="package" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="ace-tao-consumer.exe">
       <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
       <environment name="CB_BDS" value="{BDS}"/>
-      <environment name="PATH" value="{ExtensionInstallRoot}\tools\bin\win64\Release;{ExtensionInstallRoot}\services\bin\win64\Release;{ExtensionInstallRoot}\bin\win64\Release;{ENV:PATH}"/>
+      <!-- Isolate this version's ACE/TAO DLLs and tools from globally installed versions. -->
+      <environment name="ACE_TAO_NAMING_SERVICE" value="{ExtensionInstallRoot}\services\bin\win64\Release\tao_cosnaming.exe"/>
+      <environment name="PATH" value="{ExtensionInstallRoot}\bin\win64\Release;{ExtensionInstallRoot}\tools\bin\win64\Release;{ExtensionInstallRoot}\services\bin\win64\Release;{DependencyRoot:openssl}\bin\win64\Release;{DependencyRoot:xerces-c}\bin\win64\Release;{DependencyRoot:zlib}\bin\win64\Release;{BDS}\bin64;{ENV:SystemRoot}\System32;{ENV:SystemRoot}"/>
+      <argument value="-DACE_TAO_PACKAGE_ROOT:PATH={ExtensionInstallRoot}"/>
    </smoke>
    
 </library>
