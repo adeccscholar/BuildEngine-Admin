@@ -1,0 +1,25 @@
+diff --git a/tools/clang/tools/dxildll/CMakeLists.txt b/tools/clang/tools/dxildll/CMakeLists.txt
+--- a/tools/clang/tools/dxildll/CMakeLists.txt
++++ b/tools/clang/tools/dxildll/CMakeLists.txt
+@@ -42,9 +42,17 @@
+ if (WIN32)
+ add_clang_library(dxildll SHARED ${sources})
+-list(APPEND DXCLibs
+-  kernel32.lib
+-  atls.lib
+-  advapi32.lib
+-  ole32.lib)
++if(ADECC_BCC64X_NATIVE_X64)
++  # Native BCC64X uses the portable COM helpers; ATL is neither installed
++  # nor part of the required DXIL runtime dependencies.
++  list(APPEND DXCLibs kernel32 advapi32 ole32)
++else()
++  list(APPEND DXCLibs
++    kernel32.lib
++    atls.lib
++    advapi32.lib
++    ole32.lib)
++endif()
+ else()
+ add_clang_library(dxildll SHARED ${sources})
+ endif()
