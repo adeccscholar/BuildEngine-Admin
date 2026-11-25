@@ -1,7 +1,7 @@
 diff --git a/tools/clang/tools/dxildll/CMakeLists.txt b/tools/clang/tools/dxildll/CMakeLists.txt
 --- a/tools/clang/tools/dxildll/CMakeLists.txt
 +++ b/tools/clang/tools/dxildll/CMakeLists.txt
-@@ -42,9 +42,17 @@
+@@ -44,10 +44,16 @@
  if (WIN32)
  add_clang_library(dxildll SHARED ${sources})
 -list(APPEND DXCLibs
