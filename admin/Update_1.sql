@@ -120,7 +120,7 @@ SELECT v.library_id,v.version_no,v.version_text,
        sec.checked_at AS security_checked_at,sec.diagnostic_summary AS security_diagnostic
 FROM buildengine.library_version AS v
 LEFT JOIN buildengine.version_security_status AS sec
-   USING(library_id,version_no)
+   ON sec.library_id=v.library_id AND sec.version_no=v.version_no
 LEFT JOIN buildengine.dom_security_query_status AS ss
    ON ss.status_id=sec.status_id;
 
@@ -133,7 +133,7 @@ SELECT sc.library_id,sc.version_no,sc.state_id,d.state_code,
             THEN MAX(sc.completed_at) ELSE NULL END AS completed_at,
        MAX(sc.checked_at) AS last_checked_at
 FROM buildengine.library_scope_state AS sc
-JOIN buildengine.dom_library_state AS d USING(state_id)
+JOIN buildengine.dom_library_state AS d ON d.state_id=sc.state_id
 GROUP BY sc.library_id,sc.version_no,sc.state_id,d.state_code;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA buildengine TO buildengine_reader;
@@ -227,7 +227,7 @@ BEGIN
       SELECT l.library_id,v.version_no,v.current_contract_timestamp
       INTO i_library,i_version,the_current_contract_timestamp
       FROM buildengine.library l
-      JOIN buildengine.library_version v USING(library_id)
+      JOIN buildengine.library_version v ON v.library_id=l.library_id
       WHERE l.library_code=the_record.library_code
         AND v.version_text=the_record.version_text;
       IF i_library IS NULL THEN
