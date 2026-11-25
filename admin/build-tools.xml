@@ -250,6 +250,13 @@
       <discover executable="rc.exe" path="false"><candidate path="{ProgramFilesX86}\Windows Kits\10\bin\*\x64\rc.exe"/></discover>
    </tool>
 
+   <!-- WinRT IDL compiler is a separate SDK tool, not implied by rc.exe. -->
+   <tool id="windows-midlrt" version="Windows-SDK" required="when-used">
+      <discover executable="midlrt.exe" path="false">
+         <candidate path="{ProgramFilesX86}\Windows Kits\10\bin\*\x64\midlrt.exe"/>
+      </discover>
+   </tool>
+
    <tool id="nasm" version="3.02" required="always">
       <managed root="nasm\3.02" executable="nasm-3.02\nasm.exe"><download url="https://www.nasm.us/pub/nasm/releasebuilds/3.02/win64/nasm-3.02-win64.zip" archive="nasm-3.02-win64.zip" sha256="161d0bfaff53c2f9e9f3e69fd0672323ebabafd1268976a5cec11be92a19aee7"/></managed>
       <probe contains="NASM version 3.02"><argument value="-v"/></probe>
