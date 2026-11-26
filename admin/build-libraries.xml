@@ -18413,7 +18413,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-26T20:45:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-26T20:53:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18687,7 +18687,8 @@
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
          <!-- MC.EXE is the Windows SDK message compiler used by the original ETW generation. -->
-         <environment name="PATH" value="{ToolDir:windows-rc};{ENV:PATH}"/>
+         <!-- Resolve imported SPIRV-Tools and optimizer DLLs during native DXC tests. -->
+         <environment name="PATH" value="{DependencyRoot:spirv-tools}\bin\win64\{Configuration};{ToolDir:windows-rc};{ENV:PATH}"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -18770,10 +18771,12 @@
          <argument value="-DDXC_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-26T17:55:02Z">
+   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-26T20:53:01Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxc" version="1.9.2609"/>
+      <!-- The managed DXC executable loads Khronos SPIRV runtime DLLs. -->
+      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Tool Kit 12" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXTK12" description="Native Direct3D 12 rendering utilities, effects, shaders and input support, with managed DXC and DirectX dependencies." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXTK12.git" ref="may2026"/></security>
       <source>
@@ -18790,7 +18793,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
-         <environment name="PATH" value="{DependencyRoot:dxc}\bin;{DependencyRoot:dxc}\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PATH" value="{DependencyRoot:dxc}\bin;{DependencyRoot:dxc}\bin\win64\{Configuration};{DependencyRoot:spirv-tools}\bin\win64\{Configuration};{ENV:PATH}"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
