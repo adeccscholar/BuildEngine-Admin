@@ -18303,7 +18303,7 @@
          <argument value="-DWINMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-25T21:06:00Z">
+   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-26T17:55:00Z">
       <dependency library="winmd" version="0f1eae3b"/>
       <metadata artifactType="tool" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
@@ -18413,7 +18413,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-25T17:53:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-26T17:55:01Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18740,6 +18740,9 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
             </perVariant>
             <common>
+               <!-- The DXC public dxcapi.h includes WinAdapter.h. Install that header in the same API package. -->
+               <copy source="{Workspace}\include\dxc\WinAdapter.h" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\dxc\WinAdapter.h" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\dxc\WinAdapter.h"/>
                <copy source="{Workspace}\LICENSE.TXT" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT" overwrite="true"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"/>
             </common>
@@ -18761,7 +18764,7 @@
          <argument value="-DDXC_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-22T05:20:00Z">
+   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-26T17:55:02Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxc" version="1.9.2609"/>
@@ -18781,7 +18784,7 @@
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
          <environment name="CB_WINDOWS_RC" value="{Tool:windows-rc}"/>
-         <environment name="PATH" value="{DependencyRoot:dxc}\bin\win64\{Configuration};{ENV:PATH}"/>
+         <environment name="PATH" value="{DependencyRoot:dxc}\bin;{DependencyRoot:dxc}\bin\win64\{Configuration};{ENV:PATH}"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
@@ -18795,6 +18798,7 @@
          <argument value="-DBUILD_TESTING:BOOL=ON"/>
          <argument value="-DBUILD_SHARED_LIBS:BOOL=ON"/>
          <argument value="-DBUILD_DXIL_SHADERS:BOOL=ON"/>
+         <argument value="-DDIRECTX_DXC_TOOL:FILEPATH={DependencyRoot:dxc}\bin\dxc.exe"/>
          <argument value="-DBUILD_XAUDIO_WIN10:BOOL=ON"/>
          <argument value="-DBUILD_XINPUT:BOOL=ON"/>
          <argument value="-DBUILD_WGI:BOOL=ON"/>
