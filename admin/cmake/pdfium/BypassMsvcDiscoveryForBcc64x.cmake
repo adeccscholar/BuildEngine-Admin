@@ -21,13 +21,37 @@ file(READ "${_data_file}" _data)
 set(_data_marker "# BCC64X uses a native toolchain; Chromium MSVC environment discovery is irrelevant.")
 string(FIND "${_data}" "${_data_marker}" _data_existing)
 if(_data_existing EQUAL -1)
-   set(_data_open "declare_args() {")
-   set(_data_close "}\n\nif (current_cpu == \"x86\") {")
-   string(FIND "${_data}" "${_data_open}" _open_pos)
-   string(FIND "${_data}" "${_data_close}" _close_pos)
-   if(_open_pos EQUAL -1 OR _close_pos EQUAL -1 OR _close_pos LESS _open_pos)
-      message(FATAL_ERROR "Pinned Chromium GN toolchain-data contract changed")
+   # Only replace the top-level GN declare_args block containing MSVC setup.
+   # Locate its matching brace structurally rather than relying on whitespace
+   # around the following current_cpu branch.
+   string(FIND "${_data}" "declare_args() {" _data_begin)
+   string(FIND "${_data}" "setup_toolchain.py" _setup_pos)
+   if(_data_begin EQUAL -1 OR _setup_pos EQUAL -1)
+      message(FATAL_ERROR "Pinned Chromium GN toolchain declaration not recognized")
    endif()
+   string(LENGTH "${_data}" _data_size)
+   math(EXPR _scan "${_data_begin} + 14")
+   set(_depth 1)
+   set(_data_end -1)
+   while(_scan LESS _data_size)
+      string(SUBSTRING "${_data}" ${_scan} 1 _character)
+      if(_character STREQUAL "{")
+         math(EXPR _depth "${_depth} + 1")
+      elseif(_character STREQUAL "}")
+         math(EXPR _depth "${_depth} - 1")
+         if(_depth EQUAL 0)
+            set(_data_end ${_scan})
+            break()
+         endif()
+      endif()
+      math(EXPR _scan "${_scan} + 1")
+   endwhile()
+   if(_data_end EQUAL -1 OR _setup_pos GREATER _data_end)
+      message(FATAL_ERROR "Pinned Chromium GN toolchain declaration is incomplete")
+   endif()
+   string(SUBSTRING "${_data}" 0 ${_data_begin} _data_prefix)
+   math(EXPR _after "${_data_end} + 1")
+   string(SUBSTRING "${_data}" ${_after} -1 _data_suffix)
    set(_data_guard [=[
 if (defined(custom_toolchain) && custom_toolchain == "//build/toolchain/bcc64x:bcc64x") {
   # BCC64X uses a native toolchain; Chromium MSVC environment discovery is irrelevant.
@@ -48,10 +72,11 @@ if (defined(custom_toolchain) && custom_toolchain == "//build/toolchain/bcc64x:b
   win_toolchain_data_x64 = win_toolchain_data_x86
   win_toolchain_data_arm64 = win_toolchain_data_x86
 } else {
-declare_args() {
 ]=])
-   string(REPLACE "${_data_open}" "${_data_guard}" _data "${_data}")
-   string(REPLACE "${_data_close}" "}\n}\n\nif (current_cpu == \"x86\") {" _data "${_data}")
+   string(SUBSTRING "${_data}" ${_data_begin} ${_after} _unused)
+   math(EXPR _length "${_after} - ${_data_begin}")
+   string(SUBSTRING "${_data}" ${_data_begin} ${_length} _declarations)
+   set(_data "${_data_prefix}${_data_guard}${_declarations}\n}\n${_data_suffix}")
    file(WRITE "${_data_file}" "${_data}")
 else()
    string(FIND "${_data}" "win_toolchain_data_x64 = win_toolchain_data_x86" _guard_complete)
