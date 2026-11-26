@@ -24,6 +24,15 @@ if(iBegin EQUAL -1)
 endif()
 string(SUBSTRING "${strSource}" 0 ${iBegin} strPrefix)
 string(SUBSTRING "${strSource}" ${iBegin} -1 strTail)
+# A tolerated prior-workspace edit may change whitespace or nested source paths,
+# but the original source integration contract must still be recognizable.
+foreach(strExpected IN ITEMS "DXC_SPIRV_HEADERS_DIR" "DXC_SPIRV_TOOLS_DIR"
+      "SPIRV-Tools-static" "SPIRV_DEP_TARGETS")
+   string(FIND "${strTail}" "${strExpected}" iExpected)
+   if(iExpected EQUAL -1)
+      message(FATAL_ERROR "Unexpected DXC SPIRV source contract: missing ${strExpected}")
+   endif()
+endforeach()
 # In pinned DXC v1.9.2609 the SPIR-V dependency block is the last block.
 # Never discard unrelated trailing CMake content.
 string(REGEX MATCH "endif\\(\\)[ \t\r\n]*$" strEnd "${strTail}")
