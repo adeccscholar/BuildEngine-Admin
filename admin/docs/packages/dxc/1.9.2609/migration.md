@@ -32,13 +32,15 @@ The BuildEngine now passes `LLVM_TARGETS_TO_BUILD=` explicitly. The pinned `llvm
 
 **[not verified]**: successful configure/build, shader tests or SPIR-V runtime output.
 
-## Managed Khronos SPIR-V source integration
+## Managed Khronos SPIR-V shared-package integration (26 November 2026)
 
-The detailed CMake configure log reported that `external/SPIRV-Headers` did not contain a `CMakeLists.txt` (CMake `external/CMakeLists.txt:31`). DXC's original SPIR-V code generator calls `add_subdirectory` for both SPIRV-Headers and SPIRV-Tools and requires actual `SPIRV-Tools-static` and `SPIRV-Tools-opt` build targets. Merely passing installed include directories would not satisfy the original upstream contract.
+DXC v1.9.2609 originally builds SPIRV-Headers and SPIRV-Tools inside its own CMake tree and hardcodes the `SPIRV-Tools-static` and `SPIRV-Tools-opt` targets. That would duplicate the independent BuildEngine SPIR-V producer. The version-bound `bcc64x-system-spirv-imports.patch` replaces the nested `add_subdirectory` integration with the installed managed packages `spirv-headers/v1.202609.0` and `spirv-tools/2026.4`.
 
-The library now declares dependencies on managed `spirv-headers/v1.202609.0` and `spirv-tools/2026.4` and passes their versioned extracted source directories under `build/thirdparty-test`. A global `SPIRV-Headers_SOURCE_DIR` also permits the nested SPIRV-Tools CMake project to reuse the same headers. `SPIRV_TOOLS_BUILD_STATIC=ON` retains the upstream targets and `SPIRV_TOOLS_USE_MIMALLOC=OFF` avoids an unrelated undeclared allocator requirement. DXC's HLSL/DXIL/SPIR-V functionality and its original CTest suite remain enabled. The two Khronos libraries remain separately managed and versioned; DXC does not download uncontrolled copies.
+DXC receives `DXC_SPIRV_HEADERS_PACKAGE_ROOT` and `DXC_SPIRV_TOOLS_PACKAGE_ROOT` from dependency roots and requires the corresponding `SPIRV-Tools` and `SPIRV-Tools-opt` imported CMake targets. The patch validates that both are shared targets, that their selected Release/Debug DLL and import library exist, and that they resolve inside the selected package's configuration directories. CMake config discovery is restricted to package-local Windows and `lib/win64/{Configuration}/cmake` layouts; missing or mismatched artifacts fail configuration rather than enabling an upstream source fallback. The DXC build and DirectXTK12 shader compiler runtime PATH include the managed SPIRV-Tools DLL directory.
 
-The source-root path contract and the cross-version API compatibility still require native BCC64X Release/Debug evidence. **[not verified]**.
+The SPIRV-Tools producer additionally requires its main, hidden-visibility, and optimizer import libraries at install time, allowing missing optimizer artifacts to fail before DXC is scheduled. Its CMake export files and selected dynamic DLLs are validated again by the DXC import adapter.
+
+The patch's upstream removal hunk was checked against the pinned `v1.9.2609/external/CMakeLists.txt`; it matches the original 50-line block. A successful BCC64X Release/Debug configure, link, CTest and shader smoke is still **[not verified]** until the next complete run.
 
 ## Native Ninja TAEF discovery
 
