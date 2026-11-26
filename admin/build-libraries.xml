@@ -15606,7 +15606,7 @@
          <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
       </publish>
    </library>
-   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-24T23:04:06Z">
+   <library id="spirv-tools" version="2026.4" category="graphics" timestamp="2026-11-26T22:30:00Z">
       <dependency library="spirv-headers" version="v1.202609.0"/>
       <metadata name="SPIRV-Tools" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/SPIRV-Tools" description="SPIR-V assembler, validator, optimizer and associated libraries" licenseSignal="green">
          <license name="Apache License 2.0" spdx="Apache-2.0" file="licenses\spirv-tools\LICENSE"/>
@@ -15649,6 +15649,8 @@
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\include\spirv-tools\libspirv.h"/>
                <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libSPIRV-Tools-shared.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libSPIRV-Tools.lib"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}\libSPIRV-Tools-opt.lib"/>
             </perVariant>
             <common><copy source="{Workspace}\LICENSE" target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\licenses\spirv-tools\LICENSE" overwrite="true"/></common>
          </install>
