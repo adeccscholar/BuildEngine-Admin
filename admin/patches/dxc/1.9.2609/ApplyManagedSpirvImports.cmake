@@ -26,7 +26,7 @@ string(SUBSTRING "${strSource}" 0 ${iBegin} strPrefix)
 string(SUBSTRING "${strSource}" ${iBegin} -1 strTail)
 # In pinned DXC v1.9.2609 the SPIR-V dependency block is the last block.
 # Never discard unrelated trailing CMake content.
-string(REGEX MATCH "endif\\(\\)[ \\t\\r\\n]*$" strEnd "${strTail}")
+string(REGEX MATCH "endif\\(\\)[ \t\r\n]*$" strEnd "\${strTail}")
 if(strEnd STREQUAL "")
    message(FATAL_ERROR "Unexpected DXC external/CMakeLists.txt suffix")
 endif()
