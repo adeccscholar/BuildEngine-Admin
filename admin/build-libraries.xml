@@ -16573,7 +16573,7 @@
          <argument value="-DRECAST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="jolt-physics" version="5.7.0" category="graphics" timestamp="2026-11-25T21:13:00Z">
+   <library id="jolt-physics" version="5.7.0" category="graphics" timestamp="2026-11-26T22:55:00Z">
       <metadata name="Jolt Physics" supplier="Jorrit Rouwe and contributors" homepage="https://github.com/jrouwe/JoltPhysics" description="Jolt CPU physics engine built as native BCC64X shared library with optional backends and samples disabled." artifactType="shared" licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="licenses\jolt-physics\LICENSE"/>
       </metadata>
@@ -16607,6 +16607,16 @@
          <argument value="-DJPH_USE_VK:BOOL=OFF"/>
          <argument value="-DJPH_USE_MTL:BOOL=OFF"/>
          <argument value="-DJPH_USE_CPU_COMPUTE:BOOL=ON"/>
+         <!-- Reproducible x64 baseline: no machine-specific SIMD instructions. -->
+         <argument value="-DUSE_SSE4_1:BOOL=OFF"/>
+         <argument value="-DUSE_SSE4_2:BOOL=OFF"/>
+         <argument value="-DUSE_AVX:BOOL=OFF"/>
+         <argument value="-DUSE_AVX2:BOOL=OFF"/>
+         <argument value="-DUSE_AVX512:BOOL=OFF"/>
+         <argument value="-DUSE_LZCNT:BOOL=OFF"/>
+         <argument value="-DUSE_TZCNT:BOOL=OFF"/>
+         <argument value="-DUSE_F16C:BOOL=OFF"/>
+         <argument value="-DUSE_FMADD:BOOL=OFF"/>
          <argument value="-DTARGET_UNIT_TESTS:BOOL=OFF"/>
          <argument value="-DTARGET_HELLO_WORLD:BOOL=OFF"/>
          <argument value="-DTARGET_PERFORMANCE_TEST:BOOL=OFF"/>
