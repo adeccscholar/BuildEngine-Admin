@@ -96,8 +96,9 @@ INSERT INTO buildengine.dom_library_state(state_id,state_code,description,notice
    (50,'install','Installation scope completed',''),
    (60,'metadata','License and SBOM generation completed',''),
    (70,'publish','Publication scope completed',''),
-   (80,'documentation','Documentation scope completed','May contain dynamically materialized scopes.'),
-   (90,'ready','Logical library ready state','Derived from the FSM; no separate state file.') ON CONFLICT DO NOTHING;
+   (80,'smoke','Consumer smoke scope completed',''),
+   (90,'documentation','Documentation scope completed','May contain dynamically materialized scopes.'),
+   (100,'ready','Logical library ready state','Derived from the FSM; no separate state file.') ON CONFLICT DO NOTHING;
 
 INSERT INTO buildengine.dom_security_query_status VALUES
    (10,'not-scanned','Version has not yet been checked',''),
