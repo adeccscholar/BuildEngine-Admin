@@ -34,7 +34,7 @@
 +    # Never introduce Microsoft SDK um/shared headers into BCC64X.
 +    set(_adecc_test_headers "${CMAKE_CURRENT_BINARY_DIR}/adecc-winrt-headers")
 +    file(MAKE_DIRECTORY "${_adecc_test_headers}")
-+    foreach(_adecc_header IN ITEMS winstring.h windows.foundation.h)
++    foreach(_adecc_header IN ITEMS winstring.h windows.foundation.h asyncinfo.h activation.h)
 +        if(NOT EXISTS "${ADECC_CPPWINRT_IDL_ROOT}/winrt/${_adecc_header}")
 +            message(FATAL_ERROR
 +                "Pinned Windows SDK WinRT header missing: ${ADECC_CPPWINRT_IDL_ROOT}/winrt/${_adecc_header}")
