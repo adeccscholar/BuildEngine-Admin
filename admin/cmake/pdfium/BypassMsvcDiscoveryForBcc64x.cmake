@@ -13,7 +13,7 @@ file(READ "${_gn_file}" _text)
 set(_marker "# BuildEngine: BCC64X uses its registered compiler, not Visual Studio.")
 set(_original "if (visual_studio_path == \"\") {")
 set(_replacement
-   "if (defined(custom_toolchain) && custom_toolchain == \"//build/toolchain/bcc64x:bcc64x\") {\n  ${_marker}\n  visual_studio_runtime_dirs = ""\n} else if (visual_studio_path == \"\") {")
+   "if (defined(custom_toolchain) && custom_toolchain == \"//build/toolchain/bcc64x:bcc64x\") {\n  ${_marker}\n  visual_studio_runtime_dirs = \"\"\n} else if (visual_studio_path == \"\") {")
 string(FIND "${_text}" "${_marker}" _existing)
 if(NOT _existing EQUAL -1)
    string(FIND "${_text}" "${_replacement}" _complete)
