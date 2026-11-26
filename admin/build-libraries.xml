@@ -16573,7 +16573,7 @@
          <argument value="-DRECAST_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="jolt-physics" version="5.7.0" category="graphics" timestamp="2026-11-26T22:55:00Z">
+   <library id="jolt-physics" version="5.7.0" category="graphics" timestamp="2026-11-26T22:15:00Z">
       <metadata name="Jolt Physics" supplier="Jorrit Rouwe and contributors" homepage="https://github.com/jrouwe/JoltPhysics" description="Jolt CPU physics engine built as native BCC64X shared library with optional backends and samples disabled." artifactType="shared" licenseSignal="green">
          <license name="MIT License" spdx="MIT" file="licenses\jolt-physics\LICENSE"/>
       </metadata>
