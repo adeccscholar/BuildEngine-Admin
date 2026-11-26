@@ -18413,7 +18413,7 @@
          <argument value="-DCPPWINRT_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-26T17:55:01Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
+   <library id="dxc" version="1.9.2609" category="graphics" timestamp="2026-11-26T20:45:00Z">\n      <dependency library="spirv-headers" version="v1.202609.0"/>\n      <dependency library="spirv-tools" version="2026.4"/>
       <metadata artifactType="shared" name="Microsoft DirectX Shader Compiler (DXC)" supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler" description="Full native HLSL LLVM-based compiler, DXIL toolchain and Windows compiler runtime targeted at BCC64X." licenseSignal="yellow"><license name="Upstream License" file="LICENSE.TXT"/></metadata>
       <security><repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/></security>
       <source>
@@ -18671,6 +18671,15 @@
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
 
+         <!-- BuildEngine-managed Khronos DLLs replace the second SPIRV source build. -->
+         <copy source="{BuildFileDir}\patches\dxc\1.9.2609\bcc64x-system-spirv-imports.patch" target="{Workspace}\.buildengine\patches\bcc64x-system-spirv-imports.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-bcc64x-system-spirv-imports" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-system-spirv-imports.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
       </source>
 
       <build testsAffectBuild="true">
@@ -18714,12 +18723,9 @@
          <argument value="-DHLSL_BUILD_DXILCONV:BOOL=ON"/>
          <argument value="-DENABLE_SPIRV_CODEGEN:BOOL=ON"/>
          <argument value="-DSPIRV_BUILD_TESTS:BOOL=ON"/>
-         <!-- Reuse the independently managed Khronos source snapshots. DXC upstream\n              needs the source CMake targets (including SPIRV-Tools-opt), not just headers. -->
-         <argument value="-DDXC_SPIRV_HEADERS_DIR:PATH={BuildRoot}\thirdparty-test\spirv-headers\v1.202609.0"/>
-         <argument value="-DSPIRV-Headers_SOURCE_DIR:PATH={BuildRoot}\thirdparty-test\spirv-headers\v1.202609.0"/>
-         <argument value="-DDXC_SPIRV_TOOLS_DIR:PATH={BuildRoot}\thirdparty-test\spirv-tools\2026.4"/>
-         <argument value="-DSPIRV_TOOLS_USE_MIMALLOC:BOOL=OFF"/>
-         <argument value="-DSPIRV_TOOLS_BUILD_STATIC:BOOL=ON"/>
+         <!-- Link the exact installed variant of the independent Khronos DLL packages. -->
+         <argument value="-DDXC_SPIRV_HEADERS_PACKAGE_ROOT:PATH={DependencyRoot:spirv-headers}"/>
+         <argument value="-DDXC_SPIRV_TOOLS_PACKAGE_ROOT:PATH={DependencyRoot:spirv-tools}"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
