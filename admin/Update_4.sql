@@ -20,12 +20,20 @@ END
 $migration$;
 
 DELETE FROM buildengine.library_scope_state
-WHERE state_id IN (80,90,100);
+WHERE state_id IN (80,90,100)
+  AND EXISTS (
+     SELECT 1 FROM buildengine.dom_library_state AS d
+     WHERE (d.state_id=80 AND d.state_code <> 'smoke')
+        OR (d.state_id=90 AND d.state_code <> 'documentation')
+        OR (d.state_id=100 AND d.state_code <> 'ready')
+  );
 
--- The old IDs represented documentation=80, ready=90. Drop those domain
--- records only after clearing the derived cache to honor the foreign key.
+-- Preserve valid cache evidence on repeat migrations.
 DELETE FROM buildengine.dom_library_state
-WHERE state_id IN (80,90,100);
+WHERE state_id IN (80,90,100)
+  AND ((state_id=80 AND state_code <> 'smoke')
+    OR (state_id=90 AND state_code <> 'documentation')
+    OR (state_id=100 AND state_code <> 'ready'));
 
 INSERT INTO buildengine.dom_library_state
    (state_id,state_code,description,notice)
