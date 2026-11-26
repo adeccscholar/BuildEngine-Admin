@@ -16,7 +16,8 @@ target_compile_definitions(jolt-consumer-real PRIVATE
    JPH_OBJECT_STREAM
    JPH_DEBUG_RENDERER
    JPH_PROFILE_ENABLED
-   # Baseline x64 SSE2; no optional ISA feature defines.)
+)
+# Baseline x64 SSE2: do not define optional JPH_USE_* features.
 target_include_directories(jolt-consumer-real PRIVATE "${JOLT_PACKAGE_ROOT}/include")
 find_library(JOLT_LIBRARY NAMES Jolt libJolt PATHS "${JOLT_PACKAGE_ROOT}/lib/win64/Release" NO_DEFAULT_PATH REQUIRED)
 target_link_libraries(jolt-consumer-real PRIVATE "${JOLT_LIBRARY}")
