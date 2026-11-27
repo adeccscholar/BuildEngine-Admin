@@ -1,0 +1,26 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -316,7 +316,7 @@
+         MAIN_DEPENDENCY "${PROJECT_SOURCE_DIR}/Src/Shaders/CompileShaders.cmd"
+         DEPENDS ${SHADER_SOURCES}
+         COMMENT "Generating HLSL shaders..."
+-        COMMAND ${CMAKE_COMMAND} -E env CompileShadersOutput="${COMPILED_SHADERS}" $<$<BOOL:${DIRECTX_DXC_TOOL}>:DirectXShaderCompiler=${DIRECTX_DXC_TOOL}> $<$<BOOL:${DIRECTX_FXC_TOOL}>:LegacyShaderCompiler=${DIRECTX_FXC_TOOL}> CompileShaders.cmd ARGS ${ShaderOpts} > "${COMPILED_SHADERS}/compileshaders.log"
++        COMMAND ${CMAKE_COMMAND} -E env CompileShadersOutput="${COMPILED_SHADERS}" $<$<BOOL:${DIRECTX_DXC_TOOL}>:DirectXShaderCompiler=${DIRECTX_DXC_TOOL}> $<$<BOOL:${DIRECTX_FXC_TOOL}>:LegacyShaderCompiler=${DIRECTX_FXC_TOOL}> $<$<BOOL:${DIRECTX_DXC_DLL}>:ADECC_DXC_DLL=${DIRECTX_DXC_DLL}> CompileShaders.cmd ARGS ${ShaderOpts} > "${COMPILED_SHADERS}/compileshaders.log"
+         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/Src/Shaders"
+         USES_TERMINAL)
+ endif()
+--- a/Src/Shaders/CompileShaders.cmd
++++ b/Src/Shaders/CompileShaders.cmd
+@@ -72,8 +72,10 @@
+ goto continue
+ 
+ :dxcviaenv
+-set PCDXC="%DirectXShaderCompiler%"
+-if not exist %PCDXC% goto needdxil
++set PCDXC="%DirectXShaderCompiler%"
++if not exist %PCDXC% goto needdxil
++REM The BuildEngine-pinned compiler uses its own DXC runtime DLL.
++if defined ADECC_DXC_DLL set PCDXC=%PCDXC% -external "%ADECC_DXC_DLL%" -external-fn DxcCreateInstance
+ 
+ if not "x%DirectXShaderCompiler:10.0.19041.0=%"=="x%DirectXShaderCompiler%" set DXILOPTS=%DXILOPTS:-HV 2021=%
+ if not "x%DirectXShaderCompiler:10.0.20348.0=%"=="x%DirectXShaderCompiler%" set DXILOPTS=%DXILOPTS:-HV 2021=%

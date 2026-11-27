@@ -54,7 +54,7 @@ file(WRITE "${strShader}"
    "RWByteAddressBuffer outputBuffer : register(u0);\n"
    "[numthreads(1, 1, 1)] void main() { outputBuffer.Store(0, 1); }\n")
 execute_process(
-   COMMAND "${strDxcExe}" -T cs_6_0 -E main -Fo "${strDxil}" "${strShader}"
+   COMMAND "${strDxcExe}" -external "${strDxcDll}" -external-fn DxcCreateInstance -T cs_6_0 -E main -Fo "${strDxil}" "${strShader}"
    RESULT_VARIABLE iCompile OUTPUT_VARIABLE strCompileOut ERROR_VARIABLE strCompileErr)
 file(APPEND "${REPORT_FILE}" "\nDXC EXECUTION exit=${iCompile}\n${strCompileOut}\n${strCompileErr}\n")
 if(NOT "${iCompile}" STREQUAL "0" OR NOT EXISTS "${strDxil}")
