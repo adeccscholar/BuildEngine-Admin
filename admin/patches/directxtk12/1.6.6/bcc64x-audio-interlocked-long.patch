@@ -1,0 +1,22 @@
+--- a/Audio/SoundEffect.cpp
++++ b/Audio/SoundEffect.cpp
+@@ -163,7 +163,7 @@
+     uint32_t                            mLoopLength;
+     AudioEngine*                        mEngine;
+     std::list<IVoiceNotify*>            mInstances;
+-    uint32_t                            mOneShots;
++    volatile LONG                       mOneShots;
+ 
+ #ifdef DIRECTX_ENABLE_SEEK_TABLES
+     uint32_t                            mSeekCount;
+--- a/Audio/WaveBank.cpp
++++ b/Audio/WaveBank.cpp
+@@ -132,7 +132,7 @@
+     AudioEngine*                        mEngine;
+     std::list<IVoiceNotify*>            mInstances;
+     WaveBankReader                      mReader;
+-    uint32_t                            mOneShots;
++    volatile LONG                       mOneShots;
+     bool                                mPrepared;
+     bool                                mStreaming;
+ };

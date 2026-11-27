@@ -18802,7 +18802,7 @@
          <argument value="-DDXC_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-27T15:30:00Z">
+   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-27T18:30:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxc" version="1.9.2609"/>
@@ -18818,6 +18818,15 @@
             <require path="Src\Shaders\CompileShaders.cmd"/>
             <require path="LICENSE"/>
          </extract>
+         <!-- Keep XAudio enabled and adapt its atomic counters to the Windows LONG ABI. -->
+         <copy source="{BuildFileDir}\patches\directxtk12\1.6.6\bcc64x-audio-interlocked-long.patch" target="{Workspace}\.buildengine\patches\bcc64x-audio-interlocked-long.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-audio-interlocked-long" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-audio-interlocked-long.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
          <!-- Pin shader generation to the tested managed DXC DLL instead of OS DLL search. -->
          <copy source="{BuildFileDir}\patches\directxtk12\1.6.6\bcc64x-managed-dxc-shaders.patch" target="{Workspace}\.buildengine\patches\bcc64x-managed-dxc-shaders.patch" overwrite="true" preserveCurrentArtifact="true"/>
          <execute name="apply-managed-dxc-shaders" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
@@ -18851,7 +18860,7 @@
          <argument value="-DDIRECTX_DXC_DLL:FILEPATH={DependencyRoot:dxc}\bin\dxcompiler.dll"/>
          <argument value="-DBUILD_XAUDIO_WIN10:BOOL=ON"/>
          <argument value="-DBUILD_XINPUT:BOOL=ON"/>
-         <argument value="-DBUILD_WGI:BOOL=ON"/>
+         <argument value="-DBUILD_WGI:BOOL=OFF"/>
          <argument value="-Ddirectxmath_DIR:PATH={DependencyRoot:directxmath}\share\directxmath"/>
          <argument value="-Ddirectx-headers_DIR:PATH={DependencyRoot:directx-headers}\share\directx-headers\cmake"/>
          <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers}"/>
