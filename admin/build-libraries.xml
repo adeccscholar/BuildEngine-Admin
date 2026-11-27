@@ -18802,7 +18802,7 @@
          <argument value="-DDXC_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-27T19:12:40Z">
+   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-27T20:33:08Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxc" version="1.9.2609"/>

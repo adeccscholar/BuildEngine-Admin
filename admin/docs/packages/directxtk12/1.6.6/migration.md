@@ -25,3 +25,7 @@ The native Debug and Release builds now compile all DirectXTK12 C++ translation 
 ## XAudio2 import library (27 November 2026)
 
 The 19:04 UTC development run reached the shared-library link in both variants, but the BCC64X linker could not find `-lxaudio2`. The existing `bcc64x-link-input-audio.patch` remains ordered before the new `bcc64x-xaudio2-import.patch`. The latter creates a COFF import library with the already managed LLVM linker from a declaration of the required exports of the Windows system `xaudio2_9.dll`, then links that import library. No Microsoft SDK lib directory or additional managed tool is introduced. The generated .lib is an import library, not a statically linked XAudio implementation. Debug/Release native validation remains **[not verified]** until a new BuildEngine run.
+
+## Consumer smoke include contract (27 November 2026)
+
+The development log BuildLog_20261127_195313_555.zip confirms successful DirectXTK12 Debug/Release compilation, installation, metadata and publication. The package-exported CMake target `Microsoft::DirectXTK12` already includes `include/directxtk12` in its public include directories. The consumer smoke therefore includes `<SpriteBatch.h>` and `<GeometricPrimitive.h>` directly instead of adding another `directxtk12/` path component. No producer, shader, audio or linker changes are required for this fix. The consumer smoke result remains **[not verified]** until the next BCC64X run.

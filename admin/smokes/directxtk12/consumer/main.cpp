@@ -1,5 +1,5 @@
-#include <directxtk12/SpriteBatch.h>
-#include <directxtk12/GeometricPrimitive.h>
+#include <SpriteBatch.h>
+#include <GeometricPrimitive.h>
 #include <print>
 #include <type_traits>
 int main() {
