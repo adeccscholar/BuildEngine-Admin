@@ -10,6 +10,42 @@ if(NOT EXISTS "${_gn_file}")
    message(FATAL_ERROR "Pinned Chromium visual_studio_version.gni is missing: ${_gn_file}")
 endif()
 file(READ "${_gn_file}" _text)
+# Chromium also executes a Visual Studio runtime deployment action in
+# build/toolchain/win/BUILD.gn for the default toolchain. BCC64X must never
+# execute that action: runtime DLLs are supplied by BuildEngine packages.
+set(_toolchain_gn "${SOURCE_ROOT}/build/toolchain/win/BUILD.gn")
+if(NOT EXISTS "${_toolchain_gn}")
+   message(FATAL_ERROR "Pinned Chromium win/BUILD.gn missing")
+endif()
+file(READ "${_toolchain_gn}" _toolchain_text)
+set(_copy_call [=[exec_script("../../vs_toolchain.py",]=])
+set(_guard_marker "# BuildEngine: the BCC64X toolchain never stages Visual Studio runtime DLLs.")
+string(FIND "${_toolchain_text}" "${_copy_call}" _copy_pos)
+string(FIND "${_toolchain_text}" "${_guard_marker}" _guard_pos)
+if(_copy_pos EQUAL -1)
+   message(FATAL_ERROR "Pinned Chromium Visual Studio runtime copy action missing")
+endif()
+if(_guard_pos EQUAL -1)
+   set(_copy_condition "if (current_toolchain == default_toolchain) {")
+   string(FIND "${_toolchain_text}" "${_copy_condition}" _cond_pos)
+   if(_cond_pos EQUAL -1 OR _cond_pos GREATER _copy_pos)
+      message(FATAL_ERROR "Pinned Chromium Visual Studio runtime copy condition changed")
+   endif()
+   set(_native_condition [==[
+# BuildEngine: the BCC64X toolchain never stages Visual Studio runtime DLLs.
+if (current_toolchain == default_toolchain &&
+    !(defined(custom_toolchain) &&
+      custom_toolchain == "//build/toolchain/bcc64x:bcc64x")) {
+]==])
+   string(REPLACE "${_copy_condition}" "${_native_condition}" _toolchain_text "${_toolchain_text}")
+   file(WRITE "${_toolchain_gn}" "${_toolchain_text}")
+else()
+   string(FIND "${_toolchain_text}" "custom_toolchain == \"//build/toolchain/bcc64x:bcc64x\"" _native_guard)
+   if(_native_guard EQUAL -1 OR _native_guard GREATER _copy_pos)
+      message(FATAL_ERROR "Pinned Chromium BCC64X runtime-copy guard incomplete")
+   endif()
+endif()
+
 # The upstream win_toolchain_data.gni imports setup_toolchain.py even for a
 # custom toolchain. Under native BCC64X this would implicitly require MSVC.
 # Provide inert GN environment scopes only for our explicitly selected toolchain.
