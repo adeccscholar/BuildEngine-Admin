@@ -49,6 +49,10 @@ smokes/            small package-related consumer smokes
 
 The earlier 451/451 CURRENT run remains historical evidence for the pre-FSM architecture. It is not the current verification baseline and does not prove later FSM, documentation, extension, Publish or BZip2/libarchive changes.
 
+## DXC native Windows build without DIA
+
+For DXC 1.9.2609, the BCC64X build explicitly excludes the legacy DIA/PIX DIA interfaces: it does not discover Visual Studio's DIA SDK, compile `LLVMDxilDia`, link that target into `dxcompiler.dll`, register `CLSID_DxcDiaDataSource`, or expose the DIA-dependent PIX factory from `IDxcPdbUtils2`. Ordinary shader compilation, DXIL/SPIR-V output and the independent DXC PDB utilities remain in scope. The version-bound source patch is `admin/patches/dxc/1.9.2609/bcc64x-disable-dia.patch`. Native C++23 behavior tests and package smoke tests are still mandatory; the BCC64X result is **[not verified]** until the next real build.
+
 ## Core principle
 
 BuildEngine keeps library knowledge out of the C++ core. XML describes libraries; C++ implements generic mechanisms.

@@ -219,38 +219,6 @@
      return S_OK;
    }
  
---- a/lib/DxilDia/DxilDiaDataSource.cpp
-+++ b/lib/DxilDia/DxilDiaDataSource.cpp
-@@ -54,5 +54,5 @@
-                        const llvm::Twine &BufferName) {
-   CComPtr<IDxcBlob> pBlob;
--  if (SUCCEEDED(pStream->QueryInterface(&pBlob))) {
-+  if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pStream, &pBlob))) {
-     return getMemBufferFromBlob(pBlob, BufferName);
-   }
---- a/lib/DxilDia/DxilDiaSession.cpp
-+++ b/lib/DxilDia/DxilDiaSession.cpp
-@@ -172,5 +172,5 @@
-   CComPtr<IUnknown> pElt;
-   IFR(pTable->Item(uniqueId, &pElt));
--  return pElt->QueryInterface(ppResult);
-+  return DXC_NATIVE_QUERY_INTERFACE(pElt, ppResult);
- }
- 
-@@ -198,5 +198,5 @@
- 
-   CComPtr<IDiaEnumSourceFiles> pSourceTable;
--  IFR(pTable->QueryInterface(&pSourceTable));
-+  IFR(DXC_NATIVE_QUERY_INTERFACE(pTable, &pSourceTable));
-   HRESULT hr;
-   CComPtr<IDiaSourceFile> src;
-@@ -304,5 +304,5 @@
- 
-   CComPtr<IDiaEnumLineNumbers> pLineTable;
--  IFR(pTable->QueryInterface(&pLineTable));
-+  IFR(DXC_NATIVE_QUERY_INTERFACE(pTable, &pLineTable));
-   HRESULT hr;
-   CComPtr<IDiaLineNumber> line;
 --- a/lib/DxilContainer/DxcContainerBuilder.cpp
 +++ b/lib/DxilContainer/DxcContainerBuilder.cpp
 @@ -116,5 +116,5 @@
@@ -276,27 +244,6 @@
 +    if (SUCCEEDED(DXC_NATIVE_QUERY_INTERFACE(pVersionInfo, &pVersionInfo3))) {
        IFT(pVersionInfo3->GetCustomVersionString(&m_CustomStringStorage));
        m_CustomString = llvm::StringRef(m_CustomStringStorage,
---- a/lib/DxilDia/DxcPixDxilStorage.cpp
-+++ b/lib/DxilDia/DxcPixDxilStorage.cpp
-@@ -54,15 +54,15 @@
-   IFR(UnAliasType(OriginalType, &UnalisedType));
- 
--  if (UnalisedType->QueryInterface(&ArrayTy) == S_OK) {
-+  if (DXC_NATIVE_QUERY_INTERFACE(UnalisedType, &ArrayTy) == S_OK) {
-     return dxil_debug_info::NewDxcPixDxilDebugInfoObjectOrThrow<
-         dxil_debug_info::DxcPixDxilArrayStorage>(
-         ppStorage, pDxilDebugInfo->GetMallocNoRef(), pDxilDebugInfo,
-         OriginalType, ArrayTy, VarInfo, CurrentOffsetInBits);
--  } else if (UnalisedType->QueryInterface(&StructTy) == S_OK) {
-+  } else if (DXC_NATIVE_QUERY_INTERFACE(UnalisedType, &StructTy) == S_OK) {
-     return dxil_debug_info::NewDxcPixDxilDebugInfoObjectOrThrow<
-         dxil_debug_info::DxcPixDxilStructStorage>(
-         ppStorage, pDxilDebugInfo->GetMallocNoRef(), pDxilDebugInfo,
-         OriginalType, StructTy, VarInfo, CurrentOffsetInBits);
--  } else if (UnalisedType->QueryInterface(&ScalarTy) == S_OK) {
-+  } else if (DXC_NATIVE_QUERY_INTERFACE(UnalisedType, &ScalarTy) == S_OK) {
-     return dxil_debug_info::NewDxcPixDxilDebugInfoObjectOrThrow<
-         dxil_debug_info::DxcPixDxilScalarStorage>(
 --- a/tools/clang/tools/dxcompiler/dxclinker.cpp
 +++ b/tools/clang/tools/dxcompiler/dxclinker.cpp
 @@ -436,5 +436,5 @@

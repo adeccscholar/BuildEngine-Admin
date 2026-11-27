@@ -1,0 +1,95 @@
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -29,5 +29,7 @@
+ add_subdirectory(DxilPdbInfo) # HLSL Change
+ add_subdirectory(DxilPIXPasses) # HLSL Change
+-add_subdirectory(DxilDia) # HLSL Change
++if(NOT ADECC_BCC64X_NATIVE_X64)
++  add_subdirectory(DxilDia)
++endif() # BCC64X does not provide the legacy DIA/PIX runtime
+ add_subdirectory(DxilRootSignature) # HLSL Change
+ add_subdirectory(DxilValidation) # HLSL Change
+diff --git a/tools/clang/tools/dxcompiler/CMakeLists.txt b/tools/clang/tools/dxcompiler/CMakeLists.txt
+--- a/tools/clang/tools/dxcompiler/CMakeLists.txt
++++ b/tools/clang/tools/dxcompiler/CMakeLists.txt
+@@ -104,8 +104,8 @@
+   )
+ 
+-if(WIN32)
+-  set(LIBRARIES
+-    ${LIBRARIES} 
+-    LLVMDxilDia)
++if(WIN32 AND NOT ADECC_BCC64X_NATIVE_X64)
++  set(LIBRARIES
++    ${LIBRARIES} 
++    LLVMDxilDia)
+-endif(WIN32)
++endif()
+ 
+@@ -122,8 +122,11 @@
+ 
+-if (MSVC)
++if (MSVC AND NOT ADECC_BCC64X_NATIVE_X64)
+   find_package(DiaSDK REQUIRED) # Used for constants and declarations.
+-endif (MSVC)
++endif()
+ 
+-add_clang_library(dxcompiler SHARED ${SOURCES})
++add_clang_library(dxcompiler SHARED ${SOURCES})
++if(ADECC_BCC64X_NATIVE_X64)
++  target_compile_definitions(dxcompiler PRIVATE DXC_DISABLE_DIA=1)
++endif()
+ add_dependencies(dxcompiler TablegenHLSLOptions) 
+ if (MSVC)
+@@ -143,5 +146,5 @@
+                PROPERTY LINK_FLAGS " -Wl,-rpath,${MetalIRConverter_LIB_DIR}")
+ endif (ENABLE_METAL_CODEGEN)
+-include_directories(AFTER ${LLVM_INCLUDE_DIR}/dxc/Tracing ${DIASDK_INCLUDE_DIRS} ${HLSL_VERSION_LOCATION})
++include_directories(AFTER ${LLVM_INCLUDE_DIR}/dxc/Tracing ${HLSL_VERSION_LOCATION})
+ include_directories(${LLVM_SOURCE_DIR}/tools/clang/tools/dxcvalidator)
+ 
+diff --git a/tools/clang/tools/dxcompiler/dxcapi.cpp b/tools/clang/tools/dxcompiler/dxcapi.cpp
+--- a/tools/clang/tools/dxcompiler/dxcapi.cpp
++++ b/tools/clang/tools/dxcompiler/dxcapi.cpp
+@@ -29,5 +29,7 @@
+ 
+ HRESULT CreateDxcCompiler(REFIID riid, _Out_ LPVOID *ppv);
+-HRESULT CreateDxcDiaDataSource(REFIID riid, _Out_ LPVOID *ppv);
++#if !defined(DXC_DISABLE_DIA)
++HRESULT CreateDxcDiaDataSource(REFIID riid, _Out_ LPVOID *ppv);
++#endif
+ HRESULT CreateDxcIntelliSense(REFIID riid, _Out_ LPVOID *ppv);
+ HRESULT CreateDxcCompilerArgs(REFIID riid, _Out_ LPVOID *ppv);
+@@ -97,6 +99,6 @@
+   }
+ // Note: The following targets are not yet enabled for non-Windows platforms.
+-#ifdef _WIN32
+-  else if (IsEqualCLSID(rclsid, CLSID_DxcDiaDataSource)) {
++#if defined(_WIN32) && !defined(DXC_DISABLE_DIA)
++  else if (IsEqualCLSID(rclsid, CLSID_DxcDiaDataSource)) {
+     hr = CreateDxcDiaDataSource(riid, ppv);
+   }
+diff --git a/tools/clang/tools/dxcompiler/dxcpdbutils.cpp b/tools/clang/tools/dxcompiler/dxcpdbutils.cpp
+--- a/tools/clang/tools/dxcompiler/dxcpdbutils.cpp
++++ b/tools/clang/tools/dxcompiler/dxcpdbutils.cpp
+@@ -49,3 +49,3 @@
+ 
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(DXC_DISABLE_DIA)
+ #include "dxc/dxcpix.h"
+@@ -275,3 +275,3 @@
+ struct DxcPdbUtils : public IDxcPdbUtils2
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(DXC_DISABLE_DIA)
+     // Skip Pix debug info on linux for dia dependence.
+@@ -845,3 +845,3 @@
+                                            void **ppvObject) override {
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(DXC_DISABLE_DIA)
+     HRESULT hr =
+@@ -1073,3 +1073,3 @@
+ 
+-#ifdef _WIN32
++#if defined(_WIN32) && !defined(DXC_DISABLE_DIA)
+   virtual STDMETHODIMP

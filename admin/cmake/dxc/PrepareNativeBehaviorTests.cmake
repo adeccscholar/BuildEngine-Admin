@@ -49,11 +49,6 @@ _adecc_dxc_replace_once("tools/llvm-diff/DiffConsumer.cpp"
 
 # GoogleTest TEST_F methods derive from their test fixture.
 
-# DXC already discovers the DIA SDK for dxcompiler; attach it to dxclib too.
-_adecc_dxc_replace_once("tools/clang/tools/dxclib/CMakeLists.txt"
-   "add_clang_library(dxclib\n  dxc.cpp\n  )"
-   "add_clang_library(dxclib\n  dxc.cpp\n  )\n\nif (WIN32 AND NOT MSVC)\n  find_path(ADECC_DXC_DIA_INCLUDE_DIR dia2.h\n    HINTS\n      \"$ENV{VSINSTALLDIR}/DIA SDK/include\"\n      \"$ENV{MSVC_DIA_SDK_DIR}/include\"\n      \"$ENV{DIA_SDK_DIR}/include\"\n      \"C:/Program Files/Microsoft Visual Studio/2022/Professional/DIA SDK/include\"\n      \"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/DIA SDK/include\"\n      \"C:/Program Files/Microsoft Visual Studio/2022/Community/DIA SDK/include\")\n  if (NOT ADECC_DXC_DIA_INCLUDE_DIR)\n    message(FATAL_ERROR \"DXC dxclib requires DIA SDK dia2.h\")\n  endif()\n  target_include_directories(dxclib PRIVATE \"${ADECC_DXC_DIA_INCLUDE_DIR}\")\nendif()")
-
 # DXC's fixed LangOptions profile declares most flags immutable. ARC migration,
 # however, must mutate these two per-invocation flags. Shadow only those two
 # fixed defaults with per-instance state on BCC64X; do not globally switch
@@ -61,52 +56,6 @@ _adecc_dxc_replace_once("tools/clang/tools/dxclib/CMakeLists.txt"
 _adecc_dxc_replace_once("tools/clang/include/clang/Basic/LangOptions.h"
    "class LangOptions : public LangOptionsBase {\npublic:"
    "class LangOptions : public LangOptionsBase {\npublic:\n#if defined(__CODEGEARC__) || defined(__BORLANDC__)\n  bool ObjCAutoRefCount = false;\n  bool ObjCARCWeak = false;\n#endif")
-
-# The target compiler may report MSVC simulation. Select BCC64X by the
-# explicit BuildEngine toolchain contract, never by NOT MSVC.
-_adecc_dxc_replace_once("tools/clang/tools/dxclib/CMakeLists.txt"
-   "if (WIN32 AND NOT MSVC)\n  find_path(ADECC_DXC_DIA_INCLUDE_DIR"
-   "if (ADECC_BCC64X_NATIVE_X64)\n  find_path(ADECC_DXC_DIA_INCLUDE_DIR")
-
-# Confirm the DIA include contract at CMake configure time, not after compiling
-# thousands of LLVM translation units. This postcondition is deliberately
-# independent of the historical WIN32/NOT MSVC compiler classification.
-set(_adecc_dxclib_cmake "${SOURCE_ROOT}/tools/clang/tools/dxclib/CMakeLists.txt")
-file(READ "${_adecc_dxclib_cmake}" _adecc_dxclib_contents)
-if(NOT _adecc_dxclib_contents MATCHES "ADECC_DXC_DIA_TARGET_CHECK")
-   file(APPEND "${_adecc_dxclib_cmake}" [=[
-
-# ADECC_DXC_DIA_TARGET_CHECK: required Windows DIA SDK contract for dxclib.
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  if(NOT ADECC_DXC_DIA_INCLUDE_DIR OR
-     NOT EXISTS "${ADECC_DXC_DIA_INCLUDE_DIR}/dia2.h")
-    unset(ADECC_DXC_DIA_INCLUDE_DIR CACHE)
-    find_path(ADECC_DXC_DIA_INCLUDE_DIR NAMES dia2.h
-      HINTS
-        "$ENV{VSINSTALLDIR}/DIA SDK/include"
-        "$ENV{MSVC_DIA_SDK_DIR}/include"
-        "$ENV{DIA_SDK_DIR}/include"
-        "C:/Program Files/Microsoft Visual Studio/2022/Professional/DIA SDK/include"
-        "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/DIA SDK/include"
-        "C:/Program Files/Microsoft Visual Studio/2022/Community/DIA SDK/include"
-        "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/DIA SDK/include")
-  endif()
-  if(NOT ADECC_DXC_DIA_INCLUDE_DIR OR
-     NOT EXISTS "${ADECC_DXC_DIA_INCLUDE_DIR}/dia2.h")
-    message(FATAL_ERROR
-      "DXC dxclib requires the genuine Microsoft DIA SDK dia2.h. "
-      "Set ADECC_DXC_DIA_INCLUDE_DIR to a verified DIA SDK include directory.")
-  endif()
-  target_include_directories(dxclib PRIVATE "${ADECC_DXC_DIA_INCLUDE_DIR}")
-  get_target_property(_adecc_dia_target_includes dxclib INCLUDE_DIRECTORIES)
-  if(NOT _adecc_dia_target_includes)
-    message(FATAL_ERROR "DXC dxclib DIA include contract was not attached")
-  endif()
-  message(STATUS "DXC dxclib DIA SDK: ${ADECC_DXC_DIA_INCLUDE_DIR}")
-endif()
-]=])
-endif()
-
 
 # Keep standalone C++23 API/compiler regression tests in the build regardless
 # of upstream HLSL_INCLUDE_TESTS. The historical Windows test targets do not
