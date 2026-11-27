@@ -91,6 +91,9 @@ if (${ENABLE_SPIRV_CODEGEN})
     if(NOT TARGET ${_adecc_target})
       message(FATAL_ERROR "Managed ${_adecc_target} did not export a target")
     endif()
+    # Imported targets created in external/ are otherwise invisible to sibling
+    # DXC directories: CMake converts the bare name into -lSPIRV-Tools-opt.
+    set_property(TARGET ${_adecc_target} PROPERTY IMPORTED_GLOBAL TRUE)
     get_target_property(_adecc_type ${_adecc_target} TYPE)
     if(NOT _adecc_type STREQUAL "SHARED_LIBRARY")
       message(FATAL_ERROR "DXC requires dynamic ${_adecc_target}, not ${_adecc_type}")
