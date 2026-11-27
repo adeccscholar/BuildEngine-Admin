@@ -1,0 +1,23 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -358,3 +358,19 @@
+   if(BUILD_XAUDIO_WIN10)
+-    target_link_libraries(${PROJECT_NAME} PRIVATE xaudio2.lib)
++    if(NOT DEFINED ADECC_LLD_TOOL OR NOT EXISTS "${ADECC_LLD_TOOL}")
++      message(FATAL_ERROR "DirectXTK12 XAudio requires the managed LLVM linker")
++    endif()
++
++    set(_XAUDIO2_IMPORT_DEF "${CMAKE_CURRENT_BINARY_DIR}/xaudio2_9.def")
++    set(_XAUDIO2_IMPORT_LIB "${CMAKE_CURRENT_BINARY_DIR}/xaudio2_9.lib")
++    file(WRITE "${_XAUDIO2_IMPORT_DEF}"
++      "LIBRARY xaudio2_9.dll\nEXPORTS\n  XAudio2Create\n  CreateFX\n  CreateAudioReverb\n  X3DAudioInitialize\n  X3DAudioCalculate\n")
++    execute_process(
++      COMMAND "${ADECC_LLD_TOOL}" -flavor link /machine:x64
++              "/def:${_XAUDIO2_IMPORT_DEF}" "/out:${_XAUDIO2_IMPORT_LIB}"
++      RESULT_VARIABLE _XAUDIO2_IMPORT_RESULT
++      ERROR_VARIABLE _XAUDIO2_IMPORT_ERROR)
++    if(NOT _XAUDIO2_IMPORT_RESULT EQUAL 0 OR NOT EXISTS "${_XAUDIO2_IMPORT_LIB}")
++      message(FATAL_ERROR "XAudio2 2.9 import library creation failed: ${_XAUDIO2_IMPORT_ERROR}")
++    endif()
++    target_link_libraries(${PROJECT_NAME} PRIVATE "${_XAUDIO2_IMPORT_LIB}")
+   endif()

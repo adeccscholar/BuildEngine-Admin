@@ -21,3 +21,7 @@ Build, install and consumer-smoke success for these corrections remains **[not v
 ## DLL link completion (27 November 2026)
 
 The native Debug and Release builds now compile all DirectXTK12 C++ translation units but previously failed to link the shared DLL. The linker reported missing XInputGetState, XInputGetCapabilities, XInputSetState, CreateFX, CreateAudioReverb, X3DAudioInitialize and X3DAudioCalculate. The version-bound `bcc64x-link-input-audio.patch` augments the upstream CMake shared target with the platform import libraries `xinput.lib` when XInput is enabled and `xaudio2.lib` when XAudio 2.9 is enabled. Neither component is disabled. The native link and subsequent consumer smoke remain **[not verified]** until the next BCC64X run.
+
+## XAudio2 import library (27 November 2026)
+
+The 19:04 UTC development run reached the shared-library link in both variants, but the BCC64X linker could not find `-lxaudio2`. The existing `bcc64x-link-input-audio.patch` remains ordered before the new `bcc64x-xaudio2-import.patch`. The latter creates a COFF import library with the already managed LLVM linker from a declaration of the required exports of the Windows system `xaudio2_9.dll`, then links that import library. No Microsoft SDK lib directory or additional managed tool is introduced. The generated .lib is an import library, not a statically linked XAudio implementation. Debug/Release native validation remains **[not verified]** until a new BuildEngine run.
