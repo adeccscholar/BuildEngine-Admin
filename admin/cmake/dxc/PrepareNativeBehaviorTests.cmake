@@ -19,16 +19,6 @@ function(_adecc_dxc_replace_once _relative _original _replacement)
    file(WRITE "${_path}" "${_updated}")
 endfunction()
 
-set(_adecc_native_com_guard
-   "#if !defined(__CODEGEARC__) && !defined(__BORLANDC__)\\n#include <comdef.h>\\n#endif")
-set(_adecc_native_atl_guard
-   "#if !defined(__CODEGEARC__) && !defined(__BORLANDC__)\\n#include <atlfile.h>\\n#endif")
-# CMake quoted strings above intentionally encode newlines; expand only here.
-string(REPLACE "\\n" "\n" _adecc_native_com_guard "${_adecc_native_com_guard}")
-string(REPLACE "\\n" "\n" _adecc_native_atl_guard "${_adecc_native_atl_guard}")
-_adecc_dxc_replace_once("tools/clang/tools/dxclib/dxc.cpp"
-   "#include <comdef.h>" "${_adecc_native_com_guard}")
-
 # Restore the original PCH accessor instead of adding a second class method.
 # Only this accessor is enabled; unsupported module and PCH writer methods
 # remain inside the upstream disabled region.

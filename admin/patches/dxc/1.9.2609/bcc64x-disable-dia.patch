@@ -93,3 +93,75 @@ diff --git a/tools/clang/tools/dxcompiler/dxcpdbutils.cpp b/tools/clang/tools/dx
 -#ifdef _WIN32
 +#if defined(_WIN32) && !defined(DXC_DISABLE_DIA)
    virtual STDMETHODIMP
+diff --git a/tools/clang/tools/dxclib/dxc.cpp b/tools/clang/tools/dxclib/dxc.cpp
+--- a/tools/clang/tools/dxclib/dxc.cpp
++++ b/tools/clang/tools/dxclib/dxc.cpp
+@@ -62,10 +62,6 @@
+ #include "llvm/Support/MemoryBuffer.h"
+ #include "llvm/Support/Path.h"
+ #include "llvm/Support/raw_ostream.h"
+-#ifdef _WIN32
+-#include <comdef.h>
+-#include <dia2.h>
+-#endif
+ #include <algorithm>
+ #include <unordered_map>
+ 
+@@ -137,13 +133,6 @@
+   HRESULT ReadFileIntoPartContent(hlsl::DxilFourCC fourCC, LPCWSTR fileName,
+                                   IDxcBlob **ppResult);
+ 
+-// Dia is only supported on Windows.
+-#ifdef _WIN32
+-  // TODO : Refactor two functions below. There are duplicate functions in
+-  // DxcContext in dxa.cpp
+-  HRESULT GetDxcDiaTable(IDxcLibrary *pLibrary, IDxcBlob *pTargetBlob,
+-                         IDiaTable **ppTable, LPCWSTR tableName);
+-#endif // _WIN32
+ 
+   HRESULT FindModuleBlob(hlsl::DxilFourCC fourCC, IDxcBlob *pSource,
+                          IDxcLibrary *pLibrary, IDxcBlob **ppTargetBlob);
+@@ -1147,43 +1136,6 @@
+   return E_INVALIDARG;
+ }
+ 
+-// This function is currently only supported on Windows due to usage of
+-// IDiaTable.
+-#ifdef _WIN32
+-// TODO : There is an identical code in DxaContext in Dxa.cpp. Refactor this
+-// function.
+-HRESULT DxcContext::GetDxcDiaTable(IDxcLibrary *pLibrary, IDxcBlob *pTargetBlob,
+-                                   IDiaTable **ppTable, LPCWSTR tableName) {
+-  if (!pLibrary || !pTargetBlob || !ppTable)
+-    return E_INVALIDARG;
+-  CComPtr<IDiaDataSource> pDataSource;
+-  CComPtr<IStream> pSourceStream;
+-  CComPtr<IDiaSession> pSession;
+-  CComPtr<IDiaEnumTables> pEnumTables;
+-  IFT(CreateInstance(CLSID_DxcDiaDataSource, &pDataSource));
+-  IFT(pLibrary->CreateStreamFromBlobReadOnly(pTargetBlob, &pSourceStream));
+-  IFT(pDataSource->loadDataFromIStream(pSourceStream));
+-  IFT(pDataSource->openSession(&pSession));
+-  IFT(pSession->getEnumTables(&pEnumTables));
+-  CComPtr<IDiaTable> pTable;
+-  for (;;) {
+-    ULONG fetched;
+-    pTable.Release();
+-    IFT(pEnumTables->Next(1, &pTable, &fetched));
+-    if (fetched == 0) {
+-      pTable.Release();
+-      break;
+-    }
+-    CComBSTR name;
+-    IFT(pTable->get_name(&name));
+-    if (wcscmp(name, tableName) == 0) {
+-      break;
+-    }
+-  }
+-  *ppTable = pTable.Detach();
+-  return S_OK;
+-}
+-#endif // _WIN32
+ 
+ bool GetDLLFileVersionInfo(const char *dllPath, unsigned int *version) {
+   // This function is used to get version information from the DLL file.
