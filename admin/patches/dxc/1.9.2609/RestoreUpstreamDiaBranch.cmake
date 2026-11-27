@@ -1,0 +1,31 @@
+# DXC v1.9.2609: remove previously installed Visual Studio DIA SDK dependency.
+# BCC64X uses upstream non-MSVC DxilDia sources; no host DIA SDK is allowed.
+cmake_minimum_required(VERSION 3.31)
+foreach(strVar IN ITEMS SOURCE_ROOT GIT_EXECUTABLE PATCH_FILE)
+   if(NOT DEFINED ${strVar} OR "${${strVar}}" STREQUAL "")
+      message(FATAL_ERROR "Missing ${strVar} for DXC DIA migration")
+   endif()
+endforeach()
+if(NOT EXISTS "${SOURCE_ROOT}/lib/DxilDia/CMakeLists.txt" OR NOT EXISTS "${PATCH_FILE}")
+   message(FATAL_ERROR "DXC DIA source or migration patch missing")
+endif()
+execute_process(COMMAND "${GIT_EXECUTABLE}" apply --reverse --check --no-index --whitespace=nowarn "${PATCH_FILE}"
+   WORKING_DIRECTORY "${SOURCE_ROOT}" RESULT_VARIABLE iReverse ERROR_VARIABLE strReverse)
+if(iReverse EQUAL 0)
+   execute_process(COMMAND "${GIT_EXECUTABLE}" apply --reverse --no-index --whitespace=nowarn "${PATCH_FILE}"
+      WORKING_DIRECTORY "${SOURCE_ROOT}" RESULT_VARIABLE iUndo ERROR_VARIABLE strUndo)
+   if(NOT iUndo EQUAL 0)
+      message(FATAL_ERROR "Failed to restore upstream non-MSVC DIA branch: ${strUndo}")
+   endif()
+else()
+   execute_process(COMMAND "${GIT_EXECUTABLE}" apply --check --no-index --whitespace=nowarn "${PATCH_FILE}"
+      WORKING_DIRECTORY "${SOURCE_ROOT}" RESULT_VARIABLE iForward ERROR_VARIABLE strForward)
+   if(NOT iForward EQUAL 0)
+      message(FATAL_ERROR "DXC DIA source matches neither pinned upstream nor prior patch; reverse=${strReverse}; forward=${strForward}")
+   endif()
+endif()
+file(READ "${SOURCE_ROOT}/lib/DxilDia/CMakeLists.txt" strDia)
+if(strDia MATCHES "ADECC_DXC_DIA_INCLUDE_DIR" OR NOT strDia MATCHES "if \(MSVC\)")
+   message(FATAL_ERROR "DXC still requires host DIA SDK or upstream selection is missing")
+endif()
+message(STATUS "DXC DIA: restored upstream non-MSVC branch; no Visual Studio DIA SDK lookup")
