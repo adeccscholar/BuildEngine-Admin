@@ -1,0 +1,76 @@
+diff --git a/tools/clang/tools/dxclib/dxc.cpp b/tools/clang/tools/dxclib/dxc.cpp
+--- a/tools/clang/tools/dxclib/dxc.cpp
++++ b/tools/clang/tools/dxclib/dxc.cpp
+@@ -1462,16 +1462,39 @@
+     DxcDllExtValidationLoader dxcSupport;
+     {
+       HRESULT dllResult;
+-      if (!dxcOpts.ExternalLib.empty() || !dxcOpts.ExternalFn.empty())
+-        dllResult =
+-            dxcSupport.InitializeForDll(dxcOpts.ExternalLib.str().c_str(),
+-                                        dxcOpts.ExternalFn.str().c_str());
+-      else
+-        dllResult = dxcSupport.initialize();
+-
+-      if (DXC_FAILED(dllResult)) {
+-        switch (dxcSupport.getFailureReason()) {
+-        case dxcSupport.FailedCompilerLoad: {
++      if (!dxcOpts.ExternalLib.empty() || !dxcOpts.ExternalFn.empty())
++        dllResult =
++            dxcSupport.InitializeForDll(dxcOpts.ExternalLib.str().c_str(),
++                                        dxcOpts.ExternalFn.str().c_str());
++      else {
++#ifdef _WIN32
++        // Resolve the managed runtime next to dxc.exe, not via the host PATH.
++        char szExePath[32768]{};
++        DWORD dwLength = GetModuleFileNameA(nullptr, szExePath, sizeof(szExePath));
++        if (dwLength != 0 && dwLength < sizeof(szExePath)) {
++          std::string strDllPath(szExePath, dwLength);
++          size_t iSeparator = strDllPath.find_last_of("\\/");
++          if (iSeparator != std::string::npos) {
++            strDllPath.resize(iSeparator + 1);
++            strDllPath += dxc::kDxCompilerLib;
++            dllResult = dxcSupport.InitializeForDll(strDllPath.c_str(),
++                                                     "DxcCreateInstance");
++          } else {
++            dllResult = dxcSupport.initialize();
++          }
++        } else {
++          dllResult = dxcSupport.initialize();
++        }
++#else
++        dllResult = dxcSupport.initialize();
++#endif
++      }
++
++      if (DXC_FAILED(dllResult)) {
++        switch (dxcSupport.getFailureReason()) {
++        case dxcSupport.FailedCompilerLoad: {
+-          fprintf(stderr, "dxcompiler.dll failed to load\n");
++          fprintf(stderr, "dxcompiler.dll failed to load (HRESULT=0x%08lX, Win32=%lu)\n",
++                  static_cast<unsigned long>(dllResult),
++                  static_cast<unsigned long>(HRESULT_CODE(dllResult)));
+           break;
+         }
+diff --git a/include/dxc/Support/dxcapi.use.h b/include/dxc/Support/dxcapi.use.h
+--- a/include/dxc/Support/dxcapi.use.h
++++ b/include/dxc/Support/dxcapi.use.h
+@@ -69,10 +69,14 @@
+       return S_OK;
+ 
+ #ifdef _WIN32
+-    m_dll = LoadLibraryA(
+-        dllName); // CodeQL [SM01925] This is by design, intended to be used to
+-                  // test multiple validators versions.
+-    if (m_dll == nullptr)
++    // For an explicit absolute path, load its dependencies from that folder.
++    bool bAbsolutePath = dllName != nullptr &&
++        ((dllName[0] != '\0' && dllName[1] == ':') ||
++         (dllName[0] == '\\' && dllName[1] == '\\'));
++    m_dll = bAbsolutePath
++        ? LoadLibraryExA(dllName, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH)
++        : LoadLibraryA(dllName);
++    if (m_dll == nullptr)
+       return HRESULT_FROM_WIN32(GetLastError());
+     m_createFn = (DxcCreateInstanceProc)GetProcAddress(m_dll, fnName);
+ 
