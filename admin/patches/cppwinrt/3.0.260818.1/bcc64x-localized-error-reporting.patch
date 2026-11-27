@@ -1,0 +1,24 @@
+--- a/test/test/suppress_error_info.cpp
++++ b/test/test/suppress_error_info.cpp
+@@ -5,12 +5,17 @@
+ {
+     winrt::check_hresult(RoSetErrorReportingFlags(RO_ERROR_REPORTING_SUPPRESSSETERRORINFO));
+ 
+-    // Since the error information is suppressed, the best we can hope for is that C++/WinRT
+-    // will provide a generic message for the HRESULT.
+-    REQUIRE(winrt::hresult_error(E_FAIL, L"message").message() == L"Unspecified error");
+-
++    // Store the suppressed message without asserting while the global flag is
++    // changed. Windows translates the fallback HRESULT message into the
++    // installed UI language; the English literal is not a portable contract.
++    winrt::hstring const strSuppressed = winrt::hresult_error(E_FAIL, L"message").message();
+     winrt::check_hresult(RoSetErrorReportingFlags(RO_ERROR_REPORTING_USESETERRORINFO));
+ 
++    // Assertions run only after the global error reporting state is restored.
++    // This prevents a failed localization assertion from poisoning later tests.
++    REQUIRE(!strSuppressed.empty());
++    REQUIRE(strSuppressed != L"message");
++
+     // The default behavior has been restored, so C++/WinRT can faithfully provide error
+     // information as usual.
+     REQUIRE(winrt::hresult_error(E_FAIL, L"message").message() == L"message");
