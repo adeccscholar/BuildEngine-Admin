@@ -18802,7 +18802,7 @@
          <argument value="-DDXC_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-27T18:30:00Z">
+   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-27T19:03:32Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxc" version="1.9.2609"/>
@@ -18824,6 +18824,15 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-audio-interlocked-long.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <!-- Link Windows import libraries for enabled desktop input and XAudio. -->
+         <copy source="{BuildFileDir}\patches\directxtk12\1.6.6\bcc64x-link-input-audio.patch" target="{Workspace}\.buildengine\patches\bcc64x-link-input-audio.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-link-input-audio" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-link-input-audio.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>

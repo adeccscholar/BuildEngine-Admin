@@ -1,0 +1,19 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -348,8 +348,16 @@
+   endif()
+ 
+   if(MINGW AND BUILD_XINPUT)
+     target_link_libraries(${PROJECT_NAME} PRIVATE xinput1_4.lib)
+   endif()
++
++  if(NOT MINGW AND BUILD_XINPUT)
++    target_link_libraries(${PROJECT_NAME} PRIVATE xinput.lib)
++  endif()
++
++  if(BUILD_XAUDIO_WIN10)
++    target_link_libraries(${PROJECT_NAME} PRIVATE xaudio2.lib)
++  endif()
+ endif()
+ 
+ target_include_directories(${PROJECT_NAME} PRIVATE ${COMPILED_SHADERS} Src)
