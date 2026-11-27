@@ -18775,7 +18775,7 @@
          <argument value="-DDXC_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-26T20:53:01Z">
+   <library id="directxtk12" version="1.6.6" category="graphics" timestamp="2026-11-27T05:05:00Z">
       <dependency library="directxmath" version="3.21"/>
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxc" version="1.9.2609"/>
@@ -18818,6 +18818,20 @@
          <argument value="-Ddirectxmath_DIR:PATH={DependencyRoot:directxmath}\share\directxmath"/>
          <argument value="-Ddirectx-headers_DIR:PATH={DependencyRoot:directx-headers}\share\directx-headers\cmake"/>
          <argument value="-DCMAKE_PREFIX_PATH:STRING={DependencyRoot:directxmath};{DependencyRoot:directx-headers}"/>
+         <!-- One native runtime check before expensive Shader Model 6 generation. -->
+         <execute name="preflight-managed-dxc-runtime" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DDXC_PACKAGE_ROOT:PATH={DependencyRoot:dxc}"/>
+            <argument value="-DSPIRV_TOOLS_PACKAGE_ROOT:PATH={DependencyRoot:spirv-tools}"/>
+            <argument value="-DBCC64X_TOOLCHAIN:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+            <argument value="-DNINJA_EXECUTABLE:FILEPATH={Tool:ninja}"/>
+            <argument value="-DCMAKE_EXECUTABLE:FILEPATH={Tool:cmake}"/>
+            <argument value="-DPROBE_SOURCE_ROOT:PATH={BuildFileDir}\cmake\dxc\runtime-probe"/>
+            <argument value="-DPROBE_BUILD_ROOT:PATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\dxc-runtime-probe"/>
+            <argument value="-DREPORT_FILE:FILEPATH={BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}\dxc-runtime-preflight.log"/>
+            <argument value="-DCONFIGURATION:STRING={Configuration}"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\dxc\PreflightDxcRuntime.cmake"/>
+         </execute>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
