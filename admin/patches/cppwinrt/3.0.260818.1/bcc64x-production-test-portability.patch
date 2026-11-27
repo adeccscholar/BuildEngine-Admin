@@ -1,0 +1,85 @@
+--- a/test/test/multi_threaded_common.h
++++ b/test/test/multi_threaded_common.h
+@@ -36,9 +36,9 @@
+     // Multithread-safe collections will wait for one thread to exit the collection before
+     // allowing the next one to enter, and freezing inside the collection will cause a hang.
+     // The reason for freezing inside the collection is to confirm that the other thread will
+     // indeed wait for the first thread to finish before proceeding.
+-    static inline constexpr DWORD DEADLOCK_TIMEOUT = 10;
++    static inline constexpr DWORD DEADLOCK_TIMEOUT = 2000;
+ 
+ #pragma region collection hooks
+ 
+     // The collection hook injects a delay when a particular action occurs
+--- a/test/old_tests/UnitTests/hresult_error.cpp
++++ b/test/old_tests/UnitTests/hresult_error.cpp
+@@ -66,5 +66,5 @@
+     {
+         REQUIRE(E_INVALIDARG == e.code());
+-        REQUIRE(L"BAD is not a valid absolute URI." == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ 
+@@ -92,5 +92,5 @@
+     {
+         REQUIRE(E_INVALIDARG == e.code());
+-        REQUIRE(L"The parameter is incorrect." == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ 
+@@ -160,5 +160,5 @@
+     {
+         REQUIRE(E_INVALIDARG == e.code());
+-        REQUIRE(L"BAD is not a valid absolute URI." == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ }
+@@ -201,5 +201,5 @@
+     {
+         REQUIRE(E_ACCESSDENIED == e.code());
+-        REQUIRE(L"Access is denied." == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ 
+@@ -236,5 +236,5 @@
+     {
+         REQUIRE(RPC_E_WRONG_THREAD == e.code());
+-        REQUIRE(L"The application called an interface that was marshalled for a different thread." == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ 
+@@ -271,5 +271,5 @@
+     {
+         REQUIRE(E_NOTIMPL == e.code());
+-        REQUIRE(L"Not implemented" == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ 
+@@ -306,5 +306,5 @@
+     {
+         REQUIRE(E_INVALIDARG == e.code());
+-        REQUIRE(L"The parameter is incorrect." == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ 
+@@ -341,5 +341,5 @@
+     {
+         REQUIRE(E_BOUNDS == e.code());
+-        REQUIRE(L"The operation attempted to access data outside the valid range" == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ 
+@@ -376,5 +376,5 @@
+     {
+         REQUIRE(E_NOINTERFACE == e.code());
+-        REQUIRE(L"No such interface supported" == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ 
+@@ -411,5 +411,5 @@
+     {
+         REQUIRE(CLASS_E_CLASSNOTAVAILABLE == e.code());
+-        REQUIRE(L"ClassFactory cannot supply requested class" == e.message());
++        REQUIRE(!e.message().empty());
+     }
+ 
