@@ -18315,7 +18315,7 @@
          <argument value="-DWINMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-27T01:25:01Z">
+   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-27T02:50:00Z">
       <dependency library="winmd" version="0f1eae3b"/>
       <metadata artifactType="tool" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
@@ -18362,6 +18362,12 @@
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
+         <!-- Test-only real Windows Runtime ABI, independent of optional SDK UM headers. -->
+         <execute name="bind-native-roerrorapi" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\BindNativeRoerrorapi.cmake"/>
+         </execute>
          <!-- Stage only Windows SDK winstring.h for the original PCH test.
               The patch was checked with git apply --check against upstream. -->
          <copy source="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\bcc64x-winstring-isolated.patch"
@@ -18394,6 +18400,7 @@
          <argument value="-DEXTERNAL_WINMD_INCLUDE_DIR:PATH={DependencyRoot:winmd}\include"/>
          <argument value="-DCPPWINRT_BUILD_VERSION:STRING=3.0.260818.1"/>
          <argument value="-DADECC_CPPWINRT_MIDLRT:FILEPATH={Tool:windows-midlrt}"/>
+         <argument value="-DADECC_CPPWINRT_ROERRORAPI_HEADER:FILEPATH={BuildFileDir}\compat\bcc64x\cppwinrt-roerrorapi.h"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <variant name="Release"><argument value="-DCMAKE_BUILD_TYPE:STRING=Release"/></variant>
