@@ -42,8 +42,10 @@ execute_process(
   RESULT_VARIABLE _result
   OUTPUT_VARIABLE _stdout
   ERROR_VARIABLE _stderr
-  TIMEOUT 45)
+  TIMEOUT 180)
 
+# Retain real shader execution on resource-constrained production hosts; timeout
+# must not be confused with a compiler correctness failure.
 # Loader failures are infrastructure errors, not shader compilation results.
 # In particular, ERROR_MOD_NOT_FOUND (0x8007007E) must never count as
 # successful rejection of an intentionally invalid shader.
