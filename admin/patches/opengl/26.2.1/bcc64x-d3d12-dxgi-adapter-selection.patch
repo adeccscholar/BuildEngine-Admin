@@ -1,0 +1,64 @@
+--- a/src/gallium/drivers/d3d12/d3d12_dxgi_screen.cpp
++++ b/src/gallium/drivers/d3d12/d3d12_dxgi_screen.cpp
+@@ -74,5 +74,61 @@
+ choose_dxgi_adapter(IDXGIFactory4 *factory, LUID *adapter)
+ {
+    IDXGIAdapter3 *ret;
++   // On native Windows, the DXCore adapter-name override is not used.
++   // An explicit user preference must win over the WGL-provided HDC LUID.
++   const char *szRequestedName =
++      debug_get_option("MESA_D3D12_DEFAULT_ADAPTER_NAME", nullptr);
++   if (szRequestedName && szRequestedName[0]) {
++      wchar_t wszRequestedName[128] = {};
++      int iLength = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS,
++         szRequestedName, -1, wszRequestedName,
++         static_cast<int>(sizeof(wszRequestedName) / sizeof(wszRequestedName[0])));
++      if (iLength <= 1) {
++         debug_printf("D3D12: invalid requested DXGI adapter name\n");
++         return NULL;
++      }
++      --iLength; // MultiByteToWideChar includes the trailing NUL.
++
++      for (UINT uIndex = 0; ; ++uIndex) {
++         IDXGIAdapter1 *pCandidate = nullptr;
++         HRESULT hr = factory->EnumAdapters1(uIndex, &pCandidate);
++         if (hr == DXGI_ERROR_NOT_FOUND)
++            break;
++         if (FAILED(hr) || !pCandidate)
++            continue;
++
++         DXGI_ADAPTER_DESC1 theDescription = {};
++         bool bMatches = false;
++         if (SUCCEEDED(pCandidate->GetDesc1(&theDescription)) &&
++             !(theDescription.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)) {
++            int const iDescriptionLength = lstrlenW(theDescription.Description);
++            for (int iOffset = 0;
++                 iOffset + iLength <= iDescriptionLength; ++iOffset) {
++               if (CompareStringOrdinal(theDescription.Description + iOffset,
++                      iLength, wszRequestedName, iLength, TRUE) == CSTR_EQUAL) {
++                  bMatches = true;
++                  break;
++               }
++            }
++         }
++         if (bMatches) {
++            HRESULT const hrInterface =
++               pCandidate->QueryInterface(IID_PPV_ARGS(&ret));
++            pCandidate->Release();
++            if (SUCCEEDED(hrInterface)) {
++               debug_printf("D3D12: selected DXGI adapter matching '%s'\n",
++                  szRequestedName);
++               return ret;
++            }
++            debug_printf("D3D12: matching DXGI adapter has no IDXGIAdapter3\n");
++            return NULL;
++         }
++         pCandidate->Release();
++      }
++      // An explicit selection must fail closed, not silently use adapter 0.
++      debug_printf("D3D12: no DXGI adapter matching '%s'\n", szRequestedName);
++      return NULL;
++   }
++
+    if (adapter) {
+       if (SUCCEEDED(factory->EnumAdapterByLuid(*adapter,
