@@ -1,0 +1,28 @@
+diff --git a/loader/CMakeLists.txt b/loader/CMakeLists.txt
+--- a/loader/CMakeLists.txt
++++ b/loader/CMakeLists.txt
+@@ -395,16 +395,16 @@
+ 
+     # when adding the suffix the import and runtime library names must be consistent
+     # mingw: libvulkan-1.dll.a / vulkan-1.dll
+     # msvc: vulkan-1.lib / vulkan-1.dll
+-    set_target_properties(vulkan
+-                          PROPERTIES
+-                          OUTPUT_NAME ${API_TYPE}-1)
+-    if(MINGW)
+-        # generate the same DLL with mingw
+-        set_target_properties(vulkan
+-                              PROPERTIES
+-                              PREFIX "")
++    # The Vulkan Windows ABI requires vulkan-1.dll and a matching import library.
++    # BCC64X deliberately clears MINGW, so the ABI names must not depend on it.
++    set_target_properties(vulkan
++                          PROPERTIES
++                          OUTPUT_NAME ${API_TYPE}-1
++                          PREFIX ""
++                          IMPORT_PREFIX "")
++    if(MINGW)
+         # let the linker just fix up the stdcall mangling, like on msvc
+         if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+             target_link_options(vulkan PRIVATE "-Wl,--enable-stdcall-fixup")
+         endif()
