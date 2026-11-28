@@ -19,3 +19,11 @@ This is an intentionally separate producer identity. The complete upstream fork 
 The BCC64X 20.1.7 compiler log proves that NVIDIA's `common/compiler_gcc.h` defines a function-like `_rotr64(x,n)` macro before the Embarcadero CRT's `stdlib.h` declares the `_rotr64` function. That macro expands inside the CRT declaration and breaks parsing. The version-pinned `bcc64x-crt-rotate-order.patch` includes `<stdlib.h>` in the internal `lib/lib_common.h` before `common_defs.h` defines the rotation macro, scoped to the BCC64X Windows Clang build. No SIMD or rotation algorithm is disabled; SDK headers remain untouched.
 
 The same native log showed a redundant `BUILDING_LIBDEFLATE` compiler definition; the original internal header already defines it, so the dedicated CMake adapter now supplies only `LIBDEFLATE_DLL`. Release, Debug, DLL exports and native tests remain **[not verified]**.
+
+## DirectStorage GDeflate dependency, 28 November 2026
+
+This is the independently managed NVIDIA libdeflate GDeflate fork required by the Microsoft DirectStorage repository's open GDeflate reference-code example. Ordinary upstream libdeflate 1.26 does not expose the `libdeflate_gdeflate_*` entry points, which caused an initial unresolved-symbol build failure. The BuildEngine XML therefore declares this fork with separate source, install and package identity and the DirectStorage GDeflate producer depends on it explicitly. The proprietary DirectStorage runtime is **not** distributed or emulated by these two packages.
+
+Final native library integration across the developer and Windows Server 2025 environments was **operator-reported**. A later showcase may compare identical roundtrip buffers and report compression/decompression throughput; GPU DirectStorage execution must not be claimed from the CPU reference implementation.
+
+[Engineering retrospective](/news/2026-11-28/) · [Complete library catalog](/manual/libraries.md)
