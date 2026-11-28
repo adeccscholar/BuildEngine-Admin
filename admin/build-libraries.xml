@@ -4689,7 +4689,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="dxil.dll"/>
       </publish>
    </library>
-<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-28T15:12:07Z">
+<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-28T15:55:00Z">
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxil-validator" version="1.9.2609"/>
       <metadata name="Mesa OpenGL" supplier="Mesa project" homepage="https://mesa3d.org/" description="Mesa-based OpenGL runtime and development package for hardware-accelerated graphics on Windows." licenseSignal="yellow">
@@ -4767,6 +4767,20 @@
             <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
             <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-d3d12-com-abi.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <!-- Native Windows DXGI does not honor the DXCore-only
+              MESA_D3D12_DEFAULT_ADAPTER_NAME selection. The explicit user
+              selection must take priority over the WGL-provided adapter LUID. -->
+         <copy source="{BuildFileDir}\patches\opengl\26.2.1\bcc64x-d3d12-dxgi-adapter-selection.patch"
+            target="{Workspace}\.buildengine\patches\bcc64x-d3d12-dxgi-adapter-selection.patch"
+            overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-bcc64x-d3d12-dxgi-adapter-selection"
+            executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-d3d12-dxgi-adapter-selection.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
          </execute>
