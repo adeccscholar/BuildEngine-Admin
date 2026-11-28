@@ -4651,7 +4651,7 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\glew\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="glew-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
-<library id="dxil-validator" version="1.9.2609" category="graphics" timestamp="2026-11-28T00:00:00Z">
+<library id="dxil-validator" version="1.9.2609" category="graphics" timestamp="2026-11-28T15:12:07Z">
       <metadata artifactType="shared" name="Microsoft DXIL Validator Runtime"
          supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler"
          description="Pinned x64 DXIL shader validator runtime extracted from the official Microsoft DXC v1.9.2609 release. Used by Mesa Gallium D3D12 without requiring an SDK-installed validator."
@@ -4689,7 +4689,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="dxil.dll"/>
       </publish>
    </library>
-<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-28T00:00:00Z">
+<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-28T15:12:07Z">
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxil-validator" version="1.9.2609"/>
       <metadata name="Mesa OpenGL" supplier="Mesa project" homepage="https://mesa3d.org/" description="Mesa-based OpenGL runtime and development package for hardware-accelerated graphics on Windows." licenseSignal="yellow">
