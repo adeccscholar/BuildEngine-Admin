@@ -15397,7 +15397,7 @@
          <argument value="-DMARIADB_LIBRARY:FILEPATH={ConsumerRoot}\lib\libmariadb.lib"/>
       </smoke>
    </library>
-   <library id="vulkan-loader" version="1.4.368" category="graphics" timestamp="2026-11-28T16:57:53Z">
+   <library id="vulkan-loader" version="1.4.368" category="graphics" timestamp="2026-11-28T17:02:00Z">
       <dependency library="vulkan-headers" version="1.4.368"/>
       <metadata artifactType="shared" name="Khronos Vulkan Loader" supplier="Khronos Group"
          homepage="https://github.com/KhronosGroup/Vulkan-Loader"
@@ -15450,6 +15450,8 @@
          <argument value="-DCMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY:BOOL=ON"/>
          <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
          <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <variant name="Release"/>
+         <variant name="Debug"/>
          <install>
             <perVariant>
                <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
