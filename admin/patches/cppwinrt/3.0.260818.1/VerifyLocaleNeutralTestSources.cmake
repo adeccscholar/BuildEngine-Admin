@@ -20,7 +20,8 @@ file(READ "${_old_source}" _old_text)
 
 foreach(_literal IN ITEMS
    "REQUIRE(e.message() == L\"The parameter is incorrect.\")"
-   "REQUIRE(e.message() == L\"bad is not a valid absolute URI.\")")
+   "REQUIRE(e.message() == L\"bad is not a valid absolute URI.\")"
+   "REQUIRE(e.message() == L\"Invalid at the top level of the document.\")")
    string(FIND "${_test_text}" "${_literal}" _position)
    if(NOT _position EQUAL -1)
       message(FATAL_ERROR "CPPWINRT locale-dependent assertion remains in error_info.cpp: ${_literal}")
@@ -50,8 +51,8 @@ endforeach()
 # Require the semantic replacement to exist; absence of the old string alone is insufficient.
 string(REGEX MATCHALL "REQUIRE\\(!e\\.message\\(\\)\\.empty\\(\\)\\)" _old_checks "${_old_text}")
 list(LENGTH _old_checks _old_check_count)
-if(_old_check_count LESS 10)
-   message(FATAL_ERROR "CPPWINRT legacy HRESULT test replacements incomplete: ${_old_check_count}/10")
+if(_old_check_count LESS 20)
+   message(FATAL_ERROR "CPPWINRT legacy HRESULT test replacements incomplete: ${_old_check_count}/20")
 endif()
 
 # The archive may preserve older timestamps than existing Ninja objects.
