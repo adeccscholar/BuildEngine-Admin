@@ -4689,9 +4689,11 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="dxil.dll"/>
       </publish>
    </library>
-<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-28T15:55:00Z">
+<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-28T16:51:03Z">
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxil-validator" version="1.9.2609"/>
+      <dependency library="vulkan-loader" version="1.4.368"/>
+      <dependency library="vulkan-headers" version="1.4.368"/>
       <metadata name="Mesa OpenGL" supplier="Mesa project" homepage="https://mesa3d.org/" description="Mesa-based OpenGL runtime and development package for hardware-accelerated graphics on Windows." licenseSignal="yellow">
          <license name="Mesa component licenses" file="LICENSE-MESA.rst"/>
       </metadata>
@@ -4796,13 +4798,13 @@
          <!-- Native BCC64X Mesa build. No MSVC, clang-cl or MinGW fallback is permitted. Parallel tests must not rewrite shared Meson source files. -->
          <environment name="CC" value="{Tool:bcc64x}"/>
          <environment name="CXX" value="{Tool:bcc64x}"/>
-         <environment name="CXXFLAGS" value="-I{Workspace}/.buildengine/compat"/>
+         <environment name="CXXFLAGS" value="-I{Workspace}/.buildengine/compat -I{DependencyRoot:vulkan-headers}/include"/>
          <!-- Meson consumes the DirectX-Headers pkg-config link names; provide its actual BCC64X import-library directory. -->
-         <environment name="LDFLAGS" value="-L{DependencyRoot:directx-headers}/lib/win64/{Configuration}"/>
+         <environment name="LDFLAGS" value="-L{DependencyRoot:directx-headers}/lib/win64/{Configuration} -L{DependencyRoot:vulkan-loader}/lib/win64/{Configuration}"/>
          <environment name="AR" value="{Tool:llvm-ar}"/>
          <environment name="WINDRES" value="{Tool:bcc64x-windres}"/>
          <!-- Native pinned DirectX-Headers package, no Meson wrap fallback. -->
-         <environment name="PKG_CONFIG_PATH" value="{DependencyRoot:directx-headers}\lib\win64\{Configuration}\pkgconfig"/>
+         <environment name="PKG_CONFIG_PATH" value="{DependencyRoot:directx-headers}\lib\win64\{Configuration}\pkgconfig;{DependencyRoot:vulkan-loader}\lib\win64\{Configuration}\pkgconfig"/>
          <environment name="PYTHONPATH" value="{Workspace}\packaging-26.3\src;{Workspace}\markupsafe-3.0.3\src;{Workspace}\mako-1.4.1;{Workspace}\pyyaml-6.0.3\lib"/>
          <environment name="PATH" value="{ToolDir:bcc64x};{ToolDir:llvm-ar};{ToolDir:bcc64x-windres};{ToolDir:ninja};{ToolDir:python};{ENV:PATH}"/>
 
@@ -4822,11 +4824,11 @@
             <argument value="--includedir=include"/>
             <argument value="--buildtype={MesonBuildType}"/>
             <argument value="-Dplatforms=windows"/>
-            <!-- The softpipe reference remains available. The D3D12 path is an
-                 intentionally experimental BCC64X build gate and must pass
-                 upstream Mesa tests before GPU support is reported. Zink
-                 follows after managed Vulkan loader availability. -->
-            <argument value="-Dgallium-drivers=softpipe,d3d12"/>
+            <!-- Softpipe and the already verified D3D12 path remain available.
+                 Zink now builds against the pinned native BCC64X Vulkan loader.
+                 Real Vulkan GPU execution must still pass its own independent
+                 native desktop smoke before any performance claim. -->
+            <argument value="-Dgallium-drivers=softpipe,d3d12,zink"/>
             <argument value="-Dgallium-d3d12-video=disabled"/>
             <argument value="-Dgallium-wgl-dll-name=libgallium_wgl"/>
             <argument value="-Dopengl=true"/>
