@@ -15395,7 +15395,78 @@
          <argument value="-DMARIADB_LIBRARY:FILEPATH={ConsumerRoot}\lib\libmariadb.lib"/>
       </smoke>
    </library>
-   <library id="vulkan-headers" version="1.4.368" category="graphics" timestamp="2026-11-15T16:58:00Z">
+   <library id="vulkan-loader" version="1.4.368" category="graphics" timestamp="2026-11-28T16:50:35Z">
+      <dependency library="vulkan-headers" version="1.4.368"/>
+      <metadata artifactType="shared" name="Khronos Vulkan Loader" supplier="Khronos Group"
+         homepage="https://github.com/KhronosGroup/Vulkan-Loader"
+         description="Native Vulkan loader DLL with installed BCC64X import library and explicit managed Vulkan-Headers dependency."
+         licenseSignal="green">
+         <license name="Apache License 2.0 with upstream exceptions" file="LICENSE.txt"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/KhronosGroup/Vulkan-Loader.git" commit="f61c41f6b4c0a2fa3d2b900ab690febbf3235172"/>
+      </security>
+      <source>
+         <download url="https://github.com/KhronosGroup/Vulkan-Loader/archive/f61c41f6b4c0a2fa3d2b900ab690febbf3235172.tar.gz"
+            archive="vulkan-loader-1.4.368.tar.gz"/>
+         <extract format="libarchive" root="Vulkan-Loader-f61c41f6b4c0a2fa3d2b900ab690febbf3235172">
+            <require path="CMakeLists.txt"/>
+            <require path="loader\CMakeLists.txt"/>
+            <require path="loader\vulkan-1.def"/>
+            <require path="LICENSE.txt"/>
+         </extract>
+         <copy source="{BuildFileDir}\cmake\vulkan\VulkanHeadersConfig.cmake"
+            target="{Workspace}\.buildengine\vulkan\VulkanHeadersConfig.cmake"
+            overwrite="true" preserveCurrentArtifact="true"/>
+         <copy source="{BuildFileDir}\cmake\vulkan\VulkanHeadersConfigVersion.cmake"
+            target="{Workspace}\.buildengine\vulkan\VulkanHeadersConfigVersion.cmake"
+            overwrite="true" preserveCurrentArtifact="true"/>
+      </source>
+      <build testsAffectBuild="false">
+         <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
+         <environment name="CB_BDS" value="{BDS}"/>
+         <argument value="-G"/><argument value="Ninja"/>
+         <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
+         <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
+         <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
+         <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
+         <argument value="-DCMAKE_INSTALL_BINDIR:STRING=bin/win64/{Configuration}"/>
+         <argument value="-DCMAKE_BUILD_TYPE:STRING={Configuration}"/>
+         <argument value="-DVULKAN_HEADERS_INSTALL_DIR:PATH={DependencyRoot:vulkan-headers}"/>
+         <argument value="-DVulkanHeaders_DIR:PATH={Workspace}\.buildengine\vulkan"/>
+         <argument value="-DBUILD_TESTS:BOOL=OFF"/>
+         <argument value="-DBUILD_STATIC_LOADER:BOOL=OFF"/>
+         <argument value="-DUSE_MASM:BOOL=OFF"/>
+         <argument value="-DUSE_GAS:BOOL=OFF"/>
+         <argument value="-DLOADER_CODEGEN:BOOL=OFF"/>
+         <argument value="-DUPDATE_DEPS:BOOL=OFF"/>
+         <argument value="-DCMAKE_FIND_USE_PACKAGE_REGISTRY:BOOL=OFF"/>
+         <argument value="-DCMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY:BOOL=OFF"/>
+         <argument value="-DCMAKE_FIND_PACKAGE_NO_PACKAGE_REGISTRY:BOOL=ON"/>
+         <argument value="-DCMAKE_FIND_PACKAGE_NO_SYSTEM_PACKAGE_REGISTRY:BOOL=ON"/>
+         <cmake mode="configure" executable="{Tool:cmake}" source="{Workspace}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <cmake mode="build" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+         <install>
+            <perVariant>
+               <cmake mode="install" executable="{Tool:cmake}" build="{BuildRoot}\packages\{LibraryId}\{LibraryVersion}\{Configuration}"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\{Configuration}\vulkan-1.dll"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\lib\win64\{Configuration}" kind="directory"/>
+            </perVariant>
+            <common>
+               <copy source="{Workspace}\LICENSE.txt"
+                  target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt" overwrite="true"/>
+               <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.txt"/>
+            </common>
+         </install>
+      </build>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="vulkan-1.dll"/>
+         <files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/>
+         <cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake" optional="true"/>
+      </publish>
+   </library>
+<library id="vulkan-headers" version="1.4.368" category="graphics" timestamp="2026-11-15T16:58:00Z">
       <metadata name="vulkan-headers" supplier="Khronos Group" homepage="https://github.com/KhronosGroup/Vulkan-Headers" description="Vulkan C and C++ API headers; no runtime DLL" licenseSignal="yellow"/>
       <security><repository url="https://github.com/KhronosGroup/Vulkan-Headers.git" ref="v1.4.368"/></security>
       <source>
