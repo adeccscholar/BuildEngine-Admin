@@ -147,3 +147,20 @@ A separate headless `--verify` / CTest checks Ceres convergence, OpenEXR half-fl
 The existing **[Tesseract OCR Studio](/showcase/graphics/tesseract-ocr-studio/)** now adds an opt-in `cv::remap` stage to unbend a manually estimated symmetric text-line bow. This follows the existing flat-page `warpPerspective` extraction and precedes the Leptonica/Tesseract pipeline, retaining full-resolution pixels and the frozen-camera capture workflow. The signed page-height control is explicit; a single image does not establish a physically correct 3D page surface.
 
 The independent `--verify` now checks a synthetic curved ink baseline is reduced from at least 25 pixels to 4 pixels or less, alongside the original exact OCR, confidence and page-detection regression. It does not pretend to measure unknown real-world OCR accuracy without a photographed book and ground-truth transcript. **[not verified]** Native BCC64X and camera image validation pending.
+
+## Mesa GPU acceleration and independent per-showcase controls (28 November 2026)
+
+Operator-provided native Windows logs now establish successful **DirectX Prism** D3D12 shader execution, 30-frame ImGui/WGL verification and benchmark completion on both Intel UHD and NVIDIA RTX 4000 Ada Generation Laptop GPU. The reproducible managed stack includes Mesa 26.2.1, DirectX-Headers 1.619.1, the independent `dxil-validator@1.9.2609` runtime package and a version-bound Windows DXGI adapter-selection patch.
+
+| DirectX Prism timer-query measurement | Intel UHD | NVIDIA RTX 4000 Ada Laptop |
+| --- | ---: | ---: |
+| 30-frame verification | PASS | PASS |
+| GPU samples | 105 | 210 |
+| Median GPU draw pass | 5.062 ms | 0.157 ms |
+| P95 GPU draw pass | 5.524 ms | 0.162 ms |
+
+The measured NVIDIA GPU-pass time is 32.24 times shorter by median, and 34.10 times shorter at P95. Those figures are **only** DirectX Prism shader durations, not full FPS, CPU speedup or representative numbers for other showcases.
+
+The separately updated GPU-capable application surfaces include [DirectX Prism](/showcase/graphics/directx-prism/), [Tensor Nebula](/showcase/graphics/tensor-nebula/), [DXC Shader Foundry](/showcase/graphics/dxc-shader-foundry/), [Navigation Reactor](/showcase/graphics/navigation-reactor/), [OpenGL SDL2 Earth](/showcase/opengl-sdl2-earth/), [OpenMP Galaxy](/showcase/openmp-galaxy/), and the terrain executable in [GeoSpatial Skia](/showcase/geospatial-skia/). They provide an explicit backend selector, DXGI device preference and a caption with a live *completed GPU-pass* measurement. The legacy SDL2 applications use native Win32 comboboxes; the official Dear ImGui applications use ImGui comboboxes. A backend change launches a new process so it is not applied to an existing WGL context. Their new UI integrations remain **[not verified]** pending BCC64X builds and individual desktop tests.
+
+VTK Visualization is a separate case: its packaged VTK/OpenGL2 runtime was deliberately configured for system OpenGL, so replacing that with a Mesa provider requires a separate VTK package/build acceptance contract. The project does not pretend to switch VTK GPU drivers through a dropdown when the required DLL runtime is not staged. Mesa **Zink/Vulkan** is similarly not available in the active Mesa 26.2.1 build (`softpipe,d3d12` only) and has **no measured benchmark** yet.
