@@ -69,3 +69,23 @@ The first native BCC64X attempt for DirectX-Headers 1.619.1 reached both Release
 The correction retains both upstream test suites and adds `admin/cmake/directx-headers/WindowsSdkWinRT.cmake`. It derives the SDK version/root from the **registered** `CB_WINDOWS_RC` tool by the same path traversal used by the shared BCC64X toolchain, requires `Include/<version>/winrt/wrl/client.h` to exist, and attaches that directory only to the actual upstream test targets through `target_include_directories(... SYSTEM PRIVATE ...)`. The upstream GoogleTest build remains pinned to managed GoogleTest 1.18.0, and the original ordinary test CMakeLists is retained with just the necessary include adapter. No test targets or test execution are disabled; no alternate compiler toolchain is selected.
 
 This change has been committed on `main`, but the repaired Release/Debug builds and tests remain **[not verified]** until the next native BuildEngine run. A subsequent WRL, COM or SDK-ABI error must be handled using its actual diagnostic rather than preemptively disabling test coverage.
+
+## Architecture update, 28 November 2026
+
+The earlier text above documents historical integration stages; the current
+BuildEngine XML declares opengl@26.2.1 with gallium drivers softpipe,d3d12,zink
+and its managed Vulkan loader/headers. The virtual production server has no
+dedicated GPU and must produce the exact same compiled package without a
+Vulkan ICD or a physical graphics adapter.
+
+The published OpenGL consumer smoke now checks application-local managed
+binaries, DLL loading, PE imports and GL/WGL exports without making a WGL
+context. Optional graphics tests live only in BuildEngine-Tests, isolated
+and bounded by process timeouts.
+
+Development-host results: NVIDIA Zink shader/readback PASS and Google
+Benchmark timings on NVIDIA Zink/D3D12 and Intel D3D12. Intel Vulkan
+instance/logical-device PASS, but Zink startup repeatedly timed out.
+The missing capability inventory is a runtime-only diagnostic issue;
+do not change build variants based on GPU vendor or host features.
+Native production VM acceptance of the revised smoke is [not verified].

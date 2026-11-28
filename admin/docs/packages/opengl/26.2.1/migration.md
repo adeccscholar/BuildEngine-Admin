@@ -204,3 +204,23 @@ flowchart TD
 ### Verification status
 
 The D3D12 configuration is committed but **[not verified]** by a local BCC64X build. A configure/build failure is expected to identify remaining API, compiler, linker, shader compiler or package-discovery gaps; it must be resolved as a native BCC64X compatibility issue rather than disabling existing tests or adopting MSVC/MinGW libraries. Zink remains **[not verified]** and cannot be presented as installed. The completed historical Softpipe FSM evidence is not evidence of a GPU backend.
+
+## 28 November 2026: GPU-independent package acceptance
+
+The current XML builds Mesa 26.2.1 with Gallium drivers softpipe,d3d12,zink.
+Managed vulkan-loader@1.4.368, vulkan-headers@1.4.368 and DirectX packages
+are compile/link dependencies, **not** requirements for physical GPUs or
+vendor ICDs on the Windows Server 2025 production VM.
+
+The published consumer smoke is now a hardware-neutral artifact/import
+check. It verifies that application-local opengl32.dll and libgallium_wgl.dll
+are present and load, that the managed consumer links, and that public GL/WGL
+exports exist. It does not create WGL contexts or query any Vulkan/DXGI
+hardware. Runtime GPU validation belongs to optional, separately supervised
+desktop diagnostics in BuildEngine-Tests.
+
+The existing testsAffectBuild flag is deliberately unchanged: in the current
+BuildEngine implementation it affects the test runtime PATH and build token,
+and is not a general GPU-requirement toggle. Build/install/publish and
+hardware-independent smoke errors still matter. Absent GPU capabilities do
+not invalidate the package. Native server verification remains [not verified].
