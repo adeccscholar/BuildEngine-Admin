@@ -15397,7 +15397,7 @@
          <argument value="-DMARIADB_LIBRARY:FILEPATH={ConsumerRoot}\lib\libmariadb.lib"/>
       </smoke>
    </library>
-   <library id="vulkan-loader" version="1.4.368" category="graphics" timestamp="2026-11-28T16:56:33Z">
+   <library id="vulkan-loader" version="1.4.368" category="graphics" timestamp="2026-11-28T16:57:53Z">
       <dependency library="vulkan-headers" version="1.4.368"/>
       <metadata artifactType="shared" name="Khronos Vulkan Loader" supplier="Khronos Group"
          homepage="https://github.com/KhronosGroup/Vulkan-Loader"
@@ -15440,7 +15440,6 @@
          <argument value="-DVULKAN_HEADERS_INSTALL_DIR:PATH={DependencyRoot:vulkan-headers}"/>
          <argument value="-DVulkanHeaders_DIR:PATH={Workspace}\.buildengine\vulkan"/>
          <argument value="-DBUILD_TESTS:BOOL=OFF"/>
-         <argument value="-DBUILD_STATIC_LOADER:BOOL=OFF"/>
          <argument value="-DUSE_MASM:BOOL=OFF"/>
          <argument value="-DUSE_GAS:BOOL=OFF"/>
          <argument value="-DLOADER_CODEGEN:BOOL=OFF"/>
