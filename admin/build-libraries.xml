@@ -18315,7 +18315,7 @@
          <argument value="-DWINMD_PACKAGE_ROOT:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
       </smoke>
    </library>
-   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-28T02:13:00Z">
+   <library id="cppwinrt" version="3.0.260818.1" category="foundation" timestamp="2026-11-28T02:56:54Z">
       <dependency library="winmd" version="0f1eae3b"/>
       <metadata artifactType="tool" name="Microsoft C++/WinRT" supplier="Microsoft" homepage="https://github.com/microsoft/cppwinrt" description="Native WinRT source-projection generator with managed winmd metadata reader and original upstream test project." licenseSignal="yellow"><license name="Upstream License" file="LICENSE"/></metadata>
       <security><repository url="https://github.com/microsoft/cppwinrt.git" ref="3.0.260818.1"/></security>
@@ -18407,6 +18407,20 @@
             <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-winstring-isolated.patch"/>
             <argument value="-P"/>
             <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <!-- Final locale-neutral tests: patch the URI assertion, then verify and refresh only affected sources. -->
+         <copy source="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\bcc64x-uri-message-portability.patch" target="{Workspace}\.buildengine\patches\bcc64x-uri-message-portability.patch" overwrite="true" preserveCurrentArtifact="true"/>
+         <execute name="apply-uri-message-portability" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DGIT_EXECUTABLE:FILEPATH={Tool:git}"/>
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-DPATCH_FILE:FILEPATH={Workspace}\.buildengine\patches\bcc64x-uri-message-portability.patch"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\cmake\packages\ApplyIdempotentSourcePatch.cmake"/>
+         </execute>
+         <execute name="verify-and-refresh-localized-test-sources" executable="{Tool:cmake}" workingDirectory="{Workspace}" showOutput="false">
+            <argument value="-DSOURCE_ROOT:PATH={Workspace}"/>
+            <argument value="-P"/>
+            <argument value="{BuildFileDir}\patches\cppwinrt\3.0.260818.1\VerifyLocaleNeutralTestSources.cmake"/>
          </execute>
       </source>
 
