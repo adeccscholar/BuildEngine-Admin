@@ -8,7 +8,7 @@ A chronological engineering account of BuildEngine's growth from an August BCC64
 
 ## Timeline (newest first)
 
-- **[2026-11-28](/news/2026-11-28/)** — 116 distinct libraries / 152 retained versions; operator-reported BCC64X completion across developer workstation and Windows Server 2025, Microsoft DirectX/DXC/WinRT integration retrospective, scoped locale-neutral test corrections and new GPU showcase direction
+- **[2026-11-28](/news/2026-11-28/)** — 117 distinct library IDs / 153 retained versions; developer and production BCC64X milestone, verified Mesa D3D12 Intel/NVIDIA DirectX Prism benchmark (5.062 ms versus 0.157 ms median, 32.24× GPU-pass duration ratio), new DXIL validator and hardware adapter selection, updated GPU showcase controls
 
 - **[2026-11-22](/news/2026-11-22/)** — Earlier operator-reported 141/141 clean-room completion; extended Microsoft native source catalog includes Detours, DirectXMath, DirectXMesh, DirectXTex, DXC, DirectXTK12, WinMD, C++/WinRT and the open DirectStorage GDeflate reference (**117 declared libraries / 153 versions; new packages not verified**)
 
@@ -77,7 +77,7 @@ Each news item reports **distinct libraries** (unique logical library IDs) and *
 | 21 Nov | 98 | 134 |
 | 22 Nov, prior completed baseline | 105 | 141 |
 | 22 Nov, after NVIDIA GDeflate source correction | 117 | 153 |
-| 28 Nov, current active XML | 116 | 152 |
+| 28 Nov, current active XML | 117 | 153 |
 
 The first schema-3 version had just one pugiXML entry earlier on 24 August; the end-of-day schema-4 count was two. The feasibility study examined approximately twenty libraries before the initial Admin library catalog was established.
 
