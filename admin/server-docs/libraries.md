@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-**Current library catalog (17 November 2026): 81 distinct libraries and 116 versioned integrations, including retained superseded versions.** Source: `admin/build-libraries.xml` (schema 17). The version totals cover all retained historical versions; a successor is not counted as a new distinct library.
+**Current library catalog (28 November 2026): 116 distinct libraries and 152 versioned integrations, including retained superseded versions.** Source: `admin/build-libraries.xml` (schema 17). The version totals cover all retained historical versions; a successor is not counted as a new distinct library.
 
 The catalog begins with **2 packages on 24 August**, grows to **44 on 25 September**, and reaches **81 distinct library IDs across 116 version records on 17 November**. The original August compiler feasibility study preceded the first two-entry library catalog. Details appear in the [project story](/manual/story.md) and [dated news](/news/).
 
@@ -19,6 +19,27 @@ The catalog lists upstream versions built and managed with C++Builder 13 / BCC64
 Four new versioned integrations are registered in `admin/build-libraries.xml`: [Dear ImGui 1.93.0](/package/imgui/1.93.0/migration) (shared GUI core), [ImPlot 1.1](/package/implot/1.1/migration) (shared plotting extension), [raygui 5.0](/package/raygui/5.0/migration) (header-only / interface extension of raylib 6.2) and [Matplot++ 1.2.2](/package/matplotplusplus/1.2.2/migration) (mathematical plotting).
 
 **Current declared catalog: 85 unique library IDs / 120 versioned library records.** The new packages are **[not verified]** until native BCC64X compilation and consumer smokes complete. Extension relationships and the distinction between `depends-on` and `extends` appear in [the engineering news](/news/2026-11-18/) with two Mermaid graphs. A header-only interface package is installed and smoke-tested without producing a DLL.
+
+## Microsoft graphics, Windows runtime and shader integration: 28 November 2026
+
+The active XML defines **116 distinct library IDs / 152 retained version records**. The previous 17 November and 22 November totals below remain useful historical milestones, not the current top-line inventory. The project operator has reported successful completion on both the developer workstation and the reduced Windows Server 2025; this is operator-reported evidence. A reproducible unchanged second CURRENT run and GPU showcase acceptance are separate claims.
+
+| Managed integration | Version | Primary use | Guide |
+| --- | --- | --- | --- |
+| DirectX-Headers | 1.619.1 | D3D12 and DXCore APIs | [Guide](/package/directx-headers/1.619.1/wrl-compatibility) |
+| Detours | 4.0.1 | Opt-in native interception and diagnostics | [Guide](/package/detours/4.0.1/migration) |
+| DirectXMath | 3.21 | SIMD geometry and matrix mathematics | [Guide](/package/directxmath/3.21/migration) |
+| DirectXMesh | 1.7.2 | Mesh normals, adjacency and optimization | [Guide](/package/directxmesh/1.7.2/migration) |
+| DirectXTex | 2.1.1 | Textures, format conversion and mipmaps | [Guide](/package/directxtex/2.1.1/migration) |
+| WinMD Reader | 0f1eae3b | Windows Runtime metadata | [Guide](/package/winmd/0f1eae3b/migration) |
+| C++/WinRT | 3.0.260818.1 | C++ metadata projections | [Guide](/package/cppwinrt/3.0.260818.1/migration) |
+| DXC | 1.9.2609 | Native HLSL compiler, DXIL and SPIR-V tools | [Guide](/package/dxc/1.9.2609/migration) |
+| DirectXTK12 | 1.6.6 | Direct3D 12 effects, geometry, input and audio | [Guide](/package/directxtk12/1.6.6/migration) |
+| DirectStorage GDeflate reference | 9352da00 | GDeflate codec, **not** the proprietary DirectStorage runtime | [Guide](/package/directstorage-gdeflate/9352da00/migration) |
+| NVIDIA libdeflate GDeflate fork | 1.8-8ba9502f | Native GDeflate codec dependency | [Guide](/package/libdeflate-gdeflate/1.8-8ba9502f/migration) |
+| WIL | 1.0.260126.7 | Native Windows resource and COM lifetime | [Guide](/package/wil/1.0.260126.7/migration) |
+
+The latest versioned inventory and direct dependencies remain authoritative in `admin/build-libraries.xml`. This summary does not replace the category tables below. OpenGL acceleration must be measured using the *actual* Mesa renderer/adapter rather than inferred from library installation. [Engineering retrospective](/news/2026-11-28/) · [Showcases](/showcases/).
 
 ## Libraries by category
 

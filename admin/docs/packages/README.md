@@ -2,7 +2,7 @@
 
 [TOC|Content]
 
-This catalog contains **144 version-specific migration guides** from the public BuildEngine Administration repository. The complete library catalog and configuration are determined by the current `admin/build-libraries.xml`; a documentation page may describe a superseded version or a configuration that has not yet passed native BCC64X builds.
+This catalog contains version-specific migration guides from the public BuildEngine Administration repository. The complete library catalog and configuration are determined by the current `admin/build-libraries.xml`; a documentation page may describe a superseded version or a configuration that has not yet passed native BCC64X builds.
 
 Each versioned guide documents the intended native C++Builder 13/BCC64X build profile, upstream integration, chosen dependencies, CMake or other build settings, patch decisions, installation artifacts, runtime boundaries and consumer evidence. **The contract describes what should happen, not proof that it happened successfully.**
 
@@ -152,3 +152,7 @@ A declared XML setting is not a passing build. A patch is evidence of a delibera
 All public server documentation, package migrations, news items and integration instructions are written in English. Keep original technical flags, path names, symbols and version identifiers unchanged when editing prose.
 
 [Library catalog](/manual/libraries.md) · [Development news](/news/) · [Project story](/manual/story.md)
+
+## Microsoft integration retrospective (28 November 2026)
+
+The latest XML catalog declares 116 distinct library IDs and 152 retained versions. The guides above include the new Microsoft native packages, independent GDeflate fork, and DXC / C++/WinRT portability history. Full developer and reduced Windows Server 2025 completion was **operator-reported**; GPU showcase acceptance is a separate verification activity. [Read the engineering retrospective](/news/2026-11-28/).

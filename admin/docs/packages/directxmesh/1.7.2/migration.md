@@ -23,3 +23,11 @@ The pinned upstream tag contains no packaged Tests/ tree; BUILD_TESTING is left 
 Source pin and extraction, Release/Debug compilation, all selected original targets and features, DLL or interface package export, installed license and header ownership, publisher collision check, security and CycloneDX metadata, and native consumer execution remain **[not verified]**.
 
 [Microsoft integration overview](/manual/libraries.md) · [Development news](/news/2026-11-22/)
+
+## Integration retrospective and showcase contract (28 November 2026)
+
+DirectXMesh is the mesh-processing building block for adjacency, normals, optimization and topology. A geometric before/after visualization should measure mesh invariants and compare actual processed geometry, not imply an automatic GPU gain.
+
+**Operational boundary:** The operator reported that the developer and Windows Server 2025 integration environments now complete their library work. This is an operator-reported outcome, not a newly executed BCC64X build in this documentation update. Shader compilation, graphics-card selection, measured frame rate and future showcase acceptance remain independent checks. Do not replace the managed C++Builder 13 / BCC64X toolchain, change another library's timestamp or disable upstream tests to obtain a visual result.
+
+[Engineering retrospective](/news/2026-11-28/) · [Library catalog](/manual/libraries.md) · [Showcases](/showcases/)

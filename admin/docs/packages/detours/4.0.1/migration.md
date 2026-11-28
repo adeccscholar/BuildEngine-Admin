@@ -41,3 +41,11 @@ After the StrSafe guard fix, the original `modules.cpp` CLR entrypoint returns t
 The original `src/image.cpp` refers to `CImageImportName*` inside `CImageImportFile` before the type is declared. A version-bound patch adds only the forward declaration. Import parsing, PE functionality, the original DLL and the native transaction test remain enabled.
 
 **[not verified]** until Release and Debug builds pass.
+
+## Integration retrospective and showcase contract (28 November 2026)
+
+Detours is a Windows API interception and trampoline library, not a graphics renderer. Showcase value: instrument Win32/D3D12 initialization calls in a separately opted-in diagnostics mode, without changing normal application behaviour.
+
+**Operational boundary:** The operator reported that the developer and Windows Server 2025 integration environments now complete their library work. This is an operator-reported outcome, not a newly executed BCC64X build in this documentation update. Shader compilation, graphics-card selection, measured frame rate and future showcase acceptance remain independent checks. Do not replace the managed C++Builder 13 / BCC64X toolchain, change another library's timestamp or disable upstream tests to obtain a visual result.
+
+[Engineering retrospective](/news/2026-11-28/) · [Library catalog](/manual/libraries.md) · [Showcases](/showcases/)

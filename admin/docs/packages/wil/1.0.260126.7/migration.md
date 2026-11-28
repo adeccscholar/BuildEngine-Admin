@@ -91,3 +91,11 @@ flowchart LR
 - `{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\ThirdPartyNotices.txt`
 
 **Verbindliche Sources:** `admin/build-libraries.xml` for configuration and pins; FSM/build logs for actual execution. [Library catalog](/manual/libraries.md).
+
+## Integration retrospective and showcase contract (28 November 2026)
+
+WIL supplies Windows resource ownership and error-handling infrastructure, including COM lifetime support. It is an implementation-quality dependency for D3D12/WIC resources, not an independent GPU compute engine.
+
+**Operational boundary:** The operator reported that the developer and Windows Server 2025 integration environments now complete their library work. This is an operator-reported outcome, not a newly executed BCC64X build in this documentation update. Shader compilation, graphics-card selection, measured frame rate and future showcase acceptance remain independent checks. Do not replace the managed C++Builder 13 / BCC64X toolchain, change another library's timestamp or disable upstream tests to obtain a visual result.
+
+[Engineering retrospective](/news/2026-11-28/) · [Library catalog](/manual/libraries.md) · [Showcases](/showcases/)

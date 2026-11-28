@@ -29,3 +29,11 @@ The 19:04 UTC development run reached the shared-library link in both variants, 
 ## Consumer smoke include contract (27 November 2026)
 
 The development log BuildLog_20261127_195313_555.zip confirms successful DirectXTK12 Debug/Release compilation, installation, metadata and publication. The package-exported CMake target `Microsoft::DirectXTK12` already includes `include/directxtk12` in its public include directories. The consumer smoke therefore includes `<SpriteBatch.h>` and `<GeometricPrimitive.h>` directly instead of adding another `directxtk12/` path component. No producer, shader, audio or linker changes are required for this fix. The consumer smoke result remains **[not verified]** until the next BCC64X run.
+
+## Integration retrospective and showcase contract (28 November 2026)
+
+The native DirectXTK12 build progressed through managed DXC shader execution, XInput selection, XAudio 2.9 Interlocked LONG compatibility, generation of the XAudio2 system-DLL import library and finally the package consumer include correction. The developer build passed Debug/Release, installation, publish and package smoke; the later operator-reported full integration is distinct from direct showcase GPU validation. DirectXTK12 is intended for true D3D12 rendering rather than an OpenGL wrapper.
+
+**Operational boundary:** The operator reported that the developer and Windows Server 2025 integration environments now complete their library work. This is an operator-reported outcome, not a newly executed BCC64X build in this documentation update. Shader compilation, graphics-card selection, measured frame rate and future showcase acceptance remain independent checks. Do not replace the managed C++Builder 13 / BCC64X toolchain, change another library's timestamp or disable upstream tests to obtain a visual result.
+
+[Engineering retrospective](/news/2026-11-28/) · [Library catalog](/manual/libraries.md) · [Showcases](/showcases/)

@@ -24,3 +24,11 @@ The installed-header consumer uses std::vector<TypeSig> before TypeSig is fully 
 Automatic C++ module scanning is disabled centrally by the BCC64X CMake toolchain (`CMAKE_CXX_SCAN_FOR_MODULES=OFF`) without lowering the C++23 language level.
 
 **[not verified]** until native Release, Debug and consumer tests pass.
+
+## Integration retrospective and showcase contract (28 November 2026)
+
+WinMD Reader is a metadata parsing component supporting native projection generation. Its showcase role is a metadata/ABI explorer with deterministic queries, not a real-time rendering workload.
+
+**Operational boundary:** The operator reported that the developer and Windows Server 2025 integration environments now complete their library work. This is an operator-reported outcome, not a newly executed BCC64X build in this documentation update. Shader compilation, graphics-card selection, measured frame rate and future showcase acceptance remain independent checks. Do not replace the managed C++Builder 13 / BCC64X toolchain, change another library's timestamp or disable upstream tests to obtain a visual result.
+
+[Engineering retrospective](/news/2026-11-28/) · [Library catalog](/manual/libraries.md) · [Showcases](/showcases/)

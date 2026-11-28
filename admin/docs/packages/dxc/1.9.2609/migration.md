@@ -156,3 +156,11 @@ The 24 November 2026 build successfully completed source patching and Debug/Rele
 The source corrections are supplied as `bcc64x-native-dia-source-compat.patch`, applied after the existing native COM query-call patch in the library's source contract. The native helpers are updated at `admin/compat/bcc64x/dxc-native-atl.h`. All ten patch hunks were checked against the complete pinned original source files.
 
 **Acceptance [not verified]:** BCC64X Release/Debug compile and link, COM reference ownership, DIA factory activation, interface round-trips, BSTR/VARIANT memory management and all original tests still require an actual build and runtime verification.
+
+## Integration retrospective and showcase contract (28 November 2026)
+
+DXC is the native HLSL shader compiler and provides DXIL and SPIR-V compilation capabilities according to the managed build contract. The integration required eliminating legacy TAEF/WEX/ATL assumptions in test dependencies, native COM ownership handling, managed SPIR-V packages and runtime preflights. Long Doxygen runs exposed documentation scalability limits. A Shader Laboratory should report compiler identity, shader profile, bytecode diagnostics and real pipeline creation.
+
+**Operational boundary:** The operator reported that the developer and Windows Server 2025 integration environments now complete their library work. This is an operator-reported outcome, not a newly executed BCC64X build in this documentation update. Shader compilation, graphics-card selection, measured frame rate and future showcase acceptance remain independent checks. Do not replace the managed C++Builder 13 / BCC64X toolchain, change another library's timestamp or disable upstream tests to obtain a visual result.
+
+[Engineering retrospective](/news/2026-11-28/) · [Library catalog](/manual/libraries.md) · [Showcases](/showcases/)
