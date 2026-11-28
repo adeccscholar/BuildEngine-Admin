@@ -4689,7 +4689,7 @@
          <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="dxil.dll"/>
       </publish>
    </library>
-<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-28T19:06:00Z">
+<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-28T19:20:00Z">
       <dependency library="directx-headers" version="1.619.1"/>
       <dependency library="dxil-validator" version="1.9.2609"/>
       <dependency library="vulkan-loader" version="1.4.368"/>
