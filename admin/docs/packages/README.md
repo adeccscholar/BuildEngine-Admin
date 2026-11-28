@@ -8,6 +8,8 @@ Each versioned guide documents the intended native C++Builder 13/BCC64X build pr
 
 ## Versioned package guides
 
+- [directx-headers 1.619.1](/package/directx-headers/1.619.1/migration)
+
 - [libdeflate-gdeflate 1.8-8ba9502f](/package/libdeflate-gdeflate/1.8-8ba9502f/migration)
 
 - [winmd 0f1eae3b](/package/winmd/0f1eae3b/migration)

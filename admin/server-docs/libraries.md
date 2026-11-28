@@ -26,7 +26,7 @@ The active XML defines **116 distinct library IDs / 152 retained version records
 
 | Managed integration | Version | Primary use | Guide |
 | --- | --- | --- | --- |
-| DirectX-Headers | 1.619.1 | D3D12 and DXCore APIs | [Guide](/package/directx-headers/1.619.1/wrl-compatibility) |
+| DirectX-Headers | 1.619.1 | D3D12 and DXCore APIs | [Guide](/package/directx-headers/1.619.1/migration) |
 | Detours | 4.0.1 | Opt-in native interception and diagnostics | [Guide](/package/detours/4.0.1/migration) |
 | DirectXMath | 3.21 | SIMD geometry and matrix mathematics | [Guide](/package/directxmath/3.21/migration) |
 | DirectXMesh | 1.7.2 | Mesh normals, adjacency and optimization | [Guide](/package/directxmesh/1.7.2/migration) |
