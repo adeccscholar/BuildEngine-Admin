@@ -4651,8 +4651,47 @@
       <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer"><tree source="include" target="include"/><files source="lib\win64\{Configuration}" target="lib" extensions=".lib"/><files source="bin\win64\{Configuration}" target="bin" extensions=".dll"/><cmake source="lib\win64\{Configuration}\cmake" target="lib\cmake"/></publish>
       <smoke id="consumer" source="smokes\glew\consumer" configuration="Release" cmake="{Tool:cmake}" ninja="{Tool:ninja}" toolchain="{BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake" executable="glew-consumer.exe"><environment name="CB_BCC64X" value="{Tool:bcc64x}"/><environment name="CB_BDS" value="{BDS}"/></smoke>
    </library>
-<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-23T01:12:00Z">
+<library id="dxil-validator" version="1.9.2609" category="graphics" timestamp="2026-11-28T00:00:00Z">
+      <metadata artifactType="shared" name="Microsoft DXIL Validator Runtime"
+         supplier="Microsoft" homepage="https://github.com/microsoft/DirectXShaderCompiler"
+         description="Pinned x64 DXIL shader validator runtime extracted from the official Microsoft DXC v1.9.2609 release. Used by Mesa Gallium D3D12 without requiring an SDK-installed validator."
+         licenseSignal="green">
+         <license name="University of Illinois/NCSA License" file="LICENSE.TXT"/>
+      </metadata>
+      <security>
+         <repository url="https://github.com/microsoft/DirectXShaderCompiler.git" ref="v1.9.2609"/>
+      </security>
+      <source>
+         <download url="https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.9.2609/dxc_2026_09_29.zip"
+            archive="dxc_2026_09_29.zip"
+            sha256="ad31b1fc8443175d204f77a611fdb3ef2ec42759bdc2f1167368de24a4a7e7f1"/>
+         <extract format="zip" root=".">
+            <require path="bin\x64\dxil.dll"/>
+         </extract>
+      </source>
+      <install>
+         <!-- The official signed x64 validator is configuration independent.
+              Install the same verified binary in each managed runtime variant. -->
+         <copy source="{Workspace}\bin\x64\dxil.dll"
+            target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release\dxil.dll"
+            overwrite="true"/>
+         <copy source="{Workspace}\bin\x64\dxil.dll"
+            target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Debug\dxil.dll"
+            overwrite="true"/>
+         <copy source="{BuildFileDir}\licenses\dxil-validator\1.9.2609\LICENSE.TXT"
+            target="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"
+            overwrite="true"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Release\dxil.dll"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\bin\win64\Debug\dxil.dll"/>
+         <require path="{InstallRoot}\packages\{LibraryId}\{LibraryVersion}\LICENSE.TXT"/>
+      </install>
+      <publish root="Win64x" configuration="Release" consumer="{BuildFileDir}\cmake\consumer">
+         <files source="bin\win64\{Configuration}" target="bin" extensions=".dll" names="dxil.dll"/>
+      </publish>
+   </library>
+<library id="opengl" version="26.2.1" category="graphics" timestamp="2026-11-28T00:00:00Z">
       <dependency library="directx-headers" version="1.619.1"/>
+      <dependency library="dxil-validator" version="1.9.2609"/>
       <metadata name="Mesa OpenGL" supplier="Mesa project" homepage="https://mesa3d.org/" description="Mesa-based OpenGL runtime and development package for hardware-accelerated graphics on Windows." licenseSignal="yellow">
          <license name="Mesa component licenses" file="LICENSE-MESA.rst"/>
       </metadata>
