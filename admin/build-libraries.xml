@@ -15397,7 +15397,7 @@
          <argument value="-DMARIADB_LIBRARY:FILEPATH={ConsumerRoot}\lib\libmariadb.lib"/>
       </smoke>
    </library>
-   <library id="vulkan-loader" version="1.4.368" category="graphics" timestamp="2026-11-28T16:50:35Z">
+   <library id="vulkan-loader" version="1.4.368" category="graphics" timestamp="2026-11-28T16:56:33Z">
       <dependency library="vulkan-headers" version="1.4.368"/>
       <metadata artifactType="shared" name="Khronos Vulkan Loader" supplier="Khronos Group"
          homepage="https://github.com/KhronosGroup/Vulkan-Loader"
@@ -15427,9 +15427,11 @@
       <build testsAffectBuild="false">
          <environment name="CB_BCC64X" value="{Tool:bcc64x}"/>
          <environment name="CB_BDS" value="{BDS}"/>
+         <environment name="CB_WINDOWS_RC" value="{Tool:bcc64x-windres}"/>
          <argument value="-G"/><argument value="Ninja"/>
          <argument value="-DCMAKE_TOOLCHAIN_FILE:FILEPATH={BuildFileDir}\cmake\toolchains\bcc64x-buildengine-cxx.cmake"/>
          <argument value="-DCMAKE_MAKE_PROGRAM:FILEPATH={Tool:ninja}"/>
+         <argument value="-DCMAKE_RC_COMPILER:FILEPATH={Tool:bcc64x-windres}"/>
          <argument value="-DCMAKE_INSTALL_PREFIX:PATH={InstallRoot}\packages\{LibraryId}\{LibraryVersion}"/>
          <argument value="-DCMAKE_INSTALL_INCLUDEDIR:STRING=include"/>
          <argument value="-DCMAKE_INSTALL_LIBDIR:STRING=lib/win64/{Configuration}"/>
