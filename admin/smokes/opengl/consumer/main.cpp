@@ -99,17 +99,17 @@ int main() {
       HasExport(hOpenGL,"wglCreateContext")&&
       HasExport(hOpenGL,"wglMakeCurrent");
 
-   std::println("SMOKE|CHECK|opengl-package-file|{}",
-      bOpenGLFile?"PASS":"FAIL");
-   std::println("SMOKE|CHECK|gallium-package-file|{}",
-      bGalliumFile?"PASS":"FAIL");
-   std::println("SMOKE|CHECK|opengl-app-local-import|{}",
-      bOpenGLAppLocal?"PASS":"FAIL");
+   std::println("SMOKE|CHECK|opengl-package-file|{}|file={}",
+      bOpenGLFile?"PASS":"FAIL",theOpenGLPath.string());
+   std::println("SMOKE|CHECK|gallium-package-file|{}|file={}",
+      bGalliumFile?"PASS":"FAIL",theGalliumPath.string());
+   std::println("SMOKE|CHECK|opengl-app-local-import|{}|module={}",
+      bOpenGLAppLocal?"PASS":"FAIL",ModulePath(hOpenGL).string());
    std::println("SMOKE|CHECK|gallium-app-local-load|{}|win32_error={}",
       bGalliumAppLocal?"PASS":"FAIL",
       bGalliumAppLocal?0UL:static_cast<unsigned long>(::GetLastError()));
-   std::println("SMOKE|CHECK|opengl-link-and-exports|{}",
-      bImports?"PASS":"FAIL");
+   std::println("SMOKE|CHECK|opengl-link-and-exports|{}|linked={}",
+      bImports?"PASS":"FAIL",uLinkedAddress!=0U?"yes":"no");
    std::println("SMOKE|INFO|gpu-runtime|SKIPPED|"
       "hardware is not required to build or publish Mesa");
 
